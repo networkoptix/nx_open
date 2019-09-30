@@ -11,10 +11,9 @@ class ResourceHelper: public Connective<QObject>, public QnConnectionContextAwar
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
-    Q_PROPERTY(qint64 serverTimeOffset READ serverTimeOffset NOTIFY serverTimeOffsetChanged)
     Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
         NOTIFY defaultCameraPasswordChanged)
     Q_PROPERTY(bool hasOldCameraFirmware READ hasOldCameraFirmware
@@ -24,6 +23,7 @@ class ResourceHelper: public Connective<QObject>, public QnConnectionContextAwar
     Q_PROPERTY(bool isIoModule READ isIoModule NOTIFY isIoModuleChanged)
     Q_PROPERTY(bool hasVideo READ hasVideo NOTIFY hasVideoChanged)
 
+    Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY displayOffsetChanged)
     Q_ENUMS(Qn::ResourceStatus)
 
     using base_type = Connective<QObject>;
@@ -31,8 +31,8 @@ class ResourceHelper: public Connective<QObject>, public QnConnectionContextAwar
 public:
     ResourceHelper(QObject* parent = nullptr);
 
-    QString resourceId() const;
-    void setResourceId(const QString& id);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
 
     Qn::ResourceStatus resourceStatus() const;
     QString resourceName() const;
@@ -43,7 +43,7 @@ public:
     bool isIoModule() const;
     bool hasVideo() const;
 
-    qint64 serverTimeOffset() const;
+    qint64 displayOffset() const;
 
 signals:
     void resourceIdChanged();
@@ -51,10 +51,10 @@ signals:
     void resourceNameChanged();
     void defaultCameraPasswordChanged();
     void oldCameraFirmwareChanged();
-    void serverTimeOffsetChanged();
     void audioSupportedChanged();
     void isIoModuleChanged();
     void hasVideoChanged();
+    void displayOffsetChanged();
 
 private:
     bool hasCameraCapability(Qn::CameraCapability capability) const;

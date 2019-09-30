@@ -61,6 +61,9 @@ QString pluginError(PluginInfo::Error errorCode)
         case PluginInfo::Error::unsupportedVersion:
             return ServerSettingsDialogStore::tr("plugin API version is no longer supported");
 
+        case PluginInfo::Error::internalError:
+            return ServerSettingsDialogStore::tr("internal error");
+            
         default:
             return ServerSettingsDialogStore::tr("unknown error");
     }

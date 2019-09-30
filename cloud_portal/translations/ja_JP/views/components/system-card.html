@@ -1,15 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">ご利用のシステム</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">システム名を変更</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">別のシステムと統合する</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">別のシステムと統合する</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()"><span class="product-name">&nbsp;%PRODUCT_NAME%</span> から切断</button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -35,23 +37,29 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
             がこのシステムに統合されています</div>
-        <hr />
-        <div class="merge-info-text">データベースのサイズに応じて、数時間かかる場合があります</div>
+            <hr />
+            <div class="merge-info-text light-text">データベースのサイズに応じて、数時間かかる場合があります</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">システム統合が完了しました</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>このシステムは次のシステムに統合されています
+        <div ng-if="mergeTargetSystem.name">
+            <div>このシステムは次のシステムに統合されています
             <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>データベースのサイズに応じて、数時間かかる場合があります.</p>
-            <p>システムにログインして映像を表示する事はできますが、統合が完了するまで設定を変更することはできません</p>
-            <p>統合が終了すると、すべてのユーザーおよびカメラ がシステム「<span class="merge-system-name">{{mergeTargetSystem.name}}</span>」で利用できるようになります</p>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>データベースのサイズに応じて、数時間かかる場合があります.</p>
+                <p>システムにログインして映像を表示する事はできますが、統合が完了するまで設定を変更することはできません</p>
+                <p>統合が終了すると、すべてのユーザーとカメラがシステム「<strong>{{mergeTargetSystem.name}}</strong>」で利用できるようになり、このシステムは削除されます。</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">システム統合が完了しました</div>
     </div>
 </div>

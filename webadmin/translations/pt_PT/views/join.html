@@ -10,7 +10,7 @@
                 <label for="otherSystemUrl" class="control-label">Outro URL do sistema</label>
                 <div class="">
                     <div class="input-group" uib-dropdown>
-                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host: porta" required />
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:porta" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Nenhum sistema encontrado</a></li>
@@ -33,7 +33,7 @@
                 <label for="otherSystemLogin" class="control-label">Outro login do Sistema</label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
-                           placeholder="Login" required>
+                           placeholder="Entrar" required>
                 </div>
             </div>
 

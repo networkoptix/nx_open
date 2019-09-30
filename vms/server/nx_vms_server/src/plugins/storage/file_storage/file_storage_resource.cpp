@@ -16,6 +16,8 @@
 #include <media_server/media_server_module.h>
 #include <nx/system_commands.h>
 #include <nx/vms/server/root_fs.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -53,12 +55,6 @@
     const QString QnFileStorageResource::TO_SEP = lit("\\");
 #endif
 
-#ifdef __APPLE__
-static const auto MS_NODEV = MNT_NODEV;
-static const auto MS_NOSUID = MNT_NOSUID;
-static const auto MS_NOEXEC = MNT_NOEXEC;
-#endif
-
 
 namespace {
 
@@ -88,7 +84,7 @@ static QString sysDrivePath(QnMediaServerModule* /*serverModule*/)
     return deviceString;
 }
 
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 
 static QString getDevicePath(QnMediaServerModule* serverModule, const QString& path)
 {
@@ -112,6 +108,14 @@ static const QString& sysDrivePath()
 QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
 {
     return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
+}
+
+static void toggleFlag(int& flags, int value, bool on)
+{
+    if (on)
+        flags |= value;
+    else
+        flags &= ~value;
 }
 
 } // namespace <anonymous>
@@ -139,6 +143,7 @@ QIODevice* QnFileStorageResource::open(
         m_serverModule->settings().maxFfmpegBufferSize();
 
     int systemFlags = 0;
+    Q_UNUSED(systemFlags);
     if (openMode & QIODevice::WriteOnly)
     {
         ioBlockSize = m_serverModule->settings().ioBlockSize();
@@ -150,7 +155,7 @@ QIODevice* QnFileStorageResource::open(
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (m_serverModule->settings().disableDirectIO())
+        else if (!m_serverModule->settings().disableDirectIO())
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -194,8 +199,6 @@ QIODevice* QnFileStorageResource::open(
 
     return result;
 #endif
-
-    return nullptr;
 }
 
 nx::vms::server::RootFileSystem* QnFileStorageResource::rootTool() const
@@ -210,10 +213,11 @@ void QnFileStorageResource::setLocalPathSafe(const QString &path)
 }
 
 
-QString QnFileStorageResource::getLocalPathSafe() const
+QString QnFileStorageResource::localPath() const
 {
+    const QString resourcePath = getPath();
     QnMutexLocker lk(&m_mutex);
-    return m_localPath;
+    return m_localPath.isEmpty() ? resourcePath : m_localPath;
 }
 
 QString QnFileStorageResource::getPath() const
@@ -335,72 +339,34 @@ bool QnFileStorageResource::isSystem() const
     return m_isSystem;
 }
 
-bool QnFileStorageResource::checkWriteCap() const
+bool QnFileStorageResource::readyForSqlDB() const
 {
     if (!m_valid)
         return false;
 
-    QnMutexLocker lock(&m_writeTestMutex);
-    if (!m_writeCapCached.is_initialized())
-        m_writeCapCached = testWriteCapInternal();
-    return *m_writeCapCached;
-}
-
-bool QnFileStorageResource::checkDBCap() const
-{
-    if (!m_valid)
-        return false;
 #ifdef _WIN32
     return true;
 #else
-    // if storage is mounted via mediaserver (smb://...)
-    // let's not create media DB there
-    if (!getLocalPathSafe().isEmpty())
-        return false;
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (m_dbReady.is_initialized())
-            return *m_dbReady;
-    }
-
-    // Same for mounted by hand remote storages (NAS)
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         m_serverModule->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::NetworkPartition );
+            QnPlatformMonitor::NetworkPartition);
 
-    bool dbReady = true;
+    const auto storagePath = localPath();
     for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
     {
-        if(getPath().startsWith(partition.path))
-            dbReady = false;
+        if(storagePath.startsWith(partition.path))
+            return false;
     }
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_dbReady = dbReady;
-        return dbReady;
-    }
-#endif
+    return true;
+#endif    
 }
 
 int QnFileStorageResource::getCapabilities() const
 {
-    if (!m_valid)
-        return 0;
-
-    if (checkDBCap())
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_capabilities |= QnAbstractStorageResource::cap::DBReady;
-    }
-
-    int writeCap = checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0;
-    {
-        QnMutexLocker lk(&m_mutex);
-        return m_capabilities | writeCap;
-    }
-    return 0;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_capabilities;
 }
 
 QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
@@ -632,15 +598,13 @@ QnFileStorageResource::~QnFileStorageResource()
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
-#if __linux__
+#ifdef Q_OS_UNIX
         auto result = rootTool()->unmount(m_localPath);
         NX_VERBOSE(
             this,
             lm("[mount] unmounting folder %1 while destructing object result: %2")
                 .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
-#elif __APPLE__
-        unmount(m_localPath.toLatin1().constData(), 0);
-#endif
+#endif // Q_OS_UNIX
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
@@ -702,13 +666,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    QString localPathCopy = getLocalPathSafe();
-
-    if (!m_valid)
-        return QnStorageResource::kUnknownSize;
-
-    QString path = localPathCopy.isEmpty() ?  getPath() : localPathCopy;
-    return rootTool()->freeSpace(path);
+    return m_valid ? rootTool()->freeSpace(localPath()) : QnStorageResource::kUnknownSize;
 }
 
 qint64 QnFileStorageResource::getTotalSpace() const
@@ -731,33 +689,30 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
     if (!m_valid)
         return QnAbstractStorageResource::FileInfoList();
 
-    QnAbstractStorageResource::FileInfoList ret;
-
     QString path = translateUrlToLocal(dirName);
     QDir dir(path);
     if (!dir.exists())
     {
-#if defined (Q_OS_UNIX)
-        return rootTool()->fileList(path);
-#endif
-        return ret;
+        #if defined (Q_OS_UNIX)
+            return rootTool()->fileList(path);
+        #else
+            return QnAbstractStorageResource::FileInfoList();
+        #endif
     }
 
     QFileInfoList localList = dir.entryInfoList(
-        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-        QDir::DirsFirst
-    );
+        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, QDir::DirsFirst);
 
+    QnAbstractStorageResource::FileInfoList result;
+    std::transform(
+        localList.cbegin(), localList.cend(), std::back_inserter(result),
+        [this](const QFileInfo& fi)
+        {
+            return QnAbstractStorageResource::FileInfo(
+                translateUrlToRemote(fi.absoluteFilePath()), fi.size(), fi.isDir());
+        });
 
-    for (const QFileInfo &entry : localList)
-    {
-        ret.append(
-            QnAbstractStorageResource::FileInfo(
-                translateUrlToRemote(entry.absoluteFilePath()),
-                entry.size(),
-                entry.isDir()));
-    }
-    return ret;
+    return result;
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
@@ -794,13 +749,27 @@ bool QnFileStorageResource::testWriteCapInternal() const
     return false;
 }
 
+void QnFileStorageResource::updateCapabilities()
+{
+    const bool dbReady = readyForSqlDB();
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    toggleFlag(m_capabilities, QnAbstractStorageResource::cap::DBReady, dbReady);
+    toggleFlag(
+        m_capabilities, QnAbstractStorageResource::cap::WriteFile,
+        m_writeCapCached ? *m_writeCapCached : 0);
+}
+
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
     NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
 
+    const auto scopeGuard = nx::utils::makeScopeGuard([this](){ updateCapabilities(); });
+
     if (!isMounted())
     {
-        NX_VERBOSE(this, "[initOrUpdate] storage %1 is not mounted", nx::utils::url::hidePassword(getUrl()));
+        NX_VERBOSE(
+            this, "[initOrUpdate] storage %1 is not mounted",
+            nx::utils::url::hidePassword(getUrl()));
         return Qn::StorageInitResult::StorageInit_CreateFailed;
     }
 
@@ -833,9 +802,8 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
         m_valid = false;
         return Qn::StorageInit_WrongPath;
     }
-    QString localPath = getLocalPathSafe();
-    QString path = localPath.isEmpty() ? getPath() : localPath;
-    m_cachedTotalSpace = rootTool()->totalSpace(path); // update cached value periodically
+
+    m_cachedTotalSpace = rootTool()->totalSpace(localPath()); // update cached value periodically
     NX_VERBOSE(
         this,
         "initOrUpdate successfully completed for %1", nx::utils::url::hidePassword(getUrl()));
@@ -872,8 +840,6 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
             return baseSpaceLimit;
         return qMin(maxSpaceLimit, qMax(m_cachedTotalSpace / kMaxSpaceLimitRatio, baseSpaceLimit));
     }
-
-    return baseSpaceLimit;
 }
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype) const
@@ -923,93 +889,23 @@ bool QnFileStorageResource::isMounted() const
     return m_isMounted;
 }
 
-float QnFileStorageResource::getAvarageWritingUsage() const
+float QnFileStorageResource::getAverageWritingUsage() const
 {
     QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
-    return writer ? writer->getAvarageUsage() : 0;
+    return writer ? writer->getAverageUsage() : 0;
 }
-
-#ifdef _WIN32
-bool QnFileStorageResource::isStorageDirMounted() const
-{
-    return true;    //common check is enough on mswin
-}
-
-#else
-
-//!Reads mount points (local dirs) from /etc/fstab or /etc/mtab
-static bool readTabFile( const QString& filePath, QStringList* const mountPoints )
-{
-    FILE* tabFile = fopen( filePath.toLocal8Bit().constData(), "r" );
-    if( !tabFile )
-        return false;
-
-    char* line = nullptr;
-    size_t length = 0;
-    while( !feof(tabFile) )
-    {
-        if( getline( &line, &length, tabFile ) == -1 )
-            break;
-
-        if( length == 0 || line[0] == '#' )
-            continue;
-
-        //TODO #ak regex is actually not needed here, removing it will remove memcpy by QString also
-        const QStringList& fields = QString::fromLatin1(line, length).split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
-        if( fields.size() >= 2 )
-            mountPoints->push_back( fields[1] );
-    }
-
-    free( line );
-    fclose( tabFile );
-
-    return true;
-}
-
-namespace {
-bool findPathInTabFile(const QString& path, const QString& tabFilePath, QString* outMountPoint, bool exact)
-{
-    QStringList mountPoints;
-
-    if(!readTabFile(tabFilePath, &mountPoints))
-    {
-        NX_WARNING(typeid(QnFileStorageResource), lit("Could not read %1 file while checking storage %2 availability")
-                .arg(tabFilePath)
-                .arg(path));
-        return false;
-    }
-
-    const QString notResolvedStoragePath = closeDirPath(path);
-    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
-
-    for(const QString& mountPoint: mountPoints )
-    {
-        const QString& mountPointCanonical = QDir(closeDirPath(mountPoint)).canonicalPath();
-        if((!exact && storagePath.startsWith(mountPointCanonical)) || (exact && storagePath == mountPointCanonical))
-        {
-            *outMountPoint = mountPointCanonical;
-            return true;
-        }
-    }
-
-    return false;
-}
-} // namespace <anonymous>
 
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    QString mountPoint;
-    const auto localPath = getLocalPathSafe();
-    NX_VERBOSE(this, lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
-            .arg(localPath)
-            .arg(getPath()));
-
-    if (!localPath.isEmpty())
-        return findPathInTabFile(localPath, lit("/proc/mounts"), &mountPoint, true);
-    else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
-        return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
-
-    return findPathInTabFile(getPath(), lit("/etc/mtab"), &mountPoint, false);
+    #if defined(Q_OS_WIN)
+        return true;
+    #else
+        return nx::vms::server::fs::media_paths::isMounted(
+            nx::vms::server::fs::media_paths::FilterConfig::createDefault(
+                m_serverModule->platform(),
+               /*includeNonHdd*/ true,
+               &m_serverModule->settings()),
+            localPath(),
+            [](const QString& path) { return QDir(path).canonicalPath(); });
+    #endif
 }
-#endif    // _WIN32
-

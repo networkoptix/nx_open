@@ -2,11 +2,12 @@ from __future__ import absolute_import
 from celery import shared_task
 from .engines import email_engine
 
-from smtplib import SMTPException, SMTPConnectError, SMTPServerDisconnected
+from smtplib import SMTPException, SMTPServerDisconnected
 from ssl import SSLError
 from celery.exceptions import Ignore
 
 from django.conf import settings
+from django.utils import timezone
 
 from api.models import Account
 from notifications import notifications_api
@@ -23,12 +24,13 @@ class MaxResendException(Exception):
         return "Emails was not sent because it hit max retry limit!!!"
 
 
-def log_error(error, user_email, type, message, lang, customization, queue, attempt):
-    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
+def log_error(error, user_email, msg_type, message, lang, customization, queue, attempt):
+    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\n' \
+                      'Attempt: {}\nCall Stack: {}'\
         .format(error.__class__.__name__,
                 error,
                 user_email,
-                type,
+                msg_type,
                 message,
                 lang,
                 customization,
@@ -77,6 +79,8 @@ def send_email(msg_id, queue="", attempt=1):
                                                        })
         raise Ignore()
     else:
+        message.send_date = timezone.now()
+        message.save()
         return {
             'user_email': message.user_email,
             'type': message.type,
@@ -94,8 +98,6 @@ def send_email(msg_id, queue="", attempt=1):
 def send_to_all_users(notification_id, message, customizations, force=False):
     # if forced and not testing dont apply any filters to send to all users
     users = Account.objects.exclude(activated_date=None, last_login=None).filter(customization__in=customizations)
-    if not force:
-        users = users.filter(subscribe=True)
 
     if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
         users = users.filter(is_superuser=True)
@@ -113,6 +115,6 @@ def test_task(x, y):
     print("x: %i\ty:%i" % (x, y))
     sleep(y * 60)
     print("total: %i" % (x * y))
-    with open('task.log', 'a+') as f:
+    with open('task.log', 'ab+') as f:
         f.write("Task Done: %i * %i = %i" % (x, x, x*y))
     return x * y

@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Unknown error: %1</source>
-      <translation type="unfinished">Unknown error: %1</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก: %1</translation>
     </message>
   </context>
 </TS>

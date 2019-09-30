@@ -10,19 +10,14 @@ namespace nx::analytics {
 using namespace nx::vms::api::analytics;
 
 DescriptorManager::DescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_pluginDescriptorManager(commonModule),
-    m_engineDescriptorManager(commonModule),
-    m_groupDescriptorManager(commonModule),
-    m_eventTypeDescriptorManager(commonModule),
-    m_objectTypeDescriptorManager(commonModule)
+    base_type(commonModule)
 {
 }
 
 void DescriptorManager::updateFromPluginManifest(
     const nx::vms::api::analytics::PluginManifest& manifest)
 {
-    m_pluginDescriptorManager.updateFromPluginManifest(manifest);
+    commonModule()->analyticsPluginDescriptorManager()->updateFromPluginManifest(manifest);
 
     commit();
 }
@@ -33,12 +28,14 @@ void DescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const nx::vms::api::analytics::EngineManifest& manifest)
 {
-    m_engineDescriptorManager.updateFromEngineManifest(pluginId, engineId, engineName,  manifest);
-    m_groupDescriptorManager.updateFromEngineManifest(pluginId, engineId, engineName, manifest);
-
-    m_eventTypeDescriptorManager.updateFromEngineManifest(
+    commonModule()->analyticsEngineDescriptorManager()->updateFromEngineManifest(
+        pluginId, engineId, engineName,  manifest);
+    commonModule()->analyticsGroupDescriptorManager()->updateFromEngineManifest(
         pluginId, engineId, engineName, manifest);
-    m_objectTypeDescriptorManager.updateFromEngineManifest(
+
+    commonModule()->analyticsEventTypeDescriptorManager()->updateFromEngineManifest(
+        pluginId, engineId, engineName, manifest);
+    commonModule()->analyticsObjectTypeDescriptorManager()->updateFromEngineManifest(
         pluginId, engineId, engineName, manifest);
 
     commit();
@@ -49,9 +46,12 @@ void DescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
-    m_groupDescriptorManager.updateFromDeviceAgentManifest(deviceId, engineId, manifest);
-    m_eventTypeDescriptorManager.updateFromDeviceAgentManifest(deviceId, engineId, manifest);
-    m_objectTypeDescriptorManager.updateFromDeviceAgentManifest(deviceId, engineId, manifest);
+    commonModule()->analyticsGroupDescriptorManager()->updateFromDeviceAgentManifest(
+        deviceId, engineId, manifest);
+    commonModule()->analyticsEventTypeDescriptorManager()->updateFromDeviceAgentManifest(
+        deviceId, engineId, manifest);
+    commonModule()->analyticsObjectTypeDescriptorManager()->updateFromDeviceAgentManifest(
+        deviceId, engineId, manifest);
 
     commit();
 }

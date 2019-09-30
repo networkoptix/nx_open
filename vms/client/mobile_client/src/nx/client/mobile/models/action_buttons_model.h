@@ -22,7 +22,7 @@ class ActionButtonsModel: public Connective<QAbstractListModel>
     Q_OBJECT
     using base_type = Connective<QAbstractListModel>;
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
     enum ButtonType
@@ -40,8 +40,8 @@ public:
 
     static void registerQmlType();
 
-    void setResourceId(const QString& resourceId);
-    QString resourceId() const;
+    void setResourceId(const QnUuid& resourceId);
+    QnUuid resourceId() const;
 
     Q_INVOKABLE int rowById(const QnUuid& id) const;
 
@@ -71,10 +71,6 @@ private:
     void removeButton(int index);
 
     bool ptzButtonVisible() const;
-
-    ButtonList::const_iterator lowerBoundByTriggerButtonId(const QnUuid& ruleId) const;
-
-    int triggerButtonInsertionIndexById(const QnUuid& id) const;
 
     void addSoftwareTriggerButton(
         const QnUuid& id,

@@ -43,7 +43,7 @@ QnAviResource::QnAviResource(const QString& file, QnCommonModule* commonModule)
         m_imageAspectRatio = getAspectRatioFromImage(file);
     }
     m_timeZoneOffset = Qn::InvalidUtcOffset;
-    setId(guidFromArbitraryData(getUniqueId().toUtf8()));
+    setIdUnsafe(guidFromArbitraryData(getUniqueId().toUtf8()));
 }
 
 QnAviResource::~QnAviResource()

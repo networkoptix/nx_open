@@ -27,6 +27,7 @@ class BasicAction;
 
 class ActionBuilder;
 class EventFilter;
+class Plugin;
 class Rule;
 
 namespace api = ::nx::vms::api::rules;
@@ -80,13 +81,20 @@ private: //< ?
         QObject* executor);
 
     Rule* buildRule(const api::Rule& serialized) const;
+    api::Rule serialize(const Rule* rule) const;
 
 private:
     EventFilter* buildEventFilter(const api::EventFilter& serialized) const;
+    api::EventFilter serialize(const EventFilter* filter) const;
+
     ActionBuilder* buildActionBuilder(const api::ActionBuilder& serialized) const;
+    api::ActionBuilder serialize(const ActionBuilder *builder) const;
 
     EventField* buildEventField(const api::Field& serialized) const;
+    //api::Field serialize(const EventField* field) const;
+
     ActionField* buildActionField(const api::Field& serialized) const;
+    //api::Field serialize(const ActionField* field) const;
 
 private:
     void processEvent(const EventPtr& event);

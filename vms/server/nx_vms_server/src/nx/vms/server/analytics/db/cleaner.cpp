@@ -21,16 +21,10 @@ Cleaner::Cleaner(
 
 Cleaner::Result Cleaner::clean(nx::sql::QueryContext* queryContext)
 {
-    if (!kLookupObjectsInAnalyticsArchive)
-    {
-        if (cleanObjectSearch(queryContext) >= kRecordsToRemoveAtATime)
-            return Result::incomplete;
-    }
-
-    if (cleanObjectSearchToObject(queryContext) >= kRecordsToRemoveAtATime)
+    if (cleanTrackGroupToTrack(queryContext) >= kRecordsToRemoveAtATime)
         return Result::incomplete;
 
-    if (cleanObject(queryContext) >= kRecordsToRemoveAtATime)
+    if (cleanTrack(queryContext) >= kRecordsToRemoveAtATime)
         return Result::incomplete;
 
     // Cleaning unused unique_attributes and text index.
@@ -40,17 +34,16 @@ Cleaner::Result Cleaner::clean(nx::sql::QueryContext* queryContext)
     return Result::done;
 }
 
-int Cleaner::cleanObjectSearch(nx::sql::QueryContext* queryContext)
+int Cleaner::cleanTrackGroupToTrack(nx::sql::QueryContext* queryContext)
 {
     if (m_deviceId == -1)
     {
         return executeObjectDataCleanUpQuery(
             queryContext,
             R"sql(
-            DELETE FROM object_search WHERE id IN
-                (SELECT id FROM object_search WHERE object_group_id IN
-	                (SELECT DISTINCT group_id FROM object_group WHERE object_id IN
-		                (SELECT id FROM object WHERE track_start_ms<?))
+            DELETE FROM track_group WHERE rowid IN
+                (SELECT rowid FROM track_group WHERE track_id IN
+                    (SELECT id FROM track WHERE track_start_ms<?)
                 LIMIT ?)
         )sql");
     }
@@ -58,55 +51,30 @@ int Cleaner::cleanObjectSearch(nx::sql::QueryContext* queryContext)
     return executeObjectDataCleanUpQuery(
         queryContext,
         R"sql(
-            DELETE FROM object_search WHERE id IN
-                (SELECT id FROM object_search WHERE object_group_id IN
-	                (SELECT DISTINCT group_id FROM object_group WHERE object_id IN
-		                (SELECT id FROM object WHERE device_id=? AND track_start_ms<?))
+            DELETE FROM track_group WHERE rowid IN
+                (SELECT rowid FROM track_group WHERE track_id IN
+                    (SELECT id FROM track WHERE device_id=? AND track_start_ms<?)
                 LIMIT ?)
         )sql");
 }
 
-int Cleaner::cleanObjectSearchToObject(nx::sql::QueryContext* queryContext)
+int Cleaner::cleanTrack(nx::sql::QueryContext* queryContext)
 {
     if (m_deviceId == -1)
     {
         return executeObjectDataCleanUpQuery(
             queryContext,
             R"sql(
-            DELETE FROM object_group WHERE rowid IN
-                (SELECT rowid FROM object_group WHERE object_id IN
-                    (SELECT id FROM object WHERE track_start_ms<?)
-                LIMIT ?)
+            DELETE FROM track WHERE id IN
+                (SELECT id FROM track WHERE track_start_ms<? LIMIT ?)
         )sql");
     }
 
     return executeObjectDataCleanUpQuery(
         queryContext,
         R"sql(
-            DELETE FROM object_group WHERE rowid IN
-                (SELECT rowid FROM object_group WHERE object_id IN
-                    (SELECT id FROM object WHERE device_id=? AND track_start_ms<?)
-                LIMIT ?)
-        )sql");
-}
-
-int Cleaner::cleanObject(nx::sql::QueryContext* queryContext)
-{
-    if (m_deviceId == -1)
-    {
-        return executeObjectDataCleanUpQuery(
-            queryContext,
-            R"sql(
-            DELETE FROM object WHERE id IN
-                (SELECT id FROM object WHERE track_start_ms<? LIMIT ?)
-        )sql");
-    }
-
-    return executeObjectDataCleanUpQuery(
-        queryContext,
-        R"sql(
-            DELETE FROM object WHERE id IN
-                (SELECT id FROM object WHERE device_id=? AND track_start_ms<? LIMIT ?)
+            DELETE FROM track WHERE id IN
+                (SELECT id FROM track WHERE device_id=? AND track_start_ms<? LIMIT ?)
         )sql");
 }
 
@@ -133,8 +101,8 @@ int Cleaner::cleanAttributesTextIndex(nx::sql::QueryContext* queryContext)
     query->prepare(R"sql(
         DELETE FROM attributes_text_index WHERE docid IN(
             SELECT attrs.id
-            FROM unique_attributes attrs LEFT JOIN object o ON attrs.id = o.attributes_id
-            WHERE o.id IS NULL
+            FROM unique_attributes attrs LEFT JOIN track t ON attrs.id = t.attributes_id
+            WHERE t.id IS NULL
             LIMIT ?)
     )sql");
 
@@ -144,8 +112,8 @@ int Cleaner::cleanAttributesTextIndex(nx::sql::QueryContext* queryContext)
     query->prepare(R"sql(
         DELETE FROM unique_attributes WHERE id IN(
             SELECT attrs.id
-            FROM unique_attributes attrs LEFT JOIN object o ON attrs.id = o.attributes_id
-            WHERE o.id IS NULL
+            FROM unique_attributes attrs LEFT JOIN track t ON attrs.id = t.attributes_id
+            WHERE t.id IS NULL
             LIMIT ?)
     )sql");
 

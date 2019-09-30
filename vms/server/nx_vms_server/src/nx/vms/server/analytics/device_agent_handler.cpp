@@ -3,7 +3,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 
-#include <nx/vms/event/events/plugin_event.h>
+#include <nx/vms/event/events/plugin_diagnostic_event.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
 
@@ -25,13 +25,12 @@ DeviceAgentHandler::DeviceAgentHandler(
     m_device(std::move(device)),
     m_metadataHandler(serverModule, m_device, m_engineResourceId)
 {
-    connect(this, &DeviceAgentHandler::pluginEventTriggered,
-        serverModule->eventConnector(), &event::EventConnector::at_pluginEvent,
+    connect(this, &DeviceAgentHandler::pluginDiagnosticEventTriggered,
+        serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
         Qt::QueuedConnection);
 
-    nx::analytics::EventTypeDescriptorManager descriptorManager(serverModule->commonModule());
-    m_metadataHandler.setEventTypeDescriptors(
-        descriptorManager.supportedEventTypeDescriptors(m_device));
+    m_metadataHandler.setEventTypeDescriptors(serverModule->commonModule()
+        ->analyticsEventTypeDescriptorManager()->supportedEventTypeDescriptors(m_device));
 }
 
 void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)
@@ -39,18 +38,20 @@ void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* met
     m_metadataHandler.handleMetadata(metadataPacket);
 }
 
-void DeviceAgentHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent)
+void DeviceAgentHandler::handlePluginDiagnosticEvent(
+    nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent)
 {
-    nx::vms::event::PluginEventPtr pluginEvent(
-        new nx::vms::event::PluginEvent(
+    nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+        new nx::vms::event::PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             m_engineResourceId,
-            sdkPluginEvent->caption(),
-            sdkPluginEvent->description(),
-            nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),
+            sdkPluginDiagnosticEvent->caption(),
+            sdkPluginDiagnosticEvent->description(),
+            nx::vms::server::sdk_support::fromPluginDiagnosticEventLevel(
+                sdkPluginDiagnosticEvent->level()),
             m_device));
 
-    emit pluginEventTriggered(pluginEvent);
+    emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
 }
 
 void DeviceAgentHandler::setMetadataSink(QnAbstractDataReceptor* metadataSink)

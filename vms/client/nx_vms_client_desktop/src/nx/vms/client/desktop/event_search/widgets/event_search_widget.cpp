@@ -1,6 +1,7 @@
 #include "event_search_widget.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
@@ -17,14 +18,18 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
+
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
+
+using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
@@ -33,6 +38,7 @@ namespace nx::vms::client::desktop {
 
 class EventSearchWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(EventSearchWidget::Private)
     EventSearchWidget* const q;
     SelectableTextButton* const m_typeSelectionButton;
     EventSearchListModel* const m_eventModel;
@@ -81,30 +87,25 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     setupTypeSelection();
 
-    // Update analytics events submenu when servers are added to or removed from the system.
-    const auto handleServerChanges =
-        [this](const QnResourcePtr& resource)
+    auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
+        [this]
         {
-            if (!m_eventModel->isOnline())
-                return;
-
-            const auto flags = resource->flags();
-            if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+            if (m_eventModel->isOnline())
                 updateAnalyticsMenu();
-        };
+        },
+        100ms,
+        this);
+    updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerChanges);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerChanges);
+    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
-    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, this,
-        [this](bool isOnline)
-        {
-            if (isOnline)
-                updateAnalyticsMenu();
-        });
-
-    if (m_eventModel->isOnline())
-        updateAnalyticsMenu();
+    connect(q->commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
     // Disable server event selection when selected cameras differ from "Any camera".
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
@@ -239,90 +240,70 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     NX_ASSERT(m_analyticsEventsSubmenuAction && m_analyticsEventsSingleAction);
 
     auto analyticsMenu = m_analyticsEventsSubmenuAction->menu();
-    NX_ASSERT(analyticsMenu);
 
     const QString currentSelection = m_eventModel->selectedSubType();
     bool currentSelectionStillAvailable = false;
 
-    if (analyticsMenu)
-    {
-        using namespace nx::vms::event;
-
-        nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(q->commonModule());
-        nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
-        const auto eventTypeDescriptors = eventTypeDescriptorManager.descriptors();
-        const auto engineDescriptors = engineDescriptorManager.descriptors();
-
-        WidgetUtils::clearMenu(analyticsMenu);
-
-        QSet<QnUuid> enabledEngines;
-        const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
-        for (const auto& camera: cameras)
-            enabledEngines += camera->enabledAnalyticsEngines();
-
-        if (!eventTypeDescriptors.empty())
+    auto addItemRecursive = nx::utils::y_combinator(
+        [this, currentSelection, &currentSelectionStillAvailable]
+        (auto addItemRecursive, auto parent, auto root) -> void
         {
-            addMenuAction(analyticsMenu, tr("Any analytics event"),
-                EventType::analyticsSdkEvent, {});
+            using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
 
-            analyticsMenu->addSeparator();
-
-            QHash<QnUuid, EngineInfo> engineById;
-            for (const auto& [engineId, engineDescriptor]: engineDescriptors)
+            for (auto node: root->children)
             {
-                if (enabledEngines.contains(engineId))
-                    engineById[engineId].name = engineDescriptor.name;
-            }
-
-            for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
-            {
-                if (eventTypeDescriptor.isHidden())
-                    continue;
-
-                for (const auto& scope: eventTypeDescriptor.scopes)
+                // Leaf node - event type.
+                if (node->nodeType == NodeType::eventType)
                 {
-                    if (enabledEngines.contains(scope.engineId))
-                    {
-                        engineById[scope.engineId].eventTypes
-                            .emplace(eventTypeId, eventTypeDescriptor);
-                    }
-                }
-            }
-
-            QList<EngineInfo> engines;
-            for (const auto& engineInfo: engineById)
-                engines.push_back(engineInfo);
-
-            std::sort(engines.begin(), engines.end());
-            const bool multipleEnginesArePresent = engines.size() > 1;
-
-            QMenu* currentMenu = analyticsMenu;
-            for (const auto& engine: engines)
-            {
-                if (multipleEnginesArePresent)
-                {
-                    const auto engineName = engine.name.isEmpty()
-                        ? QString("<%1>").arg(tr("unnamed analytics engine"))
-                        : engine.name;
-
-                    currentMenu->setWindowFlags(
-                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-                    currentMenu = analyticsMenu->addMenu(engineName);
-                }
-
-                for (const auto& [eventTypeId, eventTypeDescriptor]: engine.eventTypes)
-                {
-                    addMenuAction(currentMenu,
-                        eventTypeDescriptor.name,
-                        EventType::analyticsSdkEvent, eventTypeDescriptor.id);
+                    addMenuAction(parent, node->text, EventType::analyticsSdkEvent,
+                        node->entityId);
 
                     if (!currentSelectionStillAvailable
-                        && currentSelection == eventTypeDescriptor.getId())
+                        && currentSelection == node->entityId)
                     {
                         currentSelectionStillAvailable = true;
                     }
                 }
+                else
+                {
+                    NX_ASSERT(!node->children.empty());
+                    auto menu = parent->addMenu(node->text);
+                    q->fixMenuFlags(menu);
+
+                    // TODO: Implement search by the analytics events groups: VMS-14877.
+                    // if (child->nodeType == NodeType::group)
+                    // {
+                    //     addMenuAction(menu, child->name, EventType::analyticsSdkEvent,
+                    //         groupId);
+                    //     menu->addSeparator();
+                    //  }
+
+                    addItemRecursive(menu, node);
+                }
             }
+        });
+
+    if (NX_ASSERT(analyticsMenu))
+    {
+        using namespace nx::vms::event;
+
+        auto analyticsEventsSearchTreeBuilder =
+            q->commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+
+        const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+
+        WidgetUtils::clearMenu(analyticsMenu);
+
+        if (!root->children.empty())
+        {
+            addMenuAction(
+                analyticsMenu,
+                tr("Any analytics event"),
+                EventType::analyticsSdkEvent,
+                {});
+
+            analyticsMenu->addSeparator();
+            addItemRecursive(analyticsMenu, root);
         }
     }
 
@@ -331,7 +312,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     m_analyticsEventsSingleAction->setVisible(!hasAnalyticsMenu);
 
     if (!currentSelectionStillAvailable)
-        m_eventModel->setSelectedSubType({});
+        m_typeSelectionButton->deactivate();
 }
 
 // ------------------------------------------------------------------------------------------------

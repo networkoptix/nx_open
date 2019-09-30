@@ -2,31 +2,31 @@
   "activate_account": {
     "emailSubject": "Aktivera ditt konto"
   },
-  "restore_password": {
-    "emailSubject": "Återställ ditt lösenord"
-  },
-  "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} inbjuder till %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Videosystem {{message.system_name}} delades med dig {{/message.sharer_name}}"
-  },
-  "system_shared": {
-    "emailSubject": "Videosystemet {{message.system_name}} delades med dig"
-  },
-  "review_version": {
-    "emailSubject": "Version {{message.id}} är redo att ses över"
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %CLOUD_NAME%"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"
   },
-  "cloud_invite": {
-    "emailSubject": "You have been invited to %PRODUCT_NAME%"
-  },
-  "ipvd_feedback": {
-    "emailSubject": "Camera Page Feedback for {{message.product}}"
-  },
-  "sales_inquiry": {
+  "contact_sales": {
     "emailSubject": "Sales inquiry for {{message.product}}"
   },
-  "support_request": {
+  "contact_support": {
     "emailSubject": "Support request for {{message.product}}"
+  },
+  "ipvd_feedback": {
+    "emailSubject": "Kamerasidor för återkoppling av {{message.product}}"
+  },
+  "review_version": {
+    "emailSubject": "{{message.product_type}}: {{message.product}} has a new version to review"
+  },
+  "restore_password": {
+    "emailSubject": "Återställ ditt lösenord"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %CLOUD_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "Videosystemet {{message.system_name}} delades med dig"
   }
 }

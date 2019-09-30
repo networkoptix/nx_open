@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/types.h>
@@ -780,7 +779,7 @@ TEST_F(Database, handles_removing_non_existent_key)
 
     whenRemoveNonExistentKey();
 
-    thenOperationSucceeded();
+    thenOperationFailed(map::ResultCode::notFound);
 }
 
 TEST_F(Database, fails_to_fetch_non_existent_value)
@@ -1090,6 +1089,184 @@ TEST_F(Database, multiple_nodes_synchronize_remove_operation)
 
     andValueIsNotInDb();
     andValueIsNotInSecondDb();
+}
+
+//-------------------------------------------------------------------------------------------------
+// EmbeddedDatabase
+
+class EmbeddedDatabase:
+    public testing::Test
+{
+protected:
+    void whenStartEmbeddedDatabaseWithCache()
+    {
+        m_nodes.emplace_back(std::make_unique<EmbeddedNodeLauncher>());
+        m_nodes.back()->addArg("-enableCache", "true");
+        ASSERT_TRUE(m_nodes.back()->startAndWaitUntilStarted());
+    }
+
+    void thenEmbeddedDatabaseHasCache()
+    {
+        ASSERT_NE(node(0).database().cache(), nullptr);
+    }
+
+    void givenEmbeddedDatabaseWithCache()
+    {
+        whenStartEmbeddedDatabaseWithCache();
+        thenEmbeddedDatabaseHasCache();
+        insertKeyValuePair("key", "value");
+    }
+
+    void givenEmbeddedDatabaseWithCacheAndData()
+    {
+        givenEmbeddedDatabaseWithCache();
+        insertKeyValuePair("akey", "avalue");
+        insertKeyValuePair("key1", "value1");
+        insertKeyValuePair("kez", "valuez");
+    }
+
+    void whenEmbeddedDatabaseIsRestarted()
+    {
+        ASSERT_TRUE(m_nodes[0]->restart());
+    }
+
+    void whenFetchRangeWithUpperBound()
+    {
+        fetchRange("key", "kez");
+    }
+
+    void whenFetchRangeWithoutUpperBound()
+    {
+        fetchRange("akey");
+    }
+
+    void whenFetchRangeWithPrefix()
+    {
+        fetchRangeWithPrefix("key");
+    }
+
+    void thenFetchRangeFromCacheMatchesAsyncFetchRange()
+    {
+        ASSERT_EQ(m_fetchedRangeAsync, m_fetchedRange);
+    }
+
+    void thenCacheIsReloaded()
+    {
+        auto value = node(0).database().cache()->find("key");
+        ASSERT_NE(std::nullopt, value);
+        ASSERT_EQ("value", *value);
+    }
+
+private:
+    EmbeddedNode& node(int index)
+    {
+        return *m_nodes[index]->moduleInstance();
+    }
+
+    void fetchRange(const std::string& lowerBound, std::string upperBound)
+    {
+        m_fetchedRange = node(0).database().cache()->getRange(lowerBound, upperBound);
+
+        nx::utils::SyncQueue<bool> asyncFetchComplete;
+        node(0).database().database().dataManager().getRange(
+            lowerBound, upperBound,
+            [this, &asyncFetchComplete](ResultCode result, std::map<std::string, std::string> map)
+            {
+                m_fetchedRangeAsync = std::move(map);
+                asyncFetchComplete.push(result == ResultCode::ok);
+            });
+
+        ASSERT_TRUE(asyncFetchComplete.pop());
+    }
+
+    void fetchRange(const std::string& lowerBound)
+    {
+        m_fetchedRange = node(0).database().cache()->getRange(lowerBound);
+
+        nx::utils::SyncQueue<bool> asyncFetchComplete;
+        node(0).database().database().dataManager().getRange(
+            lowerBound,
+            [this, &asyncFetchComplete](ResultCode result, std::map<std::string, std::string> map)
+            {
+                m_fetchedRangeAsync = std::move(map);
+                asyncFetchComplete.push(result == ResultCode::ok);
+            });
+
+        ASSERT_TRUE(asyncFetchComplete.pop());
+    }
+
+    void fetchRangeWithPrefix(const std::string& prefix)
+    {
+        m_fetchedRange = node(0).database().cache()->getRangeWithPrefix(prefix);
+
+        nx::utils::SyncQueue<bool> asyncFetchComplete;
+        node(0).database().database().dataManager().getRangeWithPrefix(
+            prefix,
+            [this, &asyncFetchComplete](ResultCode result, std::map<std::string, std::string> map)
+            {
+                m_fetchedRangeAsync = std::move(map);
+                asyncFetchComplete.push(result == ResultCode::ok);
+            });
+
+        ASSERT_TRUE(asyncFetchComplete.pop());
+    }
+
+    void insertKeyValuePair(
+        const std::string& key,
+        const std::string& value)
+    {
+        nx::utils::SyncQueue<ResultCode>insertComplete;
+
+        // Inserting key value pair to test cache reload after restart
+        node(0).database().database().dataManager().insertOrUpdate(
+            key,
+            value,
+            [&insertComplete](ResultCode resultCode)
+            {
+                insertComplete.push(resultCode);
+            });
+
+        ASSERT_EQ(ResultCode::ok, insertComplete.pop());
+    }
+
+private:
+    std::vector<std::unique_ptr<EmbeddedNodeLauncher>> m_nodes;
+    std::map<std::string, std::string> m_fetchedRange;
+    std::map<std::string, std::string> m_fetchedRangeAsync;
+};
+
+TEST_F(EmbeddedDatabase, cache_is_enabled_through_settings)
+{
+    whenStartEmbeddedDatabaseWithCache();
+    thenEmbeddedDatabaseHasCache();
+}
+
+TEST_F(EmbeddedDatabase, cache_is_reloaded_after_restart)
+{
+    givenEmbeddedDatabaseWithCache();
+    whenEmbeddedDatabaseIsRestarted();
+    thenCacheIsReloaded();
+}
+
+TEST_F(EmbeddedDatabase, cache_get_range_upper_bound_equals_async_get_range_upper_bound)
+{
+    givenEmbeddedDatabaseWithCacheAndData();
+    whenFetchRangeWithUpperBound();
+    thenFetchRangeFromCacheMatchesAsyncFetchRange();
+}
+
+TEST_F(EmbeddedDatabase, cache_get_range_no_upper_bound_equals_async_get_range_no_upper_bound)
+{
+    givenEmbeddedDatabaseWithCacheAndData();
+    whenFetchRangeWithoutUpperBound();
+    thenFetchRangeFromCacheMatchesAsyncFetchRange();
+}
+
+TEST_F(EmbeddedDatabase, cache_get_range_prefix_equals_async_get_range_prefix)
+{
+    givenEmbeddedDatabaseWithCacheAndData();
+    whenFetchRangeWithPrefix();
+    thenFetchRangeFromCacheMatchesAsyncFetchRange();
 }
 
 } // namespace nx::clusterdb::map::test

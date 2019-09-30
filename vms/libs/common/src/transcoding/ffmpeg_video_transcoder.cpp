@@ -244,6 +244,12 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     {
         decodedFrame = CLVideoDecoderOutputPtr(
             decodedFrame->scaled(m_sourceResolution, AV_PIX_FMT_YUV420P));
+
+        if (!decodedFrame)
+        {
+            NX_ERROR(this, "Failed to scale video frame to %1", m_sourceResolution);
+            return 0;
+        }
     }
 
     decodedFrame = processFilterChain(decodedFrame);

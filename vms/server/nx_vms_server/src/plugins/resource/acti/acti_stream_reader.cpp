@@ -80,27 +80,27 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
     QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%2"));
 
-    const int kStreamingMethodTcpOnly = 0;
-    const int kStreamingMethodMulticast = 1;
-    const int kStreamingMethodRtpUdp = 3;
-    const int kStreamingMethodRtpMulticast = 4;
-    const int kStreamingMethodRtpUdpMulticast = 5;
+    [[maybe_unused]] const int kStreamingMethodTcpOnly = 0;
+    [[maybe_unused]] const int kStreamingMethodMulticast = 1;
+    [[maybe_unused]] const int kStreamingMethodRtpUdp = 3;
+    [[maybe_unused]] const int kStreamingMethodRtpMulticast = 4;
+    [[maybe_unused]] const int kStreamingMethodRtpUdpMulticast = 5;
 
     m_multiCodec.setRole(getRole());
     params.fps = m_actiRes->roundFps(params.fps, getRole());
-    int ch = getActiChannelNum();
+    const int ch = getActiChannelNum();
 
-    QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
+    const QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
 
     int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
-    QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
+    const QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
 
-    QString encoderStr = QnActiResource::toActiEncoderString(params.codec);
+    const QString encoderStr = QnActiResource::toActiEncoderString(params.codec);
     if (encoderStr.isEmpty())
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
 
-    auto desiredTransport = m_actiRes->getDesiredTransport();
+    const auto desiredTransport = m_actiRes->getDesiredTransport();
 
     if (isCameraControlRequired)
     {
@@ -143,7 +143,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
 
     // get URL
 
-    QString streamUrl = m_actiRes->getRtspUrl(ch);
+    const QString streamUrl = m_actiRes->getRtspUrl(ch);
 
     NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
         .arg(streamUrl)

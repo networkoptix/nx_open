@@ -1,8 +1,10 @@
 #include "timeline_zoom_level.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/time/formatter.h>
 
-bool QnTimelineZoomLevel::testTick(qint64 tick) const {
+bool QnTimelineZoomLevel::testTick(qint64 tick) const
+{
     if (isMonotonic())
         return tick % interval == 0;
 
@@ -131,22 +133,24 @@ int QnTimelineZoomLevel::tickCount(qint64 start, qint64 end) const {
     return 0;
 }
 
-bool QnTimelineZoomLevel::isMonotonic() const {
+bool QnTimelineZoomLevel::isMonotonic() const
+{
     return type < Days;
 }
 
-
-QString QnTimelineZoomLevel::baseValue(qint64 tick) const {
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
+QString QnTimelineZoomLevel::value(qint64 tick) const
+{
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Milliseconds:
         return dateTime.toString(QStringLiteral("zzz"));
     case Seconds:
         return dateTime.toString(QStringLiteral("s"));
     case Minutes:
-        return dateTime.toString(QStringLiteral("h"));
     case Hours:
-        return dateTime.toString(QStringLiteral("h"));
+        return QString("%1:%2").arg(
+            nx::vms::time::toString(dateTime, nx::vms::time::Format::h),
+            nx::vms::time::toString(dateTime, nx::vms::time::Format::m));
     case Days:
         return dateTime.toString(QStringLiteral("d"));
     case Months:
@@ -157,23 +161,8 @@ QString QnTimelineZoomLevel::baseValue(qint64 tick) const {
     return QString();
 }
 
-QString QnTimelineZoomLevel::subValue(qint64 tick) const {
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
-    switch (type) {
-    case Minutes:
-        return dateTime.toString(QStringLiteral("mm"));
-    case Hours:
-        return dateTime.toString(QStringLiteral("mm"));
-    default:
-        return QString();
-    }
-    return QString();
-}
-
-QString QnTimelineZoomLevel::suffix(qint64 tick) const {
-    if (!suffixOverride.isEmpty())
-        return suffixOverride;
-
+QString QnTimelineZoomLevel::suffix(qint64 tick) const
+{
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Days:
@@ -186,7 +175,7 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
         return QStringLiteral("s");
     case Minutes:
     case Hours:
-        return QStringLiteral(":");
+        return nx::vms::time::toString(dateTime, nx::vms::time::Format::a);
     default:
         return QString();
     }
@@ -202,7 +191,9 @@ QString QnTimelineZoomLevel::longestText() const
             return QStringLiteral("00 s");
         case Minutes:
         case Hours:
-            return QStringLiteral("00:00");
+            return nx::vms::time::is24HoursTimeFormat()
+                ? QStringLiteral("00:00")
+                : QStringLiteral("00:00 MM");
         case Years:
             return QStringLiteral("0000");
         case Days:

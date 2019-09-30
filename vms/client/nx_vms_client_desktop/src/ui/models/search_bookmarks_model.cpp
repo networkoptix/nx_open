@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
@@ -313,9 +313,9 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
     if (role == Qt::DisplayRole)
     {
         if (index.column() == QnSearchBookmarksModel::kStartTime)
-            return datetime::toString(displayTime(bookmark.startTimeMs.count()));
+            return nx::vms::time::toString(displayTime(bookmark.startTimeMs.count()));
         if (index.column() == QnSearchBookmarksModel::kCreationTime)
-            return datetime::toString(displayTime(bookmark.creationTime().count()));
+            return nx::vms::time::toString(displayTime(bookmark.creationTime().count()));
     }
 
     switch(index.column())

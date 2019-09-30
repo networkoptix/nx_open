@@ -624,9 +624,6 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         }
 
         availResolutions = parseResolutionStr(resolutions);
-        int maxSecondaryRes =
-            SECONDARY_STREAM_MAX_RESOLUTION.width()
-            * SECONDARY_STREAM_MAX_RESOLUTION.height();
         m_resolutionList[(int) StreamIndex::secondary] = availResolutions;
     }
 

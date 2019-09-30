@@ -13,12 +13,4 @@ label {
         opacity : .3;
         cursor  : default;
     }
-    
-    &:hover:not([disabled]) {
-        color : $dark1;
-    }
-    
-    &:active:not([disabled]) {
-        color : $dark9 !important;
-    }
 }

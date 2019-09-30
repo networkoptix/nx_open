@@ -1,0 +1,8 @@
+<div [ngSwitch]="value">
+    <div class="icon-positive" [ngClass]="{'justify-content-start' : align}" *ngSwitchCase="true">
+        <div class="float-left">&#9679;</div> <div *ngIf="additional" class="icon-additional">{{additional}}</div>
+    </div>
+    <div class="icon-negative" [ngClass]="{'justify-content-start' : align}" *ngSwitchCase="false">&#9675;</div>
+    <div class="icon-unknown" [ngClass]="{'justify-content-start' : align}" *ngSwitchCase="null">&#63;</div>
+    <div *ngSwitchDefault [innerHTML]="value"></div>
+</div>

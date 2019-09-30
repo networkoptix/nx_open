@@ -5,9 +5,7 @@
 
 #include <QtCore/QString>
 
-#include <nx/utils/std/cppnx.h>
 #include <nx/utils/std/future.h>
-#include <nx/utils/unused.h>
 
 #include <nx/network/http/buffer_source.h>
 
@@ -16,9 +14,11 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <network/tcp_connection_processor.h>
 
@@ -146,6 +146,7 @@ void DeviceAgent::makeDeferredSubscription()
 {
     m_httpClient.reset();
     m_tcpSocket.reset();
+    m_reconnectTimer.cancelSync();
     m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
 }
 
@@ -381,7 +382,7 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     m_buffer.reserve(kBufferCapacity);
 
     // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
-    size_t nonZeroIndex = 0;
+    int nonZeroIndex = 0;
     while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
         ++nonZeroIndex;
 
@@ -391,29 +392,30 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     return request;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
-
-    if (eventTypeIds->count() == 0)
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        stopFetchingMetadata();
-        return Error::noError;
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
     }
 
-    return startFetchingMetadata(metadataTypes);
+    stopFetchingMetadata();
+
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     m_terminated = false;
 
@@ -422,9 +424,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    nx::sdk::Ptr<const IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
-        return Error::unknownError;
+    const auto eventTypeIdList = metadataTypes->eventTypeIds();
+    if (const char* const message = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIdList, message))
+    {
+        return error(ErrorCode::internalError, message);
+    };
 
     for (int i = 0; i < eventTypeIdList->count(); ++i)
     {
@@ -440,23 +445,23 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
     QByteArray eventNames;
     for (const auto& event: m_eventsToCatch)
-    {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
-    }
+
     NX_URL_PRINT << "Server demanded to start fetching event(s): " << eventNames.constData();
 
     NX_URL_PRINT << "Trying to get DW MTT-camera tcp notification server port.";
     if (!m_cameraController.readPortConfiguration())
     {
-        NX_URL_PRINT << "Failed to get DW MTT-camera tcp notification server port.";
-        return Error::networkError;
+        static const char* const kMessage =
+            "Failed to get DW MTT-camera tcp notification server port";
+        NX_URL_PRINT << kMessage;
+        return error(ErrorCode::networkError, kMessage);
     }
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
     makeSubscription();
-
-    return Error::noError;
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -482,19 +487,20 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const IString* DeviceAgent::manifest(Error* /*error*/) const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_cameraManifest);
+    *outResult = new nx::sdk::String(m_cameraManifest);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace dw_mtt

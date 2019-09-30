@@ -262,14 +262,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="watermarkExplanationLabel">
-     <property name="text">
-      <string>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <widget class="QnWordWrappedLabel" name="watermarkExplanationLabel" native="true"/>
    </item>
    <item>
     <widget class="QPushButton" name="watermarkSettingsButton">
@@ -300,6 +293,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::HintButton</class>
    <extends>QWidget</extends>

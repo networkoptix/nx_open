@@ -3,6 +3,8 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/watermark_settings.h>
 
+#include <nx/utils/pending_operation.h>
+
 class QPixmap;
 
 namespace nx::vms::client::desktop {
@@ -34,6 +36,7 @@ private:
     QnWatermarkSettings m_settings;
     QPixmap m_baseImage;
     bool m_lockUpdate = false;
+    nx::utils::PendingOperation m_repaintOperation;
 };
 
 } // namespace nx::vms::client::desktop

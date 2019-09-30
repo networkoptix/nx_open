@@ -8,15 +8,15 @@ GroupBox
 
     leftPadding: 0
     rightPadding: 0
-    topPadding: 36
+    topPadding: 32
     bottomPadding: 20
 
     font.pixelSize: 15
-    font.weight: Font.Medium
+    font.weight: Font.DemiBold
 
     background: Rectangle
     {
-        y: 24
+        y: 19
         width: parent.availableWidth
         height: 1
         color: ColorTheme.colors.dark12

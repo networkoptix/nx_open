@@ -192,6 +192,26 @@ QnMediaResourceWidget* PtzInstrument::target() const
     return m_target.data();
 }
 
+void PtzInstrument::setTarget(QnMediaResourceWidget* target)
+{
+    if (m_target)
+        disconnect(m_target, &QGraphicsWidget::visibleChanged, this, &PtzInstrument::resetIfTargetIsInvisible);
+
+    m_target = target;
+
+    if (m_target)
+        connect(m_target, &QGraphicsWidget::visibleChanged, this, &PtzInstrument::resetIfTargetIsInvisible);
+}
+
+void PtzInstrument::resetIfTargetIsInvisible()
+{
+    if (m_target && m_target->isVisible())
+        return;
+
+    reset();
+    setTarget(nullptr);
+}
+
 PtzManipulatorWidget* PtzInstrument::targetManipulator() const
 {
     return overlayWidget(target())->manipulatorWidget();
@@ -396,7 +416,7 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     }
 
     m_skipNextAction = false;
-    m_target = target;
+    setTarget(target);
 
     return true;
 }

@@ -1,0 +1,6 @@
+Dobrý den, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) poskytla následující zpětnou vazbu pro {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+Kontaktovat uživatele: {{ message.sender_to_be_contacted}}

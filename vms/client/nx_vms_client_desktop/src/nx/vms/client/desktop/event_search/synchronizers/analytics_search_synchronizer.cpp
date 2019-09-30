@@ -63,7 +63,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         {
             updateAreaSelection();
             updateCachedDevices();
-            updateTimelineDisplay();
+            updateWorkbench();
             updateAllMediaResourceWidgetsAnalyticsMode();
         });
 
@@ -77,19 +77,22 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         [this]()
         {
             updateCachedDevices();
-            updateTimelineDisplay();
+            updateWorkbench();
 
             if (m_analyticsSearchWidget->selectedCameras() != AbstractSearchWidget::Cameras::current)
                 setAreaSelectionActive(false);
         });
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::textFilterChanged,
-        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+        this, &AnalyticsSearchSynchronizer::updateWorkbench);
+
+    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::selectedObjectTypeChanged,
+        this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::filterRectChanged, this,
         [this](const QRectF& value)
         {
-            updateTimelineDisplay();
+            updateWorkbench();
 
             const auto mediaWidget = this->mediaWidget();
             if (value.isNull() && mediaWidget && m_analyticsSearchWidget->areaSelectionEnabled())
@@ -97,7 +100,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+        this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [this](QnResourceWidget* widget)
@@ -112,6 +115,8 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
                 connect(mediaWidget, &QnMediaResourceWidget::analyticsSupportChanged, this,
                     updateWidgetMode);
                 updateMediaResourceWidgetAnalyticsMode(mediaWidget);
+
+                mediaWidget->setAnalyticsFilter(active() ? m_filter : nx::analytics::db::Filter());
             }
         });
 
@@ -125,15 +130,26 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         this,
         [this](const QnLayoutItemIndex& index, AnalyticsObjectsVisualizationMode value)
         {
-            if (index.layout() != workbench()->currentLayout()->resource())
+            const auto currentLayout = workbench()->currentLayout();
+            if (index.layout() != currentLayout->resource())
                 return;
 
-            const auto item = workbench()->currentLayout()->item(index.uuid());
+            const auto item = currentLayout->item(index.uuid());
             if (!item)
                 return;
 
             if (const auto widget = asMediaWidget(display()->widget(item)))
                 updateMediaResourceWidgetAnalyticsMode(widget);
+
+            // Cleanup analytics areas on all target widget zoom windows.
+            for (const auto zoomItem: currentLayout->zoomItems(item))
+            {
+                if (const auto widget = asMediaWidget(display()->widget(zoomItem)))
+                {
+                    NX_ASSERT(widget->isZoomWindow());
+                    updateMediaResourceWidgetAnalyticsMode(widget);
+                }
+            }
         });
 }
 
@@ -188,12 +204,43 @@ void AnalyticsSearchSynchronizer::updateCachedDevices()
     }
 }
 
-void AnalyticsSearchSynchronizer::updateTimelineDisplay()
+void AnalyticsSearchSynchronizer::updateWorkbench()
 {
     if (!active())
     {
+        for (const auto widget: display()->widgets())
+        {
+            if (const auto mediaWidget = asMediaWidget(widget))
+                mediaWidget->setAnalyticsFilter({});
+        }
+
         setTimeContentDisplayed(Qn::AnalyticsContent, false);
         return;
+    }
+
+    m_filter = {};
+    const auto cameraSetType = m_analyticsSearchWidget->selectedCameras();
+    if (cameraSetType != AbstractSearchWidget::Cameras::all
+        && cameraSetType != AbstractSearchWidget::Cameras::layout)
+    {
+        for (const auto& camera: m_analyticsSearchWidget->cameras())
+            m_filter.deviceIds.push_back(camera->getId());
+    }
+
+    const auto filterRect = m_analyticsSearchWidget->filterRect();
+    if (!filterRect.isNull())
+        m_filter.boundingBox = filterRect;
+
+    const auto selectedObjectType = m_analyticsSearchWidget->selectedObjectType();
+    if (!selectedObjectType.isEmpty())
+        m_filter.objectTypeId.push_back(selectedObjectType);
+
+    m_filter.loadUserInputToFreeText(m_analyticsSearchWidget->textFilter());
+
+    for (const auto widget: display()->widgets())
+    {
+        if (const auto mediaWidget = asMediaWidget(widget))
+            mediaWidget->setAnalyticsFilter(m_filter);
     }
 
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
@@ -204,14 +251,11 @@ void AnalyticsSearchSynchronizer::updateTimelineDisplay()
         return;
     }
 
-    const auto filterRect = m_analyticsSearchWidget->filterRect();
-
-    analytics::db::Filter filter;
+    auto filter = m_filter;
     filter.deviceIds = {camera->getId()};
-    if (!filterRect.isNull())
-        filter.boundingBox = filterRect;
-    filter.freeText = m_analyticsSearchWidget->textFilter();
+    NX_VERBOSE(this, "Load analytics chunks by filter %1", filter);
     navigator()->setAnalyticsFilter(filter);
+
     navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
 }
 

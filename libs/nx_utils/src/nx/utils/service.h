@@ -8,6 +8,7 @@
 #include "move_only_func.h"
 #include "std/future.h"
 #include "thread/stoppable.h"
+#include "thread/sync_queue.h"
 
 namespace nx {
 namespace utils {
@@ -46,6 +47,18 @@ public:
 
     int exec();
 
+	/**
+	 * Restarts the process without terminating it. The service should have been started already
+	 * with a call to exec.
+	 * NOTE: Causes runMainLoop to return.
+	 * NOTE: serviceMain will be invoked again after it returns.
+	 * NOTE: Cannot be called in the same thread as exec, because exec blocks until termination.
+	 * NOTE: exec does not return if restart is called. pleaseStop must be called to stop the
+	 * the service.
+	 * NOTE: exec will return the most recent return code if restart is called.
+	 */
+	void restart();
+
     std::string applicationDisplayName() const;
 
 protected:
@@ -59,15 +72,25 @@ protected:
     bool isTerminated() const;
 
 private:
+	enum class ActionToTake
+	{
+		restart,
+		stop,
+	};
+
     bool m_isLoggingInitializationRequired = true;
     int m_argc = 0;
     char** m_argv = nullptr;
-    nx::utils::promise<int> m_processTerminationEvent;
     nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
     nx::utils::MoveOnlyFunc<void(ServiceStartInfo)> m_abnormalTerminationHandler;
     const QString m_applicationDisplayName;
+	nx::utils::SyncQueue<ActionToTake> m_processTerminationEvents;
+	ActionToTake m_actionToTake;
     std::atomic<bool> m_isTerminated;
     QString m_startInfoFilePath;
+    std::unique_ptr<AbstractServiceSettings> m_settings;
+
+    int runServiceMain(const AbstractServiceSettings& settings);
 
     void initializeLog(const AbstractServiceSettings& settings);
     void reportStartupResult(bool result);

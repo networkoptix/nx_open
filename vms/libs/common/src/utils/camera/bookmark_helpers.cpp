@@ -14,15 +14,15 @@
 
 #include <utils/common/synctime.h>
 
-using std::chrono::milliseconds;
+using namespace std::chrono;
 
 using namespace nx;
 
 namespace {
 
-bool isChangedEnough(qint64 first, qint64 second, qint64 minDiff)
+bool isChangedEnough(milliseconds first, milliseconds second, milliseconds minDiff)
 {
-    return (std::abs(first - second) >= minDiff);
+    return (std::chrono::abs(first - second) >= minDiff);
 }
 
 } // namespace
@@ -97,14 +97,15 @@ QnCameraBookmarkList helpers::bookmarksAtPosition(
     return result;
 };
 
-bool helpers::isTimeWindowChanged(qint64 firstStartTimeMs,
-    qint64 firstEndTimeMs,
-    qint64 secondStartTimeMs,
-    qint64 secondEndTimeMs,
-    qint64 minStep)
+bool helpers::isTimeWindowChanged(
+    milliseconds firstStartTime,
+    milliseconds firstEndTime,
+    milliseconds secondStartTime,
+    milliseconds secondEndTime,
+    milliseconds minStep)
 {
-    return (isChangedEnough(firstStartTimeMs, secondStartTimeMs, minStep)
-        || isChangedEnough(firstEndTimeMs, secondEndTimeMs, minStep));
+    return (isChangedEnough(firstStartTime, secondStartTime, minStep)
+        || isChangedEnough(firstEndTime, secondEndTime, minStep));
 }
 
 QnTimePeriod helpers::extendTimeWindow(qint64 startTimeMs,

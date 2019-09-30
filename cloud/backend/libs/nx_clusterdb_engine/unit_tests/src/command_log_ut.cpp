@@ -9,6 +9,7 @@
 #include <nx/sql/test_support/test_with_db_helper.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/random.h>
+#include <nx/utils/random_qt_device.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
@@ -28,7 +29,7 @@ class BaseDbTest:
 {
 public:
     BaseDbTest():
-        nx::sql::test::TestWithDbHelper("clusterdb_engine_ut", ""),
+        nx::sql::test::TestWithDbHelper(""),
         m_dbController(dbConnectionOptions())
     {
     }
@@ -710,7 +711,7 @@ protected:
         for (int i = 0; i < transactionToAddCount; ++i)
             m_transactionOrder[i] = i;
 
-        std::random_device rd;
+        nx::utils::random::QtDevice rd;
         std::mt19937 g(rd());
         std::shuffle(m_transactionOrder.begin(), m_transactionOrder.end(), g);
 

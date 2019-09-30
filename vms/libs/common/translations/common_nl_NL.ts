@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -417,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
+      <translation>Kon geen encoder vinden voor codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -877,7 +866,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -912,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -1587,7 +1576,7 @@
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>RAID error. %1.</translation>
     </message>
   </context>
   <context>

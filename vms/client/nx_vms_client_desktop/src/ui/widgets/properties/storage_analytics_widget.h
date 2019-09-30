@@ -47,6 +47,7 @@ private:
     void setupTableView(nx::vms::client::desktop::TableView* table,
         nx::vms::client::desktop::TableView* totalsTable, QAbstractItemModel* model);
     nx::vms::client::desktop::TableView* currentTable() const;
+    nx::vms::client::desktop::TableView* currentTotalsTable() const;
     qint64 currentForecastAveragingPeriod();
 
     // Starts server request.
@@ -95,9 +96,13 @@ private:
     virtual void resizeEvent(QResizeEvent*) override; //< Use this to resize table columns; accepts null.
     virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.
 
+private:
+    void atReceivedStats(
+        bool success, int handle, const QnRecordingStatsReply& data);
+    void atReceivedSpaceInfo(QnMediaServerResourcePtr server,
+        bool success, int handle, const QnStorageSpaceReply& data);
+
 private slots:
-    void atReceivedStats(int status, const QnRecordingStatsReply& data, int requestNum);
-    void atReceivedSpaceInfo(int status, const QnStorageSpaceReply& data, int requestNum);
     void atEventsGrid_customContextMenuRequested(const QPoint&);
     void atClipboardAction_triggered();
     void atExportAction_triggered();

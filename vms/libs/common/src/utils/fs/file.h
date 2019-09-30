@@ -20,7 +20,7 @@
 #pragma warning( disable : 4290 )
 #endif
 
-#if defined (Q_OS_LINUX)
+#if defined (Q_OS_LINUX) || defined (Q_OS_MAC)
     int makeUnixOpenFlags(const QIODevice::OpenMode& oflag);
 #endif
 

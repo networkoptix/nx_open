@@ -62,7 +62,10 @@ public:
      * @param keepUser - should we keep username and reset only a password.
      */
     void resetCredentials(bool keepUser = false);
-    bool setCredentials(const nx::vms::common::Credentials& credentials, bool initial = false);
+
+    bool setInitialCredentials(const nx::vms::common::Credentials& credentials);
+    bool setCredentials(const nx::vms::common::Credentials& credentials);
+    bool forcedSetCredentials(const nx::vms::common::Credentials& credentials);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;

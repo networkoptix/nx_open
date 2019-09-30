@@ -21,7 +21,8 @@ public:
     enum Algorithm {
         Md4 = QCryptographicHash::Md4,
         Md5 = QCryptographicHash::Md5,
-        Sha1 = QCryptographicHash::Sha1
+        Sha1 = QCryptographicHash::Sha1,
+        Sha256 = QCryptographicHash::Sha256,
     };
 
     QnCryptographicHash(Algorithm algorithm);

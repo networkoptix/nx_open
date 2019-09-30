@@ -26,7 +26,6 @@ public:
     virtual const char* codec() const override { return m_codec.c_str(); }
     virtual const char* data() const override { return m_frame->data(); }
     virtual int dataSize() const override { return (int) m_frame->dataSize(); }
-    virtual const nx::sdk::analytics::IMediaContext* context() const override { return nullptr; }
 
     virtual MediaFlags flags() const override
     {
@@ -37,6 +36,12 @@ public:
 
     virtual int width() const override { return m_frame->width; }
     virtual int height() const override { return m_frame->height; }
+
+protected:
+    virtual const nx::sdk::analytics::IMediaContext* getContext() const override
+    {
+        return nullptr;
+    }
 
 private:
     const QnConstCompressedVideoDataPtr m_frame;

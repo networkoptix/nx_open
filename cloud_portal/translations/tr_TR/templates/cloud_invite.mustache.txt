@@ -1,0 +1,12 @@
+Merhaba,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+e posta adresinizi kullanın ve talimatları takip edin.
+
+Hesabınızı bu linkten kaydedin: {{ config.portal_url }}/register/{{ message.code }}

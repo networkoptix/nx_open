@@ -117,17 +117,18 @@ void QnAdamResource::startInputPortStatesMonitoring()
         }
     };
 
-    auto networkIssueHandler = [this](QString reason, bool isFatal)
-    {
-        emit networkIssue(
-            toSharedPointer(this),
-            qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::api::EventReason::networkNoResponseFromDevice,
-            QString());
+    const auto networkIssueHandler =
+        [this](QString /*reason*/, bool isFatal)
+        {
+            emit networkIssue(
+                toSharedPointer(this),
+                qnSyncTime->currentUSecsSinceEpoch(),
+                nx::vms::api::EventReason::networkNoResponseFromDevice,
+                QString());
 
-        if (isFatal)
-            setStatus(Qn::Offline);
-    };
+            if (isFatal)
+                setStatus(Qn::Offline);
+        };
 
     m_ioManager->setInputPortStateChangeCallback(callback);
     m_ioManager->setNetworkIssueCallback(networkIssueHandler);

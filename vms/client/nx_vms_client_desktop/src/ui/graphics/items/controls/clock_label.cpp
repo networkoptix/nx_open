@@ -9,7 +9,7 @@
 #include <ui/common/palette.h>
 #include <ui/style/nx_style.h>
 #include <utils/common/synctime.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 
 QnClockDataProvider::QnClockDataProvider(QObject *parent) :
@@ -20,10 +20,10 @@ QnClockDataProvider::QnClockDataProvider(QObject *parent) :
 
     connect(m_timer, &QTimer::timeout, this, [this](){
         emit timeChanged(
-            datetime::toString(m_clockType == serverClock
+            nx::vms::time::toString(m_clockType == serverClock
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : QDateTime::currentMSecsSinceEpoch(),
-                datetime::Format::hh_mm_ss));
+                nx::vms::time::Format::hh_mm_ss));
     });
     m_timer->start(100);
 }

@@ -177,10 +177,17 @@ Page
         d.connecting = true;
         connectButton.forceActiveFocus()
 
-        ConnectionController.connectByUserInput(
-            address, login, password, systemName,
-            handleConnectionFailed,
-            handleConnected)
+        // We need this execute delayed to make sure connection animation is started if server is
+        // located locally.
+        var kAnimationDelayMs = 50
+        Utils.executeDelayed(
+            function()
+            {
+                ConnectionController.connectByUserInput(
+                    address, login, password, systemName,
+                    handleConnectionFailed,
+                    handleConnected)
+            }, kAnimationDelayMs, this)
     }
 
     function handleConnected()

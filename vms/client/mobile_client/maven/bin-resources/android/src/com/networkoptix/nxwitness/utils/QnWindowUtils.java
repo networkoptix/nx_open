@@ -1,5 +1,6 @@
 package com.networkoptix.nxwitness.utils;
 
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.Window;
 import android.view.Display;
@@ -157,6 +158,11 @@ public class QnWindowUtils {
 
     public static boolean isPhone() {
         return (QtNative.activity().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    public static boolean is24HoursTimeFormat()
+    {
+        return DateFormat.is24HourFormat(QtNative.activity());
     }
 
     public static void setKeepScreenOn(final boolean keepScreenOn) {

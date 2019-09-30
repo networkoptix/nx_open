@@ -2,11 +2,9 @@
 
 #include <chrono>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics::db {
-
-static constexpr bool kLookupObjectsInAnalyticsArchive = true;
 
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;

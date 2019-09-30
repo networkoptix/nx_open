@@ -42,6 +42,7 @@ MediatorInstance::MediatorInstance(int flags, const QString& dataDir):
     addArg("-http/addrToListenList", "127.0.0.1:0");
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", dataDir.toLatin1().constData());
+    addArg("-listeningPeerDb/cluster/enableCache", "true");
 }
 
 MediatorInstance::~MediatorInstance()
@@ -124,6 +125,13 @@ nx::utils::Url MediatorInstance::httpUrl() const
         .setPath(hpm::api::kMediatorApiPrefix).toUrl();
 }
 
+nx::utils::Url MediatorInstance::stunTcpBaseUrl() const
+{
+    return network::url::Builder()
+        .setScheme(network::stun::kUrlSchemeName)
+        .setEndpoint(m_stunTcpEndpoint);
+}
+
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorInstance::clientConnection()
 {
@@ -139,11 +147,12 @@ std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
 std::unique_ptr<MediaServerEmulator> MediatorInstance::addServer(
     const AbstractCloudDataProvider::System& system,
     nx::String name,
-    ServerTweak::Value tweak)
+    ServerTweak::Value tweak,
+    const QString& tcpUrlScheme)
 {
     auto server = std::make_unique<MediaServerEmulator>(
         stunUdpEndpoint(),
-        stunTcpEndpoint(),
+        buildMediatorTcpUrl(tcpUrlScheme),
         system,
         std::move(name));
 
@@ -167,7 +176,8 @@ std::unique_ptr<MediaServerEmulator> MediatorInstance::addServer(
 std::unique_ptr<MediaServerEmulator> MediatorInstance::addRandomServer(
     const AbstractCloudDataProvider::System& system,
     boost::optional<QnUuid> serverId,
-    ServerTweak::Value tweak)
+    ServerTweak::Value tweak,
+    const QString& tcpUrlScheme)
 {
     if (!serverId)
         serverId = QnUuid::createUuid();
@@ -175,18 +185,20 @@ std::unique_ptr<MediaServerEmulator> MediatorInstance::addRandomServer(
     return addServer(
         system,
         serverId.get().toSimpleString().toUtf8(),
-        tweak);
+        tweak,
+        tcpUrlScheme);
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorInstance::addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count, ServerTweak::Value tweak)
+        size_t count, ServerTweak::Value tweak,
+        const QString& tcpUrlScheme)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
     for (size_t i = 0; i < count; ++i)
     {
-        auto server = addRandomServer(system, boost::none, tweak);
+        auto server = addRandomServer(system, boost::none, tweak, tcpUrlScheme);
         if (!server)
             return {};
 
@@ -217,6 +229,17 @@ void MediatorInstance::beforeModuleCreation()
 void MediatorInstance::afterModuleDestruction()
 {
     //clearArgs();
+}
+
+nx::utils::Url MediatorInstance::buildMediatorTcpUrl(const QString& urlScheme) const
+{
+    if (urlScheme == "stun")
+        return stunTcpBaseUrl();
+    if (urlScheme == "http")
+        return httpUrl();
+    if (urlScheme == "https")
+        return network::url::Builder().setScheme(urlScheme).setEndpoint(httpsEndpoint());
+    return {};
 }
 
 bool MediatorInstance::startProxy()
@@ -262,7 +285,7 @@ bool MediatorInstance::allocateTcpPorts()
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags, const QString& testDir):
-    utils::test::TestWithTemporaryDirectory("hpm", testDir),
+    utils::test::TestWithTemporaryDirectory(testDir),
     MediatorInstance(flags, testDir.isEmpty() ? testDataDir() : testDir)
 {
     if (flags & initializeSocketGlobals)

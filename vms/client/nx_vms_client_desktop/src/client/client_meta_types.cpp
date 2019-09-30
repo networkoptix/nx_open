@@ -9,6 +9,7 @@
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <client/client_color_types.h>
+#include <recording/time_period.h>
 
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
@@ -41,6 +42,7 @@
 #include <nx/cloud/db/api/system_data.h>
 #include <api/server_rest_connection.h>
 
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -52,7 +54,6 @@
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
-#include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
@@ -84,6 +85,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QValidator::State>();
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
+    qRegisterMetaTypeStreamOperators<QnTimePeriod>();
+    qRegisterMetaTypeStreamOperators<QList<QRegion>>();
 
     qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
@@ -148,6 +151,7 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QnNotificationLevel::Value>();
 
     qRegisterMetaType<nx::update::Information>();
+    qRegisterMetaType<nx::update::UpdateDeliveryInfo>();
     qRegisterMetaType<nx::update::UpdateContents>();
 
     QMetaType::registerComparators<QnUuid>();

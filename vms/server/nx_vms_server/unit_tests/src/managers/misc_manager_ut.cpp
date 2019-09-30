@@ -17,7 +17,6 @@ class MiscManager:
 
 public:
     MiscManager():
-        base_type("MiscManager"),
         m_appserver2(testDataDir())
     {
     }

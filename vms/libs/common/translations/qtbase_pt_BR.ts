@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation>Fechar Separador</translation>
+      <translation>Fechar aba</translation>
     </message>
   </context>
   <context>

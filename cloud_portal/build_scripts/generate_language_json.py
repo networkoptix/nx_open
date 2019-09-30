@@ -3,12 +3,14 @@ import json
 import errno
 import codecs
 import sys
-from shutil import copyfile
+
+US_LANGUAGE_NAME = "English (US)"
+US_LANGUAGE_CODE = "en_US"
 
 
 def make_dir(filename):
     dirname = os.path.dirname(filename)
-    print ("make dir " + dirname + " for " + filename)
+    print(f"make dir {dirname} for {filename}")
     if not os.path.exists(dirname):
         try:
             os.makedirs(dirname)
@@ -26,68 +28,50 @@ def save_content(filename, content):
             file.close()
 
 
-def merge(source, destination):
-    for key, value in source.items():
-        if isinstance(value, dict):
-            # get node or create one
-            node = destination.setdefault(key, {})
-            merge(value, node)
-        else:
-            destination[key] = value
+def merge_files(base_lang, lang, file_name):
+    merged_lang = base_lang.copy()
+    lang_json_file = os.path.join("../../../..", "translations", lang, file_name)
+    print(f"Load {lang_json_file}")
 
-    return destination
+    if os.path.exists(lang_json_file):
+        with codecs.open(lang_json_file, "r", "utf-8") as file:
+            translated_json = json.load(file)
+            translated_json["language"] = lang
 
+            language_name = translated_json.get("language_name", "")
+            if not language_name or language_name == "LANGUAGE_NAME":
+                translated_json["language_name"] = lang
 
-def merge_json(target_filename, source_filename, key=None):
-    if not os.path.exists(source_filename) or not os.path.exists(target_filename):
-        return
-    with codecs.open(target_filename, 'r', 'utf-8') as file_descriptor:
-        target_content = json.load(file_descriptor)
-    with codecs.open(source_filename, 'r', 'utf-8') as file_descriptor:
-        source_content = json.load(file_descriptor)
-
-    if key is None:
-        merge(source_content, target_content)
+            if translated_json["language_name"] == "LANGUAGE_NAME":
+                sys.stderr.write(f"ERROR: For BORIS to fix: language.json has wrong language_name. "
+                                 f"File: {lang_json_file}\n")
+                translated_json["language_name"] = lang
+            merged_lang.update(translated_json)
+    elif lang != US_LANGUAGE_CODE:
+        sys.stderr.write(f"WARNING: {lang_json_file} don't exist.\n")
     else:
-        content = {}
-        content[key] = source_content
-        merge(content, target_content)
-    save_content(target_filename, json.dumps(target_content, ensure_ascii=False))
+        merged_lang["language"] = US_LANGUAGE_CODE
+        merged_lang["language_name"] = US_LANGUAGE_NAME
+
+    save_content(f"static/lang_{lang}/{file_name}",
+                 json.dumps(merged_lang, indent=4, ensure_ascii=False, sort_keys=True))
 
 
 def generate_languages_files(languages, template_filename):
     # Localize this language
-    with codecs.open(template_filename, 'r', 'utf-8') as file_descriptor:
-        template = json.load(file_descriptor)
+    with codecs.open(template_filename, "r", "utf-8") as file_descriptor:
+        base_lang = json.load(file_descriptor)
+
+    with codecs.open("static/language_i18n.json", "r", "utf-8") as file_descriptor:
+        base_i18n = json.load(file_descriptor)
 
     for lang in languages:
-        all_strings = {}
-        merge(template, all_strings)
-        language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
+        merge_files(base_lang, lang, "language.json")
+        merge_files(base_i18n, lang, "language_i18n.json")
 
-        print("Load: " + language_json_filename)
-        with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
-            data = json.load(file_descriptor)
-            data["language"] = lang
-
-            if data["language_name"]=='LANGUAGE_NAME':
-                sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
-                                 'File: ' + language_json_filename + '\n')
-                data["language_name"] = lang
-            merge(data, all_strings)
-        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
-
-        # Process i18n files
-        i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
-        print("Load: " + i18n_json_filename)
-
-        if os.path.exists(i18n_json_filename):
-            copyfile(i18n_json_filename, "static/lang_" + lang + "/language_i18n.json")
-        else:
-            sys.stderr.write('ERROR: For BORIS to fix -> ' + i18n_json_filename + ' don\'t exist.\n')
 
 languages = sys.argv[1:]
 if not languages:
     languages = ["en_US"]
 
-generate_languages_files(languages, 'static/language.json')
+generate_languages_files(languages, "static/language.json")

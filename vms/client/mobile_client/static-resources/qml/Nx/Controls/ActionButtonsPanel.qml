@@ -53,7 +53,16 @@ Item
 
         onButtonDownChanged:
         {
-            if (d.getType(index) != ActionButtonsModel.SoftTriggerButton || d.isProlonged(index))
+            if (d.getType(index) != ActionButtonsModel.SoftTriggerButton)
+                return
+
+            if (down && !d.isEnabled(index))
+            {
+                hintControl.showScheduleError()
+                return
+            }
+
+            if (d.isProlonged())
                 return
 
             if (down)
@@ -74,7 +83,7 @@ Item
                     hintControl.showCustomProcess(voiceVisualizerComponent, d.getIcon(index))
                     return
                 case ActionButtonsModel.SoftTriggerButton:
-                    if (d.isProlonged(index))
+                    if (d.isEnabled(index) && d.isProlonged(index))
                         d.tryActivateTrigger(index)
                     return
                 default:
@@ -91,7 +100,10 @@ Item
                     return
                 case ActionButtonsModel.TwoWayAudioButton:
                 case ActionButtonsModel.SoftTriggerButton:
-                    d.handleTriggerClicked(index)
+                    if (d.isEnabled(index))
+                        d.handleTriggerClicked(index)
+                    else
+                        hintControl.hideDelayed()
                     return
                 default:
                     throw "Shouldn't get here"
@@ -113,15 +125,17 @@ Item
                     return
                 case ActionButtonsModel.SoftTriggerButton:
                     var prolonged = d.isProlonged(index)
-
+                    var enabled = d.isEnabled(index)
                     if (!pressed)
                     {
-                        if (prolonged)
+                        if (!enabled)
+                            hintControl.hideDelayed()
+                        else if (prolonged)
                             d.tryDeactivateTrigger(index)
                         else
                             d.tryActivateTrigger(index)
                     }
-                    else if (!d.isProlonged(index) && down)
+                    else if (!d.isProlonged(index) && down && enabled)
                     {
                         hintControl.showHint(d.getPrefix(index),
                             d.getText(index), d.getIcon(index), true)
@@ -132,7 +146,13 @@ Item
             }
         }
 
-        onActionCancelled: d.tryDeactivateTrigger(index)
+        onActionCancelled:
+        {
+            if (d.isEnabled())
+                d.tryDeactivateTrigger(index)
+            else
+                hintControl.hideDelayed()
+        }
 
         onEnabledChanged:
         {
@@ -157,7 +177,7 @@ Item
 
             onTriggerActivated:
             {
-                var index = buttonModel.rowById(id)
+                var index = buttonModel.rowById(ruleId)
                 var text = d.getText(index)
                 if (!success)
                 {
@@ -166,7 +186,7 @@ Item
                 else if (d.isProlonged(index))
                 {
                     if (d.triggersController.hasActiveTrigger())
-                    hintControl.showActivity(text, d.getIcon(index))
+                        hintControl.showActivity(text, d.getIcon(index))
                 }
                 else
                 {
@@ -190,6 +210,11 @@ Item
         function getId(index)
         {
             return modelDataAccessor.getData(index, "id")
+        }
+
+        function isEnabled(index)
+        {
+            return modelDataAccessor.getData(index, "enabled")
         }
 
         function getPrefix(index)

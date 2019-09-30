@@ -48,11 +48,6 @@ class RadassResourceManagerTest:
     public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
-public:
-    RadassResourceManagerTest():
-        TestWithTemporaryDirectory("nx_vms_client_desktop/radass_resource_manager")
-    {}
-
 protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
@@ -64,7 +59,7 @@ protected:
         m_manager.reset(new RadassResourceManager());
         m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new QnLayoutResource());
-        m_layout->setId(QnUuid::createUuid());
+        m_layout->setIdUnsafe(QnUuid::createUuid());
         resourcePool()->addResource(m_layout);
     }
 

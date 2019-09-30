@@ -58,6 +58,16 @@ QString TestOptions::temporaryDirectoryPath(bool canCreate)
    return s_temporaryDirectory.path(canCreate);
 }
 
+void TestOptions::setModuleName(const QString& value)
+{
+    s_moduleName = value;
+}
+
+QString TestOptions::moduleName()
+{
+    return s_moduleName;
+}
+
 void TestOptions::setLoadMode(const QString& mode)
 {
     QString loadMode;
@@ -112,11 +122,13 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 #endif
 }
 
+//-------------------------------------------------------------------------------------------------
+
 TestOptions::TemporaryDirectory::TemporaryDirectory()
 {
     const auto kModuleSubdirectory =
         QString("nx_unit_tests/%1").arg(QnUuid::createUuid().toSimpleString());
-    
+
     const auto root = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     m_path = root.absoluteFilePath(kModuleSubdirectory);
 }
@@ -151,6 +163,7 @@ std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);
 
 TestOptions::TemporaryDirectory TestOptions::s_temporaryDirectory;
+QString TestOptions::s_moduleName(QnUuid::createUuid().toSimpleString());
 
 } // namespace utils
 } // namespace nx

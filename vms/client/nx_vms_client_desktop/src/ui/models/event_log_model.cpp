@@ -11,7 +11,7 @@
 #include <nx/vms/event/strings_helper.h>
 
 #include <common/common_module.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <client_core/client_core_module.h>
 
@@ -44,6 +44,7 @@
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 
@@ -409,7 +410,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
 
             const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
             QDateTime dt = timeWatcher->displayTime(timestampMs);
-            return datetime::toString(dt);
+            return nx::vms::time::toString(dt);
         }
         case EventColumn:
         {
@@ -419,9 +420,8 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     action.eventParams.eventResourceId).
                     dynamicCast<QnVirtualCameraResource>();
 
-                nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
-                const auto descriptor = eventTypeDescriptorManager.descriptor(
-                    action.eventParams.getAnalyticsEventTypeId());
+                const auto descriptor = commonModule()->analyticsEventTypeDescriptorManager()
+                    ->descriptor(action.eventParams.getAnalyticsEventTypeId());
                 QString eventName = descriptor ? descriptor->name : QString();
 
                 if (!eventName.isEmpty())

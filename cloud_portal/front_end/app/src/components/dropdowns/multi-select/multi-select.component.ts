@@ -39,11 +39,12 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     @Input() canSelectAll: any;
     @Input() canSearch: any;
 
-    private items: any;
-    private show: boolean;
-    private numSelected: string;
+    public items: any = {};
+    public filter: string;
+    public show: boolean;
+    public textSelected: any = {};
     private innerValue: any;
-    private filter: string;
+    private lang: any = {};
 
     // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
@@ -53,6 +54,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     constructor(private translate: TranslateService) {
         this.show = false;
         this.filter = '';
+        this.lang = this.translate.translations[this.translate.currentLang];
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
@@ -113,13 +115,21 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     updateLabel() {
         switch (this.innerValue && this.innerValue.length) {
+            case 1: {
+                this.textSelected = this.items.find(item => {
+                    return (item.label.name || item.id) === this.innerValue[0];
+                });
+                // Aggregated MSelect items vs. simple list
+                this.textSelected = this.textSelected.label.name || this.textSelected.label;
+                break;
+            }
             case 0:
             case this.items.length: {
-                this.numSelected = 'Any';
+                this.textSelected = this.lang.search.Any;
                 break;
             }
             default: {
-                this.numSelected = this.innerValue.length + ' Selected';
+                this.textSelected = this.innerValue.length + ' ' + this.lang.search.selected;
                 break;
             }
         }

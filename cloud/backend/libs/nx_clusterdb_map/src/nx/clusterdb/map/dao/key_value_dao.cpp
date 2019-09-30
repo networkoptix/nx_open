@@ -73,6 +73,12 @@ SELECT key, value from `%1_data` WHERE key >= :lower_bound
 
 )sql";
 
+static constexpr char kFetchAllTemplate[] = R"sql(
+
+SELECT * from `%1_data`
+
+)sql";
+
 std::string hash(const QByteArray& key)
 {
     //SHA512 hash is 64 bytes. Converted to hex, we have 128 characters.
@@ -112,12 +118,14 @@ void KeyValueDao::insertOrUpdate(
     query->exec();
 }
 
-void KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string& key)
+bool KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kRemoveKeyValuePairTemplate).arg(kSchemaName));
     query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
+
+    return query->numRowsAffected() > 0;
 }
 
 std::optional<std::string> KeyValueDao::get(
@@ -196,6 +204,15 @@ std::map<std::string, std::string> KeyValueDao::getRange(
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kFetchRangeTemplateWithoutUpperBound).arg(kSchemaName));
     query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
+    query->exec();
+
+    return toStdMap(query.get());
+}
+
+std::map<std::string, std::string> KeyValueDao::getAll(nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(QString(kFetchAllTemplate).arg(kSchemaName));
     query->exec();
 
     return toStdMap(query.get());

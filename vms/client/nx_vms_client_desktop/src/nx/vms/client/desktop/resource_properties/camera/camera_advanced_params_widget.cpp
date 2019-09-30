@@ -217,7 +217,10 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
 
         nx::core::ptz::Vector speed;
 
-        speed.pan = values[0].toDouble(&ok);
+        // Workaround for VMS-15380: changing sign of 'pan' control to make camera
+        // rotate in a proper direction.
+        // TODO: We need some flag to set a proper direction for camera rotation.
+        speed.pan = -values[0].toDouble(&ok);
         speed.tilt = values[1].toDouble(&ok);
 
         // Control provides the angle in range [-180; 180],
@@ -340,11 +343,11 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
 rest::QnConnectionPtr CameraAdvancedParamsWidget::getServerConnection(
     const QnNetworkResourcePtr& camera)
 {
-    if (!camera)
-        return {};
-
-    if (const auto& server = camera->getParentResource().dynamicCast<QnMediaServerResource>())
-        return server->restConnection();
+    if (auto cam = camera.dynamicCast<QnSecurityCamResource>())
+    {
+        if (const auto server = cam->getParentServer())
+            return server->restConnection();
+    }
 
     return {};
 }
@@ -374,48 +377,45 @@ QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
 bool CameraAdvancedParamsWidget::sendSetCameraParams(
     const QnNetworkResourcePtr& camera, const QnCameraAdvancedParamValueList& values)
 {
-    if (auto connection = getServerConnection(camera))
-    {
-        QnCameraAdvancedParamsPostBody body;
-        body.cameraId = camera->getId().toString();
-        for(const auto& value: values)
-            body.paramValues.insert(value.id, value.value);
+    auto connection = getServerConnection(camera);
+    if (!connection)
+        return false;
+    QnCameraAdvancedParamsPostBody body;
+    body.cameraId = camera->getId().toString();
+    for(const auto& value: values)
+        body.paramValues.insert(value.id, value.value);
 
-        auto callback = nx::utils::guarded(this,
-            [this](bool success, int handle, QnJsonRestResult data)
-            {
-                auto response = data.deserialized<QnCameraAdvancedParamValueList>();
-                at_advancedParam_saved(success, handle, response);
-            });
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, int handle, QnJsonRestResult data)
+        {
+            auto response = data.deserialized<QnCameraAdvancedParamValueList>();
+            at_advancedParam_saved(success, handle, response);
+        });
 
-        m_paramRequestHandle = connection->postJsonResult("/api/setCameraParam", {},
-            QJson::serialized(body), callback, thread());
-        return true;
-    }
-
-    return false;
+    m_paramRequestHandle = connection->postJsonResult("/api/setCameraParam", {},
+        QJson::serialized(body), callback, thread());
+    return m_paramRequestHandle != 0;
 }
 
 bool CameraAdvancedParamsWidget::sendGetCameraParams(const QnNetworkResourcePtr& camera, const QStringList& keys)
 {
-    if (auto connection = getServerConnection(camera))
-    {
-        QnRequestParamList params;
-        params.insert("cameraId", camera->getId());
-        for(const QString &param: keys)
-            params.insert(param, QString());
+    auto connection = getServerConnection(camera);
+    if (!connection)
+        return false;
+    QnRequestParamList params;
+    params.insert("cameraId", camera->getId());
+    for(const QString &param: keys)
+        params.insert(param, QString());
 
-        auto callback = nx::utils::guarded(this,
-            [this](bool success, int handle, QnJsonRestResult data)
-            {
-                auto response = data.deserialized<QnCameraAdvancedParamValueList>();
-                at_advancedSettingsLoaded(success, handle, response);
-            });
-        m_paramRequestHandle = connection->getJsonResult("/api/getCameraParam",
-            params, callback,thread());
-        return true;
-    }
-    return false;
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, int handle, QnJsonRestResult data)
+        {
+            auto response = data.deserialized<QnCameraAdvancedParamValueList>();
+            at_advancedSettingsLoaded(success, handle, response);
+        });
+    m_paramRequestHandle = connection->getJsonResult("/api/getCameraParam",
+        params, callback,thread());
+    return true;
 }
 
 void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, const QString& value)

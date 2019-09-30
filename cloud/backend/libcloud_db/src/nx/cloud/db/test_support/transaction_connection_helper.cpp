@@ -15,11 +15,7 @@ namespace test {
 
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
-    m_runningInstanceGuid(QnUuid::createUuid()),
-    m_totalConnectionsFailed(0),
-    m_transactionConnectionIdSequence(0),
-    m_removeConnectionAfterClosure(false),
-    m_maxDelayBeforeConnect(std::chrono::milliseconds::zero())
+    m_runningInstanceGuid(QnUuid::createUuid())
 {
     m_syncPath = api::kEc2EventsPath;
 }
@@ -27,7 +23,15 @@ TransactionConnectionHelper::TransactionConnectionHelper():
 TransactionConnectionHelper::~TransactionConnectionHelper()
 {
     closeAllConnections();
-    m_aioTimer.pleaseStopSync();
+    pleaseStopSync();
+}
+
+void TransactionConnectionHelper::bindToAioThread(
+    nx::network::aio::AbstractAioThread* thread)
+{
+    base_type::bindToAioThread(thread);
+
+    NX_ASSERT(m_connections.empty());
 }
 
 void TransactionConnectionHelper::setRemoveConnectionAfterClosure(bool val)
@@ -180,6 +184,12 @@ OnConnectionFailureSubscription&
     return m_onConnectionFailureSubscription;
 }
 
+void TransactionConnectionHelper::stopWhileInAioThread()
+{
+    m_connections.clear();
+    m_connectedConnections.clear();
+}
+
 TransactionConnectionHelper::ConnectionContext
     TransactionConnectionHelper::prepareConnectionContext(
         const std::string& login,
@@ -202,8 +212,8 @@ TransactionConnectionHelper::ConnectionContext
             protocolVersion,
             ++m_transactionConnectionIdSequence);
     connectionContext.timer = std::make_unique<nx::network::aio::Timer>();
-    connectionContext.timer->bindToAioThread(m_aioTimer.getAioThread());
-    connectionContext.connection->bindToAioThread(m_aioTimer.getAioThread());
+    connectionContext.timer->bindToAioThread(getAioThread());
+    connectionContext.connection->bindToAioThread(getAioThread());
     if (keepAlivePolicy == KeepAlivePolicy::noKeepAlive)
         connectionContext.connection->setKeepAliveEnabled(false);
     QObject::connect(
@@ -273,7 +283,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
             // Transaction transport invokes this handler with mutex locked,
             // so have to do some work around this misbehavior.
-            m_aioTimer.post(
+            post(
                 [this, connectionId]()
                 {
                     QnMutexLocker lk(&m_mutex);

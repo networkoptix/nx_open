@@ -98,8 +98,7 @@ class DbAsyncSqlQueryExecutor:
     using base_type = test::BaseDbTest;
 
 public:
-    DbAsyncSqlQueryExecutor():
-        base_type(kModuleName)
+    DbAsyncSqlQueryExecutor()
     {
         using namespace std::placeholders;
 

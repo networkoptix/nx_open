@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cms', '0036_convert_to_utf8mb4'),
+        ('cms', 'customization_cloud_merge'),
     ]
 
     operations = [
@@ -70,12 +70,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contentversion',
             name='customization',
-            field=models.ForeignKey(default=None, null=True, to='cms.Customization'),
+            field=models.ForeignKey(default=None, null=True, to='cms.Customization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterField(
             model_name='datarecord',
             name='customization',
-            field=models.ForeignKey(default=None, null=True, to='cms.Customization'),
+            field=models.ForeignKey(default=None, null=True, to='cms.Customization', on_delete=django.db.models.deletion.CASCADE),
         ),
         migrations.AlterField(
             model_name='product',

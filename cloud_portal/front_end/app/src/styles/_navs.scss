@@ -5,6 +5,7 @@
     width: 20px;
     height: 20px;
     right: 10px;
+    bottom: 6px;
 
     & span {
         display: block;
@@ -56,7 +57,37 @@
     }
 }
 
-.dropdown.show {
+.nav-arrow.left {
+    position: unset;
+    & span:nth-child(odd) {
+        transform     : rotate(-45deg);
+        top: 30%;
+        left: 20% !important;
+    }
+    & span:nth-child(even) {
+        transform     : rotate(45deg);
+        top: 50%;
+        left: 20% !important;
+    }
+}
+
+.nav-arrow.right {
+    position: unset;
+    & span:nth-child(even) {
+        transform     : rotate(-45deg);
+        top: 50%;
+        left: 25% !important;
+    }
+
+    & span:nth-child(odd) {
+        transform     : rotate(45deg);
+        top: 30%;
+        left: 25% !important;
+    }
+}
+
+.dropdown.show,
+.btn-tag.selected{
     .nav-arrow span:nth-child(1) {
         -webkit-transform : rotate(45deg);
         -moz-transform    : rotate(45deg);

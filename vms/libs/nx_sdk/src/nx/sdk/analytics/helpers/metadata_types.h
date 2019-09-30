@@ -4,7 +4,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_list.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 
@@ -16,13 +16,15 @@ class MetadataTypes: public RefCountable<IMetadataTypes>
 {
 public:
     MetadataTypes();
-    virtual const IStringList* eventTypeIds() const override;
-    virtual const IStringList* objectTypeIds() const override;
 
     virtual bool isEmpty() const override;
 
     void addEventTypeId(std::string eventTypeId);
     void addObjectTypeId(std::string objectTypeId);
+
+protected:
+    virtual const IStringList* getEventTypeIds() const override;
+    virtual const IStringList* getObjectTypeIds() const override;
 
 private:
     nx::sdk::Ptr<StringList> m_eventTypeIds;

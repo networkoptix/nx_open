@@ -16,7 +16,13 @@ static const int FRAMES_BUFFER_SIZE = 2;
 class QnMotionEstimation
 {
 public:
-    QnMotionEstimation();
+    struct Config
+    {
+        DecoderConfig decoderConfig;
+    };
+
+public:
+    QnMotionEstimation(const Config& config);
     ~QnMotionEstimation();
     /*
     * Set motion mask as array of quint8 values in range [0..255] . array size is Qn::kMotionGridWidth * Qn::kMotionGridHeight
@@ -59,7 +65,8 @@ private:
 
 private:
     QnMutex m_mutex;
-    QnFfmpegVideoDecoder* m_decoder;
+    Config m_config;
+    std::unique_ptr<QnFfmpegVideoDecoder> m_decoder;
     QSharedPointer<CLVideoDecoderOutput> m_frames[2];
 
     quint8* m_motionMask;

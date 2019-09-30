@@ -1210,6 +1210,11 @@ enum IDType
      */
     AnalyticsObjectsVisualizationModeAction,
 
+    /**
+    * Opens dialog to create parameterized snapshot of the resource tree model for tests.
+    */
+    CreateResourceTreeModelSnapshotAction,
+
     ActionCount,
 
     NoAction = -1

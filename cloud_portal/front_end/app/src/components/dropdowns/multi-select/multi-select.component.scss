@@ -9,9 +9,14 @@ nx-multi-select {
     }
     
     .dropdown-menu {
+        
+        overflow : auto;
+        
         &--list {
             max-height : $dropdown-multi-list-height !important;
             margin     : 0;
+            margin-top : 4px;
+            overflow   : unset !important;
         }
         
         .dropdown-item--non-checkbox {

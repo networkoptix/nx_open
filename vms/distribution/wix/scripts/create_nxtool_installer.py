@@ -43,7 +43,7 @@ class Config():
 
     def __init__(self, args):
         with open(args.config, 'r') as f:
-            config = yaml.load(f)
+            config = yaml.load(f, Loader=yaml.SafeLoader)
         self.installer_cultures = config['installer_cultures']
         self.language_file = installer_language_pattern.format(config['installer_language'])
         self.wix_directory = config['wix_directory']

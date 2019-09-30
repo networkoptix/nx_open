@@ -75,8 +75,9 @@
             <span class="glyphicon glyphicon-plus"></span>
         </span>
         <span class="webclient-button glyphicon-pm zoomOutButton inline-block" ng-if="canViewArchive"
-            ng-class="{'disabled' : disableZoomOut || emptyArchive}">
+            ng-class="{'disabled' : scaleManager.disableZoomOut || emptyArchive}">
             <span class="glyphicon glyphicon-minus"></span>
         </span>
     </div>
 </div>
+

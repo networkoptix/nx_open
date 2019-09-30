@@ -1,9 +1,12 @@
 #pragma once
 
-#include <boost/optional.hpp>
-#include <map>
-#include <list>
 #include <functional>
+#include <list>
+#include <map>
+#include <vector>
+
+#include <boost/optional.hpp>
+
 #include <QString>
 
 namespace nx {
@@ -34,10 +37,17 @@ public:
     template<typename ValueType = QString>
     boost::optional<ValueType> get() const { return boost::none; }
 
+    bool contains(const QString& name) const;
+
     template<typename Handler>
     void forEach(const QString& name, const Handler& handler) const;
 
     std::multimap<QString, QString> allArgs() const;
+
+    /**
+     * @return Arguments without name in the order of appearance.
+     */
+    std::vector<QString> getPositionalArgs() const;
 
 private:
     template<typename ValueType = QString>
@@ -47,6 +57,7 @@ private:
     boost::optional<ValueType> getImpl(const char* name) const;
 
     std::multimap<QString, QString> m_args;
+    std::vector<QString> m_positionalArgs;
 };
 
 template<typename ValueType, typename MainName, typename ... AltNames>

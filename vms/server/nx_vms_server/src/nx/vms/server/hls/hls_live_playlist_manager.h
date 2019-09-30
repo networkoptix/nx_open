@@ -33,7 +33,7 @@ public:
      * Provides playlist for live data.
      * @return Number of chunks generated.
      */
-    virtual size_t generateChunkList(
+    virtual CameraDiagnostics::Result generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;

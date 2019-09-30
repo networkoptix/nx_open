@@ -16,9 +16,7 @@
 #include <nx/utils/time.h>
 #include <nx/vms/api/data/misc_data.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
@@ -252,7 +250,7 @@ void ServerTimeSyncManager::updateTime()
         if (route.id == ownId)
             success = loadTimeFromInternet();
         else
-            success = loadTimeFromServer(route);
+            success = loadTimeFromServer(route) == TimeSyncManager::Result::ok;
         if (success)
         {
             m_timeLoadFromServer = route.id;
@@ -266,7 +264,7 @@ void ServerTimeSyncManager::updateTime()
         {
             if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
                 return;
-            if (loadTimeFromServer(route))
+            if (loadTimeFromServer(route) == TimeSyncManager::Result::ok)
             {
                 m_timeLoadFromServer = route.id;
                 m_lastNetworkSyncTime.restart();
@@ -288,6 +286,4 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
     setSyncTimeInternal(m_systemClock->millisSinceEpoch() + std::chrono::milliseconds(m_systemTimeDeltaMs));
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

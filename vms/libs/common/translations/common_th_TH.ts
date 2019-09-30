@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM / DD</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -521,7 +510,7 @@
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation>
-        <numerusform>เวลาใบอนุญาต</numerusform>
+        <numerusform>เวลาใบอนุญาต%n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -539,19 +528,19 @@
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตทั่วไป</numerusform>
+        <numerusform>ใบอนุญาตทั่วไป%n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาต Vmax</numerusform>
+        <numerusform>%nใบอนุญาต Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
+        <numerusform>%nใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -569,19 +558,19 @@
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>เริ่มต้นใบอนุญาต</numerusform>
+        <numerusform>%nเริ่มต้นใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตของการเชื่อมต่อ</numerusform>
+        <numerusform>%nใบอนุญาตของการเชื่อมต่อ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตไม่ถูกต้อง</numerusform>
+        <numerusform>%nใบอนุญาตไม่ถูกต้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -598,63 +587,63 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตกำหนดระยะเวลา</numerusform>
+        <numerusform>%n%1ใบอนุญาตกำหนดระยะเวลา</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาตอะนาล็อก</numerusform>
+        <numerusform>%n %1ใบอนุญาตอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาตแบบมืออาชีพ</numerusform>
+        <numerusform>%n %1ใบอนุญาตแบบมืออาชีพ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตทั่วไป</numerusform>
+        <numerusform>%n%1ใบอนุญาตทั่วไป</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาต Vmax</numerusform>
+        <numerusform>%n%1ใบอนุญาต Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
+        <numerusform>%n%1ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาต Video Wall</numerusform>
+        <numerusform>%n%1 ใบอนุญาต Video Wall</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตของโมดูล I / O %n</numerusform>
+        <numerusform>%n/%1 I / O สิทธิ์การใช้งานโมดูล</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>เริ่มต้นใบอนุญาต</numerusform>
+        <numerusform>%n%1เริ่มต้นใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -668,14 +657,14 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตของการเชื่อมต่อ</numerusform>
+        <numerusform>%n/%1 ฟรีใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตไม่ถูกต้อง</numerusform>
+        <numerusform>%n/%1 สิทธิ์การใช้งานไม่ถูกต้อง</numerusform>
       </translation>
     </message>
   </context>
@@ -1010,7 +999,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1517,31 +1506,31 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>ตรวจพบข้อขัดแย้งที่อยู่หลายผู้รับ ที่อยู่ %1 ถูกใช้งานโดย %2 ใน %3 สตรีม</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>ที่อยู่เครือข่าย %1 ไม่ใช่ที่อยู่แบบหลายผู้รับ</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>ที่เก็บข้อมูล Analytics &quot;%1&quot; ออฟไลน์</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>พื้นที่เก็บข้อมูล Analytics &quot;%1&quot; ใกล้จะเต็มแล้ว</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอิน</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอินที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>ข้อผิดพลาดของ RAID %1.</translation>
     </message>
   </context>
   <context>

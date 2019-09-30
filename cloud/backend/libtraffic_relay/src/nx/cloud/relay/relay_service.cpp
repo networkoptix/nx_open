@@ -1,8 +1,11 @@
 #include "relay_service.h"
 
+#include <nx/utils/system_error.h>
+
 #include "controller/controller.h"
 #include "libtraffic_relay_app_info.h"
 #include "model/model.h"
+#include "model/remote_relay_peer_pool.h"
 #include "settings.h"
 #include "statistics_provider.h"
 #include "view/view.h"
@@ -45,6 +48,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
+	watchSslCertificateFileIfNeeded(settings);
+
     Model model(settings);
     while (!model.doMandatoryInitialization())
     {
@@ -62,10 +67,19 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     View view(settings, &model, &controller);
     m_view = &view;
 
+    const auto remoteRelayPeerPool =
+        dynamic_cast<const model::RemoteRelayPeerPool*>(&model.remoteRelayPeerPool());
+
     auto statisticsProvider = StatisticsProviderFactory::instance().create(
         model.listeningPeerPool(),
         view.httpServer(),
-        controller.trafficRelay());
+        controller.trafficRelay(),
+        remoteRelayPeerPool && remoteRelayPeerPool->peerDb()
+            ? &remoteRelayPeerPool->peerDb()->synchronizationEngine().statisticsProvider()
+            : nullptr,
+        remoteRelayPeerPool && remoteRelayPeerPool->sqlQueryExecutor()
+            ? &remoteRelayPeerPool->sqlQueryExecutor()->statisticsCollector()
+            : nullptr);
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
     if (!registerThisInstanceNameInCluster(settings))
@@ -76,6 +90,9 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     view.start();
 
     int result = runMainLoop();
+
+	if (m_fileWatcher)
+		m_fileWatcher.reset();
 
     model.stop();
 
@@ -119,6 +136,43 @@ bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& setti
     m_model->remoteRelayPeerPool().setPublicUrl(publicUrl);
 
     return true;
+}
+
+void RelayService::watchSslCertificateFileIfNeeded(const conf::Settings& settings)
+{
+	if (settings.https().certificatePath.empty())
+		return;
+
+	NX_INFO(this, "Ssl certificate file specified: %1, watching for changes",
+		settings.https().certificatePath);
+
+	m_fileWatcher = std::make_unique<nx::utils::file_system::FileWatcher>(
+		settings.https().certificateMonitorTimeout);
+
+	const auto systemError = m_fileWatcher->subscribe(
+		settings.https().certificatePath,
+		[this, certificatePath = settings.https().certificatePath](
+		    const auto& filePath,
+		    auto systemError,
+		    auto /*watchEvent*/)
+		{
+			if (systemError && filePath == certificatePath)
+			{
+				NX_WARNING(this, "SystemError %1 occured while watching ssl certificate file %2.",
+					SystemError::toString(systemError), filePath);
+				return;
+			}
+
+			NX_INFO(this, "Ssl certificate file %1 changed, restarting service", filePath);
+			restart();
+		},
+		&m_subscriptionId);
+
+	if (systemError)
+	{
+		NX_WARNING(this, "Failed to watch ssl certificate file for changes: %1",
+			SystemError::toString(systemError));
+	}
 }
 
 } // namespace relay

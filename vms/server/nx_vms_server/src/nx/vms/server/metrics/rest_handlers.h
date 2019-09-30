@@ -1,30 +1,30 @@
 #pragma once
 
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/utils/metrics/controller.h>
+#include <nx/vms/utils/metrics/system_controller.h>
 #include <nx/network/rest/handler.h>
 
 namespace nx::vms::server::metrics {
 
-class LocalRestHandler: 
+class LocalRestHandler:
     public nx::network::rest::Handler
 {
 public:
-    LocalRestHandler(utils::metrics::Controller* controller);
+    LocalRestHandler(utils::metrics::SystemController* controller);
 
 protected:
     nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
 
 protected:
-    utils::metrics::Controller* const m_controller;
+    utils::metrics::SystemController* const m_controller;
 };
 
-class SystemRestHandler: 
-    public LocalRestHandler, 
+class SystemRestHandler:
+    public LocalRestHandler,
     public ServerModuleAware
 {
 public:
-    SystemRestHandler(utils::metrics::Controller* controller, QnMediaServerModule* serverModule);
+    SystemRestHandler(utils::metrics::SystemController* controller, QnMediaServerModule* serverModule);
 
 protected:
     nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;

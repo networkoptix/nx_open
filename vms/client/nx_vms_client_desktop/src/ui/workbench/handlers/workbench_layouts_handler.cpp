@@ -201,10 +201,14 @@ void LayoutsHandler::at_openLayoutAction_triggered(
     if (!currentUser)
         return;
 
-    // User should be mentioned in actionParams.additionalResources to be able to handle this action.
+    const auto roleId = QnUserRolesManager::unifiedUserRoleId(currentUser);
+
+    // Either user or his role should be mentioned in actionParams.additionalResources
+    // so that user can handle this action.
     auto permittedUsers = actionParams.additionalResources;
-    const auto it = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
-    if (it == permittedUsers.end() && !actionParams.allUsers)
+    const auto itU = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
+    const auto itR = std::find(permittedUsers.begin(), permittedUsers.end(), roleId);
+    if (!actionParams.allUsers && itU == permittedUsers.end() && itR == permittedUsers.end())
         return;
 
     if (accessController()->hasPermissions(layout, Qn::ReadPermission))
@@ -407,7 +411,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setId(QnUuid::createUuid());
+    newLayout->setIdUnsafe(QnUuid::createUuid());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -837,7 +841,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     }
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     resourcePool()->addResource(layout);

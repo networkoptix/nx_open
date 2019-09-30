@@ -157,7 +157,7 @@ Page
                 running: model.isRunning
                 reachable: model.isReachable
                 compatible: model.isCompatibleToMobileClient || model.isFactorySystem
-
+                wrongCustomization: model.wrongCustomization ? model.wrongCustomization : false
                 invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
             }
         }
@@ -244,22 +244,29 @@ Page
         }
     }
 
-    function openConnectionWarningDialog(systemName)
+    function openConnectionWarningDialog(systemName, errorText)
     {
         var message = systemName ?
                     qsTr("Cannot connect to System \"%1\"", "%1 is a system name").arg(systemName) :
-                    qsTr("Cannot connect to Server")
-        Workflow.openStandardDialog(
-            message, qsTr("Check your network connection or contact a system administrator"))
+                    qsTr("Cannot connect to server")
+        Workflow.openStandardDialog(message, errorText)
     }
 
-    Connections
+    function resetSearch()
     {
-        target: ConnectionController
-        onConnectingChanged:
-        {
-            if (target.connecting)
-                searchEdit.text = ""
-        }
+        searchEdit.text = ""
+        if (!sessionsList.count)
+            return
+
+        sessionsList.positionViewAtBeginning()
+        sessionsList.contentY += searchPanel.visible ? searchEdit.height : 0
     }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            resetSearch()
+    }
+
+    Component.onCompleted: resetSearch()
 }

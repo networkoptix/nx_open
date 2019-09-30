@@ -2,22 +2,32 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.4
 import Nx 1.0
+import Nx.Core 1.0
 import com.networkoptix.qml 1.0
 
 import "private/ArchiveCalendar"
 
 Pane
 {
-    id: calendar
+    id: control
 
-    property int year: (new Date()).getFullYear()
-    property int month: (new Date()).getMonth() + 1
-    property date date: new Date()
-    property QnCameraChunkProvider chunkProvider: null
+    property real position: 0
+    property real displayOffset: 0
+    property ChunkProvider chunkProvider: null
     property bool horizontal: mainWindow.width > 540
 
-    signal datePicked(date date)
+    signal picked(real position)
     signal closeClicked()
+
+    function resetToCurrentPosition()
+    {
+        d.monthData = d.createMonthDataFromPosition(control.position, control.displayOffset)
+        monthsModel.clear()
+        monthsModel.append(d.prevMonthData(d.monthData))
+        monthsModel.append(d.monthData)
+        monthsModel.append(d.nextMonthData(d.monthData))
+        d.ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
+    }
 
     padding: 0
 
@@ -34,11 +44,7 @@ Pane
         id: d
 
         readonly property alias ui: loader.item
-
-        function monthDiff(date)
-        {
-            return (year - date.getFullYear()) * 12 + month - date.getMonth() - 1
-        }
+        property var monthData: createMonthDataFromDate(new Date())
 
         function previousMonthClicked()
         {
@@ -58,46 +64,61 @@ Pane
             contentAnimation.start()
         }
 
+        function shiftToNextMonth()
+        {
+            d.monthData = prevMonthData(d.monthData)
+
+            monthsModel.remove(2, 1)
+            monthsModel.insert(0, prevMonthData(d.monthData))
+            ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
+        }
+
+        function shiftToPrevMonth()
+        {
+            d.monthData = nextMonthData(d.monthData)
+
+            monthsModel.remove(0, 1)
+            monthsModel.append(nextMonthData(d.monthData))
+        }
+
         function shiftToNeighbourMonth()
         {
             if (ui.monthsList.atYBeginning)
-            {
-                if (month > 1)
-                {
-                    --month
-                }
-                else
-                {
-                    month = 12
-                    --year
-                }
-                monthsModel.remove(2, 1)
-                monthsModel.insert(0, { "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
-                ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
-            }
+                shiftToNextMonth()
             else if (ui.monthsList.atYEnd)
-            {
-                if (month < 12)
-                {
-                    ++month
-                }
-                else
-                {
-                    month = 1
-                    ++year
-                }
-                monthsModel.remove(0, 1)
-                monthsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
-            }
+                shiftToPrevMonth()
         }
 
-        function populate()
+        function createMonthData(year, month)
         {
-            monthsModel.clear()
-            monthsModel.append({ "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
-            monthsModel.append({ "year" : year, "month" : month })
-            monthsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
-            d.ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
+            var result = {}
+            result.year = year
+            result.month = month
+            return result;
+        }
+
+        function createMonthDataFromDate(date)
+        {
+            return createMonthData(date.getUTCFullYear(), date.getUTCMonth() + 1)
+        }
+
+        function createMonthDataFromPosition(position, displayOffset)
+        {
+            return createMonthDataFromDate(new Date(position + displayOffset))
+        }
+
+        function prevMonthData(data)
+        {
+            return createMonthData(
+                data.month > 1 ? data.year : data.year - 1,
+                data.month > 1 ? data.month - 1 : 12)
+        }
+
+        function nextMonthData(data)
+        {
+            return createMonthData(
+                data.month < 12 ? data.year : data.year + 1,
+                data.month < 12 ? data.month + 1 : 1)
         }
     }
 
@@ -119,9 +140,9 @@ Pane
 
         HorizontalCalendar
         {
-            locale: calendar.locale
-            monthText: locale.standaloneMonthName(month - 1, Locale.LongFormat)
-            yearText: year
+            locale: control.locale
+            monthText: locale.standaloneMonthName(d.monthData.month - 1, Locale.LongFormat)
+            yearText: d.monthData.year
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
         }
@@ -133,9 +154,9 @@ Pane
 
         VerticalCalendar
         {
-            locale: calendar.locale
-            monthText: locale.standaloneMonthName(month - 1, Locale.LongFormat)
-            yearText: year
+            locale: control.locale
+            monthText: locale.standaloneMonthName(d.monthData.month - 1, Locale.LongFormat)
+            yearText: d.monthData.year
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
         }
@@ -147,7 +168,7 @@ Pane
 
         onPreviousMonthClicked: d.previousMonthClicked()
         onNextMonthClicked: d.nextMonthClicked()
-        onCloseClicked: calendar.closeClicked()
+        onCloseClicked: control.closeClicked()
     }
 
     Connections
@@ -177,21 +198,15 @@ Pane
         {
             id: calendarMonth
 
+            position: control.position
+            displayOffset: control.displayOffset
             width: d.ui.monthsList.width
             height: d.ui.monthsList.height
             year: model.year
             month: model.month
-            onCurrentDateChanged: calendar.date = currentDate
-            onDatePicked: calendar.datePicked(date)
-            locale: calendar.locale
-            chunkProvider: calendar.chunkProvider
-
-            Binding
-            {
-                target: calendarMonth
-                property: "currentDate"
-                value: calendar.date
-            }
+            onPicked: control.picked(position)
+            locale: control.locale
+            periodsStore: control.chunkProvider
         }
     }
 
@@ -208,33 +223,4 @@ Pane
 
         onStopped: d.shiftToNeighbourMonth()
     }
-
-    onDateChanged:
-    {
-        var dm = d.monthDiff(date)
-
-        if (dm === 0)
-            return
-
-        if (dm === -1)
-        {
-            d.ui.monthsList.positionViewAtEnd()
-            d.shiftToNeighbourMonth()
-        }
-        else if (dm === 1)
-        {
-            d.ui.monthsList.positionViewAtBeginning()
-            d.shiftToNeighbourMonth()
-        }
-        else
-        {
-            year = date.getFullYear()
-            month = date.getMonth() + 1
-
-            d.populate()
-            d.ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
-        }
-    }
-
-    Component.onCompleted: d.populate()
 }

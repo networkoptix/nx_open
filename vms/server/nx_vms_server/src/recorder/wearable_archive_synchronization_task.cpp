@@ -147,7 +147,10 @@ QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate(
     if (!m_withMotion)
         return new QnAviArchiveDelegate();
 
-    std::unique_ptr<AviMotionArchiveDelegate> result = std::make_unique<AviMotionArchiveDelegate>();
+    QnMotionEstimation::Config config;
+    config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
+    std::unique_ptr<AviMotionArchiveDelegate> result =
+        std::make_unique<AviMotionArchiveDelegate>(config);
     QnMotionRegion region;
     result->setMotionRegion(m_camera->getMotionRegion(0));
     return result.release();
@@ -213,7 +216,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     if (!m_withMotion)
     {
-        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
+        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& /*motion*/) { return false; };
         m_recorder->setSaveMotionHandler(saveMotionHandler);
     }
 
@@ -234,6 +237,14 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
             emit stateChanged(m_state);
         }, Qt::DirectConnection);
+
+    m_recorder->setEndOfRecordingHandler(
+        [this]
+        {
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+            m_recorder->pleaseStop();
+        });
 }
 
 } // namespace recorder

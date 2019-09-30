@@ -371,7 +371,9 @@ void ServerMessageBus::commitLazyData()
 {
     if (m_dbCommitTimer.hasExpired(commitIntervalMs))
     {
-        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(
+            m_db->getTransaction(), __FILE__, __LINE__);
+
         dbTran.commit();
         m_dbCommitTimer.restart();
     }
@@ -384,7 +386,9 @@ void ServerMessageBus::stop()
         QnMutexLocker lock(&m_mutex);
         if (m_db->getTransaction())
         {
-            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(
+                m_db->getTransaction(), __FILE__, __LINE__);
+
             dbTran.commit();
         }
     }
@@ -518,9 +522,9 @@ bool ServerMessageBus::readFullInfoData(
 {
     ErrorCode errorCode;
     if (remotePeer.peerType == vms::api::PeerType::mobileClient)
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess.userId);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess);
     else
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData, userAccess);
 
     if (errorCode != ErrorCode::ok)
         NX_WARNING(this, lm("Cannot execute query for FullInfoData: %1").arg(errorCode));
@@ -573,7 +577,10 @@ void ServerMessageBus::resubscribePeers(
 {
     QMap<P2pConnectionPtr, QVector<vms::api::PersistentIdData>> updatedSubscription;
     for (auto itr = newSubscription.begin(); itr != newSubscription.end(); ++itr)
+    {
         updatedSubscription[itr.value()].push_back(itr.key());
+        NX_ASSERT(itr.key() != localPeer()); //< Subscription on myself is not allowed.
+    }
     for (auto& value : updatedSubscription)
         std::sort(value.begin(), value.end());
     for (auto connection : m_connections.values())
@@ -588,6 +595,7 @@ void ServerMessageBus::resubscribePeers(
                 shortValues.push_back(connectionContext->encode(id));
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
+            NX_ASSERT(!newValue.contains(localPeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
             if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
@@ -767,7 +775,8 @@ void ServerMessageBus::gotTransaction(
     {
         updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
         std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
-        dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
+        dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(
+            m_db->getTransaction(), __FILE__, __LINE__));
 
         auto userAccessData = connection.staticCast<Connection>()->userAccessData();
         QByteArray serializedTran =

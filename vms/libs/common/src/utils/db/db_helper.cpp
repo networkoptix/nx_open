@@ -42,9 +42,9 @@ QnDbHelper::QnDbTransaction::~QnDbTransaction()
 {
 }
 
-bool QnDbHelper::QnDbTransaction::beginTran()
+bool QnDbHelper::QnDbTransaction::beginTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite();
+    m_mutex.lockForWrite(sourceFile, sourceLine);
     if( !m_database.transaction() )
     {
         //TODO #ak ignoring this error since calling party thinks it always succeeds
@@ -141,11 +141,13 @@ bool QnDbHelper::QnDbTransaction::dbCommit(const QString& event)
     }
 }
 
-QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran):
+QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(
+    QnDbTransaction* tran, const char* sourceFile, int sourceLine)
+:
     m_committed(false),
     m_tran(tran)
 {
-    m_tran->beginTran();
+    m_tran->beginTran(sourceFile, sourceLine);
 }
 
 QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()

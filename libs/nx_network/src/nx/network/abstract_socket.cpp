@@ -3,7 +3,6 @@
 #include <future>
 
 #include <nx/utils/thread/mutex_lock_analyzer.h>
-#include <nx/utils/unused.h>
 
 #include "aio/aio_thread.h"
 #include "aio/pollable.h"

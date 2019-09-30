@@ -3,14 +3,12 @@
 #include <rest/server/fusion_rest_handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-namespace nx::vms::common::p2p::downloader { class Downloader; }
+namespace nx::vms::server::rest::handlers {
 
-class QnDownloadsRestHandler:
-    public QnFusionRestHandler,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
+class Downloads: public QnFusionRestHandler, public nx::vms::server::ServerModuleAware
 {
 public:
-    QnDownloadsRestHandler(QnMediaServerModule* serverModule);
+    Downloads(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
         const QString& path,
@@ -44,3 +42,5 @@ public:
         QByteArray& resultContentType,
         const QnRestConnectionProcessor* processor) override;
 };
+
+} // namespace nx::vms::server::rest::handlers

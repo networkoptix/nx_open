@@ -10,7 +10,7 @@
 
 #include <client_core/client_core_module.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
@@ -288,13 +288,13 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
 QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate, bool showTime)
 {
     if (showDate && showTime)
-        return datetime::toString(dateTime);
+        return nx::vms::time::toString(dateTime);
 
     if (showDate)
-        return datetime::toString(dateTime.date());
+        return nx::vms::time::toString(dateTime.date());
 
     if (showTime)
-        return datetime::toString(dateTime.time());
+        return nx::vms::time::toString(dateTime.time());
 
     return QString();
 }
@@ -352,7 +352,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ServerUpdate:
             return tr("Server updated");
         case Qn::AR_BEventUpdate:
-            return tr("Business rule updated");
+            return tr("Event rule changed");
         case Qn::AR_EmailSettings:
             return tr("Email settings changed");
         case Qn::AR_CameraRemove:
@@ -364,11 +364,11 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
-            return tr("Business rule removed");
+            return tr("Event rule removed");
         case Qn::AR_UserRemove:
             return tr("User removed");
         case Qn::AR_BEventReset:
-            return tr("Business rule reseted");
+            return tr("Event rules reset to default");
         case Qn::AR_DatabaseRestore:
             return tr("Database restored");
         case Qn::AR_UpdateInstall:

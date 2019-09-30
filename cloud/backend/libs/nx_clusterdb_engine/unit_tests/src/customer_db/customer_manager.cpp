@@ -32,11 +32,17 @@ CustomerManager::CustomerManager(
 
     m_synchronizationEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveCustomer>(
-            [this](auto&&... args) { return processSaveCustomer(std::move(args)...); });
+            [this](auto&&... args) -> nx::sql::DBResult
+            {
+                return processSaveCustomer(std::move(args)...);
+            });
 
     m_synchronizationEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveCustomer>(
-            [this](auto&&... args) { return processRemoveCustomer(std::move(args)...); });
+            [this](auto&&... args) -> nx::sql::DBResult
+            {
+                return processRemoveCustomer(std::move(args)...);
+            });
 }
 
 CustomerManager::~CustomerManager()

@@ -89,6 +89,12 @@ do
         web)
             write_my_cnf
 
+            while [ -z "$(python manage.py healthcheck)" ]
+            do
+                echo Waiting for migrations to be applied
+                sleep 1
+            done
+
             python manage.py filldata
             python manage.py filldata --preview=True &
 

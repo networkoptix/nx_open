@@ -112,8 +112,17 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qt::DisplayRole:
             return title(eventParams);
 
+        case Qn::DecorationPathRole:
+            return iconPath(eventParams);
+
         case Qt::DecorationRole:
-            return QVariant::fromValue(pixmap(eventParams));
+            if (eventParams.eventType == EventType::softwareTriggerEvent)
+            {
+                return QVariant::fromValue(QnSoftwareTriggerPixmaps::colorizedPixmap(
+                    eventParams.description, QPalette().light().color()));
+            }
+            handled = false;
+            return {};
 
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(eventParams));
@@ -316,7 +325,8 @@ void EventSearchListModel::Private::fetchLive()
                 q->clear(); //< Otherwise there will be a gap between live and archive events.
             }
 
-            q->setFetchDirection(FetchDirection::later);
+            ScopedLiveCommit liveCommit(q);
+
             q->addToFetchedTimeWindow(periodToCommit);
 
             NX_VERBOSE(q, "Live update commit");
@@ -386,70 +396,73 @@ QString EventSearchListModel::Private::description(
     return m_helper->eventDetails(parameters).join("<br>");
 }
 
-QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters& parameters)
+QString EventSearchListModel::Private::iconPath(const vms::event::EventParameters& parameters)
 {
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return qnSkin->pixmap("events/storage_red.png");
+            return "events/storage_red.png";
 
         case EventType::backupFinishedEvent:
-            return qnSkin->pixmap("events/storage_green.png");
+            return "events/storage_green.png";
 
         case EventType::serverStartEvent:
-            return qnSkin->pixmap("events/server.png");
+            return "events/server.png";
 
         case EventType::serverFailureEvent:
-            return qnSkin->pixmap("events/server_red.png");
+            return "events/server_red.png";
 
         case EventType::serverConflictEvent:
-            return qnSkin->pixmap("events/server_yellow.png");
+            return "events/server_yellow.png";
 
         case EventType::licenseIssueEvent:
-            return qnSkin->pixmap("events/license_red.png");
+            return "events/license_red.png";
 
         case EventType::cameraDisconnectEvent:
-            return qnSkin->pixmap("events/connection_red.png");
+            return "events/connection_red.png";
 
         case EventType::networkIssueEvent:
         case EventType::cameraIpConflictEvent:
-            return qnSkin->pixmap("events/connection_yellow.png");
+            return "events/connection_yellow.png";
 
         case EventType::softwareTriggerEvent:
-            return QnSoftwareTriggerPixmaps::colorizedPixmap(
-                parameters.description, QPalette().light().color());
+            return QnSoftwareTriggerPixmaps::pixmapsPath() + parameters.description + ".png";
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         {
             switch (QnNotificationLevel::valueOf(parameters))
             {
                 case QnNotificationLevel::Value::CriticalNotification:
-                    return qnSkin->pixmap("events/alert_red.png");
+                    return "events/alert_red.png";
                 case QnNotificationLevel::Value::ImportantNotification:
-                    return qnSkin->pixmap("events/alert_yellow.png");
+                    return "events/alert_yellow.png";
                 default:
-                    return qnSkin->pixmap("events/alert.png");
+                    return "events/alert.png";
             }
         }
 
         case EventType::cameraMotionEvent:
-            return qnSkin->pixmap("events/motion.svg");
+            return "events/motion.svg";
 
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
-            return qnSkin->pixmap("tree/camera.svg");
+            return "tree/camera.svg";
 
         case EventType::analyticsSdkEvent:
-            return QPixmap();
+            // TODO:
+            return {};
 
         default:
-            return QPixmap();
+            return {};
     }
 }
 
 QColor EventSearchListModel::Private::color(const vms::event::EventParameters& parameters)
 {
-    return QnNotificationLevel::notificationTextColor(QnNotificationLevel::valueOf(parameters));
+    const auto color =
+        QnNotificationLevel::notificationTextColor(QnNotificationLevel::valueOf(parameters));
+
+    return color.isValid() ? color : QPalette().light().color();
 }
 
 bool EventSearchListModel::Private::hasPreview(EventType eventType)

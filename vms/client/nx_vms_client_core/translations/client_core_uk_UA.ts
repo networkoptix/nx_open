@@ -76,7 +76,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>Тб</translation>
+      <translation>ТБ</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -91,7 +91,7 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>Пб</translation>
+      <translation>ПБ</translation>
     </message>
   </context>
   <context>
@@ -123,7 +123,7 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Внутрішня помилка %1. Будь ласка, зв'яжіться з командою підтримки.</translation>
+      <translation>Внутрішня помилка %1. Будь ласка, зв'яжіться з Командою Підтримки Користувачів.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -132,11 +132,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 тимчасово недоступний. Повторіть спробу пізніше.</translation>
+      <translation>%1 тимчасово недоступний. Будь ласка, повторіть спробу пізніше.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Мережева помилка. Перевірте з'єднання з Інтернетом і спробуйте ще раз.</translation>
+      <translation>Мережева помилка. Будь ласка, перевірте з'єднання з Інтернетом і спробуйте ще раз.</translation>
     </message>
   </context>
   <context>
@@ -148,7 +148,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation>Ваша система</translation>
+      <translation>Ваша Система</translation>
     </message>
   </context>
   <context>
@@ -191,7 +191,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation>Ваша система</translation>
+      <translation>Ваша Система</translation>
     </message>
   </context>
   <context>
@@ -209,12 +209,12 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>м</translation>
+      <translation>хв</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>ч</translation>
+      <translation>год</translation>
     </message>
     <message>
       <source>d</source>

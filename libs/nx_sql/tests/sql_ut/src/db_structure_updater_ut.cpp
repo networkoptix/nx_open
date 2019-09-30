@@ -139,8 +139,7 @@ class BasicDbStructureUpdaterTestSetup:
     using base_type = FixtureWithQueryExecutorOnly;
 
 public:
-    BasicDbStructureUpdaterTestSetup():
-        base_type(kModuleName)
+    BasicDbStructureUpdaterTestSetup()
     {
         using namespace std::placeholders;
 

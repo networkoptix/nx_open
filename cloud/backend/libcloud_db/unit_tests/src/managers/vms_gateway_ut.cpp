@@ -39,7 +39,7 @@ protected:
 
     void givenVmsWithAuthenticationEnabled()
     {
-        m_mediaserverEmulator->setAuthenticationEnabled(true);
+        m_mediaserverEmulator->enableAuthentication(".*");
         m_mediaserverEmulator->registerUserCredentials(
             m_ownerAccount.email.c_str(), m_ownerAccount.password.c_str());
     }

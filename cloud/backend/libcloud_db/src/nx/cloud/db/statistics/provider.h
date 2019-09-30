@@ -2,14 +2,14 @@
 
 #include <nx/clusterdb/engine/statistics/provider.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/connection_server/server_statistics.h>
+#include <nx/network/http/server/http_statistics.h>
 #include <nx/sql/db_statistics_collector.h>
 
 namespace nx::cloud::db::statistics {
 
 struct Statistics
 {
-    network::server::Statistics http;
+    network::http::server::HttpStatistics http;
     clusterdb::engine::statistics::Statistics dataSync;
     nx::sql::QueryStatistics sql;
 };
@@ -26,14 +26,14 @@ class Provider
 {
 public:
     Provider(
-        const network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+        const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
         const clusterdb::engine::statistics::Provider& dataSyncEngineStatisticsProvider,
         const nx::sql::StatisticsCollector& statisticsCollector);
 
     Statistics statistics() const;
 
 private:
-    const network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
+    const network::http::server::AbstractHttpStatisticsProvider& m_httpServerStatisticsProvider;
     const clusterdb::engine::statistics::Provider& m_dataSyncEngineStatisticsProvider;
     const nx::sql::StatisticsCollector& m_statisticsCollector;
 };

@@ -10,7 +10,7 @@ devpi login root --password=SuGiYaOfJ0L8OREl
 devpi index -c root/$VERSION bases=root/pypi volatile=True || true
 devpi use http://la.hdw.mx:3141/root/$VERSION --set-cfg
 
-LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip wheel --trusted-host la.hdw.mx --index-url http://la.hdw.mx:3141/root/$VERSION/ --extra-index-url http://la.hdw.mx:3141/root/pypi/ -r requirements.txt -w wheelhouse"
+LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip wheel --trusted-host la.hdw.mx --index-url http://la.hdw.mx:3141/root/$VERSION/ --extra-index-url http://la.hdw.mx:3141/root/public/ --extra-index-url http://la.hdw.mx:3141/root/pypi/ -r requirements.txt -w wheelhouse"
 
 devpi upload --from-dir --formats=* wheelhouse
 

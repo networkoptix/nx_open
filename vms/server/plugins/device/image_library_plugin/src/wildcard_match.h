@@ -1,13 +1,8 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef WILDCARDMATCH_H
-#define WILDCARDMATCH_H
+#pragma once
 
 #include <cstdlib>
-
 
 //!Matches \a str by wildcard expression \a mask
 /*!
@@ -17,5 +12,3 @@
 */
 bool wildcardMatch( const char* mask, const char* str );
 bool wildcardMatch( const wchar_t* mask, const wchar_t* str );
-
-#endif  //WILDCARDMATCH_H

@@ -304,6 +304,13 @@ const QnResourcePtr &QnResourceWidget::resource() const
     return m_resource;
 }
 
+QnLayoutResourcePtr QnResourceWidget::layoutResource() const
+{
+    if (!m_item || !m_item->layout())
+        return {};
+    return m_item->layout()->resource();
+}
+
 QnWorkbenchItem* QnResourceWidget::item() const
 {
     return m_item.data();

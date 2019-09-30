@@ -52,9 +52,10 @@ protected:
             "admin", serverToMergePassword, nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
         QByteArray responseBody;
-        NX_TEST_API_POST(requestTarget.get(), "api/mergeSystems", mergeSystemData,
+        NX_TEST_API_POST(
+            requestTarget.get(), "api/mergeSystems", mergeSystemData,
             [](const QByteArray& data) {return data;},
-            nx::network::http::StatusCode::ok,
+            Equals(nx::network::http::StatusCode::ok),
             "admin", requestTargetPassword,
             &responseBody);
         bool success = false;
@@ -127,7 +128,7 @@ protected:
             lit("matching physicalId %1").arg(serverGuid);
         cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
         NX_TEST_API_POST(server.get(), "/ec2/saveCamera", cameraData,
-            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+            nullptr, Equals(nx::network::http::StatusCode::ok), "admin", adminPassword);
 
         vms::api::UserDataList users;
         vms::api::UserData userData;
@@ -135,7 +136,7 @@ protected:
         userData.fullName = lit("user %1").arg(serverGuid);
         userData.permissions = GlobalPermission::admin;
         NX_TEST_API_POST(server.get(), "/ec2/saveUser", userData,
-            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+            nullptr, Equals(nx::network::http::StatusCode::ok), "admin", adminPassword);
 
         nx::vms::api::LayoutData layoutData;
         layoutData.name = "fixed layout name";
@@ -146,7 +147,7 @@ protected:
         item.id = QnUuid::createUuid();
         layoutData.items.push_back(item);
         NX_TEST_API_POST(server.get(), "/ec2/saveLayout", layoutData,
-            nullptr, nx::network::http::StatusCode::ok, "admin", adminPassword);
+            nullptr, Equals(nx::network::http::StatusCode::ok), "admin", adminPassword);
     }
 
     void thenFullInfoEqual(const std::vector<LauncherPtr>& servers,

@@ -1,6 +1,7 @@
+
 FROM ubuntu:18.04
 MAINTAINER "Dmitry Kargin" <dkargin@networkoptix.com>
-
+# Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 # This Dockerfile was based on the knowledge from the following sources:
 #  - some words about systemd problems inside docker https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/ 
 #  - some parts from https://github.com/defn/docker-systemd
@@ -11,10 +12,8 @@ ENV container docker
 # This will override our EULA check. 
 ENV DEBIAN_FRONTEND noninteractive
 
-# This is the deb file used to install mediaserver
-ARG mediaserver_deb
-
-RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
+# Disabling it since build.sh does all the necessary checks.
+# RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
 
 COPY manage.sh /setup/
 RUN chmod a+x /setup/manage.sh
@@ -32,6 +31,9 @@ STOPSIGNAL SIGRTMIN+3
 
 # Using systemd as an entry point. It will launch mediaserver according to systemd scripts.
 ENTRYPOINT ["/sbin/init", "--log-target=journal"]
+
+# This is the deb file used to install mediaserver
+ARG mediaserver_deb
 
 COPY "${mediaserver_deb}" /setup/
 

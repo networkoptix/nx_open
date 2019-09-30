@@ -93,8 +93,8 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
     timer.restart();
     QnCameraBookmarkList result;
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
-    auto elapsedMs = timer.elapsedMs();
-    NX_DEBUG(this, lm("Loading bookmarks time: %1, count: %2").args(elapsedMs, result.size()));
+    const auto elapsed = timer.elapsed();
+    NX_DEBUG(this, lm("Loading bookmarks time: %1, count: %2").args(elapsed, result.size()));
 }
 
 TEST_F(BookmarksDatabaseTest, selectTest)
@@ -320,7 +320,7 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
     ASSERT_EQ(0, result.size());
 
     result.clear();
-    filter.text = "btag";
+    filter.text = "Btag";
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(3, result.size());
 }

@@ -39,23 +39,9 @@ nx::sql::DBResult filterDbResult(
 }
 
 template<typename OptionalType>
-OptionalType getValue(const std::optional<OptionalType>& optional)
+OptionalType getValue(std::optional<OptionalType>&& optional)
 {
-    return optional.has_value() ? *optional : OptionalType();
-}
-
-std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
-{
-    if (!keyPrefix.empty())
-    {
-        std::string upperBound = keyPrefix;
-        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
-        {
-            if (++(*rit) != 0)
-                return upperBound;
-        }
-    }
-    return std::nullopt;
+    return optional.has_value() ? std::move(*optional) : OptionalType();
 }
 
 } // namespace
@@ -76,6 +62,20 @@ const char * toString(ResultCode result)
     }
 }
 
+std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
+{
+    if (!keyPrefix.empty())
+    {
+        std::string upperBound = keyPrefix;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (++(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return std::nullopt;
+}
+
 //-------------------------------------------------------------------------------------------------
 // DataManager
 
@@ -92,7 +92,7 @@ DataManager::DataManager(
 {
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
-            [this](auto&&... args)
+            [this](auto&& ... args) -> nx::sql::DBResult
             {
                 insertOrUpdateReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
@@ -100,7 +100,7 @@ DataManager::DataManager(
 
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveKeyValuePair>(
-            [this](auto&&... args)
+            [this](auto&&... args) -> nx::sql::DBResult
             {
                 removeReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
@@ -145,16 +145,20 @@ void DataManager::remove(
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
+    auto removed = std::make_shared<bool>();
+
     m_syncEngine->transactionLog().startDbTransaction(
         m_clusterId,
-        [this, key](nx::sql::QueryContext* queryContext)
+        [this, key, removed](nx::sql::QueryContext* queryContext)
         {
-            removeFromDb(queryContext, key);
+            *removed = removeFromDb(queryContext, key);
             return nx::sql::DBResult::ok;
         },
-        [completionHandler = std::move(completionHandler)](
+        [completionHandler = std::move(completionHandler), removed](
             nx::sql::DBResult dbResult)
         {
+            if (!*removed)
+                dbResult = nx::sql::DBResult::notFound;
             completionHandler(toResultCode(dbResult));
         });
 }
@@ -179,7 +183,7 @@ void DataManager::get(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedValue, dbResult)),
-                getValue(*sharedValue));
+                getValue(std::move(*sharedValue)));
         }
     );
 }
@@ -202,7 +206,7 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedKey, dbResult)),
-                getValue(*sharedKey));
+                getValue(std::move(*sharedKey)));
         });
 }
 
@@ -224,7 +228,7 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedKey, dbResult)),
-                getValue(*sharedKey));
+                getValue(std::move(*sharedKey)));
         });
 }
 
@@ -250,7 +254,7 @@ void DataManager::getRange(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedPairs, dbResult)),
-                getValue(*sharedPairs));
+                getValue(std::move(*sharedPairs)));
         });
 }
 
@@ -275,7 +279,7 @@ void DataManager::getRange(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedPairs, dbResult)),
-                getValue(*sharedPairs));
+                getValue(std::move(*sharedPairs)));
         });
 }
 
@@ -292,6 +296,26 @@ void DataManager::getRangeWithPrefix(
         getRange(keyPrefix, *keyPrefixUpperBound, std::move(completionHandler));
     else
         getRange(keyPrefix, std::move(completionHandler));
+}
+
+void DataManager::getAll(GetRangeCompletionHandler completionHandler)
+{
+    auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
+
+    m_queryExecutor->executeSelect(
+        [this, sharedPairs](
+            nx::sql::QueryContext* queryContext)
+        {
+            *sharedPairs = m_keyValueDao.getAll(queryContext);
+            return nx::sql::DBResult::ok;
+        },
+        [sharedPairs, completionHandler = std::move(completionHandler)](
+            nx::sql::DBResult dbResult)
+        {
+            completionHandler(
+                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                getValue(std::move(*sharedPairs)));
+        });
 }
 
 void DataManager::insertToOrUpdateDb(
@@ -347,16 +371,20 @@ std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
 }
 
-void DataManager::removeFromDb(
+bool DataManager::removeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
-    m_keyValueDao.remove(queryContext, key);
+	if (!m_keyValueDao.remove(queryContext, key))
+		return false;
+
     m_eventProvider->notifyRecordRemoved(queryContext, key);
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
             queryContext, m_clusterId, Key{key});
+
+	return true;
 }
 
 void DataManager::insertOrUpdateReceivedRecord(

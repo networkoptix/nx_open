@@ -4,6 +4,8 @@ import { NxLanguageProviderService } from './nx-language-provider';
 import { NxConfigService }           from './nx-config';
 import { NxAppStateService }         from './nx-app-state.service';
 import { downgradeInjectable }       from '@angular/upgrade/static';
+import { NxUtilsService }            from './utils.service';
+import { NxPageService }             from './page.service';
 
 
 @NgModule({
@@ -17,7 +19,9 @@ import { downgradeInjectable }       from '@angular/upgrade/static';
     providers      : [
         NxAppStateService,
         NxLanguageProviderService,
-        NxConfigService
+        NxConfigService,
+        NxUtilsService,
+        NxPageService,
     ],
     exports        : []
 })
@@ -29,5 +33,6 @@ angular
     .module('cloudApp.services')
     .service('nxLanguageService', downgradeInjectable(NxLanguageProviderService))
     .service('nxConfigService', downgradeInjectable(NxConfigService))
+    .service('nxPageService', downgradeInjectable(NxPageService))
     .service('nxAppStateService', downgradeInjectable(NxAppStateService));
 

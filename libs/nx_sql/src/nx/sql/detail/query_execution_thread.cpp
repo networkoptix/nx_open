@@ -55,7 +55,7 @@ void QueryExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> ha
 void QueryExecutionThread::start()
 {
     m_queryExecutionThread =
-        nx::utils::thread(std::bind(&QueryExecutionThread::queryExecutionThreadMain, this));
+        std::thread(std::bind(&QueryExecutionThread::queryExecutionThreadMain, this));
 }
 
 void QueryExecutionThread::queryExecutionThreadMain()

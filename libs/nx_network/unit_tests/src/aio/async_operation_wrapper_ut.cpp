@@ -1,3 +1,5 @@
+#include <list>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/aio_service.h>
@@ -30,6 +32,7 @@ protected:
         m_wrappedOperations.back().operation =
             std::make_unique<WrappedOperation>(
                 [this, context = &m_wrappedOperations.back()](
+                    const std::string& /*dummy*/,
                     CompletionHandler handler)
                 {
                     startAsyncOperation(context, std::move(handler));
@@ -39,7 +42,8 @@ protected:
         m_wrappedOperations.back().operation->invokeWithTimeout(
             [this, operation]() { saveResult(operation); },
             m_timeout,
-            [this, operation]() { saveResult(operation, /*isTimedOut*/ true); });
+            [this, operation]() { saveResult(operation, /*isTimedOut*/ true); },
+            "dummy value");
     }
 
     void givenMultipleOperations()
@@ -52,13 +56,13 @@ protected:
 
     void whenOperationHasCompleted()
     {
-        m_wrappedOperations.back().completionHandler();
+        m_wrappedOperations.back().completionHandler.get_future().get()();
     }
 
     void whenOperationsHaveCompleted()
     {
         for (auto& operationContext: m_wrappedOperations)
-            operationContext.completionHandler();
+            operationContext.completionHandler.get_future().get()();
     }
 
     void thenCompletionHandlerIsCalled()
@@ -103,7 +107,7 @@ protected:
     {
         ASSERT_TRUE(m_prevResult.timedOut);
     }
-    
+
     void andOperationDidNotTimeOut()
     {
         ASSERT_FALSE(m_prevResult.timedOut);
@@ -112,12 +116,12 @@ protected:
 private:
     using CompletionHandler = std::function<void()>;
     using WrappedOperation =
-        aio::AsyncOperationWrapper<std::function<void(CompletionHandler)>>;
+        aio::AsyncOperationWrapper<std::function<void(std::string /*dummy*/, CompletionHandler)>>;
 
     struct OperationContext
     {
         std::unique_ptr<WrappedOperation> operation;
-        CompletionHandler completionHandler;
+        std::promise<CompletionHandler> completionHandler;
     };
 
     struct Result
@@ -127,7 +131,7 @@ private:
         WrappedOperation* operation = nullptr;
     };
 
-    std::vector<OperationContext> m_wrappedOperations;
+    std::list<OperationContext> m_wrappedOperations;
     nx::utils::SyncQueue<Result> m_completedOperations;
     Result m_prevResult;
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds::zero();
@@ -136,7 +140,7 @@ private:
         OperationContext* context,
         CompletionHandler completionHandler)
     {
-        context->completionHandler = std::move(completionHandler);
+        context->completionHandler.set_value(std::move(completionHandler));
     }
 
     void saveResult(

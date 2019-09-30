@@ -1,0 +1,12 @@
+您好,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+請使用您的電子郵件, 並依照說明進行操作。
+
+請使用此連結註冊您的帳號： {{ config.portal_url }}/ register /{{ message.code }}

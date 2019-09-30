@@ -51,7 +51,7 @@
   <!-- __onvifImg__GetServiceCapabilities(..., _onvifImg__GetServiceCapabilitiesResponse &onvifImg__GetServiceCapabilitiesResponse) -->
   <onvifImg:GetServiceCapabilitiesResponse>
    <!-- onvifImg__Capabilities *Capabilities -->
-   <onvifImg:Capabilities ImageStabilization="false" Presets="false">
+   <onvifImg:Capabilities ImageStabilization="false" Presets="false" AdaptablePreset="false">
     <!-- std::vector<struct soap_dom_element> __any -->
     <!-- a repetition of 0 or more of the following -->
 

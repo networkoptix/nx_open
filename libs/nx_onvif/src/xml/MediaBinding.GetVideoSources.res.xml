@@ -198,7 +198,7 @@
        <tt:Iris>0.0</tt:Iris>
       </tt:Exposure>
       <!-- tt__FocusConfiguration20 *Focus -->
-      <tt:Focus>
+      <tt:Focus AFMode="">
        <!-- tt__AutoFocusMode AutoFocusMode -->
        <tt:AutoFocusMode>AUTO</tt:AutoFocusMode>
        <!-- float *DefaultSpeed -->

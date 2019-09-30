@@ -20,7 +20,6 @@ class ClientRegistration:
 {
 public:
     ClientRegistration():
-        nx::utils::test::TestWithTemporaryDirectory("appserver2_ut", ""),
         m_clientId(QnUuid::createUuid()),
         m_runtimeId(QnUuid::createUuid()),
         m_videoWallInstanceGuid(QnUuid::createUuid()),

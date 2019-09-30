@@ -8,8 +8,18 @@
 
 namespace nx::network::aio::detail {
 
+static constexpr int kAbnormalProcessTimeFactor = 1000;
+static constexpr auto kAbnormalProcessTimeDetectionPeriod = std::chrono::seconds(20);
+
 AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
-    m_pollSet(pollSet)
+    m_pollSet(pollSet),
+    m_abnormalProcessingTimeDetector(
+        kAbnormalProcessTimeFactor,
+        kAbnormalProcessTimeDetectionPeriod,
+        [this](auto&&... args)
+        {
+            reportAbnormalProcessingTime(std::forward<decltype(args)>(args)...);
+        })
 {
 }
 
@@ -334,7 +344,9 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             continue;
 
         //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
-        handlingData->eventHandler->eventTriggered(socket, sockEventType);
+        callAndReportAbnormalProcessingTime(
+            [&]() { handlingData->eventHandler->eventTriggered(socket, sockEventType); },
+            "socket event");
 
         //updating socket's periodic task (it's garanteed that there is a periodic task for socket)
         if (handlingData->timeout > std::chrono::milliseconds::zero())
@@ -402,9 +414,15 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         if (periodicTaskData.socket)    //periodic event, associated with socket (e.g., socket operation timeout)
         {
             //NOTE socket is allowed to be removed in eventTriggered
-            handlingData->eventHandler->eventTriggered(
-                periodicTaskData.socket,
-                static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut));
+            callAndReportAbnormalProcessingTime(
+                [&]()
+                {
+                    handlingData->eventHandler->eventTriggered(
+                        periodicTaskData.socket,
+                        static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut));
+                },
+                "timer");
+
             //adding periodic task with same timeout
             addPeriodicTaskNonSafe(
                 curClock + handlingData->timeout.count(),
@@ -428,7 +446,10 @@ void AioTaskQueue::processPostedCalls()
         NX_ASSERT(!m_postedCalls.front().socket ||
             m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
-        postHandler();
+
+        callAndReportAbnormalProcessingTime(
+            [&]() { postHandler(); },
+            "post");
     }
 }
 
@@ -562,6 +583,26 @@ bool AioTaskQueue::empty() const
     return m_postedCalls.empty()
         && m_pollSetModificationQueue.empty()
         && m_periodicTasksByClock.empty();
+}
+
+template<typename Func>
+void AioTaskQueue::callAndReportAbnormalProcessingTime(
+    Func func,
+    const char* description)
+{
+    nx::utils::BasicElapsedTimer<std::chrono::microseconds> timer(
+        nx::utils::ElapsedTimerState::started);
+    func();
+    m_abnormalProcessingTimeDetector.add(timer.elapsed(), description);
+}
+
+void AioTaskQueue::reportAbnormalProcessingTime(
+    std::chrono::microseconds value,
+    std::chrono::microseconds average,
+    const char* where_)
+{
+    NX_DEBUG(this, "Abnormal %1 running time detected: %2 vs %3 on average",
+        where_, value, average);
 }
 
 } // namespace nx::network::aio::detail

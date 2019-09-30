@@ -1,0 +1,8 @@
+{{#systemName}}
+Järjestelmä: {{systemName}} {{systemSignature}}
+{{/systemName}}
+
+{{>body}}
+
+%COMPANY_LINK%
+Tuki: %SUPPORT_LINK%

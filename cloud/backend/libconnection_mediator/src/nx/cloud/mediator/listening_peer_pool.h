@@ -6,11 +6,13 @@
 
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/data/connection_method.h>
+#include <nx/network/cloud/mediator/api/connection_speed.h>
 #include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/stun/abstract_server_connection.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/subscription.h>
 
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
@@ -131,11 +133,18 @@ private:
     ListeningPeerDb* m_listeningPeerDb = nullptr;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Counter m_counter;
+    nx::utils::SubscriptionId m_uplinkSpeedUpdatedId;
+    mutable std::map<nx::String /*systemId*/, api::PeerConnectionSpeed> m_bestUplinkSpeeds;
 
     void onListeningPeerConnectionClosed(
         const MediaserverData& peerData,
         nx::network::stun::AbstractServerConnection* connection);
     void closeConnectionAsync(std::shared_ptr<nx::network::stun::ServerConnection> peerConnection);
+
+    void onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed peerUplinkSpeed);
+
+    std::optional<nx::hpm::api::PeerConnectionSpeed> findLocalPeerWithBestUplinkSpeedUnsafe(
+        const nx::String& peerId) const;
 };
 
 } // namespace hpm

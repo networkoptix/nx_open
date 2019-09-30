@@ -15,8 +15,7 @@ class UserManagement:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    UserManagement():
-        nx::utils::test::TestWithTemporaryDirectory("appserver2_ut", "")
+    UserManagement()
     {
         const auto dbFileArg =
             lm("--dbFile=%1/db.sqlite").args(testDataDir()).toStdString();

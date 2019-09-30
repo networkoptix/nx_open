@@ -1,0 +1,349 @@
+{
+  "language": "fi_FI",
+  "language_name": "Suomi",
+  "productName": "%PRODUCT_NAME%",
+  "vmsName": "%VMS_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
+  "dialogs": {
+    "okButton": "OK",
+    "cancelButton": "Peruuta",
+    "loginTitle": "Kirjaudu sisään %PRODUCT_NAME%",
+    "loginButton": "Kirjaudu sisään",
+    "logoutAuthorisedTitle": "Olet jo kirjautunut sisään.",
+    "logoutAuthorisedContinueButton": "Jatka",
+    "logoutAuthorisedLogoutButton": "Kirjaudu ulos"
+  },
+  "pageTitles": {
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Tervetuloa",
+    "register": "Luo tili",
+    "changePassword": "Vaihda salasana -",
+    "account": "Tilin asetukset -",
+    "systems": "Järjestelmät",
+    "system": "Järjestelmä",
+    "systemShare": "Jaa järjestelmä -",
+    "activate": "Aktivoi tili",
+    "activateSent": "Aktivoi tili",
+    "activateSuccess": "Tili aktivoitu",
+    "activateCode": "Aktivoi tili",
+    "restorePassword": "Vaihda salasana -",
+    "restorePasswordSuccess": "Salasana tallennettu",
+    "restorePasswordCode": "Vaihda salasana -",
+    "view": "Näytä kamerat - ",
+    "debug": "Vianetsintä",
+    "login": "Kirjaudu sisään -",
+    "download": "Lataa %VMS_NAME%",
+    "downloadPlatform": "Lataa %VMS_NAME% ",
+    "pageNotFound": "Sivua ei löydy"
+  },
+  "systemStatuses": {
+    "activated": "Aktivoitu",
+    "incompatible": "yhteensopimaton",
+    "merging": "liitetään",
+    "notActivated": "Ei aktivoitu",
+    "online": "Yhteys muodostettu",
+    "offline": "Ei yhteyttä",
+    "unavailable": "Ei saatavilla"
+  },
+  "accessRoles": {
+    "disabled": {
+      "label": "Poissa käytöstä",
+      "description": "Käyttäjä on poistettu käytöstä ja ei voi kirjautua järjestelmään"
+    },
+    "Owner": {
+      "label": "Omistaja",
+      "description": "Rajoittamaton pääsy, mukaan lukien kyky jakaa ja yhdistää / irroittaa järjestelmää pilvestä"
+    },
+    "Viewer": {
+      "label": "Katsoja",
+      "description": "Voi katsella reaaliaikaista videota ja selata arkistoa"
+    },
+    "Live Viewer": {
+      "label": "Reaaliaikainen katselu",
+      "description": "Voit katsella vain reaaliaikaista videota"
+    },
+    "Advanced Viewer": {
+      "label": "Edistyneempi katselu",
+      "description": "Voi katsella reaaliaikasta videota, selata arkistoa, määrittää kameroita, ohjata PTZ: tä jne"
+    },
+    "Administrator": {
+      "label": "Järjestelmänvalvoja",
+      "description": "Rajoittamaton pääsy mukaan lukien kyky jakaa"
+    },
+    "Custom": {
+      "label": "Asiakassuhde",
+      "description": "Käytä %VMS_NAME% Client -sovellusta mukautettujen käyttöoikeuksien määrittämiseen"
+    },
+    "cloudAdmin": {
+      "label": "Järjestelmänvalvoja",
+      "description": "Voi konfiguroida järjestelmää ja jakaa sen"
+    },
+    "customRole": {
+      "label": "Mukautettu rooli",
+      "description": "Mukautettu käyttäjärooli Järjestelmässä"
+    },
+    "owner": {
+      "label": "Omistaja",
+      "description": "Rajoittamaton pääsy, mukaan lukien oikeus jakaa ja yhdistää / irrottaa järjestelmä pilvestä"
+    },
+    "viewer": {
+      "label": "Katsoja",
+      "description": "Voi katsella reaaliaikaista videota ja selata arkistoa"
+    },
+    "liveViewer": {
+      "label": "Reaaliaikainen katselu",
+      "description": "Voi katsella vain reaaliaikaista videota"
+    },
+    "advancedViewer": {
+      "label": "Edistyneempi katselu",
+      "description": "Voi katsella reaaliaikasta videota, selata arkistoa, määrittää kameroita, ohjata PTZ: tä jne"
+    },
+    "custom": {
+      "label": "Muokattu",
+      "description": "Käytä %VMS_NAME% Client -sovellusta mukautettujen käyttöoikeuksien määrittämiseen"
+    }
+  },
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Vahvistussähköpostia ei voida lähettää",
+    "cantDisconnectSystemPrefix": "Järjestelmää ei voi poistaa",
+    "cantUnshareWithMeSystemPrefix": "Järjestelmää ei voi poistaa",
+    "cantSharePrefix": "Järjestelmää ei voi jakaa",
+    "cantGetUsersListPrefix": "Käyttäjien luettelo ei ole käytettävissä",
+    "cantGetSystemsListPrefix": "Järjestelmäluettelo ei ole käytettävissä",
+    "cantRegisterPrefix": "Tapahtui virhe",
+    "cantGetSystemInfoPrefix": "Järjestelmätiedot eivät ole käytettävissä",
+    "cantChangeAccountPrefix": "Muutoksia ei voida tallentaa",
+    "cantChangePasswordPrefix": "Salasanaa ei voida tallentaa",
+    "cantActivatePrefix": "Tiliäsi ei voida aktivoida",
+    "cantSendConfirmationPrefix": "Vahvistussähköpostia ei voida lähettää",
+    "cloudInvalidResponse": "Cloud DB palautti odottamattoman vastauksen",
+    "notAuthorized": "Väärä salasana",
+    "brokenAccount": "Odottamaton ongelma tilillä. <a href=\"/restore_password\">Palauta tili</a>",
+    "wrongParameters": "Jotkin lomakkeen parametrit ovat virheellisiä",
+    "wrongCode": "Tili on jo aktivoitu tai vahvistuskoodi on virheellinen",
+    "wrongCodeRestore": "Vahvistuskoodi on jo käytetty tai virheellinen",
+    "forbidden": "Sinulla ei ole oikeuksia tämän toiminnon suorittamiseen",
+    "accountNotActivated": "Tätä tiliä ei ole vielä aktivoitu. <a href=\"/activate\">Lähetä aktivointilinkki uudelleen</a>",
+    "accountBlocked": "Tämä tili on estetty tilapäisesti. Yritä uudelleen muutaman minuutin.",
+    "notFound": "Ei löydy",
+    "alreadyExists": "Tili on jo olemassa",
+    "unknownError": "Odottamaton virhe",
+    "accountAlreadyActivated": "Käyttäjätilisi on jo aktivoitu",
+    "emailNotFound": "Tiliä ei ole olemassa.",
+    "EmailAlreadyExists": "Tämä sähköpostiosoite on jo rekisteröity",
+    "oldPasswordMistmatch": "Salasana on virheellinen.",
+    "passwordMismatch": "Väärä salasana",
+    "cantEditYourself": "Oman käyttöoikeuden muuttaminen ei ole sallittua",
+    "cantEditAdmin": "Tällä käyttäjällä on järjestelmänvalvojan oikeudet",
+    "cantOpenClient": "%VMS_NAME% sovellusta ei havaita. <a href=\"/download\">Lataa</a>",
+    "lostConnection": "Yhteys {{systemName}} menetetty",
+    "thisSystem": "järjestelmä",
+    "oldSafariNotSupported": "Safari-selaimen versio 10 vanhempia ei tueta",
+    "DUPLICATE_MEDIASERVER_FOUND": "Jotkin palvelimet ovat olemassa molemmissa järjestelmissä - valituissa ja nykyisissä järjestelmissä.<br>Poista offline- ja yhteensopimattomat palvelimet jokaisesta järjestelmästä ja yritä uudelleen.",
+    "mergedSystemIsOffline": "Järjestelmä <strong>{{failedSystem}}</strong> on offline-tilassa.",
+    "INCOMPATIBLE": "Järjestelmissä on erilaisia ohjelmistoversioita. Päivitä molemmat <a href=\"/download\">viimeisin versio</a>kohdalle.",
+    "FAIL": "Järjestelmä <strong>{{failedSystem}}</strong> ei ole tällä hetkellä saavutettavissa.<br>Yritä uudelleen hetken kuluttua tai ota yhteys <a href=\"%SUPPORT_LINK%\" target=\"_blank\">tukeen</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Järjestelmien yhdistäminen epäonnistui",
+    "commonText": "Järjestelmien yhdistäminen <strong>{{primarySystem}}</strong> ja <strong>{{secondarySystem}}</strong>epäonnistui."
+  },
+  "passwordRequirements": {
+    "good": "hyvä",
+    "fair": "kohtalainen",
+    "minLength": "liian lyhyt",
+    "minLengthMessage": "Salasanan pitää olla vähintään 8 merkkiä pitkä",
+    "required": "virheellinen",
+    "requiredMessage": "Käytä vain latinankielisiä kirjaimia, numeroita ja näppäimistön symboleja",
+    "weak": "heikko",
+    "weakMessage": "Käytä numeroita, isoja ja pieniä kirjaimia ja erikoismerkkejä vahvistaaksesi salasanasi",
+    "strongMessage": "Vahva salasana!",
+    "common": "liian yleinen",
+    "commonMessage": "Tämä salasana on maailman suosituimpia salasanoja",
+    "missingMessage": "Salasana tarvitaan"
+  },
+  "sharing": {
+    "confirmOwner": "Jos vaihdat järjestelmän omistajaa, peruutat omistusoikeuden nykyisestä tilistä. Tämä toimenpide on peruuttamaton. Oletko varma?",
+    "shareTitle": "Jaa",
+    "shareConfirmButton": "Jaa",
+    "editShareTitle": "Muokkaa käyttöoikeuksia",
+    "editShareConfirmButton": "Tallenna",
+    "permissionsSaved": "Uudet käyttöoikeudet tallennettu"
+  },
+  "system": {
+    "yourSystem": "Järjestelmäsi",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Järjestelmä ei ole tavoitettavissa",
+    "offline": "Järjestelmään ei saada yhteyttä",
+    "openClient": "Avaa %VMS_NAME%",
+    "openClientNoSystem": "Avaa %VMS_NAME%",
+    "confirmMergeAction": "Yhdistä",
+    "mergeSystemTitle": "Yhdistä järjestelmät",
+    "confirmRenameTitle": "Järjestelmänimi",
+    "confirmRenameAction": "Tallenna",
+    "successRename": "Järjestelmän nimi on tallennettu",
+    "confirmDisconnectTitle": "Irrota järjestelmä %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Katkaise yhteys",
+    "confirmUnshareFromMe": "Olet poistamassa tämän järjestelmän tilistäsi. Et voi enää käyttää tätä järjestelmää. Oletko varma?",
+    "confirmUnshareFromMeTitle": "Katkaise yhteys järjestelmään?",
+    "confirmUnshareFromMeAction": "Katkaise yhteys",
+    "confirmUnshare": "Tämä käyttäjä ei voi käyttää järjestelmää. Oletko varma?",
+    "confirmUnshareTitle": "Poista käyttäjä",
+    "confirmUnshareAction": "Poista",
+    "successDisconnected": "Järjestelmä irrotetaan onnistuneesti %PRODUCT_NAME%",
+    "successDeleted": "Järjestelmä {{systemName}} poistetaan onnistuneesti tililtäsi",
+    "mergeFailed": "Järjestelmien yhdistäminen epäonnistui",
+    "mergeStart": "Järjestelmät ovat alkaneet yhdistyä",
+    "mergeSuccess": "Järjestelmän yhdistäminen on valmis",
+    "permissionsRemoved": "Käyttöoikeudet poistettiin {{email}}",
+    "unknownName": "Järjestelmän tuntematon nimi (pilviliitoksen aiheuttama)"
+  },
+  "account": {
+    "accountSavedSuccess": "Tilisi on onnistuneesti päivitetty.",
+    "activationLinkSent": "Aktivointilinkki lähetetty",
+    "passwordChangedSuccess": "Tilisi on onnistuneesti päivitetty.",
+    "changePassword": "Vaihda salasana",
+    "newPasswordLabel": "Uusi salasana",
+    "saveChanges": "Tallenna"
+  },
+  "downloads": {
+    "noClientDetectedTitle": "Asenna %VMS_NAME% nähdäksesi järjestelmän",
+    "action": "Lataa %VMS_NAME%",
+    "mobile": {
+      "ios": {
+        "link": "%IOS_APPLICATION_LINK%"
+      },
+      "android": {
+        "link": "%ANDROID_APPLICATION_LINK%"
+      }
+    },
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+      },
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "ios": {
+        "label": "iOS",
+        "shortLabel": "iOS"
+      },
+      "android": {
+        "label": "Android",
+        "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": "C++ cross platform SDK"
+      }
+    },
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
+    },
+    "appTypes": {
+      "client": "Vain Client-sovellus",
+      "server": "Vain palvelin-sovellus",
+      "bundle": "Client ja palvelin",
+      "servertool": "Konfigurointityökalu"
+    },
+    "releasesTypes": {
+      "beta": "Beta",
+      "betas": "Betas",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
+    }
+  },
+  "activeActions": {
+    "sendConfirm": "Lähetä aktivointilinkki uudelleen",
+    "resetPassword": "Vaihda salasana",
+    "setNewPassword": "Tallenna salasana",
+    "setNewPasswordLabel": "Uusi salasana"
+  },
+  "regActions": {
+    "passwordLabel": "Salasana",
+    "createAccount": "Luo tili"
+  },
+  "header": {
+    "allSystems": "Kaikki järjestelmät",
+    "systems": "Järjestelmät"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "High stream",
+      "lowStream": "Low stream",
+      "transcoding": "Transkoodaus",
+      "unknown": "Tuntematon",
+      "copyToClipboard": "kopioi leikepöydälle",
+      "copyDefaultText": "kopio",
+      "copyActiveText": "kopioitu leikepöydälle"
+    },
+    "systemOffline": "Järjestelmä offline-tilassa",
+    "systemHasNoCameras": "Ei kameroita",
+    "cameraStates": {
+      "offline": "Offline-tilassa",
+      "error": "Virhe",
+      "unauthorized": "Tunnistus vaaditaan",
+      "noData": "Ei dataa",
+      "iosVideoTooLarge": "iOS ei tue videota, joka on suurempi kuin fullHD (2MP: 1920x1080).",
+      "flashRequired": "Siirry<a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> videoiden toistamiseen.",
+      "flashOrWebmRequired": "Siirry <a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> tai<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM koodekin</a> videon toistamiseen Internet Explorer:ssa.",
+      "noArmSupport": "Tämä selain tai laite ei tue videotoistoa ARM-pohjaisista palvelimista.",
+      "noFormat": "Tämä selain ei tue videon toistoa tästä kamerasta.",
+      "ieNoWebm": "Asenna <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM-koodekki</a> Internet Exploreriin.",
+      "ieWin10": "Käytä Microsoft Edgen tai Google Chromen selaimia.",
+      "ubuntuNX": "Tämä selain ei tue ARM-pohjaisia palvelimia. Käytä sen sijaan Chromium-selainta."
+    },
+    "searchCamPlaceholder": "Etsi",
+    "resolution": {
+      "auto": "Automaattinen",
+      "high": "Korkea",
+      "low": "Matala"
+    },
+    "chromeCastWarning": "Chromecast on resursseja kuormittava ja saattaa aiheuttaa ongelmia palvelimellasi.",
+    "voiceCommands": {
+      "play": "toista",
+      "pause": "tauko",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "tyhjennä haku",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "laajenna kaikki palvelimet",
+      "collapse all servers": "kokoa kaikki palvelimet",
+      "stop listening": "lopeta kuuntelu",
+      "help": "help | show commands"
+    }
+  },
+  "recommendSupport": {
+    "a_recommend": "We'd recommend consulting with",
+    "b_support": "tuki",
+    "c_proceeding": "ennen etenemistä."
+  }
+}

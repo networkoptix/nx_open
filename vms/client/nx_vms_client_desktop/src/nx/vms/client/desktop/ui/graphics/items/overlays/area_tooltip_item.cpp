@@ -174,23 +174,18 @@ void AreaTooltipItem::setText(const QString& text)
     d->invalidateTextPixmap();
 }
 
-QFont AreaTooltipItem::font() const
+AreaTooltipItem::Fonts AreaTooltipItem::fonts() const
 {
-    return d->textPainter.nameFont();
+    return d->textPainter.fonts();
 }
 
-void AreaTooltipItem::setFont(const QFont& font)
+void AreaTooltipItem::setFonts(const Fonts& fonts)
 {
-    if (d->textPainter.nameFont() == font)
+    if (d->textPainter.fonts() == fonts)
         return;
 
     prepareGeometryChange();
-
-    auto valueFont = font;
-    valueFont.setWeight(QFont::Medium);
-    d->textPainter.setNameFont(font);
-    d->textPainter.setValueFont(valueFont);
-
+    d->textPainter.setFonts(fonts);
     d->invalidateTextPixmap();
 }
 
@@ -230,7 +225,8 @@ QRectF AreaTooltipItem::boundingRect() const
     if (d->textPixmap.isNull())
         return QRectF();
 
-    return QRectF(QPoint(), Geometry::dilated(d->textPixmap.size(), textMargins()));
+    const auto pixmapSize = d->textPixmap.size() / d->textPixmap.devicePixelRatio();
+    return QRectF(QPoint(), Geometry::dilated(pixmapSize, textMargins()));
 }
 
 void AreaTooltipItem::paint(

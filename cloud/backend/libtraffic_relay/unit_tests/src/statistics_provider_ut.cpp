@@ -29,13 +29,17 @@ controller::RelaySessionStatistics generateRelaySessionStatistics()
     return statistics;
 }
 
-nx::network::server::Statistics generateHttpServerStatistics()
+nx::network::http::server::HttpStatistics generateHttpServerStatistics()
 {
-    nx::network::server::Statistics statistics;
+    nx::network::http::server::HttpStatistics statistics;
     statistics.connectionCount = nx::utils::random::number<>(1, 20);
     statistics.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
     statistics.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
     statistics.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
+    statistics.averageRequestProcessingTimeUsec =
+        std::chrono::microseconds(nx::utils::random::number(1, 20));
+    statistics.maxRequestProcessingTimeUsec =
+        std::chrono::microseconds(nx::utils::random::number(1, 20));
     return statistics;
 }
 
@@ -97,22 +101,22 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class HttpServerStatisticsProvider:
-    public nx::network::server::AbstractStatisticsProvider
+    public nx::network::http::server::AbstractHttpStatisticsProvider
 {
 public:
-    virtual nx::network::server::Statistics statistics() const override
+    virtual nx::network::http::server::HttpStatistics httpStatistics() const override
     {
         m_lastProvidedStatistics = generateHttpServerStatistics();
         return m_lastProvidedStatistics;
     }
 
-    nx::network::server::Statistics lastProvidedStatistics() const
+    nx::network::http::server::HttpStatistics lastProvidedStatistics() const
     {
         return m_lastProvidedStatistics;
     }
 
 private:
-    mutable nx::network::server::Statistics m_lastProvidedStatistics;
+    mutable nx::network::http::server::HttpStatistics m_lastProvidedStatistics;
 };
 
 } // namespace
@@ -128,7 +132,9 @@ public:
         m_statisticsProvider(
             m_listeningPeerPool,
             m_httpServerStatisticsProvider,
-            m_trafficRelay)
+            m_trafficRelay,
+            nullptr,
+            nullptr)
     {
     }
 

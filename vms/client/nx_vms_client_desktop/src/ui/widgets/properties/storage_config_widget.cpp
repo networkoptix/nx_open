@@ -24,7 +24,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <server/server_storage_manager.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
@@ -48,10 +48,10 @@
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/analytics/utils.h>
-#include <nx/utils/unused.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -140,9 +140,17 @@ namespace
             if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
                 opt.state &= ~QStyle::State_Enabled;
 
-            // Set proper color for actions when they are hovered.
-            if (hasActiveAction && hovered)
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
+            // Set proper color for action text buttons.
+            if (index.column() == QnStorageListModel::ActionsColumn)
+            {
+                if (hasActiveAction && hovered)
+                    opt.palette.setColor(QPalette::Text, colorTheme()->color("light14"));
+                else if (hasActiveAction)
+                    opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
+                else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
+                    opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::Light));
+            }
+
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
@@ -501,8 +509,9 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     if (!m_server || isReadOnly())
         return;
 
-    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
-    dialog->setProtocols(qnServerStorageManager->protocols(m_server));
+    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
+    dialog->setProtocols(storageManager->protocols(m_server));
     dialog->setCurrentServerStorages(m_model->storages());
     if (!dialog->exec())
         return;
@@ -916,7 +925,7 @@ QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
     QDateTime backupDateTime = ServerTimeWatcher::serverTime(m_server, backupTimeMs);
     if (context()->instance<ServerTimeWatcher>()->timeMode() == ServerTimeWatcher::clientTimeMode)
         backupDateTime = backupDateTime.toLocalTime();
-    return datetime::toString(backupDateTime);
+    return nx::vms::time::toString(backupDateTime);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
@@ -1031,7 +1040,7 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
             QnMessageBoxIcon::Question,
             tr("What to do with current analytics data?"),
             tr("Current analytics data will not be automatically moved to another location"
-                " and will become unaccessible. You can keep it and manually move later,"
+                " and will become inaccessible. You can keep it and manually move later,"
                 " or delete permanently."
                 "\n"
                 "If you intended to move analytics data to another storage location,"

@@ -22,7 +22,7 @@ class StatisticsRdbDataObject:
 {
 public:
     StatisticsRdbDataObject():
-        nx::sql::test::TestWithDbHelper("hpm", QString())
+        nx::sql::test::TestWithDbHelper(QString())
     {
         init();
     }

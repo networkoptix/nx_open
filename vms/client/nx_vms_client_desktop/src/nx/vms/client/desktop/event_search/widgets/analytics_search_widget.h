@@ -21,11 +21,13 @@ public:
     void setFilterRect(const QRectF& value);
 
     bool areaSelectionEnabled() const;
+    QString selectedObjectType() const;
 
 signals:
     void areaSelectionEnabledChanged(bool value, QPrivateSignal);
     void areaSelectionRequested(QPrivateSignal);
     void filterRectChanged(const QRectF& value);
+    void selectedObjectTypeChanged();
 
 private:
     virtual QString placeholderText(bool constrained) const override;

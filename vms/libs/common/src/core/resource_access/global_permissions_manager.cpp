@@ -8,6 +8,8 @@
 
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
+
 
 using namespace nx::core::access;
 
@@ -65,13 +67,24 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
     return calculateGlobalPermissions(subject);
 }
 
+bool QnGlobalPermissionsManager::containsPermission(
+    GlobalPermissions globalPermissions,
+    GlobalPermission requiredPermission)
+{
+    return requiredPermission == GlobalPermission::none
+        ? true
+        : globalPermissions.testFlag(requiredPermission);
+}
+
 bool QnGlobalPermissionsManager::hasGlobalPermission(const QnResourceAccessSubject& subject,
     GlobalPermission requiredPermission) const
 {
-    if (requiredPermission == GlobalPermission::none)
-        return true;
+    return containsPermission(globalPermissions(subject), requiredPermission);
+}
 
-    return globalPermissions(subject).testFlag(requiredPermission);
+bool QnGlobalPermissionsManager::canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const
+{
+    return hasGlobalPermission(accessRights, nx::vms::api::GlobalPermission::admin);
 }
 
 bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& accessRights,
@@ -148,7 +161,7 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
     else
     {
         /* If the group does not exist, permissions will be empty. */
-        result = subject.role().permissions;
+        result = subject.rolePermissions();
 
         /* If user belongs to group, he cannot be an admin - by design. */
         result &= ~GlobalPermissions(GlobalPermission::admin);

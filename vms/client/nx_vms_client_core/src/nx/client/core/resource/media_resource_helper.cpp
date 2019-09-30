@@ -47,6 +47,38 @@ bool MediaResourceHelper::isWearableCamera() const
     return d->camera && d->camera->flags().testFlag(Qn::wearable_camera);
 }
 
+bool MediaResourceHelper::audioSupported() const
+{
+    return d->camera && d->camera->isAudioSupported();
+}
+
+MediaPlayer::VideoQuality MediaResourceHelper::livePreviewVideoQuality() const
+{
+    if (!d->camera)
+        return nx::media::Player::LowIframesOnlyVideoQuality;
+
+    static const auto isLowNativeStream =
+        [](const CameraMediaStreamInfo& info)
+        {
+            if (info.transcodingRequired)
+                return false;
+
+            static const QSize kMaximalSize(800, 600);
+            const auto size = info.getResolution();
+            return !size.isEmpty()
+                && size.width() <= kMaximalSize.width()
+                && size.height() < kMaximalSize.height();
+        };
+
+    if (isLowNativeStream(d->camera->streamInfo(QnSecurityCamResource::StreamIndex::secondary)))
+        return nx::media::Player::LowVideoQuality;
+
+    // Checks if primary stream is low quality one.
+    return isLowNativeStream(d->camera->streamInfo(QnSecurityCamResource::StreamIndex::primary))
+        ? nx::media::Player::HighVideoQuality
+        : nx::media::Player::LowIframesOnlyVideoQuality;
+}
+
 bool MediaResourceHelper::analogCameraWithoutLicense() const
 {
     return d->camera && d->camera->isDtsBased() && !d->camera->isLicenseUsed();
@@ -124,6 +156,7 @@ void MediaResourceHelper::Private::handlePropertyChanged(
     }
     else if (key == ResourcePropertyKey::kMediaStreams)
     {
+        emit q->livePreviewVideoQualityChanged();
         emit q->aspectRatioChanged();
     }
 }
@@ -156,7 +189,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     const auto cameraResource = currentResource.dynamicCast<QnVirtualCameraResource>();
     if (currentResource && !cameraResource)
     {
-        q->setResourceId(QString()); //< We support only camera resources.
+        q->setResourceId(QnUuid()); //< We support only camera resources.
         return;
     }
 
@@ -189,6 +222,8 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->fisheyeParamsChanged();
     emit q->analogCameraWithoutLicenseChanged();
     emit q->wearableCameraChanged();
+    emit q->audioSupportedChanged();
+    emit q->livePreviewVideoQualityChanged();
 }
 
 } // namespace nx::vms::client::core

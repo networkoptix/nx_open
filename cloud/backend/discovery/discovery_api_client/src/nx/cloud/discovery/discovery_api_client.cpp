@@ -94,6 +94,7 @@ DiscoveryClient::DiscoveryClient(
     const NodeInfo& nodeInfo)
     :
     m_settings(discoverySettings),
+    m_clusterId(clusterId),
     m_thisNodeInfo(nodeInfo)
 {
     NX_ASSERT(m_settings.roundTripPadding >= std::chrono::milliseconds::zero());
@@ -117,10 +118,15 @@ void DiscoveryClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioTh
     m_onlineNodesRequest->bindToAioThread(aioThread);
 }
 
-void DiscoveryClient::start()
+bool DiscoveryClient::start()
 {
+    if (!validateSettings())
+        return false;
+
     startRegistration();
     startGetOnlineNodes();
+
+    return true;
 }
 
 void DiscoveryClient::startRegistration()
@@ -462,6 +468,17 @@ DiscoveryClient::calculateRegistrationDelay(const nx::network::http::Response* r
     }
 
     return registrationDelay;
+}
+
+bool DiscoveryClient::validateSettings() const
+{
+    if (m_settings.enabled && m_clusterId.empty())
+    {
+        NX_WARNING(this, "Discovery is enabled but clusterId is empty. Discovery will not start");
+        return false;
+    }
+
+    return m_settings.enabled;
 }
 
 } // namespace nx::cloud::discovery

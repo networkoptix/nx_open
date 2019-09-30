@@ -13,27 +13,31 @@ const QString kPluginDescriptorTypeName("Plugin");
 
 } // namespace
 
-PluginDescriptorManager::PluginDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+PluginDescriptorManager::PluginDescriptorManager(QObject* parent) :
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_pluginDescriptorContainer(
-        makeContainer<PluginDescriptorContainer>(commonModule, kPluginDescriptorsProperty))
+        makeContainer<PluginDescriptorContainer>(commonModule(), kPluginDescriptorsProperty))
 {
 }
 
 std::optional<PluginDescriptor> PluginDescriptorManager::descriptor(const PluginId& pluginId) const
 {
-    return fetchDescriptor(m_pluginDescriptorContainer, pluginId);
+    return fetchDescriptor(m_pluginDescriptorContainer.get(), pluginId);
 }
 
 PluginDescriptorMap PluginDescriptorManager::descriptors(const std::set<PluginId>& pluginIds) const
 {
-    return fetchDescriptors(m_pluginDescriptorContainer, pluginIds, kPluginDescriptorTypeName);
+    return fetchDescriptors(
+        m_pluginDescriptorContainer.get(),
+        pluginIds,
+        kPluginDescriptorTypeName);
 }
 
 void PluginDescriptorManager::updateFromPluginManifest(const PluginManifest& manifest)
 {
     PluginDescriptor descriptor{manifest.id, manifest.name};
-    m_pluginDescriptorContainer.mergeWithDescriptors(std::move(descriptor), manifest.id);
+    m_pluginDescriptorContainer->mergeWithDescriptors(std::move(descriptor), manifest.id);
 }
 
 } // namespace nx::analytics

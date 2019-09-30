@@ -1,0 +1,10 @@
+On olemassa uusi versio {{ message.product }}
+
+Napsauta linkkiä, jolla voit tarkastella luonnosta {{ message.id }} {{ message.product }}
+
+Linkki tarkistettavaksi: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
+
+Tällä sivulla voit
+Luoda esikatselun nähdäksesi uusimmat muutokset.
+2) Julkaista tämän version, joka päivittää kaiken sisällön.
+3) Muokata sisältöä painamalla muokkaa tallennuspainiketta. Jos haluat nähdä muutokset, sinun täytyy luoda uusi versio.

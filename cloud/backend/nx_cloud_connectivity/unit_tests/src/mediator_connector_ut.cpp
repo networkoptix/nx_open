@@ -38,8 +38,7 @@ class MediatorConnector:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    MediatorConnector():
-        nx::utils::test::TestWithTemporaryDirectory("mediator", QString())
+    MediatorConnector()
     {
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(

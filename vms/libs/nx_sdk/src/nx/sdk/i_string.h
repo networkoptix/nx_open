@@ -10,7 +10,7 @@ namespace sdk {
 class IString: public nx::sdk::Interface<IString>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IString"); }
+    static auto interfaceId() { return makeId("nx::sdk::IString"); }
 
     /** Never null. */
     virtual const char* str() const = 0;

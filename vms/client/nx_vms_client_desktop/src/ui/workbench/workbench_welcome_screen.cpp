@@ -127,7 +127,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     if (!system)
         return;
 
-    if (qnSettings->autoLogin())
+    if (qnSettings->autoLogin() && qnSettings->saveCredentialsAllowed())
         return; // Do nothing in case of auto-login option set
 
     if (system->isCloudSystem() || !system->isConnectable())
@@ -319,6 +319,11 @@ QString QnWorkbenchWelcomeScreen::message() const
     return m_message;
 }
 
+int QnWorkbenchWelcomeScreen::tileHideOptions() const
+{
+    return ini().tileHideOptions;
+}
+
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
@@ -480,7 +485,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                             nx::vms::client::core::helpers::saveCloudCredentials(cloudCredentials);
                         }
 
-                        qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
+                        qnCloudStatusWatcher->setInitialCredentials(cloudCredentials);
                         connectToSystemInternal(QString(), url, cloudCredentials,
                             dialog->savePassword(), kNoAutoLogin, controlsGuard);
                     }
@@ -557,4 +562,9 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString
     }
 
     qnClientCoreSettings->save();
+}
+
+bool QnWorkbenchWelcomeScreen::saveCredentialsAllowed() const
+{
+    return qnSettings->saveCredentialsAllowed();
 }

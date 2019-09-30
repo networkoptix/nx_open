@@ -471,7 +471,7 @@ void Appserver2Process::registerHttpHandlers(
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
-        nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
+        nx::vms::time::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
     {
         auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
@@ -499,7 +499,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     ec2::AbstractECConnectionPtr ec2Connection, int tcpPort)
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
-    server->setId(commonModule()->moduleGUID());
+    server->setIdUnsafe(commonModule()->moduleGUID());
 
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);

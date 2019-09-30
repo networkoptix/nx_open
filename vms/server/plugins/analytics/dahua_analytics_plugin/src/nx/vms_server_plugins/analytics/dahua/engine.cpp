@@ -11,6 +11,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
 #include "common.h"
@@ -89,41 +90,40 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* /*outError*/)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
-        return nullptr;
+        return;
 
-    const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
-        = fetchDeviceAgentParsedManifest(deviceInfo);
+    const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest =
+        fetchDeviceAgentParsedManifest(deviceInfo);
+
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
-        return nullptr;
-
-    return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
-}
-
-const nx::sdk::IString* Engine::manifest(Error* outError) const
-{
-    if (m_jsonManifest.isEmpty())
     {
-        *outError = Error::unknownError;
-        return nullptr;
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+        return;
     }
 
-    *outError = Error::noError;
-    return new nx::sdk::String(m_jsonManifest);
+    *outResult = new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
+}
+
+void Engine::getManifest(Result<const IString*>* outResult) const
+{
+    if (m_jsonManifest.isEmpty())
+        *outResult = error(ErrorCode::otherError, "Engine manifest is empty");
+    else
+        *outResult = new nx::sdk::String(m_jsonManifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -156,7 +156,11 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
 
     auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
-        return DeviceAgentManifest{ data.supportedEventTypeIds };
+    {
+        DeviceAgentManifest manifest;
+        manifest.supportedEventTypeIds = data.supportedEventTypeIds;
+        return manifest;
+    }
 
     using namespace std::chrono;
 
@@ -196,7 +200,10 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
-    return nx::vms::api::analytics::DeviceAgentManifest{ data.supportedEventTypeIds };
+
+    DeviceAgentManifest manifest;
+    manifest.supportedEventTypeIds = data.supportedEventTypeIds;
+    return manifest;
 }
 
 const EngineManifest& Engine::parsedManifest() const
@@ -204,14 +211,13 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -224,12 +230,12 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "dahua_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dahua",
     "name": "Dahua analytics plugin",
+    "description": "Supports built-in analytics on Dahua cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -241,7 +247,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

@@ -189,6 +189,8 @@
       <!-- std::vector<struct soap_dom_element> __any -->
       <!-- a repetition of 0 or more of the following -->
 
+      <!-- std::string *AFModes -->
+      <tt:AFModes></tt:AFModes>
      </tt:Extension>
     </tt:Focus>
     <!-- std::vector<tt__IrCutFilterMode> IrCutFilterModes -->

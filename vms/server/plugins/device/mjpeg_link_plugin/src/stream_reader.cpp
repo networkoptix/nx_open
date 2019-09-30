@@ -66,8 +66,6 @@ StreamReader::StreamReader(
 StreamReader::~StreamReader()
 {
     NX_ASSERT(m_isInGetNextData == 0);
-    m_timeProvider->releaseRef();
-
     m_videoPacket.reset();
 }
 

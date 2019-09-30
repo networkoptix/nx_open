@@ -61,6 +61,10 @@ static const char* IGNORE_VENDORS[][2] =
         {"Hanwha*", "*" },
         {"Samsung*", "*" },
         {"*", "XNB-6000" },
+        {"*", "Hanwha*" },
+        {"*", "Samsung*" },
+        {"*", "SPE-410" },
+        {"SPE-410", "*" },
     #endif
 };
 

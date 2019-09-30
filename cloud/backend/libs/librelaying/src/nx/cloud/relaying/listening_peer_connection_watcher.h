@@ -15,8 +15,9 @@ struct ClientInfo
 };
 
 /**
+ * Monitors server connection until it is closed or passed to a client.
  * NOTE: The first keep-alive notification is sent right after call to
- * ListeningPeerConnectionWatcher::start().
+ * ListeningPeerConnectionWatcher::startMonitoringConnection().
  * Other keep-alive probes are sent after keepAliveProbePeriod.
  */
 class NX_RELAYING_API ListeningPeerConnectionWatcher:
@@ -36,9 +37,14 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> connectionClosureHandler);
+    void startMonitoringConnection(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> connectionClosureHandler);
 
-    void startTunnel(const ClientInfo& clientInfo, OpenTunnelHandler handler);
+    /**
+     * Prepares the connection to be used by a client (notifies the server)
+     * and reports the connection via handler.
+     */
+    void openTunnel(const ClientInfo& clientInfo, OpenTunnelHandler handler);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -61,12 +67,12 @@ private:
     void sendKeepAliveProbe(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
-    void startTunnel(
+    void openTunnel(
         relay::api::OpenTunnelNotification notification,
         OpenTunnelHandler handler);
 
     template<typename Notification, typename Handler>
-    // requires std::is_void<std::invoke_result_t<handler, SystemError::ErrorCode>::type>::value
+    // requires std::is_void_v<std::invoke_result_t<handler, SystemError::ErrorCode>>
     void sendNotification(
         Notification notification,
         Handler handler);

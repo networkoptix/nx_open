@@ -1,0 +1,23 @@
+@import '../../styles/mixins';
+
+.menu {
+    padding          : .5rem 0;
+    background-color : $light5;
+    
+    // TODO: Add additional class for not having header
+    // border-radius    : 2px;
+    // else
+    border-radius    : 0 0 2px 2px;
+    
+    nx-level-1-item {
+    }
+    
+    nx-level-2-item {
+        width       : 100%;
+        display     : block;
+        line-height : 26px;
+    }
+    
+    nx-level-3-item {
+    }
+}

@@ -102,32 +102,6 @@ TEST_F(AlgorithmMoveIf, whole_initial_data_is_left_in_place)
 }
 
 //-------------------------------------------------------------------------------------------------
-// reverseWords
-
-TEST(Algorithm_reverseWords, common)
-{
-    ASSERT_EQ("com.google.inbox", reverseWords<std::string>("inbox.google.com", "."));
-    ASSERT_EQ(".com", reverseWords<std::string>("com.", "."));
-    ASSERT_EQ("com.", reverseWords<std::string>(".com", "."));
-}
-
-TEST(Algorithm_reverseWords, empty_string)
-{
-    ASSERT_EQ("", reverseWords<std::string>("", "."));
-}
-
-TEST(Algorithm_reverseWords, no_separators)
-{
-    ASSERT_EQ("com", reverseWords<std::string>("com", "."));
-}
-
-TEST(Algorithm_reverseWords, only_separators)
-{
-    ASSERT_EQ("...", reverseWords<std::string>("...", "."));
-    ASSERT_EQ(".", reverseWords<std::string>(".", "."));
-}
-
-//-------------------------------------------------------------------------------------------------
 // countElementsWithPrefix
 
 TEST(Algorithm_countElementsWithPrefix, all)
@@ -197,6 +171,20 @@ TEST(Algorithm_equalRangeByPrefix, all)
     range = equalRangeByPrefix(m, "c");
     ASSERT_EQ(m.end(), range.first);
     ASSERT_EQ(m.end(), range.second);
+}
+
+TEST(Algorithm_y_combinator, compilation_test)
+{
+    auto addItemRecursive = nx::utils::y_combinator(
+        [](auto addItemRecursive, int a) -> int
+        {
+            if (a == 10)
+                return a;
+
+            return addItemRecursive(a + 1);
+        });
+
+    ASSERT_EQ(addItemRecursive(0), 10);
 }
 
 } // namespace test

@@ -281,7 +281,7 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     const QnTimePeriod& period, Qt::SortOrder order, int limit)
 {
     const auto server = q->commonModule()->currentServer();
-    if (!NX_ASSERT(server && server->apiConnection() && !q->isFilterDegenerate()))
+    if (!NX_ASSERT(server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnChunksRequestData request;

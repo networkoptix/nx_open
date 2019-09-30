@@ -51,15 +51,9 @@ QByteArray Playlist::toString() const
         //   and QDateTime::toString(Qt::ISODate) do not provide expected result.
         if (chunk.programDateTime)
         {
-            const int tzOffset = chunk.programDateTime->timeZone().offsetFromUtc(*chunk.programDateTime);
             playlistStr += "#EXT-X-PROGRAM-DATE-TIME:";
-            playlistStr += chunk.programDateTime->toString(Qt::ISODate) + "."; //< data/time.
-            playlistStr += QString::number((chunk.programDateTime->toMSecsSinceEpoch() % 1000)); // Milliseconds.
-            playlistStr +=
-                (tzOffset >= 0                                                                    //< Timezone.
-                    ? ("+" + QTime(0, 0, 0).addSecs(tzOffset).toString(QStringLiteral("hh:mm")))
-                    : ("-" + QTime(0, 0, 0).addSecs(-tzOffset).toString(QStringLiteral("hh:mm"))))
-                + "\r\n";
+            playlistStr += chunk.programDateTime->toString(Qt::ISODateWithMs); //< data/time.
+            playlistStr += "\r\n";
         }
         playlistStr += "#EXTINF:" + QByteArray::number(chunk.duration, 'f', 3) + ",\r\n";
         playlistStr += chunk.url.host().isEmpty()

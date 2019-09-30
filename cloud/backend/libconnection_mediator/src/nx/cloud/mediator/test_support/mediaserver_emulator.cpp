@@ -76,7 +76,7 @@ private:
 
 MediaServerEmulator::MediaServerEmulator(
     const network::SocketAddress& mediatorUdpEndpoint,
-    const network::SocketAddress& mediatorTcpEndpoint,
+    const nx::utils::Url& mediatorTcpUrl,
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
@@ -97,7 +97,7 @@ MediaServerEmulator::MediaServerEmulator(
             mediatorUdpEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
-    m_cloudConnectionMethodMask((int)network::cloud::ConnectType::all),
+    m_cloudConnectionMethodMask((int) network::cloud::ConnectType::udpHp),
     m_cloudSystemIdForModuleInformation(m_systemData.id),
     m_serverIdForModuleInformation(m_serverId)
 {
@@ -114,9 +114,7 @@ MediaServerEmulator::MediaServerEmulator(
     bindToAioThread(getAioThread());
 
     m_mediatorConnector->mockupMediatorAddress({
-        nx::network::url::Builder()
-            .setScheme(network::stun::kUrlSchemeName)
-            .setEndpoint(mediatorTcpEndpoint),
+        mediatorTcpUrl,
         mediatorUdpEndpoint});
 
     m_mediatorConnector->setSystemCredentials(
@@ -281,6 +279,11 @@ std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::medi
     return m_mediatorConnector->systemConnection();
 }
 
+void MediaServerEmulator::setCloudConnectionMethodMask(int mask)
+{
+    m_cloudConnectionMethodMask = mask;
+}
+
 void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
 {
@@ -292,6 +295,8 @@ void MediaServerEmulator::onConnectionRequested(
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
     if ((m_cloudConnectionMethodMask & (int)network::cloud::ConnectType::udpHp) > 0)
         connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    if ((m_cloudConnectionMethodMask & (int)network::cloud::ConnectType::proxy) > 0)
+        connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::proxy;
 
     if (m_onConnectionRequestedHandler)
     {

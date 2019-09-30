@@ -13,7 +13,7 @@ struct UserAccessData
     enum class Access
     {
         Default,            /**< Default access rights. All permissions are checked as usual. */
-        ReadAllResources,   /**< Read permission on all resources is granted additionally. */
+        ReadAllResources,   /**< Read permission on all resources except of users is granted additionally. */
         System              /**< Full permissions on all transactions. */
     };
 

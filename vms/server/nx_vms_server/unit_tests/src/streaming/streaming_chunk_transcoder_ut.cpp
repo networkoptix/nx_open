@@ -36,7 +36,7 @@ protected:
         m_cameraResourceId = QnUuid::createUuid();
 
         auto cameraResource = resource::CameraPtr(new resource::test::CameraMock(&m_serverModule));
-        cameraResource->setId(m_cameraResourceId);
+        cameraResource->setIdUnsafe(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
             cameraResource, nx::vms::server::VideoCameraPtr(new VideoCameraMock())));

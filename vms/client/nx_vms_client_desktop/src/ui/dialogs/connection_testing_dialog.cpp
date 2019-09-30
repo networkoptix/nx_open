@@ -7,8 +7,6 @@
 
 #include <QtWidgets/QDataWidgetMapper>
 #include <QtWidgets/QPushButton>
-
-#include <api/session_manager.h>
 #include <api/app_server_connection.h>
 
 #include <client_core/client_core_module.h>

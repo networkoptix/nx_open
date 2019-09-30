@@ -132,7 +132,7 @@ class SpecialCommandProcessor:
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        const std::string& /*systemId*/,
+        const std::string& /*clusterId*/,
         CommandTransportHeader /*transportHeader*/,
         Command<typename CommandDescriptor::Data> /*data*/,
         CommandProcessedHandler /*handler*/)> ProcessorFunc;
@@ -150,9 +150,9 @@ private:
         SerializableCommand<CommandDescriptor> transaction,
         CommandProcessedHandler handler) override
     {
-        const auto systemId = transportHeader.systemId;
+        const auto clusterId = transportHeader.clusterId;
         m_processorFunc(
-            std::move(systemId),
+            std::move(clusterId),
             std::move(transportHeader),
             std::move(transaction.take()),
             std::move(handler));
@@ -172,7 +172,7 @@ public:
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, std::string /*systemId*/, SpecificCommand)>;
+            nx::sql::QueryContext*, std::string /*clusterId*/, SpecificCommand)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
@@ -204,12 +204,12 @@ private:
     {
         using namespace std::placeholders;
 
-        const auto systemId = transportHeader.systemId;
+        const auto clusterId = transportHeader.clusterId;
         TransactionContext transactionContext{
             std::move(transportHeader),
             std::move(transaction)};
         m_commandLog->startDbTransaction(
-            systemId.c_str(),
+            clusterId.c_str(),
             [this, transactionContext = std::move(transactionContext)](
                 nx::sql::QueryContext* queryContext) mutable
             {
@@ -235,14 +235,14 @@ private:
         auto dbResultCode =
             m_commandLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
                 queryContext,
-                transactionContext.transportHeader.systemId.c_str(),
+                transactionContext.transportHeader.clusterId.c_str(),
                 transactionContext.transaction);
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
         {
             NX_DEBUG(this,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
-                .args(CommandDescriptor::name, transactionContext.transportHeader.systemId,
+                .args(CommandDescriptor::name, transactionContext.transportHeader.clusterId,
                     transactionContext.transportHeader.endpoint));
             // Command cancellation is not a DB-level error, but a logical one.
             // So, providing nx::sql::DBResult::ok. Otherwise, the connection will be broken.
@@ -252,7 +252,7 @@ private:
         {
             NX_WARNING(this,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
-                .args(CommandDescriptor::name, transactionContext.transportHeader.systemId,
+                .args(CommandDescriptor::name, transactionContext.transportHeader.clusterId,
                     transactionContext.transportHeader.endpoint,
                     queryContext->connection()->lastErrorText()));
             return dbResultCode;
@@ -260,7 +260,7 @@ private:
 
         dbResultCode = m_processTranFunc(
             queryContext,
-            transactionContext.transportHeader.systemId.c_str(),
+            transactionContext.transportHeader.clusterId.c_str(),
             std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {

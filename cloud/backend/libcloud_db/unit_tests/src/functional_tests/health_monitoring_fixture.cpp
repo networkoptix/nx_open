@@ -7,8 +7,12 @@
 namespace nx::cloud::db {
 namespace test {
 
-HealthMonitoring::HealthMonitoring()
+void HealthMonitoring::SetUp()
 {
+    addArg("--systemManager/saveSystemHealthHistory=true");
+
+    base_type::SetUp();
+
     m_anotherUser = addActivatedAccount2();
 }
 

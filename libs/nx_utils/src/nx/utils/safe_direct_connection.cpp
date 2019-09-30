@@ -88,6 +88,7 @@ bool SafeDirectConnectionGlobalHelper::beforeSlotInvoked(
     auto it = m_receivers.find(receiver);
     if (it == m_receivers.end() || it->second.terminated)
         return false;
+
     ++it->second.slotsInvokedCounter;
     return true;
 }

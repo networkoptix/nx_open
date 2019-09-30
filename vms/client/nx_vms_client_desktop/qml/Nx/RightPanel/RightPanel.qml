@@ -92,6 +92,7 @@ Item
 
                 EventRibbon
                 {
+                    brief: true
                     anchors.fill: parent
                     model: RightPanelModel
                     {

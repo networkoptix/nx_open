@@ -1,7 +1,10 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Het is niet gelukt toegang te krijgen tot het systeem</h1>
-        <h3>Deze link is gebroken, <br>het systeem kan worden losgekoppeld van %PRODUCT_NAME%, <br>toegang tot dit systeem kan zijn ingetrokken, <br>of u bent reeds ingelogd bij een ander account
+        <h3>This link is broken,<br>
+            System may be disconnected from %CLOUD_NAME%,<br>
+            Access to this System may be revoked, <br>
+            or you may be logged into a different account
         </h3>
         <p class="mt-4 d-flex justify-content-center">
             <a href="/systems" class="btn btn-primary">Lijst van de beschikbare systemen</a>
@@ -10,10 +13,10 @@
 
     <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
-        <div class="col-lg-4 order-1 order-lg-2">
+        <div class="col-12 col-lg-4 order-1 order-lg-2">
             <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
         </div>
-        <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
+        <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
                     U heeft geen toegang tot systeeminformatie.

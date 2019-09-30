@@ -757,47 +757,6 @@ void socketAcceptCancelSync(
 }
 
 template<typename ServerSocketMaker>
-void socketAcceptCancelAsync(
-    const ServerSocketMaker& serverMaker, StopType stopType)
-{
-    std::vector<std::unique_ptr<AbstractStreamServerSocket>> servers;
-    nx::utils::BarrierWaiter barrier;
-    const auto serverCount = testClientCount();
-    for (size_t i = 0; i < serverCount; ++i)
-    {
-        auto server = serverMaker();
-        ASSERT_TRUE(server->setNonBlockingMode(true))
-            << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()))
-            << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))
-            << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->listen(5))
-            << SystemError::getLastOSErrorText().toStdString();
-
-        server->acceptAsync(
-            [&](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) { NX_CRITICAL(false); });
-
-        if (i)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10 * i));
-
-        switch (stopType)
-        {
-            case StopType::cancelIo:
-                server->cancelIOAsync(barrier.fork());
-                break;
-            case StopType::pleaseStop:
-                server->pleaseStop(barrier.fork());
-                break;
-            default:
-                NX_CRITICAL(false);
-        };
-
-        servers.push_back(std::move(server));
-    }
-}
-
-template<typename ServerSocketMaker>
 void serverSocketPleaseStopCancelsPostedCall(
     const ServerSocketMaker& serverMaker)
 {
@@ -953,10 +912,6 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketAcceptCancelSync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopSync) \
         { nx::network::test::socketAcceptCancelSync(mkServer, StopType::pleaseStop); } \
-    Type(Name, AcceptCancelIoAsync) \
-        { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::cancelIo); } \
-    Type(Name, AcceptPleaseStopAsync) \
-        { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::pleaseStop); } \
     Type(Name, PleaseStopCancelsPostedCall) \
         { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 

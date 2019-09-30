@@ -966,7 +966,7 @@ Do you want to delete it anyway?</source>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
@@ -1136,7 +1136,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>这是什么？</translation>
+      <translation>这是什么?</translation>
     </message>
   </context>
   <context>

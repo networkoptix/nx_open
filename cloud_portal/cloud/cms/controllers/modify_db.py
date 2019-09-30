@@ -16,39 +16,51 @@ from api.models import Account
 from ..models import *
 
 BYTES_TO_MEGABYTES = 1048576.0
+PENDING = ProductCustomizationReview.REVIEW_STATES[ProductCustomizationReview.REVIEW_STATES.pending].lower()
 
 
 def update_draft_state(review_id, target_state, user):
-    review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None)
-    if not review.exists():
+    review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None).last()
+    if not review:
         return " is currently publishing or has already been published"
-
-    review = review.latest('id')
 
     if not review.version.accepted_by:
         review.version.accepted_by = user
         review.version.accepted_date = datetime.now()
         review.version.save()
 
-    review.update_state(user, target_state)
+    review.update_between_published_and_current(user, target_state)
 
     return None
 
 
-def notify_version_ready(product, version_id, exclude_user):
+def notify_version_ready(product, version, exclude_user):
     perm = Permission.objects.filter(codename='publish_version')
-    users = Account.objects.\
-        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
-        filter(subscribe=True, customization__in=product.customizations.all()).\
-        exclude(pk=exclude_user.pk).\
-        distinct()
+    users = Account.objects.filter(groups__permissions__in=perm).exclude(pk=exclude_user.pk).distinct()
 
     product_name = product.name
+    product_type = ProductType.PRODUCT_TYPES[product.product_type.type]
+    product_customizations_set = set()
+    for customization in product.customizations.values_list('name', flat=True):
+        cloud_capabilities = cloud_portal_customization_cache(customization, 'cloud_capabilities')
+        # Ignore integrations if the integration store is disabled.
+        if not product.is_integration or cloud_capabilities['integration_store_enabled']:
+            product_customizations_set.add(customization)
 
     for user in users:
-        send(user.email, "review_version",
-             {'id': version_id, 'product': product_name},
-             user.customization)
+        # If the user has a customization in common with product send them a notification
+        intersection_user_customizations_to_products = set(user.customizations) & product_customizations_set
+        if intersection_user_customizations_to_products:
+            # There should never be two customizations with the same name but this is a safety check
+            review_id = version.productcustomizationreview_set.\
+                filter(customization__name=intersection_user_customizations_to_products.pop()).first().id
+            send(user.email, "review_version",
+                 {
+                     'id': review_id,
+                     'product': product_name,
+                     'product_type': product_type
+                 },
+                 user.customization)
 
 
 def save_unrevisioned_records(product, context, language, data_structures,
@@ -216,11 +228,12 @@ def save_unrevisioned_records(product, context, language, data_structures,
             record.external_file = external_file
             record.save()
 
-    fill_content(product,
-                 preview=True,
-                 incremental=True,
-                 version_id=version_id,
-                 changed_context=context)
+    if product.is_cloud_portal and product.can_preview_on_portal:
+        fill_content(product,
+                     preview=True,
+                     incremental=True,
+                     version_id=version_id,
+                     changed_context=context)
 
     return upload_errors
 
@@ -265,18 +278,22 @@ def remove_unused_records(product):
             record.delete()
 
 
-def generate_preview_link(context=None):
-    return context.url + "?preview" if context else "/content/about?preview"
+def generate_preview_link(context=None, product=None, state=""):
+    if product and product.is_integration:
+        return f"{settings.INTEGRATION_STORE_PAGE}/{product.id}?state={state}"
+
+    return f"{context.url}?preview" if context else "/content/about?preview"
 
 
 def generate_preview(product, context=None, version_id=None, send_to_review=False):
-    fill_content(product,
-                 preview=True,
-                 incremental=True,
-                 changed_context=context,
-                 version_id=version_id,
-                 send_to_review=send_to_review)
-    return generate_preview_link(context)
+    if product.is_cloud_portal and product.can_preview_on_portal:
+        fill_content(product,
+                     preview=True,
+                     incremental=True,
+                     changed_context=context,
+                     version_id=version_id,
+                     send_to_review=send_to_review)
+    return generate_preview_link(context, product=product, state=PENDING)
 
 
 def publish_latest_version(product, review_id, user):
@@ -288,8 +305,13 @@ def publish_latest_version(product, review_id, user):
 
 def integration_has_required_data(product):
     errors = []
-    for datastructure in DataStructure.objects.filter(context__product_type__product=product):
-        if not datastructure.optional and not datastructure.datarecord_set.exists():
+    for datastructure in DataStructure.objects.filter(context__product_type=product.product_type):
+        records = datastructure.datarecord_set.filter(product=product)
+        last_record_value = records.last().value if records.last() else None
+        if last_record_value and datastructure.type in [DataStructure.DATA_TYPES.select,
+                                                        DataStructure.DATA_TYPES.array]:
+            last_record_value = json.loads(last_record_value)
+        if not datastructure.optional and (not records.exists() or not last_record_value):
             ds_name = datastructure.label if datastructure.label else datastructure.name
             errors.append((ds_name,
                            "This field cannot be blank. Go to the {} page and fill in {}.".
@@ -298,15 +320,14 @@ def integration_has_required_data(product):
 
 
 def send_version_for_review(product, user):
-    old_versions = ContentVersion.objects.filter(product=product, accepted_date=None)
+    old_version = ContentVersion.objects.filter(product=product, accepted_date=None).order_by('created_date').last()
 
-    if old_versions.exists():
-        old_version = old_versions.latest('created_date')
+    if old_version:
         strip_version_from_records(old_version, product)
         old_version.delete()
 
     # We only check for integrations because its the only product type that non staff have access to.
-    if product.product_type.type == ProductType.PRODUCT_TYPES.integration:
+    if product.is_integration:
         errors = integration_has_required_data(product)
         if len(errors) > 0:
             return errors
@@ -318,17 +339,30 @@ def send_version_for_review(product, user):
 
     update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 
-    notify_version_ready(product, version.id, user)
+    notify_version_ready(product, version, user)
     return []
 
 
-def get_records_for_version(version):
-    data_records = version.datarecord_set.all()\
-        .order_by('data_structure__context__name', 'language__code')
+def get_records_for_version(product, version, customization):
+    published_version = product.version_id(customization)
+    if version.id > published_version:
+
+        data_records = product.datarecord_set.filter(version__id__gt=published_version,
+                                                     version__id__lte=version.id)
+    else:
+        data_records = product.datarecord_set.filter(version__id=version.id)
+    data_records = data_records.\
+        order_by('data_structure__context__order', 'language__code', 'data_structure__order', '-id')
     contexts = {}
+    used_data_structures = set()
 
     for record in data_records:
-        context_name = record.data_structure.context.name
+        ds_with_lang = record.get_data_structure_with_name
+        if ds_with_lang in used_data_structures:
+            continue
+
+        used_data_structures.add(ds_with_lang)
+        context_name = record.data_structure.context.get_nice_name()
         if context_name in contexts:
             contexts[context_name].append(record)
         else:
@@ -416,7 +450,7 @@ def check_meta_settings(data_structure, new_file):
 
 # End of file upload helpers
 def upload_file(data_structure, new_file):
-    encoded_file = base64.b64encode(new_file.read())
+    encoded_file = base64.b64encode(new_file.read()).decode('utf8')
     if new_file.size >= settings.CMS_MAX_FILE_SIZE:
         return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'.
                        format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]

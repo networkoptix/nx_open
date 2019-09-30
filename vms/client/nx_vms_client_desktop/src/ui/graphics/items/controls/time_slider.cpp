@@ -18,7 +18,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <camera/thumbnails_loader.h>
 
@@ -628,6 +628,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
 {
     setAutoHideToolTip(false);
 
+    setSkipUpdateOnSliderChange({ SliderRangeChange, SliderStepsChange, SliderValueChange, SliderMappingChange });
+
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));
@@ -775,19 +777,19 @@ QnTimeSlider::~QnTimeSlider()
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
 
-    static const QString mFormat = datetime::getFormatString(datetime::Format::hh_mm);
-    static const QString hFormat = datetime::getFormatString(datetime::Format::hh);
+    static const QString mFormat = nx::vms::time::getFormatString(nx::vms::time::Format::hh_mm);
+    static const QString hFormat = nx::vms::time::getFormatString(nx::vms::time::Format::hh);
 
-    static const QString dFormat = datetime::getFormatString(datetime::Format::dd);
-    static const QString moFormat = datetime::getFormatString(datetime::Format::MMM);
-    static const QString yFormat = datetime::getFormatString(datetime::Format::yyyy);
-    static const QString dateMinsFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy)
-        + QChar::Space + datetime::getFormatString(datetime::Format::hh_mm);
-    static const QString dateHoursFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy)
-        + QChar::Space + datetime::getFormatString(datetime::Format::hh);
-    static const QString dateDaysFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy);
-    static const QString dateMonthsFormat = datetime::getFormatString(datetime::Format::MMMM_yyyy);
-    static const QString dateYearsFormat = datetime::getFormatString(datetime::Format::yyyy);;
+    static const QString dFormat = nx::vms::time::getFormatString(nx::vms::time::Format::dd);
+    static const QString moFormat = nx::vms::time::getFormatString(nx::vms::time::Format::MMM);
+    static const QString yFormat = nx::vms::time::getFormatString(nx::vms::time::Format::yyyy);
+    static const QString dateMinsFormat = nx::vms::time::getFormatString(nx::vms::time::Format::dd_MM_yyyy)
+        + QChar::Space + nx::vms::time::getFormatString(nx::vms::time::Format::hh_mm);
+    static const QString dateHoursFormat = nx::vms::time::getFormatString(nx::vms::time::Format::dd_MM_yyyy)
+        + QChar::Space + nx::vms::time::getFormatString(nx::vms::time::Format::hh);
+    static const QString dateDaysFormat = nx::vms::time::getFormatString(nx::vms::time::Format::dd_MM_yyyy);
+    static const QString dateMonthsFormat = nx::vms::time::getFormatString(nx::vms::time::Format::MMMM_yyyy);
+    static const QString dateYearsFormat = nx::vms::time::getFormatString(nx::vms::time::Format::yyyy);
 
     QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
     QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);
@@ -1001,6 +1003,7 @@ void QnTimeSlider::setOption(Option option, bool value)
 
 void QnTimeSlider::setTimeRange(milliseconds min, milliseconds max)
 {
+    NX_VERBOSE(this, "Set time range: %1 - %2", min, max);
     setRange(min.count(), max.count());
 }
 
@@ -1180,6 +1183,7 @@ milliseconds QnTimeSlider::value() const
 
 void QnTimeSlider::setValue(milliseconds value, bool keepInWindow)
 {
+    NX_VERBOSE(this, "Set value to %1 (keep in window: %2)", value, keepInWindow);
     {
         /* To not change tooltip visibility in setValue or setWindow: */
         QScopedValueRollback<bool> updateRollback(m_updatingValue, true);
@@ -1910,12 +1914,19 @@ bool QnTimeSlider::isLive() const
 
 void QnTimeSlider::updateLive()
 {
-    m_isLive = m_liveSupported && !m_selecting && value() == maximum();
+    const bool isLive = m_liveSupported && !m_selecting && value() == maximum();
+    if (m_isLive == isLive)
+        return;
+
+    NX_VERBOSE(this, "Live changed to %1", isLive);
+    if (!isLive)
+        NX_VERBOSE(this, "Value %1 while maximum is %2", value(), maximum());
+    m_isLive = isLive;
 }
 
-qreal QnTimeSlider::msecsPerPixel() const
+milliseconds QnTimeSlider::msecsPerPixel() const
 {
-    return m_msecsPerPixel;
+    return milliseconds(qint64(m_msecsPerPixel));
 }
 
 void QnTimeSlider::updateMSecsPerPixel()

@@ -1,0 +1,6 @@
+こんにちは、{{ message.userFullName }}
+{{ message.sender_name}} （{{ message.sender_email }}）から {{ message.product }}についてのフィードバックがありました
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+ユーザー： {{ message.sender_to_be_contacted}}

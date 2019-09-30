@@ -1,9 +1,63 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls static admin_modify %}
 {% load cms_filters %}
-{% block content %}
+{% block extrahead %}
+    {{ block.super }}
+    <script>window.$ = django.jQuery;</script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+{% endblock %}
+
+{% block object-tools-items %}
+    {% if user.is_superuser %}
+    <li><a href="{% url 'download_structure_from_db' original.id %}?get_values">Export Current Records</a></li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block field_sets %}
     <div class="module custom-block">
-        <div style="margin-bottom: 20px;">
+        <h2>Product Information</h2>
+        {{ block.super }}
+
+        {% if original.pk %}
+            <h2>Related Groups</h2>
+            <div class="table-responsive" style="margin-bottom: 10px;">
+            {% if related_groups %}
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <td><strong>Group</strong></td>
+                            <td><strong>Permissions</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for group in related_groups %}
+                        <tr>
+                            <td>
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'admin:api_proxygroup_change' group.pk %}">{{ group.name }}</a>
+                                {% else %}
+                                    {{ group.name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% for permission in group.permissions.all %}
+                                {{ permission.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+            {% if user.is_superuser %}
+                <a class="btn btn-default pull-right" style="margin-bottom:10px;"
+                   href="{% url 'admin:api_proxygroup_add' %}">Create Group</a>
+            {% endif %}
+            </div>
+        {% endif %}
+
         {% if current_versions %}
             <h2>Current Version for customization</h2>
             <div class="table-responsive">
@@ -32,8 +86,27 @@
             <h2>Current Version</h2>
             <div>{{ current_versions.0.id }}</div>
         {% endif %}
-        </div>
-        <h2>Product Information</h2>
     </div>
-    {{ block.super }}
+
+    <script>
+        function show_customizations(show) {
+            customizations = $('.field-customizations');
+            if (show)
+                customizations.show();
+            else
+                customizations.hide();
+        }
+
+        $(document).ready(function() {
+            publishAllDiv = $('.field-publish_all_customizations');
+            if(publishAllDiv.length) {
+                publishAllField = publishAllDiv.find('input').first();
+                publishAllField.change(function() {
+                    show_customizations(!this.checked);
+                });
+
+                publishAllField.change();
+            }
+        });
+    </script>
 {% endblock %}

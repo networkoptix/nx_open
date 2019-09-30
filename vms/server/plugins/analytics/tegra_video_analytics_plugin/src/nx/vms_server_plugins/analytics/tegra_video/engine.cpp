@@ -16,18 +16,18 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
-    nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(Plugin* plugin):
+    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
+    m_plugin(plugin)
 {
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    return new DeviceAgent(this, deviceInfo);
+    *outResult = new DeviceAgent(this, deviceInfo);
 }
 
-std::string Engine::manifest() const
+std::string Engine::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
     "eventTypes": [
@@ -61,12 +61,12 @@ std::string Engine::manifest() const
 
 namespace {
 
-static const std::string kLibName = "tegra_video_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.tegra_video",
     "name": "TegraVideo analytics plugin",
+    "description": "Supports video analytics implemented using NVIDIA Tegra Multimedia API for Tegra (Jetson) AI platforms",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -78,9 +78,8 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
+        [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::tegra_video::Engine(plugin);
         });

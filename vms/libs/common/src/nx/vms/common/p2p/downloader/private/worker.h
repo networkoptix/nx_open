@@ -14,6 +14,8 @@
 
 namespace nx::vms::common::p2p::downloader {
 
+using namespace std::chrono;
+
 class Storage;
 
 class Worker: public QnLongRunnable
@@ -40,9 +42,9 @@ public:
         QnUuid id;
         AbstractPeerManager* manager = nullptr;
 
-        QString toString() const { return manager->peerString(id); }
+        QString toString() const { return manager ? manager->peerString(id) : QString(); }
 
-        bool isNull() const { return id.isNull(); }
+        bool isNull() const { return !manager && id.isNull(); }
 
         bool operator==(const Peer& other) const
         {
@@ -67,9 +69,6 @@ public:
     virtual ~Worker() override;
 
     State state() const;
-
-    int peersPerOperation() const;
-    void setPeersPerOperation(int peersPerOperation);
 
     bool haveChunksToDownload();
 
@@ -118,12 +117,14 @@ private:
         const Peer& peer, const std::optional<QVector<QByteArray>>& checksums);
     void downloadChunks();
     void handleDownloadChunkReply(
-        const Peer& peer, int chunkIndex, const std::optional<QByteArray>& data);
+        const Peer& peer,
+        int chunkIndex,
+        const std::optional<QByteArray>& data,
+        bool decreaseRankOnFailure = true);
 
     void finish(State state = State::finished);
 
-    void updateAvailableChunks();
-    QSet<Peer> peersForChunk(int chunkIndex) const;
+    int updateAvailableChunks();
 
     void sleep();
     void wake();
@@ -134,15 +135,14 @@ private:
 protected:
     FileInformation fileInformation() const;
 
-    QList<Peer> selectPeersForOperation(AbstractPeerManager::Capability capability,
-        int count = -1,
-        const QList<Peer>& allowedPeers = {}) const;
-    QList<QnUuid> selectPeersForOperation(
-        AbstractPeerManager* peerManagers, int count = -1, QList<QnUuid> peers = {}) const;
-    void revivePeersWithMinimalRank();
+    QSet<Peer> getPeersToCheckInfo() const;
+    QList<Peer> getPeersToGetCheksums() const;
+    Peer selectPeerForChunk(int chunk, const QSet<Peer>& busyPeers) const;
+
+    void reviveBannedPeers();
     int selectNextChunk(const QSet<int>& ignoredChunks) const;
 
-    bool needToFindBetterPeers() const;
+    bool needToFindBetterPeersForDownload() const;
 
     void increasePeerRank(const Peer& peer, int value = 1);
     void decreasePeerRank(const Peer& peer, int value = 1);
@@ -151,6 +151,7 @@ protected:
 
     void markActive();
     void checkStalled();
+    void reDownload();
 
 private:
     QnUuid m_selfId;
@@ -170,17 +171,30 @@ private:
 
     QBitArray m_availableChunks;
 
-    int m_peersPerOperation = 1;
     struct PeerInformation
     {
+        static constexpr int kMaxAutoRank = 3;
+        static constexpr int kMinAutoRank = 0;
+
         QBitArray downloadedChunks;
-        int rank = 0;
+        int rank = kMaxAutoRank / 2;
         bool isInternet = false;
+        QList<milliseconds> latestChunksDownloadTime;
+        // The default value `0` here is intentional. When we find a new peer, we'll prefer it and
+        // measure its chunk download time.
+        milliseconds averageChunkDownloadTime{0};
+        time_point<steady_clock> lastSuccessfulRequestTime{};
 
         void increaseRank(int value = 1);
         void decreaseRank(int value = 1);
+        bool isBanned() const { return rank <= kMinAutoRank; }
+        void recordChunkDownloadTime(milliseconds time);
+        bool hasChunk(int chunk) const;
     };
     QHash<Peer, PeerInformation> m_peerInfoByPeer;
+
+    bool m_retryingStep = false;
+    int m_downloadRetriesCount = 0;
 
     QElapsedTimer m_stallDetectionTimer;
     bool m_stalled = false;

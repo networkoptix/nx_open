@@ -2,6 +2,8 @@
 
 #include <QtCore/QPointer>
 
+#include <analytics/db/analytics_db_types.h>
+
 #include "abstract_search_synchronizer.h"
 
 namespace nx::vms::client::desktop {
@@ -23,7 +25,7 @@ private:
     bool calculateMediaResourceWidgetAnalyticsEnabled(QnMediaResourceWidget* widget) const;
 
     void updateAreaSelection();
-    void updateTimelineDisplay();
+    void updateWorkbench();
     void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
@@ -37,6 +39,7 @@ private:
     const QPointer<AnalyticsObjectsVisualizationManager> m_objectsVisualizationManager;
     QMetaObject::Connection m_activeMediaWidgetConnection;
     bool m_areaSelectionActive = false;
+    analytics::db::Filter m_filter;
 };
 
 } // namespace nx::vms::client::desktop

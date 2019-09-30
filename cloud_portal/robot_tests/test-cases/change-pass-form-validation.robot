@@ -1,9 +1,9 @@
 *** Settings ***
 Resource          ../resource.robot
 Suite Setup       Open Change Password Dialog
-Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Passwords Invalid
+Test Teardown     Run Keyword If Test Failed    Restart
+Suite Teardown    Close Browser
 Force Tags        form    Threaded File
 
 *** Variables ***

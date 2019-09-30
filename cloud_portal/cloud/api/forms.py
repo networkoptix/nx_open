@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from dal import autocomplete
 
 import base64
-from api.account_backend import AccountBackend
+from api.account_backend import AccountManager
 from api.models import Account
 from cms.models import Customization, Product, UserGroupsToProductPermissions
 from notifications import notifications_api
@@ -57,13 +57,12 @@ class GroupAdminForm(forms.ModelForm):
         if self.instance.pk:
             # Populate the users field with the current Group users.
             self.fields['users'].initial = self.instance.user_set.all()
-            self.fields['products'].initial = UserGroupsToProductPermissions.objects.filter(group=self.instance).values_list(
-                'product', flat=True).distinct()
+            self.fields['products'].initial = UserGroupsToProductPermissions.objects.filter(group=self.instance)\
+                .values_list('product', flat=True).distinct()
 
     def save_m2m(self):
         # Add the users to the Group.
-        self.instance.user_set = self.cleaned_data['users']
-        self.instance.products_set = self.cleaned_data['products']
+        self.instance.user_set.set(self.cleaned_data['users'])
 
         for product in self.cleaned_data['products']:
             if not UserGroupsToProductPermissions.objects.filter(group=self.instance, product=product).exists():
@@ -91,13 +90,14 @@ class UserInviteFrom(forms.Form):
         self.user = kwargs.pop('user', None)
         super(UserInviteFrom, self).__init__(*args, **kwargs)
         if self.user:
-            self.fields['customization'].choices = [(customization[0], customization[0]) for customization in self.user.customizations]
+            self.fields['customization'].choices = [(customization, customization) for customization in self.user.customizations]
 
-    def add_user(self, request):
+    @staticmethod
+    def add_user(request):
         email = request.POST['email']
         customization = request.POST['customization']
         message = request.POST['message']
-        if AccountBackend.is_email_in_portal(email):
+        if AccountManager.is_email_in_portal(email):
             messages.error(request, "User already has a cloud account!")
             return Account.objects.get(email=email).id
 
@@ -106,7 +106,7 @@ class UserInviteFrom(forms.Form):
         user = Account(email=email, customization=customization, language=language_code, is_active=False)
         user.save()
         # Password in the encoded email doesnt matter its just a place holder.
-        encode_email = base64.b64encode("password:{}".format(email))
+        encode_email = base64.b64encode(f"password:{email}".encode('utf-8')).decode('utf-8')
         notifications_api.send(email, 'cloud_invite', {"message": message, "code": encode_email}, customization)
 
         return user.id

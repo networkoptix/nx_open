@@ -5,6 +5,6 @@
 namespace nx::analytics::db {
 
 void PrintTo(ResultCode value, ::std::ostream* os);
-void PrintTo(const std::vector<DetectedObject>& value, ::std::ostream* os);
+void PrintTo(const std::vector<ObjectTrack>& value, ::std::ostream* os);
 
 } // namespace nx::analytics::db

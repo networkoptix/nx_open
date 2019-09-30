@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        Threaded
 
@@ -154,7 +154,7 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
+    Location Should Be    ${PRIVACY POLICY URL FULL}
     Select Window    @{tabs}[0]
 
     Clear Register Fields
@@ -182,7 +182,7 @@ should open Privacy Policy in a new page
     Sleep    2    #This is specifically for Firefox
     ${windows}    Get Window Handles
     Select Window    @{windows}[1]
-    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
+    Location Should Be    ${PRIVACY POLICY URL FULL}
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}
@@ -256,6 +256,7 @@ Check registration email links, colors, cloud name, and user name
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
+    ${email text}    Decode Bytes To String    ${email text}    UTF-8
 
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     Check Email User Names    ${email text}    ${TEST FIRST NAME}    ${TEST LAST NAME}

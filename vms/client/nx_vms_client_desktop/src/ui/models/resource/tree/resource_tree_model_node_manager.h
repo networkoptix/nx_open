@@ -1,11 +1,11 @@
 #pragma once
 
 #include <ui/models/resource/resource_tree_model_node.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <common/common_module_aware.h>
 
 #include <utils/common/connective.h>
 
-class QnResourceTreeModelNodeManager: public Connective<QObject>, public QnWorkbenchContextAware
+class QnResourceTreeModelNodeManager: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

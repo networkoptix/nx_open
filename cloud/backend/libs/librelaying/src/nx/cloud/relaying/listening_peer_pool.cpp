@@ -54,6 +54,9 @@ void ListeningPeerPool::addConnection(
     processExpirationTimers(lock);
 
     auto insertionPair = m_peers.emplace(peerName, PeerContext());
+    if (insertionPair.second)
+        NX_DEBUG(this, "Server %1 is now online", peerName);
+
     PeerContext& peerContext = insertionPair.first->second;
 
     if (peerContext.expirationTimer)
@@ -223,7 +226,7 @@ nx::utils::Subscription<std::string>& ListeningPeerPool::peerDisconnectedSubscri
 std::string ListeningPeerPool::convertHostnameToInternalFormat(
     const std::string& hostname) const
 {
-    auto reversed = utils::reverseWords(hostname, ".");
+    auto reversed = utils::reverseWords(hostname, '.');
     nx::utils::to_lower(&reversed);
     return reversed;
 }
@@ -288,7 +291,7 @@ void ListeningPeerPool::giveAwayConnection(
 {
     auto connectionWatcherPtr = connectionContext->connectionWatcher.get();
 
-    connectionWatcherPtr->startTunnel(
+    connectionWatcherPtr->openTunnel(
         clientInfo,
         [this,
             clientInfo,
@@ -311,7 +314,7 @@ void ListeningPeerPool::giveAwayConnection(
             completionHandler(
                 relay::api::ResultCode::ok,
                 std::move(connection),
-                nx::utils::reverseWords(peerName, "."));
+                nx::utils::reverseWords(peerName, '.'));
         });
 }
 
@@ -319,7 +322,7 @@ void ListeningPeerPool::monitoringConnectionForClosure(
     const std::string& peerName,
     ConnectionContext* connectionContext)
 {
-    connectionContext->connectionWatcher->start(
+    connectionContext->connectionWatcher->startMonitoringConnection(
         [this, peerName, connectionContext](SystemError::ErrorCode errorCode)
         {
             return closeConnection(peerName, connectionContext, errorCode);
@@ -396,6 +399,8 @@ void ListeningPeerPool::removeExpiredListeningPeers(
         m_peerExpirationTimers.begin()->first <= currentTime)
     {
         const std::string& peerName = m_peerExpirationTimers.begin()->second;
+
+        NX_DEBUG(this, "Server %1 is now offline", peerName);
 
         auto peerIter = m_peers.find(peerName);
         NX_ASSERT(peerIter != m_peers.end());

@@ -3,8 +3,11 @@
 #include <QtWidgets/QAction>
 
 #include <nx/vms/client/desktop/ini.h>
+
 #include <common/common_module.h>
+#include <client/client_module.h>
 #include <client/client_settings.h>
+
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
@@ -332,7 +335,7 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    if (auto localFilesSearcher = commonModule()->instance<ResourceDirectoryBrowser>())
+    if (auto localFilesSearcher = qnClientModule->resourceDirectoryBrowser())
     {
         QStringList paths;
         paths.append(qnSettings->mediaFolder());

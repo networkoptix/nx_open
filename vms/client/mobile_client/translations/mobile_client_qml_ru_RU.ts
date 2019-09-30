@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Отключено по расписанию</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Не в сети</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>модуль ввода/вывода</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Версия сервера %1 не поддерживается</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Слишком много попыток. Повторите позже.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Подключитесь к этому серверу из веб-браузера или с помощью клиента, чтобы настроить его</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Поиск</translation>
@@ -507,7 +519,7 @@
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation>Узел : порт</translation>
+      <translation>Адрес : порт</translation>
     </message>
     <message>
       <source>Login</source>
@@ -546,7 +558,7 @@
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation>Подключитесь к этому серверу из веб-браузера или с помощью клиент, чтобы настроить его</translation>
+      <translation>Подключитесь к этому серверу из веб-браузера или с помощью клиента, чтобы настроить его</translation>
     </message>
   </context>
   <context>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ничего не найдено</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Сохранить</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>В этом приложении модуль ввода/вывода может использоваться только как устройство ввода звука. Чтобы использовать его в качестве модуля управления, используйте клиентское приложение %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -801,11 +825,11 @@
     </message>
     <message>
       <source>Change Quality</source>
-      <translation>Изменить качество</translation>
+      <translation>Выбрать качество</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>Информация о продукте</translation>
+      <translation>Информация</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Неверная область. Пожалуйста, попробуйте снова.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Аудио</translation>
     </message>
   </context>
   <context>

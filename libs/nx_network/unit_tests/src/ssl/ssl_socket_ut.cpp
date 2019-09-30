@@ -1,9 +1,10 @@
+#include "ssl_socket_ut.h"
+
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/async_channel_reflector.h>
-#include <nx/network/ssl/ssl_stream_server_socket.h>
-#include <nx/network/ssl/ssl_stream_socket.h>
-#include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/thread/mutex.h>
@@ -15,67 +16,7 @@ namespace network {
 
 namespace test {
 
-namespace {
-
-class EnforcedSslOverTcpServerSocket:
-    public ssl::StreamServerSocket
-{
-    using base_type = ssl::StreamServerSocket;
-
-public:
-    EnforcedSslOverTcpServerSocket(int ipVersion = AF_INET):
-        base_type(
-            std::make_unique<TCPServerSocket>(ipVersion),
-            ssl::EncryptionUse::always)
-    {
-    }
-};
-
-class AutoDetectedSslOverTcpServerSocket:
-    public ssl::StreamServerSocket
-{
-    using base_type = ssl::StreamServerSocket;
-
-public:
-    AutoDetectedSslOverTcpServerSocket(int ipVersion = AF_INET):
-        base_type(
-            std::make_unique<TCPServerSocket>(ipVersion),
-            ssl::EncryptionUse::autoDetectByReceivedData)
-    {
-    }
-};
-
-class SslOverTcpStreamSocket:
-    public ssl::StreamSocket
-{
-    using base_type = ssl::StreamSocket;
-
-public:
-    SslOverTcpStreamSocket(int ipVersion = AF_INET):
-        base_type(std::make_unique<TCPSocket>(ipVersion), false)
-    {
-    }
-};
-
-struct SslSocketBothEndsEncryptedTypeSet
-{
-    using ClientSocket = SslOverTcpStreamSocket;
-    using ServerSocket = EnforcedSslOverTcpServerSocket;
-};
-
-struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet
-{
-    using ClientSocket = SslOverTcpStreamSocket;
-    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
-};
-
-struct SslSocketClientNotEncryptedTypeSet
-{
-    using ClientSocket = TCPSocket;
-    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
-};
-
-} // namespace
+using namespace nx::network::ssl::test;
 
 INSTANTIATE_TYPED_TEST_CASE_P(
     SslSocketBothEndsEncrypted,
@@ -136,7 +77,7 @@ public:
 
     void start()
     {
-        m_ioThread = nx::utils::thread(
+        m_ioThread = std::thread(
             std::bind(&SynchronousReflector::ioThreadMain, this));
     }
 
@@ -150,7 +91,7 @@ public:
     }
 
 private:
-    nx::utils::thread m_ioThread;
+    std::thread m_ioThread;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     std::atomic<bool> m_terminated;
 
@@ -670,6 +611,42 @@ TEST_F(SslSocketSpecificHandshake, handshake_time_is_limited_by_send_timeout)
     whenDoHandshake();
 
     thenHandshakeFailedWith(SystemError::timedOut);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class SslSocketCertificateVerification:
+    public network::test::StreamSocketAcceptance<SslSocketBothEndsEncryptedTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<SslSocketBothEndsEncryptedTypeSet>;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        givenListeningServerSocket();
+    }
+};
+
+TEST_F(SslSocketCertificateVerification, connect_succeeds_if_server_certificate_is_verified)
+{
+    givenClientSocket();
+    connection()->setVerifyCertificateCallback([](auto&&...) { return true; });
+
+    whenConnectToServerAsync();
+
+    thenConnectionIsEstablished();
+}
+
+TEST_F(SslSocketCertificateVerification, connect_fails_if_server_certificate_is_not_verified)
+{
+    givenClientSocket();
+    connection()->setVerifyCertificateCallback([](auto&&...) { return false; });
+
+    whenConnectToServerAsync();
+
+    thenConnectionIsNotEstablished();
 }
 
 //-------------------------------------------------------------------------------------------------

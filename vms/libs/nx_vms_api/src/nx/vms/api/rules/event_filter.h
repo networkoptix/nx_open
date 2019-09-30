@@ -14,12 +14,13 @@ struct NX_VMS_API EventFilter
 public:
     QnUuid id;
     QString eventType;
-    // TODO: #spanasenko EventState
-    QList<QList<Field>> fieldBlocks;
+    // TODO: #spanasenko EventState.
+    QList<Field> fields;
+    // TODO: #spanasenko Custom Field blocks.
 };
 
 #define nx_vms_api_rules_EventFilter_Fields \
-    (id)(eventType)(fieldBlocks)
+    (id)(eventType)(fields)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventFilter, (json), NX_VMS_API)
 

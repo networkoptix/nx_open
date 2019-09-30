@@ -8,7 +8,6 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
-#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -166,8 +165,6 @@ bool Socket<SocketInterfaceToImplement>::shutdown()
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::close()
 {
-    shutdown();
-
     if (m_fd == -1)
         return true;
 
@@ -225,7 +222,7 @@ bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
     const int on = value ? 1 : 0;
     return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
 #else
-    nx::utils::unused(value);
+    /*unused*/ (void) value;
     SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
     return false;
 #endif
@@ -246,7 +243,7 @@ bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
     *value = reuseAddrVal > 0;
     return true;
 #else
-    nx::utils::unused(value);
+    /*unused*/ (void) value;
     SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
     return false;
 #endif
@@ -1098,7 +1095,7 @@ bool TCPSocket::getNoDelay(bool* value) const
     return true;
 }
 
-bool TCPSocket::toggleStatisticsCollection(bool val)
+bool TCPSocket::toggleStatisticsCollection([[maybe_unused]] bool val)
 {
 #ifdef _WIN32
     //dynamically resolving functions that require win >= vista we want to use here
@@ -1144,15 +1141,13 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    nx::utils::unused(val);
     return true;
 #else
-    nx::utils::unused(val);
     return false;
 #endif
 }
 
-bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
+bool TCPSocket::getConnectionStatistics([[maybe_unused]] StreamSocketInfo* info)
 {
 #ifdef _WIN32
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
@@ -1174,7 +1169,6 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    nx::utils::unused(info);
     return false;
 #endif
 }

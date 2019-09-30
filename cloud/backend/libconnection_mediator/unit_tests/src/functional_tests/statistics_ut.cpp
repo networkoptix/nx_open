@@ -99,6 +99,9 @@ protected:
                 connected.set_value(resultCode);
             });
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
+
+        // NOTE: Due to technical reasons servers accepts the connection a bit later
+        // than client reports connect success.
     }
 
     void thenExpectedConnectionsHaveBeenReported()
@@ -132,20 +135,20 @@ protected:
 
     void andStatisticsContainsExpectedValues()
     {
-        // There was at least one connection at the request moment (connection of the request itself).
-        ASSERT_EQ(1, m_serverStatistics.http.connectionCount);
+        ASSERT_TRUE(statisticsHasExpectedValues());
+    }
 
-        int expectedStunConnectionCount = 1;
-        if (m_server)
-            ++expectedStunConnectionCount;
-        if (m_clientConnection)
-            ++expectedStunConnectionCount;
-        if (m_stunClient)
-            ++expectedStunConnectionCount;
-        ASSERT_EQ(expectedStunConnectionCount, m_serverStatistics.stun.connectionCount);
+    void waitUntilStatisticsMatchesExpectations()
+    {
+        for (;;)
+        {
+            whenRequestServerStatistics();
+            thenServerStatisticsIsProvided();
+            if (statisticsHasExpectedValues())
+                break;
 
-        int expectedServerCount = m_server ? 1 : 0;
-        ASSERT_EQ(expectedServerCount, m_serverStatistics.cloudConnect.serverCount);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
 
 private:
@@ -156,6 +159,29 @@ private:
     std::unique_ptr<MediaServerEmulator> m_server;
     std::unique_ptr<api::MediatorClientTcpConnection> m_clientConnection;
     std::unique_ptr<nx::network::stun::AsyncClientWithHttpTunneling> m_stunClient;
+
+    bool statisticsHasExpectedValues() const
+    {
+        // There was at least one connection at the request moment (connection of the request itself).
+        if (m_serverStatistics.http.connectionCount != 1)
+            return false;
+
+        int expectedStunConnectionCount = 1;
+        if (m_server)
+            ++expectedStunConnectionCount;
+        if (m_clientConnection)
+            ++expectedStunConnectionCount;
+        if (m_stunClient)
+            ++expectedStunConnectionCount;
+        if (m_serverStatistics.stun.connectionCount != expectedStunConnectionCount)
+            return false;
+
+        int expectedServerCount = m_server ? 1 : 0;
+        if (m_serverStatistics.cloudConnect.serverCount != expectedServerCount)
+            return false;
+
+        return true;
+    }
 };
 
 TEST_F(StatisticsApi, listening_peer_list)
@@ -182,10 +208,7 @@ TEST_F(StatisticsApi, tunnelled_stun_connections_are_reflected_in_statistics)
 {
     establishStunOverHttpConnection();
 
-    whenRequestServerStatistics();
-
-    thenServerStatisticsIsProvided();
-    andStatisticsContainsExpectedValues();
+    waitUntilStatisticsMatchesExpectations();
 }
 
 } // namespace test

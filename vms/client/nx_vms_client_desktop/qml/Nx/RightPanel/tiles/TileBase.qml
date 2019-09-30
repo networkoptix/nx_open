@@ -15,6 +15,8 @@ Control
         windowText: ColorTheme.colors.light16
         text: ColorTheme.colors.light4
         highlight: ColorTheme.colors.brand_core
+        shadow: ColorTheme.colors.dark5
+        dark: ColorTheme.colors.dark6
     }
 
     leftPadding: 8

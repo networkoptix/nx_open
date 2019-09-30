@@ -278,9 +278,9 @@ bool ServerTransactionMessageBus::readFullInfoData(
 {
     ErrorCode errorCode;
     if (remotePeer.peerType == vms::api::PeerType::mobileClient)
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess.userId);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess);
     else
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData, userAccess);
 
     if (errorCode != ErrorCode::ok)
     {

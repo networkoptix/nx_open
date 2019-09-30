@@ -1,17 +1,12 @@
-/**********************************************************
-* 18 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef SYNC_HTTP_CLIENT_DELEGATE_H
-#define SYNC_HTTP_CLIENT_DELEGATE_H
+#pragma once
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QWaitCondition>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
-
 
 //!Helper class, used by SyncHttpClient
 /*!
@@ -68,5 +63,3 @@ private slots:
     //!Reads reply message body to \a m_messageBody
     void readWholeMessageBodyPriv();
 };
-
-#endif  //SYNC_HTTP_CLIENT_DELEGATE_H

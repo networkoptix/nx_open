@@ -8,26 +8,43 @@ interface Platform {
     name: string;
     order: string;
     url: string;
+    noFollow: boolean;
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class IntegrationService implements OnDestroy {
-    plugins: any;
-    pluginsSubject = new BehaviorSubject([]);
-    selectedPluginSubject = new BehaviorSubject(undefined);
+    config: any = {};
+    pluginsSubject = new BehaviorSubject(undefined);
+    selectedSectionSubject = new BehaviorSubject([]);
+    plugin: any = {};
     inReview: boolean;
 
     constructor(private api: NxCloudApiService,
-                private config: NxConfigService) {
+                private configService: NxConfigService) {
 
         this.getIntegrations()
             .subscribe(result => {
-                this.plugins = result.data;
-                this.formatPlugins();
-                this.pluginsSubject.next(this.plugins);
+                result.data.forEach(plugin => {
+                    if (!plugin.versionDetails.version || plugin.versionDetails.version &&
+                            plugin.versionDetails.version !== '&nbsp;' &&
+                            plugin.versionDetails.version.indexOf('v.') !== 0) {
+                        plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+                    }
+
+                    plugin.information.platforms.icons = this.setPlatformIcons(plugin);
+                    plugin.information.logo = plugin.information.logo || this.config.icons.default;
+
+                    plugin.state = (plugin.pending) ? 'pending' : (plugin.draft) ? 'draft' : undefined;
+
+                    plugin.link = '/integrations/' + plugin.id;
+                    plugin.link += (plugin.state) ? '?state=' + plugin.state : '';
+                });
+                this.pluginsSubject.next(result.data);
             });
+
+        this.config = this.configService.getConfig();
     }
 
     private getIntegrations(): Observable<any> {
@@ -38,76 +55,124 @@ export class IntegrationService implements OnDestroy {
         if (section) {
             section.screenshots = Object.keys(section).filter((element) => {
                 return element.match(/screenshot/i) && section[element];
-            }).sort().map((key) => section[key]);
+            }).sort().map((key) => {
+                return {id: key, value: section[key]};
+            });
             if (section.screenshots.length < 1) {
                 delete section.screenshots;
             }
         }
     }
 
-    private formatPlugins() {
-        if (!this.plugins) {
-            return;
-        }
+    private formatScreenshots(plugin) {
+        const processed: any = [];
 
-        this.inReview = false;
+        Object.entries(plugin.overview).forEach((item) => {
+            const matchScreenshot = item[0].match(/Screenshot[\d]+$/);
 
-        this.plugins.forEach((plugin) => {
-            if (!this.inReview && plugin.pending) {
-                this.inReview = true;
+            if (matchScreenshot) {
+                processed.push({ id: item[0].replace('overview', ''), value: item[1] });
             }
+        });
 
-            if (plugin.downloadFiles) {
-                const downloadPlatforms = plugin.downloadFiles;
-                plugin.downloadFiles = [];
+        Object.entries(plugin.overview).forEach((item) => {
+            const matchCaption = item[0].match(/Screenshot[\d]+caption$/);
 
-                for (const platformName in downloadPlatforms) {
-                    // If there is no file url or its the name for an additional field skip
-                    if (typeof downloadPlatforms[platformName] !== 'string' ||
-                        !downloadPlatforms[platformName] ||
-                        platformName.match(/-file-[\d]+-name/)) {
-
-                        continue;
+            if (matchCaption) {
+                processed.find((i) => {
+                    if (i.id === matchCaption[0].replace('caption', '')) {
+                        i.caption = item[1];
                     }
-
-                    const platform: Platform = { file: '', name: '', order: '', url: '' };
-                    // If the platformName is additional file we replace it with the correct name
-                    if (platformName.match(/-file-[\d]+/)) {
-                        platform.name = downloadPlatforms[`${platformName}-name`];
-                    } else {
-                        platform.name = this.config.config.defaultPlatformNames[platformName];
-                    }
-
-                    platform.url = downloadPlatforms[platformName];
-                    platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
-                    platform.order = plugin.downloadFilesOrder[platformName];
-                    if (!platform.file) {
-                        platform.file = platform.url;
-                    }
-                    plugin.downloadFiles.push(platform);
-                }
-                // sort by name and then sort by file name.
-                plugin.downloadFiles = plugin.downloadFiles.sort((a, b) => {
-                    if (a.order < b.order) {
-                        return -1;
-                    }  else if (a.order > b.order) {
-                        return 1;
-                    }
-                    return 0;
                 });
             }
-
-            this.setScreenshots(plugin.instructions);
-            this.setScreenshots(plugin.overview);
         });
+
+        plugin.overview.screenshots = processed;
     }
 
-    getPluginBy(id) {
-        if (this.plugins) {
-            this.selectedPluginSubject.next(this.plugins.find(plugin => plugin.id === Number(id)));
+    setPlatformIcons(plugin) {
+        const platformIcons = [];
+
+        this.config.icons.platforms.forEach(icon => {
+            const platform = plugin.information.platforms.find(platform => {
+                // 32 or 64 bit? ... it doesn't matter :)
+                return platform.toLowerCase().indexOf(icon.name) > -1;
+            });
+            if (platform) {
+                platformIcons.push({ name: platform, src: icon.src });
+            }
+        });
+
+        return platformIcons;
+    }
+
+    format(plugin) {
+        if (plugin.downloadFiles) {
+            const downloadPlatforms = plugin.downloadFiles;
+            plugin.downloadFiles = [];
+
+            for (const platformName in downloadPlatforms) {
+                // If there is no file url or its the name for an additional field skip
+                if (typeof downloadPlatforms[platformName] !== 'string' ||
+                    !downloadPlatforms[platformName] ||
+                    platformName.match(/-file-[\d]+-name/) ||
+                    platformName.match(/external-link-name/)) {
+                    continue;
+                }
+
+                const platform: Platform = { file: '', name: '', order: '', url: '', noFollow: false };
+                // If the platformName is additional file we replace it with the correct name
+                if (platformName.match(/-file-[\d]+/) || platformName.match(/external-link/)) {
+                    platform.name = downloadPlatforms[`${platformName}-name`];
+                    if (platformName.match(/external-link/)) {
+                        platform.noFollow = true;
+                    }
+                } else {
+                    platform.name = this.config.defaultPlatformNames[platformName];
+                }
+
+                platform.url = downloadPlatforms[platformName];
+                platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
+                platform.order = plugin.downloadFilesOrder[platformName];
+                if (!platform.file) {
+                    platform.file = platform.url;
+                }
+                plugin.downloadFiles.push(platform);
+            }
+            // sort by name and then sort by file name.
+            plugin.downloadFiles = plugin.downloadFiles.sort((a, b) => {
+                if (a.order < b.order) {
+                    return -1;
+                }  else if (a.order > b.order) {
+                    return 1;
+                }
+                return 0;
+            });
         }
 
-        return undefined;
+        plugin.versionDetails.version = (plugin.versionDetails.version) ? 'v.&nbsp;' + plugin.versionDetails.version : '&nbsp;';
+        plugin.information.platforms.icons = this.setPlatformIcons(plugin);
+
+        this.setScreenshots(plugin.instructions);
+        this.formatScreenshots(plugin);
+
+        return plugin;
+    }
+
+    getIntegrationBy(id: number, status: string): Observable<any> {
+        return this.api.getIntegrationBy(id, status);
+    }
+
+    setIntegrationPlugin(plugin: any = {}) {
+        this.plugin = plugin;
+    }
+
+    getIntegrationPlugin() {
+        return this.plugin;
+    }
+
+    setSection(section) {
+        this.selectedSectionSubject.next(section);
     }
 
     ngOnDestroy() {

@@ -1,17 +1,12 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef AXIS_MEDIA_ENCODER_H
-#define AXIS_MEDIA_ENCODER_H
+#pragma once
 
 #include <vector>
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 class AxisCameraManager;
 
@@ -64,5 +59,3 @@ private:
 
     int fetchCameraResolutionList() const;
 };
-
-#endif  //AXIS_MEDIA_ENCODER_H

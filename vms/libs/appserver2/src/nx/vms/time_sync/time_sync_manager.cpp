@@ -18,9 +18,7 @@
 #include <nx/utils/time.h>
 #include <common/static_common_module.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
 const std::chrono::milliseconds TimeSyncManager::kMaxJitterForLocalClock(250);
@@ -104,20 +102,31 @@ void TimeSyncManager::loadTimeFromLocalClock()
     m_isTimeTakenFromInternet = false;
 }
 
-bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
+TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
         NX_DEBUG(this,
             lm("Server %1 is not known yet. Postpone time sync request").arg(qnStaticCommon->moduleDisplayName(route.id)));
-        return false;
+        return Result::error;
     }
 
     nx::utils::Url url(server->getApiUrl());
     url.setHost(route.addr.address.toString());
     url.setPort(route.addr.port);
     url.setPath(kTimeSyncUrlPath);
+
+    // Server v.4.0 pass this method as unauthorized.
+    // But client may open connection to the server v.3.2.
+    // It doesn't know about this method and requests authorization by default.
+    const auto userName = commonModule()->currentUrl().userName();
+    const auto password = commonModule()->currentUrl().password();
+    if (!userName.isEmpty() && !password.isEmpty())
+    {
+        url.setUserName(userName);
+        url.setPassword(password);
+    }
 
     const bool sslRequired = url.scheme() == nx::network::http::kSecureUrlSchemeName;
     auto socket = connectToRemoteHost(route, sslRequired);
@@ -127,7 +136,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
         NX_WARNING(this,
             lm("Can't read time from server %1. Can't establish connection to the remote host.")
             .arg(qnStaticCommon->moduleDisplayName(route.id)));
-        return false;
+        return Result::error;
     }
     auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
@@ -150,8 +159,16 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
         {
             NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
                 .args(qnStaticCommon->moduleDisplayName(route.id), httpClient->lastSysErrorCode()));
-            return false;
+            return Result::error;
         }
+    }
+
+    if (httpClient->contentLocationUrl() != httpClient->url())
+    {
+        // In case of client v4.0 connect to the server v3.2 it don't understand this request
+        // and redirect it to the index.html root page instead.
+        NX_DEBUG(this, "Can not synchronized time with incompatible server");
+        return Result::incompatibleServer;
     }
 
     auto jsonResult = QJson::deserialized<QnJsonRestResult>(*response);
@@ -160,17 +177,17 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     {
         NX_WARNING(this, lm("Can't deserialize time reply from server %1")
             .arg(qnStaticCommon->moduleDisplayName(route.id)));
-        return false;
+        return Result::error;
     }
 
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
     bool syncWithInternel = commonModule()->globalSettings()->primaryTimeServer().isNull();
     if (syncWithInternel && !timeData.isTakenFromInternet)
-        return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
+        return Result::error; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
     m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)
-        return false; //< Too big rtt. Try again.
+        return Result::error; //< Too big rtt. Try again.
     const auto ownGuid = commonModule()->moduleGUID();
     NX_DEBUG(this, lm("Got time %1 (%2 <-- %3), rtt=%4")
         .args(
@@ -184,7 +201,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
             .arg(qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID()))
             .arg(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate)));
     }
-    return true;
+    return Result::ok;
 }
 
 bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt)
@@ -232,6 +249,4 @@ QString TimeSyncManager::idForToStringFromPtr() const
     return qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID());
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

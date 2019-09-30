@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>AA/gg</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>AAAA yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -124,7 +113,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -824,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modül</translation>
+      <translation>I/O Modülü</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -912,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Akış Çıkışı Ayrılamadı.</translation>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -1587,7 +1576,7 @@
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>RAID hatası. %1.</translation>
     </message>
   </context>
   <context>

@@ -115,16 +115,16 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Demasiadas tentativas. Tente novamente dentro de um minuto.</translation>
+      <translation>Demasiadas tentativas. Tente novamente mais tarde.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 está temporariamente indisponível. Por favor, tente novamente mais tarde.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Erro de rede. Por favor verifique sua conexão com a internet e tente novamente.</translation>
     </message>
   </context>
   <context>
@@ -147,7 +147,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível iniciar o codificador de áudio.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

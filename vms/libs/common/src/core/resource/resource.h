@@ -41,8 +41,7 @@ public:
     QnResource(const QnResource&);
     virtual ~QnResource();
 
-    QnUuid getId() const;
-    void setId(const QnUuid& id);
+    virtual const QnUuid& getId() const { return m_id;  }
 
     QnUuid getParentId() const;
     virtual void setParentId(const QnUuid& parent);
@@ -201,6 +200,7 @@ public:
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
+    void setIdUnsafe(const QnUuid& id);
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
@@ -219,6 +219,7 @@ protected:
      */
     bool setUrlUnsafe(const QString& value);
 private:
+
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
     friend class QnResourceConsumer;
@@ -279,7 +280,7 @@ private:
     };
 
     /** Resource pool this resource belongs to. */
-    QnResourcePool* m_resourcePool = nullptr;
+    std::atomic<QnResourcePool*> m_resourcePool{};
 
     /** Identifier of this resource. */
     QnUuid m_id;

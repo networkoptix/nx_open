@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 #Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        Threaded
 
@@ -89,7 +89,7 @@ Going to the history page anonymous asks for login and login shows history page
     Log In    ${email}   ${password}    button=None
     Validate Log In
     Wait Until Element Is Visible    ${RELEASES TAB}
-    Location Should Be    ${url}/downloads/history
+    Location Should Be    ${url}/downloads/releases
 
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history

@@ -72,6 +72,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/common/indents.h>
+#include <ui/dialogs/resource_tree_snapshot_dialog.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -171,7 +172,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     // To keep aspect ratio specify only maximum height for server request
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
-    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
+    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope,
+        accessController(), snapshotManager(), this);
+    m_resourceModel->setActionManager(context->menu());
+
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
@@ -242,6 +246,19 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 style()->pixelMetric(QStyle::PM_ScrollBarExtent) : 0);
             ui->scrollAreaWidgetContents->setContentsMargins(margins);
         });
+
+    if (ini().developerMode)
+    {
+        m_connections << connect(action(action::CreateResourceTreeModelSnapshotAction),
+            &QAction::triggered, this,
+            [this]()
+            {
+                auto dialog = new ResourceTreeSnapshotDialog(
+                    ui->resourceTreeWidget->treeView()->model(), mainWindowWidget());
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->show();
+            });
+    }
 
     /* Run handlers. */
     updateIcons();
@@ -511,6 +528,9 @@ void QnResourceBrowserWidget::setupAutoExpandPolicy()
 
 void QnResourceBrowserWidget::updateInstantFilter()
 {
+    if (m_resourceModel->resetInProgress())
+        return;
+
     const auto filterEdit = ui->instantFilterLineEdit;
     const auto queryText = filterEdit->text();
 

@@ -76,8 +76,6 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-static bool onlyOnePlaceholder = false;
-
 LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -127,9 +125,6 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
         this, &LayoutTourReviewController::handleItemDataChanged);
-
-    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
-        [this]{ onlyOnePlaceholder = !onlyOnePlaceholder; updatePlaceholders(); });
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -215,7 +210,7 @@ void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTour
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server.
+    layout->setIdUnsafe(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
@@ -278,7 +273,7 @@ void LayoutTourReviewController::updateOrder()
     NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
 
     auto items = workbench()->currentLayout()->items().toList();
-    QnWorkbenchItem::sortByGeometry(&items);
+    QnWorkbenchItem::sortByGeometryAndName(items);
 
     int index = 0;
     for (auto item: items)
@@ -341,8 +336,7 @@ void LayoutTourReviewController::updatePlaceholders()
             const QPoint cell(x, y);
             const bool isFree = layout->isFreeSlot(cell, kCellSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
-            const bool mustBePlaceholder = isFree &&
-                (onlyOnePlaceholder ? placeholdersCount == 0 : true);
+            const bool mustBePlaceholder = isFree;
 
             // If cell is empty and there is a placeholder (or vise versa), skip this step.
             if (mustBePlaceholder == placeholderExists)
@@ -383,7 +377,7 @@ void LayoutTourReviewController::updateItemsLayout()
     nx::vms::api::LayoutTourDataList currentItems;
 
     auto layoutItems = wbLayout->items().toList();
-    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    QnWorkbenchItem::sortByGeometryAndName(layoutItems);
 
     for (auto layoutItem : layoutItems)
     {
@@ -507,7 +501,7 @@ bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataL
         return false;
 
     auto layoutItems = workbench()->currentLayout()->items().toList();
-    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    QnWorkbenchItem::sortByGeometryAndName(layoutItems);
     for (auto item: layoutItems)
     {
         const auto resource = item->resource();

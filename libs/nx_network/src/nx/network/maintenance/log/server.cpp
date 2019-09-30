@@ -6,6 +6,7 @@
 #include <nx/network/http/writable_message_body.h>
 #include <nx/utils/log/logger_builder.h>
 #include <nx/utils/log/logger_collection.h>
+#include <nx/utils/log/aggregate_logger.h>
 
 #include "utils.h"
 #include "logger.h"
@@ -68,29 +69,10 @@ void Server::serveGetLoggers(
     http::RequestContext /*requestContext*/,
     http::RequestProcessedHandler completionHandler)
 {
-    Loggers loggers;
-    auto uniqueLoggers = removeDuplicates(m_loggerCollection->allLoggers());
-
-    if (auto mainLogger = m_loggerCollection->main())
-    {
-        loggers.loggers.push_back(utils::toLoggerInfo(
-            mainLogger,
-            mainLogger->filters(),
-            -1));
-    }
-
-    for (const auto& loggerContext : uniqueLoggers)
-    {
-        loggers.loggers.push_back(utils::toLoggerInfo(
-            loggerContext.logger,
-            m_loggerCollection->getEffectiveFilters(loggerContext.id),
-            loggerContext.id));
-    }
-
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::make_unique<http::BufferSource>(
         "application/json",
-        QJson::serialized(loggers));
+        QJson::serialized(mergeLoggers()));
 
     completionHandler(std::move(result));
 }
@@ -149,7 +131,7 @@ void Server::servePostLogger(
         return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
 
     Logger loggerInfo = utils::toLoggerInfo(
-        logger,
+        logger.get(),
         m_loggerCollection->getEffectiveFilters(loggerId),
         loggerId);
 
@@ -167,7 +149,11 @@ void Server::serveGetStreamingLogger(
 {
     LoggerSettings loggerSettings;
     if (!loggerSettings.parse(requestContext.request.requestLine.url.query()))
+    {
+        NX_DEBUG(this, "Failed to parse log settings %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::StatusCode::badRequest);
+    }
 
     auto messageBody = std::make_unique<WritableMessageBody>("text/plain");
     auto logWriter = std::make_unique<StreamingLogWriter>(messageBody.get());
@@ -185,13 +171,21 @@ void Server::serveGetStreamingLogger(
         utils::toFilters(loggerSettings.level.filters),
         std::move(logWriter));
     if (!newLogger)
+    {
+        NX_DEBUG(this, "Failed to create logger %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::StatusCode::internalServerError);
+    }
 
     std::shared_ptr<AbstractLogger> sharedNewLogger(std::move(newLogger));
 
     int loggerId = m_loggerCollection->add(sharedNewLogger);
     if (loggerId == LoggerCollection::kInvalidId)
+    {
+        NX_DEBUG(this, "Failed to install logger %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
+    }
 
     messageBody->setOnBeforeDestructionHandler(
         [this, sharedNewLogger, logWriterPtr, loggerId]()
@@ -205,5 +199,69 @@ void Server::serveGetStreamingLogger(
 
     completionHandler(std::move(result));
 }
+
+Loggers Server::mergeLoggers() const
+{
+    Loggers allLoggersInfo;
+
+    if (auto mainLogger = m_loggerCollection->main())
+    {
+        allLoggersInfo.loggers =
+            splitAggregateLogger(
+                LoggerCollection::kInvalidId,
+                mainLogger.get(),
+                mainLogger->filters());
+    }
+
+    auto allLoggers = removeDuplicates(m_loggerCollection->allLoggers());
+    for (const auto& context : allLoggers)
+    {
+        auto aggregateLoggerInfo = splitAggregateLogger(
+            context.id,
+            context.logger.get(),
+            m_loggerCollection->getEffectiveFilters(context.id));
+
+        allLoggersInfo.loggers.insert(
+            allLoggersInfo.loggers.end(),
+            aggregateLoggerInfo.begin(),
+            aggregateLoggerInfo.end());
+    }
+
+    return allLoggersInfo;
+}
+
+std::vector<Logger> Server::splitAggregateLogger(
+    int id,
+    nx::utils::log::AbstractLogger* logger,
+    const std::set<nx::utils::log::Filter>& effectiveFilters) const
+{
+    auto aggregateLogger = dynamic_cast<AggregateLogger*>(logger);
+    if (!aggregateLogger)
+        return { utils::toLoggerInfo(logger, effectiveFilters, id) };
+
+    std::vector<Logger> loggersInfo;
+    const auto& actualLoggers = aggregateLogger->loggers();
+
+    for (const auto& actualLogger : actualLoggers)
+    {
+        auto actualLoggerFilters = actualLogger->filters();
+        for (
+            auto it = actualLoggerFilters.begin();
+            it != actualLoggerFilters.end();
+            ++it)
+        {
+            if (effectiveFilters.find(*it) == effectiveFilters.end())
+                it = actualLoggerFilters.erase(it);
+        }
+
+        loggersInfo.emplace_back(
+            utils::toLoggerInfo(
+                actualLogger.get(),
+                actualLoggerFilters,
+                id));
+    }
+
+    return loggersInfo;
+};
 
 } // namespace nx::network::maintenance::log

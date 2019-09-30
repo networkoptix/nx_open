@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
-Test Teardown     Restart
 Suite Setup       Open Browser and go to URL    ${url}
+Test Teardown     Restart
 Suite Teardown    Close All Browsers
 
 *** Variables ***
@@ -42,7 +42,7 @@ Privacy leads to the proper page
     [tags]    C41546    Threaded
     Wait Until Element Is Visible    ${FOOTER PRIVACY LINK}
     Click Link    ${FOOTER PRIVACY LINK}
-    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
+    Location Should Be    ${PRIVACY POLICY URL FULL}
 
 Copyright leads to the proper site
     [tags]    C41547    Threaded

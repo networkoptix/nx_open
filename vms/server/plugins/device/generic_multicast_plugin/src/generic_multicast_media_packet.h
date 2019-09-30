@@ -4,7 +4,8 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <utils/memory/cyclic_allocator.h>
+
+#include <nx/utils/memory/cyclic_allocator.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

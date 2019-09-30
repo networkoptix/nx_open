@@ -13,7 +13,6 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-constexpr const int kSocketTimeoutMs = 29*1000;
 using SslMode = nx::network::http::server::proxy::SslMode;
 
 ProxyHandler::ProxyHandler(

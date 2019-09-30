@@ -7,7 +7,7 @@
 #include <utils/common/util.h> /* For getUsecTimer. */
 #include <utils/media/frame_info.h>
 #include <utils/media/media_stream_cache.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 #include <nx/network/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -76,8 +76,6 @@ VideoCamera::VideoCamera(
     m_settings(settings),
     m_dataProviderFactory(dataProviderFactory),
     m_camera(camera),
-    m_primaryGopKeeper(nullptr),
-    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC),
     m_hiStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC)
 {
@@ -96,9 +94,9 @@ nx::vms::server::GopKeeper* VideoCamera::getGopKeeper(StreamIndex streamIndex) c
     switch (streamIndex)
     {
         case StreamIndex::primary:
-            return m_primaryGopKeeper;
+            return m_primaryGopKeeper.get();
         case StreamIndex::secondary:
-            return m_secondaryGopKeeper;
+            return m_secondaryGopKeeper.get();
         default:
             break;
     }
@@ -121,14 +119,14 @@ void VideoCamera::beforeStop()
         m_secondaryGopKeeper->disconnectFromResource();
 
     if (m_primaryReader) {
-        m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->removeDataProcessor(m_primaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_High].restart();
         m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
-        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_Low].restart();
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
@@ -147,8 +145,6 @@ VideoCamera::~VideoCamera()
 {
     beforeStop();
     stop();
-    delete m_primaryGopKeeper;
-    delete m_secondaryGopKeeper;
 }
 
 void VideoCamera::at_camera_resourceChanged()
@@ -183,48 +179,51 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
     QnLiveStreamProviderPtr &reader =
         (streamIndex == StreamIndex::primary) ? m_primaryReader : m_secondaryReader;
+    if (reader)
+        return;
+
+    QnAbstractStreamDataProvider* dataProvider = nullptr;
+    if (streamIndex == StreamIndex::primary || m_camera->hasDualStreaming())
+        dataProvider = m_dataProviderFactory->createDataProvider(m_camera, role);
+
+    if (!dataProvider)
+        return;
+
+    reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
     if (!reader)
     {
-        QnAbstractStreamDataProvider* dataProvider = nullptr;
-        if (streamIndex == StreamIndex::primary || m_camera->hasDualStreaming())
-        {
-            dataProvider = m_dataProviderFactory->createDataProvider(m_camera, role);
-        }
-
-        if (dataProvider)
-        {
-            reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
-            if (!reader)
-            {
-                delete dataProvider;
-            }
-            else
-            {
-                reader->setOwner(toSharedPointer());
-                // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
-                if (role == Qn::CR_LiveVideo)
-                {
-                    QObject::connect(reader->getResource().data(), &QnResource::resourceChanged,
-                        this, &VideoCamera::at_camera_resourceChanged, Qt::DirectConnection);
-                }
-
-                nx::vms::server::GopKeeper* gopKeeper =
-                    new nx::vms::server::GopKeeper(this, m_camera, catalog);
-                if (streamIndex == StreamIndex::primary)
-                    m_primaryGopKeeper = gopKeeper;
-                else
-                    m_secondaryGopKeeper = gopKeeper;
-                reader->addDataProcessor(gopKeeper);
-
-                connect(reader.get(), &QThread::started, this,
-                    [gopKeeper]()
-                    {
-                        gopKeeper->clearVideoData();
-                    },
-                    Qt::DirectConnection);
-            }
-        }
+        delete dataProvider;
+        return;
     }
+
+    reader->setOwner(toSharedPointer());
+    // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
+    if (role == Qn::CR_LiveVideo)
+    {
+        connect(
+            reader->getResource().data(),
+            &QnResource::resourceChanged,
+            this,
+            &VideoCamera::at_camera_resourceChanged,
+            Qt::DirectConnection);
+    }
+
+    auto gopKeeper = std::make_unique<nx::vms::server::GopKeeper>(this, m_camera, catalog);
+    reader->addDataProcessor(gopKeeper.get());
+
+    if (streamIndex == StreamIndex::primary)
+        m_primaryGopKeeper = std::move(gopKeeper);
+    else
+        m_secondaryGopKeeper = std::move(gopKeeper);
+
+    connect(reader.get(), &QThread::started, this,
+        [this, streamIndex]()
+        {
+            auto gopKeeper = getGopKeeper(streamIndex);
+            NX_CRITICAL(gopKeeper != nullptr);
+            gopKeeper->clearVideoData();
+        },
+        Qt::DirectConnection);
 }
 
 QnLiveStreamProviderPtr VideoCamera::readerByQuality(MediaQuality streamQuality) const
@@ -411,6 +410,21 @@ QnConstCompressedAudioDataPtr VideoCamera::getLastAudioFrame(StreamIndex streamI
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();
+    return nullptr;
+}
+
+QnConstCompressedVideoDataPtr VideoCamera::getLastVideoFrameRtsp(
+    StreamIndex streamIndex, int channel) const
+{
+    if (auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getLastVideoFrameRtsp(channel);
+    return nullptr;
+}
+
+QnConstCompressedAudioDataPtr VideoCamera::getLastAudioFrameRtsp(StreamIndex streamIndex) const
+{
+    if (auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getLastAudioFrameRtsp();
     return nullptr;
 }
 
@@ -633,7 +647,7 @@ bool VideoCamera::ensureLiveCacheStarted(
     {
         const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 milliseconds): %4",
             mediaQualityToStreamName(streamQuality),
             minMaxSizeMs.first,
             minMaxSizeMs.second,

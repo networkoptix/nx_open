@@ -7,6 +7,8 @@
 
 #include <nx/vms/api/protocol_version.h>
 
+#include "../access_control/authentication_manager.h"
+
 namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
@@ -23,6 +25,15 @@ MaintenanceManager::~MaintenanceManager()
 {
     m_startedAsyncCallsCounter.wait();
     m_timer.pleaseStopSync();
+}
+
+void MaintenanceManager::processPing(
+    const AuthorizationInfo& /*authzInfo*/,
+    std::function<void(api::Result, api::ModuleInfo)> completionHandler)
+{
+    api::ModuleInfo data;
+    data.realm = AuthenticationManager::realm().constData();
+    completionHandler(api::ResultCode::ok, std::move(data));
 }
 
 void MaintenanceManager::getVmsConnections(
@@ -43,7 +54,7 @@ void MaintenanceManager::getVmsConnections(
             for (const auto& connection: ec2Connections)
             {
                 result.connections.push_back(
-                    {connection.systemId, connection.peerEndpoint.toStdString()});
+                    {connection.clusterId, connection.peerEndpoint.toStdString()});
             }
 
             completionHandler(api::ResultCode::ok, std::move(result));

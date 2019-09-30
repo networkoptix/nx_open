@@ -17,7 +17,7 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::defaultCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/attribute.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
@@ -149,7 +149,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             trackingMapper->addMapping(roiMeta.tracking_id, uuid);
         }
 
-        detectedObject->setId(uuid);
+        detectedObject->setTrackId(uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
 

@@ -1,0 +1,12 @@
+สวัสดี,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+ใช้ที่อยู่อีเมลปัจจุบันของคุณและปฏิบัติตามคำแนะนำเพิ่มเติม
+
+ลงทะเบียนบัญชีของคุณโดยใช้ลิงก์นี้: {{ config.portal_url }}/ register /{{ message.code }}

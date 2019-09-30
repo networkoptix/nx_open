@@ -1,0 +1,6 @@
+שלום, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) נתן את המשוב הבא עבור {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+ניתן ליצור קשר עם המשתמש: {{ message.sender_to_be_contacted}}

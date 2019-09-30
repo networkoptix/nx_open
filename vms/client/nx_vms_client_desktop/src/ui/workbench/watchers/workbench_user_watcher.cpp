@@ -15,6 +15,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx::vms::client::desktop::ui;
 

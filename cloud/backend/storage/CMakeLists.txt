@@ -1,0 +1,5 @@
+add_subdirectory(nx_cloud_storage_client)
+add_subdirectory(nx_cloud_storage_service)
+add_subdirectory(storage_service)
+
+add_custom_target(cloud_storage_backend DEPENDS nx_cloud_storage_client nx_cloud_storage_service storage_service)

@@ -4,7 +4,8 @@
 
 #include <atomic>
 
-#include <nx/sdk/interface.h>
+#include <nx/sdk/i_ref_countable.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 namespace nx {
 namespace sdk {
@@ -76,8 +77,10 @@ private:
 
 /**
  * Recommended base class for objects implementing an interface.
+ *
+ * Supports tracking the ref-countable objects via RefCountableRegistry.
  */
-template <class RefCountableInterface>
+template<class RefCountableInterface>
 class RefCountable: public RefCountableInterface
 {
 public:
@@ -85,9 +88,12 @@ public:
     RefCountable& operator=(const RefCountable&) = delete;
     RefCountable(RefCountable&&) = delete;
     RefCountable& operator=(RefCountable&&) = delete;
-    virtual ~RefCountable() = default;
 
-    using IRefCountable::queryInterface; //< Enable const overload.
+    virtual ~RefCountable()
+    {
+        if (const auto refCountableRegistry = libContext().refCountableRegistry())
+            refCountableRegistry->notifyDestroyed(this, refCount());
+    }
 
     virtual int addRef() const override { return m_refCountableHolder.addRef(); }
     virtual int releaseRef() const override { return m_refCountableHolder.releaseRef(); }
@@ -95,7 +101,11 @@ public:
     int refCount() const { return m_refCountableHolder.refCount(); }
 
 protected:
-    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this)) {}
+    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this))
+    {
+        if (const auto refCountableRegistry = libContext().refCountableRegistry())
+            refCountableRegistry->notifyCreated(this, refCount());
+    }
 
 private:
     const RefCountableHolder m_refCountableHolder;

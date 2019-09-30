@@ -1,6 +1,7 @@
 import django
 import logging
 import json
+import time
 import traceback
 
 from rest_framework.response import Response
@@ -54,7 +55,8 @@ class ErrorCodes(Enum):
     not_acceptable = 'notAcceptable'
 
     def log_level(self):
-        if self in (ErrorCodes.account_exists,
+        if self in (ErrorCodes.account_activated,
+                    ErrorCodes.account_exists,
                     ErrorCodes.account_not_activated,
                     ErrorCodes.bad_username,
                     ErrorCodes.ok,
@@ -102,7 +104,7 @@ class APIException(Exception):
         if error_code is None:
             error_code = status_code
 
-        if isinstance(error_code, basestring):
+        if isinstance(error_code, str):
             try:
                 error_code = ErrorCodes(error_code)
             except ValueError:
@@ -126,7 +128,7 @@ class APIException(Exception):
             }, status=self.status_code)
 
     def log_level(self):
-        if isinstance(self.error_code, basestring):
+        if isinstance(self.error_code, str):
             return logging.ERROR
         return self.error_code.log_level()
 
@@ -146,7 +148,7 @@ class APIServiceException(APIException):
 
 
 class APINotFoundException(APIException):
-    # 404 error - service unavailable
+    # 404 error - not found
     def __init__(self, error_text, error_code=ErrorCodes.not_found, error_data=None):
         super(APINotFoundException, self).__init__(error_text, error_code, error_data=error_data,
                                                    status_code=status.HTTP_404_NOT_FOUND)
@@ -213,7 +215,8 @@ def validate_mediaserver_response(func):
         if response.status_code in errors:
             if response_data:
                 validate_error(response_data)
-                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'], error_data=response_data)
+                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'],
+                                                   error_data=response_data)
             else:
                 raise errors[response.status_code](response.text, error_code=ErrorCodes.unknown_error)
 
@@ -264,7 +267,8 @@ def validate_response(func):
         if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok.value:
             validate_error(response_data)
             if response_data['resultCode'] in logic_errors:
-                raise logic_errors[response_data['resultCode']](response_data['errorText'], error_code=response_data['resultCode'])
+                raise logic_errors[response_data['resultCode']](response_data['errorText'],
+                                                                error_code=response_data['resultCode'])
             raise APILogicException(response_data['errorText'], response_data['resultCode'])
 
         # everything is OK - return server's response
@@ -297,6 +301,8 @@ def log_error(request, error, log_level):
     user_name = 'not authorized'
     request_data = ''
     ip = 'unknown'
+    login_type = 'temp key'
+    session_time = 0
 
     if isinstance(request, Request):
         page_url = request.build_absolute_uri()
@@ -304,6 +310,11 @@ def log_error(request, error, log_level):
         ip = get_client_ip(request)
         if not isinstance(request.user, AnonymousUser):
             user_name = request.user.email
+        if request.session:
+            if 'login' in request.session and request.session['login'] == request.user.email:
+                login_type = 'email and password'
+            if 'time' in request.session:
+                session_time = (time.time() - request.session['time'])/1000.0
 
     if isinstance(request_data, QueryDict):
         request_data = request_data.dict()
@@ -325,18 +336,23 @@ def log_error(request, error, log_level):
     clean_passwords(request_data)
 
     if log_level == logging.INFO:
-        error_formatted = ' {}:{} ({} at {}) Request: {}'. \
+        error_formatted = ' {}:{}\nUser: {} Login: {} Session Time: {} IP: {}\n{} Request: {}'. \
             format(error.__class__.__name__,
                    error_text,
                    user_name,
+                   login_type,
+                   session_time,
+                   ip,
                    page_url,
                    request_data
                    )
     else:
-        error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
+        error_formatted = ' {}:{}\nUser: {} Login: {} Session Time: {} IP: {}\n{} Request: {}\n{}\nCall Stack: \n{}'. \
             format(error.__class__.__name__,
                    error_text,
                    user_name,
+                   login_type,
+                   session_time,
                    ip,
                    page_url,
                    request_data,
@@ -352,6 +368,7 @@ def kill_session(request):
     request.session.pop('login', None)
     request.session.pop('password', None)
     request.session.pop('timezone', None)
+    request.session.pop('time', None)
     django.contrib.auth.logout(request)
 
 

@@ -73,9 +73,9 @@
     <!-- tt__DateTimeRange *Validity -->
     <tt:Validity>
      <!-- time_t From -->
-     <tt:From>2019-06-26T13:17:18Z</tt:From>
+     <tt:From>2019-08-15T16:06:00Z</tt:From>
      <!-- time_t Until -->
-     <tt:Until>2019-06-26T13:17:18Z</tt:Until>
+     <tt:Until>2019-08-15T16:06:00Z</tt:Until>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 

@@ -74,9 +74,13 @@ nx::api::CameraImageRequest CameraThumbnailProvider::requestData() const
     return m_request;
 }
 
-void CameraThumbnailProvider::setRequestData(const nx::api::CameraImageRequest& data)
+void CameraThumbnailProvider::setRequestData(
+    const nx::api::CameraImageRequest& data, bool resetStatus)
 {
     m_request = data;
+
+    if (resetStatus)
+        setStatus(Qn::ThumbnailStatus::Invalid);
 }
 
 QImage CameraThumbnailProvider::image() const

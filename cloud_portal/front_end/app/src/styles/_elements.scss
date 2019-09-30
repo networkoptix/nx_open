@@ -1,0 +1,24 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+.standalone-delimiter {
+    height           : 1px;
+    background-color : $light5;
+    padding          : 0 12px;
+    position         : relative;
+    
+    &:after {
+        height           : 1px;
+        background-color : $light7;
+        content          : '';
+        position         : absolute;
+        width            : calc(100% - 24px);
+    }
+}
+
+.group-label {
+    margin-bottom : 8px;
+    font-family   : $font-family-regular;
+    color         : $light16;
+}

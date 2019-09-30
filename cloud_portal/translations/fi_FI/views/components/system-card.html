@@ -1,0 +1,66 @@
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Järjestelmäsi</h2>
+        <p>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Nimeä järjestelmä uudelleen</button>
+        </p>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Yhdistä toiseen järjestelmään</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Irrota
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+    </div>
+</div>
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
+        <h2>Omistaja</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Omat oikeudet:
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Nimeä järjestelmä uudelleen</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Katkaise yhteytesi tiliisi</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
+            yhdistetään tähän järjestelmään</div>
+            <hr />
+            <div class="merge-info-text light-text">Tietokannan koosta riippuen voi kestää useita tunteja</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Viimeistellään järjestelmien yhdistämistä</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div ng-if="mergeTargetSystem.name">
+            <div>Tämä järjestelmä on yhdistetty
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>Tietokannan koosta riippuen voi kestää useita tunteja.</p>
+                <p>Ennen yhdistämistä voit kirjautua tähän järjestelmään ja katsoa videota, mutta et voi muuttaa asetuksia.</p>
+                <p>Kun yhdistäminen on valmis, kaikki käyttäjät ja kamerat tästä järjestelmästä tulevat saataville
+                    in <strong>{{mergeTargetSystem.name}}</strong> Järjestelmä, ja tämä järjestelmä poistetaan.</p>
+            </div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Viimeistellään järjestelmien yhdistämistä</div>
+    </div>
+</div>

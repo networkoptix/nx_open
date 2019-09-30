@@ -20,18 +20,6 @@ public:
         return (int) m_items.size();
     }
 
-    virtual IItem* at(int index) const override
-    {
-        if (!NX_KIT_ASSERT(index >= 0 && index < (int) m_items.size()))
-            return nullptr;
-
-        if (!NX_KIT_ASSERT(m_items[index]))
-            return nullptr;
-
-        m_items[index]->addRef();
-        return m_items[index].get();
-    }
-
     void addItem(IItem* item)
     {
         if (!NX_KIT_ASSERT(item))
@@ -44,6 +32,19 @@ public:
     void clear()
     {
         m_items.clear();
+    }
+
+protected:
+    virtual IItem* getAt(int index) const override
+    {
+        if (!NX_KIT_ASSERT(index >= 0 && index < (int) m_items.size()))
+            return nullptr;
+
+        if (!NX_KIT_ASSERT(m_items[index]))
+            return nullptr;
+
+        m_items[index]->addRef();
+        return m_items[index].get();
     }
 
 private:

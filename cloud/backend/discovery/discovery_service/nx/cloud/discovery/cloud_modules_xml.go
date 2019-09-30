@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 const kCloudModulesXmlTemplateApi string = `<?xml version="1.0" encoding="utf-8"?>
@@ -21,12 +22,19 @@ const kCloudModulesXmlTemplateV1 string = `<?xml version="1.0" encoding="utf-8"?
 			<set resName="hpm.udpUrl" resValue="%s"/>
 		</sequence>
 	<set resName="notification_module" resValue="https://%s:443"/>
+	%s
 </sequence>
 `
+
+const kSpeedTestTemplate string = `<set resName="speedtest_module" resValue="%s"/>`
 
 var CloudModulesXmlFunctions = map[string]func(*http.Request, *Node) (string, error, int){
 	"/api/cloud_modules.xml":          ApiCloudModulesXml,
 	"/discovery/v1/cloud_modules.xml": V1CloudModulesXml,
+}
+
+func speedTestUrl() string {
+	return os.Getenv("SPEEDTEST_URL")
 }
 
 func ApiCloudModulesXml(request *http.Request, node *Node) (string, error, int /*httpStatusCode*/) {
@@ -70,6 +78,11 @@ func V1CloudModulesXml(request *http.Request, node *Node) (string, error, int /*
 		return "", errors.New("udp url is empty"), http.StatusBadRequest
 	}
 
-	xml := fmt.Sprintf(kCloudModulesXmlTemplateV1, cdbHost, tcpUrl, udpUrl, cdbHost)
+	speedTestModule := ""
+	if url := speedTestUrl(); len(url) > 0 {
+		speedTestModule = fmt.Sprintf(kSpeedTestTemplate, url)
+	}
+
+	xml := fmt.Sprintf(kCloudModulesXmlTemplateV1, cdbHost, tcpUrl, udpUrl, cdbHost, speedTestModule)
 	return xml, nil, http.StatusOK
 }

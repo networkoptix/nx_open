@@ -67,6 +67,18 @@ private:
     SHA_CTX ctx;
 };
 
+class QnSha256CryptographicHashPrivate : public QnCryptographicHashPrivate {
+public:
+    virtual void init() override { SHA256_Init(&ctx); }
+    virtual void update(const char *data, int length) override { SHA256_Update(&ctx, data, length); }
+    virtual void final(unsigned char *result) override { SHA256_Final(result, &ctx); }
+    virtual int size() const override { return SHA256_DIGEST_LENGTH; }
+    virtual QnCryptographicHashPrivate *clone() const { return new QnSha256CryptographicHashPrivate(*this); }
+
+private:
+    SHA256_CTX ctx;
+};
+
 
 // -------------------------------------------------------------------------- //
 // QnCryptographicHash
@@ -81,6 +93,9 @@ QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
         break;
     case Sha1:
         d.reset(new QnSha1CryptographicHashPrivate());
+        break;
+    case Sha256:
+        d.reset(new QnSha256CryptographicHashPrivate());
         break;
     default:
         std::printf("%s: Invalid cryptographic hash algorithm %d.\n", Q_FUNC_INFO, static_cast<int>(algorithm));

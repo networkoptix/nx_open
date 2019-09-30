@@ -115,23 +115,9 @@ public:
 
 public:
 
-    // Functionality:
-    //    initialize the UDT library.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0 if success, otherwise -1 is returned.
+    Result<> initializeUdtLibrary();
 
-    int startup();
-
-    // Functionality:
-    //    release the UDT library.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0 if success, otherwise -1 is returned.
-
-    int cleanup();
+    Result<> deinitializeUdtLibrary();
 
     // Functionality:
     //    Create a new UDT socket.
@@ -141,33 +127,25 @@ public:
     // Returned value:
     //    The new UDT socket ID, or INVALID_SOCK.
 
-    UDTSOCKET newSocket(int af, int type);
+    Result<UDTSOCKET> newSocket(int af, int type);
 
-    // Functionality:
-    //    Create a new UDT connection.
     // Parameters:
     //    0) [in] listen: the listening UDT socket;
     //    1) [in] peer: peer address.
     //    2) [in/out] hs: handshake information from peer side (in), negotiated value (out);
     // Returned value:
-    //    If the new connection is successfully created: 1 success, 0 already exist, -1 error.
+    //    If the new connection is successfully created: 1 success, 0 already exist.
 
-    int newConnection(
+    Result<int> createConnection(
         const UDTSOCKET listen,
         const detail::SocketAddress& remotePeerAddress,
         CHandShake* hs);
 
-    // Functionality:
-    //    look up the UDT entity according to its ID.
     // Parameters:
     //    0) [in] u: the UDT socket ID.
-    // Returned value:
-    //    Pointer to the UDT entity.
 
-    std::shared_ptr<CUDT> lookup(const UDTSOCKET u);
+    Result<std::shared_ptr<CUDT>> lookup(const UDTSOCKET u);
 
-    // Functionality:
-    //    Check the status of the UDT socket.
     // Parameters:
     //    0) [in] u: the UDT socket ID.
     // Returned value:
@@ -177,46 +155,62 @@ public:
 
     // socket APIs
 
-    int bind(const UDTSOCKET u, const sockaddr* name, int namelen);
-    int bind(const UDTSOCKET u, UDPSOCKET udpsock);
-    int listen(const UDTSOCKET u, int backlog);
-    UDTSOCKET accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
-    int connect(const UDTSOCKET u, const sockaddr* name, int namelen);
-    int shutdown(const UDTSOCKET u, int how);
-    int close(const UDTSOCKET u);
-    int getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
-    int getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
-    int select(ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout);
-    int selectEx(const std::vector<UDTSOCKET>& fds, std::vector<UDTSOCKET>* readfds, std::vector<UDTSOCKET>* writefds, std::vector<UDTSOCKET>* exceptfds, int64_t msTimeOut);
-    int epoll_create();
-    int epoll_add_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
-    int epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
-    int epoll_remove_usock(const int eid, const UDTSOCKET u);
-    int epoll_remove_ssock(const int eid, const SYSSOCKET s);
-    int epoll_wait(
+    Result<> bind(const UDTSOCKET u, const sockaddr* name, int namelen);
+    Result<> bind(const UDTSOCKET u, UDPSOCKET udpsock);
+    Result<> listen(const UDTSOCKET u, int backlog);
+    Result<UDTSOCKET> accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
+    Result<> connect(const UDTSOCKET u, const sockaddr* name, int namelen);
+    Result<> shutdown(const UDTSOCKET u, int how);
+    Result<> close(const UDTSOCKET u);
+    Result<> getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
+    Result<> getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
+
+    /**
+     * @return Signalled socket count.
+     */
+    Result<int> select(ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout);
+
+    /**
+     * @return Signalled socket count.
+     */
+    Result<int> selectEx(
+        const std::vector<UDTSOCKET>& fds,
+        std::vector<UDTSOCKET>* readfds,
+        std::vector<UDTSOCKET>* writefds,
+        std::vector<UDTSOCKET>* exceptfds,
+        int64_t msTimeOut);
+
+    /**
+     * @return epoll id.
+     */
+    Result<int> epoll_create();
+
+    Result<> epoll_release(const int eid);
+
+    Result<> epoll_add_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
+    Result<> epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
+    Result<> epoll_remove_usock(const int eid, const UDTSOCKET u);
+    Result<> epoll_remove_ssock(const int eid, const SYSSOCKET s);
+
+    /**
+     * @return Signalled socket count.
+     */
+    Result<int> epoll_wait(
         const int eid,
         std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
         std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* lwfds = NULL);
-    int epoll_interrupt_wait(int eid);
-    int epoll_release(const int eid);
 
-    // Functionality:
-    //    record the UDT exception.
-    // Parameters:
-    //    0) [in] e: pointer to a UDT exception instance.
-    // Returned value:
-    //    None.
+    Result<> epoll_interrupt_wait(int eid);
 
-    void setError(CUDTException* e);
+    /**
+     * Set last error for the current thread.
+     */
+    void setError(Error e);
 
-    // Functionality:
-    //    look up the most recent UDT exception.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    pointer to a UDT exception instance.
-
-    CUDTException* getError();
+    /**
+     * @return The last error occured in the current thread.
+     */
+    const Error& getError() const;
 
 private:
     //   void init();
@@ -232,29 +226,24 @@ private:
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
 private:
-    pthread_key_t m_TLSError;                         // thread local error record (last error)
-#ifndef _WIN32
-    static void TLSDestroy(void* e) { if (NULL != e) delete (CUDTException*)e; }
-#else
-    std::map<DWORD, CUDTException*> m_mTLSRecord;
-    void checkTLSValue();
-    pthread_mutex_t m_TLSLock;
-#endif
+    std::map<ThreadId, Error> m_mTLSRecord;
+    void cleanupPerThreadLastErrors();
+    mutable std::mutex m_TLSLock;
 
 private:
-    void connect_complete(const UDTSOCKET u);
+    Result<> connect_complete(const UDTSOCKET u);
 
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
 
     std::shared_ptr<CUDTSocket> locate(
         const detail::SocketAddress& peer, const UDTSOCKET id, int32_t isn);
 
-    void updateMux(
+    Result<> updateMux(
         CUDTSocket* s,
         const std::optional<detail::SocketAddress>& addr = std::nullopt,
         const UDPSOCKET* = NULL);
 
-    void updateMux(CUDTSocket* s, const CUDTSocket* ls);
+    Result<> updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
     std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;

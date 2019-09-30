@@ -271,7 +271,7 @@ protected:
 
     void thenGetConnectionRequestIs(relay::api::ResultCode expectedResultCode)
     {
-        thenGetConnectionRequestIs({{expectedResultCode}});
+        thenGetConnectionRequestIs(std::vector<relay::api::ResultCode>{expectedResultCode});
     }
 
     void thenConnectRequestHasCompleted()
@@ -378,11 +378,11 @@ private:
 
         nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
         m_pool->peerConnectedSubscription().subscribe(
-            std::bind(&nx::utils::SyncQueue<std::string>::push, &m_peerConnectedEvents, _1),
+            [this](auto&&... args) { m_peerConnectedEvents.push(std::forward<decltype(args)>(args)...); },
             &subscriptionId);
 
         m_pool->peerDisconnectedSubscription().subscribe(
-            std::bind(&nx::utils::SyncQueue<std::string>::push, &m_peerDisconnectedEvents, _1),
+            [this](auto&&... args) { m_peerDisconnectedEvents.push(std::forward<decltype(args)>(args)...); },
             &subscriptionId);
     }
 };

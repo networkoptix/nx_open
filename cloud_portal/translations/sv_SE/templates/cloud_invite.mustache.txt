@@ -1,0 +1,12 @@
+Hej,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+använd din nuvarande e-postadress och följ ytterligare instruktioner.
+
+Registrera ditt konto med den här länken: {{ config.portal_url }}/ register /{{ message.code }}

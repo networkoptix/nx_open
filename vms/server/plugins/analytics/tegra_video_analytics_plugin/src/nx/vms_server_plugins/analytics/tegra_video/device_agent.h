@@ -23,13 +23,15 @@ class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
-
 protected:
-    virtual std::string manifest() const override;
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+
+    virtual std::string manifestString() const override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
@@ -69,6 +71,8 @@ private:
         const std::map<std::string, std::vector<std::string>>& options);
 
 private:
+    nx::sdk::analytics::Engine* const m_engine;
+
     int m_counter = 0;
     int m_counterObjects = 0;
     std::string m_eventTypeId;

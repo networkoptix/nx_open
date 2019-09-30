@@ -20,6 +20,7 @@ extern "C"
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
+#include <nx/utils/random_qt_device.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -241,7 +242,7 @@ private:
     StreamRecorderRole m_role;
     boost::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
 
-    std::random_device m_rd;
+    nx::utils::random::QtDevice m_rd;
     std::mt19937 m_gen;
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;

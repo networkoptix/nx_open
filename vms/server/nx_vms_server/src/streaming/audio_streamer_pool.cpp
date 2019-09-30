@@ -1,6 +1,5 @@
 #include "audio_streamer_pool.h"
 #include <core/resource/camera_resource.h>
-#include <nx/utils/unused.h>
 #include <core/resource_management/resource_pool.h>
 #include <camera/camera_pool.h>
 #include <nx/vms/event/actions/abstract_action.h>

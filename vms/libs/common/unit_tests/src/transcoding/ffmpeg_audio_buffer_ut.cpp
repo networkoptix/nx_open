@@ -12,13 +12,13 @@ public:
     {
         data.resize(size);
         dataRef.resize(size);
-        for (int i = 0; i < size; ++i)
+        for (int i = 0; i < (int) size; ++i)
             data[i] = i;
     }
     uint32_t write(uint8_t** buffers, uint32_t sampleCount)
     {
         uint32_t actualSize = std::min<uint64_t>(sampleCount * sampleSize, size - dataOffset);
-        for (int i = 0; actualSize && i < planeCount; ++i)
+        for (int i = 0; actualSize && i < (int) planeCount; ++i)
             memcpy(buffers[i], data.data() + dataOffset, actualSize);
         dataOffset += actualSize;
         return actualSize / sampleSize;
@@ -27,7 +27,7 @@ public:
     void read(uint8_t** buffers, uint32_t sampleCount)
     {
         ASSERT_TRUE(sampleCount * sampleSize <= size - dataRefOffset);
-        for (int i = 0; i < planeCount; ++i)
+        for (int i = 0; i < (int) planeCount; ++i)
             memcpy(dataRef.data() + dataRefOffset, buffers[i], sampleCount * sampleSize);
         dataRefOffset += sampleCount * sampleSize;
     }
@@ -59,7 +59,7 @@ void testReadWrite(int readCount, int writeCount, int sampleCount)
         buffers = buffer.startWriting(writeCount);
         ASSERT_TRUE(buffers != nullptr);
         buffer.finishWriting(samples.write(buffers, writeCount));
-        while(buffer.sampleCount() >= readCount)
+        while((int) buffer.sampleCount() >= readCount)
         {
             ASSERT_TRUE(buffer.popData(readCount, buffers));
             samples.read(buffers, readCount);

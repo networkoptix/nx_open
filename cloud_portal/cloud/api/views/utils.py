@@ -18,23 +18,36 @@ from cms.models import DataStructure, get_cloud_portal_product,\
 logger = logging.getLogger(__name__)
 
 
+def get_cloud_capabilities_from_cache():
+    customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'cloud_capabilities')
+    return {
+        'integrationStoreEnabled': customization_cache['integration_store_enabled']
+    }
+
+
 def get_settings_from_cache():
     customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')
     return {
-        'productName': customization_cache['product_name'],
+        'cloudName': customization_cache['cloud_name'],
         'vmsName': customization_cache['vms_name'],
+        'cloudMerge': customization_cache['cloud_merge'],
         'copyrightYear': customization_cache['copyright_year'],
         'companyName': customization_cache['company_name'],
         'companyLink': customization_cache['company_link'],
+        'feedbackEnabled': customization_cache['feedback_enabled'],
         'footerItems': customization_cache['footer_items'],
+        'integrationFilterItems': customization_cache['integration_filter_items'],
+        'integrationStoreEnabled': customization_cache['integration_store_enabled'],
         'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
         'publicDownloads': customization_cache['public_downloads'],
         'publicReleases': customization_cache['public_releases'],
-        'sortSupportedDevices': customization_cache['sort_supported_devices'],
+        'sortSupportedDevicesByPopularity': customization_cache['sort_supported_devices_by_popularity'],
         'supportLink': customization_cache['support_link'],
+        'privacyLink': customization_cache['privacy_link'],
         'supportedResolutions': customization_cache['supported_resolutions'],
         'supportedHardwareTypes': customization_cache['supported_hardware_types'],
-        'searchTags': customization_cache['search_tags']
+        'searchTags': customization_cache['search_tags'],
+        'vendorsShown': customization_cache['vendors_shown']
     }
 
 
@@ -86,7 +99,7 @@ def language(request):
         request.session['language'] = lang
 
         # Save account value
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.language = lang
             request.user.save()
 
@@ -109,6 +122,14 @@ def downloads_history(request):
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
     downloads_json = requests.get(downloads_url)
+
+    if downloads_json.status_code == 404:
+        logger.error(
+            "downloads.json doesn't exist for customization: {0}, Ask Boris to fix that (publish and accept a "
+            "release)".format(settings.CUSTOMIZATION)
+        )
+        return Response(None)
+
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
 
@@ -245,4 +266,94 @@ def get_settings(request):
     settings_object = get_settings_from_cache()
     if 'version_id' in settings_object:
         del settings_object['version_id']
+
+    # Hide cloud merge setting if its disabled to not reveal this feature to users.
+    if 'cloudMerge' in settings_object and not settings_object['cloudMerge']:
+        del settings_object['cloudMerge']
     return Response(settings_object)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes((AllowAny,))
+@handle_exceptions
+def get_ipvd(request):
+    url = settings.IPVD_CONNECT
+
+    if request.method == 'GET':
+        # check cache and return cached item if any
+        ipvd = cache.get("ipvd", dict())
+
+        if all(k in ipvd for k in ("cameras", "vendors", "num_cameras")):
+            return Response({
+                "cameras": ipvd["cameras"],
+                "vendors": ipvd["vendors"],
+                "num_cameras": ipvd["num_cameras"],
+                "cached": True
+            })
+        # ---------------------
+
+        # else request and process
+        cameras = requests.get(url, "[]").json()
+
+        # build vendor list
+        vendors_dict = {}
+        camera_names = []
+
+        for camera in cameras:
+            camera["isH265"] = camera["primaryCodec"] == 'H.265'
+
+            if camera["hardwareType"] == "Camera" and camera["isMultiSensor"]:
+                camera["hardwareType"] = 'Multi-Sensor Camera'
+
+            res = camera["maxResolution"].split('x')
+            if len(res) == 2:
+                camera["resolutionArea"] = int(res[0]) * int(res[1])
+            else:
+                camera["resolutionArea"] = 0
+
+            vendor = camera["vendor"]
+            if vendor in vendors_dict:
+                vendors_dict[vendor]['count'] += camera["count"]
+            else:
+                vendors_dict[vendor] = {'name': vendor, 'count': camera["count"]}
+
+            vm = camera["vendor"].replace(" ", "") + camera["model"].replace(" ", "")
+            camera["sortKey"] = vm
+            camera_names.append(vm)
+
+            if camera["aliases"]:
+                for alias in camera["aliases"].split(','):
+                    alias = alias.strip()
+                    camera_names.append(camera["vendor"].replace(" ", "") + alias.replace(" ", ""))
+
+        num_cameras = len(set(camera_names))
+        # ---------------------
+
+        vendors = list(vendors_dict.values())
+
+        ipvd = {
+            "cameras": cameras,
+            "vendors": vendors,
+            "num_cameras": num_cameras
+        }
+
+        # cache ipvd
+        cache.set("ipvd", ipvd, 60 * 60 * 24)  # 24 hours
+        # ---------------------
+
+        return Response(ipvd)
+
+    elif request.method == 'POST':
+        # clear cache
+        cache.set("ipvd", dict())
+        # --------------------
+
+        return Response({'IPVD cache cleared'})
+
+
+@api_view(['GET'])
+@handle_exceptions
+def cloud_capabilities(request):
+    capabilities = get_cloud_capabilities_from_cache()
+
+    return Response(capabilities)

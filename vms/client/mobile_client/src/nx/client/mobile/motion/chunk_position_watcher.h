@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <utils/common/connective.h>
 
-class QnCameraChunkProvider;
+namespace nx::client::core { class ChunkProvider; }
 
 // TODO: #ynikitenkov Move it to the nx::vms::client::mobile namespace in 19.2
 namespace nx {
@@ -25,7 +25,7 @@ class ChunkPositionWatcher: public Connective<QObject>
         WRITE setPosition
         NOTIFY positionChanged)
 
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider
+    Q_PROPERTY(nx::client::core::ChunkProvider* chunkProvider
         READ chunkProvider
         WRITE setChunkProvider
         NOTIFY chunkProviderChanged)
@@ -42,8 +42,8 @@ public:
     qint64 position() const;
     void setPosition(qint64 value);
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* value);
+    nx::client::core::ChunkProvider* chunkProvider() const;
+    void setChunkProvider(nx::client::core::ChunkProvider* value);
 
     Q_INVOKABLE qint64 nextChunkStartTimeMs() const;
     Q_INVOKABLE qint64 prevChunkStartTimeMs() const;

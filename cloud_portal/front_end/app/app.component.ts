@@ -3,6 +3,7 @@ import { Component, OnInit }     from '@angular/core';
 import { TranslateService }      from '@ngx-translate/core';
 import { CookieService }         from 'ngx-cookie-service';
 import { DeviceDetectorService } from 'ngx-device-detector';
+import { Title }                 from '@angular/platform-browser';
 
 @Component({
     selector: 'nx-app',
@@ -20,7 +21,9 @@ export class AppComponent {
     constructor(private cookieService: CookieService,
                 private deviceService: DeviceDetectorService,
                 private location: Location,
+                private titleService: Title,
                 translate: TranslateService) {
+
 
         // TODO: Componentize this
         this.allowedDevices = {
@@ -71,5 +74,9 @@ export class AppComponent {
         // const langCookie = this.cookieService.get('language');
         // const lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');
         // translate.use(lang);
+    }
+
+    public setTitle(newTitle: string) {
+        this.titleService.setTitle(newTitle);
     }
 }

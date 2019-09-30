@@ -269,7 +269,8 @@ protected:
     void andExpectedStatisticsIsProvided()
     {
         const auto prevStatistics = m_receivedStatistics.pop();
-        ASSERT_EQ(m_expectedStatistics, prevStatistics);
+        ASSERT_EQ(m_expectedStatistics.relaying, prevStatistics.relaying);
+        ASSERT_EQ(m_expectedStatistics.http, prevStatistics.http);
     }
 
 private:

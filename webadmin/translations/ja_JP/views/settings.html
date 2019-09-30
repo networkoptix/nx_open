@@ -36,14 +36,14 @@
 
                     <div>
                         <h3>サーバーをリセット</h3>
-                        <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)
-                            サーバーは現在のシステムから切り離されます ビデオのアーカイブはそのまま残ります</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">出荷時のデフォルトに戻す</button></p>
+                        <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)。
+                            サーバーは現在のシステムから切り離されます。 ビデオのアーカイブはそのまま残ります。</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">工場出荷時の状態に戻します</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>システムからサーバーを切離す</h3>
-                        <p>このアクションは、データベース、ローカルユーザー、および設定を保持しているシステムからサーバーを切り離します
-                            ビデオのアーカイブはそのまま残ります <b>クラウドユーザーは削除されます </b></p>
+                        <p>このアクションは、データベース、ローカルユーザーおよび設定を保持しているシステムからサーバーを切り離します。
+                            ビデオのアーカイブはそのまま残ります。 <b>クラウドユーザーは削除されます。 </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
                     <div>
@@ -53,9 +53,9 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Adminパスワードの変更</h3>
-                            <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
-それ以外は回復パスワードのみを変更</p>
+                            <h3>管理者パスワードを変更する</h3>
+                            <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます。<br>　　
+それ以外は回復パスワードのみを変更します。</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
@@ -93,7 +93,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>このシステムは {{Config.cloud.productName}}にリンクされています システムオーナー: <b>{{cloudAccountName}}</b></p>
+                            <p>このシステムは {{Config.cloud.productName}}にリンクされています。システムオーナー: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}}から切断</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -199,7 +199,7 @@
                         <h3>サーバー上のクライアント アプリケーションを実行</h3>
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">クライアントを実行</button>                            
 <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">クライアントを停止</button></p>
-                        <p>キーボード/マウス、またはモバイル アプリケーションを使用して制御します</p>
+                        <p>キーボード/マウス、またはモバイル アプリケーションを使用して制御します。</p>
                     </div>
                 </uib-tab>
             </uib-tabset>

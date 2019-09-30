@@ -199,9 +199,10 @@ Qn::AuthResult Authenticator::verifyPassword(
 
     // Address is changed so lockout through authorized requests still happen but does not affect
     // user connections.
-    const nx::network::HostAddress clientIpForLockout(clientIp.toString() + "_API");
+    auto ipForLockout = clientIp.toString() + "_api";
+    ipForLockout.replace(":", "_"); //< Bypass QUrl host name checks.
     const auto result = tryHttpMethods(
-        clientIpForLockout, request, response, /*isProxy*/ false, nullptr, nullptr);
+        ipForLockout, request, response, /*isProxy*/ false, nullptr, nullptr);
 
     NX_VERBOSE(this, "Check %1 password result: %2", user, result);
     return result;

@@ -1,4 +1,5 @@
-from notifications.models import Message, Event
+from cms.models import get_cloud_portal_product, Product
+from notifications.models import Message, Event, Feedback
 from django.core.exceptions import ValidationError
 import django
 from django.conf import settings
@@ -40,3 +41,19 @@ def send(user_email, msg_type, message, customization, external_id=None):
 def notify(event_type, object, data):
     event = Event(type=event_type, object=object, data=data)
     event.send()
+
+
+def send_feedback(event_type, product_id, data):
+    if not product_id:
+        product = get_cloud_portal_product()
+    else:
+        product = Product.objects.get(id=product_id)
+
+    feedback = Feedback.objects.create(sender_to_be_contacted=data['contact'],
+                                       message=data['message'],
+                                       product_name=data['product'],
+                                       sender_name=data['sender_name'],
+                                       sender_email=data['sender_email'],
+                                       target_product=product,
+                                       type=event_type)
+    feedback.send()

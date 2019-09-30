@@ -8,8 +8,7 @@
             <tr><td>현재서버</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
             <tr><td>버전 정보</td><td><b>{{settings.version}}</b></td></tr>
-            <tr><td>플렛폼</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
-            <tr><td>구조</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
+            <tr><td>플렛폼</td><td><b>{{settings.osInfo.platform}}</b></td></tr>
             <tr ng-if="user.isAdmin" class="table-spacer"><td>&nbsp;</td><td></td></tr>
             <tr ng-if="user.isAdmin"><td>모든 서버</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">

@@ -23,6 +23,7 @@
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
@@ -61,8 +62,10 @@ class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
 
+namespace nx::analytics::db { struct Filter; }
+
 /**
- * Widget to show media from a camera or disk file (from QnMediaResource). 
+ * Widget to show media from a camera or disk file (from QnMediaResource).
  */
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -163,7 +166,7 @@ public:
 
     bool isAnalyticsSupported() const;
     bool isAnalyticsEnabled() const;
-    void setAnalyticsEnabled(bool analyticsEnabled);
+    void setAnalyticsEnabled(bool enabled);
 
     enum class AreaType
     {
@@ -183,6 +186,8 @@ public:
     void setAnalyticsFilterRect(const QRectF& value);
 
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
+
+    void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 
 signals:
     void motionSelectionChanged();
@@ -253,6 +258,11 @@ protected:
 
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
+    void paintAnalyticsObjectsDebugOverlay(
+        std::chrono::milliseconds timestamp,
+        QPainter* painter,
+        const QRectF& rect);
+
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
 
@@ -275,11 +285,6 @@ protected:
 
     void updateTwoWayAudioWidget();
     bool animationAllowed() const;
-
-    rest::Handle invokeTrigger(
-        const QString& id,
-        std::function<void(bool, rest::Handle)> resultHandler,
-        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
@@ -353,14 +358,14 @@ private:
 private:
     struct SoftwareTriggerInfo
     {
-        QString triggerId;
+        QnUuid ruleId;
         QString name;
         QString icon;
         bool prolonged = false;
 
         bool operator ==(const SoftwareTriggerInfo& other) const
         {
-            return triggerId == other.triggerId
+            return ruleId == other.ruleId
                 && name == other.name
                 && icon == other.icon
                 && prolonged == other.prolonged;
@@ -482,6 +487,7 @@ private:
     QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
     QnUuid m_itemId;
+    nx::vms::client::core::SoftwareTriggersController m_triggerController;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

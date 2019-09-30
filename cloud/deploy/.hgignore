@@ -1,3 +1,6 @@
 syntax: glob
 
 cloud_portal/stage
+mediaserver/build
+mediaserver/deb
+mediaserver/state

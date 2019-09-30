@@ -23,6 +23,7 @@
 #include <utils/common/checked_cast.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_access/resource_access_subject.h>
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -89,6 +90,7 @@ void QnWorkbenchAccessController::setUser(const QnUserResourcePtr& user)
 
     m_user = user;
     recalculateAllPermissions();
+    emit userChanged(m_user);
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr& resource) const

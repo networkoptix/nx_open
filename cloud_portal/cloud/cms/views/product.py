@@ -12,6 +12,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 import os
 import json
 from cloud import settings
+from api.helpers.exceptions import APIRequestException
 from api.helpers.permissions import make_customization_visible_to_user
 from cms.controllers import filldata, generate_structure, modify_db, structure
 from cms.forms import *
@@ -19,8 +20,13 @@ from cms.forms import *
 from django.contrib.admin import AdminSite
 
 
+DRAFT = Product.PREVIEW_STATUS[Product.PREVIEW_STATUS.draft]
+
+
 class MyAdminSite(AdminSite):
     pass
+
+
 mysite = MyAdminSite()
 
 
@@ -58,14 +64,14 @@ def add_upload_error_messages(request, message, errors):
 # Used to make sure users without advanced permission don't modify advanced DataStructures
 def advanced_touched_without_permission(request_data, data_structures, product):
     for ds_name in request_data:
-        data_structure = data_structures.filter(name=ds_name)
-        if data_structure.exists() and data_structure[0].advanced:
-            data_record = data_structure[0].datarecord_set.filter(product=product)
+        data_structure = data_structures.filter(name=ds_name).first()
+        if data_structure and data_structure.advanced:
+            data_record = data_structure.datarecord_set.filter(product=product).order_by('created_date').last()
 
-            if data_record.exists():
-                db_record_value = data_record.latest('created_date').value
+            if data_record:
+                db_record_value = data_record.value
             else:
-                db_record_value = data_structure[0].default
+                db_record_value = data_structure.default
 
             if request_data[ds_name] != db_record_value:
                 return True
@@ -98,9 +104,6 @@ def context_editor_action(request, product, context_id, language_code):
                                                             current_lang, context.datastructure_set.all(),
                                                             request_data, request_files, request.user)
 
-        if 'Preview' in request_data:
-            saved_msg += " Preview has been created."
-
         if 'SendReview' in request_data:
             if upload_errors:
                 warning_no_error_msg = "Cannot have any errors when sending for review."
@@ -114,9 +117,17 @@ def context_editor_action(request, product, context_id, language_code):
             add_upload_error_messages(request, "Upload error for {}. {}", upload_errors)
             add_upload_error_messages(request, "Product error for {}. {}", product_errors)
         else:
+            if 'Preview' in request_data:
+                if product.can_preview_on_portal:
+                    saved_msg += " Preview has been created."
+                    product.change_preview_status(product.PREVIEW_STATUS.draft)
+                    preview_link = modify_db.generate_preview_link(context, product, state=DRAFT)
+                else:
+                    add_upload_error_messages(request, "{}", [
+                        ("Cannot create preview for this product on this portal.", "")
+                    ])
+
             messages.success(request, saved_msg)
-            if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-                preview_link = modify_db.generate_preview_link(context)
 
     return preview_link, upload_errors, product_errors
 
@@ -129,14 +140,14 @@ def page_editor(request):
     context_id = request.POST['context_id']
     language_code = request.POST['language'] if 'language' in request.POST else None
 
-    if not request.user.has_perm('cms.edit_content'):
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
         raise PermissionDenied
 
     preview_link, context_errors, product_errors = context_editor_action(request, product, context_id, language_code)
 
     if 'SendReview' in request.POST and not context_errors and not product_errors:
         customization_review = ProductCustomizationReview.objects.\
-            filter(version_id=ContentVersion.objects.latest('created_date'))
+            filter(version_id=ContentVersion.objects.filter(product=product).latest('created_date'))
 
         # If the current customization is in the list of reviews go to that one.
         # Otherwise go to the first customization in the list of reviews.
@@ -155,16 +166,16 @@ def page_editor(request):
 @permission_required("cms.change_productcustomizationreview")
 def review(request):
     review_id = request.POST['review_id'] if 'review_id' in request.POST else None
+    product_review = ProductCustomizationReview.objects.filter(id=review_id).first()
 
-    if not ProductCustomizationReview.objects.filter(id=review_id).exists():
+    if not product_review:
         return HttpResponseBadRequest("Version does not exist")
 
-    product_review = ProductCustomizationReview.objects.get(id=review_id)
     product = product_review.version.product
 
     if 'force_update' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.force_update'):
-        if product.product_type.can_preview:
+        if product.is_cloud_portal and product.can_preview_on_portal:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
             messages.success(request, "Version {} was force updated ".format(product_review.version.id))
@@ -173,7 +184,7 @@ def review(request):
 
     elif 'publish' in request.POST and UserGroupsToProductPermissions.\
             check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-        if product.product_type.can_preview:
+        if product.is_cloud_portal and product.can_preview_on_portal:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:
                 messages.error(request, "Version {} {}".format(product_review.version.id, publishing_errors))
@@ -192,12 +203,19 @@ def review(request):
         elif 'reject' in request.POST:
             raise PermissionDenied
 
-        message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
+        if 'access_customization' in request.POST:
+            make_customization_visible_to_user(get_cloud_portal_product(product_review.customization),
+                                               product_review.version.created_by)
+
+        if not UserGroupsToProductPermissions.check_customization_permission(
+                product_review.version.created_by, product_review.customization, 'cms.access_customization'
+        ):
+            message = '\nMessage: {}\n'.format(request.POST['addedNote'])
+        else:
+            message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
         product_review.notes += message
         product_review.save()
-        if 'can_view_customization' in request.POST:
-            make_customization_visible_to_user(get_cloud_portal_product(settings.CUSTOMIZATION),
-                                               product_review.version.created_by)
+
     elif any(action in request.POST for action in ['publish', 'force_update']):
         raise PermissionDenied
     else:
@@ -210,10 +228,17 @@ def review(request):
 @permission_required('cms.change_productcustomizationreview')
 def make_preview(request):
     version_id = request.POST['version_id'] if 'version_id' in request.POST else None
-    context = Context.objects.get(id=request.POST['context_id'])
+    context = Context.objects.filter(id=request.POST['context_id']).first()
     product = get_product_by_revision(version_id)
-    if product.product_type.can_preview:
+    cloud = get_cloud_portal_product()
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content') and \
+            not UserGroupsToProductPermissions.check_permission(request.user, cloud, 'cms.publish_version'):
+        raise PermissionDenied
+
+    if product.can_preview_on_portal:
         redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
+        product.change_preview_status(product.PREVIEW_STATUS.review)
     else:
         review = ProductCustomizationReview.objects.get(version_id=version_id,
                                                         customization=product.customizations.first())
@@ -226,7 +251,7 @@ def make_preview(request):
 def response_attachment(data, filename, content_type):
     response = HttpResponse(data, content_type=content_type)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
-    response.set_cookie('filename', filename, max_age=10);
+    response.set_cookie('filename', filename, max_age=10)
     return response
 
 
@@ -234,6 +259,10 @@ def response_attachment(data, filename, content_type):
 @permission_required('cms.change_product')
 def product_settings(request, product_id):
     product = Product.objects.get(pk=product_id)
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
+
     form = None
     if request.method == "POST":
         form = ProductSettingsForm(request.POST, request.FILES)
@@ -243,6 +272,7 @@ def product_settings(request, product_id):
     if form:
         action = form.cleaned_data['action']
         generate_json = action == 'generate_json'
+        merge_with_db = action == 'merge_with_db'
         update_structure = action == 'update_structure'
         update_content = action == 'update_content'
 
@@ -252,7 +282,10 @@ def product_settings(request, product_id):
             if not update_structure:
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
             cms_structure = json.load(file)
-            structure.update_from_object(cms_structure)
+            if type(cms_structure) == list and len(cms_structure) > 1:
+                messages.warning(request, "You can only update one product_type at a time. "
+                                          "Only the first product type from structure.json was used.")
+            structure.update_from_object(cms_structure[0], product_type=product.product_type)
             messages.success(request, "Structure updated")
         else:
             if not file.name.endswith('zip'):
@@ -263,7 +296,13 @@ def product_settings(request, product_id):
                 for error in log_messages:
                     messages.error(request, "Error with {} problem with {}".format(error['file'], error['extension']))
                 return response_attachment(content, 'structure.json', 'application/json')
-            log_messages = structure.process_zip(file, request.user, product, update_structure, update_content)
+            elif merge_with_db:
+                data = generate_structure.merge_db_with_archive(file, product)
+                content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                return response_attachment(content, 'structure.json', 'application/json')
+
+            else:
+                log_messages = structure.process_zip(file, request.user, product, update_structure, update_content)
             for item in log_messages:
                 log_type = {
                     'info': messages.INFO,
@@ -289,8 +328,26 @@ def product_settings(request, product_id):
 
 
 @require_http_methods(["GET"])
+@permission_required('cms.change_product')
+def download_current_structure(request, product_id):
+    use_actual_values = "get_values" in request.GET
+    product = Product.objects.filter(id=product_id).last()
+    if product_id and product:
+        if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+            raise PermissionDenied
+        data = generate_structure.from_database(product, use_actual_values)
+        content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+        return response_attachment(content, 'structure.json', 'application/json')
+    return APIRequestException("Product not given or not found")
+
+
+@require_http_methods(["GET"])
+@permission_required('cms.change_product')
 def download_file(request, path):
     product = get_cloud_portal_product()
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
 
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
@@ -302,8 +359,12 @@ def download_file(request, path):
 
 
 @require_http_methods(["GET"])
+@permission_required('cms.change_product')
 def download_package(request, product_id):
     product = Product.objects.get(id=product_id)
+
+    if not UserGroupsToProductPermissions.check_permission(request.user, product, 'cms.edit_content'):
+        raise PermissionDenied
 
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET

@@ -49,7 +49,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>GB</translation>
+      <translation>Gb</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -114,11 +114,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 là tạm thời không có. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
   </context>
   <context>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

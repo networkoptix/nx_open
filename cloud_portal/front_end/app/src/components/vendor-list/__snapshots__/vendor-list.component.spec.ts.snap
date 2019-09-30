@@ -37,10 +37,10 @@ exports[`NxVendorListComponent renders correctly 1`] = `
       </div>
     </div>
   </nx-pre-loader><div
-    class="row pl-3 pb-3 m-0 campage-info"
+    class="row pl-3 pb-3 m-0 ipvd-info"
   >
     <h4>
-      
+
     </h4>
   </div>
 </nx-vendor-list>

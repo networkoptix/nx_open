@@ -1,11 +1,15 @@
 #pragma once
 
-#include <nx/utils/log/log_level.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 
 #include "logger.h"
 
-namespace nx::utils::log { class LoggerCollection; }
+namespace nx::utils::log {
+
+class AbstractLogger;
+class LoggerCollection;
+
+}
 
 namespace nx::network::maintenance::log {
 
@@ -36,6 +40,12 @@ private:
     void serveGetStreamingLogger(
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
+
+    Loggers mergeLoggers() const;
+    std::vector<Logger>splitAggregateLogger(
+        int id,
+        nx::utils::log::AbstractLogger* logger,
+        const std::set<nx::utils::log::Filter>& effectiveFilters) const;
 
 private:
     nx::utils::log::LoggerCollection* m_loggerCollection = nullptr;

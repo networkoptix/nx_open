@@ -7,7 +7,7 @@ class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
     typedef QnResourceSearchProxyModel base_type;
 
 public:
-    QnResourceTreeSortProxyModel(QObject* parent = nullptr);
+    NX_VMS_CLIENT_DESKTOP_API QnResourceTreeSortProxyModel(QObject* parent = nullptr);
 
     virtual bool setData(
         const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;

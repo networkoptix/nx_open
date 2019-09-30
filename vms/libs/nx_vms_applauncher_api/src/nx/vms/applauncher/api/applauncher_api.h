@@ -162,7 +162,12 @@ public:
 class NX_VMS_APPLAUNCHER_API_API InstallZipCheckStatus: public BaseTask
 {
 public:
+    nx::utils::SoftwareVersion version;
+
     InstallZipCheckStatus(): BaseTask(TaskType::checkZipProgress) {}
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
 };
 
 class NX_VMS_APPLAUNCHER_API_API InstallZipCheckStatusResponse: public Response

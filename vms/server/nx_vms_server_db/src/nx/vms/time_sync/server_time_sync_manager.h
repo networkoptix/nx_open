@@ -13,9 +13,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx_ec/ec_api_fwd.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 class ServerTimeSyncManager: public TimeSyncManager
 {
@@ -58,6 +56,4 @@ private:
     qint64 m_systemTimeDeltaMs = 0;
 };
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

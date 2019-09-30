@@ -1,7 +1,10 @@
 import { Component, OnInit }  from '@angular/core';
+import { Location }           from '@angular/common';
 import { IntegrationService } from './integration.service';
 import { NxUriService }       from '../../services/uri.service';
 import { NxConfigService }    from '../../services/nx-config';
+import { TranslateService }   from '@ngx-translate/core';
+import { Title }              from '@angular/platform-browser';
 
 @Component({
     selector   : 'integrations-component',
@@ -11,11 +14,13 @@ import { NxConfigService }    from '../../services/nx-config';
 
 export class NxIntegrationsComponent implements OnInit {
     private CONFIG: any = {};
+    private lang: any = {};
     private searchBy: any;
     private allElements: any;
     private elements: any;
     private emptyFilter: any = {};
     private filterModel: any = {};
+    location: any;
     params: any;
 
     selectors = {
@@ -30,6 +35,7 @@ export class NxIntegrationsComponent implements OnInit {
         this.CONFIG = this.config.getConfig();
 
         this.allElements = [];
+        this.elements = [];
 
         this.emptyFilter = {
             query: ''
@@ -40,8 +46,11 @@ export class NxIntegrationsComponent implements OnInit {
 
     constructor(private uri: NxUriService,
                 private integrations: IntegrationService,
-                private config: NxConfigService) {
-
+                private config: NxConfigService,
+                private translate: TranslateService,
+                private title: Title,
+                location: Location) {
+        this.location = location;
         this.setupDefaults();
     }
 
@@ -58,28 +67,37 @@ export class NxIntegrationsComponent implements OnInit {
         this.integrations
             .pluginsSubject
             .subscribe((result: any) => {
-                        if (result.length) {
-                            this.allElements = result;
-                            this.setTags();
-                            this.setFilter();
-                        }
-                    },
-                    error => {
-                        console.error('Integration plugins error -> ', error);
-                    });
+                if (result) {
+                    if (!this.CONFIG.integrationStoreEnabled && !result.length) {
+                        this.location.go('404');
+                    } else {
+                        this.allElements = result;
+                        this.setTags();
+                        this.setFilter();
+                    }
+                } else {
+                    this.elements = undefined;
+                }
+            },
+            error => {
+                console.error('Integration plugins error -> ', error);
+                this.location.go('404');
+            });
+
+        setTimeout(() => {
+            this.lang = this.translate.translations[this.translate.currentLang];
+            this.title.setTitle(this.lang.pageTitles.integrations);
+        });
     }
 
     setTags() {
-        this.allElements.forEach((integration) => {
-            integration.information.type.forEach((type) => {
-                const found = this.filterModel.tags.some((tag) => tag.id === type);
-                if (!found) {
-                    this.filterModel.tags.push({ id: type, label: type, value: false });
-                }
-            });
+        this.CONFIG.integrationFilterItems.forEach(item => {
+            if (item.enabled) {
+                    this.filterModel.tags.push({ id: item.name, label: item.name, value: false });
+            }
         });
 
-        // Ecsure model change will be trigger
+        // Ensure model change will be trigger
         this.filterModel = { ...this.filterModel };
     }
 
@@ -88,7 +106,7 @@ export class NxIntegrationsComponent implements OnInit {
             return (item.information.name && item.information.name.toLowerCase().indexOf(query) > -1 ||
                     item.information.companyName && item.information.companyName.toLowerCase().indexOf(query) > -1 ||
                     item.information.shortDescription && item.information.shortDescription.toLowerCase().indexOf(query) > -1 ||
-                    item.overview && item.overview.description.toLowerCase().indexOf(query) > -1);
+                    item.overview.description && item.overview.description.toLowerCase().indexOf(query) > -1);
         }
 
         this.elements = this.allElements.map(obj => ({ ...obj }));
@@ -122,6 +140,7 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     modelChanged(searchModel): void {
+        this.filterModel.query = searchModel.query;
         this.setFilter();
     }
 

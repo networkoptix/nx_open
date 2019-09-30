@@ -6,14 +6,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-class QnUserProfileWidget;
-class QnUserSettingsWidget;
-class QnPermissionsWidget;
-class QnAccessibleResourcesWidget;
-class QnAbstractPermissionsModel;
-class QnUserSettingsModel;
-class AlertBar;
-
 namespace Ui { class CameraSettingsDialog; }
 
 namespace nx::vms::client::desktop {
@@ -48,6 +40,7 @@ private:
     void updateState(const CameraSettingsDialogState& state);
 
     void updateButtonsAvailability();
+    void updateScheduleAlert();
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)

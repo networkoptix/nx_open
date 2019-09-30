@@ -20,16 +20,16 @@ public:
 
     template<typename T>
     boost::optional<T> attribute(
-        const QString& group,
-        const QString& attributeName,
-        int channel = kNoChannel) const
+        const QString& /*group*/,
+        const QString& /*attributeName*/,
+        int /*channel*/ = kNoChannel) const
     {
         static_assert(std::is_same<T, int>::value
             || std::is_same<T, double>::value
             || std::is_same<T, QString>::value
             || std::is_same<T, bool>::value,
             "Only QString, int, double and bool specializations are allowed");
-    };
+    }
 
     template<typename T>
     boost::optional<T> attribute(const QString& path) const

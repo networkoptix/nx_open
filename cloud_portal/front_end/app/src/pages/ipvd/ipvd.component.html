@@ -1,0 +1,85 @@
+<nx-pre-loader type="page" *ngIf="!cameras.length"></nx-pre-loader>
+
+<div class="ipvd">
+    <div class="row p-3 m-0" [style.display]="mobileDetailMode ? 'none' : 'block'">
+        <nx-search
+                name="filterModel"
+                [(ngModel)]="filterModel"
+                (ngModelChange)="modelChanged($event)"
+                [placeholder]="placeholder"
+                ngDefaultControl>
+        </nx-search>
+    </div>
+
+    <div class="row pl-3 pr-3 m-0 d-flex">
+
+        <div class="text-placeholder order-1 order-md-0 m-0 p-0 pr-2 col-md-7 col-xl-9"
+             *ngIf="!camerasTable.length && activeCamera" translate>
+            Nothing Found
+        </div>
+
+        <div class="order-1 order-md-0 m-0 p-0"
+             *ngIf="camerasTable.length"
+             [ngClass]="{'toggle': toggleCamview, 'pr-2' : toggleCamview, 'col-12': !toggleCamview, 'col-md-7 col-xl-9' : toggleCamview}"
+             [style.display]="mobileDetailMode ? 'none' : 'block'">
+
+            <nx-cam-table
+                    [elements]="camerasTable"
+                    [allowedParameters]="allowedParameters"
+                    [activeCamera]="activeCamera"
+                    [params]="params"
+                    (onRowClick)="activateCamera($event)">
+            </nx-cam-table>
+        </div>
+
+        <div class="row m-0 pt-3 pb-3 pl-0"
+             *ngIf="camerasTable.length"
+             [style.display]="!mobileDetailMode ? 'none' : 'block'">
+
+            <button class="btn btn-default btn-back" (click)="resetActiveCamera()">
+                <span class="back-arrow"></span>
+                <span translate>All results</span>
+            </button>
+        </div>
+
+        <div class="order-0 order-md-1 pb-3 pl-0 pl-lg-2 pr-0 col-12 col-md-5 col-xl-3"
+             *ngIf="activeCamera">
+
+            <nx-cam-view
+                    [activeCamera]="activeCamera"
+                    (onCloseView)="resetActiveCamera()"
+                    (onFeedbackClick)="openFeedback('device')">
+            </nx-cam-view>
+        </div>
+    </div>
+
+    <div class="row pl-3 pr-3 m-0 mb-3 text-placeholder d-flex align-items-center"
+         *ngIf="noResult && !activeCamera" translate>
+        Nothing Found
+    </div>
+
+    <div class="row pl-3 pr-3 m-0"
+         *ngIf="vendors && !camerasTable.length && !noResult && hasNoSearch">
+
+        <nx-vendor-list
+                [vendors]="vendors"
+                [cameras]="cameras.length"
+                [(ngModel)]="filterModel"
+                (ngModelChange)="modelChanged($event)">
+        </nx-vendor-list>
+    </div>
+
+    <div class="row pl-3 pr-3 m-0"
+         *ngIf="vendors">
+
+        <p *ngIf="CONFIG.feedbackEnabled && lang && lang.ipvd">
+            <span [translate]="'disclaimer'"
+                  [translateParams]="{value: company}">
+            </span>
+            <span>
+                {{lang.ipvd.feedback.a_Please}} <a href (click)="openFeedback('page')">{{lang.ipvd.feedback.b_Link}}</a> {{lang.ipvd.feedback.c_Info}}
+            </span>
+        </p>
+        <button *ngIf="debug" (click)="reset()">reset</button>
+    </div>
+</div>

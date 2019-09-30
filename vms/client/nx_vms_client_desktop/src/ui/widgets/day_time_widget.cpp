@@ -7,7 +7,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
@@ -221,13 +221,13 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
     m_delegate->paintCell(painter, rect, localPeriod, m_primaryPeriodStorage
         , m_secondaryPeriodStorage, isSelected);
     m_delegate->paintCellText(painter, palette(), rect, 
-        datetime::toString(time, datetime::Format::hh), isEnabled);
+        nx::vms::time::toString(time, nx::vms::time::Format::hh), isEnabled);
 }
 
 void QnDayTimeWidget::updateHeaderText() 
 {
     /* Note that the format is the same as in time slider date bar. */
-    m_headerLabel->setText(lit("<b>%1</b>").arg(datetime::toString(m_date)));
+    m_headerLabel->setText(lit("<b>%1</b>").arg(nx::vms::time::toString(m_date)));
 }
 
 void QnDayTimeWidget::updateCurrentTime() {

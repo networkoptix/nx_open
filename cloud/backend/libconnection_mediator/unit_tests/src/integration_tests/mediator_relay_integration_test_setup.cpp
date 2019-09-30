@@ -117,7 +117,7 @@ void MediatorRelayIntegrationTestSetup::SetUp()
 
     m_mediaServerEmulator = std::make_unique<MediaServerEmulator>(
         stunUdpEndpoint(),
-        stunTcpEndpoint(),
+        stunTcpBaseUrl(),
         system);
 
     m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
@@ -209,6 +209,11 @@ std::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRela
         return m_connectResponse->trafficRelayUrl;
 
     return std::nullopt;
+}
+
+MediaServerEmulator& MediatorRelayIntegrationTestSetup::server()
+{
+    return *m_mediaServerEmulator;
 }
 
 void MediatorRelayIntegrationTestSetup::assertUrlsEquality(

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <plugins/plugin_tools.h>
-
 #include <memory>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <plugins/plugin_tools.h>
+
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 
@@ -55,7 +55,6 @@ private:
     void cleanStreamCacheUp();
 
 private:
-    // TODO: Migrate to nx::sdk::Ptr.
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;

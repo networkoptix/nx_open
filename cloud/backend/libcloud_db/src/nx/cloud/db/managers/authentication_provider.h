@@ -23,6 +23,7 @@ namespace nx::cloud::db {
 namespace conf { class Settings; }
 namespace ec2 { class AbstractVmsP2pCommandBus; }
 
+class AbstractSystemManager;
 class AbstractTemporaryAccountPasswordManager;
 
 /**
@@ -39,8 +40,10 @@ public:
         const conf::Settings& settings,
         nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
         AbstractAccountManager* accountManager,
+        AbstractSystemManager* systemManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
+        std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus);
     virtual ~AuthenticationProvider();
 
@@ -71,6 +74,17 @@ public:
         const data::AuthRequest& authRequest,
         std::function<void(api::Result, api::AuthResponse)> completionHandler);
 
+    void resolveUserCredentials(
+        const AuthorizationInfo& authzInfo,
+        const api::UserAuthorization& authorization,
+        std::function<void(api::Result, api::CredentialsDescriptor)> completionHandler);
+
+    void getSystemAccessLevel(
+        const AuthorizationInfo& authzInfo,
+        const std::string& systemId,
+        const api::UserAuthorization& authorization,
+        std::function<void(api::Result, api::SystemAccess)> completionHandler);
+
 private:
     struct AccountWithEffectivePassword
     {
@@ -81,9 +95,11 @@ private:
     const conf::Settings& m_settings;
     nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlQueryExecutor;
     AbstractAccountManager* m_accountManager;
+    AbstractSystemManager* m_systemManager = nullptr;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
+    std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
     nx::network::aio::Timer m_updateExpiredAuthTimer;
     nx::utils::Counter m_ongoingOperationCounter;
@@ -98,12 +114,12 @@ private:
         const std::string& nonce,
         const std::string& systemId,
         std::shared_ptr<bool> isNonceValid);
-    
+
     std::tuple<api::Result, api::AuthResponse>
         prepareAuthenticationResponse(
             const std::string& systemId,
             const data::AuthRequest& authRequest);
-    
+
     api::AuthResponse prepareResponse(
         std::string nonce,
         api::SystemSharingEx systemSharing,
@@ -149,6 +165,48 @@ private:
         const api::SystemSharingEx& userSharing);
 
     void startCheckForExpiredAuthRecordsTimer(sql::DBResult result);
+
+    void fillAuthObjectDescriptor(
+        const nx::utils::stree::ResourceContainer& attributes,
+        api::CredentialsDescriptor* descriptor);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Implements "get system access level" request.
+ */
+class GetSystemAccessLevelExecutor
+{
+public:
+    using CompletionHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::SystemAccess)>;
+
+    GetSystemAccessLevelExecutor(
+        AuthenticationProvider* authenticationProvider,
+        AbstractSystemManager* systemManager);
+
+    void execute(
+        const AuthorizationInfo& authzInfo,
+        const std::string& systemId,
+        const api::UserAuthorization& authorization,
+        CompletionHandler completionHandler);
+
+private:
+    AuthenticationProvider* m_authenticationProvider = nullptr;
+    AbstractSystemManager* m_systemManager = nullptr;
+    api::UserAuthorization m_userAuthorization;
+    std::string m_systemId;
+    api::CredentialsDescriptor m_credentialsDescriptor;
+    CompletionHandler m_completionHandler;
+
+    void handleResolvedCredentials(
+        api::Result result, api::CredentialsDescriptor descriptor);
+
+    void checkSystemAccessLevel(const api::CredentialsDescriptor& descriptor);
+    AuthorizationInfo prepareAuthorizationInfo();
+    data::DataFilter prepareSystemsFilter();
+
+    void handleSystemAccessResult(api::Result result, api::SystemDataExList systems);
 };
 
 } // namespace nx::cloud::db

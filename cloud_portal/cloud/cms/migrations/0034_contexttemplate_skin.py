@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contexttemplate',
             name='skin',
-            field=models.CharField(blank=True, default=b'blue', max_length=16),
+            field=models.CharField(blank=True, default='blue', max_length=16),
         ),
     ]

@@ -1,28 +1,38 @@
 {
   "language": "hu_HU",
   "language_name": "Magyar",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Mégse",
-    "loginTitle": "Bejelentkezés ide: %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Bejelentkezés",
     "logoutAuthorisedTitle": "Már bejelentkezett",
     "logoutAuthorisedContinueButton": "Folyatatás",
     "logoutAuthorisedLogoutButton": "Kijelentkezés",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Telepítse a %VMS_NAME% alkalmazást a rendszer megtekintéshez",
+    "download": "%VMS_NAME% letöltése"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Üdvözöljük",
     "register": "Fiók létrehozása itt",
     "changePassword": "Jelszó módosítása -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "aktiválva",
-    "merging": "merging",
+    "incompatible": "Inkompatibilis",
+    "merging": "egyesülő",
     "notActivated": "nincs aktiválva",
     "online": "online",
     "offline": "offline",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Jelszó mentése nem lehetséges",
     "cantActivatePrefix": "A fiók aktiválása nem lehetséges",
     "cantSendConfirmationPrefix": "Megerősítő e-mailt nem lehet elküldeni",
-    "cloudInvalidResponse": "Felhő DB ismeretlen választ jelzett vissza",
     "notAuthorized": "Hibás jelszó",
     "brokenAccount": "Váratlan probléma a fiókkal. <a href=\"/restore_password\">Fiók visszaállítása</a>",
     "wrongParameters": "Néhány paraméter hibás",
     "wrongCode": "A fiók van már aktiválva van, vagy a megerősítési kód hibás",
     "wrongCodeRestore": "Megerősítési kód már használt, vagy hibás",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "Nincs engedélye erre a műveletre",
     "accountNotActivated": "Ez a fiók még nincs aktiválva. <a href=\"/activate\">Küldje újra az aktiváló linket</a>",
     "accountBlocked": "A fiók zárolva van. Próbálja újra pár perc múlva.",
@@ -147,13 +158,20 @@
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
     "thisSystem": "a rendszer",
     "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Egyes szerverlisták mindkét rendszerben léteznek - a kiválasztott és az aktuális rendszerben.<br>Távolítsa el az offline és inkompatibilis kiszolgálókat minden egyes rendszerből, és próbálja újra.",
+    "mergedSystemIsOffline": "A rendszer <strong>{{failedSystem}}</strong> offline állapotban van.",
+    "INCOMPATIBLE": "A rendszerek különböző szoftververziókkal rendelkeznek. Kérjük, frissítse mindkettőt a <a href=\"/download\">legutóbbi verzióra</a>.",
+    "FAIL": "A <strong>{{failedSystem}}</strong> rendszer jelenleg nem érhető el.<br>Próbálkozzon újra néhány perc múlva, vagy lépjen kapcsolatba a <a href=\"%SUPPORT_LINK%\" target=\"_blank\">támogatással</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "A rendszerek egyesítése sikertelen",
+    "commonText": "A rendszerek <strong>{{primarySystem}}</strong> és <strong>{{secondarySystem}}</strong>egyesítése sikertelen."
   },
   "passwordRequirements": {
     "good": "jó",
     "fair": "elegendő",
+    "fairMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "minLength": "túl rövid",
     "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
     "required": "nem megfelelő",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",
     "successRename": "Rendszer neve mentve",
-    "confirmDisconnectTitle": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Szétkapcsolás",
     "confirmUnshareFromMe": "A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
     "confirmUnshareFromMeTitle": "Leválasztja a rendszert?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Ez a felhasználó nem fog tudni csatlakozni a rendszerhez. Folytatja?",
     "confirmUnshareTitle": "Törli a felhasználót?",
     "confirmUnshareAction": "Törlés",
-    "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
-    "successMerge": "System merge completed",
+    "mergeFailed": "A rendszeregyesítés sikertelen",
+    "mergeStart": "A rendszerek egyesülnek",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "{{email}} engedélyei vissavonva",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Ismeretlen név a rendszerhez (felhő egyesítése okozta)"
   },
   "account": {
     "accountSavedSuccess": "A fiók mentése sikeres",
@@ -206,72 +226,6 @@
     "changePassword": "Jelszómódosítás",
     "newPasswordLabel": "Új jelszó",
     "saveChanges": "Mentés"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Telepítse a %VMS_NAME% alkalmazást a rendszer megtekintéshez",
-    "action": "%VMS_NAME% letöltése",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Csak kliens",
-      "server": "Csak szerver",
-      "bundle": "Kliens és szerver",
-      "servertool": "Konfigurációs eszköz"
-    },
-    "releasesTypes": {
-      "beta": "Béta",
-      "betas": "Béták",
-      "rc": "Kiadásra jelölt",
-      "release": "Kiadás",
-      "releases": "Kiadások",
-      "patch": "Javítás",
-      "patches": "Javítások"
-    }
   },
   "activeActions": {
     "sendConfirm": "Aktiválási link újraküldése",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "A rendszer offline",
     "systemHasNoCameras": "NINCSENEK KAMERÁK",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Offline",
       "error": "Hiba",
@@ -334,5 +289,10 @@
       "stop listening": "figyelés leállítása",
       "help": "súgó | parancsok megjelenítése"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Javasoljuk, hogy konzultáljon erről",
+    "b_support": "támogatás",
+    "c_proceeding": "mielőtt folytatná."
   }
 }

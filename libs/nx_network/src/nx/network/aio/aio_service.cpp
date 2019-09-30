@@ -139,6 +139,16 @@ AbstractAioThread* AIOService::getCurrentAioThread() const
     return (it != m_aioThreadPool.end()) ? it->get() : nullptr;
 }
 
+std::vector<AbstractAioThread*> AIOService::getAllAioThreads() const
+{
+    std::vector<AbstractAioThread*> result;
+    std::transform(
+        m_aioThreadPool.begin(), m_aioThreadPool.end(),
+        std::back_inserter(result),
+        [](const auto& thread) { return thread.get(); });
+    return result;
+}
+
 bool AIOService::isInAnyAioThread() const
 {
     return getCurrentAioThread() != nullptr;

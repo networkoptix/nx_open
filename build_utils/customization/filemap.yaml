@@ -71,12 +71,31 @@ mobile: {
     logo_ldpi.png:    'icons/android/android/res/drawable-ldpi/logo.png', # 192px.
 
     # Launcher icons are rounded, framed, square.
-    launcher_xxxhdpi.png: 'icons/android/android/res/drawable-xxxhdpi/ic_launcher.png', # 192px.
-    launcher_xxhdpi.png:  'icons/android/android/res/drawable-xxhdpi/ic_launcher.png', # 144px.
-    launcher_xhdpi.png:   'icons/android/android/res/drawable-xhdpi/ic_launcher.png', # 96px.
-    launcher_hdpi.png:   'icons/android/android/res/drawable-hdpi/ic_launcher.png', # 72px.
-    launcher_mdpi.png:   'icons/android/android/res/drawable-mdpi/ic_launcher.png', # 48px.
-    launcher_ldpi.png:   'icons/android/android/res/drawable-ldpi/ic_launcher.png', # 36px.
+    launcher_xxxhdpi.png: 'icons/android/android/res/mipmap-xxxhdpi/ic_launcher.png', # 192px.
+    launcher_xxhdpi.png:  'icons/android/android/res/mipmap-xxhdpi/ic_launcher.png', # 144px.
+    launcher_xhdpi.png:   'icons/android/android/res/mipmap-xhdpi/ic_launcher.png', # 96px.
+    launcher_hdpi.png:   'icons/android/android/res/mipmap-hdpi/ic_launcher.png', # 72px.
+    launcher_mdpi.png:   'icons/android/android/res/mipmap-mdpi/ic_launcher.png', # 48px.
+    launcher_ldpi.png:   'icons/android/android/res/mipmap-ldpi/ic_launcher.png', # 36px.
+
+    # Launcher adaptive icon parts.
+    launcher_bg_xxxhdpi.png: 'icons/android/android/res/mipmap-xxxhdpi/ic_launcher_bg.png', # 432px.
+    launcher_fg_xxxhdpi.png: 'icons/android/android/res/mipmap-xxxhdpi/ic_launcher_fg.png', # 432px.
+
+    launcher_bg_xxhdpi.png: 'icons/android/android/res/mipmap-xxhdpi/ic_launcher_bg.png', # 324px.
+    launcher_fg_xxhdpi.png: 'icons/android/android/res/mipmap-xxhdpi/ic_launcher_fg.png', # 324px.
+
+    launcher_bg_xhdpi.png: 'icons/android/android/res/mipmap-xhdpi/ic_launcher_bg.png', # 216px.
+    launcher_fg_xhdpi.png: 'icons/android/android/res/mipmap-xhdpi/ic_launcher_fg.png', # 216px.
+
+    launcher_bg_hdpi.png: 'icons/android/android/res/mipmap-hdpi/ic_launcher_bg.png', # 162px.
+    launcher_fg_hdpi.png: 'icons/android/android/res/mipmap-hdpi/ic_launcher_fg.png', # 162px.
+
+    launcher_bg_mdpi.png: 'icons/android/android/res/mipmap-mdpi/ic_launcher_bg.png', # 108px.
+    launcher_fg_mdpi.png: 'icons/android/android/res/mipmap-mdpi/ic_launcher_fg.png', # 108px.
+
+    launcher_bg_ldpi.png: 'icons/android/android/res/mipmap-ldpi/ic_launcher_bg.png', # 81px.
+    launcher_fg_ldpi.png: 'icons/android/android/res/mipmap-ldpi/ic_launcher_fg.png', # 81px.
   },
 
   ios: {

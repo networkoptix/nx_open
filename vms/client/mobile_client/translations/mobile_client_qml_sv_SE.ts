@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv-SE" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Inaktiverad enligt schema</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Frånkopplade</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O modul</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Oförenlig serverversion %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Alltför många försök. Försök igen om någon minut.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Anslut till den här servern från webbläsaren eller via skrivbordsklienten för att ställa in den</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Sök</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Kan inte ansluta till systemet &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting hittades</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behåll</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>I denna app kan I / O-modulen endast användas som en ljudingång. För att använda den som en kontrollmodul, använd datorklienten med version %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Ogiltigt anpassat område. Var god rita ett korrekt.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Ljud</translation>
     </message>
   </context>
   <context>

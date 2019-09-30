@@ -40,6 +40,7 @@ public:
 
     QnMutex mutex;
     bool allowIndirectInternetRequests = false;
+    QSet<QnUuid> peersWithInternet;
 
 public:
     Private(ResourcePoolPeerManager* q):
@@ -137,7 +138,8 @@ QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
 
 QList<QnUuid> ResourcePoolPeerManager::peers() const
 {
-    return d->peerSelector.selectPeers(d->otherPeersInfos());
+    auto otherInfo = d->otherPeersInfos();
+    return d->peerSelector.selectPeers(otherInfo);
 }
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
@@ -160,6 +162,20 @@ void ResourcePoolPeerManager::setServerDirectConnection(
         d->directConnectionByServerId.insert(id, connection);
     else
         d->directConnectionByServerId.remove(id);
+}
+
+QnUuid ResourcePoolPeerManager::getServerIdWithInternet() const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    if (!d->peersWithInternet.empty())
+        return *d->peersWithInternet.begin();
+    return {};
+}
+
+void ResourcePoolPeerManager::setPeersWithInternetAccess(const QSet<QnUuid>& ids)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    d->peersWithInternet = ids;
 }
 
 void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
@@ -201,7 +217,7 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager:
                 setPromiseValueIfEmpty(promise, {});
         };
 
-    const auto handle = connection->fileDownloadStatus(fileName, std::move(handleReply), thread());
+    const auto handle = connection->fileDownloadStatus(fileName, std::move(handleReply));
     if (handle < 0)
         return {};
 
@@ -227,7 +243,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerMana
                 setPromiseValueIfEmpty(promise, {});
         };
 
-    const auto handle = connection->fileChunkChecksums(fileName, handleReply, thread());
+    const auto handle = connection->fileChunkChecksums(fileName, handleReply);
     if (handle < 0)
         return {};
 
@@ -264,12 +280,21 @@ AbstractPeerManager::RequestContextPtr<QByteArray> ResourcePoolPeerManager::down
     rest::Handle handle = -1;
     if (d->allowIndirectInternetRequests)
     {
-        handle = connection->downloadFileChunkFromInternet(
-            fileName, url, chunkIndex, chunkSize, handleReply, thread());
+        auto proxyServerId = getServerIdWithInternet();
+        if (!proxyServerId.isNull())
+        {
+            handle = connection->downloadFileChunkFromInternetUsingServer(proxyServerId,
+                fileName, url, chunkIndex, chunkSize, handleReply);
+        }
+        else
+        {
+            handle = connection->downloadFileChunkFromInternet(
+                fileName, url, chunkIndex, chunkSize, handleReply);
+        }
     }
     else
     {
-        handle = connection->downloadFileChunk(fileName, chunkIndex, handleReply, thread());
+        handle = connection->downloadFileChunk(fileName, chunkIndex, handleReply);
     }
 
     if (handle < 0)

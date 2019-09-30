@@ -113,30 +113,17 @@ function(nx_add_qrc qrc_file out_cpp_file_variable)
 
 endfunction()
 
-function(nx_add_external_resources_target target)
-    set(oneValueArgs OUTPUT)
-    cmake_parse_arguments(QRC "" "${oneValueArgs}" "" ${ARGN})
+function(nx_add_external_resources file_name)
+    set(qrc_file ${file_name}.qrc)
+    nx_generate_qrc(${qrc_file} ${ARGN} USED_FILES_VARIABLE qrc_used_files)
 
-    set(qrc_file ${CMAKE_CURRENT_BINARY_DIR}/${target}.qrc)
-
-    nx_generate_qrc(${qrc_file}
-        ${QRC_UNPARSED_ARGUMENTS}
-        USED_FILES_VARIABLE qrc_used_files
-    )
-
-    set(output ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target}.rcc)
-    if(QRC_OUTPUT)
-        set(output ${QRC_OUTPUT})
-    endif()
-
-    get_filename_component(resource_name ${qrc_file} NAME_WE)
+    get_filename_component(resource_name ${file_name} NAME_WE)
 
     _nx_validate_rcc_executable()
-    add_custom_target(${target}
-        ${Qt5Core_RCC_EXECUTABLE}
-            -binary
-            --name ${resource_name}
-            --output ${output} ${qrc_file}
+    add_custom_command(
+        OUTPUT ${file_name}
+        COMMAND ${Qt5Core_RCC_EXECUTABLE}
+        ARGS -binary --name ${resource_name} --output ${file_name} ${qrc_file}
         COMMENT "Generating ${output}"
         DEPENDS ${qrc_file} ${qrc_used_files}
         VERBATIM

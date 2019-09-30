@@ -8,7 +8,8 @@ extern "C" {
 
 } // extern "C"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
@@ -56,7 +57,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         std::to_string(gstreamerDebugLevel).c_str(), 1);
 
     gst_init(NULL, NULL);
-    NX_PRINT << " Created Engine for " << plugin->name();
+    NX_PRINT << " Created Engine for " << libContext().name();
 
     if (m_objectClassDescritions.empty())
         m_objectClassDescritions = loadObjectClasses();
@@ -66,16 +67,17 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
 Engine::~Engine()
 {
-    NX_PRINT << " Destroyed Engine for " << m_plugin->name();
+    NX_PRINT << " Destroyed Engine for " << libContext().name();
 }
 
-void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* settings)
 {
-    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
+    NX_OUTPUT << __func__ << " Received " << libContext().name() << " settings:";
     NX_OUTPUT << "{";
 
     const auto count = settings->count();
@@ -88,17 +90,17 @@ void Engine::setSettings(const IStringMap* settings)
     NX_OUTPUT << "}";
 }
 
-IStringMap* Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-const IString* Engine::manifest(Error* error) const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    *error = Error::noError;
-
     if (!m_manifest.empty())
-        return new nx::sdk::String(m_manifest);
+    {
+        *outResult = new nx::sdk::String(m_manifest);
+        return;
+    }
 
     std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
@@ -135,11 +137,10 @@ const IString* Engine::manifest(Error* error) const
 }
 )json";
 
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* outError)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__
@@ -148,18 +149,16 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         << deviceInfo->model() << ", "
         << deviceInfo->id();
 
-    *outError = Error::noError;
-
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
     if (!m_deviceAgent)
         m_deviceAgent = new DeviceAgent(this, deviceInfo->id());
 
     m_deviceAgent->addRef();
-    return m_deviceAgent;
+    *outResult = m_deviceAgent;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
@@ -261,10 +260,9 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Implement.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
@@ -278,8 +276,6 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 } // namespace nx
 
 namespace {
-
-static const std::string kLibName = "deepstream_analytics_plugin";
 
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
@@ -296,7 +292,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

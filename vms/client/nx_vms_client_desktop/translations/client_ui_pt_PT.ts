@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Suporte ao cliente</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -733,7 +728,7 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
@@ -2051,11 +2046,6 @@
       <source>New Virtual Camera...</source>
       <translation type="unfinished">New Virtual Camera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,9 +2089,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Origem:</translation>
     </message>
@@ -2601,7 +2591,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
+      <translation>Um computador potente é recomendado para a "Melhor" qualidade e resolução.</translation>
     </message>
     <message>
       <location/>
@@ -2761,12 +2751,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
+      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Visualização de marca d&apos;água</translation>
+      <translation>Visualização de marca d'água</translation>
     </message>
     <message>
       <location/>
@@ -2777,11 +2767,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation type="unfinished">Limit session duration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
@@ -3084,12 +3069,12 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>A gravação foi activada no armazenamento USB</translation>
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3195,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>Largura da área</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Sincronizar tempo com a Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
     </message>
   </context>
   <context>
@@ -3400,7 +3372,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>Pré-visualização da marca d&apos;água</translation>
+      <translation>Pré-visualização da marca d'água</translation>
     </message>
     <message>
       <location/>

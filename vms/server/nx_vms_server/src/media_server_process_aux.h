@@ -34,7 +34,8 @@ QnStorageResourceList getUnmountedStorages(
     QnPlatformAbstraction* platform,
     const QnStorageResourceList& allServerStorages,
     const nx::vms::server::Settings* settings);
-bool isStorageUnmounted(
+
+bool isStorageMounted(
     QnPlatformAbstraction* platform,
     const QnStorageResourcePtr& storage,
     const nx::vms::server::Settings* settings);

@@ -51,7 +51,7 @@ Page
                     var dialog = Workflow.openStandardDialog(
                         "", qsTr("What to do with currently saved passwords?"),
                         [
-                            "Keep",
+                            qsTr("Keep"),
                             { "id": "DELETE", "text": qsTr("Delete") }
                         ], true)
 
@@ -63,6 +63,14 @@ Page
                         })
 
                 }
+            }
+
+            LabeledSwitch
+            {
+                width: parent.width
+                text: qsTr("Use server time")
+                checked: serverTimeMode
+                onCheckedChanged: serverTimeMode = checked
             }
         }
     }

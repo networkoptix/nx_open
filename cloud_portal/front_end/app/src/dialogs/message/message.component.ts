@@ -3,6 +3,7 @@ import { Location }                                                             
 import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator, NgForm }                                                    from '@angular/forms';
 import { NxConfigService }                                                           from '../../services/nx-config';
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
     selector: 'nx-modal-message-content',
@@ -14,8 +15,10 @@ export class MessageModalContent {
     @Input() productId;
     @Input() product;
     @Input() closable;
+    @Input() config;
 
-    config: any;
+    lang: any;
+    placeholder: string;
     sendMessage: any;
     userName: string;
     userEmail: string;
@@ -23,34 +26,58 @@ export class MessageModalContent {
     contact: boolean;
     agree: boolean;
     title: string;
+    topic: string;
+    topics: any;
 
     @ViewChild('feedbackForm') public feedbackForm: NgForm;
 
     constructor(private activeModal: NgbActiveModal,
-                private configService: NxConfigService,
                 private renderer: Renderer2,
+                private translation: TranslateService,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any
                 ) {
 
-        this.config = configService.getConfig();
+        this.lang = this.translation.translations[this.translation.currentLang];
+        this.placeholder = '';
+        this.topic = '';
     }
 
     ngOnInit() {
-        if (this.messageType === 'undefined') {
-            this.messageType = this.language.messageType.unknown;
-        }
-        this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
-
+        this.initForm();
         this.sendMessage = this.process.init(() => {
-            return this.cloudApi.sendMessage(this.messageType, this.productId, this.message);
+            return this.cloudApi.sendMessage(this.topic, this.productId, this.message, this.userName, this.userEmail, this.contact);
         }, {
             successMessage: this.language.lang.dialogs.messageSent
         }).then(() => {
             this.activeModal.close(true);
         });
+    }
+
+    close() {
+        this.activeModal.close();
+    }
+
+    initForm() {
+        switch (this.messageType) {
+            case this.config.messageType.ipvd_page :
+                this.placeholder = this.lang.messageDialogPlaceholders.feedback;
+                break;
+            default :
+                this.placeholder = '';
+        }
+
+        this.title = this.language.lang.messageDialog.title[this.messageType].replace('{{product}}', this.product);
+        this.topics = this.config.messageTopics[this.messageType].map((topic) => {
+            return {
+                id: topic,
+                name: this.language.lang.messageDialog.topic[topic].replace('{{product}}', this.product)
+            };
+        });
+
+        this.setTopic(this.topics[0]);
 
         this.account
             .get()
@@ -58,11 +85,10 @@ export class MessageModalContent {
                 this.userName = account.first_name + ' ' + account.last_name ;
                 this.userEmail = account.email;
             });
-
     }
 
-    close() {
-        this.activeModal.close();
+    setTopic(topic) {
+        this.topic = topic.id;
     }
 }
 
@@ -94,15 +120,17 @@ export class NxModalMessageComponent implements OnInit {
         this.modalRef.componentInstance.messageType = type;
         this.modalRef.componentInstance.product = product;
         this.modalRef.componentInstance.productId = productId;
+        this.modalRef.componentInstance.config = this.config;
+
 
         return this.modalRef;
     }
 
-    open(type, product, productId) {
-        if (productId === 'undefined') {
+    open(type, product?, productId?) {
+        if (productId === undefined) {
             productId = '';
         }
-        if (product === 'undefined') {
+        if (product === undefined) {
             product = '';
         }
 

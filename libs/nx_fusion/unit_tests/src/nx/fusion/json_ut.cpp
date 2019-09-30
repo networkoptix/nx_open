@@ -88,7 +88,41 @@ struct BriefMockDataWithQList
 };
 #define BriefMockDataWithQList_Fields (items)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
+struct BriefMockDataWithQJsonValue
+{
+    int pre = 666;
+    QJsonValue nullVal;
+    bool t = true;
+    QJsonValue tVal;
+    bool f = false;
+    QJsonValue fVal;
+    double d = 123.45;
+    QJsonValue dVal;
+    QString s = kHelloWorld;
+    QJsonValue sVal;
+    int post = 999;
+
+    bool operator==(const BriefMockDataWithQJsonValue& other) const
+    {
+        return pre == other.pre
+            && nullVal == other.nullVal
+            && t == other.t
+            && tVal == other.tVal
+            && f == other.f
+            && fVal == other.fVal
+            && d == other.d
+            && dVal == other.dVal
+            && s == other.s
+            && sVal == other.sVal
+            && post == other.post;
+    }
+};
+#define BriefMockDataWithQJsonValue_Fields (pre)(nullVal)(t)(tVal)(f)(fVal)(d)(dVal)(s)(sVal)(post)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (IntMockData)
+    (BriefMockDataWithQJsonValue),
+    (json), _Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (BriefMockData)
     (BriefMockDataWithVector)
@@ -112,8 +146,12 @@ TEST_F(QnJsonTextFixture, integralTypes)
 TEST_F(QnJsonTextFixture, chronoTypes)
 {
     // Chrono types are 64-bit and so serialized as strings with extra quotes
-    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ("\"3\"", QJson::serialized(std::chrono::seconds(3)));
+    ASSERT_EQ(std::chrono::seconds(30), QJson::deserialized<std::chrono::seconds>("\"30\""));
+    ASSERT_EQ("\"5\"", QJson::serialized(std::chrono::milliseconds(5)));
     ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
+    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::microseconds(7)));
+    ASSERT_EQ(std::chrono::microseconds(70), QJson::deserialized<std::chrono::microseconds>("\"70\""));
 }
 
 TEST_F(QnJsonTextFixture, QtStringTypes)
@@ -192,6 +230,20 @@ TEST_F(QnJsonTextFixture, bitArray)
     QBitArray target;
     ASSERT_TRUE(QJson::deserialize(data, &target));
     ASSERT_EQ(value, target);
+}
+
+TEST_F(QnJsonTextFixture, qJsonValue)
+{
+    BriefMockDataWithQJsonValue value;
+    value.tVal = value.t;
+    value.fVal = value.f;
+    value.dVal = value.d;
+    value.sVal = value.s;
+
+    BriefMockDataWithQJsonValue result = QJson::deserialized<BriefMockDataWithQJsonValue>(
+        QJson::serialized(value));
+
+    ASSERT_EQ(value, result);
 }
 
 TEST_F(QnJsonTextFixture, deserializeStruct)

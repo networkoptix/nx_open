@@ -1,3 +1,14 @@
+@font-face {
+  font-family: Roboto;
+  src: url('/fonts/roboto/roboto_light/Roboto-Light-webfont.woff');
+}
+
+#header {
+    height: 40px !important;
+    line-height: 40px !important;
+    display: block !important;
+}
+
 #header #branding h1{
     text-indent: unset !important;
     background: none !important;
@@ -32,10 +43,6 @@
     text-align: center;
 }
 
-.form-row ul {
-    padding-inline-start: 160px;
-}
-
 .text-danger{
     color: red !important;
 }
@@ -65,6 +72,7 @@ img.preview-image{
 .context-preview{
     max-height: 400px;
     max-width: 400px;
+    margin-bottom: 6px;
 }
 
 .review-preview{
@@ -121,4 +129,51 @@ img.preview-image{
 
 .disabled-row{
     background-color: lightgray;
+}
+
+.ml-160 {
+    margin-left: 160px !important;
+}
+
+.nodots {
+    padding-left: 0 !important;
+}
+.nodots > li {
+    list-style-type: none;
+}
+
+.button.cancel-link {
+    font-size: 14px;
+    height: 40px !important;
+    line-height: 20px !important;
+}
+
+.muted {
+    opacity: 0.7;
+}
+
+.preview-html h1,
+.preview-html h2,
+.preview-html h3,
+.preview-html h4,
+.preview-html h5,
+.preview-html h6 {
+    all: initial;
+    opacity: inherit;
+    font-weight: 100;
+    line-height: 1.2;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    display: block;
+}
+
+.preview-html h1, .preview-html h2 {
+    margin: 16px 0 0 0;
+    padding: 0;
+    font-size: 22px;
+    font-family: Roboto;
+    color: #2B383F;
+}
+
+.tooltip-inner {
+  max-width: 500px;
 }

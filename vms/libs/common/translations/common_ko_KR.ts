@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -104,12 +93,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>동일한 ID를 가진 서버가 하나 이상 있기 때문에 시스템을 머지 할 수 없습니다. 이 서버를 제거하고 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>클라우드 시스템에는 다른 소유자가 있습니다. 머지가 허용되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -336,15 +325,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>플러그인 오류. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>플러그인이 없습니다.</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>인터넷 서버 오류. %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +372,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>샘플 버퍼를 할당 할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -520,162 +509,162 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>기한 라이선스 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>아날로그 라이센스 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>프로 라이선스 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Edge 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Vmax 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n 아날로그 인코더 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n 비디오 월 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n I / O 모듈 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Start 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n 브리지 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n 유효하지 않은 라이센스</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>무료 라이센스</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n 무료 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 기한 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 아날로그 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 프로페셔널 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 에지 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Vmax 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 아날로그 인코더 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 비디오 월 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 I / O 모듈 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 시작 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 무료 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 브리지 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 유효하지 않은 라이센스</numerusform>
       </translation>
     </message>
   </context>
@@ -738,11 +727,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>시스템 당 하나의 스타터 라이센스 만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>이미 하나의 활성 스타터 라이센스가 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -804,38 +793,38 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라들</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라들</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O 모듈들</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O 모듈들</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n 장치들</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n 장치들</numerusform>
       </translation>
     </message>
   </context>
@@ -994,42 +983,42 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip 파일이 손상되었습니다.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>대상 디렉토리를 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>쓸 파일을 열 수 없습니다.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>디스크에 여유 공간이 없습니다.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>추출이 취소되었습니다.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>추출기가 사용 중입니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>암호화 된 스트림 크기가 잘못되었습니다.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>암호화 된 스트림 헤더가 손상되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -1505,43 +1494,43 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>시간차가 심해 강제로 카메라 시간을 사용하는데 실패하여 시스템 시간이 사용됩니다</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>카메라 시간이 정상으로 돌아 왔습니다.</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>멀티 캐스트 주소 충돌이 감지되었습니다. %2 가 %3 스트림으로 이미 %1 주소를 사용중 입니다.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>네트워크 주소 %1 은 멀티 캐스트 주소가 아닙니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>웹 로그 분석 저장 공간 &quot;%1&quot; 은 오프라인입니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>에널리틱 저장소 &quot;%1&quot; 가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>플러그인 진단 이벤트</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>알 수없는 플러그인 진단 이벤트</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>RAID 오류. %1.</translation>
     </message>
   </context>
   <context>

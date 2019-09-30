@@ -58,7 +58,7 @@ struct ActionButtonsModel::Button
     bool disableLongPress = false;
     bool enabled = true;
 
-    static ActionButtonsModel::ButtonPtr createFakeSoftButton(const QnUuid& id);
+    static ActionButtonsModel::ButtonPtr createFakeSoftButton(const QnUuid& id, const QString& name);
     static ActionButtonsModel::ButtonPtr createPtzButton();
     static ActionButtonsModel::ButtonPtr createTwoWayAudioButton();
     static ActionButtonsModel::ButtonPtr createSoftwareTriggerButton(
@@ -93,10 +93,10 @@ ActionButtonsModel::Button::~Button()
 }
 
 ActionButtonsModel::ActionButtonsModel::ButtonPtr
-ActionButtonsModel::Button::createFakeSoftButton(const QnUuid& id)
+ActionButtonsModel::Button::createFakeSoftButton(const QnUuid& id, const QString& name)
 {
     return ButtonPtr(new Button(id, ActionButtonsModel::SoftTriggerButton,
-        QString(), QString(), true, true, true));
+        QString(), name, true, true, true));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::createPtzButton()
@@ -173,9 +173,9 @@ void ActionButtonsModel::registerQmlType()
     qmlRegisterType<ActionButtonsModel>("nx.client.mobile", 1, 0, "ActionButtonsModel");
 }
 
-void ActionButtonsModel::setResourceId(const QString& resourceId)
+void ActionButtonsModel::setResourceId(const QnUuid& resourceId)
 {
-    const auto uuid = QnUuid::fromStringSafe(resourceId);
+    const auto uuid = resourceId;//QnUuid::fromStringSafe(resourceId);
     if (uuid == m_resourceId)
         return;
 
@@ -183,9 +183,9 @@ void ActionButtonsModel::setResourceId(const QString& resourceId)
     emit resourceIdChanged();
 }
 
-QString ActionButtonsModel::resourceId() const
+QnUuid ActionButtonsModel::resourceId() const
 {
-    return m_resourceId.toString();
+    return m_resourceId;//.toString();
 }
 
 int ActionButtonsModel::rowCount(const QModelIndex& parent) const
@@ -251,40 +251,12 @@ int ActionButtonsModel::softTriggerButtonStartIndex() const
     return it == m_buttons.end() ? m_buttons.size() : it - m_buttons.begin();
 }
 
-ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByTriggerButtonId(
-    const QnUuid& id) const
-{
-    static const auto compareFunction =
-        [](const ButtonPtr& left, const ButtonPtr& right)
-        {
-            const auto leftRuleId = left->id;
-            const auto rightRuleId = right->id;
-            if (leftRuleId.isNull() || rightRuleId.isNull())
-            {
-                NX_ASSERT(false, "We expect each button to be software trigger");
-                return leftRuleId == rightRuleId ? left < right : leftRuleId < rightRuleId;
-            }
-            return leftRuleId < rightRuleId;
-        };
-
-    const auto startIndex = softTriggerButtonStartIndex();
-    return std::lower_bound(
-        m_buttons.begin() + startIndex, m_buttons.end(),
-        Button::createFakeSoftButton(id), compareFunction);
-}
-
 int ActionButtonsModel::rowById(const QnUuid& id) const
 {
-    const auto it = lowerBoundByTriggerButtonId(id);
-    return it != m_buttons.end() && (*it)->id == id
-        ? it - m_buttons.begin()
-        : -1;
-}
-
-int ActionButtonsModel::triggerButtonInsertionIndexById(const QnUuid& ruleId) const
-{
-    const auto it = lowerBoundByTriggerButtonId(ruleId);
-    return it == m_buttons.end() ? m_buttons.size() : it - m_buttons.begin();
+    const int startIndex = softTriggerButtonStartIndex();
+    const auto it = std::find_if(m_buttons.begin() + startIndex, m_buttons.end(),
+        [id](const ButtonPtr& button) { return button->id == id; });
+    return it == m_buttons.end() ? -1 : it - m_buttons.begin();
 }
 
 void ActionButtonsModel::addSoftwareTriggerButton(
@@ -294,8 +266,26 @@ void ActionButtonsModel::addSoftwareTriggerButton(
     bool prolonged,
     bool enabled)
 {
-    insertButton(triggerButtonInsertionIndexById(id),
-        Button::createSoftwareTriggerButton(id, iconPath, name, prolonged, enabled));
+    const auto insertionIndex =
+        [this, id, name]
+        {
+            static const auto compareFunction =
+                [](const ButtonPtr& left, const ButtonPtr& right)
+                {
+                    const auto compare = nx::utils::naturalStringCompare(left->hint, right->hint);
+                    return compare ? compare > 0 : left->id > right->id;
+                };
+
+            const auto startIndex = softTriggerButtonStartIndex();
+            const auto it = std::lower_bound(
+                m_buttons.begin() + startIndex, m_buttons.end(),
+                Button::createFakeSoftButton(id, name), compareFunction);
+
+            return it == m_buttons.end() ? m_buttons.size() : it - m_buttons.begin();
+        }();
+
+    const auto button = Button::createSoftwareTriggerButton(id, iconPath, name, prolonged, enabled);
+    insertButton(insertionIndex, button);
 }
 
 void ActionButtonsModel::removeSoftwareTriggerButton(const QnUuid& id)

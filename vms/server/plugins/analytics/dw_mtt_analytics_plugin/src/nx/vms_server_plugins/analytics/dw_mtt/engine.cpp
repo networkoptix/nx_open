@@ -60,30 +60,25 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* outError)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    *outError = Error::noError;
-    if (!isCompatible(deviceInfo))
-        return nullptr;
-
-    return new DeviceAgent(this, deviceInfo, m_typedManifest);
+    if (isCompatible(deviceInfo))
+        *outResult = new DeviceAgent(this, deviceInfo, m_typedManifest);
 }
 
-const IString* Engine::manifest(Error* error) const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    *error = Error::noError;
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
@@ -96,14 +91,13 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
     return (it != m_typedManifest.eventTypes.cend()) ? &(*it) : nullptr;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -134,12 +128,12 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "dw_mtt_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dw_mtt",
     "name": "DW MTT analytics plugin",
+    "description": "Supports built-in analytics on Digital Watchdog cameras (MTT series)",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -151,7 +145,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

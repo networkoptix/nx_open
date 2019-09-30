@@ -122,6 +122,23 @@ static QColor calculateTooltipColor(const QColor& frameColor)
     return color;
 }
 
+AreaTooltipItem::Fonts makeFonts(const QFont& baseFont)
+{
+    AreaTooltipItem::Fonts result;
+    result.name = baseFont;
+    result.name.setPixelSize(11);
+
+    result.value = baseFont;
+    result.value.setPixelSize(11);
+    result.value.setWeight(QFont::Medium);
+
+    result.title = baseFont;
+    result.title.setPixelSize(13);
+    result.title.setWeight(QFont::Medium);
+
+    return result;
+}
+
 } // namespace
 
 class AreaHighlightOverlayWidget::Private: public QObject
@@ -232,10 +249,6 @@ AreaHighlightOverlayWidget::AreaHighlightOverlayWidget(QGraphicsWidget* parent):
     setAcceptedMouseButtons(Qt::NoButton);
     setFocusPolicy(Qt::NoFocus);
 
-    QFont font = this->font();
-    font.setPixelSize(11);
-    setFont(font);
-
     connect(this, &QGraphicsWidget::geometryChanged, d.data(), &Private::updateAreas);
 }
 
@@ -285,11 +298,12 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
     {
         tooltipItem.reset(new AreaTooltipItem(this));
         tooltipItem->setTextColor(colorTheme()->color("light1"));
-        tooltipItem->setFont(font());
+        tooltipItem->setFonts(makeFonts(font()));
         tooltipItem->stackBefore(rectItem.data());
     }
 
     d->updateArea(area);
+    NX_VERBOSE(this, "Area was added or updated, total %1", d->areaById.size());
 
     update();
 }
@@ -297,7 +311,10 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
 void AreaHighlightOverlayWidget::removeArea(const QnUuid& areaId)
 {
     if (d->areaById.remove(areaId) > 0)
+    {
+        NX_VERBOSE(this, "Area was removed, total %1 left", d->areaById.size());
         update();
+    }
 }
 
 QnUuid AreaHighlightOverlayWidget::highlightedArea() const
@@ -346,7 +363,7 @@ bool AreaHighlightOverlayWidget::event(QEvent* event)
         {
             const auto& font = this->font();
             for (auto& area: d->areaById)
-                area.tooltipItem->setFont(font);
+                area.tooltipItem->setFonts(makeFonts(font));
             break;
         }
 

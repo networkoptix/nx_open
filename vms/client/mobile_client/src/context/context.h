@@ -18,12 +18,19 @@ namespace nx::vms::client::core {
 class UserWatcher;
 class TwoWayAudioController;
 class OperationManager;
+class ServerTimeWatcher;
 
 } // namespace nx::vms::client::core
 
-namespace nx::client::mobile { class QmlSettingsAdaptor; }
+using nx::vms::client::core::ServerTimeWatcher;
+
+namespace nx::client::mobile {
+class QmlSettingsAdaptor;
+class AudioController;
+} // namespace nx::client::mobile
 
 using nx::client::mobile::QmlSettingsAdaptor;
+using nx::client::mobile::AudioController;
 
 class QnContext: public QObject, public QnConnectionContextAware
 {
@@ -31,6 +38,8 @@ class QnContext: public QObject, public QnConnectionContextAware
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
+    Q_PROPERTY(nx::client::mobile::AudioController* audioController
+        MEMBER m_audioController CONSTANT)
     Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
@@ -56,6 +65,9 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(int rightCustomMargin READ rightCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int topCustomMargin READ topCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int bottomCustomMargin READ bottomCustomMargin NOTIFY customMarginsChanged)
+
+    Q_PROPERTY(bool serverTimeMode READ serverTimeMode WRITE setServerTimeMode
+        NOTIFY serverTimeModeChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -128,7 +140,11 @@ public:
     int topCustomMargin() const;
     int bottomCustomMargin() const;
 
+    bool serverTimeMode() const;
+    void setServerTimeMode(bool value);
+
 signals:
+    void serverTimeModeChanged();
     void autoLoginEnabledChanged();
     void showCameraInfoChanged();
     void deviceStatusBarHeightChanged();
@@ -136,12 +152,13 @@ signals:
     void customMarginsChanged();
 
 private:
-    QnConnectionManager *m_connectionManager;
-    QmlSettingsAdaptor* m_settings;
-    QnMobileAppInfo *m_appInfo;
-    QnMobileClientUiController* m_uiController;
-    QnCloudUrlHelper* m_cloudUrlHelper;
-
+    AudioController* const m_audioController;
+    QnConnectionManager* const m_connectionManager;
+    QmlSettingsAdaptor* const m_settings;
+    QnMobileAppInfo* const m_appInfo;
+    QnMobileClientUiController* const m_uiController;
+    QnCloudUrlHelper* const m_cloudUrlHelper;
+    ServerTimeWatcher* const m_timeWatcher;
     QString m_localPrefix;
     QMargins m_customMargins;
 };

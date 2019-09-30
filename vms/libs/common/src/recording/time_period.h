@@ -186,4 +186,4 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
-QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype)(ubjson)(xml)(csv_record));
+QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype)(datastream)(ubjson)(xml)(csv_record));

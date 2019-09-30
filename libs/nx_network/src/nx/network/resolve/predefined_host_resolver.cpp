@@ -3,6 +3,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace network {
@@ -12,8 +13,8 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     int ipVersion,
     std::deque<AddressEntry>* resolvedAddresses)
 {
-    auto reversedName = nx::utils::reverseWords(name.toStdString(), ".");
-    nx::utils::to_lower(&reversedName);
+    auto reversedName = nx::utils::reverseWords(name.toStdString(), '.');
+    nx::utils::toLower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -45,8 +46,8 @@ void PredefinedHostResolver::addMapping(
     const std::string& name,
     std::deque<AddressEntry> entries)
 {
-    auto reversedName = nx::utils::reverseWords(name, ".");
-    nx::utils::to_lower(&reversedName);
+    auto reversedName = nx::utils::reverseWords(name, '.');
+    nx::utils::toLower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     auto& existingEntries = m_etcHosts[reversedName];
@@ -61,8 +62,8 @@ void PredefinedHostResolver::replaceMapping(
     const std::string& name,
     std::deque<AddressEntry> entries)
 {
-    auto reversedName = nx::utils::reverseWords(name, ".");
-    nx::utils::to_lower(&reversedName);
+    auto reversedName = nx::utils::reverseWords(name, '.');
+    nx::utils::toLower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     m_etcHosts[reversedName] = std::move(entries);
@@ -70,8 +71,8 @@ void PredefinedHostResolver::replaceMapping(
 
 void PredefinedHostResolver::removeMapping(const std::string& name)
 {
-    auto reversedName = nx::utils::reverseWords(name, ".");
-    nx::utils::to_lower(&reversedName);
+    auto reversedName = nx::utils::reverseWords(name, '.');
+    nx::utils::toLower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     m_etcHosts.erase(reversedName);
@@ -81,8 +82,8 @@ void PredefinedHostResolver::removeMapping(
     const std::string& name,
     const AddressEntry& entryToRemove)
 {
-    auto reversedName = nx::utils::reverseWords(name, ".");
-    nx::utils::to_lower(&reversedName);
+    auto reversedName = nx::utils::reverseWords(name, '.');
+    nx::utils::toLower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     auto it = m_etcHosts.find(reversedName);

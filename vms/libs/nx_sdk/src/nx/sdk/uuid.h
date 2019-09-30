@@ -8,6 +8,8 @@
 namespace nx {
 namespace sdk {
 
+using UuidBase = std::array<uint8_t, 16>;
+
 /**
  * Universally Unique Identifier. Intended for arbitrary purposes.
  *
@@ -16,12 +18,11 @@ namespace sdk {
  *
  * Is binary-compatible (has the same binary layout) with the old SDK (struct NX_GUID).
  */
-class Uuid: public std::array<uint8_t, 16>
+class Uuid: public UuidBase
 {
 public:
-    using base_type = std::array<uint8_t, 16>;
-
-    static constexpr int kSize = (int) std::tuple_size<base_type>();
+    static constexpr int kSize = (int) std::tuple_size<UuidBase>();
+    static constexpr int size() { return kSize; } //< For C++14, to avoid the definition.
 
     constexpr Uuid(
         uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3,
@@ -29,7 +30,7 @@ public:
         uint8_t b8, uint8_t b9, uint8_t bA, uint8_t bB,
         uint8_t bC, uint8_t bD, uint8_t bE, uint8_t bF)
         :
-        base_type({b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, bA, bB, bC, bD, bE, bF})
+        UuidBase({b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, bA, bB, bC, bD, bE, bF})
     {
     }
 
@@ -38,7 +39,7 @@ public:
         memcpy(data(), byteArray, kSize);
     }
 
-    constexpr Uuid(): base_type{} {} //< All zeros.
+    constexpr Uuid(): UuidBase{} {} //< All zeros.
 
     bool isNull() const { return *this == Uuid(); }
 };

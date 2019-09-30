@@ -14,6 +14,8 @@ namespace test {
 class Ec2MserverCloudSynchronizationConnection:
     public CdbFunctionalTest
 {
+    using base_type = CdbFunctionalTest;
+
 public:
     Ec2MserverCloudSynchronizationConnection();
 
@@ -45,6 +47,8 @@ public:
 
 protected:
     test::TransactionConnectionHelper& connectionHelper();
+
+    virtual void SetUp() override;
 
 private:
     AccountWithPassword m_account;

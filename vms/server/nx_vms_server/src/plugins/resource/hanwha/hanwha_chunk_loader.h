@@ -54,7 +54,7 @@ class HanwhaChunkLoader: public QObject
             name(name),
             value(value)
         {
-        };
+        }
 
         QString name;
         QString value;

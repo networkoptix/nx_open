@@ -66,11 +66,6 @@ public:
     QList<nx::network::SocketAddress> getAllAvailableAddresses() const;
 
     /*
-    * Deprecated server rest connection
-    */
-    QnMediaServerConnectionPtr apiConnection();
-
-    /*
     * New server rest connection
     */
     rest::QnConnectionPtr restConnection();
@@ -164,7 +159,6 @@ signals:
 
 private:
     nx::network::SocketAddress m_primaryAddress;
-    QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
     QList<nx::network::SocketAddress> m_netAddrList;
     QList<nx::utils::Url> m_additionalUrls;

@@ -1,8 +1,6 @@
-import {
-    Component, Inject, Input, Renderer2,
-    ViewChild, ViewEncapsulation
-}                                                from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Inject, Input, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef }       from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
 import { Location }                              from '@angular/common';
 import { EmailValidator }                        from '@angular/forms';
 import { NxConfigService }                       from '../../services/nx-config';
@@ -14,25 +12,29 @@ import { NxConfigService }                       from '../../services/nx-config'
 })
 export class MergeModalContent {
     @Input() system;
+    @Input() systems;
     @Input() systemName;
     @Input() language;
     @Input() closable;
+    @Input() user;
 
+    checking: boolean;
+    checkMergeabilityProcess: any;
     config: any;
-    latestBuildUrl: string;
-    masterId: string;
-    merging: any;
+    lang: any;
+    mergingProcess: any;
     multipleSystems: boolean;
     outOfDate: boolean;
     password: string;
-    showMergeForm: boolean;
+    primarySystem: any;
+    processedSystems: any;
+    secondarySystem: any;
     state: string;
-    systems: any;
+    systemError: boolean;
     systemMergeable: string;
-    systemsSelect: any;
     targetSystem: any;
+    targetSystemDropdown: any;
     tooManySystems: boolean;
-    user: any;
     wrongPassword: boolean;
 
     @ViewChild('mergeForm') mergeForm: HTMLFormElement;
@@ -44,134 +46,213 @@ export class MergeModalContent {
                 @Inject('account') private account: any,
                 @Inject('system') private systemService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
-                @Inject('cloudApiService') private cloudApi: any) {
-
-        this.config = configService.getConfig();
-    }
-
-    // Add system can merge where added to systems form api call
-    checkMergeAbility(system) {
-        if (!system.id) {
-            return undefined;
-        }
-        if (system.stateOfHealth === 'offline' || !system.isOnline) {
-            return 'offline';
-        }
-        if (!system.canMerge) {
-            return 'cannotMerge';
-        }
-        return '';
-    }
-
-    setTargetSystem(system) {
-        this.systemMergeable = undefined;
-        this.targetSystem = { ...system };
-        if (!system.id) {
-            return;
-        }
-
-        return this.systemService(system.id, this.user.email).update().then((system) => {
-            this.targetSystem = { ...this.targetSystem, ...system };
-            this.systemMergeable = this.checkMergeAbility(system);
-
-            return Promise.all([
-                this.system.mediaserver.getMediaServers(),
-                this.targetSystem.mediaserver.getMediaServers()
-            ]).then(res => {
-                this.tooManySystems = res.map(req => req.data.length)
-                                         .reduce((acc, cur) => acc + cur) > this.config.maxServers;
-            });
-        });
-    }
-
-    addStatus(system) {
-        let status = '';
-
-        if (system.stateOfHealth === 'offline') {
-            status = ' (offline)';
-        } else if (system.stateOfHealth === 'online' && !system.canMerge) {
-            status = ' (incompatable)';
-        }
-
-        return system.name + status;
-    }
-
-    makeSelectorList(systems) {
-        this.systemsSelect = [{ name: '- - - -', id: '' }];
-        systems.forEach(element => {
-            this.systemsSelect.push({
-                name: this.addStatus(element),
-                id  : element.id
-            });
+                @Inject('cloudApiService') private cloudApi: any,
+                public translateService: TranslateService) {
+        this.config = this.configService.getConfig();
+        this.checking = false;
+        this.state = 'select';
+        this.wrongPassword = false;
+        this.translateService.getTranslation(this.translateService.currentLang)
+            .subscribe((translations) => {
+                this.lang = translations;
         });
     }
 
     ngOnInit() {
-        this.systemMergeable = undefined;
-        this.systemsSelect = [{ name: '- - - -', id: '' }];
-        this.wrongPassword = false;
-        this.masterId = this.system.id;
-        this.account
-            .get()
-            .then((user) => {
-                this.state = 'select';
-                this.user = user;
-                this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
-                this.multipleSystems = this.systems.length > 0;
-                this.outOfDate = this.multipleSystems && !this.system.canMerge;
-                this.makeSelectorList(this.systems);
-                this.targetSystem = { ...this.systemsSelect[0] };
-                this.systemMergeable = this.checkMergeAbility(this.targetSystem);
-                this.showMergeForm = this.multipleSystems && !this.outOfDate;
-            });
+        this.primarySystem = this.system;
+        this.multipleSystems = this.systems.length > 0;
+        this.outOfDate = this.multipleSystems && !this.system.canMerge;
+        this.processedSystems = this.makeSelectorList(this.systems);
+        this.targetSystem = this.selectDefaultSystem();
+        this.secondarySystem = this.targetSystem;
+        this.targetSystemDropdown = this.makeSelectorList([this.targetSystem])[0];
+        this.systemMergeable = this.checkMergeability(this.targetSystem);
+        this.systemError = !this.multipleSystems || this.outOfDate;
 
-        this.merging = this.process.init(() => {
-            let masterSystemId;
-            let slaveSystemId;
-            if (this.masterId === this.system.id) {
-                masterSystemId = this.system.id;
-                slaveSystemId = this.targetSystem.id;
-            } else {
-                masterSystemId = this.targetSystem.id;
-                slaveSystemId = this.system.id;
-            }
-            return this.cloudApi.merge(masterSystemId, slaveSystemId, this.password);
+        this.mergingProcess = this.process.init(() => {
+            return this.cloudApi.merge(this.primarySystem.id, this.secondarySystem.id, this.password);
         }, {
-            errorCodes    : {
-                mergedSystemIsOffline: (error) => {
-                    return this.language.errorCodes[error.errorText] || error.errorText;
+            errorCodes: {
+                mergedSystemIsOffline: () => {
+                    return this.language.system.mergeFailed;
                 },
-                vmsRequestFailure    : (error) => {
-                    const errorText = this.language.errorCodes[error.errorText] || error.errorText;
-                    let errorData = '';
-                    if (!(errorText in this.language.errorCodes) && error.errorData) {
-                        errorData = JSON.stringify(error.errorData);
-                    }
-                    return errorData ? `${errorText}\nError Data: ${errorData}` : errorText;
+                vmsRequestFailure: () => {
+                    return this.language.system.mergeFailed;
                 },
-                wrongPassword        : () => {
+                wrongPassword: () => {
                     this.mergeForm.controls['mergePassword'].setErrors({ 'wrongPassword': true });
                     this.password = '';
 
                     this.renderer.selectRootElement('#mergePassword').focus();
                     this.wrongPassword = true;
-
                 },
             },
-            successMessage: this.language.system.mergeSystemSuccess
+            successMessage: this.language.system.mergeStart
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
-                role           : this.masterId === this.system.id ?
-                        this.config.systemStatuses.master :
-                        this.config.systemStatuses.slave
+                role: this.primarySystem.id === this.system.id ?
+                    this.configService.config.systemStatuses.master :
+                    this.configService.config.systemStatuses.slave
             });
+        }, (error) => {
+            if (error.data.resultCode !== 'wrongPassword') {
+                /* Get the names of the primary and secondary system.
+                   Next try to figure out which system caused the problem.
+                   If the primary system's stateOfHealth is not online set it as the failedSystem.
+                   Otherwise the secondary system is set as the failedSystem no matter what.
+                 */
+                // Set the name of the primary system.
+                error.data.primarySystemName = this.primarySystem.name;
+                // If name is undefined try looking in info for the name.
+                if (error.data.primarySystemName === undefined) {
+                    error.data.primarySystemName = this.primarySystem.info && this.primarySystem.info.name;
+                }
+
+                // Set the name of the secondary system.
+                error.data.secondarySystemName = this.secondarySystem.name;
+
+                // If name is undefined try looking in info for the name.
+                if (error.data.secondarySystemName === undefined) {
+                    error.data.secondarySystemName = this.secondarySystem.info && this.secondarySystem.info.name;
+                }
+
+                // Check the state of health
+                var primaryState = this.primarySystem.stateOfHealth;
+                // If stateOfHealth is undefined check in info for stateOfHealth.
+                if (primaryState === undefined) {
+                    primaryState = this.primarySystem.info && this.primarySystem.info.stateOfHealth;
+                }
+
+                // Assume the secondary system is the issue unless the primary system is not online.
+                error.data.failedSystemName = error.data.secondarySystemName;
+                if (primaryState !== 'online') {
+                    error.data.failedSystemName = error.data.primarySystemName;
+                }
+                this.activeModal.dismiss(error.data);
+            }
         });
 
-        this.cloudApi.getDownloads().then((res) => {
-            this.latestBuildUrl = `/downloads/${res.data.buildNumber}`;
+        this.checkMergeabilityProcess = this.process.init(() => {
+            this.checking = true;
+            this.systemMergeable = '';
+            return this.precheckSystemMerge();
+        }, {
+            errorCodes: {}
+        }).then((res) => {
+            this.checking = false;
+            this.targetSystemDropdown.name = this.addStatus(this.targetSystem);
+            this.systemMergeable = this.checkMergeability(this.targetSystem);
+            if (!res.system && this.systemMergeable === '' || this.config.allowDebugMode) {
+                return this.updateState();
+            }
         });
+    }
+
+    addStatus(system) {
+        let status = '';
+        const statusIncompatible = ` – ${this.language.systemStatuses.incompatible}`;
+        const statusUnavailable = ` – ${this.language.systemStatuses.unavailable}`;
+        const statusOffline = ` – ${this.language.systemStatuses.offline}`;
+        const stateOfHealth = system.info && system.info.stateOfHealth || system.stateOfHealth || system.stateMessage || '';
+        switch (stateOfHealth) {
+            case 'online':
+                if (!system.canMerge) {
+                    status = statusIncompatible;
+                }
+                break;
+            case 'unavailable':
+                status = statusUnavailable;
+                break;
+            case 'offline':
+                status = statusOffline;
+                break;
+            default:
+                if (system.hasOwnProperty('isOnline') && !system.isOnline) {
+                    status = statusOffline;
+                } else {
+                    status = statusUnavailable;
+                }
+        }
+
+        return `<span>${system.name}</span><span class="text-muted">${status}</span>`;
+    }
+
+    // Add system can merge where added to systems form api call
+    checkMergeability(system) {
+        const stateOfHealth = system.info && system.info.stateOfHealth || system.stateOfHealth || system.stateMessage || '';
+
+        if (system.hasOwnProperty('isOnline') && !system.isOnline || stateOfHealth.indexOf('offline') > -1) {
+            return 'offline';
+        }
+        if (system.hasOwnProperty('isAvailable') && !system.isAvailable || stateOfHealth.indexOf('unavailable') > -1) {
+            return 'unavailable';
+        }
+        if (!system.canMerge) {
+            return 'secondaryCannotMerge';
+        }
+
+        if (!this.system.canMerge) {
+            return 'primaryCannotMerge';
+        }
+        if (!this.system.isOnline) {
+            return 'primaryOffline';
+        }
+        if (!this.system.isAvailable) {
+            return 'primaryUnavailable';
+        }
+        return '';
+    }
+
+    precheckSystemMerge() {
+        return this.systemService(this.targetSystem.id, this.user.email).update().then((system) => {
+            return system.getUsersDataFromTheSystem().then(() => {
+                this.targetSystem = {...this.targetSystem, ...system};
+                return Promise.all([
+                    this.system.mediaserver.getMediaServers().catch(error => {
+                        return Promise.reject({system: 'current', errorResponse: error});
+                    }),
+                    this.targetSystem.mediaserver.getMediaServers().catch(error => {
+                        return Promise.reject({system: 'target', errorResponse: error});
+                    })
+                ]).then(res => {
+                    this.tooManySystems = res.map(req => req.data.length)
+                        .reduce((acc, cur) => acc + cur) > this.config.maxServers;
+                    return {};
+                }).catch(error => error);
+            });
+        });
+    }
+
+    makeSelectorList(systems) {
+        return systems.map(system => {
+            return { id: system.id, name: this.addStatus(system) };
+        });
+    }
+
+    selectDefaultSystem() {
+        if (this.systems.length < 1) {
+            console.error('Error User needs to be the owner of more than 1 system');
+            return {};
+        }
+        for (const i in this.systems) {
+            if (this.checkMergeability(this.systems[i]) === '') {
+                return {...this.systems[i]};
+            }
+        }
+        return {...this.systems[0]};
+    }
+
+    setSystems() {
+        this.primarySystem = this.primarySystem.id === this.system.id ? this.system : this.targetSystem;
+        this.secondarySystem = this.primarySystem.id === this.system.id ? this.targetSystem : this.system;
+    }
+
+    setTargetSystem(targetSystem) {
+        this.systemMergeable = '';
+        this.targetSystem = {... this.systems.find(system => system.id === targetSystem.id)};
+        this.setSystems();
     }
 
     updateState() {
@@ -202,23 +283,25 @@ export class NxModalMergeComponent {
                 private modalService: NgbModal) {
     }
 
-    private dialog(system) {
+    private dialog(system, systems, user) {
         // TODO: Refactor dialog to use generic dialog
         // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(MergeModalContent,
-                {
-                    windowClass: 'modal-holder',
-                    backdrop   : 'static'
-                });
+            {
+                backdrop: 'static',
+                windowClass: 'modal-holder'
+            });
         this.modalRef.componentInstance.language = this.language.lang;
+        this.modalRef.componentInstance.user = user;
         this.modalRef.componentInstance.system = system;
+        this.modalRef.componentInstance.systems = systems;
         this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }
 
-    open(system) {
-        return this.dialog(system).result;
+    open(system, systems, user) {
+        return this.dialog(system, systems, user).result;
     }
 
     close() {

@@ -6,6 +6,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern C
 
+#include <nx/utils/memory/cyclic_allocator.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -13,7 +14,6 @@ extern "C" {
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
-#include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_media_packet.h"
 #include "camera/camera.h"

@@ -45,7 +45,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/network/socket_common.h>
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -69,8 +69,16 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
 
 void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
+    if (connection)
+    {
+        auto info = connection->connectionInfo();
+        NX_VERBOSE(this, "init() - connecting to %1", info.ecUrl);
+    }
+
     if (m_connection)
     {
+        auto info = m_connection->connectionInfo();
+        NX_VERBOSE(this, "init() - clearing existing connection to %1", info.ecUrl);
         // Safety check in case connection will not be deleted instantly.
         m_connection->stopReceivingNotifications();
         qnSyncTime->setTimeNotificationManager(nullptr);

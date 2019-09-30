@@ -20,7 +20,6 @@
 
 class QnStoragePluginFactory;
 class QSettings;
-class QnSessionManager;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
@@ -44,6 +43,16 @@ namespace nx { namespace metrics { struct Storage; } }
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
 namespace nx::network::http { class ClientPool; }
+
+namespace nx::analytics {
+
+class PluginDescriptorManager;
+class EventTypeDescriptorManager;
+class EngineDescriptorManager;
+class GroupDescriptorManager;
+class ObjectTypeDescriptorManager;
+
+} // namespace nx::analytics;
 
 struct BeforeRestoreDbData
 {
@@ -90,11 +99,6 @@ public:
     QnStoragePluginFactory* storagePluginFactory() const
     {
         return m_storagePluginFactory;
-    }
-
-    QnSessionManager* sessionManager() const
-    {
-        return m_sessionManager.data();
     }
 
     QnResourcePool* resourcePool() const
@@ -177,6 +181,31 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const
     {
         return m_eventRuleManager;
+    }
+
+    nx::analytics::PluginDescriptorManager* analyticsPluginDescriptorManager() const
+    {
+        return m_analyticsPluginDescriptorManager;
+    }
+
+    nx::analytics::EventTypeDescriptorManager* analyticsEventTypeDescriptorManager() const
+    {
+        return m_analyticsEventTypeDescriptorManager;
+    }
+
+    nx::analytics::EngineDescriptorManager* analyticsEngineDescriptorManager() const
+    {
+        return m_analyticsEngineDescriptorManager;
+    }
+
+    nx::analytics::GroupDescriptorManager* analyticsGroupDescriptorManager() const
+    {
+        return m_analyticsGroupDescriptorManager;
+    }
+
+    nx::analytics::ObjectTypeDescriptorManager* analyticsObjectTypeDescriptorManager() const
+    {
+        return m_analyticsObjectTypeDescriptorManager;
     }
 
     void setNeedToStop(bool value) { m_needToStop = value; }
@@ -305,7 +334,6 @@ private:
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
     QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;
-    QScopedPointer<QnSessionManager> m_sessionManager;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
@@ -350,6 +378,12 @@ private:
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
     QnResourceDataPool* m_resourceDataPool = nullptr;
+
+    nx::analytics::PluginDescriptorManager* m_analyticsPluginDescriptorManager = nullptr;
+    nx::analytics::EventTypeDescriptorManager* m_analyticsEventTypeDescriptorManager = nullptr;
+    nx::analytics::EngineDescriptorManager* m_analyticsEngineDescriptorManager = nullptr;
+    nx::analytics::GroupDescriptorManager* m_analyticsGroupDescriptorManager = nullptr;
+    nx::analytics::ObjectTypeDescriptorManager* m_analyticsObjectTypeDescriptorManager = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;

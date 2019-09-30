@@ -43,6 +43,8 @@ Downloader::Private::Private(Downloader* q):
 
 void Downloader::Private::startDownload(const QString& fileName)
 {
+    NX_INFO(this, "Starting download for %1", fileName);
+
     NX_MUTEX_LOCKER lock(&mutex);
 
     if (workers.contains(fileName))
@@ -80,7 +82,9 @@ void Downloader::Private::startDownload(const QString& fileName)
 }
 
 void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals)
-{
+{   
+    NX_INFO(this, "Stopping download for %1", fileName);
+
     Worker::State state;
     {
         NX_MUTEX_LOCKER lock(&mutex);
@@ -113,6 +117,8 @@ Downloader::Downloader(
     QnCommonModuleAware(commonModule),
     d(new Private(this))
 {
+    NX_DEBUG(this, "Created");
+
     d->storage.reset(new Storage(downloadsDirectory));
 
     connect(d->storage.data(), &Storage::fileAdded, this,
@@ -146,6 +152,8 @@ Downloader::~Downloader()
 {
     stopDownloads();
     qDeleteAll(d->peerManagers);
+
+    NX_DEBUG(this, "Deleted");
 }
 
 QStringList Downloader::files() const
@@ -221,6 +229,8 @@ void Downloader::startDownloads()
 
 void Downloader::stopDownloads()
 {
+    NX_DEBUG(this, "Stopping downloads...");
+
     decltype(d->workers) workers;
 
     {

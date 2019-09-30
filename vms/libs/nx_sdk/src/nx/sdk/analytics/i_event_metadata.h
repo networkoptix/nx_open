@@ -13,7 +13,7 @@ namespace analytics {
 class IEventMetadata: public Interface<IEventMetadata, IMetadata>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEventMetadata"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata"); }
 
     /**
      * @return Caption of the event, in UTF-8.

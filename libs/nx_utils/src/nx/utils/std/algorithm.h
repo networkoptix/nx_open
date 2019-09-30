@@ -128,22 +128,6 @@ typename std::pair<
     return result;
 }
 
-/**
- * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
- */
-template<typename RandomAccessContainer, typename Separator>
-RandomAccessContainer reverseWords(
-    const RandomAccessContainer& str,
-    const Separator& separator)
-{
-    std::vector<RandomAccessContainer> splitVec;
-    boost::split(splitVec, str, boost::algorithm::is_any_of(separator));
-
-    return boost::join(
-        boost::make_iterator_range(splitVec.rbegin(), splitVec.rend()),
-        separator);
-}
-
 template<typename InputIt, typename T>
 bool contains(InputIt first, InputIt last, const T& value)
 {
@@ -213,6 +197,42 @@ template<typename StringType>
 void to_lower(StringType* str)
 {
     std::transform(str->begin(), str->end(), str->begin(), &tolower);
+}
+
+namespace detail {
+
+template<class Functor>
+class y_combinator_result
+{
+    Functor functor;
+
+public:
+    y_combinator_result() = delete;
+    y_combinator_result(const y_combinator_result&) = delete;
+
+    template<class T>
+    explicit y_combinator_result(T&& impl): functor(std::forward<T>(impl)) {}
+
+    template<class... Args>
+    decltype(auto) operator()(Args&&... args) const
+    {
+        return functor(std::cref(*this), std::forward<Args>(args)...);
+    }
+};
+
+} // namespace detail
+
+/**
+ * Standard Y-combinator implementation to create recursive lambdas without an explicit declaration
+ * of the std::function arguments and the return type.
+ * Usage example:
+ * auto recursive_lambda = y_combinator([](auto recursive_lambda) { recursive_lambda(); });
+ * Implementation is taken from the P0200R0.
+ */
+template<class Functor>
+decltype(auto) y_combinator(Functor&& functor)
+{
+    return detail::y_combinator_result<std::decay_t<Functor>>(std::forward<Functor>(functor));
 }
 
 } // namespace utils

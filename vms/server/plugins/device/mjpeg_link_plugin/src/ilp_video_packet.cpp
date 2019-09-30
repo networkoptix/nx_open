@@ -5,9 +5,8 @@
 #include <cstdlib>
 #include <functional>
 
-#include <utils/memory/cyclic_allocator.h>
-
 #include <nx/kit/utils.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 namespace nx::vms_server_plugins::mjpeg_link {
 

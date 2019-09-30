@@ -27,6 +27,7 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
         ResourcePropertyKey::kCredentials,
         ResourcePropertyKey::kDefaultCredentials,
         ResourcePropertyKey::kCameraAdvancedParams,
+        ResourcePropertyKey::kOnvifIgnoreMedia2,
         ResourcePropertyKey::Onvif::kDeviceID,
         ResourcePropertyKey::Onvif::kDeviceUrl,
         ResourcePropertyKey::Onvif::kMediaUrl,

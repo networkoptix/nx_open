@@ -9,6 +9,7 @@ from cloud import settings
 import hashlib
 import base64
 
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
@@ -47,16 +48,16 @@ def sharing(request, system_id):
 
 def md5(data):
     m = hashlib.md5()
-    m.update(data)
+    m.update(data.encode('utf-8'))
     return m.hexdigest()
 
 
 def digest(login, password, realm, nonce, method):
-    dig = md5(login + ':' + realm + ':' + password)
-    method = md5(method + ':')
-    auth_digest = md5(dig + ':' + nonce + ':' + method)
-    auth = base64.b64encode(login + ':' + nonce + ':' + auth_digest)
-    return auth
+    dig = md5(f"{login}:{realm}:{password}")
+    method = md5(f"{method}:")
+    auth_digest = md5(f"{dig}:{nonce}:{method}")
+    auth = f"{login}:{nonce}:{auth_digest}".encode('utf-8')
+    return base64.b64encode(auth)
 
 
 @api_view(['GET'])
@@ -111,7 +112,7 @@ def disconnect(request):
     require_params(request, ('system_id', 'password'))
 
     try:
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             email = request.user.email
         else:
             require_params(request, ('email',))
@@ -130,7 +131,7 @@ def disconnect(request):
 @handle_exceptions
 def connect(request):
     require_params(request, ('name',))
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         data = cloud_api.System.bind(request.session['login'], request.session['password'], request.data['system_id'])
         return api_success(data)
 
@@ -152,7 +153,7 @@ def proxy(request, system_id, system_url):
     if position > -1:
         system_url += full_url[position:]
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         email = request.session['login']
         password = request.session['password']
 

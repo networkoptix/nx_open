@@ -3,6 +3,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include "system_data.h"
+#include "types.h"
 #include "../field_name.h"
 
 namespace nx::cloud::db::api {
@@ -39,12 +40,18 @@ void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQue
         QString::fromStdString(authRequest.realm));
 }
 
-const char* const kVmsUserAuthInfoAttributeName = "cloudUserAuthenticationInfo";
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (NonceData)(AuthRequest)(AuthResponse)(AuthInfoRecord)(AuthInfo),
+    (NonceData)(AuthRequest)(AuthResponse) \
+        (UserAuthorization)(CredentialsDescriptor)(SystemAccess) \
+        (AuthInfoRecord)(AuthInfo),
     (json),
     _Fields,
     (optional, false))
 
 } // namespace nx::cloud::db::api
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, ObjectType,
+    (nx::cloud::db::api::ObjectType::none, "none")
+    (nx::cloud::db::api::ObjectType::account, "account")
+    (nx::cloud::db::api::ObjectType::system, "system")
+)

@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Systém nelze nastavit</h2>
-    <p class="master-description">The System cannot be configured. <br>
+    <p class="master-description">Systém nelze konfigurovat. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>Začněte s {{Config.productName}}</h2>
-        <p>Nejprve prosím nakonfigurujte server. <br>
+        <p class="master-description">Nejprve prosím nakonfigurujte server. <br>
             Vybrat možnost.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Nastavit nový systému</button>
@@ -66,13 +66,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
+        <a href="" ng-click="next('advanced', true)">Pokročilé nastavení systému</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Advanced System settings</h2>
+    <h2>Pokročilé nastavení systému</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -142,7 +142,7 @@
     </div>
     <h2>{{Config.cloud.productName}} účet</h2>
     <p class="master-description">
-        An account is required to use the cloud System {{Config.cloud.productName}}
+        Pro použití cloudového systému {{Config.cloud.productName}}je vyžadován účet
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Vytvořit nový účet </button>&nbsp;&nbsp;
@@ -280,7 +280,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect the server to the existing System</h2>
+    <h2>Připojit server k existujícímu systému</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -292,7 +292,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="Stávající systémová adresa URL (https: // host: port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -339,13 +339,13 @@
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>Slučování systémů ...</h2>
-    <p class="master-description">Trying to connect to the System</p>
+    <p class="master-description">Pokus o připojení k systému</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge Systems</h2>
+    <h2>Systémy nelze sloučit</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>

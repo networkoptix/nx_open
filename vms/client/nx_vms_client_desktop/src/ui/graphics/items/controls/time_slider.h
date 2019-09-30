@@ -249,7 +249,7 @@ public:
     Qn::TimePeriodContent selectedExtraContent() const; //< Qn::RecordingContent if none.
     void setSelectedExtraContent(Qn::TimePeriodContent value);
 
-    qreal msecsPerPixel() const;
+    std::chrono::milliseconds msecsPerPixel() const;
 
     bool positionMarkerVisible() const;
 

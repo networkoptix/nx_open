@@ -1,0 +1,6 @@
+안녕하세요, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }})가 {{ message.product }}대해 다음과 같은 피드백을 제공했습니다.
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+사용자에게 연락 할 수 있습니까? {{ message.sender_to_be_contacted}}

@@ -17,9 +17,7 @@
 
 #include "nx/cloud/relay/settings.h"
 
-namespace nx {
-
-namespace cloud::relay{
+namespace nx::cloud::relay {
 
 class AbstractRelaySelector;
 
@@ -65,6 +63,9 @@ public:
 
     virtual void pleaseStopSync() override;
 
+    const nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor() const;
+    const nx::clusterdb::map::EmbeddedDatabase* peerDb() const;
+
 private:
     void startDiscovery();
     std::string toInternalStorageFormat(const std::string& peerDomain) const;
@@ -105,5 +106,4 @@ private:
 };
 
 } // namespace model
-} // namespace cloud::relay
-} // namespace nx
+} // namespace nx::cloud::relay

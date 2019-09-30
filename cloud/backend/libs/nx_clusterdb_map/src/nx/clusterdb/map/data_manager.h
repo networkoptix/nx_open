@@ -30,6 +30,8 @@ enum ResultCode
 
 NX_KEY_VALUE_DB_API const char * toString(ResultCode result);
 
+NX_KEY_VALUE_DB_API std::optional<std::string> calculateUpperBound(const std::string& keyPrefix);
+
 using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 
 /**
@@ -116,6 +118,8 @@ public:
         const std::string& keyPrefix,
         GetRangeCompletionHandler completionHandler);
 
+    void getAll(GetRangeCompletionHandler completionHandler);
+
 private:
     /**
      * Inserts/updates key/value within existing transaction.
@@ -173,8 +177,9 @@ private:
     /**
      * Removes elements within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
+	 * @return true if the key existed and was removed.
      */
-    void removeFromDb(
+    bool removeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 

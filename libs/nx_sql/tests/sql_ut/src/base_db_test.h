@@ -22,7 +22,7 @@ class BasicFixture:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicFixture(const std::string& testModuleName);
+    BasicFixture();
 
 protected:
     virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
@@ -86,7 +86,7 @@ protected:
         return queryCompletedPromise.get_future().get();
     }
 
-    std::filesystem::path dbFilePath() const;
+    nx::utils::filesystem::path dbFilePath() const;
 
 private:
     std::string m_tmpDir;

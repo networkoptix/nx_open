@@ -1,19 +1,28 @@
 'use strict';
 
 angular.module('cloudApp')
-    .run(['$http','$templateCache', function($http,$templateCache) {
+    .run(['$http', '$templateCache', function($http, $templateCache) {
         // Preload content into cache
         $http.get(Config.viewsDir + 'static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
         '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64', 'authorizationCheckService',
+        'languageService', 'nxPageService',
 
         function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
-                  $sessionStorage, $routeParams, account, urlProtocol, $base64, authorizationCheckService) {
+                  $sessionStorage, $routeParams, account, urlProtocol, $base64, authorizationCheckService,
+                  languageService, nxPageService) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;
         $scope.activated = $routeParams.activated;
+        $scope.lang = languageService.lang;
+        
+        if ($scope.registerSuccess) {
+            nxPageService.setPageTitle($scope.lang.pageTitles.registerSuccess);
+        } else {
+            nxPageService.setPageTitle($scope.lang.pageTitles.register);
+        }
 
         if(!$scope.registerSuccess){
             authorizationCheckService.logoutAuthorised();
@@ -67,14 +76,14 @@ angular.module('cloudApp')
         },{
             errorCodes:{
                 alreadyExists: function(error){
-                    $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
+                    $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists', false);
                     $scope.registerForm.registerForm.registerEmail.$setTouched();
                     return false;
                 },
-                portalError: L.errorCodes.brokenAccount
+                portalError: $scope.lang.errorCodes.brokenAccount
             },
             holdAlerts:true,
-            errorPrefix:L.errorCodes.cantRegisterPrefix
+            errorPrefix: $scope.lang.errorCodes.cantRegisterPrefix
         }).then(function(){
             $scope.context.process = 'registerSuccess';
             if($scope.account.code){

@@ -60,6 +60,7 @@ private:
     bool commitPrefetch(const QnTimePeriod& periodToCommit,
         Iter prefetchBegin, Iter prefetchEnd, int position);
 
+    static QString iconPath();
     static QPixmap pixmap();
     static QColor color();
 

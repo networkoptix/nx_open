@@ -23,3 +23,5 @@ void setScreenOrientation(Qt::ScreenOrientation orientation);
 QMargins getCustomMargins();
 
 void makeShortVibration();
+
+bool is24HoursTimeFormat();

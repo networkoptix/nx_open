@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>일정에 따라 중지됨</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>오프라인</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>IO장치</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>실시간 뷰</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>호환되지 않는 서버 버전 %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>웹 브라우저 또는 데스크톱 클라이언트를 통해 이 서버에 연결하여 설정하십시오.</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>검색</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>&quot;%1&quot; 시스템에 연결할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>결과 없음</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>유지</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>이 응용 프로그램에서는 I / O 모듈은 사운드 입력 장치로만 사용할 수 있습니다. 제어 모듈로 사용하려면 데스크톱 버전 %1사용하십시오.</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>잘못 된 사용자 지정 영역입니다. 올바르게 그리십시요.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>오디오</translation>
     </message>
   </context>
   <context>

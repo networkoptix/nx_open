@@ -12,9 +12,9 @@ static constexpr char kNodeId[] = "nodeId";
 
 static constexpr char kClusterId[] = "clusterId";
 
-static constexpr char kMaxConcurrentConnectionsFromSystem[] =
-    "maxConcurrentConnectionsFromSystem";
-static constexpr int kMaxConcurrentConnectionsFromSystemDefault = 2;
+static constexpr char kMaxConcurrentConnectionsFromCluster[] =
+    "maxConcurrentConnectionsFromCluster";
+static constexpr int kMaxConcurrentConnectionsFromClusterDefault = 2;
 
 static constexpr char kNodeConnectRetryTimeout[] = "nodeConnectRetryTimeout";
 static constexpr std::chrono::seconds kDefaultNodeConnectRetryTimeout = std::chrono::seconds(7);
@@ -26,8 +26,8 @@ static constexpr bool kDefaultGroupCommandsUnderDbTransaction = false;
 
 SynchronizationSettings::SynchronizationSettings():
     nodeId(QnUuid::createUuid().toStdString()),
-    maxConcurrentConnectionsFromSystem(
-        kMaxConcurrentConnectionsFromSystemDefault),
+    maxConcurrentConnectionsFromCluster(
+        kMaxConcurrentConnectionsFromClusterDefault),
     nodeConnectRetryTimeout(kDefaultNodeConnectRetryTimeout)
 {
 }
@@ -49,13 +49,13 @@ void SynchronizationSettings::load(const QnSettings& settings, std::string group
 
     if (clusterId.empty())
     {
-        maxConcurrentConnectionsFromSystem = settings.value(
-            lm(settingsTemplate).arg(groupName).arg(kMaxConcurrentConnectionsFromSystem),
-            kMaxConcurrentConnectionsFromSystemDefault).toInt();
+        maxConcurrentConnectionsFromCluster = settings.value(
+            lm(settingsTemplate).arg(groupName).arg(kMaxConcurrentConnectionsFromCluster),
+            kMaxConcurrentConnectionsFromClusterDefault).toInt();
     }
     else
     {
-        maxConcurrentConnectionsFromSystem = std::numeric_limits<int>::max();
+        maxConcurrentConnectionsFromCluster = std::numeric_limits<int>::max();
     }
 
     nodeConnectRetryTimeout = nx::utils::parseTimerDuration(settings.value(

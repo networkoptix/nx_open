@@ -15,7 +15,7 @@ class ResourcePtzController: public QnProxyPtzController
     Q_OBJECT
     using base_type = QnProxyPtzController;
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
     Q_PROPERTY(int capabilities READ capabilities NOTIFY capabilitiesChanged)
     Q_PROPERTY(int auxTraits READ auxTraits NOTIFY auxTraitsChanged)
@@ -28,8 +28,8 @@ public:
     virtual ~ResourcePtzController() override;
 
 public: // Properties section
-    QString resourceId() const;
-    void setResourceId(const QString& value);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& value);
 
     bool available() const;
 

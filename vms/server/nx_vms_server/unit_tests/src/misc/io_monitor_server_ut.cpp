@@ -6,6 +6,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/random_qt_device.h>
 #include <api/model/api_ioport_data.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <core/resource_management/resource_pool.h>
@@ -78,7 +79,7 @@ static QnIOStateDataList genTestData()
 {
     QnIOStateDataList result;
 
-    std::random_device rd;
+    nx::utils::random::QtDevice rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> stateGen(0, 1);
 

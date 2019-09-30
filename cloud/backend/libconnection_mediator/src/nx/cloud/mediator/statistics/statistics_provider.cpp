@@ -6,6 +6,8 @@ namespace nx {
 namespace hpm {
 namespace stats {
 
+using namespace nx::network;
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Statistics),
     (json),
@@ -15,8 +17,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 Provider::Provider(
     const StatsManager& statsManager,
-    const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-    const nx::network::server::AbstractStatisticsProvider& stunServerStatisticsProvider,
+    const http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
+    const server::AbstractStatisticsProvider& stunServerStatisticsProvider,
     geo_ip::StatisticsProvider geoIpStatisticsProvider)
     :
     m_statsManager(statsManager),
@@ -29,7 +31,7 @@ Provider::Provider(
 Statistics Provider::getAllStatistics() const
 {
     Statistics statistics;
-    statistics.http = m_httpServerStatisticsProvider.statistics();
+    statistics.http = m_httpServerStatisticsProvider.httpStatistics();
     statistics.stun = m_stunServerStatisticsProvider.statistics();
     statistics.cloudConnect = m_statsManager.cloudConnectStatistics();
     statistics.listeningPeers = m_geoIpStatisticsProvider.listeningPeers();

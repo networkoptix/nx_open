@@ -80,6 +80,8 @@ private slots:
 
     void at_focusAutoButton_clicked();
 
+    void resetIfTargetIsInvisible();
+
     void updateOverlayWidget();
     void updateWidgetPtzController(QnMediaResourceWidget* widget);
     void updateOverlayWidgetInternal(QnMediaResourceWidget* widget);
@@ -88,6 +90,7 @@ private slots:
 
 private:
     QnMediaResourceWidget* target() const;
+    void setTarget(QnMediaResourceWidget* target);
     PtzManipulatorWidget* targetManipulator() const;
 
     QnSplashItem* newSplashItem(QGraphicsItem* parentItem);

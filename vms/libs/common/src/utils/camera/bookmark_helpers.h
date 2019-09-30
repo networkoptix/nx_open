@@ -20,11 +20,12 @@ QnCameraBookmark bookmarkFromAction(
 QnCameraBookmarkList bookmarksAtPosition(const QnCameraBookmarkList& bookmarks,
     qint64 posMs);
 
-bool isTimeWindowChanged(qint64 firstStartTimeMs,
-    qint64 firstEndTimeMs,
-    qint64 secondStartTimeMs,
-    qint64 secondEndTimeMs,
-    qint64 minStep);
+bool isTimeWindowChanged(
+    std::chrono::milliseconds firstStartTime,
+    std::chrono::milliseconds firstEndTime,
+    std::chrono::milliseconds secondStartTime,
+    std::chrono::milliseconds secondEndTime,
+    std::chrono::milliseconds minStep);
 
 QnTimePeriod extendTimeWindow(qint64 startTimeMs,
     qint64 endTimeMs,

@@ -66,7 +66,8 @@ public:
     std::chrono::seconds notActivatedSystemLivePeriod;
     /** Once per this period expired systems are removed from DB. */
     std::chrono::seconds dropExpiredSystemsPeriod;
-    bool controlSystemStatusByDb;
+    bool controlSystemStatusByDb = false;
+    bool saveSystemHealthHistory = false;
 
     SystemManager();
 };

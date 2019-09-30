@@ -37,6 +37,7 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kDropTimePeriodTable);
 
     dbStructureUpdater().addUpdateScript(kDropObjectSearchFromDb);
+    dbStructureUpdater().addUpdateScript(kRenameObjectToTrack);
 }
 
 } // namespace nx::analytics::db

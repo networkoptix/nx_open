@@ -9,6 +9,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnCameraAccessRightsHelperPrivate : public QObject, public QnConnectionContextAware
 {
@@ -47,22 +48,21 @@ QnCameraAccessRightsHelper::~QnCameraAccessRightsHelper()
 {
 }
 
-QString QnCameraAccessRightsHelper::resourceId() const
+QnUuid QnCameraAccessRightsHelper::resourceId() const
 {
     Q_D(const QnCameraAccessRightsHelper);
-    if (d->camera)
-        return d->camera->getId().toString();
-
-    return QString();
+    return d->camera
+        ? d->camera->getId()
+        : QnUuid();
 }
 
-void QnCameraAccessRightsHelper::setResourceId(const QString &id)
+void QnCameraAccessRightsHelper::setResourceId(const QnUuid &id)
 {
     if (id == resourceId())
         return;
 
     Q_D(QnCameraAccessRightsHelper);
-    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     d->updateAccessRights();
 }
 

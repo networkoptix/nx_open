@@ -9,6 +9,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/type_traits.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
@@ -62,6 +63,71 @@ public:
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     virtual int pendingQueryCount() const = 0;
+
+    /**
+     * Convenience overload for executeUpdate where DbFunc returns void or throws an exception
+     * @param queryAggregationKey Queries with same non-empty value of this parameter
+     * can be executed together under single transaction.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeUpdate(
+        DbFunc dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey = std::string())
+    {
+        executeUpdate(
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler),
+            queryAggregationKey);
+    }
+
+    /**
+     * Convenience overload for executeUpdateWithoutTran where DbFunc returns void or throws an
+     * exception.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeUpdateWithoutTran(
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    {
+        executeUpdateWithoutTran(
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler));
+    }
+
+    /**
+     * Convenience overload for executeSelect where DbFunc returns void or throws an exception.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeSelect(
+        DbFunc dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    {
+        executeSelect(
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler));
+    }
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
@@ -230,7 +296,7 @@ public:
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
-    void setStatisticsCollector(StatisticsCollector* statisticsCollector);
+    const StatisticsCollector& statisticsCollector() const;
 
     void reserveConnections(int count);
 
@@ -300,7 +366,7 @@ private:
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
-    StatisticsCollector* m_statisticsCollector;
+    StatisticsCollector m_statisticsCollector;
 
     detail::QueryQueue m_cursorTaskQueue;
     std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContexts;
@@ -344,8 +410,7 @@ private:
             std::move(completionHandler),
             queryAggregationKey);
 
-        if (m_statisticsCollector)
-            executor->setStatisticsCollector(m_statisticsCollector);
+        executor->setStatisticsCollector(&m_statisticsCollector);
 
         m_queryQueue.push(std::move(executor));
     }

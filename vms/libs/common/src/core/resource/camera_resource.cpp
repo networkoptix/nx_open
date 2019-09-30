@@ -477,6 +477,8 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
         m_cachedSupportedEventTypes.reset();
         m_cachedSupportedObjectTypes.reset();
         emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
+        emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
 
     if (key == kCompatibleAnalyticsEnginesProperty)
@@ -485,6 +487,8 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
         m_cachedSupportedEventTypes.reset();
         m_cachedSupportedObjectTypes.reset();
         emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
+        emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
 
     if (key == kDeviceAgentManifestsProperty)
@@ -493,6 +497,8 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
         m_cachedSupportedEventTypes.reset();
         m_cachedSupportedObjectTypes.reset();
         emit deviceAgentManifestsChanged(toSharedPointer(this));
+        emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }    
     
     if (key == ResourcePropertyKey::kIoConfigCapability)
@@ -759,3 +765,19 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
 }
+
+bool QnVirtualCameraResource::hasDualStreamingInternal() const
+{
+    // Calculate secondary stream capability for manually added based on the custom streams.
+    const auto supportsUserDefinedStreams = hasCameraCapabilities(Qn::CustomMediaUrlCapability);
+    if (supportsUserDefinedStreams)
+    {
+        const auto primaryStream = sourceUrl(Qn::CR_LiveVideo);
+        const auto secondaryStream = sourceUrl(Qn::CR_SecondaryLiveVideo);
+        if (!primaryStream.isEmpty() && !secondaryStream.isEmpty())
+            return true;
+    }
+
+    return base_type::hasDualStreamingInternal();
+}
+

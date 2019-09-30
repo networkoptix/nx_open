@@ -1,0 +1,8 @@
+Hei, {{message.userFullName}},
+
+  Avaa alla oleva linkki ja vahvista sähköpostiosoitteesi ja aktivoi tilisi.
+
+{{config.portal_url}}/activate/{{message.code}}
+
+Jos et rekisteröitynyt %PRODUCT_NAME%, niin ohita tämä sähköposti.
+Älä jaa viestiä tai linkkiä kenenkään kanssa.

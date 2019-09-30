@@ -11,12 +11,13 @@ namespace nx {
 namespace utils {
 
 /**
- * Does not use any external thread.
- * Timers are processed and reported by ElapsedTimerPool::processTimers call.
+ * The pool of elapsed (delay-based) timers.
+ * Does not use any external thread. Timers are processed and reported by
+ * ElapsedTimerPool::processTimers call.
  * NOTE: Not thread-safe.
  */
 template<typename TimerId>
-// requires Less_than_comparable<TimerId> && is_copy_constructible<TimerId>
+// requires less_than_comparable<TimerId> && is_copy_constructible<TimerId>
 class ElapsedTimerPool
 {
 public:
@@ -57,7 +58,7 @@ public:
     }
 
     /**
-     * Executes timerFunction with appropriate finished timers within this class.
+     * Executes timerFunction with appropriate finished timers within this method.
      */
     void processTimers()
     {
@@ -71,6 +72,23 @@ public:
             m_timerFunction(timerId);
         }
     }
+
+	/**
+	 * Calculates the delay before the next timerFunction is processing.
+	 * @return std::nullopt if there are no timers, otherwise amount of time between now and the
+	 * next timerFunction invokation.
+	 * NOTE: return value may be negative if the timers are backed up or if processTimers is not
+	 * called periodically.
+	 */
+	std::optional<std::chrono::milliseconds> delayToNextProcessing()
+	{
+		const auto currentTime = nx::utils::monotonicTime();
+		if (m_deadlineToTimerId.empty())
+			return std::nullopt;
+
+		return std::chrono::duration_cast<std::chrono::milliseconds>(
+			currentTime - m_deadlineToTimerId.begin()->first);
+	}
 
 private:
     using DeadlineToTimerId =

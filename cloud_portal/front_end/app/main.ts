@@ -5,6 +5,7 @@ import { setUpLocationSync } from '@angular/router/upgrade';
 import { enableProdMode } from '@angular/core';
 
 if (PRODUCTION) {
+    console.info('In PROD mode!'); // test if PRODUCTION flag is working
     enableProdMode();
 }
 

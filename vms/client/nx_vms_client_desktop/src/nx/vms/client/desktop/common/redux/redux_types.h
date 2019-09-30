@@ -35,6 +35,8 @@ struct NX_VMS_CLIENT_DESKTOP_API UserEditableMultiple
     T operator()() const { return get(); }
     operator std::optional<T>() const { return m_user ? m_user : m_base; }
 
+    bool equals(T value) const { return hasValue() && get() == value; }
+
 private:
     std::optional<T> m_base;
     std::optional<T> m_user;

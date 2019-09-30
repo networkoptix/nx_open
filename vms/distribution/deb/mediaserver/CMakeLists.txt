@@ -9,7 +9,7 @@ set(deb_dependencies_list
     "debconf (>= 0.5) | debconf-2.0"
     "python"
     "psmisc"
-    "systemd"
+    "systemd (>= 229)"
     "cifs-utils"
     "net-tools"
     "libcap2-bin"
@@ -35,6 +35,7 @@ list(JOIN deb_dependencies_list ", " deb_dependencies)
 
 if(withRootTool)
     list(APPEND depends root_tool)
+    set(root_tool_service "${deb.customization.company.name}-root-tool.service")
 endif()
 
 nx_configure_directory(

@@ -5,6 +5,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/vms/time/formatter.h>
 
 namespace nx::vms::client::core {
 
@@ -14,20 +16,20 @@ ResourceHelper::ResourceHelper(QObject* parent):
 {
     const auto timeWatcher = commonModule()->instance<ServerTimeWatcher>();
     connect(timeWatcher, &ServerTimeWatcher::displayOffsetsChanged,
-        this, &ResourceHelper::serverTimeOffsetChanged);
+        this, &ResourceHelper::displayOffsetChanged);
 }
 
-QString ResourceHelper::resourceId() const
+QnUuid ResourceHelper::resourceId() const
 {
-    return m_resource ? m_resource->getId().toString() : QString();
+    return m_resource ? m_resource->getId() : QnUuid();
 }
 
-void ResourceHelper::setResourceId(const QString& id)
+void ResourceHelper::setResourceId(const QnUuid& id)
 {
     if (resourceId() == id)
         return;
 
-    const auto uuid = QnUuid::fromStringSafe(id);
+    const auto uuid = id;//QnUuid::fromStringSafe(id);
     const auto resource = resourcePool()->getResourceById<QnResource>(uuid);
 
     if (m_resource)
@@ -67,7 +69,7 @@ void ResourceHelper::setResourceId(const QString& id)
     emit resourceStatusChanged();
     emit oldCameraFirmwareChanged();
     emit defaultCameraPasswordChanged();
-    emit serverTimeOffsetChanged();
+    emit displayOffsetChanged();
     emit audioSupportedChanged();
     emit isIoModuleChanged();
     emit hasVideoChanged();
@@ -90,10 +92,8 @@ QnResourcePtr ResourceHelper::resource() const
 
 bool ResourceHelper::hasCameraCapability(Qn::CameraCapability capability) const
 {
-    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
-        return camera->hasCameraCapabilities(capability);
-
-    return false;
+    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->hasCameraCapabilities(capability);
 }
 
 bool ResourceHelper::hasDefaultCameraPassword() const
@@ -108,36 +108,31 @@ bool ResourceHelper::hasOldCameraFirmware() const
 
 bool ResourceHelper::audioSupported() const
 {
-    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
-        return camera->isAudioSupported();
-
-    return false;
+    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->isAudioSupported();
 }
 
 bool ResourceHelper::isIoModule() const
 {
-    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
-        return camera->isIOModule();
-
-    return false;
+    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->isIOModule();
 }
 
 bool ResourceHelper::hasVideo() const
 {
-    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
-        return camera->hasVideo();
-
-    return false;
+    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->hasVideo();
 }
 
-qint64 ResourceHelper::serverTimeOffset() const
+qint64 ResourceHelper::displayOffset() const
 {
+    using Watcher = nx::vms::client::core::ServerTimeWatcher;
+    const auto timeWatcher = commonModule()->instance<Watcher>();
     const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource)
-        return 0;
 
-    const auto timeWatcher = commonModule()->instance<nx::vms::client::core::ServerTimeWatcher>();
-    return timeWatcher->displayOffset(mediaResource);
+    return !mediaResource || timeWatcher->timeMode() == Watcher::clientTimeMode
+        ? nx::vms::time::systemDisplayOffset()
+        : timeWatcher->utcOffset(mediaResource);
 }
 
 } // namespace nx::vms::client::core

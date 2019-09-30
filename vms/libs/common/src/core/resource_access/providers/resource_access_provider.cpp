@@ -29,6 +29,14 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
         });
 }
 
+QSet<QnUuid> QnResourceAccessProvider::accessibleResources(const QnResourceAccessSubject& subject) const
+{
+    QSet<QnUuid> result;
+    for (const auto& provider: m_providers)
+        result += provider->accessibleResources(subject);
+    return result;
+}
+
 Source QnResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
@@ -138,6 +146,8 @@ void QnResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
+    // This check assures client will receive all requred notifications if something was modified
+    // on the server while it was in the 'Reconnecting' state.
     for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())

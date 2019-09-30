@@ -1,75 +1,71 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Utviklerverktøy</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Har du en ide om hvordan du kan forbedre utviklerverktøyene, eller bare ønsker å starte en samtale?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Gi tilbakemelding</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generisk hendelse generator</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps developers and integrators build
-            and test HTTP Generic Event calls.
+            En gnerisk hendelse er en metode for å sende hendelser fra tredjepartssystemer til et system,
+            som kan brukes til å utløse systemhandlinger i hendelser og regler-motoren.
+            Generic Event Generator er et verktøy som hjelper utviklere og integratorer til å bygge
+            og teste HTTP Generic Event calls.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generisk hendelse generator</a></p>
     </div>
     <div>
         <h3>Server API</h3>
         <p>
-            A REST API that gives developers the ability to access almost every system feature available in the regular
-            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
-            out of System, generate events, create rules, control PTZ cameras, and more.
+            Et REST API som gir utviklere muligheten til å få tilgang til nesten alle systemfunksjoner som er tilgjengelige i den vanlige klienten: spørre/administrere systemressurser (servere, kameraer, brukere, tillatelser), hente live eller innspilt video ut av System, generer hendelser, sett opp regler, kontroller PTZ kameraer og mer.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation and tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - a list of breaking changes in API since the last release<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
-            - a full list of available Server API calls
+            <a href="#/developers/api"><b> API-testverktøyet (nytt) </b></a>
+            - Interaktiv dokumentasjon og verktøy for testing av API-anrop <br>
+            <a href="#/developers/changelog"> API Changelog </a>
+            - En liste over bryte endringer i API siden siste utgivelse <br>
+            <a id="api-doc" href="api.xml" target="_blank"> API-dokumentasjon </a>
+            - En fullstendig liste over tilgjengelige Server API-anrop
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Kameradetaljer Panel</h3>
         <p>
-            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
+            Vise utvikler-vennlig informasjon for individuelle kameraer i Web-admingrensesnittets Vis-faneblad:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Kamera-ID</li>
+            <li>Lenker for alle tilgjengelige videostrømmer</li>
+            <li>Direkte videoeksport fra nettleser</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            For å åpne Kameradetaljer-panelet - naviger til Web Admin-grensesnittet, velg <a href="#/view"> Vis </a>,
+            velg målkamera, klikk på innstillingsikonet (gir), og velg deretter "Kameradetaljer"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">åpne Kameradetaljer Panel</a></p>
     </div>
     <div>
-        <h3>Video Source SDK</h3>
+        <h3>Videokilde SDK</h3>
         <p>
-            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
-            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
-            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
-            information from 3rd party devices.
+            Videokilden SDK gir muligheten til å integrere nesten hvilken som helst levende eller innspilt videokilde (IP-kameraer,                                     NVRer, DVRer, osv.) i Systemet og gjør det mulig å lage metoder for å oppdage, vise, analysere             og spille inn video. Det tillater også å integrere I/O-porter og enheter, samt å hente bevegelsesdeteksjon
+            informasjon fra tredjepartsenheter.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >få SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>Lagrings SDK</h3>
         <p>
-            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
-            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
-            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
-            server as a storage location.
+            Lagrings-SDK lar utviklere lese fra eller skrive til alle lagringssteder: lokal, ekstern og til og med
+            sky en. Å utvikle en lagringspluggin krever implementering av standardfunksjoner som: I/O-strøm, hvis filen
+            eksisterer, slett filen, listen over filer i mappen osv. Lagrings-SDK inneholder et eksempel på bruk av en FTP
+            server som lagringsplass.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >få SDK</a></p>
     </div>
 </div>

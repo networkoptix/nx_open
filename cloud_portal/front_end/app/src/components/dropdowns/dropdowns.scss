@@ -54,6 +54,7 @@ header {
     
     .dropdown-toggle {
         display          : flex;
+        justify-content  : flex-start;
         padding          : 5px 32px 5px 10px;
         background-color : $light4;
         width            : 100%;
@@ -83,6 +84,12 @@ header {
         }
     }
     
+    .dropdown-menu > ul:last-of-type {
+        li:last-of-type {
+            margin-bottom : 4px;
+        }
+    }
+    
     .dropdown-menu {
         margin-top       : 0;
         background-color : $light4;
@@ -91,7 +98,7 @@ header {
         border           : none;
         border-radius    : 2px;
         width            : 100%;
-        padding          : 4px 0;
+        padding          : 4px 0 0 !important;
         
         &--list {
             max-height      : $dropdown-list-height;
@@ -107,6 +114,13 @@ header {
             margin          : 0;
             list-style-type : none;
         }
+    
+        &--footer {
+            li:last-of-type {
+                margin-bottom : 4px;
+            }
+            margin-bottom: 4px !important;
+        }
         
         .multi-column-dropdown {
             list-style : none;
@@ -121,10 +135,12 @@ header {
             .dropdown-item {
                 display     : flex;
                 align-items : center;
-                padding     : 0.25rem rem(10px);
+                padding     : 0;
                 height      : 26px;
                 line-height : 26px;
                 font-family : $font-family-medium;
+                text-decoration: none;
+                cursor      : pointer !important;
                 
                 @media (max-width : $collapse-second-width) {
                     height : 32px;
@@ -152,20 +168,27 @@ header {
                 &:focus {
                     background-color : $light4;
                 }
-                
+    
+                & > span:first-child {
+                    padding      : 0 rem(10px);
+                    display      : flex;
+                    align-items  : center;
+                }
             }
             
             nx-checkbox {
                 position : absolute;
                 left     : 10px;
-                top      : 4px;
+                top      : 3px;
+                height   : 20px;
                 
                 & + label {
                     position     : absolute;
-                    padding-left : 24px !important;
+                    padding-left : 30px !important;
                     margin       : 0;
                     cursor       : pointer;
-                    width        : calc(100% - 10px);
+                    width        : 100%;
+                    line-height  : 26px;
                 }
             }
             

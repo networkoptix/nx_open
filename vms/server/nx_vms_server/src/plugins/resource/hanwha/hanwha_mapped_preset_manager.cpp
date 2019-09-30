@@ -8,11 +8,7 @@ namespace nx {
 namespace vms::server {
 namespace plugins {
 
-namespace {
-
 static const int kHanwhaMaxPresetNameLength = 12;
-
-} // namespace
 
 HanwhaMappedPresetManager::HanwhaMappedPresetManager(const QnResourcePtr& resource):
     base_type(resource)
@@ -20,7 +16,8 @@ HanwhaMappedPresetManager::HanwhaMappedPresetManager(const QnResourcePtr& resour
     m_hanwhaResource = resource.dynamicCast<HanwhaResource>();
 }
 
-bool HanwhaMappedPresetManager::createNativePreset(const QnPtzPreset& nxPreset, QString *outNativePresetId)
+bool HanwhaMappedPresetManager::createNativePreset(
+    const QnPtzPreset& /*nxPreset*/, QString* outNativePresetId)
 {
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto presetNumber = freePresetNumber();
@@ -30,7 +27,7 @@ bool HanwhaMappedPresetManager::createNativePreset(const QnPtzPreset& nxPreset, 
     const auto devicePresetName = makeDevicePresetName(presetNumber);
 
     const auto response = helper.add(
-        lit("ptzconfig/preset"),
+        "ptzconfig/preset",
         {
             {kHanwhaChannelProperty, channel()},
             {kHanwhaPresetNumberProperty, presetNumber},

@@ -119,6 +119,11 @@ void AggregateLogger::writeLogHeader()
         logger->writeLogHeader();
 }
 
+const std::vector<std::unique_ptr<AbstractLogger>>& AggregateLogger::loggers() const
+{
+    return m_loggers;
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx

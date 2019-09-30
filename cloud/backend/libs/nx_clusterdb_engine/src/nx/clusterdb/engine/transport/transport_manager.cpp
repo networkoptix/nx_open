@@ -53,7 +53,7 @@ bool TransportManager::setConnectorTypeKey(const std::string& key)
     auto it = std::find_if(
         m_transportFactories.begin(), m_transportFactories.end(),
         [key](auto& factory) { return factory->key() == key; });
-    
+
     if (it == m_transportFactories.end())
         return false;
 

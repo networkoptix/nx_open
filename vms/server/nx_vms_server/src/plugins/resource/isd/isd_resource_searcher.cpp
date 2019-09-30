@@ -59,19 +59,17 @@ QnPlISDResourceSearcher::~QnPlISDResourceSearcher()
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
-    QnNetworkResourcePtr result;
-
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
     {
         NX_DEBUG(this, lm("No resource type for %1").arg(resourceTypeId));
-        return result;
+        return {};
     }
 
     if (resourceType->getManufacturer() != manufacturer())
-        return result;
+        return {};
 
-    result = QnVirtualCameraResourcePtr(new QnPlIsdResource(serverModule()));
+    const auto result = QnVirtualCameraResourcePtr(new QnPlIsdResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     NX_DEBUG(this, lm("Create resource with type %1").arg(resourceTypeId));

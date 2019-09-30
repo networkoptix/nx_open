@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
@@ -50,14 +50,20 @@ public:
 
 struct QnRoute;
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 class TimeSyncManager: public AbstractTimeSyncManager, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:
+
+    enum class Result
+    {
+        ok,
+        error,
+        incompatibleServer
+    };
+
     static const std::chrono::milliseconds kMaxJitterForLocalClock;
 
     static const QString kTimeSyncUrlPath;
@@ -86,7 +92,7 @@ public:
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
-    bool loadTimeFromServer(const QnRoute& route);
+    Result loadTimeFromServer(const QnRoute& route);
     void loadTimeFromLocalClock();
 
     virtual void updateTime() = 0;
@@ -111,6 +117,4 @@ private:
     std::unique_ptr<QTimer> m_timer = nullptr;
 };
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

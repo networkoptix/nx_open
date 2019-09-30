@@ -11,6 +11,7 @@ struct DeviceData
     std::string name;
     std::string path;
     std::string uniqueId;
+    std::string audioPath;
 
     DeviceData(
         const std::string& name,
@@ -21,6 +22,27 @@ struct DeviceData
         path(path),
         uniqueId(uniqueId)
     {
+    }
+
+    bool operator==(const DeviceData& rhs) const
+    {
+        return name == rhs.name
+            && path == rhs.path
+            && uniqueId == rhs.uniqueId
+            && audioPath == rhs.audioPath;
+    }
+
+    bool operator!=(const DeviceData& rhs) const
+    {
+        return !operator==(rhs);
+    }
+
+    std::string toString() const
+    {
+        return std::string("device: { name: ") + name +
+            ", path: " + path +
+            ", uid: " + uniqueId +
+            ", audio: " + audioPath + " }";
     }
 };
 

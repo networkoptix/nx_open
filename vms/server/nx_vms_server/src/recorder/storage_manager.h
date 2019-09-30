@@ -293,6 +293,7 @@ private:
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
+    void updateMountedStatus(const QnStorageResourcePtr& storage);
     QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(int storageIndex);
     void scanMediaCatalog(
         const QnStorageResourcePtr& storage,

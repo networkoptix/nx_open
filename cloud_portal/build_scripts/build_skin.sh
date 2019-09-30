@@ -18,7 +18,7 @@ dir=../skins/$SKIN
     mkdir -p $TARGET_DIR/$SKIN
 
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
     echo "Building front_end"
 
 
@@ -26,6 +26,7 @@ dir=../skins/$SKIN
     pushd ../front_end
         npm run setSkin $SKIN
         npm run build
+        rm -rf dist/src
         # Save the repository info.
         echo "Create version.txt"
         hg log -r . --repository "$2" | head -n 7 > dist/version.txt
@@ -49,8 +50,10 @@ dir=../skins/$SKIN
     echo "Building front_end finished"
 
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
+    echo
     echo "Building templates - for each language"
+    echo
 
     mkdir -p $TARGET_DIR/$SKIN/templates/
     cp -rf $dir/templates/* $TARGET_DIR/$SKIN/templates || true
@@ -79,11 +82,13 @@ dir=../skins/$SKIN
 
         echo "Clean sources"
         rm -rf $TARGET_DIR/$SKIN/templates/lang_$LANG/src
+        echo
     done
     echo "Templates success"
 
-    echo "------------------------------"
+    echo "------------------------------------------------------------"
     echo "Localization - portal"
+    echo
 
     for lang_dir in ../translations/*/
     do
@@ -92,27 +97,28 @@ dir=../skins/$SKIN
 
         echo "$TARGET_DIR/$SKIN/static/lang_$LANG/views/"
 
-        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/views/
+        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/views
 
         echo "Copy default views - with default language"
-        cp -rf $TARGET_DIR/$SKIN/static/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/views/
+        cp -rf $TARGET_DIR/$SKIN/static/views $TARGET_DIR/$SKIN/static/lang_$LANG
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/views/ || true
+        cp -rf $lang_dir/views $TARGET_DIR/$SKIN/static/lang_$LANG || true
 
 
-        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/
+        mkdir -p $TARGET_DIR/$SKIN/static/lang_$LANG/web_common
 
         echo "Copy web_common default views - with default language"
-        cp -rf $TARGET_DIR/$SKIN/static/web_common/* $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/
+        cp -rf $TARGET_DIR/$SKIN/static/web_common/views $TARGET_DIR/$SKIN/static/lang_$LANG/web_common
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/ || true
+        cp -rf $lang_dir/web_common/views $TARGET_DIR/$SKIN/static/lang_$LANG/web_common || true
 
         echo "Generate language.json"
         pushd $TARGET_DIR/$SKIN
         python ../../../../build_scripts/generate_language_json.py $LANG
         popd
+        echo
 
     done
 
@@ -120,7 +126,7 @@ dir=../skins/$SKIN
     python ../../../../build_scripts/generate_all_languages_json.py
     popd
 
-    rm -rf $TARGET_DIR/$SKIN/static/views
+    rm -rf $TARGET_DIR/$SKIN/static/{views,web_common/views}
     echo "Localization success"
 
 echo "$SKIN Done"

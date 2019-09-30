@@ -1,0 +1,163 @@
+{
+	"search": {
+		"Search": "חיפוש",
+		"search_ipvd": "חפש לפי דגם או יצרן",
+		"filter applied": "מסננים הופעלו",
+		"filters applied": "מסננים הופעלו",
+		"Any": "כל",
+		"selected": "נבחר",
+		"vendor": "יצרן",
+		"vendors": "יצרנים",
+		"hardwareType": "סוג",
+		"hardwareTypes": "סוגים",
+		"minResolution": "רזולוציה מינימלית"
+	},
+	"cameraFilters": {
+		"ptz": "מצלמות PTZ",
+		"aptz": "מצלמות עם PTZ מתקדם",
+		"fisheye": "מצלמות Fisheye",
+		"H265": "H.265 מצלמות",
+		"IO": "מודולי קלט פלט",
+		"multiSensor": "מצלמות מרובות חיישנים",
+		"TwWayAudio": "התקני שמע דו-כיוונית",
+		"audio": "מצלמות עם אודיו",
+		"encoder": "דוחסים",
+		"highRes": "מצלמות ברזולוציה גבוהה במיוחד"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu Linux"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "C + + פלטפורמת SDK"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"linux64": "x64",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "לקוח בלבד",
+			"server": "שרת בלבד",
+			"bundle": "לקוח ושרת",
+			"servertool": "כלי תצורה",
+			"package": "חבילה"
+		},
+		"releasesTypes": {
+			"beta": "בטא",
+			"betas": "ביתא",
+			"rc": "גירסא לא סופית",
+			"release": "מהדורה",
+			"releases": "גרסאות",
+			"patch": "תיקון",
+			"patches": "תיקונים"
+		}
+	},
+	"ipvd": {
+		"count": "ספירה",
+		"vendor": "יצרן",
+		"model": "מודל",
+		"hardwareType": "סוג",
+		"maxResolution": "רזולוציה מקסימלית",
+		"maxFps": "מקס FPS",
+		"primaryCodec": "מקודד",
+		"isAudioSupported": "אודיו",
+		"isTwAudioSupported": "אודיו דו כיווני",
+		"isPtzSupported": "מצלמה ממונעת",
+		"isAptzSupported": "מתקדם PTZ",
+		"isAptzSupportedShort": "מתקדם PTZ",
+		"isFisheye": "עין הדג",
+		"isMdSupported": "תנועה",
+		"isIoSupported": "I / O",
+		"isH265": "H.265",
+		"isMultiSensor": "מרובה חיישנים",
+		"camera": "מצלמה",
+		"multiSensorCamera": "מצלמה עם מספר חיישנים",
+		"encoder": "דוחס",
+		"dvr": "DVR",
+		"other": "אחר",
+		"PTZ cameras": "מצלמות PTZ",
+		"Advanced PTZ cameras": "מצלמות PTZ מתקדמות",
+		"Fisheye Cameras": "מצלמות Fisheye",
+		"Cameras supporting H.265": "מצלמות התומכות H.265",
+		"I / O modules": "מודולי קלט פלט",
+		"Multisensor Cameras": "מצלמות מרובות חיישנים",
+		"Cameras with 2-way audio": "מצלמות עם אודיו דו כיווני",
+		"Extra high resolution cameras": "מצלמות ברזולוציה גבוהה במיוחד",
+		"feedback": {
+			"a_Please": "בבקשה",
+			"b_Link": "הגש בקשה",
+			"c_Info": "לשאלות / בקשות נוספות בנוגע להתקנים נתמכים."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "דף זה הוא תצוגה מקדימה של השינויים האחרונים, והוא אינו תואם לגרסה הזמינה לציבור.",
+		"backToEditText": "חזרה לממשקי העריכה",
+		"Access Control": "בקרת כניסה",
+		"Connector": "מחבר",
+		"Data Analytics": "ניתוח נתונים",
+		"Drone": "מטוס זעיר ללא טייס",
+		"Health Monitor": "ניטור תקינות",
+		"Storage": "אחסון"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "הקפד לכלול את דגם המצלמה והיצרן שלך..."
+	},
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
+	"dialogs": {
+		"merge": {
+			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+			"mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+			"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+			"primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+			"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+			"systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+			"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+		}
+	}
+}

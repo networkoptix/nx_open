@@ -2,8 +2,8 @@
 
 #include <rest/helpers/request_context.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/update/common_update_manager.h>
 #include <nx/update/update_storages_helper.h>
+#include <nx/vms/server/update/update_manager.h>
 #include "multiserver_request_helper.h"
 
 class QnMediaServerModule;
@@ -26,6 +26,7 @@ void getStoragesDataRemotely(
     nx::update::storage::ServerToStoragesList* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager);
+IfParticipantPredicate makeIfParticipantPredicate(
+    nx::vms::server::UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants = {});
 
 } // namespace detail

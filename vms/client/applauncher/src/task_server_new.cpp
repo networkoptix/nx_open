@@ -154,21 +154,21 @@ void TaskServerNew::processNewConnection(NamedPipeSocket* clientConnection)
 }
 
 /** Adds a simple 'responseless' subscriber. */
-bool TaskServerNew::subscribe(const QByteArray& name, std::function<bool (const QByteArray&)> callback)
+bool TaskServerNew::subscribeSimple(const QByteArray& name, std::function<bool ()> callback)
 {
-    return subscribe(name,
+    return subscribeImpl(name,
         [callback](
-            Channel& channel,
+            Channel& /*channel*/,
             const QByteArray& /*requestRawData*/,
             QByteArray& /*responseRawData*/)
         {
-            if (callback(channel.name))
+            if (callback())
                 return ResponseError::noError;
             return ResponseError::failedToDeserialize;
         });
 }
 
-bool TaskServerNew::subscribe(const QByteArray& name, Channel::Callback&& callback)
+bool TaskServerNew::subscribeImpl(const QByteArray& name, Channel::Callback&& callback)
 {
     NX_ASSERT(!name.isEmpty());
     NX_ASSERT(callback);

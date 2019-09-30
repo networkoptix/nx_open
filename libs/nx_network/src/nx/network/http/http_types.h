@@ -17,6 +17,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/string.h>
 #include <nx/utils/url.h>
 
 /**
@@ -72,7 +73,7 @@ struct NX_NETWORK_API ci_less
     /** Case-independent (ci) compare_less binary function. */
     bool operator() (const QByteArray& c1, const QByteArray& c2) const
     {
-        return strcasecmp(c1, c2) < 0;
+        return nx::utils::stricmp(c1, c2) < 0;
     }
 };
 

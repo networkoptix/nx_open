@@ -4,48 +4,39 @@
 
 namespace nx::vms::api::metrics {
 
+void PrintTo(const Value& v, ::std::ostream* s)
+{
+    *s << QJson::serialized(v).toStdString();
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ParameterRule)(ParameterGroupRules)
-    (ParameterManifest)(ParameterGroupManifest)
-    (ParameterValue)(ParameterGroupValues)(ResourceValues),
+    (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(Alarm),
     (json), _Fields, (optional, true))
 
-std::vector<ParameterGroupManifest>::iterator find(
-    std::vector<ParameterGroupManifest>& group, const QString& id)
+static QString nameOrCapitalizedId(QString name, const QString& id)
 {
-    return std::find_if(group.begin(), group.end(), [&](const auto& i) { return i.id == id; });
+    if (!name.isEmpty() || id.isEmpty())
+        return name;
+
+    return id.left(1).toUpper() + id.mid(1);
 }
 
-ParameterGroupManifest makeParameterManifest(QString id, QString name, QString unit)
+Label::Label(QString id, QString name):
+    id(std::move(id)),
+    name(nameOrCapitalizedId(std::move(name), this->id))
 {
-    ParameterGroupManifest manifest;
-    manifest.id = std::move(id);
-    manifest.name = std::move(name);
-    manifest.unit = std::move(unit);
-    return manifest;
 }
 
-ParameterGroupManifest makeParameterGroupManifest(
-    QString id, QString name, std::vector<ParameterGroupManifest> group)
+ValueManifest::ValueManifest(Label label, Displays display, QString unit):
+    Label(std::move(label)),
+    display(display),
+    unit(std::move(unit))
 {
-    ParameterGroupManifest manifest = makeParameterManifest(std::move(id), std::move(name));
-    manifest.group = std::move(group);
-    return manifest;
 }
 
-ParameterGroupValues makeParameterValue(Value value, Status status)
+ValueGroupManifest::ValueGroupManifest(Label label):
+    Label(std::move(label))
 {
-    ParameterGroupValues parameter;
-    parameter.value = std::move(value);
-    parameter.status = std::move(status);
-    return parameter;
-}
-
-ParameterGroupValues makeParameterGroupValue(std::map<QString, ParameterGroupValues> group)
-{
-    ParameterGroupValues parameter;
-    parameter.group = std::move(group);
-    return parameter;
 }
 
 void merge(SystemValues* destination, SystemValues* source)
@@ -58,14 +49,21 @@ void merge(SystemValues* destination, SystemValues* source)
     }
 }
 
-SystemValues merge(std::vector<SystemValues> valuesList)
+void merge(Alarms* destination, Alarms* source)
 {
-    SystemValues result;
-    for (auto values: valuesList)
-        merge(&result, &values);
-    return result;
+    destination->insert(destination->end(), source->begin(), source->end());
 }
 
 } // namespace nx::vms::api::metrics
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::metrics, AlarmLevel,
+    (nx::vms::api::metrics::AlarmLevel::warning, "warning")
+    (nx::vms::api::metrics::AlarmLevel::danger, "danger")
+)
 
+#define METRICS_DISPLAY_NAMES \
+    (nx::vms::api::metrics::Display::none, "") \
+    (nx::vms::api::metrics::Display::table, "table") \
+    (nx::vms::api::metrics::Display::panel, "panel")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::metrics, Display, METRICS_DISPLAY_NAMES)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::metrics, Displays, METRICS_DISPLAY_NAMES)

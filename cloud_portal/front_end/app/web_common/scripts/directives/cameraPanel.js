@@ -107,43 +107,26 @@
                     server.expanded = !server.expanded;
                     scope.storage.serverStates[ server.id ] = server.expanded;
                 };
+                
+                scope.formatURL = function(addresses) {
+                    var addr = addresses.split(';');
+                    var mainAddr = addr[0];
+                    // IPv6 literal support
+                    var offset = mainAddr[0] === '['
+                        ? mainAddr.indexOf(']') + 1
+                        : 0;
+                    var index = mainAddr.indexOf(':', offset);
     
-                function getIP(addresses) {
-                    function checkIsIPV4(entry) {
-                        var blocks = entry.split('.');
-                        if (blocks.length === 4) {
-                            return blocks.every(function (block) {
-                                return !isNaN(block) &&
-                                    parseInt(block, 10) >= 0 &&
-                                    parseInt(block, 10) <= 255;
-                            });
-                        }
-                        return false;
-                    }
-        
-                    var ips = addresses.split(';'),
-                        ip;
-        
-                    ips.some(function (tmpIP) {
-                        tmpIP = tmpIP.split(':')[0];
-            
-                        if (checkIsIPV4(tmpIP)) {
-                            ip = tmpIP;
-                            return true;
-                        }
-                    });
-        
-                    return ip;
-                }
+                    return index !== -1
+                        ? mainAddr.substring(0, index)
+                        : mainAddr;
+                };
 
                 function updateMediaServers () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
 
                     if (scope.mediaServers) {
                         scope.mediaServers.forEach(function (server) {
-                            
-                            server.ip = getIP(server.networkAddresses);
-                            
                             if (Object.keys(scope.storage.serverStates).length === 0) {
                                 server.expanded = false;
                                 return;

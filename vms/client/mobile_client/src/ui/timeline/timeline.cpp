@@ -17,9 +17,9 @@
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
-#include "camera/camera_chunk_provider.h"
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/media/chunk_provider.h>
 #include <nx/client/core/animation/kinetic_helper.h>
 #include <utils/math/color_transformations.h>
 
@@ -134,7 +134,6 @@ public:
     qreal liveOpacity = 0.0;
     qreal stripesPosition = 0.0;
     bool stickToEnd = false;
-    bool autoPlay = false;
     qreal autoPlaySpeed = 1.0;
     qreal playSpeedCorrection = 1.0;
     qint64 previousCorrectionTime = -1;
@@ -172,15 +171,13 @@ public:
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
-    int timeZoneShift = 0;
-    int serverTimeZoneShift = 0;
+    int displayOffset = 0;
+    QLocale locale = QLocale::system();
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
 
-    QStringList suffixList;
-
-    QnCameraChunkProvider* chunkProvider = nullptr;
+    nx::client::core::ChunkProvider* chunkProvider = nullptr;
 
 public:
     QnTimelinePrivate(QnTimeline* parent):
@@ -192,31 +189,31 @@ public:
         const int min = 60 * sec;
         const int hour = 60 * min;
 
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    10));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    50));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    100));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    500));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         5 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         10 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         30 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         5 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         10 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         30 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           3 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           6 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           12 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            5));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            15));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          3));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          6));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           5));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           10));
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 10});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 50});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 100});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 500});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 5 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 10 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 30 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 5 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 10 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 30 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 3 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 6 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 12 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 1});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 5});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 15});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 1});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 3});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 6});
+        zoomLevels.append({QnTimelineZoomLevel::Years,  1});
+        zoomLevels.append({QnTimelineZoomLevel::Years, 5});
+        zoomLevels.append({QnTimelineZoomLevel::Years, 10});
         targetZoomLevel = zoomLevel = zoomLevels.size() - zoomLevelsVisible;
 
         static constexpr int kMaxStickyPointSpeed = 15;
@@ -239,6 +236,8 @@ public:
         if (textTexture)
             delete textTexture;
     }
+
+    void setWindow(qint64 start, qint64 end);
 
     void updateZoomLevel()
     {
@@ -342,23 +341,10 @@ public:
 
     qint64 adjustTime(qint64 time) const
     {
-        return time + timeZoneShift + serverTimeZoneShift;
+        return time + displayOffset;
     }
 
-    void updateTextHelper()
-    {
-        auto window = parent->window();
-        if (!window)
-            return;
-
-        textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
-        textTexture = window->createTextureFromImage(textHelper->texture());
-
-        updateMaxZoomLevelTextLengths();
-    }
-
-    void updateMaxZoomLevelTextLengths();
-
+    void updateTextHelper();
     void updateStripesTextures();
 
     void tryFitInBounds();
@@ -374,7 +360,7 @@ public:
     int calculateTargetTextLevel() const;
     QVector<TextMarkInfo> calculateVisibleTextMarks() const;
 
-    void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points);
+    QSize placeSymbol(qreal x, qreal y, QChar symbol, QSGGeometry::TexturedPoint2D* points);
     int placeText(const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points);
 
     bool hasArchive() const;
@@ -387,18 +373,8 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     setFlag(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::LeftButton);
 
-    connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
-
-    d->suffixList << "ms" << "s" << ":";
-
-    QLocale locale;
-    for (int i = 1; i <= 12; ++i)
-    {
-        d->suffixList.append(locale.standaloneMonthName(i, QLocale::ShortFormat));
-        d->suffixList.append(locale.monthName(i, QLocale::ShortFormat));
-    }
-
+    connect(this, &QnTimeline::localeChanged, this, [this]() { d->updateTextHelper(); });
     d->updateTextHelper();
 }
 
@@ -411,60 +387,9 @@ qint64 QnTimeline::windowStart() const
     return d->windowStart;
 }
 
-void QnTimeline::setWindowStart(qint64 windowStart)
-{
-    if (d->windowStart == windowStart)
-        return;
-
-    d->windowStart = windowStart;
-    d->updateZoomLevel();
-    update();
-    emit windowStartChanged();
-    emit positionChanged();
-    emit windowSizeChanged();
-}
-
 qint64 QnTimeline::windowEnd() const
 {
     return d->windowEnd;
-}
-
-void QnTimeline::setWindowEnd(qint64 windowEnd)
-{
-    if (d->windowEnd == windowEnd)
-        return;
-
-    d->windowEnd = windowEnd;
-    d->updateZoomLevel();
-    update();
-    emit windowEndChanged();
-    emit positionChanged();
-    emit windowSizeChanged();
-}
-
-void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd)
-{
-    if (d->windowStart == windowStart && d->windowEnd == windowEnd)
-        return;
-
-    d->zoomKineticHelper.stop();
-    d->stickyPointKineticHelper.stop();
-    d->targetPosition = -1;
-
-    const auto oldPosition = position();
-
-    d->windowStart = windowStart;
-    d->windowEnd = windowEnd;
-    d->updateZoomLevel();
-
-    emit windowStartChanged();
-    emit windowEndChanged();
-    emit windowSizeChanged();
-
-    if (oldPosition != position())
-        emit positionChanged();
-
-    update();
 }
 
 qint64 QnTimeline::windowSize() const
@@ -476,7 +401,7 @@ void QnTimeline::setWindowSize(qint64 windowSize)
 {
     const auto windowStart = position() - windowSize / 2;
     d->initialWindowStartTime = windowStart;
-    setWindow(windowStart, windowStart + windowSize);
+    d->setWindow(windowStart, windowStart + windowSize);
 }
 
 qint64 QnTimeline::position() const
@@ -529,7 +454,7 @@ void QnTimeline::setPositionImmediately(qint64 position)
 
     const auto windowSize = this->windowSize();
     const auto newWindowEnd = position + windowSize / 2;
-    setWindow(newWindowEnd - windowSize, newWindowEnd);
+    d->setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
 
 bool QnTimeline::motionSearchMode() const
@@ -565,12 +490,6 @@ void QnTimeline::setChangingMotionRoi(bool value)
     emit changingMotionRoiChanged();
 
     d->updateLoadingState();
-}
-
-
-QDateTime QnTimeline::positionDate() const
-{
-    return QDateTime::fromMSecsSinceEpoch(position() + d->serverTimeZoneShift, Qt::UTC);
 }
 
 bool QnTimeline::stickToEnd() const
@@ -609,22 +528,6 @@ void QnTimeline::setStartBound(qint64 startBound)
     update();
 }
 
-bool QnTimeline::autoPlay() const
-{
-    return d->autoPlay;
-}
-
-void QnTimeline::setAutoPlay(bool autoPlay)
-{
-    if (d->autoPlay == autoPlay)
-        return;
-
-    d->autoPlay = autoPlay;
-
-    if (d->autoPlay)
-        update();
-}
-
 bool QnTimeline::isAutoReturnToBoundsEnabled() const
 {
     return d->autoReturnToBounds;
@@ -639,35 +542,33 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
     emit autoReturnToBoundsEnabledChanged();
 }
 
-int QnTimeline::serverTimeZoneShift() const
+int QnTimeline::displayOffset() const
 {
-    return d->serverTimeZoneShift;
+    return d->displayOffset;
 }
 
-void QnTimeline::setServerTimeZoneShift(int timeZoneShift)
+void QnTimeline::setLocale(const QLocale& locale)
 {
-    if (d->serverTimeZoneShift == timeZoneShift)
+    if (d->locale == locale)
         return;
 
-    d->serverTimeZoneShift = timeZoneShift;
-    emit serverTimeZoneShiftChanged();
-
-    update();
+    d->locale = locale;
+    emit localeChanged();
 }
 
-int QnTimeline::timeZoneShift() const
+QLocale QnTimeline::locale() const
 {
-    return d->timeZoneShift;
+    return d->locale;
 }
 
-void QnTimeline::setTimeZoneShift(int timeZoneShift)
+
+void QnTimeline::setDisplayOffset(int value)
 {
-    if (d->timeZoneShift == timeZoneShift)
+    if (d->displayOffset == value)
         return;
 
-    d->timeZoneShift = timeZoneShift;
-
-    emit timeZoneShiftChanged();
+    d->displayOffset = value;
+    emit displayOffsetChanged();
 
     update();
 }
@@ -793,12 +694,12 @@ qint64 QnTimeline::positionAtX(qreal x) const
     return d->pixelPosToTime(x);
 }
 
-QnCameraChunkProvider* QnTimeline::chunkProvider() const
+nx::client::core::ChunkProvider* QnTimeline::chunkProvider() const
 {
     return d->chunkProvider;
 }
 
-void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
+void QnTimeline::setChunkProvider(nx::client::core::ChunkProvider* chunkProvider)
 {
     if (d->chunkProvider == chunkProvider)
         return;
@@ -811,19 +712,16 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
     if (d->chunkProvider)
     {
         auto handleTimePeriodsUpdated =
-            [this]()
+            [this](Qn::TimePeriodContent type)
             {
-                for (const auto contentType: {Qn::RecordingContent, Qn::MotionContent})
-                {
-                    auto& periods = d->timePeriods[contentType];
-                    periods = d->chunkProvider->timePeriods(contentType);
-                    periods.detach();
-                }
+                auto& data = d->timePeriods[type];
+                data = d->chunkProvider->periods(type);
+                data.detach();
                 d->highlightArchiveChunks = false;
                 update();
             };
 
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+        connect(d->chunkProvider, &nx::client::core::ChunkProvider::periodsUpdated,
             this, handleTimePeriodsUpdated);
 
         const auto handleLoadingMotionChanged =
@@ -832,10 +730,11 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
                 d->loadingMotion = chunkProvider->isLoadingMotion();
                 d->updateLoadingState();
             };
-        connect(d->chunkProvider, &QnCameraChunkProvider::loadingMotionChanged,
+        connect(d->chunkProvider, &nx::client::core::ChunkProvider::loadingMotionChanged,
             this, handleLoadingMotionChanged);
 
-        handleTimePeriodsUpdated();
+        for (const auto type: {Qn::RecordingContent, Qn::MotionContent})
+            handleTimePeriodsUpdated(type);
     }
 
     emit chunkProviderChanged();
@@ -1211,18 +1110,15 @@ QSGNode* QnTimeline::updateTextNode(QSGNode* rootNode)
     {
         const auto& zoomLevel = d->zoomLevels[textMark.zoomIndex];
 
-        const auto baseValueSize = zoomLevel.baseValue(textMark.tick).size();
-        const auto subValueSize = zoomLevel.subValue(textMark.tick).size();
+        const auto valueSize = zoomLevel.value(textMark.tick).size();
         const auto suffixSize = zoomLevel.suffix(textMark.tick).isEmpty() ? 0 : 1;
 
-        lowerTextCount += baseValueSize;
-        lowerTextCount += subValueSize;
+        lowerTextCount += valueSize;
         lowerTextCount += suffixSize;
 
         if (textMark.zoomIndex > textMarkLevel)
         {
-            textCount += baseValueSize;
-            textCount += subValueSize;
+            textCount += valueSize;
             textCount += suffixSize;
         }
     }
@@ -1507,11 +1403,26 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     return chunksNode;
 }
 
-void QnTimelinePrivate::updateMaxZoomLevelTextLengths()
+void QnTimelinePrivate::updateTextHelper()
 {
-    const QFontMetricsF fm(parent->font());
-    const QLocale locale;
+    auto window = parent->window();
+    if (!window)
+        return;
 
+    QStringList suffixList{"ms", "s", ":", "AM", "PM"};
+
+    static constexpr int kMonthsCount = 12;
+    for (int i = 1; i <= kMonthsCount; ++i)
+    {
+        suffixList.append(locale.standaloneMonthName(i, QLocale::ShortFormat));
+        suffixList.append(locale.monthName(i, QLocale::ShortFormat));
+    }
+
+    textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
+    textTexture = window->createTextureFromImage(textHelper->texture());
+
+    // Updates text lengths.
+    const QFontMetricsF fm(parent->font());
     maxZoomLevelTextLength.resize(zoomLevels.size());
     for (int i = 0; i < zoomLevels.size(); ++i)
     {
@@ -1594,7 +1505,7 @@ void QnTimelinePrivate::tryFitInBounds()
         return;
 
     const qint64 maximalEndBound = position + minimalHalfWindowSize;
-    parent->setWindow(minimalStartBound, maximalEndBound);
+    setWindow(minimalStartBound, maximalEndBound);
 }
 
 void QnTimelinePrivate::animateProperties()
@@ -1614,13 +1525,6 @@ void QnTimelinePrivate::animateProperties()
         originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
 
     bool updateRequired = false;
-
-    if (!stickToEnd && autoPlay)
-    {
-        qint64 shift = static_cast<qint64>(dt * autoPlaySpeed * playSpeedCorrection);
-        windowStart += shift;
-        windowEnd += shift;
-    }
 
     const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
     const qint64 startBound = startBoundTimeValue();
@@ -1964,72 +1868,72 @@ QVector<TextMarkInfo> QnTimelinePrivate::calculateVisibleTextMarks() const
     return result;
 }
 
-void QnTimelinePrivate::placeDigit(
-    qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points)
+QSize QnTimelinePrivate::placeSymbol(
+    qreal x,
+    qreal y,
+    QChar symbol,
+    QSGGeometry::TexturedPoint2D* points)
 {
-    QSize digitSize = textHelper->digitSize();
+    const auto size = textHelper->stringSize(symbol);
+    const qreal height = size.height();
+    const qreal width = size.width();
 
-    QRectF texCoord = textHelper->digitCoordinates(digit);
-    points[0].set(x, y, texCoord.left(), texCoord.top());
-    points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
-    points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
+    const auto coord = textHelper->symbolCoordinates(symbol);
+    const qreal top = coord.top();
+    const qreal bottom = coord.bottom();
+    const qreal left = coord.left();
+    const qreal right = coord.right();
+
+    points[0].set(x, y, left, top);
+    points[1].set(x + width, y, right, top);
+    points[2].set(x + width, y + height, right, bottom);
     points[3] = points[0];
     points[4] = points[2];
-    points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
+    points[5].set(x, y + height, left, bottom);
+    return size;
 }
 
 int QnTimelinePrivate::placeText(
     const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points)
 {
-    QString baseValue = zoomLevels[textLevel].baseValue(textMark.tick);
-    QString subValue = zoomLevels[textLevel].subValue(textMark.tick);
-    QString suffix = zoomLevels[textLevel].suffix(textMark.tick);
-    QSize suffixSize = textHelper->stringSize(suffix);
+    const auto value = zoomLevels[textLevel].value(textMark.tick);
+    const auto suffix = zoomLevels[textLevel].suffix(textMark.tick);
+    const auto suffixSize = textHelper->stringSize(suffix);
+    const auto suffixWidth = suffixSize.width();
 
-    QSize digitSize = textHelper->digitSize();
+    qreal textWidth = textHelper->stringSize(value).width();
+    if (suffixWidth)
+        textWidth += suffixWidth;
 
-    qreal tw = digitSize.width() * (baseValue.size() + subValue.size()) + suffixSize.width();
-    if (baseValue.isEmpty())
-        tw += textHelper->spaceWidth() * 2;
-
-    qreal x = qFloor(textMark.x - tw / 2);
+    qreal x = qFloor(textMark.x - textWidth / 2);
     qreal y = textY >= 0
         ? textY
         : qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
     int shift = 0;
 
-    for (int i = 0; i < baseValue.size(); ++i)
+    for (QChar symbol: value)
     {
-        placeDigit(x, y, baseValue.mid(i, 1).toInt(), points);
+        const auto symbolWidth = placeSymbol(x, y, symbol, points).width();
         points += 6;
         shift += 6;
-        x += digitSize.width();
+        x += symbolWidth;
     }
-
-    if (subValue.isEmpty())
-        x += textHelper->spaceWidth();
 
     if (!suffix.isEmpty())
     {
-        QRectF texCoord = textHelper->stringCoordinates(suffix);
-        points[0].set(x, y, texCoord.left(), texCoord.top());
-        points[1].set(x + suffixSize.width(), y, texCoord.right(), texCoord.top());
-        points[2].set(x + suffixSize.width(), y + suffixSize.height(),
-            texCoord.right(), texCoord.bottom());
+        x += textHelper->spaceWidth();
+
+        const auto coord = textHelper->stringCoordinates(suffix);
+        points[0].set(x, y, coord.left(), coord.top());
+        points[1].set(x + suffixWidth, y, coord.right(), coord.top());
+        points[2].set(x + suffixWidth, y + suffixSize.height(),
+            coord.right(), coord.bottom());
         points[3] = points[0];
         points[4] = points[2];
-        points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
+        points[5].set(x, y + suffixSize.height(), coord.left(), coord.bottom());
         points += 6;
         shift += 6;
-        x += suffixSize.width();
-    }
-
-    for (int i = 0; i < subValue.size(); ++i)
-    {
-        placeDigit(x, y, subValue.mid(i, 1).toInt(), points);
-        points += 6;
-        shift += 6;
-        x += digitSize.width();
+        x += suffixWidth;
     }
 
     return shift;
@@ -2038,4 +1942,29 @@ int QnTimelinePrivate::placeText(
 bool QnTimelinePrivate::hasArchive() const
 {
     return startBoundTime > 0;
+}
+
+void QnTimelinePrivate::setWindow(qint64 start, qint64 end)
+{
+    if (start == windowStart && end == windowEnd)
+        return;
+
+    zoomKineticHelper.stop();
+    stickyPointKineticHelper.stop();
+    targetPosition = -1;
+
+    const auto oldPosition = parent->position();
+
+    windowStart = start;
+    windowEnd = end;
+    updateZoomLevel();
+
+    emit parent->windowStartChanged();
+    emit parent->windowEndChanged();
+    emit parent->windowSizeChanged();
+
+    if (oldPosition != parent->position())
+        emit parent->positionChanged();
+
+    parent->update();
 }

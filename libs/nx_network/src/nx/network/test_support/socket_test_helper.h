@@ -11,6 +11,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/result_counter.h>
+#include <nx/utils/random_qt_device.h>
 
 namespace nx {
 namespace network {
@@ -280,7 +281,7 @@ private:
     utils::ResultCounter<SystemError::ErrorCode> m_results;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
-    std::random_device m_randomDevice;
+    nx::utils::random::QtDevice m_randomDevice;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<int> m_errorEmulationDistribution;
     int m_errorEmulationPercent;

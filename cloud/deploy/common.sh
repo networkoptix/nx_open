@@ -1,4 +1,4 @@
-MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator traffic_relay nxcloud_host_agent)
+MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator traffic_relay)
 
 case $(uname -s) in
     Linux)
@@ -124,7 +124,7 @@ function push()
     docker tag $MODULE:$VERSION $REPOSITORY/$MODULE:latest
     docker push $REPOSITORY/$MODULE:latest
 
-    pushns
+    #pushns
 }
 
 function publish()
@@ -132,7 +132,7 @@ function publish()
     stage
     pack
     push
-    pushns
+    #pushns
 }
 
 function clean()
@@ -165,7 +165,7 @@ function main()
 
         if [ "$func" = "build" ]
         then
-            args="$1"; shift; n=$((n+1))
+            args="$1"; shift || true; n=$((n+1))
         fi
         if [ "$func" = "stage_cmake" ]
         then

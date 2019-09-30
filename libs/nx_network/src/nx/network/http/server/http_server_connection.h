@@ -101,11 +101,16 @@ public:
     /** Introduced for test purpose. */
     void setPersistentConnectionEnabled(bool value);
 
+    void setOnResponseSent(nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler);
+
 protected:
     virtual void processMessage(nx::network::http::Message request) override;
     virtual void stopWhileInAioThread() override;
 
 private:
+    using clock_type = std::chrono::steady_clock;
+    using time_point = clock_type::time_point;
+
     struct RequestDescriptor
     {
         http::RequestLine requestLine;
@@ -117,6 +122,7 @@ private:
     {
         nx::network::http::Request request;
         RequestDescriptor descriptor;
+        time_point requestReceivedTime;
     };
 
     struct ResponseMessageContext
@@ -124,15 +130,18 @@ private:
         nx::network::http::Message msg;
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
         ConnectionEvents connectionEvents;
+        time_point requestReceivedTime;
 
         ResponseMessageContext(
             nx::network::http::Message msg,
             std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody,
-            ConnectionEvents connectionEvents)
+            ConnectionEvents connectionEvents,
+            time_point requestReceivedTime)
             :
             msg(std::move(msg)),
             msgBody(std::move(msgBody)),
-            connectionEvents(std::move(connectionEvents))
+            connectionEvents(std::move(connectionEvents)),
+            requestReceivedTime(requestReceivedTime)
         {
         }
     };
@@ -147,6 +156,7 @@ private:
     std::atomic<std::int64_t> m_lastRequestSequence{0};
     std::map<std::int64_t /*sequence*/, std::unique_ptr<ResponseMessageContext>>
         m_requestsBeingProcessed;
+    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> m_responseSentHandler;
 
     void extractClientEndpoint(const HttpHeaders& headers);
     void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);
@@ -192,7 +202,7 @@ private:
         nx::network::http::AbstractMsgBodySource* responseMsgBody);
 
     void sendNextResponse();
-    void responseSent();
+    void responseSent(const time_point& requestReceivedTime);
     void someMsgBodyRead(SystemError::ErrorCode, BufferType buf);
     void readMoreMessageBodyData();
     void fullMessageHasBeenSent();

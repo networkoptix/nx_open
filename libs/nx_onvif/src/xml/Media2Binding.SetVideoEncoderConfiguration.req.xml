@@ -52,7 +52,7 @@
    <!-- _onvifMedia2__SetVideoEncoderConfiguration *onvifMedia2__SetVideoEncoderConfiguration -->
    <onvifMedia2:SetVideoEncoderConfiguration>
     <!-- tt__VideoEncoder2Configuration *Configuration -->
-    <onvifMedia2:Configuration GovLength="0" Profile="" token="">
+    <onvifMedia2:Configuration GovLength="0" Profile="" GuaranteedFrameRate="false" token="">
      <!-- std::string Name -->
      <tt:Name></tt:Name>
      <!-- int UseCount -->

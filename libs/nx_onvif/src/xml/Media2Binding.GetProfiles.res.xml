@@ -126,7 +126,7 @@
 
      </onvifMedia2:AudioSource>
      <!-- tt__VideoEncoder2Configuration *VideoEncoder -->
-     <onvifMedia2:VideoEncoder GovLength="0" Profile="" token="">
+     <onvifMedia2:VideoEncoder GovLength="0" Profile="" GuaranteedFrameRate="false" token="">
       <!-- std::string Name -->
       <tt:Name></tt:Name>
       <!-- int UseCount -->

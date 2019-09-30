@@ -9,9 +9,11 @@
 namespace nx::cloud::db {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
+    const conf::Settings& settings,
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
     nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
+    m_settings(settings),
     m_ec2ConnectionManager(ec2ConnectionManager),
     m_dbManager(dbManager),
     m_systemStatusChangedSubscriptionId(nx::utils::kInvalidSubscriptionId)
@@ -34,7 +36,7 @@ SystemHealthInfoProvider::~SystemHealthInfoProvider()
 bool SystemHealthInfoProvider::isSystemOnline(
     const std::string& systemId) const
 {
-    return m_ec2ConnectionManager->isSystemConnected(systemId);
+    return m_ec2ConnectionManager->isClusterConnected(systemId);
 }
 
 void SystemHealthInfoProvider::getSystemHealthHistory(
@@ -67,6 +69,9 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
 {
     using namespace std::placeholders;
 
+    if (!m_settings.systemManager().saveSystemHealthHistory)
+        return;
+
     NX_VERBOSE(this, lm("System %1 changed health state to %2")
         .args(systemId, statusDescription.isOnline ? "online" : "offline"));
 
@@ -90,7 +95,7 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
 using namespace std::placeholders;
 
 SystemHealthInfoProviderFactory::SystemHealthInfoProviderFactory():
-    base_type(std::bind(&SystemHealthInfoProviderFactory::defaultFactory, this, _1, _2))
+    base_type(std::bind(&SystemHealthInfoProviderFactory::defaultFactory, this, _1, _2, _3))
 {
 }
 
@@ -101,10 +106,12 @@ SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
 }
 
 std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
+    const conf::Settings& settings,
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
     nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
 {
     return std::make_unique<SystemHealthInfoProvider>(
+        settings,
         ec2ConnectionManager,
         dbManager);
 }

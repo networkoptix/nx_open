@@ -1,32 +1,16 @@
 #include "analytics_plugin_resource.h"
 
-#include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
-
 #include <media_server/media_server_module.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/vms/server/analytics/sdk_object_factory.h>
+#include <nx/vms/server/analytics/wrappers/plugin.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::server::resource {
-
-namespace {
-
-nx::vms::api::analytics::PluginDescriptor descriptorFromManifest(
-    const nx::vms::api::analytics::PluginManifest& manifest)
-{
-    nx::vms::api::analytics::PluginDescriptor descriptor;
-    descriptor.id = manifest.id;
-    descriptor.name = manifest.name;
-
-    return descriptor;
-}
-
-} // namespace
 
 AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModule):
     base_type(),
@@ -34,43 +18,26 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 {
 }
 
-void AnalyticsPluginResource::setSdkPlugin(nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin)
+void AnalyticsPluginResource::setSdkPlugin(analytics::wrappers::PluginPtr plugin)
 {
     m_sdkPlugin = std::move(plugin);
 }
 
-nx::sdk::Ptr<nx::sdk::analytics::IPlugin> AnalyticsPluginResource::sdkPlugin() const
+analytics::wrappers::PluginPtr AnalyticsPluginResource::sdkPlugin() const
 {
     return m_sdkPlugin;
 }
 
-std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsPluginResource::makeLogger() const
-{
-    const QString messageTemplate(
-        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
-
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        toSharedPointer(this));
-}
-
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
-    NX_DEBUG(this, "Initializing analytics plugin resource %1 (%2)", getName(), getId());
+    NX_DEBUG(this, "Initializing Analytics Plugin resource %1 (%2)", getName(), getId());
 
     if (!m_sdkPlugin)
-        return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
+        return CameraDiagnostics::InternalServerErrorResult("SDK Plugin object is not set");
 
-    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
-        m_sdkPlugin,
-        /*device*/ QnVirtualCameraResourcePtr(),
-        /*engine*/ AnalyticsEngineResourcePtr(),
-        /*plugin*/ toSharedPointer(this),
-        makeLogger());
-
+    const auto manifest = m_sdkPlugin->manifest();
     if (!manifest)
-        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
+        return CameraDiagnostics::PluginErrorResult("Can't deserialize Plugin Manifest");
 
     nx::analytics::DescriptorManager descriptorManager(commonModule());
     descriptorManager.updateFromPluginManifest(*manifest);
@@ -79,6 +46,14 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QString AnalyticsPluginResource::libName() const
+{
+    if (!NX_ASSERT(m_sdkPlugin))
+        return QString();
+
+    return m_sdkPlugin->libName();
 }
 
 } // namespace nx::vms::server::resource

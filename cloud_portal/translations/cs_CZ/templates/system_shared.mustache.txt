@@ -8,4 +8,4 @@ Dobrý den, {{message.userFullName}}
 Byl Vám udělen přístup k video management systému "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Zobrazit portál %PRODUCT_NAME%: {{config.portal_url}}/systems/{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

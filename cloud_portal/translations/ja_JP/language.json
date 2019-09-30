@@ -1,28 +1,38 @@
 {
   "language": "ja_JP",
   "language_name": "日本語",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "キャンセル",
-    "loginTitle": "%PRODUCT_NAME% にログイン",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "ログイン",
     "logoutAuthorisedTitle": "すでにログインしています",
     "logoutAuthorisedContinueButton": "続行",
     "logoutAuthorisedLogoutButton": "ログアウト",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "メッセージの送信に失敗しました",
+    "messageSent": "メッセージが送信されました",
+    "noClientDetectedTitle": "システムを表示するには %VMS_NAME% をインストールします",
+    "download": "%VMS_NAME% をダウンロード"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "ようこそ",
     "register": "アカウントを作成",
     "changePassword": "パスワードを変更 -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "アクティベート済",
-    "merging": "merging",
+    "incompatible": "互換性なし",
+    "merging": "統合中",
     "notActivated": "アクティベートされていません",
     "online": "オンライン",
     "offline": "オフライン",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "パスワードを保存できません",
     "cantActivatePrefix": "アカウントをアクティベートできません",
     "cantSendConfirmationPrefix": "確認メールを送信できません",
-    "cloudInvalidResponse": "クラウド DB が予期しない応答を返しました",
     "notAuthorized": "間違ったパスワード",
     "brokenAccount": "次のアカウントで予期しない問題 <a href=\"/restore_password\"> アカウントの復元</a>",
     "wrongParameters": "フォーム上のいくつかのパラメーターが正しくありません",
     "wrongCode": "アカウントは既にアクティブ済か確認コードが正しくありません",
     "wrongCodeRestore": "確認コードは既に使用されているかまたは不正です",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "この操作を実行するアクセス権限がありません",
     "accountNotActivated": "このアカウントはまだアクティベートされていません <a href=\"/activate\"> 再度アクティベートリンクを送信</a>",
     "accountBlocked": "このアカウントは一時的にブロックされています。数分後にもう一度お試しください。",
@@ -147,14 +158,21 @@
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
-    "DUPLICATE_MEDIASERVER_FOUND": "重複するサーバーが見つかりました。<br>統合する各システムから古いサーバーを削除してからやり直してください",
-    "mergedSystemIsOffline": "統合されているシステムの1つがオフラインです　それらがオンラインであることを確認してからやり直してください",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "選択したものと現在のもの両方のシステムに存在するサーバーリストがあります。<br>各システムからオフラインで互換性のないサーバーを削除してやり直してください。",
+    "mergedSystemIsOffline": "システム <strong>{{failedSystem}}</strong> はオフラインです。",
+    "INCOMPATIBLE": "システムには異なるソフトウェアバージョンがあります。両方とも <a href=\"/download\">最新のビルド</a>を更新してください。",
+    "FAIL": "システム <strong>{{failedSystem}}</strong> は現在到達不能です。<br>しばらくしてからもう一度試すか、<a href=\"%SUPPORT_LINK%\" target=\"_blank\">サポート</a>に連絡してください。",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "システムのマージに失敗しました",
+    "commonText": "システム <strong>{{primarySystem}}</strong> および <strong>{{secondarySystem}}</strong>をマージできませんでした。"
   },
   "passwordRequirements": {
     "good": "良い",
     "fair": "可",
-    "minLength": "短すぎ",
+    "fairMessage": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
+    "minLength": "短すぎます",
     "minLengthMessage": "パスワードは8文字以上必要です",
     "required": "無効",
     "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "システム名",
     "confirmRenameAction": "保存",
     "successRename": "システム名は保存されました",
-    "confirmDisconnectTitle": "%PRODUCT_NAME% からシステムを切断?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "切断",
     "confirmUnshareFromMe": "あなたのアカウントからこのシステムを切断しようとしています　もうこのシステムにアクセスすることはできません\n切断しますか？",
     "confirmUnshareFromMeTitle": "システムを切断しますか？",
@@ -193,11 +211,13 @@
     "confirmUnshare": "このユーザはシステムにアクセスすることができません　宜しいですか？",
     "confirmUnshareTitle": "ユーザーを削除しますか？",
     "confirmUnshareAction": "削除",
-    "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "システムが統合されました",
+    "mergeFailed": "システム統合が失敗しました",
+    "mergeStart": "システムが統合を開始しました",
+    "mergeSuccess": "システムが統合されました",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "システムの名前が不明です（クラウド統合が原因）"
   },
   "account": {
     "accountSavedSuccess": "あなたのアカウントは正常に保存されました",
@@ -206,72 +226,6 @@
     "changePassword": "パスワードを変更",
     "newPasswordLabel": "新規パスワード",
     "saveChanges": "保存"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "システムを表示するには %VMS_NAME% をインストールします",
-    "action": "%VMS_NAME% をダウンロード",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "クライアントのみ",
-      "server": "サーバーのみ",
-      "bundle": "クライアントとサーバー",
-      "servertool": "構成ツール"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "アクティベートリンク再送",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "システムはオフライン",
     "systemHasNoCameras": "カメラなし",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "オフライン",
       "error": "エラー",
@@ -334,5 +289,10 @@
       "stop listening": "聞くのをやめる",
       "help": "ヘルプ| 表示コマンド"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "相談を推奨",
+    "b_support": "サポート",
+    "c_proceeding": "続行する前に"
   }
 }

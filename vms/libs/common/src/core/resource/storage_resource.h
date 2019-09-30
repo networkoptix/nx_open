@@ -49,6 +49,7 @@ public:
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
 
+    void fillID();
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
     bool isExternal() const;
     virtual bool isSystem() const { return false; }
@@ -68,7 +69,7 @@ public:
     /*
      * Returns storage usage in range [0..1]
      */
-    virtual float getAvarageWritingUsage() const;
+    virtual float getAverageWritingUsage() const;
 
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 

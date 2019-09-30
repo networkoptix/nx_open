@@ -307,4 +307,36 @@ DROP TABLE object_search;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+static constexpr char kRenameObjectToTrack[] =
+R"sql(
+
+ALTER TABLE object RENAME TO track;
+
+DROP INDEX idx_object_object_type_id;
+DROP INDEX idx_object_attributes_id;
+DROP INDEX idx_object_device_id_track_start_ms;
+
+CREATE INDEX idx_track_object_type_id ON track(object_type_id);
+CREATE INDEX idx_track_attributes_id ON track(attributes_id);
+CREATE INDEX idx_track_device_id_track_start_ms ON track(
+    device_id, track_start_ms);
+
+ALTER TABLE object_group RENAME TO _object_group;
+CREATE TABLE track_group
+(
+    group_id    INTEGER,
+    track_id   INTEGER
+);
+
+CREATE INDEX idx_track_group_full ON track_group(group_id, track_id);
+
+INSERT INTO track_group (group_id, track_id)
+SELECT group_id, object_id FROM _object_group;
+
+DROP INDEX idx_object_group_full;
+DROP TABLE _object_group;
+
+)sql";
+
 } // namespace nx::analytics::db

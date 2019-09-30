@@ -10,86 +10,7 @@ namespace nx::vms::server::metrics {
 
 using namespace nx::network;
 
-// TODO: Move to nx::utils?
-static std::optional<QJsonValue> cleanupJson(QJsonValue value)
-{
-    switch (value.type())
-    {
-        case QJsonValue::Null:
-            return std::nullopt;
-
-        case QJsonValue::String:
-        {
-            if (value.toString().isEmpty())
-                return std::nullopt;
-            else
-                return value;
-        }
-
-        case QJsonValue::Array:
-        {
-            const auto originalArray = value.toArray();
-            if (originalArray.isEmpty())
-                return std::nullopt;
-
-            QJsonArray newArray;
-            for (auto it = originalArray.begin(); it != originalArray.end(); ++it)
-            {
-                if (auto value = cleanupJson(*it))
-                    newArray.push_back(*value);
-            }
-
-            return newArray;
-        }
-
-        case QJsonValue::Object:
-        {
-            const auto originalObject = value.toObject();
-            if (originalObject.isEmpty())
-                return std::nullopt;
-
-            QJsonObject newObject;
-            for (auto it = originalObject.begin(); it != originalObject.end(); ++it)
-            {
-                if (auto value = cleanupJson(it.value()))
-                    newObject[it.key()] = std::move(*value);
-            }
-
-            return newObject;
-        }
-
-        default:
-            return value;
-    };
-}
-
-template<typename T>
-QJsonValue cleanJson(const T& value)
-{
-    QJsonValue json;
-    QJson::serialize(value, &json);
-
-    const auto cleanJson = cleanupJson(json);
-    return cleanJson ? *cleanJson : QJsonValue();
-}
-
-using Controller = utils::metrics::Controller;
-struct Parameters
-{
-    Controller::RequestFlags flags;
-    std::optional<std::chrono::milliseconds> timeline;
-
-    Parameters(const rest::Request& request):
-        flags(request.param("noRules") 
-            ? Controller::RequestFlag::none 
-            : Controller::RequestFlag::applyRules)
-    {
-        if (const auto value = request.param("timeline"))
-            timeline = nx::utils::parseTimerDuration(*value);
-    }
-};
-
-LocalRestHandler::LocalRestHandler(utils::metrics::Controller* controller):
+LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller):
     m_controller(controller)
 {
 }
@@ -97,76 +18,98 @@ LocalRestHandler::LocalRestHandler(utils::metrics::Controller* controller):
 rest::Response LocalRestHandler::executeGet(const rest::Request& request)
 {
     if (request.path().endsWith("/rules"))
-        return rest::Response::reply(cleanJson(m_controller->rules()));
+         return rest::Response::reply(m_controller->rules());
 
-    Parameters params(request);
     if (request.path().endsWith("/manifest"))
-        return rest::Response::reply(cleanJson(m_controller->manifest(params.flags)));
+        return rest::Response::reply(m_controller->manifest());
 
     if (request.path().endsWith("/values"))
-        return rest::Response::reply(cleanJson(m_controller->values(params.flags, params.timeline)));
-     
-    return rest::Response::error(http::StatusCode::notFound, rest::Result::BadRequest);
+        return rest::Response::reply(m_controller->values());
+
+    if (request.path().endsWith("/alarms"))
+        return rest::Response::reply(m_controller->alarms());
+
+    return rest::Response::error(nx::network::http::StatusCode::notFound, rest::JsonResult::BadRequest);
 }
 
 SystemRestHandler::SystemRestHandler(
-    utils::metrics::Controller* controller, QnMediaServerModule* serverModule)
+    utils::metrics::SystemController* controller, QnMediaServerModule* serverModule)
 :
     LocalRestHandler(controller),
     ServerModuleAware(serverModule)
 {
 }
 
+template<typename Values>
+Values queryAndMerge(
+    Values values, const QString& api,
+    const QnSharedResourcePointerList<QnMediaServerResource>& servers);
+
 rest::Response SystemRestHandler::executeGet(const rest::Request& request)
 {
-    if (!request.path().endsWith("/values"))
-        return LocalRestHandler::executeGet(request);
-
-    Parameters params(request);
-    auto systemValues = m_controller->values(
-        params.flags | Controller::includeRemote, params.timeline);
-        
-    for (const auto& server: serverModule()->commonModule()
-        ->resourcePool()->getResources<QnMediaServerResource>())
+    QnSharedResourcePointerList<QnMediaServerResource> otherServers;
+    for (auto& s: serverModule()->commonModule()->resourcePool()->getResources<QnMediaServerResource>())
     {
-        if (server->getId() == moduleGUID())
-            continue;
+        if (s->getId() != moduleGUID())
+            otherServers.push_back(std::move(s));
+    }
 
-        http::HttpClient client;
+    if (request.path().endsWith("/values"))
+        return rest::Response::reply(queryAndMerge(m_controller->values(), "values", otherServers));
+
+    if (request.path().endsWith("/alarms"))
+        return rest::Response::reply(queryAndMerge(m_controller->alarms(), "alarms", otherServers));
+
+    return LocalRestHandler::executeGet(request);
+}
+
+static void logResponse(const nx::utils::Url& url, const api::metrics::SystemValues& serverValues)
+{
+    for (const auto& [name, values]: serverValues)
+        NX_DEBUG(typeid(SystemRestHandler), "Query [ %1 ] returned %2 %3", url, values.size(), name);
+}
+
+static void logResponse(const nx::utils::Url& url, const api::metrics::Alarms& alarms)
+{
+    NX_DEBUG(typeid(SystemRestHandler), "Query [ %1 ] returned %2 alarms", url, alarms.size());
+}
+
+template<typename Values>
+Values queryAndMerge(
+    Values values, const QString& api,
+    const QnSharedResourcePointerList<QnMediaServerResource>& servers)
+{
+    static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
+    for (const auto& server: servers)
+    {
+        nx::network::http::HttpClient client;
         client.setUserName(server->getId().toString());
         client.setUserPassword(server->getAuthKey());
 
         nx::utils::Url url(server->getUrl());
-        url.setPath("/api/metrics/values");
-        url.setQuery(request.params().toUrlQuery());
+        url.setPath("/api/metrics/" + api);
         if (!client.doGet(url) || !client.response())
         {
-            NX_DEBUG(this, "Query [ %1 ] has failed", url);
+            NX_DEBUG(kTag, "Query [ %1 ] has failed", url);
             continue;
         }
 
-        http::BufferType msgBody;
-        while (!client.eof())
-            msgBody.append(client.fetchMessageBodyBuffer());
-
+        const auto message = client.fetchMessageBodyBuffer();
         const auto httpCode = client.response()->statusLine.statusCode;
-        const auto result = QJson::deserialized<rest::JsonResult>(msgBody);
-        if (!http::StatusCode::isSuccessCode(httpCode)
-            || result.error != rest::Result::Error::NoError)
+        const auto result = QJson::deserialized<rest::JsonResult>(message);
+        if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
+            || result.error != rest::JsonResult::NoError)
         {
-            NX_DEBUG(this, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
+            NX_DEBUG(kTag, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
             continue;
         }
 
-        auto serverValues = result.deserialized<api::metrics::SystemValues>();
-        for (const auto& [name, values]: serverValues)
-            NX_VERBOSE(this, "Query [ %1 ] returned %2 %3", url, values.size(), name);
-
-        api::metrics::merge(&systemValues, &serverValues);
+        auto serverValues = result.deserialized<Values>();
+        logResponse(url, serverValues);
+        api::metrics::merge(&values, &serverValues);
     }
 
-    // TODO: Add some system specific information.
-    return rest::Response::reply(cleanJson(systemValues));
+    return values;
 }
 
 } // namespace nx::vms::server::metrics

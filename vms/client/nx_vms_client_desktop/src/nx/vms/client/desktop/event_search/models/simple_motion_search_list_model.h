@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <deque>
 
 #include <QtCore/QList>
@@ -40,6 +41,7 @@ public:
 protected:
     virtual void requestFetch() override;
     virtual bool isFilterDegenerate() const;
+    virtual QString timestampText(std::chrono::microseconds timestamp) const;
 
     virtual void clearData() override;
     virtual void truncateToRelevantTimePeriod() override;

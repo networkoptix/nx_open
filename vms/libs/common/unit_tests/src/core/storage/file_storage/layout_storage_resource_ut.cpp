@@ -24,7 +24,7 @@ TEST(QnLayoutFileStorageResource, Basic)
 
     QSharedPointer<QnCommonModule> module(new QnCommonModule(false, nx::core::access::Mode::direct));
 
-    nx::utils::test::TestWithTemporaryDirectory TestDir("layout_storage_resource", QString());
+    nx::utils::test::TestWithTemporaryDirectory TestDir;
 
     auto const fileName = QDir(TestDir.testDataDir()).filePath(kfileNameBase);
     QFile(fileName).remove();

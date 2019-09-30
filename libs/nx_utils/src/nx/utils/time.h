@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctime>
+
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QDateTime>
@@ -150,3 +152,10 @@ private:
 } // namespace test
 } // namespace utils
 } // namespace nx
+
+#ifdef _WIN32
+inline errno_t gmtime_r(const time_t* time, struct tm* result)
+{
+    return gmtime_s(result, time);
+}
+#endif

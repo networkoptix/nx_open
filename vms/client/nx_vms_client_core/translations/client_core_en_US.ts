@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Network error. Please check your Internet connection and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

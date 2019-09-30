@@ -50,7 +50,6 @@ public:
 
 private:
     nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
-    bool m_serverListening = false;
     std::unique_ptr<TrafficRelayCluster> m_relayCluster;
     ListeningPeerPool m_listeningPeerPool;
     std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;

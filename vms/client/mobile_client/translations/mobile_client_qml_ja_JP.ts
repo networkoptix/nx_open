@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>スケジュールで無効</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -20,7 +27,7 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation>パスワードが必要</translation>
+      <translation>パスワードが必要です</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>オフライン</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>IOモジュール</translation>
     </message>
   </context>
   <context>
@@ -87,7 +98,7 @@
     </message>
     <message>
       <source>Activation email sent</source>
-      <translation>アクティベーションメール送信</translation>
+      <translation>アクティベーションメールが送信されました。</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
@@ -95,11 +106,11 @@
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation>受信トレイを確認し、提供されたリンクを参照してアカウントを有効にする</translation>
+      <translation>受信トレイを確認し、提供されたリンクにアクセスしてアカウントを有効にしてください</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation>インターネット接続を確認してから、もう一度お試しください</translation>
+      <translation>インターネット接続を確認するか、後でもう一度やり直してください</translation>
     </message>
     <message>
       <source>Account not found</source>
@@ -107,7 +118,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation>間違ったパスワード</translation>
+      <translation>パスワードが間違っています</translation>
     </message>
     <message>
       <source>Account not activated</source>
@@ -115,16 +126,16 @@
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation>メールを空にすることはできません</translation>
+      <translation>メールアドレスを入力してください</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>パスワードは空白にできません</translation>
+      <translation>パスワードを入力してください</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 について</translation>
+      <translation>%1 の詳細</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -317,18 +328,11 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation>フルスクリーンモードでは、表示の回転はサポートされていません</translation>
+      <translation>フルスクリーンモードでは、ソフトウェア画像の回転はサポートされていません</translation>
     </message>
     <message>
       <source>%1 is offline</source>
       <translation>%1 がオフライン</translation>
-    </message>
-  </context>
-  <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>ライブ</translation>
     </message>
   </context>
   <context>
@@ -346,7 +350,7 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>LDAPサーバー接続タイムアウト</translation>
+      <translation>LDAPサーバーへ接続がタイムアウトしました</translation>
     </message>
     <message>
       <source>Server or network is not available</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>互換性のないサーバーバージョン %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Webブラウザまたはデスクトップクライアントからサーバに接続して設定する</translation>
     </message>
   </context>
   <context>
@@ -427,19 +439,19 @@
     </message>
     <message>
       <source>Transcoding is disabled.</source>
-      <translation>トランスコードは無効です</translation>
+      <translation>トランスコーディングは無効です</translation>
     </message>
     <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation>このカメラではトランスコードはサポートされていません</translation>
+      <translation>このカメラではトランスコーディングはサポートされていません。</translation>
     </message>
     <message>
       <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>バージョン3.0未満のサーバーではトランスコードはサポートされていません</translation>
+      <translation>バージョン3.0未満のサーバーではトランスコーディングはサポートされていません。</translation>
     </message>
     <message>
       <source>Transcoding is not supported for ARM servers.</source>
-      <translation>ARMサーバーではトランスコードはサポートされていません</translation>
+      <translation>ARMサーバーではトランスコーディングはサポートされていません。</translation>
     </message>
   </context>
   <context>
@@ -475,11 +487,11 @@
     <message>
       <source>Press %1 to exit</source>
       <comment>%1 is a key name (like Esc)</comment>
-      <translation>%1 を押して終了</translation>
+      <translation>%1 を押すと終了します</translation>
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>検索</translation>
@@ -493,7 +505,7 @@
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>Ctrl キーを押しながら矢印またはマウス ホイール</translation>
+      <translation>Ctrl +矢印を押すかマウスホイールを使う</translation>
     </message>
   </context>
   <context>
@@ -579,12 +591,16 @@
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <comment>%1 is a button name</comment>
-      <translation>ネットワーク接続を確認するか、&quot;%1&quot; ボタンを押して、既知のサーバーアドレスを入力してください</translation>
+      <translation>ネットワーク接続を確認するか、&quot;%1&quot; ボタンを押して、既知のサーバーアドレスを入力してください。</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
       <comment>%1 is a system name</comment>
       <translation>システム&quot;%1&quot; に接続できません</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>何も見つかりませんでした</translation>
     </message>
   </context>
   <context>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>削除</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>維持</translation>
     </message>
   </context>
   <context>
@@ -688,7 +708,7 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation>フルスクリーンモードでは、表示の回転はサポートされていません</translation>
+      <translation>フルスクリーンモードでは、ソフトウェア画像の回転はサポートされていません</translation>
     </message>
     <message>
       <source>Show as is</source>
@@ -714,7 +734,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>未認証</translation>
+      <translation>権限がありません</translation>
     </message>
     <message>
       <source>Cannot load video</source>
@@ -742,11 +762,11 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation>パスワードが必要</translation>
+      <translation>パスワードが必要です</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation>Wisenet WAVEクライアントまたはカメラのWebページを使用してこのカメラのパスワードを設定してビデオを表示する</translation>
+      <translation>Wisenet WAVEクライアントまたはカメラのWebページを使用してこのカメラのパスワードを設定し、ビデオを表示する</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
@@ -768,6 +788,10 @@
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>このアプリケーションでは、I / Oモジュールはサウンド入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、デスクトップバージョン %1を使用してください</translation>
+    </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
     </message>
   </context>
   <context>
@@ -819,6 +843,10 @@
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>カスタムエリアが無効です。正しく指定してください。</translation>
     </message>
+    <message>
+      <source>Audio</source>
+      <translation>オーディオ</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
@@ -831,7 +859,7 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation>サーバーオフライン　再接続中...</translation>
+      <translation>サーバーがオフラインです。再接続しています...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>

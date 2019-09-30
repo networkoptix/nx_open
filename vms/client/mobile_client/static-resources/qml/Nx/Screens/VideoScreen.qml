@@ -18,7 +18,7 @@ PageBase
     id: videoScreen
     objectName: "videoScreen"
 
-    property alias resourceId: videoScreenController.resourceId
+    property var initialResourceId
     property alias initialScreenshot: screenshot.source
     property QnCameraListModel camerasModel: null
     property real targetTimestamp: -1
@@ -27,7 +27,9 @@ PageBase
 
     VideoScreenController
     {
-        id: videoScreenController
+        id: controller
+
+        navigator: navigator
 
         mediaPlayer.videoQuality: settings.lastUsedQuality
 
@@ -56,28 +58,27 @@ PageBase
     {
         id: d
 
-        property alias controller: videoScreenController
-
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool showNoLicensesWarning:
-            videoScreenController.noLicenses
-            && !videoScreenController.mediaPlayer.liveMode
+            controller.noLicenses
+            && !controller.mediaPlayer.liveMode
         property bool showDefaultPasswordWarning:
-            videoScreenController.hasDefaultCameraPassword
-            && videoScreenController.mediaPlayer.liveMode
+            controller.hasDefaultCameraPassword
+            && controller.mediaPlayer.liveMode
 
         property bool cameraWarningVisible:
             ((showOfflineStatus
-                || videoScreenController.cameraOffline
-                || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed
-                || videoScreenController.noVideoStreams)
-                && !videoScreenController.mediaPlayer.playing)
-            || videoScreenController.hasOldFirmware
-            || videoScreenController.tooManyConnections
-            || videoScreenController.ioModuleWarning
-            || videoScreenController.ioModuleAudioPlaying
+                || controller.cameraOffline
+                || controller.cameraUnauthorized
+                || controller.failed
+                || controller.noVideoStreams)
+                && !controller.mediaPlayer.playing)
+            || controller.hasOldFirmware
+            || controller.tooManyConnections
+            || controller.ioModuleWarning
+            || controller.ioModuleAudioPlaying
+            || controller.liveWearableCamera
             || showDefaultPasswordWarning
             || showNoLicensesWarning
 
@@ -102,7 +103,7 @@ PageBase
 
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
         readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
-        onPtzModeChanged: videoNavigation.motionSearchMode = false
+        onPtzModeChanged: navigator.motionSearchMode = false
 
         Timer
         {
@@ -115,13 +116,13 @@ PageBase
         {
             if (cameraWarningVisible)
             {
-                if (videoScreenController.serverOffline)
+                if (controller.serverOffline)
                 {
                     exitFullscreen()
                     controlsVisible = false
                     uiVisible = true
                 }
-                else if (videoScreenController.cameraOffline)
+                else if (controller.cameraOffline)
                 {
                     showUi()
                 }
@@ -149,7 +150,7 @@ PageBase
         opacity: d.uiOpacity
         visible: opacity > 0
 
-        title: videoScreenController.resourceHelper.resourceName
+        title: controller.resourceHelper.resourceName
         leftButtonIcon.source: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
@@ -220,7 +221,7 @@ PageBase
                     [ MediaPlayer.LowVideoQuality, MediaPlayer.HighVideoQuality ]
                         .concat(customQualities)
 
-                var player = videoScreenController.mediaPlayer
+                var player = controller.mediaPlayer
 
                 var dialog = Workflow.openDialog(
                     "Screens/private/VideoScreen/QualityDialog.qml",
@@ -250,6 +251,18 @@ PageBase
             checked: showCameraInfo
             onCheckedChanged: showCameraInfo = checked
         }
+        MenuItem
+        {
+            id: enableAudioMenuItem
+
+            text: qsTr("Audio")
+            checkable: true
+            checked: video.mediaPlayer.audioEnabled
+            visible: controller.resourceHelper.audioSupported
+            height: visible ? implicitHeight : 0
+
+            onTriggered: audioController.setAudioEnabled(checked)
+        }
     }
 
     MouseArea
@@ -276,11 +289,11 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        resourceHelper: videoScreenController.resourceHelper
-        mediaPlayer: videoScreenController.mediaPlayer
+        resourceHelper: controller.resourceHelper
+        mediaPlayer: controller.mediaPlayer
         videoCenterHeightOffsetFactor: 1 / 3
-        motionController.motionSearchMode: videoNavigation.motionSearchMode
-        motionController.enabled: videoNavigation.hasArchive && !d.ptzMode
+        motionController.motionSearchMode: navigator.motionSearchMode
+        motionController.enabled: navigator.hasArchive && !d.ptzMode
 
         onClicked: toggleUi()
 
@@ -301,7 +314,7 @@ PageBase
                 if (!target.drawingRoi)
                     return
 
-                videoNavigation.motionSearchMode = true
+                navigator.motionSearchMode = true
                 showUi()
             }
 
@@ -372,7 +385,7 @@ PageBase
             if (d.ptzMode || ptzPanel.moveOnTapMode)
                 return getNavigationBarHeight()
 
-            return videoNavigation.buttonsPanelHeight + getNavigationBarHeight()
+            return navigator.buttonsPanelHeight + getNavigationBarHeight()
         }
 
         x: -mainWindow.leftPadding
@@ -390,7 +403,7 @@ PageBase
             if (visiblePtzControls || ptzPanel.moveOnTapMode)
                 return 1
 
-            return d.ptzMode ? d.uiOpacity : videoNavigation.opacity
+            return d.ptzMode ? d.uiOpacity : navigator.opacity
         }
     }
 
@@ -400,7 +413,7 @@ PageBase
 
         width: mainWindow.availableWidth
         height: mainWindow.availableHeight - header.height - toolBar.statusBarHeight
-        y: toolBar.statusBarHeight
+        y: toolBar.statusBarHeight + (header.visible ? 0 : header.height)
 
         Loader
         {
@@ -411,7 +424,7 @@ PageBase
             active: showCameraInfo
             sourceComponent: InformationLabel
             {
-                videoScreenController: d.controller
+                videoScreenController: controller
             }
         }
 
@@ -439,7 +452,7 @@ PageBase
                     rightPadding: 8 + mainWindow.rightPadding
                     leftPadding: 8 + mainWindow.leftPadding
                     compact: videoScreen.height < 540
-                    state: videoScreenController.dummyState
+                    state: controller.dummyState
 
                     MouseArea
                     {
@@ -462,8 +475,8 @@ PageBase
             width: parent.width
             anchors.bottom: parent.bottom
 
-            controller.resourceId: videoScreenController.resourceHelper.resourceId
-            customRotation: videoScreenController.resourceHelper.customRotation
+            controller.resourceId: controller.resourceId
+            customRotation: controller.resourceHelper.customRotation
 
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
             visible: opacity > 0 && d.ptzMode
@@ -505,7 +518,7 @@ PageBase
 
             onClicked:
             {
-                if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video)
+                if (controller.resourceHelper.fisheyeParams.enabled || !video)
                     return
 
                 var mapped = contentItem.mapToItem(video, pos.x, pos.y)
@@ -530,7 +543,7 @@ PageBase
 
         VideoNavigation
         {
-            id: videoNavigation
+            id: navigator
 
             drawingRoi: video.motionController.motionSearchMode && video.motionController.drawingRoi
             changingMotionRoi:
@@ -543,9 +556,9 @@ PageBase
             onWarningTextChanged: banner.showText(warningText)
 
             hasCustomRoi: video.motionController.customRoiExists
-            canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
+            canViewArchive: controller.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
-            videoScreenController: d.controller
+            controller: controller
             controlsOpacity: d.cameraUiOpacity
             onPtzButtonClicked:
             {
@@ -564,7 +577,7 @@ PageBase
                     return
 
                 switchToCamera(
-                    camerasModel.previousResourceId(videoScreen.resourceId)
+                    camerasModel.previousResourceId(controller.resourceId)
                         || camerasModel.previousResourceId(""))
             }
 
@@ -574,7 +587,7 @@ PageBase
                     return
 
                 switchToCamera(
-                    camerasModel.nextResourceId(videoScreen.resourceId)
+                    camerasModel.nextResourceId(controller.resourceId)
                         || camerasModel.nextResourceId(""))
             }
 
@@ -603,14 +616,14 @@ PageBase
         height: video.height
         x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
-        opacity: Math.min(videoNavigation.opacity, d.cameraUiOpacity)
+        opacity: Math.min(navigator.opacity, d.cameraUiOpacity)
     }
 
     SequentialAnimation
     {
         id: cameraSwitchAnimation
 
-        property string newResourceId
+        property var newResourceId
         property string thumbnail
 
         NumberAnimation
@@ -626,7 +639,7 @@ PageBase
             script:
             {
                 d.animatePlaybackControls = false
-                videoScreen.resourceId = cameraSwitchAnimation.newResourceId
+                controller.setResourceId(cameraSwitchAnimation.newResourceId)
                 initialScreenshot = cameraSwitchAnimation.thumbnail
                 video.clear()
                 d.animatePlaybackControls = true
@@ -652,7 +665,7 @@ PageBase
     {
         if (activePage)
         {
-            videoScreenController.start(targetTimestamp)
+            controller.start(initialResourceId, targetTimestamp)
             targetTimestamp = -1
         }
     }
@@ -682,10 +695,10 @@ PageBase
 
     function switchToCamera(id)
     {
-        videoNavigation.motionSearchMode = false
+        navigator.motionSearchMode = false
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
-        if (videoScreenController.mediaPlayer.liveMode)
+        if (controller.mediaPlayer.liveMode)
         {
             cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
                 camerasModel.rowByResourceId(id), "thumbnail")

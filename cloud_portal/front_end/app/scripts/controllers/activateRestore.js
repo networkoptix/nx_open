@@ -3,12 +3,16 @@
 angular.module('cloudApp')
     .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage', '$timeout',
         '$sessionStorage', 'account', 'authorizationCheckService', '$location', 'urlProtocol', 'dialogs',
+        'languageService', 'nxPageService',
         function ($scope, cloudApi, $routeParams, process, $localStorage, $timeout,
-                  $sessionStorage, account, authorizationCheckService, $location, urlProtocol, dialogs) {
+                  $sessionStorage, account, authorizationCheckService, $location, urlProtocol, dialogs,
+                  languageService, nxPageService) {
 
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
-
+    
+            nxPageService.setPageTitle(languageService.lang.pageTitles.activate);
+            
             $scope.data = {
                 newPassword: '',
                 email: '', // moved to init()
@@ -30,6 +34,7 @@ angular.module('cloudApp')
             }
             function checkActivate(){
                 if($scope.data.activateCode){
+                    nxPageService.setPageTitle(languageService.lang.pageTitles.activateCode);
                     setContext(null);
                     $scope.activate.run();
                 }
@@ -55,7 +60,7 @@ angular.module('cloudApp')
             }
 
             function setContext(name){
-                $scope.context.process = name
+                $scope.context.process = name;
             }
 
             function checkContext(name, flag){
@@ -90,6 +95,7 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:L.errorCodes.cantChangePasswordPrefix
             }).then(function(){
+                nxPageService.setPageTitle(languageService.lang.pageTitles.restorePasswordSuccess);
                 setContext('changeSuccess');
                 dialogs.dismissNotifications();
                 $location.path('/restore_password/success', false); // Change url, do not reload
@@ -105,6 +111,7 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:L.errorCodes.cantSendActivationPrefix
             }).then(function(){
+                nxPageService.setPageTitle(languageService.lang.pageTitles.restoringSuccess);
                 $scope.restoring = false;
                 $scope.restoringSuccess = true;
                 setContext('restoringSuccess');
@@ -139,6 +146,7 @@ angular.module('cloudApp')
                 },
                 errorPrefix:L.errorCodes.cantActivatePrefix
             }).then(function(){
+                nxPageService.setPageTitle(languageService.lang.pageTitles.activateSuccess);
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
                 $scope.loading = false;
@@ -157,6 +165,7 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
+                nxPageService.setPageTitle(languageService.lang.pageTitles.activateSuccess);
                 dialogs.notify(L.account.activationLinkSent, 'success');
             });
 

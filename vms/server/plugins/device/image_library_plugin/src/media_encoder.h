@@ -1,10 +1,6 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_MEDIA_ENCODER_H
-#define ILP_MEDIA_ENCODER_H
+#pragma once
 
 #include <memory>
 
@@ -12,7 +8,6 @@
 #include <plugins/plugin_tools.h>
 
 #include "stream_reader.h"
-
 
 class CameraManager;
 
@@ -61,5 +56,3 @@ private:
     unsigned int m_frameDurationUsec;
     int m_encoderNumber;
 };
-
-#endif  //ILP_MEDIA_ENCODER_H

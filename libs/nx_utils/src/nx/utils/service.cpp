@@ -37,6 +37,7 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
     m_argc(argc),
     m_argv(argv),
     m_applicationDisplayName(applicationDisplayName),
+	m_actionToTake(ActionToTake::stop),
     m_isTerminated(false)
 {
 }
@@ -48,8 +49,8 @@ void Service::setEnableLoggingInitialization(bool value)
 
 void Service::pleaseStop()
 {
-    m_isTerminated = true;
-    m_processTerminationEvent.set_value(0);
+	m_isTerminated = true;
+	m_processTerminationEvents.push(ActionToTake::stop);
 }
 
 void Service::setOnStartedEventHandler(
@@ -98,13 +99,19 @@ int Service::exec()
         writeStartInfo();
         auto startInfoFileGuard = nx::utils::makeScopeGuard([this]() { removeStartInfoFile(); });
 
-        return serviceMain(*settings);
+        return runServiceMain(*settings);
     }
     catch (const std::exception& e)
     {
         NX_ERROR(this, lm("Error starting. %1").arg(e.what()));
         return 3;
     }
+}
+
+void Service::restart()
+{
+	if (m_processTerminationEvents.empty())
+		m_processTerminationEvents.push(ActionToTake::restart);
 }
 
 std::string Service::applicationDisplayName() const
@@ -116,18 +123,38 @@ int Service::runMainLoop()
 {
     reportStartupResult(true);
 
-    return m_processTerminationEvent.get_future().get();
+	m_actionToTake = m_processTerminationEvents.pop();
+
+	return 0;
 }
 
 bool Service::isTerminated() const
 {
-    return m_isTerminated.load();
+	return m_isTerminated;
+}
+
+int Service::runServiceMain(const AbstractServiceSettings& settings)
+{
+    int result = 0;
+
+    do
+	{
+		m_actionToTake = ActionToTake::stop;
+
+        result = serviceMain(settings);
+
+        if (m_actionToTake == ActionToTake::restart)
+            NX_INFO(this, "Service will restart. serviceMain returned %1", result);
+
+    } while (m_actionToTake == ActionToTake::restart);
+
+    return result;
 }
 
 void Service::initializeLog(const AbstractServiceSettings& settings)
 {
     auto logSettings = settings.logging();
-    logSettings.updateDirectoryIfEmpty(settings.dataDir());
+    logSettings.updateDirectoryIfEmpty(settings.dataDir() + "/log");
     utils::log::setMainLogger(
         nx::utils::log::buildLogger(
             logSettings,

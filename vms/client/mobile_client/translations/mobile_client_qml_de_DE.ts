@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Nach Zeitplan deaktiviert</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Offline</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O-Modul</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Inkompatible Serverversion %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Zu viele Versuche. Versuchen Sie es später erneut.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Verbinden Sie diesen Server mit dem Webbrowser oder über den Desktopclient, um ihn einzurichten</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Suche</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Keine Verbindung mit System &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nichts gefunden</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Löschen</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behalten</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>In dieser App kann das I/O-Modul nur als Soundeingabegerät verwendet werden. Um es als Steuermodul zu verwenden, verwenden Sie bitte die Desktopversion von %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Ungültiger benutzerdefinierter Bereich. Bitte ziehe einen richtigen.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
     </message>
   </context>
   <context>

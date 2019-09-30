@@ -1,28 +1,38 @@
 {
   "language": "uk_UA",
   "language_name": "Українська",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ок",
+    "okButton": "ОК",
     "cancelButton": "Відміна",
-    "loginTitle": "Увійдіть до %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Вхід",
     "logoutAuthorisedTitle": "Ви вже увійшли",
     "logoutAuthorisedContinueButton": "Продовжити",
     "logoutAuthorisedLogoutButton": "Вийти",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Не вдалося надіслати повідомлення.",
+    "messageSent": "Повідомлення відправлено.",
+    "noClientDetectedTitle": "Встановіть %VMS_NAME% для роботи з системою",
+    "download": "Завантажити %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Ласкаво просимо на",
     "register": "Створити обліковий запис",
     "changePassword": "Змінити пароль -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "активовано",
-    "merging": "merging",
+    "incompatible": "несумісно",
+    "merging": "злиття",
     "notActivated": "не активовано",
     "online": "oнлайн",
     "offline": "поза мережею",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Не вдається зберегти пароль",
     "cantActivatePrefix": "Не вдається активувати ваш обліковий запис",
     "cantSendConfirmationPrefix": "Не вдається надіслати підтвердження електронною поштою",
-    "cloudInvalidResponse": "Хмарна DB повернула неочікувану відповідь",
     "notAuthorized": "Невірний пароль",
     "brokenAccount": "Неочікувана проблема з обліковим записом. <a href=\"/restore_password\">Відновити обліковий запис</a>",
     "wrongParameters": "Деякі параметри у формі невірні",
     "wrongCode": "Обліковий запис вже активовано або код підтвердження невірний",
     "wrongCodeRestore": "Код підтвердження вже використовується або невірний",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "У вас немає дозволів для виконання цієї дії",
     "accountNotActivated": "Цей акаунт ще не активовано. <a href=\"/activate\">Надіслати посилання для активації ще раз</a>",
     "accountBlocked": "Цей обліковий запис тимчасово заблоковано. Будь ласка, спробуйте ще раз через декілька хвилин.",
@@ -147,13 +158,20 @@
     "lostConnection": "Підключення до {{systemName}} втрачено",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
-    "DUPLICATE_MEDIASERVER_FOUND": "На одній з систем знайдено дублікати серверів.<br>Видаліть старі сервери з кожної системи, яку ви намагаєтеся об'єднати, і повторіть спробу.",
-    "mergedSystemIsOffline": "Одна з об'єднаних систем перебуває по за мережею. Переконайтеся, що вони перебувають у мережі та спробуйте ще раз.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Деякі списки серверів існують в обох системах - у вибраному і в поточному.<br>Видаліть з будь-якої системи сервер і спробуйте знову.",
+    "mergedSystemIsOffline": "Система<strong>{{failedSystem}}</strong>офлайн.",
+    "INCOMPATIBLE": "Системи мають різні версії програмного забезпечення. Будь ласка, поновіть їх до<a href=\"/download\">останньої збірки</a>.",
+    "FAIL": "Система<strong>{{failedSystem}}</strong>в даний час недоступна.<br>Повторіть спробу через кілька хвилин або зверніться до <a href=\"%SUPPORT_LINK%\" target=\"_blank\">підтримки</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Злиття систем невдалося",
+    "commonText": "Не вдалося об’єднати системи <strong>{{primarySystem}}</strong> та <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "хороший",
     "fair": "середній",
+    "fairMessage": "Для надійності паролю використовуйте цифри, букви верхнього та нижнього регістру та спеціальні символи",
     "minLength": "занадто короткий",
     "minLengthMessage": "Пароль повинен містити принаймні 8 символів",
     "required": "некоректний",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Назва системи",
     "confirmRenameAction": "Зберегти",
     "successRename": "Ім'я системи збережено",
-    "confirmDisconnectTitle": "Відключити систему від %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Відключити",
     "confirmUnshareFromMe": "Ви збираєтеся відключити цю систему від свого облікового запису. Ви більше не зможете отримати доступ до цієї системи. Ти впевнений?",
     "confirmUnshareFromMeTitle": "Відключити систему?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Цей користувач не зможе отримати доступ до системи. Ти впевнений?",
     "confirmUnshareTitle": "Видалити користувача?",
     "confirmUnshareAction": "Видалити",
-    "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "Злиття системи завершено",
+    "mergeFailed": "Не вдалося об’єднати систему",
+    "mergeStart": "Злиття систем почалося",
+    "mergeSuccess": "Злиття системи завершено",
     "permissionsRemoved": "{{email}} був позбавлений повноважень",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Невідоме ім’я для системи (викликане злиттям хмари)"
   },
   "account": {
     "accountSavedSuccess": "Ваш обліковий запис успішно збережено",
@@ -206,72 +226,6 @@
     "changePassword": "Змінити пароль",
     "newPasswordLabel": "Новий пароль",
     "saveChanges": "Зберегти"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Встановіть %VMS_NAME% для роботи з системою",
-    "action": "Завантажити %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Тільки клієнт",
-      "server": "Тільки сервер",
-      "bundle": "Клієнт і сервер",
-      "servertool": "Інструмент налаштування"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Відправити посилання активації ще раз",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "Система знаходиться поза мережею",
     "systemHasNoCameras": "НЕМАЄ КАМЕР",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Поза мережею",
       "error": "Помилка",
@@ -334,5 +289,10 @@
       "stop listening": "припинити прослуховування",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Ми рекомендуємо проконсультуватися з",
+    "b_support": "підтримка",
+    "c_proceeding": "перед тим, як продовжити."
   }
 }

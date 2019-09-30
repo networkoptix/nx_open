@@ -11,38 +11,35 @@
 
 namespace nx::sql {
 
-constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
 static const std::string kCdbStructureName = "cdb_BF58C070-B0E6-4327-BB2E-417A68AAA53D";
 
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
-    m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
     m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
     m_dbStructureUpdater(kCdbStructureName, m_queryExecutor.get())
 {
-    m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
 }
 
 bool InstanceController::initialize()
 {
-    NX_DEBUG(this, lm("Initializing query executor"));
+    NX_DEBUG(this, "Initializing DB %1", m_dbConnectionOptions.dbName);
     if (!m_queryExecutor->init())
     {
-        NX_ERROR(this, "Failed to open connection to DB");
+        NX_ERROR(this, "Failed to open connection to DB %1", m_dbConnectionOptions.dbName);
         return false;
     }
 
-    NX_DEBUG(this, lm("Configuring DB"));
+    NX_DEBUG(this, "Configuring DB %1", m_dbConnectionOptions.dbName);
     if (!configureDb())
     {
-        NX_ERROR(this, "Failed to tune DB");
+        NX_ERROR(this, "Failed to tune DB %1", m_dbConnectionOptions.dbName);
         return false;
     }
 
-    NX_DEBUG(this, lm("Updating DB structure"));
+    NX_DEBUG(this, "Updating DB structure %1", m_dbConnectionOptions.dbName);
     if (!updateDbStructure())
     {
-        NX_ERROR(this, "Could not update DB to current version");
+        NX_ERROR(this, "Could not update DB %1 to current version", m_dbConnectionOptions.dbName);
         return false;
     }
 
@@ -61,12 +58,7 @@ const AbstractAsyncSqlQueryExecutor& InstanceController::queryExecutor() const
 
 const StatisticsCollector& InstanceController::statisticsCollector() const
 {
-    return m_statisticsCollector;
-}
-
-StatisticsCollector& InstanceController::statisticsCollector()
-{
-    return m_statisticsCollector;
+    return m_queryExecutor->statisticsCollector();
 }
 
 DbStructureUpdater& InstanceController::dbStructureUpdater()

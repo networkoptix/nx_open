@@ -1,28 +1,38 @@
 {
   "language": "th_TH",
   "language_name": "ภาษาไทย",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "ตกลง",
     "cancelButton": "ยกเลิก",
-    "loginTitle": "เข้าสู่ระบบ %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
     "logoutAuthorisedLogoutButton": "ออกจากระบบ",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "ไม่สามารถส่งข้อความได้",
+    "messageSent": "ส่งข้อความแล้ว",
+    "noClientDetectedTitle": "ติดตั้ง %VMS_NAME% เพื่อดูระบบของคุณ",
+    "download": "ดาวน์โหลด %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "ขอต้อนรับสู่:",
     "register": "สร้างบัญชี",
     "changePassword": "เปลี่ยนรหัสผ่าน -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "เปิดใช้งาน",
-    "merging": "merging",
+    "incompatible": "เข้ากันไม่ได้",
+    "merging": "การผสม",
     "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "online": "ออนไลน์",
     "offline": "ออฟไลน์",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "ไม่สามารถบันทึกรหัสผ่านได้",
     "cantActivatePrefix": "ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
     "cantSendConfirmationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
-    "cloudInvalidResponse": "คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
     "notAuthorized": "รหัสผ่านผิด",
     "brokenAccount": "ปัญหาที่ไม่คาดคิดกับบัญชี <a href=\"/restore_password\">เรียกคืนบัญชี</a>",
     "wrongParameters": "พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
     "wrongCode": "บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
     "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
     "accountNotActivated": "บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
     "accountBlocked": "บัญชีนี้ถูกปิดแล้ว โปรดลองอีกครั้งในไม่กี่นาที.",
@@ -147,13 +158,20 @@
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
     "thisSystem": "ระบบ",
     "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "เซิร์ฟเวอร์บางรายการมีอยู่ในทั้งสองระบบ - ในรายการที่เลือกและในปัจจุบัน<br>ลบเซิร์ฟเวอร์ออฟไลน์และที่เข้ากันไม่ได้ออกจากแต่ละระบบแล้วลองใหม่อีกครั้ง",
+    "mergedSystemIsOffline": "ระบบ <strong>{{failedSystem}}</strong> ออฟไลน์",
+    "INCOMPATIBLE": "ระบบมีเวอร์ชั่นซอฟต์แวร์ที่ต่างกัน โปรดอัปเดตไปที่ <a href=\"/download\">รุ่นล่าสุด</a>",
+    "FAIL": "ระบบ <strong>{{failedSystem}}</strong> ไม่สามารถเข้าถึงได้ในขณะนี้<br>ลองอีกครั้งในภายหลังหรือติดต่อฝ่ายสนับสนุน <a href=\"%SUPPORT_LINK%\" target=\"_blank\"></a>",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "การรวมระบบล้มเหลว",
+    "commonText": "ไม่สามารถรวมระบบ <strong>{{primarySystem}}</strong> และ <strong>{{secondarySystem}}</strong>"
   },
   "passwordRequirements": {
     "good": "ดี",
     "fair": "ยุติธรรม",
+    "fairMessage": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
     "minLength": "สั้นเกินไป",
     "minLengthMessage": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
     "required": "ไม่ถูกต้อง",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
     "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
     "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "ผู้ใช้รายนี้จะไม่สามารถเข้าใช้งานระบบได้ คุณแน่ใจไหม?",
     "confirmUnshareTitle": "ลบผู้ใช้หรือไม่?",
     "confirmUnshareAction": "ลบ",
-    "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "successMerge": "System merge completed",
+    "mergeFailed": "การผสานระบบล้มเหลว",
+    "mergeStart": "ระบบได้รวมเข้าด้วยกันเรียบร้อยแล้ว",
+    "mergeSuccess": "ผสานระบบเสร็จสมบูรณ์",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "ชื่อที่ไม่รู้จักสำหรับระบบ (เกิดจากการผสานคลาวด์)"
   },
   "account": {
     "accountSavedSuccess": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
@@ -206,72 +226,6 @@
     "changePassword": "เปลี่ยนรหัสผ่าน",
     "newPasswordLabel": "สร้างรหัสผ่านใหม่",
     "saveChanges": "บันทึก"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "ติดตั้ง %VMS_NAME% เพื่อดูระบบของคุณ",
-    "action": "ดาวน์โหลด %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "ไคลเอ็นต์เท่านั้น",
-      "server": "เซิร์ฟเวอร์เท่านั้น",
-      "bundle": "ไคลเอ็นต์และเซิร์ฟเวอร์",
-      "servertool": "เครื่องมือกำหนดค่า"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "ส่งการเชื่อมโยงการเปิดใช้งานอีกครั้ง",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "ระบบออฟไลน์",
     "systemHasNoCameras": "ไม่พบกล้อง",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "ออฟไลน์",
       "error": "ข้อผิดพลาด",
@@ -334,5 +289,10 @@
       "stop listening": "หยุดฟัง",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "เราขอแนะนำให้ปรึกษากับ",
+    "b_support": "ทีมช่วยเหลือ",
+    "c_proceeding": "ก่อนดำเนินการต่อ"
   }
 }

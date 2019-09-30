@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        system
 
@@ -15,15 +15,16 @@ Check Systems Text
     [arguments]    ${user}
     Sleep    1
     Log Out
-    Validate Log Out
     Log In    ${user}    ${password}
     Validate Log In
-    Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
+    Wait Until Page Contains Element    ${AUTO TESTS USER}
+    Element Text Should Be    ${AUTO TESTS USER}    ${TEST FIRST NAME} ${TEST LAST NAME}
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 Reset DB and Open New Browser On Failure
     Close Browser
     Reset user owner first/last name
+    Make sure viewer is in the system
     Open Browser and go to URL    ${url}
 
 Restart
@@ -82,12 +83,10 @@ should show system name in header with no dropdown if user has only one system
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEM NAME AUTO TESTS HEADER}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -105,12 +104,10 @@ should show the system page instead of all systems when user only has one
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEM NAME}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -163,31 +160,41 @@ Search can be cleared by x button
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    ${tiles}    Get WebElements    //div[contains(@class,"card ")]
+    ${len}    Get Length    ${tiles}
     Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
     Wait Until Element Is Visible    ${SYSTEM SEARCH X BUTTON}
     Click Link    ${SYSTEM SEARCH X BUTTON}
     Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
+    ${tiles2}    Get WebElements    //div[contains(@class,"card ")]
+    ${len2}    Get Length    ${tiles2}
+    Should Be Equal    ${len}    ${len2}
+
+
+Searching for owner email should only show systems with that owner
+    [tags]    C41891    Threaded
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${EMAIL OWNER}
+    Run Keyword And Expect Error    *    Element Should Not Be Visible    ${DIFFERENT OWNER TITLE}
 
 Search should only be visible with 9 or more systems
-
     [tags]    C41890
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Remove User Permissions    ${EMAIL VIEWER}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Elements Should Not Be Visible    ${SYSTEMS SEARCH INPUT}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -198,7 +205,6 @@ Search should only be visible with 9 or more systems
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEMS SEARCH INPUT}
@@ -219,7 +225,6 @@ should update owner name in systems list, if it's changed
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL ADMIN}    ${password}
     Validate Log In
     Go To    ${url}/systems

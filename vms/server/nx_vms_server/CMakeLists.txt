@@ -55,12 +55,19 @@ add_custom_command(
         ${apidoctool_params}
 )
 
+set(old_sdk_static_resources "")
+if(TARGET nx_storage_sdk)
+    list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
+endif()
+if(TARGET nx_camera_sdk)
+    list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
+endif()
+
 set(static_resources
     ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
     ${customization_dir}/license.html
-    ${NX_SDK_PACKAGE}
-    ${NX_STORAGE_SDK_PACKAGE}
+    ${old_sdk_static_resources}
     ${CMAKE_SOURCE_DIR}/specific_features.txt
 )
 set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX static/)
@@ -101,6 +108,13 @@ nx_add_target(nx_vms_server LIBRARY
         nx_speech_synthesizer
 )
 
+if(TARGET nx_storage_sdk)
+    add_dependencies(nx_vms_server nx_storage_sdk)
+endif()
+if(TARGET nx_camera_sdk)
+    add_dependencies(nx_vms_server nx_camera_sdk)
+endif()
+
 nx_force_include(nx_vms_server
     ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h
     ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/log/log_message.h
@@ -108,7 +122,7 @@ nx_force_include(nx_vms_server
 
 nx_add_vendor_macros(nx_vms_server)
 
-if(LINUX)
+if(LINUX OR MACOSX)
     target_link_libraries(nx_vms_server PRIVATE ldap lber)
 endif()
 

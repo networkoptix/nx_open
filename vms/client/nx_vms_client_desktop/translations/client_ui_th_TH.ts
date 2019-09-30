@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>ฝ่ายสนับสนุนลูกค้า</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -320,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>ในวันถัดไป</translation>
     </message>
   </context>
   <context>
@@ -665,12 +660,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Custom Media Port</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>ประทับเวลาของกล้อง</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +685,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>คำเตือน! กล้องที่ตั้งไว้ล่วงหน้าจะไม่สามารถใช้งานได้</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +700,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>ตรวจจับการเคลื่อนไหวในระหว่างการนำเข้าที่เก็บถาวร</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1039,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>คำใบ้</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1084,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>เพิ่มอุปกรณ์</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1102,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>ฉันไม่ยอมรับ</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>ฉันยอมรับ</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1243,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>ป้องกันด้วยรหัสผ่าน</translation>
     </message>
     <message>
       <location/>
@@ -1292,7 +1287,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation type="unfinished">Nothing matches your search</translation>
+      <translation>ไม่มีรายการตรงกับการค้นหาของคุณ</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1607,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>ขนาดกริดขั้นต่ำ</translation>
     </message>
   </context>
   <context>
@@ -1678,7 +1673,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>ผู้ดูแลระบบ DN หรือ CN</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1973,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>ตรวจสอบสำหรับการอัพเดต</translation>
     </message>
     <message>
       <location/>
@@ -2003,7 +1998,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>ดาวน์โหลด &amp;&amp; ติดตั้ง</translation>
     </message>
     <message>
       <location/>
@@ -2018,7 +2013,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>การตั้งค่าขั้นสูง</translation>
     </message>
     <message>
       <location/>
@@ -2031,12 +2026,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>แสดงบนเค้าโครงทั้งหมด</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>เลือกรูปแบบ</translation>
     </message>
   </context>
   <context>
@@ -2049,12 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
+      <translation>ใหม่กล้องเสมือนจริง...</translation>
     </message>
   </context>
   <context>
@@ -2099,9 +2089,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>ทรัพยากร:</translation>
     </message>
@@ -2778,11 +2768,6 @@
       <source>Limit session duration</source>
       <translation>จำกัด ระยะเวลาเซสชัน</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3074,22 +3059,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>ข้อมูล Analytics จะถูกจัดเก็บในที่เก็บข้อมูลที่ถูกปิดใช้งาน</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>การบันทึกไปยังที่เก็บข้อมูลที่ปิดใช้งานจะหยุดลง อย่างไรก็ตามการลบภาพที่ล้าสมัยออกจากภาพจะดำเนินต่อไป</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>ข้อมูล Analytics อาจใช้พื้นที่จำนวนมาก เราขอแนะนำให้เลือกตำแหน่งอื่นแทนพาร์ติชันระบบ</translation>
     </message>
   </context>
   <context>
@@ -3195,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>ความกว้างของพื้นที่</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>เวลาการซิงค์กับอินเทอร์เน็ต</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>เวลา VMS</translation>
     </message>
   </context>
   <context>

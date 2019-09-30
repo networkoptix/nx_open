@@ -396,8 +396,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
     addActionToMenu(action::ExportBookmarkAction, m_exportBookmarkAction);
-    if (nx::vms::client::desktop::ini().enableCaseExport)
-        addActionToMenu(action::ExportBookmarksAction, m_exportBookmarksAction);
+    addActionToMenu(action::ExportBookmarksAction, m_exportBookmarksAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */

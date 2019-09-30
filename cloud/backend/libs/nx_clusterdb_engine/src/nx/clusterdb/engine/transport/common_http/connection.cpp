@@ -265,7 +265,7 @@ void CommonHttpConnection::forwardTransactionToProcessor(
 
     CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = m_connectionOriginatorEndpoint;
-    cdbTransportHeader.systemId = m_systemId;
+    cdbTransportHeader.clusterId = m_systemId;
     cdbTransportHeader.connectionId = m_connectionId;
     cdbTransportHeader.vmsTransportHeader = std::move(transportHeader);
     cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();

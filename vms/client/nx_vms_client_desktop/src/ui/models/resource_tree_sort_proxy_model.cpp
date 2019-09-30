@@ -51,7 +51,7 @@ qreal QnResourceTreeSortProxyModel::nodeOrder(const QModelIndex& index)
     const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     const bool isVideoWall = resource->hasFlags(Qn::videowall);
     if (isVideoWall)
-        return 0.5 * (order(NodeType::layouts) + order(NodeType::webPages));
+        return order(NodeType::layoutTours) + 0.5;
 
     const bool isServer = resource->hasFlags(Qn::server);
     if (isServer)

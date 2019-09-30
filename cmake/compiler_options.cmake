@@ -40,6 +40,10 @@ set(isEdgeServer "false")
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(enabledSanitizers "" CACHE STRING "A semicolon-separated list of enabled sanitizers")
 
+    if(NOT "${enabledSanitizers}" STREQUAL "" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options("-fsanitize-blacklist=${PROJECT_SOURCE_DIR}/sanitize-blacklist.txt")
+    endif()
+
     foreach(sanitizer ${enabledSanitizers})
         add_compile_options(-fsanitize=${sanitizer})
 

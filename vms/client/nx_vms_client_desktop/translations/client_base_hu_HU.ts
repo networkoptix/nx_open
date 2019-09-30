@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Bármely típus</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Válasszon területet</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Válasszon ki egy bizonyos területet a videón...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>A kijelölt területen</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>A bővítmény végrehajtása sikertelen</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Adja meg a paramétereket</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>A művelethez bizonyos paramétereket ki kell tölteni.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -84,15 +115,15 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Frissítési információk beszerzése a szerverről</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Frissítési csomag letöltése</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Telepítés</translation>
     </message>
   </context>
   <context>
@@ -854,15 +885,15 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Kijelzőbeállítások...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Könyvjelzők exportálása...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Jelszó elfelejtése</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -874,7 +905,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Az Analytics motor beállításai...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -894,11 +925,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuális kamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Új virtuális kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -922,27 +953,35 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Váltás az Értesítések fülre</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Váltás a Mozgás fülre</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Váltás a Könyvjelzők fülre</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Váltás az Események fülre</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Váltás az Objektumok fülre</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objektum keretek és információk...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Naptár rögzítése</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Naptár feloldása</translation>
     </message>
   </context>
   <context>
@@ -988,23 +1027,62 @@ több könyvjelző megjelenítéséhez</translation>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Kérjük, érvényes jelszót írjon be</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Hibás jelszó.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Titkosított elrendezés</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>A %1 fájl titkosítva van. Kérjük, írja be a jelszót:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Írja be újra %1 elrendezés jelszavát:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Szerver események</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analitikai események</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Bármilyen esemény</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Bármilyen eszköz hiba</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Bármilyen kamera hiba</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Bármely szerver esemény</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Eszközproblémák</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraproblémák</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Bármilyen analitikai esemény</translation>
     </message>
   </context>
   <context>
@@ -1323,7 +1401,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Az elrendezés zárolva van</translation>
     </message>
   </context>
   <context>
@@ -1584,7 +1662,7 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>%1 / %n folyamat részletei</numerusform>
         <numerusform>Details for %n sessions of %1</numerusform>
       </translation>
     </message>
@@ -1592,7 +1670,7 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>%1 / %n kamera részletei</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
       </translation>
     </message>
@@ -1644,24 +1722,12 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Szerver frissítve</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Üzleti szabályok frissítve</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Szerver eltávolítva</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Üzleti szabályok eltávolítva</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Felhasználó eltávolítva</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Üzleti szabályok visszaállítva</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1749,14 +1815,26 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>A frissítés telepítve</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n művelet</numerusform>
+        <numerusform>%n művelet</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Az esemény szabálya megváltozott</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Az esemény szabálya eltávolítva</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Az esemény szabályai visszaálltak alapértelmezettre</translation>
     </message>
   </context>
   <context>
@@ -2037,8 +2115,8 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Bármely kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>A kényszerítő nyugtázás csak akkor fog működni az általános eseményeknél, ha a kamera azonosítókat használják az általános esemény URL-jében</translation>
     </message>
   </context>
   <context>
@@ -2579,7 +2657,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Belső szerver hiba. Kérjük, próbálja újra később.</translation>
     </message>
   </context>
   <context>
@@ -2733,11 +2811,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Letöltés &amp;&amp; Telepítés</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Nem sikerült belépni a %1 verzió kompatibilitási módjába</translation>
     </message>
   </context>
   <context>
@@ -3004,7 +3082,7 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
       </translation>
     </message>
@@ -3012,7 +3090,7 @@ to %1</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
       </translation>
     </message>
@@ -3092,7 +3170,7 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n kamera)</numerusform>
         <numerusform>%1 (%n cameras)</numerusform>
       </translation>
     </message>
@@ -3176,11 +3254,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Ez a kamera nem része a kiválasztott elrendezések. Adja azt hozzá a műveletet kiváltó eseményt megelőzően.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Ez a kamera nem része a kiválasztott elrendezésekeknek. Adja azt hozzá a műveletet kiváltó eseményt megelőzően.</translation>
     </message>
   </context>
   <context>
@@ -3217,7 +3295,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Automatikus (%1)</translation>
     </message>
   </context>
   <context>
@@ -3375,7 +3453,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Kérem adjon meg egy értéket.</translation>
     </message>
   </context>
   <context>
@@ -3582,7 +3660,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Csatorna</translation>
     </message>
   </context>
   <context>
@@ -3778,7 +3856,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Minden licencet csak néhányszor lehet deaktiválni.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4082,7 +4160,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Terület nagyítása</translation>
     </message>
   </context>
   <context>
@@ -4237,11 +4315,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuális kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuális kamera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Virtuális kamera&quot; egy virtuális tárhely a videofájlokhoz, amelyeket fel lehet tölteni bármely szerverre a rendszerén, és bármely felhasználó hozzáférhet.</translation>
     </message>
   </context>
   <context>
@@ -4467,7 +4549,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>nagyjából %n perc</numerusform>
         <numerusform>about %n minutes</numerusform>
       </translation>
     </message>
@@ -4651,11 +4733,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Aktuális bitráta</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>nincs adat az előrejelzéshez</translation>
     </message>
   </context>
   <context>
@@ -4701,11 +4783,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Helyi fájlok</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Nincsenek helyi fájlok</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4721,7 +4803,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>összes megnyitása</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4842,7 +4924,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analitikai motor</translation>
     </message>
   </context>
   <context>
@@ -4906,7 +4988,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Könyvjelzők exportálása...</translation>
     </message>
   </context>
   <context>
@@ -5105,7 +5187,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginok</translation>
     </message>
   </context>
   <context>
@@ -5451,23 +5533,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Az utolsó 5 perc</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Az utolsó 60 perc</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Elmúlt 24 óra</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Leghosszabb rendelkezésre álló időszak</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Az előrejelzés csak a rögzítéses kamerák esetében érhető el.</translation>
     </message>
   </context>
   <context>
@@ -5582,13 +5664,7 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
-    </message>
-    <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Mi a teendő az aktuális elemzési adatokkal?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5601,6 +5677,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Mégsem</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Az aktuális elemzési adatok nem kerülnek automatikusan áthelyezésre egy másik helyre, és elérhetetlenné válnak. Megtarthatja és kézzel továbbíthatja, vagy véglegesen törölheti.
+Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérjük, lépjen kapcsolatba a supporttal mielőtt folytatná.</translation>
     </message>
   </context>
   <context>
@@ -5651,11 +5733,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Használja az analitikai adatok tárolására</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Tárolja az analitikai adatokat</translation>
     </message>
   </context>
   <context>
@@ -5744,7 +5826,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginok</translation>
     </message>
   </context>
   <context>
@@ -5881,27 +5963,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Egyik szerver sem rendelkezik internet-hozzáféréssel az időszinkronizáláshoz</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>A rendszer biztonsági módban fut</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>A rendszer nem rendelkezik internet-hozzáféréssel az időszinkronizáláshoz</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Az online szerver nem rendelkezik internet-hozzáféréssel az időszinkronizáláshoz.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>A rendszer biztonsági módban fut.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Hiba történt a távoli archívum szinkronizálása során</translation>
     </message>
   </context>
   <context>
@@ -5923,20 +6005,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Nem tartalmaz személyes adatokat, és teljesen névtelen.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Engedélyezze az eszközök és szerverek automatikus felismerését és az automatikus állapotállapot-ellenőrzést</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Engedélyezze a kamerák és a szerverek automatikus felismerését és az automatikus kameraállapot-ellenőrzést</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Ha engedélyezve van, a rendszer folyamatosan felfedezi az új kamerákat és kiszolgálókat, és küldési lekérdezéseket küld a kamerákhoz az állapotfrissítéshez.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Amennyiben a Failover engedélyezett, akkor a szerver továbbra is kérheti a kamera állapotának frissítését, függetlenül a beállítástól.</translation>
     </message>
   </context>
   <context>
@@ -5951,49 +6033,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML fájl</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Szerver</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Eltolás</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Dátum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Időzóna</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Idő</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>A szerver nem rendelkezik Internet-hozzáféréssel. Az idő nincs szinkronizálva.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Spread Sheet (CSV) fájl</translation>
     </message>
   </context>
   <context>
@@ -6513,15 +6557,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 sikeresen beállítva.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>A folyamat befejezéséhez kérjük, csatlakozzon hozzá a klienssel, és frissítse a %1verzióra.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Nem sikerült a %1 at egyesíteni a rendszerünkkel.</translation>
     </message>
   </context>
   <context>
@@ -6595,7 +6639,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -6646,11 +6690,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG kép</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG kép</translation>
     </message>
   </context>
   <context>
@@ -6873,16 +6917,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Virtuális kamera hozzáadása nem sikerült</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Virtuális kamera felvételek megnyitása...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>Feltöltheti ezeket a fájlokat egy virtuális kamera másik példányára.</numerusform>
         <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
@@ -7111,7 +7155,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Néhány videofájlok még mindig töltődnek a %n virtuális kamerára:</numerusform>
         <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
     </message>
@@ -7120,11 +7164,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Munkamenet lejárt</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>A rendszeradminisztrátorok módosíthatják a munkamenet időtartamát</translation>
+    </message>
+  </context>
+  <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Válasszon ki egy területet a videón, hogy szűrje a keresés eredményeit</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>A kijelölt területen</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Kiválasztott kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Kiválasztott eszköz</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Kiválasztott média</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>semmi</translation>
     </message>
   </context>
   <context>
@@ -7209,21 +7281,21 @@ If you intended to move analytics data to another storage location, please conta
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Ez a Linux platform már nem támogatott</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Ez az operációs rendszer verziója már nem támogatott</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Ez a %1 verzió már nem támogatott</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 már nem támogatott</translation>
     </message>
   </context>
   <context>
@@ -7298,23 +7370,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Eszközök az elrendezésben</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kamerák az elrendezésben</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Bármely eszköz</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Bármely kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Kiválasztott eszköz</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7325,11 +7397,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Mindig mutat</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Csak &quot;objektum megjelenítése&quot; Tab</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7337,18 +7409,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Ne jelenjen meg</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Ismeretlen objektum</translation>
+      <source>deleted camera</source>
+      <translation>törölt kamera</translation>
     </message>
     <message>
-      <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7364,41 +7436,9 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n objects</source>
       <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n objektumok</numerusform>
         <numerusform>%n objects</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Bármely típus</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>A kijelölt területen</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>A bővítmény végrehajtása sikertelen</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
     </message>
   </context>
   <context>
@@ -7412,7 +7452,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>törölt kamera</translation>
     </message>
   </context>
   <context>
@@ -7442,17 +7482,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Változások érvényesítése...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Ehhez az I/O modulhoz nincsenek speciális beállítási opciók</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ehhez a kamerához nincsenek speciális beállítási opciók</translation>
     </message>
   </context>
   <context>
@@ -7519,7 +7548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7581,6 +7610,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>Ez a művelet nem visszavonható.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Mozgásérzékelés stream kikapcsolva</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7621,14 +7654,14 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamerák</numerusform>
+        <numerusform>%n kamerák</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Nem rendelkezik kamerákkal</translation>
     </message>
   </context>
   <context>
@@ -7716,7 +7749,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginok</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
@@ -7756,35 +7797,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>A frissítési fájl nem található</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>A frissítési csomag sérült</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Nem sikerült letölteni a frissítési csomagot: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>A frissítési csomag sérült: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Ez a frissítés már telepítve van.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Ez a verzió nincs telepítve.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Érvénytelen verzióformátum.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Törött frissítőcsomag.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7792,11 +7833,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Nincs elegendő hely a lemezen az kliensfrissítés telepítéséhez.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>A telepítési csomag elveszett.</translation>
     </message>
   </context>
   <context>
@@ -7849,7 +7890,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>A kiválasztott kamerák közül néhány beállításához jelszó szükséges.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7931,13 +7972,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Már minden eszköz hozzáadva</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n eszköz kerül hozzáadásra. Bezárhatja ezt a párbeszédpanelt, vagy indíthat új keresést</numerusform>
+        <numerusform>%n eszköz kerül hozzáadásra. Bezárhatja ezt a párbeszédpanelt, vagy indíthat új keresést</numerusform>
       </translation>
     </message>
     <message>
@@ -7953,7 +7994,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>A cím mező nem lehet üres</translation>
     </message>
   </context>
   <context>
@@ -7964,7 +8005,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>A szoftver használatához el kell fogadnia a végfelhasználói licencszerződést</translation>
     </message>
   </context>
   <context>
@@ -7998,42 +8039,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Nincsenek események</translation>
     </message>
@@ -8045,12 +8050,8 @@ If you intended to move analytics data to another storage location, please conta
       </translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Nem történt esemény</translation>
     </message>
   </context>
   <context>
@@ -8067,7 +8068,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Kérjük, írja be a jelszót.</translation>
     </message>
   </context>
   <context>
@@ -8216,7 +8217,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Arra készül, hogy hosszú videót exportál. Nagyon sok tárhelyet igényelhet, és jelentős időt vehet igénybe.</translation>
     </message>
   </context>
   <context>
@@ -8288,16 +8289,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n új</numerusform>
+        <numerusform>%n új</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n eszköz összesen</numerusform>
+        <numerusform>%n eszköz összesen</numerusform>
       </translation>
     </message>
   </context>
@@ -8342,7 +8343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Link helyének másolása</translation>
     </message>
   </context>
   <context>
@@ -8436,8 +8437,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Az IP tartomány több mint 255 címet tartalmaz.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Keresési folyamat nem indítható</translation>
+      <source>Can not start the search process</source>
+      <translation>Nem lehet elindítani a keresési folyamatot</translation>
     </message>
   </context>
   <context>
@@ -8448,7 +8449,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>törölt kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8463,27 +8464,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Frissítések automatikus ellenőrzése</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Frissítések keresése</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Kényszer ellenőrzés</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Automatikus ellenőrzés letiltása</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Ellenőrizze egyszer</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Automatikus ellenőrzés</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8495,11 +8496,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Már telepítette ezt a verziót.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Frissítések ellenőrzése az interneten nem lehetséges</translation>
     </message>
     <message>
       <source>Build not found</source>
@@ -8507,27 +8508,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Nem lehet frissíteni a választott fájlból</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Érvénytelen frissítési információ</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>A korábbi verziókra történő áttérés nem lehetséges</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>A frissítési fájl nem található</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>A frissítési csomag megsérült</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Hiányzik a frissítőcsomag egyes szervereknél</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8536,7 +8537,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Nem érhető el frissítőcsomag</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8549,6 +8550,53 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Egyes kiszolgálók offline állapotban vannak, és nem frissülnek. Kihagyja őket?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Hiányzik a frissítőcsomag a klienshez</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Nincsenek online szerverek a frissítéshez.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Megszakítja a frissítést, és törli az összes letöltött adatot?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>A frissítés indítása sikertelen</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>A frissítés megszakítása sikertelen</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>A telepítés indítása sikertelen</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Néhány szerver nem fejezte be a frissítési folyamatot. Mindenesetre befejezi?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Nem sikerült letölteni a frissítési csomagokat egyes komponensekhez</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8567,24 +8615,56 @@ If you intended to move analytics data to another storage location, please conta
       <translation>A frissítés befejeződött</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>A frissítés befejeződött, de néhány összetevő frissítése sikertelen volt</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 a frissítés miatt újra fog indulni.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Hiba történt a frissítések telepítése során:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Frissítések letöltése...</translation>
     </message>
     <message>
+      <source>Finish Update</source>
+      <translation>Frissítés befejezése</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>A jelenleg telepített verzió a legfrissebb</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Ez a verzió már telepítve van</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Frissítés telepítése</translation>
+    </message>
+    <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Feltöltés</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Feltöltés &amp;&amp; Telepítés</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8592,15 +8672,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Letöltés &amp;&amp; Telepítés</translation>
+    </message>
+    <message>
+      <source>Browse for Another File...</source>
+      <translation>Másik fájl tallózása...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
       <translation type="unfinished">Select Another Build</translation>
-    </message>
-    <message>
-      <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8608,11 +8688,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Frissítések feltöltése...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Kliens csomag letöltése...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8620,7 +8700,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Kliens frissítések telepítése...</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Frissítés indul ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8631,12 +8715,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Készen áll a frissítésre</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Frissítés telepítése</translation>
+      <source>System updated to</source>
+      <translation>Rendszer frissítve</translation>
     </message>
     <message>
-      <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <source>Some servers have no update packages available.</source>
+      <translation>Egyes szervereknek nem állnak rendelkezésre frissítési csomagok.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Néhány szerver belső hibát észlelt.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Kérjük forduljon az ügyfélszolgálathoz.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8645,6 +8741,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Folytatás a háttérben</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Legutolsó elérhető frissítés</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8656,102 +8756,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Legutolsó elérhető frissítés</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Mégsem</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 a frissítés miatt újra fog indulni.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Frissítés a médiaszerverekről</translation>
     </message>
   </context>
   <context>
@@ -8765,7 +8770,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Nem rendelkezik elrendezésekkel</translation>
     </message>
   </context>
   <context>
@@ -8784,19 +8789,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Az eszköz lecsatlakozott</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>A kamera lecsatlakozott</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I/O modul szétkapcsolt</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Ismeretlen plugin diagnosztikai esemény</translation>
     </message>
   </context>
   <context>
@@ -8808,10 +8813,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Néhány felhasználó nem férhet hozzá a kiválasztott elrendezéshez. A művelet nem fog működni számukra.</translation>
-    </message>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Egyetlen kiválasztott felhasználó sem fér hozzá a kiválasztott elrendezéshez. A művelet nem fog működni.</translation>
@@ -8830,82 +8831,82 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>A kiválasztott felhasználói szerepek egyike sem tartalmaz felhasználókat. A művelet nem fog működni.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Néhány felhasználó nem férhet hozzá a kiválasztott elrendezéshez. A művelet nem fog működni számukra.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>A szerver hosszú ideje nem válaszol</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Nincs frissítési feladat</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Készen áll a frissítés letöltésére</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Frissítés letöltése</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Készen áll az újraindításra az új verzióra</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Frissítés telepítése</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Telepítve</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Nem sikerült a frissítés letöltése</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Várakozás a társadatokra</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Nincs elég hely a frissítő fájlok letöltéséhez.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Nincs elég hely a frissítő fájlok kibontásához.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Nem sikerült letölteni a frissítési csomagokat.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>A frissítés tartalma érvénytelen.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>A frissítési archívum sérült.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>A frissítő fájlokat nem lehet kibontani.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Belső letöltő hiba.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Belső kliens hiba.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8913,23 +8914,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Váratlan hibakód.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Készen áll a frissítés telepítésére</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>A frissítési csomag nem található.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Nincs elég hely a frissítés telepítéséhez.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Belső Szerverhiba.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Ez az operációs rendszer verziója már nem támogatott.</translation>
     </message>
   </context>
   <context>
@@ -9007,7 +9012,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Mozgás + alacsony felbontás</translation>
     </message>
   </context>
   <context>
@@ -9036,28 +9041,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Több beállítási lehetőség</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-stream nem támogatott ennél a kameránál</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-stream és mozgásérzékelés nem támogatott ennél a kameránál</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Mozgásérzékelés kikaplcsolva</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Bekapcsoláshoz és paraméterezéshez kattintson a &quot;Mozgás&quot; fülre a kamerabeállítások lapon</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Mozgásérzékelés kikapcsolva, vagy nem támogatott</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>A támogatottság ellenőrzéséhez és bekapcsolásához és bekapcsolásá a &quot;Mozgás&quot; fülre a kamerabeállítások lapon.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>A kettős streaming le van tiltva vagy nem támogatott</translation>
     </message>
   </context>
   <context>
@@ -9083,18 +9072,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>A felhasználók automatikusan kijelentkeznek, ha munkamenetük meghaladja a megadott időtartamot.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>A vízjelek élő, archivált és exportált videókon csak nem adminisztrátorok számára jelennek meg. Ön és a többi rendszergazda nem fogja látni őket.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Könyvtár</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Verzió</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9102,19 +9095,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>nincs hiba</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>a könyvtár fájl nem tölthető be</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>érvénytelen vagy nem kompatibilis plugin könyvtár</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>a plugin könyvtár inicializálása nem sikerült</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
@@ -9122,31 +9115,35 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>a plugin API verziója már nem támogatott</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>ismeretlen hiba</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Nincs betöltve</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Betöltve</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>a plugin a fekete listán van</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Állapot</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>a plugin nem kötelező, és nem szerepel a fehér listán</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>belső hiba</translation>
     </message>
   </context>
   <context>
@@ -9157,11 +9154,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Telepítve</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Telepítés...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9169,18 +9166,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Várakozás a szerver válaszára...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Nincs kapcsolat a szerverrel.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Hálózati hiba.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Szerverhiba.</translation>
     </message>
   </context>
   <context>
@@ -9195,7 +9196,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Frissítési fájlok tárolása</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9203,11 +9204,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Komponens</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Telepített verzió</translation>
     </message>
   </context>
   <context>
@@ -9224,14 +9225,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>A kijelölt területen</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Nincs mozgás</translation>
     </message>
@@ -9246,23 +9239,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n mozgás események</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Kiválasztott kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>semmi</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
@@ -9275,9 +9251,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>%n felhasználó nem állított be e-mail címet</numerusform>
+        <numerusform>%n felhasználó nem állított be e-mail címet</numerusform>
       </translation>
     </message>
     <message>
@@ -9296,14 +9272,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Kattintson duplán a kamerák hozzáadásához az aktuális elrendezéshez, vagy a Ctrl + kattintással nyissa meg új lapon</numerusform>
+        <numerusform>Kattintson duplán a kamerák hozzáadásához az aktuális elrendezéshez, vagy a Ctrl + kattintással nyissa meg új lapon</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Nincs elérhető archívum</translation>
     </message>
   </context>
   <context>
@@ -9314,7 +9290,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Időzóna</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9322,42 +9298,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Szerver OS idő</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS idő</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Idő, közös és szinkronizált minden szerver között. Az operációs rendszer idejétől eltérő lehet bármelyik kiszolgálón.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Szinkronizálva az Internettel</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Szinkronizálva a kiválasztott szerver helyi idejével</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Nem szinkronizálva. Minden szerver a saját helyi időt használja.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Egyenlő a szerver helyi idejével</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Nincs internetkapcsolat. Az idő nincs szinkronizálva.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Az időszerver offline állapotban van. Az idő nincs szinkronizálva.</translation>
     </message>
   </context>
   <context>
@@ -9383,7 +9359,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Nem lehetett feltölteni a szerver felőli oldalon: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9397,16 +9373,24 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>A fájl sérült a szerverre történő feltöltés közben</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>A &quot;%1&quot; távoli fájl sérült</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>A szerveren már van ez a fájl &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>A mozgást csak a videó feltöltésekor észleljük.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>A beállítás engedélyezése vagy letiltása semmit sem változtat a meglévő archívumban.</translation>
     </message>
   </context>
   <context>
@@ -9493,7 +9477,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Számos könyvjelző csak elrendezésként exportálható.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9505,27 +9489,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Exportálás indul...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Elrendezés mentése</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Mentés megállítása</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Sikertelen mentés</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Mentés kezdődik...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Fájlokat készítünk az exportálási folyamathoz. Várjon néhány másodpercet.</translation>
     </message>
   </context>
   <context>
@@ -9562,7 +9546,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Rekonstruálja a felbontást</translation>
     </message>
   </context>
   <context>
@@ -9600,14 +9584,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Bármely plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Az esemény csak akkor jelenik meg, ha a forrás a megadott kulcsszavak bármelyikével megegyezik.</translation>
@@ -9734,7 +9718,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Az elrendezés megtelt</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9792,7 +9776,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>A virtuális kamerákat nem lehet áthelyezni a szerverek között</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9804,7 +9788,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Minden támogatott</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9908,36 +9892,40 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>A jelszó megváltoztatása sikertelen %1/%n kamerán</numerusform>
+        <numerusform>A jelszó megváltoztatása sikertelen %1/%n kamerán</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Ez a kiadás csak tesztelési célokat szolgál.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Szerverbeállítások megnyitása</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Erősítse meg az analitikai adatok tárolási helyét &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation>a legnagyobb elérhető partíció</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
@@ -9956,7 +9944,7 @@ You can change storage location in the &quot;Storage Management&quot; tab in the
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>Váltás</translation>
     </message>
     <message>
       <source>Display for</source>

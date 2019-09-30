@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/request_param.h>
 #include <api/server_rest_connection.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::core;
 
@@ -131,8 +132,7 @@ bool QnRemotePtzController::sendRequest(
                 };
         }
 
-        // TODO: Make it guarded
-        PtzServerCallback callback =
+        PtzServerCallback callback = nx::utils::guarded(this,
             [this, command, deserializer=std::move(helper)](
                 bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& data)
             {
@@ -140,7 +140,8 @@ bool QnRemotePtzController::sendRequest(
                 QVariant value = deserializer(data);
                 auto notConstThis = const_cast<QnRemotePtzController*>(this);
                 emit notConstThis->finished(command, value);
-            };
+            });
+
         auto handle = connection->postJsonResult("/api/ptz", params, body, std::move(callback));
         Q_UNUSED(handle);
     }

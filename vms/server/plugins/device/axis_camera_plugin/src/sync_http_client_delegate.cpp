@@ -1,7 +1,4 @@
-/**********************************************************
-* 18 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "sync_http_client_delegate.h"
 
@@ -11,7 +8,6 @@
 #include <QThread>
 
 #include "sync_http_client.h"
-
 
 SyncHttpClientDelegate::SyncHttpClientDelegate( QNetworkAccessManager* networkAccessManager )
 :

@@ -26,13 +26,16 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <finders/systems_finder.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/mobile_client/controllers/audio_controller.h>
+#include <nx/vms/time/formatter.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::vms::utils;
 
@@ -44,6 +47,7 @@ static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
+    m_audioController(new AudioController(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
@@ -52,9 +56,13 @@ QnContext::QnContext(QObject* parent) :
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
         this)),
+    m_timeWatcher(commonModule()->instance<ServerTimeWatcher>()),
     m_localPrefix(lit("qrc:///")),
     m_customMargins()
 {
+    connect(m_connectionManager, &QnConnectionManager::sessionParametersChanged,
+        m_audioController, &AudioController::setSessionParameters);
+
     const auto screen = qApp->primaryScreen();
     screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
         | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation);
@@ -110,6 +118,28 @@ QnContext::QnContext(QObject* parent) :
         };
 
     connect(qApp->screens().first(), &QScreen::geometryChanged, this, updateMarginsCallback);
+
+    using UserWatcher = nx::vms::client::core::UserWatcher;
+    const auto userWatcher = commonModule()->instance<UserWatcher>();
+    connect(userWatcher, &UserWatcher::userNameChanged, this,
+        [this, userWatcher]()
+        {
+            if (userWatcher->userName().isEmpty())
+                m_uiController->disconnectFromSystem();
+        });
+
+    const auto updateTimeMode =
+        [this]()
+        {
+            m_timeWatcher->setTimeMode(qnSettings->serverTimeMode()
+                ? ServerTimeWatcher::serverTimeMode
+                : ServerTimeWatcher::clientTimeMode);
+        };
+    const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
+    connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
+    connect(m_timeWatcher, &ServerTimeWatcher::timeModeChanged,
+        this, &QnContext::serverTimeModeChanged);
+    updateTimeMode();
 }
 
 QnContext::~QnContext() {}
@@ -331,7 +361,7 @@ bool QnContext::setCloudCredentials(const QString& login, const QString& passwor
 {
     const nx::vms::common::Credentials credentials{login, password};
     nx::vms::client::core::settings()->cloudCredentials = credentials;
-    const bool result = cloudStatusWatcher()->setCredentials(credentials);
+    const bool result = cloudStatusWatcher()->forcedSetCredentials(credentials);
     return result;
 }
 
@@ -383,4 +413,14 @@ int QnContext::topCustomMargin() const
 int QnContext::bottomCustomMargin() const
 {
     return m_customMargins.bottom();
+}
+
+bool QnContext::serverTimeMode() const
+{
+    return m_timeWatcher->timeMode() == ServerTimeWatcher::serverTimeMode;
+}
+
+void QnContext::setServerTimeMode(bool value)
+{
+    qnSettings->setServerTimeMode(value);
 }

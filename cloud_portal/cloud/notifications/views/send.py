@@ -9,14 +9,20 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APIServiceException,\
+    api_success, ErrorCodes, get_client_ip
 from api.models import Account
-from cms.models import Customization, Product, UserGroupsToProductPermissions, get_cloud_portal_product
+from cms.models import Customization, Product, UserGroupsToProductPermissions, cloud_portal_customization_cache
 from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
 
 import re
+import logging
+
+logger = logging.getLogger(__name__)
+
+MESSAGE_TYPES = MessageTypes()
 
 
 # Replaces </p> and <br> with \n and then remove all html tags
@@ -39,7 +45,7 @@ def format_message(notification):
     return message
 
 
-def update_or_create_notification(data, customizations=[]):
+def update_or_create_notification(data, customizations=None):
     if not data['id']:
         notification = CloudNotification(subject=data['subject'], body=data['body'])
     else:
@@ -47,8 +53,8 @@ def update_or_create_notification(data, customizations=[]):
         notification.subject = data['subject']
         notification.body = data['body']
         notification.save()
-        customization_ids = list(Customization.objects.filter(name__in=customizations).values_list('id', flat=True))
-        notification.customizations = customization_ids
+        if customizations:
+            notification.customizations.set(Customization.objects.filter(name__in=customizations))
     notification.save()
     return notification.id
 
@@ -57,6 +63,10 @@ def update_or_create_notification(data, customizations=[]):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def send_event(request):
+    feedback_enabled = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')['feedback_enabled']
+    if not feedback_enabled:
+        raise APIServiceException('Feedback is currently unavailable', ErrorCodes.service_unavailable)
+
     try:
         validation_error = False
         error_data = {}
@@ -65,7 +75,10 @@ def send_event(request):
             validation_error = True
             error_data['type'] = ['This field is required.']
 
-        if 'type' in request.data and request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device' and 'productId' not in request.data:
+        if 'type' in request.data\
+            and request.data['type'] not in [MESSAGE_TYPES.ipvd_feedback_page,
+                                             MESSAGE_TYPES.ipvd_feedback_device]\
+                and 'productId' not in request.data:
             validation_error = True
             error_data['productId'] = ['This field is required.']
 
@@ -86,11 +99,12 @@ def send_event(request):
                                       error_data=error_data)
 
         product_id = ''
-        if request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device':
-            product = Product.objects.filter(id=request.data['productId'])
-            if product.exists():
-                request.data['product'] = product.first().name
-                product_id = product.first().id
+        if request.data['type'] not in [MESSAGE_TYPES.ipvd_feedback_page,
+                                        MESSAGE_TYPES.ipvd_feedback_device]:
+            product = Product.objects.filter(id=request.data['productId']).first()
+            if product:
+                request.data['product'] = product.name
+                product_id = product.id
         else:
             request.data['product'] = request.data['productId']
 
@@ -98,7 +112,10 @@ def send_event(request):
         request.data['sender_name'] = request.data['userName']
         request.data['sender_to_be_contacted'] = request.data['contact']
 
-        notifications_api.notify(request.data['type'], product_id, request.data)
+        ip = get_client_ip(request)
+        logging.info("ip: {}\t user: {}\nrequest data: {}".format(ip, request.user, request.data))
+
+        notifications_api.send_feedback(request.data['type'], product_id, request.data)
 
     except ValidationError as error:
         error_data = error.detail if hasattr(error, 'detail') else None
@@ -120,7 +137,7 @@ def send_notification(request):
             msg = notifications_api.find_message(external_id)
             if msg:
                 # there is already a message with this id - do not send the message, respond with status
-                serializer = models.MessageStatusSerializer(msg, many=False)
+                serializer = MessageStatusSerializer(msg, many=False)
                 return api_success(serializer.data)
 
         if 'user_email' not in request.data or not request.data['user_email']:
@@ -144,15 +161,15 @@ def send_notification(request):
 
         # Clouddb doesn't always return a full name so try to get it from cloud portal
         if 'userFullName' not in request.data['message'] or not request.data['message']['userFullName']:
-            user_account = Account.objects.filter(email=request.data['user_email'])
-            if user_account.exists():
-                request.data['message']['userFullName'] = user_account[0].get_full_name()
+            user_account = Account.objects.filter(email=request.data['user_email']).first()
+            if user_account:
+                request.data['message']['userFullName'] = user_account.get_full_name()
 
         notifications_api.send(request.data['user_email'],
-                 request.data['type'],
-                 request.data['message'],
-                 request.data['customization'],
-                 external_id)
+                               request.data['type'],
+                               request.data['message'],
+                               request.data['customization'],
+                               external_id)
     except ValidationError as error:
         error_data = error.detail if hasattr(error, 'detail') else None
         raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error_data)

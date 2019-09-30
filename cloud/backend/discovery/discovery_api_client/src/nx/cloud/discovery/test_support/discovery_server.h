@@ -32,8 +32,9 @@ public:
     /**
      * Event is emitted before the node is actually registered with discovery service.
      */
-    nx::utils::SubscriptionId subscribeToNodeDiscovered(
-        nx::utils::MoveOnlyFunc<void(std::string /*clusterId*/, NodeInfo /*nodeInfo*/)> handler);
+    void subscribeToNodeDiscovered(
+        nx::utils::MoveOnlyFunc<void(const std::string&, const NodeInfo&)> handler,
+        nx::utils::SubscriptionId* const outId);
 
     void unsubscribeFromNodeDiscovered(const nx::utils::SubscriptionId& subscriptionId);
 

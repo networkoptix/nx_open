@@ -100,15 +100,16 @@ public:
 enum class SystemAccessRole
 {
     none = 0,
-    disabled = 1,
-    custom = 2,
-    liveViewer = 3,
-    viewer = 4,
-    advancedViewer = 5,
-    localAdmin = 6,
-    cloudAdmin = 7,
-    maintenance = 8,
-    owner = 9,
+    disabled,
+    custom,
+    liveViewer,
+    viewer,
+    advancedViewer,
+    localAdmin,
+    cloudAdmin,
+    maintenance,
+    owner,
+    system,
 };
 
 class SystemSharing

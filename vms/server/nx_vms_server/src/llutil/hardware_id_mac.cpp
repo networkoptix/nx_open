@@ -5,16 +5,20 @@
 #endif
 
 #include <cassert>
+#include <uuid/uuid.h>
 
 #include <QtCore/QStringList>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/uuid.h>
 
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 
 namespace {
+
+const QString kEmptyMac = "";
 
 inline std::string trim(const std::string& str)
 {
@@ -69,16 +73,34 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
 #endif
 }
 
-void fillHardwareIds(QList<QList<LLUtil::MacAndItsHardwareIds> >&, QnHardwareInfo&)
+void fillHardwareIds(
+    QnMediaServerModule* serverModule,
+    HardwareIdListType& hardwareIds,
+    QnHardwareInfo& hardwareInfo)
 {
-    // Unused on macosx, but has to be present to linkage to succeed.
-    NX_CRITICAL(false);
+    struct timespec wait = {1, 0}; // 1 second.
+    uuid_t uuid;
+    if (gethostuuid(uuid, &wait) != 0)
+        return;
+    uuid_string_t UUIDStr;
+    uuid_unparse(uuid, UUIDStr);
+
+    hardwareInfo.boardUUID = QString::fromUtf8(UUIDStr);
+    hardwareInfo.compatibilityBoardUUID = nx::utils::changedGuidByteOrder(hardwareInfo.boardUUID);
+
+    QStringList hardwareIdList = QStringList() << hardwareInfo.boardUUID;
+
+    HardwareIdListForVersion macHardwareIds;
+    macHardwareIds << MacAndItsHardwareIds(kEmptyMac, hardwareIdList);
+
+    for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
+        hardwareIds << macHardwareIds;
+    }
 }
 
 void calcHardwareIdMap(QMap<QString, QString>&, const QnHardwareInfo&, int, bool)
 {
     // Unused on macosx, but has to be present to linkage to succeed.
-    NX_CRITICAL(false);
 }
 
 }

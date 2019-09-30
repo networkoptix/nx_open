@@ -7,7 +7,7 @@
 
 #include "attributes_dao.h"
 #include "device_dao.h"
-#include "object_searcher.h"
+#include "object_track_searcher.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {
@@ -37,7 +37,7 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    if (!filter.objectAppearanceId.isNull())
+    if (!filter.objectTrackId.isNull())
         *result = selectTimePeriodsByObject(queryContext, filter, options);
     else
         *result = selectTimePeriodsFiltered(queryContext, filter, options);
@@ -52,17 +52,19 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
 {
     using namespace std::chrono;
 
-    ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
-    const auto objects = objectSearcher.lookup(queryContext);
+    ObjectTrackSearcher objectTrackSearcher(
+        m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
+
+    const auto tracks = objectTrackSearcher.lookup(queryContext);
 
     QnTimePeriodList result;
-    for (const auto& object: objects)
+    for (const auto& track: tracks)
     {
-        for (const auto& position: object.track)
+        for (const auto& position: track.objectPositionSequence)
         {
             result += QnTimePeriod(
-                duration_cast<milliseconds>(microseconds(position.timestampUsec)),
-                duration_cast<milliseconds>(microseconds(position.durationUsec)));
+                duration_cast<milliseconds>(microseconds(position.timestampUs)),
+                duration_cast<milliseconds>(microseconds(position.durationUs)));
         }
     }
 
@@ -75,27 +77,24 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    AnalyticsArchive::Filter archiveFilter =
-        AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
-    archiveFilter.region = options.region;
-    archiveFilter.detailLevel = options.detailLevel;
+    auto archiveFilter =
+        AnalyticsArchiveDirectory::prepareArchiveFilter(
+            queryContext, filter, m_objectTypeDao, m_attributesDao);
 
-    nx::utils::ElapsedTimer timer;
-
-    if (!filter.freeText.isEmpty())
+    if (!archiveFilter)
     {
-        timer.restart();
-        const auto attributeGroups =
-            m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
-        std::copy(
-            attributeGroups.begin(), attributeGroups.end(),
-            std::back_inserter(archiveFilter.allAttributesHash));
-        NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
+        NX_DEBUG(this, "Time periods lookup canceled. The filter is %1", filter);
+        return QnTimePeriodList(); //< No records with such text.
     }
 
+    archiveFilter->detailLevel = options.detailLevel;
+
+    nx::utils::ElapsedTimer timer;
     timer.restart();
-    const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
-    NX_DEBUG(this, "Time periods lookup completed in %1", timer.elapsed());
+    NX_DEBUG(this, "Time periods lookup started, filter is %1", filter);
+    const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, *archiveFilter);
+    NX_DEBUG(this, "Time periods lookup completed in %1, %2 periods found by filter %3",
+        timer.elapsed(), timePeriods.size(), filter);
     return timePeriods;
 }
 

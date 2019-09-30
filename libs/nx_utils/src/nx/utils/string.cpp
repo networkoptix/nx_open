@@ -525,8 +525,8 @@ std::vector<QnByteArrayConstRef> splitQuotedString(
 
         if (((groupTokens & GroupToken::doubleQuotes) && ch == '"') ||
             ((groupTokens & GroupToken::singleQuotes) && ch == '\'') ||
-            ((groupTokens & GroupToken::squareBraces) && ch == '[') ||
-            ((groupTokens & GroupToken::roundBraces) && ch == '('))
+            ((groupTokens & GroupToken::squareBrackets) && ch == '[') ||
+            ((groupTokens & GroupToken::roundBrackets) && ch == '('))
         {
             currentGroupClosingToken =
                 ch == '"' ? '"' :
@@ -667,9 +667,11 @@ QByteArray formatJsonString(const QByteArray& data)
     return result;
 }
 
-int stricmp(const std::string& left, const std::string& right)
+int stricmp(const QByteArray& left, const QByteArray& right)
 {
-    return qstricmp(left.c_str(), right.c_str());
+    return stricmp(
+        std::string_view(left.data(), left.size()),
+        std::string_view(right.data(), right.size()));
 }
 
 } // namespace nx::utils

@@ -819,10 +819,10 @@ public:
     // but it is not currently used.
 };
 // ------------------------------------------------------------------------------------------------
-class SubscriptionManagerSoapWrapper : public SoapWrapper<SubscriptionManagerBindingProxy>
+class SubscriptionManagerSoapWrapper: public SoapWrapper<SubscriptionManagerBindingProxy>
 {
 public:
-    SubscriptionManagerSoapWrapper(SoapParams soapParams) :
+    SubscriptionManagerSoapWrapper(SoapParams soapParams):
         SoapWrapper<SubscriptionManagerBindingProxy>(std::move(soapParams))
     {
     }

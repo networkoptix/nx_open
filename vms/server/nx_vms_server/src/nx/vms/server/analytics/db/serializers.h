@@ -80,8 +80,6 @@ private:
  */
 QRect translate(const QRectF& box, const QSize& resolution);
 
-QRect translateToSearchGrid(const QRectF& box);
-
 /**
  * Used to restore QRect translated to QRectF.
  * The difference from translate is that translate always makes sure the resulting QRect contains
@@ -97,8 +95,6 @@ QRect restore(const QRectF& box, const QSize& resolution);
  * Translates rect coordinates from [0; resolution.width()] and [0; resolution.height()] to [0; 1].
  */
 QRectF translate(const QRect& box, const QSize& resolution);
-
-bool rectsIntersectToSearchPrecision(const QRectF& one, const QRectF& two);
 
 template<typename Rect>
 struct OtherRect {};

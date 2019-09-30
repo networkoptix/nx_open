@@ -2,18 +2,17 @@ import QtQuick 2.0
 import Nx 1.0
 import Nx.Controls 1.0
 
-ScrollView
+Scrollable
 {
-    id: navigationMenu
+    id: control
 
     property var currentItemId: null
-
     default property alias data: column.data
 
-    topPadding: 16
-    bottomPadding: 16
+    scrollView.topPadding: 16
+    scrollView.bottomPadding: 16
 
-    background: Rectangle
+    scrollView.background: Rectangle
     {
         color: ColorTheme.colors.dark8
 
@@ -26,23 +25,18 @@ ScrollView
         }
     }
 
-    Flickable
+    contentItem: Column
     {
-        boundsBehavior: Flickable.StopAtBounds
+        id: column
+        width: control.width
 
-        Column
+        onChildrenChanged:
         {
-            id: column
-            width: navigationMenu.width
-
-            onChildrenChanged:
+            for (var i = 0; i < children.length; ++i)
             {
-                for (var i = 0; i < children.length; ++i)
-                {
-                    var item = children[i]
-                    if (item.hasOwnProperty("navigationMenu"))
-                        item.navigationMenu = navigationMenu
-                }
+                var item = children[i]
+                if (item.hasOwnProperty("navigationMenu"))
+                    item.navigationMenu = control
             }
         }
     }

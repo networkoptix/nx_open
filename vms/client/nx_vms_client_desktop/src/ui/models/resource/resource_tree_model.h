@@ -11,8 +11,9 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
+#include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <common/common_module_aware.h>
 
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
@@ -20,11 +21,13 @@
 class QnResourceTreeModelCustomColumnDelegate;
 class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
+class QnWorkbenchAccessController;
+class QnWorkbenchLayoutSnapshotManager;
 namespace nx::vms::client::desktop { struct WearableState; }
 
-class QnResourceTreeModel:
+class NX_VMS_CLIENT_DESKTOP_API QnResourceTreeModel:
     public Connective<QAbstractItemModel>,
-    public QnWorkbenchContextAware
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -39,11 +42,15 @@ public:
         CamerasScope
     };
 
-    explicit QnResourceTreeModel(Scope scope, QObject* parent);
+    explicit QnResourceTreeModel(
+        Scope scope,
+        QnWorkbenchAccessController* accessController,
+        QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
+        QObject* parent);
 
-    virtual ~QnResourceTreeModel();
+    virtual ~QnResourceTreeModel() override;
 
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex buddy(const QModelIndex& index) const override;
     virtual QModelIndex parent(const QModelIndex& index) const override;
     virtual bool hasChildren(const QModelIndex& parent) const override;
@@ -53,7 +60,7 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    virtual QHash<int,QByteArray> roleNames() const;
+    virtual QHash<int, QByteArray> roleNames() const;
 
     virtual QStringList mimeTypes() const override;
     virtual QMimeData* mimeData(const QModelIndexList& indexes) const override;
@@ -70,15 +77,30 @@ public:
 
     QnResourceTreeModelNodePtr rootNode(NodeType nodeType) const;
 
+    bool resetInProgress() const;
+
     // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
+    QnWorkbenchAccessController* accessController() const;
+    QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager() const;
+
+    // TODO: #vbreus May not be set in unit test environment.
+    nx::vms::client::desktop::ui::action::Manager* actionManager() const;
+    void setActionManager(nx::vms::client::desktop::ui::action::Manager* manager);
+
+    QnUserResourcePtr user() const;
+
+signals:
+    void userChanged(QnUserResourcePtr& user);
 
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
-    /** Calculate real children as node's children() method does not return bastard nodes. */
-    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
+    /**
+     * Calculate all real children as node's children() method does not return bastard nodes.
+     */
+    QSet<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(
@@ -171,11 +193,17 @@ private:
 
     bool m_systemHasManyServers = false;
 
+    nx::vms::client::desktop::ui::action::Manager* m_actionManager = nullptr;
+    QnWorkbenchAccessController* m_accessController;
+    QnWorkbenchLayoutSnapshotManager* m_layoutSnapshotManager;
+
     /** Node managers. */
-    // TODO: Make them registerable by type.
+    // TODO: Make them registrable by type.
     //Probably turn QnResourceTreeModelUserNodes into such manager too.
-    QnResourceTreeModelNodeManager* const m_nodeManager;
-    QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
+    QnResourceTreeModelNodeManager* m_nodeManager = nullptr;
+    QnResourceTreeModelLayoutNodeManager* m_layoutNodeManager = nullptr;
+
+    bool m_resetInProgress = false;
 };
 
 Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)

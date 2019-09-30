@@ -10,7 +10,7 @@ namespace sdk {
 class IStringMap: public nx::sdk::Interface<IStringMap>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IStringMap"); }
+    static auto interfaceId() { return makeId("nx::sdk::IStringMap"); }
 
     virtual int count() const = 0;
 

@@ -1,0 +1,9 @@
+<h1>Xin chào, {{ message.userFullName }}</h1>
+
+<a href="mailto:{{ message.sender_email }}">{{ message.sender_name }}</a>đã đưa ra phản hồi sau cho {{ message.product }}:
+<div>{{ message.message }}</div>
+<br />
+<hr />
+<div>
+    Người dùng có thể liên lạc: {{ message.sender_to_be_contacted}}
+</div>

@@ -22,7 +22,8 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    m_engine(engine)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
@@ -70,13 +71,13 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
 {
-    NX_OUTPUT << __func__ << "() -> noError";
-    return Error::noError;
+    NX_OUTPUT << __func__ << "() has been called";
 }
 
-std::string DeviceAgent::manifest() const
+std::string DeviceAgent::manifestString() const
 {
     return R"manifest(
         {
@@ -201,7 +202,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto objectMetadata = makePtr<ObjectMetadata>();
-        objectMetadata->setId(UuidHelper::randomUuid());
+        objectMetadata->setTrackId(UuidHelper::randomUuid());
         objectMetadata->setTypeId(m_objectTypeId);
         objectMetadata->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
 

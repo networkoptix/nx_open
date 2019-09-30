@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.4
 import Nx 1.0
+import Nx.Utils 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
@@ -14,14 +15,16 @@ Item
 {
     id: videoNavigation
 
+    readonly property alias timeline: timeline
+    readonly property alias playback: playbackController
     readonly property bool hasArchive: d.hasArchive && videoNavigation.canViewArchive
-    property var videoScreenController
+    property var controller
     property bool paused: true
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
     property bool canViewArchive: true
-    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
+    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.overallHeight : 0
 
     property alias motionSearchMode: motionSearchModeButton.checked
     property alias motionFilter: cameraChunkProvider.motionFilter
@@ -35,7 +38,7 @@ Item
     signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
-    implicitHeight: navigator.height + buttonsPanel.height
+    implicitHeight: navigator.height + buttonsPanel.overallHeight
     anchors.bottom: parent ? parent.bottom : undefined
 
     onDrawingRoiChanged: updateWarningTextTimer.restart()
@@ -44,7 +47,7 @@ Item
 
     Connections
     {
-        target: videoScreenController
+        target: controller
         onResourceIdChanged:
         {
             actionButtonsPanelOpacityBehaviour.enabled = false
@@ -57,11 +60,11 @@ Item
 
     Connections
     {
-        target: videoScreenController.mediaPlayer
+        target: controller.mediaPlayer
 
         onPlaybackStateChanged:
         {
-            var state = videoScreenController.mediaPlayer.playbackState
+            var state = controller.mediaPlayer.playbackState
             if (state == MediaPlayer.Previewing)
                 return //< In case of previewing we do not change paused state.
 
@@ -75,7 +78,7 @@ Item
 
         readonly property bool loadingChunks:
             cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
-        property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
+        property bool loaded: controller.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool controlsNeeded: !cameraChunkProvider.loading || loaded
 
         property real controlsOpacity:
@@ -97,32 +100,6 @@ Item
         }
 
         onLoadingChunksChanged: updateWarningTextTimer.restart()
-        onLoadedChanged: d.updateTimelinePosition()
-
-        Connections
-        {
-            target: videoScreenController.mediaPlayer
-            onPositionChanged: d.updateTimelinePosition()
-        }
-
-        function goToPosition(position, savePosition)
-        {
-            resumePosition = -1
-            timeline.timelineView.position = position
-            videoScreenController.setPosition(position, savePosition)
-        }
-
-        function updateTimelinePosition()
-        {
-            if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
-                return
-
-            if (!timeline.moving && !d.liveMode)
-            {
-                timeline.autoReturnToBounds = false
-                timeline.position = videoScreenController.mediaPlayer.position
-            }
-        }
 
         Timer
         {
@@ -143,7 +120,7 @@ Item
             var hasMotionChunks = cameraChunkProvider.hasMotionChunks()
             if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
-            else if (!cameraChunkProvider.hasChunks())
+            else if (!cameraChunkProvider.hasChunks() || !cameraChunkProvider.hasMotionChunks())
                 videoNavigation.warningText = qsTr("No motion data for this camera")
             else if (videoNavigation.hasCustomRoi)
                 videoNavigation.warningText = qsTr("No motion found in the selected area")
@@ -153,10 +130,9 @@ Item
 
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
-            videoScreenController
-            && videoScreenController.mediaPlayer.liveMode
+            controller
+            && controller.mediaPlayer.liveMode
             && !playbackController.paused
-        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -171,15 +147,13 @@ Item
             }
         }
         Screen.onPrimaryOrientationChanged: updateNavigatorPosition()
-
-        readonly property var locale: Qt.locale()
     }
 
-    QnCameraChunkProvider
+    ChunkProvider
     {
         id: cameraChunkProvider
 
-        resourceId: videoScreenController.resourceId
+        resourceId: controller.resourceId
 
         onLoadingChanged:
         {
@@ -226,7 +200,7 @@ Item
             anchors.fill: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
-            drag.maximumY: buttonsPanel.height
+            drag.maximumY: buttonsPanel.overallHeight
             drag.filterChildren: true
             drag.threshold: 10
 
@@ -302,517 +276,517 @@ Item
             onClicked: videoNavigation.switchToNextCamera()
         }
 
-        MotionPlaybackMaskWatcher
-        {
-            active: videoNavigation.motionSearchMode
-            mediaPlayer: videoScreenController.mediaPlayer
-            chunkProvider: cameraChunkProvider
-        }
-
-        Timeline
-        {
-            id: timeline
-
-            property bool resumeWhenDragFinished: false
-
-            motionSearchMode: videoNavigation.motionSearchMode
-            serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
-            enabled: d.hasArchive
-            visible: videoNavigation.canViewArchive
-
-            anchors.bottom: parent.bottom
-
-            x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
-            width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
-
-            height: 96
-
-            stickToEnd: d.liveMode && !paused
-
-            chunkBarHeight: 16
-            textY: height - chunkBarHeight - 16 - 14
-
-            chunkProvider: cameraChunkProvider
-            startBound: cameraChunkProvider.bottomBound
-
-            readonly property color lineColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
-            readonly property real lineOpacity:
-                videoNavigation.canViewArchive && d.hasArchive ? d.timelineOpacity : 0
-
-            Rectangle
-            {
-                width: parent.width
-                height: 1
-                anchors.bottom: timeline.bottom
-                anchors.bottomMargin: -1
-                opacity: timeline.lineOpacity
-                color: timeline.lineColor
-            }
-
-            Rectangle
-            {
-                width: parent.width
-                height: 1
-                anchors.bottom: timeline.bottom
-                anchors.bottomMargin: timeline.chunkBarHeight
-                opacity: timeline.lineOpacity
-                color: timeline.lineColor
-            }
-
-            onWindowSizeChanged: d.lastWindowSize = windowSize
-
-            onMovingChanged:
-            {
-                if (!moving)
-                {
-                    videoScreenController.setPosition(position, true)
-                    if (resumeWhenDragFinished)
-                        videoScreenController.play()
-                    else
-                        videoScreenController.pause()
-                    timeline.autoReturnToBounds = true
-                }
-            }
-
-            onPositionTapped: d.goToPosition(position, true)
-
-            onPositionChanged:
-            {
-                if (!dragging)
-                    return
-
-                videoScreenController.setPosition(position)
-            }
-
-            onDraggingChanged:
-            {
-                if (dragging)
-                {
-                    resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.preview()
-                    d.resumePosition = -1
-                }
-            }
-        }
-
         Item
         {
-            id: timelineMask
+            id: playbackControls
 
-            anchors.fill: timeline
-            visible: false
+            visible: !controller.serverOffline
+            anchors.fill: parent
 
-            Rectangle
+            MotionPlaybackMaskWatcher
             {
-                id: blurRectangle
-
-                readonly property real blurWidth: 16
-                readonly property real margin: 8
-
-                width: timeline.height - timeline.chunkBarHeight
-                height: timeline.width
-                rotation: 90
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-                gradient: Gradient
-                {
-                    GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                }
+                active: videoNavigation.motionSearchMode
+                mediaPlayer: controller.mediaPlayer
+                chunkProvider: cameraChunkProvider
             }
 
-            Rectangle
+            Timeline
             {
-                width: timeline.width
-                height: timeline.chunkBarHeight
-                anchors.bottom: parent.bottom
-                color: "#ffffffff"
-            }
-        }
+                id: timeline
 
-        OpacityMask
-        {
-            id: timelineOpactiyMask
+                property bool resumeWhenDragFinished: false
 
-            anchors.fill: timeline
-            source: timeline.timelineView
-            maskSource: timelineMask
-            opacity: Math.min(d.controlsOpacity, d.timelineOpacity, timeline.visible ? 1 : 0)
+                displayOffset: timeHelper.displayOffset
 
-            Component.onCompleted: timeline.timelineView.visible = false
-        }
-
-        Text
-        {
-            anchors.horizontalCenter: timeline.horizontalCenter
-            text: qsTr("No Archive")
-            font.capitalization: Font.AllUppercase
-            font.pixelSize: 12
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
-            color: ColorTheme.windowText
-            visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
-            opacity: 0.5 * timelineOpactiyMask.opacity
-        }
-
-        Pane
-        {
-            id: buttonsPanel
-
-            readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
-            readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
-
-            width: parent.width
-            height: visible ? 56 : 0
-            anchors.top: timeline.bottom
-            background: Item {}
-            padding: 4
-            z: 1
-
-            readonly property bool showButtonsPanel: actionButtonsPanel.buttonsCount > 0
-            visible: videoNavigation.canViewArchive || showButtonsPanel
-
-            opacity: d.controlsOpacity
-
-            IconButton
-            {
-                id: calendarButton
-
-                padding: 0
-                visible: videoNavigation.canViewArchive
-                anchors.verticalCenter: parent.verticalCenter
-                icon.source: lp("/images/calendar.png")
+                bottomOverlap: 16
+                motionSearchMode: videoNavigation.motionSearchMode
                 enabled: d.hasArchive
-                onClicked:
+                visible: videoNavigation.canViewArchive
+
+                anchors.bottom: parent.bottom
+
+                x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
+                width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
+
+                height: 96
+
+                stickToEnd: d.liveMode && !paused
+
+                chunkBarHeight: 16
+                textY: height - chunkBarHeight - 16 - 14
+
+                chunkProvider: cameraChunkProvider
+                startBound: cameraChunkProvider.bottomBound
+
+                readonly property color lineColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
+                readonly property real lineOpacity:
+                    videoNavigation.canViewArchive && d.hasArchive ? d.timelineOpacity : 0
+
+                Rectangle
                 {
-                    calendarPanel.chunkProvider = cameraChunkProvider
-                    calendarPanel.date = timeline.positionDate
-                    calendarPanel.open()
-                }
-            }
-
-            IconButton
-            {
-                id: motionSearchModeButton
-
-                checked: false
-                checkable: true
-                anchors.left:  calendarButton.right
-                anchors.verticalCenter: parent.verticalCenter
-                icon.source: lp("/images/motion.svg")
-                icon.width: 24
-                icon.height: 24
-                padding: 0
-                checkedPadding: 4
-                normalIconColor: ColorTheme.contrast1
-                checkedIconColor: ColorTheme.base1
-                visible: videoNavigation.hasArchive
-                onCheckedChanged:
-                {
-                    videoScreenController.mediaPlayer.autoJumpPolicy = checked
-                        ? MediaPlayer.DisableAutoJump
-                        : MediaPlayer.DisableAutoJumpOnPreviewing
-                }
-            }
-
-            Row
-            {
-                id: zoomButtonsRow
-
-                anchors.centerIn: parent
-                visible: (buttonsPanel.showZoomControls || !d.liveMode)
-                    && videoNavigation.canViewArchive
-
-                IconButton
-                {
-                    id: zoomOutButton
-
-                    padding: 0
-                    icon.source: lp("/images/minus.png")
-                    enabled: d.hasArchive
-                    onClicked: timeline.zoomOut()
+                    width: parent.width
+                    height: 1
+                    anchors.bottom: timeline.bottom
+                    anchors.bottomMargin: -1
+                    opacity: timeline.lineOpacity
+                    color: timeline.lineColor
                 }
 
-                IconButton
+                Rectangle
                 {
-                    id: zoomInButton
-
-                    padding: 0
-                    icon.source: lp("/images/plus.png")
-                    enabled: d.hasArchive
-                    onClicked: timeline.zoomIn()
-                }
-            }
-
-            Button
-            {
-                id: liveModeButton
-
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("LIVE")
-                labelPadding: 0
-                rightPadding: 0
-                leftPadding: 0
-                flat: true
-                onClicked:
-                {
-                    playbackController.checked = false
-                    videoScreenController.playLive()
+                    width: parent.width
+                    height: 1
+                    anchors.bottom: timeline.bottom
+                    anchors.bottomMargin: timeline.chunkBarHeight
+                    opacity: timeline.lineOpacity
+                    color: timeline.lineColor
                 }
 
-                visible: opacity > 0
-                opacity: 0
+                onWindowSizeChanged: d.lastWindowSize = windowSize
 
-                property bool shouldBeVisible:
+                onMovingChanged:
                 {
-                    var currentTime = (new Date()).getTime()
-                    var futurePosition = position > currentTime
-                    var canViewArchive = videoNavigation.canViewArchive
-                    return canViewArchive && !d.liveMode && !futurePosition
-                        && !videoScreenController.resourceHelper.isWearableCamera
-                }
-
-                readonly property real position: videoScreenController.mediaPlayer.position
-                onPositionChanged: updateOpacity()
-                onShouldBeVisibleChanged: updateOpacity()
-
-                function updateOpacity()
-                {
-                    opacity = shouldBeVisible ? 1 : 0
-                }
-
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-            }
-
-            ActionButtonsPanel
-            {
-                id: actionButtonsPanel
-
-                visible: opacity > 0
-
-                resourceId: videoScreenController.resourceId
-                anchors.left:
-                {
-                    if (buttonsPanel.showZoomControls)
-                        return zoomButtonsRow.right
-
-                    return motionSearchModeButton.visible
-                        ? motionSearchModeButton.right
-                        : calendarButton.right
-                }
-
-                anchors.right: parent.right
-                anchors.rightMargin: -4
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                Binding
-                {
-                    target: actionButtonsPanel
-                    property: "opacity"
-                    value:
+                    if (!moving)
                     {
-                        var futurePosition =
-                            videoScreenController.mediaPlayer.position > (new Date()).getTime()
-                        var live = d.liveMode || futurePosition
-                        return live && buttonsPanel.showButtonsPanel ? 1 : 0
+                        controller.setPosition(position, true)
+                        if (resumeWhenDragFinished)
+                            controller.play()
+                        else
+                            controller.pause()
+                        timeline.autoReturnToBounds = true
                     }
                 }
 
-                onPtzButtonClicked: videoNavigation.ptzButtonClicked()
-                onTwoWayAudioButtonPressed: twoWayAudioController.start()
-                onTwoWayAudioButtonReleased: twoWayAudioController.stop()
+                onPositionTapped: controller.forcePosition(position, true)
 
-                Behavior on opacity
+                onPositionChanged:
                 {
-                    id: actionButtonsPanelOpacityBehaviour
-
-                    NumberAnimation { duration: 200 }
+                    if (dragging)
+                        controller.setPosition(position)
                 }
 
-                Binding
+                onDraggingChanged:
                 {
-                    target: twoWayAudioController
-                    property: "resourceId"
-                    value: videoScreenController.resourceId
+                    if (dragging)
+                    {
+                        resumeWhenDragFinished = !videoNavigation.paused
+                        controller.preview()
+                    }
                 }
-            }
-
-            Timer
-            {
-                interval: 100
-                repeat: true
-                running: zoomInButton.down || zoomOutButton.down
-                triggeredOnStart: true
-                onTriggered:
-                {
-                    if (zoomInButton.down)
-                        timeline.zoomIn()
-                    else
-                        timeline.zoomOut()
-                }
-            }
-        }
-
-        Item
-        {
-            id: dateTimeLabel
-
-            visible: videoNavigation.canViewArchive
-            height: 48
-            width: parent.width
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight + 8
-            opacity: d.controlsOpacity
-
-            Text
-            {
-                id: dateLabel
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                height: 20
-                font.pixelSize: 13
-                font.weight: Font.Normal
-                verticalAlignment: Text.AlignVCenter
-
-                text: timeline.positionDate.toLocaleDateString(d.locale, "d MMMM yyyy")
-                color: ColorTheme.windowText
-
-                opacity: d.liveMode ? 0.0 : 1.0
-                Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
             Item
             {
-                id: timeLiveLabel
+                id: timelineMask
 
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.fill: timeline
+                visible: false
 
-                y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
-                Behavior on y { NumberAnimation { duration: 200 } }
-
-                width: timeLabel.visible ? timeLabel.width : liveLabel.width
-                height: timeLabel.height
-
-                TimeLabel
+                Rectangle
                 {
-                    id: timeLabel
-                    dateTime: timeline.positionDate
-                    visible: !d.liveMode
+                    id: blurRectangle
+
+                    readonly property real blurWidth: 16
+                    readonly property real margin: 8
+
+                    width: timeline.height - timeline.chunkBarHeight
+                    height: timeline.width
+                    rotation: 90
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+                    gradient: Gradient
+                    {
+                        GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    }
+                }
+
+                Rectangle
+                {
+                    width: timeline.width
+                    height: timeline.chunkBarHeight
+                    anchors.bottom: parent.bottom
+                    color: "#ffffffff"
+                }
+            }
+
+            OpacityMask
+            {
+                id: timelineOpactiyMask
+
+                anchors.fill: timeline
+                source: timeline.timelineView
+                maskSource: timelineMask
+                opacity: Math.min(d.controlsOpacity, d.timelineOpacity, timeline.visible ? 1 : 0)
+
+                Component.onCompleted: timeline.timelineView.visible = false
+            }
+
+            Text
+            {
+                anchors.horizontalCenter: timeline.horizontalCenter
+                text: qsTr("No Archive")
+                font.capitalization: Font.AllUppercase
+                font.pixelSize: 12
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
+                color: ColorTheme.windowText
+                visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
+                opacity: 0.5 * timelineOpactiyMask.opacity
+            }
+
+            Pane
+            {
+                id: buttonsPanel
+
+                readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
+                readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
+
+                readonly property real overallHeight: buttonsPanel.height + timeline.bottomOverlap
+                readonly property real childrenCenterOffset: -timeline.bottomOverlap / 2
+                width: parent.width
+                height: visible ? 56 - timeline.bottomOverlap: 0
+                anchors.top: timeline.bottom
+                anchors.topMargin: timeline.bottomOverlap
+
+                background: Item {}
+                padding: 4
+                z: 1
+
+                readonly property bool showButtonsPanel: actionButtonsPanel.buttonsCount > 0
+                visible: videoNavigation.canViewArchive || showButtonsPanel
+
+                opacity: d.controlsOpacity
+
+                IconButton
+                {
+                    id: calendarButton
+
+                    padding: 0
+                    visible: videoNavigation.canViewArchive
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+                    icon.source: lp("/images/calendar.png")
+                    enabled: d.hasArchive
+                    onClicked: calendarPanel.open()
+                }
+
+                IconButton
+                {
+                    id: motionSearchModeButton
+
+                    checked: false
+                    checkable: true
+                    anchors.left:  calendarButton.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+                    icon.source: lp("/images/motion.svg")
+                    icon.width: 24
+                    icon.height: 24
+                    padding: 0
+                    checkedPadding: 4
+                    normalIconColor: ColorTheme.contrast1
+                    checkedIconColor: ColorTheme.base1
+                    visible: videoNavigation.hasArchive
+                    onCheckedChanged:
+                    {
+                        controller.mediaPlayer.autoJumpPolicy = checked
+                            ? MediaPlayer.DisableAutoJump
+                            : MediaPlayer.DisableAutoJumpOnPreviewing
+                    }
+                }
+
+                Row
+                {
+                    id: zoomButtonsRow
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+                    visible: (buttonsPanel.showZoomControls || !d.liveMode)
+                        && videoNavigation.canViewArchive
+
+                    IconButton
+                    {
+                        id: zoomOutButton
+
+                        padding: 0
+                        icon.source: lp("/images/minus.png")
+                        enabled: d.hasArchive
+                        onClicked: timeline.zoomOut()
+                    }
+
+                    IconButton
+                    {
+                        id: zoomInButton
+
+                        padding: 0
+                        icon.source: lp("/images/plus.png")
+                        enabled: d.hasArchive
+                        onClicked: timeline.zoomIn()
+                    }
+                }
+
+                Button
+                {
+                    id: liveModeButton
+
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+                    text: qsTr("LIVE")
+                    labelPadding: 0
+                    rightPadding: 0
+                    leftPadding: 0
+                    flat: true
+                    onClicked:
+                    {
+                        playbackController.checked = false
+                        controller.playLive()
+                    }
+
+                    visible: opacity > 0
+                    opacity: 0
+
+                    property bool shouldBeVisible:
+                    {
+                        var currentTime = (new Date()).getTime()
+                        var futurePosition = position > currentTime
+                        var canViewArchive = videoNavigation.canViewArchive
+                        return canViewArchive && !d.liveMode && !futurePosition
+                            && !controller.resourceHelper.isWearableCamera
+                    }
+
+                    readonly property real position: controller.mediaPlayer.position
+                    onPositionChanged: updateOpacity()
+                    onShouldBeVisibleChanged: updateOpacity()
+
+                    function updateOpacity()
+                    {
+                        opacity = shouldBeVisible ? 1 : 0
+                    }
+
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+
+                ActionButtonsPanel
+                {
+                    id: actionButtonsPanel
+
+                    visible: opacity > 0
+
+                    resourceId: controller.resourceId
+                    anchors.left:
+                    {
+                        if (buttonsPanel.showZoomControls)
+                            return zoomButtonsRow.right
+
+                        return motionSearchModeButton.visible
+                            ? motionSearchModeButton.right
+                            : calendarButton.right
+                    }
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: -4
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+
+                    Binding
+                    {
+                        target: actionButtonsPanel
+                        property: "opacity"
+                        value:
+                        {
+                            var futurePosition =
+                                controller.mediaPlayer.position > (new Date()).getTime()
+                            var live = d.liveMode || futurePosition
+                            return live && buttonsPanel.showButtonsPanel ? 1 : 0
+                        }
+                    }
+
+                    onPtzButtonClicked: videoNavigation.ptzButtonClicked()
+                    onTwoWayAudioButtonPressed: twoWayAudioController.start()
+                    onTwoWayAudioButtonReleased: twoWayAudioController.stop()
+
+                    Behavior on opacity
+                    {
+                        id: actionButtonsPanelOpacityBehaviour
+
+                        NumberAnimation { duration: 200 }
+                    }
+
+                    Binding
+                    {
+                        target: twoWayAudioController
+                        property: "resourceId"
+                        value: controller.resourceId
+                    }
+                }
+
+                Timer
+                {
+                    interval: 100
+                    repeat: true
+                    running: zoomInButton.down || zoomOutButton.down
+                    triggeredOnStart: true
+                    onTriggered:
+                    {
+                        if (zoomInButton.down)
+                            timeline.zoomIn()
+                        else
+                            timeline.zoomOut()
+                    }
+                }
+            }
+
+            Item
+            {
+                id: dateTimeLabel
+
+                visible: videoNavigation.canViewArchive
+                height: 48
+                width: parent.width
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight + 8
+                opacity: d.controlsOpacity * timelineOpactiyMask.opacity
+
+                DisplayTimeHelper
+                {
+                    id: timeHelper
+
+                    position: timeline.position
+                    displayOffset: controller.resourceHelper.displayOffset
                 }
 
                 Text
                 {
-                    id: liveLabel
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 28
+                    id: dateLabel
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    height: 20
+                    font.pixelSize: 13
                     font.weight: Font.Normal
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: timeHelper.fullDate
                     color: ColorTheme.windowText
-                    text: qsTr("LIVE")
-                    visible: d.liveMode
+
+                    opacity: d.liveMode ? 0.0 : 1.0
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+
+                Item
+                {
+                    id: timeLiveLabel
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
+                    Behavior on y { NumberAnimation { duration: 200 } }
+
+                    width: timeLabel.visible ? timeLabel.width : liveLabel.width
+                    height: timeLabel.height
+
+                    TimeLabel
+                    {
+                        id: timeLabel
+
+                        hours: timeHelper.hours
+                        minutes: timeHelper.minutes
+                        seconds: timeHelper.seconds
+                        suffix: timeHelper.noonMark
+
+                        visible: !d.liveMode
+                    }
+
+                    Text
+                    {
+                        id: liveLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 28
+                        font.weight: Font.Normal
+                        color: ColorTheme.windowText
+                        text: qsTr("LIVE")
+                        visible: d.liveMode
+                    }
                 }
             }
-        }
 
-        Text
-        {
-            id: liveOnlyText
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            verticalAlignment: Text.AlignVCenter
-            height: 56
-            font.pixelSize: 28
-            font.weight: Font.Normal
-            color: ColorTheme.windowText
-            text: qsTr("LIVE")
-            visible: d.liveMode && !videoNavigation.canViewArchive
-        }
-
-        PlaybackController
-        {
-            id: playbackController
-
-            visible: videoNavigation.canViewArchive
-
-            anchors.top: navigator.top
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            loading: videoScreenController.mediaPlayer.loading || timeline.dragging
-            paused: videoNavigation.paused
-
-            opacity: d.controlsOpacity
-
-            ChunkPositionWatcher
+            Text
             {
-                id: chunkPositionWatcher
-                motionSearchMode: videoNavigation.motionSearchMode
-                position: timeline.position
-                chunkProvider: timeline.chunkProvider
+                id: liveOnlyText
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                verticalAlignment: Text.AlignVCenter
+                height: 56
+                font.pixelSize: 28
+                font.weight: Font.Normal
+                color: ColorTheme.windowText
+                text: qsTr("LIVE")
+                visible: d.liveMode && !videoNavigation.canViewArchive
             }
 
-            PlaybackJumpButton
+            PlaybackController
             {
-                forward: false
-                visible: d.hasArchive && videoNavigation.canViewArchive
-                anchors.right: parent.left
-                anchors.verticalCenter: parent.verticalCenter
+                id: playbackController
 
-                onClicked: d.goToPosition(chunkPositionWatcher.prevChunkStartTimeMs(), false)
-            }
+                visible: videoNavigation.canViewArchive
 
-            PlaybackJumpButton
-            {
-                enabled: !d.liveMode
-                visible: d.hasArchive && videoNavigation.canViewArchive
-                anchors.left: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                loading: controller.mediaPlayer.loading || timeline.dragging
+                paused: videoNavigation.paused
+
+                opacity: d.controlsOpacity
+
+                PlaybackJumpButton
+                {
+                    forward: false
+                    visible: d.hasArchive && videoNavigation.canViewArchive
+                    anchors.right: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    onClicked: controller.jumpBackward()
+                }
+
+                PlaybackJumpButton
+                {
+                    enabled: !d.liveMode
+                    visible: d.hasArchive && videoNavigation.canViewArchive
+                    anchors.left: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    onClicked: controller.jumpForward()
+                }
 
                 onClicked:
                 {
-                    var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
-                    d.goToPosition(nextChunkStartTime, false)
-                    if (nextChunkStartTime == -1)
-                        videoScreenController.play()
+                    if (paused)
+                        controller.play()
+                    else
+                        controller.pause()
                 }
             }
 
-            onClicked:
+            Rectangle
             {
-                if (paused)
-                {
-                    if (d.resumePosition > 0)
-                    {
-                        videoScreenController.setPosition(d.resumePosition)
-                        d.resumePosition = -1
-                    }
-                    videoScreenController.play()
-                }
-                else
-                {
-                    if (d.liveMode)
-                        d.resumePosition = videoScreenController.mediaPlayer.position
-                    videoScreenController.pause()
-                }
+                color: ColorTheme.windowText
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                width: 2
+                height: 20
+                visible: d.hasArchive && videoNavigation.canViewArchive
+                opacity: timelineOpactiyMask.opacity
             }
-        }
-
-        Rectangle
-        {
-            color: ColorTheme.windowText
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            width: 2
-            height: 20
-            visible: d.hasArchive && videoNavigation.canViewArchive
-            opacity: timelineOpactiyMask.opacity
         }
     }
 
@@ -822,39 +796,18 @@ Item
         width: parent.width
         anchors.top: parent.bottom
         color: "black"
-        height: buttonsPanel.height
+        height: buttonsPanel.overallHeight
     }
 
     CalendarPanel
     {
         id: calendarPanel
 
-        onDatePicked:
-        {
-            close()
-            d.resumePosition = -1
-            // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
-            // Timeline and calendar should work in a same way.
-            var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
-            var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
-            timeline.jumpTo(targetTime)
-            videoScreenController.setPosition(targetTime, true)
-        }
-    }
+        position: timeline.position
+        displayOffset: controller.resourceHelper.displayOffset
+        chunkProvider: cameraChunkProvider
 
-    Connections
-    {
-        target: videoScreenController
-        onPlayerJump:
-        {
-            timeline.autoReturnToBounds = false
-            timeline.jumpTo(position)
-        }
-        onGotFirstPosition:
-        {
-            timeline.autoReturnToBounds = false
-            timeline.jumpTo(position)
-        }
+        onPicked: controller.forcePosition(position, true)
     }
 
     Component.onCompleted:

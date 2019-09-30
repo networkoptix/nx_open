@@ -27,7 +27,7 @@ template<typename Input = void, typename Output = void>
 class BasicHttpRequestHandler:
     public nx::network::http::AbstractFusionRequestHandler<Input, Output>
 {
-    using base_type = 
+    using base_type =
         nx::network::http::AbstractFusionRequestHandler<Input, Output>;
 
 public:
@@ -43,6 +43,16 @@ public:
     }
 
 protected:
+    bool authorize(
+        const nx::network::http::RequestContext& requestContext,
+        nx::utils::stree::ResourceContainer* const authzInfo)
+    {
+        return authorize(
+            requestContext,
+            nx::utils::stree::ResourceContainer(),
+            authzInfo);
+    }
+
     bool authorize(
         const nx::network::http::RequestContext& requestContext,
         const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
@@ -66,6 +76,9 @@ protected:
                 this->m_actionType,
                 authzInfo)) //< Using same object since we can move it.
         {
+            NX_VERBOSE(this, "Request %1 was not authorized",
+                requestContext.request.requestLine.url.path());
+
             api::ResultCode resultCode = api::ResultCode::forbidden;
             if (auto resultCodeStr = authzInfo->get<QString>(attr::resultCode))
             {
@@ -87,6 +100,10 @@ protected:
             this->requestCompleted(std::move(result));
             return false;
         }
+
+        NX_VERBOSE(this, "Request %1 authorized successfully",
+            requestContext.request.requestLine.url.path());
+
         return true;
     }
 
@@ -123,7 +140,13 @@ public:
         nx::network::http::RequestContext requestContext,
         Input inputData) override
     {
-        if (!this->authorize(requestContext, inputData, &requestContext.authInfo))
+        bool authzResult = false;
+        if constexpr (std::is_base_of_v<nx::utils::stree::AbstractResourceReader, Input>)
+            authzResult = this->authorize(requestContext, inputData, &requestContext.authInfo);
+        else
+            authzResult = this->authorize(requestContext, &requestContext.authInfo);
+
+        if (!authzResult)
             return;
 
         processRequest(
@@ -146,52 +169,6 @@ protected:
         nx::network::http::RequestContext requestContext,
         Input inputData,
         std::function<void(api::Result, Output...)> completionHandler) = 0;
-};
-
-/**
- * Contains logic common for all cloud_db HTTP request handlers.
- */
-template<typename Input, typename ... Output>
-class FiniteMsgBodyHttpHandler:
-    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
-{
-    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
-
-public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        Input inputData,
-        std::function<void(api::Result result, Output... outData)>&& completionHandler)
-    > ExecuteRequestFunc;
-
-    FiniteMsgBodyHttpHandler(
-        EntityType entityType,
-        DataActionType actionType,
-        const SecurityManager& securityManager,
-        ExecuteRequestFunc requestFunc)
-        :
-        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
-            entityType,
-            actionType,
-            securityManager),
-        m_requestFunc(std::move(requestFunc))
-    {
-    }
-
-protected:
-    virtual void processRequest(
-        nx::network::http::RequestContext requestContext,
-        Input inputData,
-        std::function<void(api::Result, Output...)> completionHandler) override
-    {
-        m_requestFunc(
-            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
-            std::move(inputData),
-            std::move(completionHandler));
-    }
-
-private:
-    ExecuteRequestFunc m_requestFunc;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -249,17 +226,62 @@ protected:
         std::function<void(api::Result, Output...)> completionHandler) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename Input, typename ... Output>
+class FiniteMsgBodyRestHandler:
+    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
+{
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
+public:
+    typedef std::function<void(
+        nx::network::http::RequestContext requestContext,
+        Input inputData,
+        std::function<void(api::Result result, Output... outData)>&& completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyRestHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const SecurityManager& securityManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
+            entityType,
+            actionType,
+            securityManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        nx::network::http::RequestContext requestContext,
+        Input inputData,
+        std::function<void(api::Result, Output...)> completionHandler) override
+    {
+        m_requestFunc(
+            std::move(requestContext),
+            std::move(inputData),
+            std::move(completionHandler));
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
+};
+
 template<typename... Output>
-class FiniteMsgBodyHttpHandler<void, Output...>:
+class FiniteMsgBodyRestHandler<void, Output...>:
     public AbstractFiniteMsgBodyHttpHandler<void, Output...>
 {
 public:
     typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         std::function<void(api::Result /*result*/, Output... /*outData*/)> completionHandler)
     > ExecuteRequestFunc;
 
-    FiniteMsgBodyHttpHandler(
+    FiniteMsgBodyRestHandler(
         EntityType entityType,
         DataActionType actionType,
         const SecurityManager& securityManager,
@@ -279,7 +301,7 @@ protected:
         std::function<void(api::Result, Output...)> completionHandler) override
     {
         m_requestFunc(
-            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+            std::move(requestContext),
             std::move(completionHandler));
     }
 

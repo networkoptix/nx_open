@@ -1,34 +1,44 @@
 {
   "language": "pt_PT",
   "language_name": "Português",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Cancelar",
-    "loginTitle": "Log in to %PRODUCT_NAME%",
-    "loginButton": "Log in",
+    "loginTitle": "Log in to %CLOUD_NAME%",
+    "loginButton": "Entrar",
     "logoutAuthorisedTitle": "Já tem sessão iniciada",
     "logoutAuthorisedContinueButton": "Continuar",
     "logoutAuthorisedLogoutButton": "Terminar sessão",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Instalar %VMS_NAME% para visualizar o seu sistema",
+    "download": "Baixar %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
-    "registerSuccess": "Welcome to",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
+    "registerSuccess": "Bem-vindo a",
     "register": "Create account",
-    "changePassword": "Change password -",
+    "changePassword": "Alterar senha -",
     "account": "Definições da conta -",
     "systems": "Sistemas -",
-    "system": "System -",
+    "system": "Sistema -",
     "systemShare": "Partilha de Sistema -",
     "activate": "Activar conta -",
     "activateSent": "Activar conta -",
@@ -38,15 +48,16 @@
     "restorePasswordSuccess": "Senha guardada -",
     "restorePasswordCode": "Reset de Senha -",
     "view": "Visualizar câmaras - ",
-    "debug": "Debug",
-    "login": "Log in -",
+    "debug": "Depurar/Debug",
+    "login": "Entrar -",
     "download": "Baixar %VMS_NAME%",
     "downloadPlatform": "Baixar %VMS_NAME% para ",
     "pageNotFound": "Página não encontrada"
   },
   "systemStatuses": {
     "activated": "activado",
-    "merging": "merging",
+    "incompatible": "incompatível",
+    "merging": "mesclagem",
     "notActivated": "não activado",
     "online": "online",
     "offline": "offline",
@@ -71,7 +82,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualizador Avançado",
-      "description": "Pode visualizar vídeo ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
+      "description": "Pode ver vídeos ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Não é possível guardar a senha",
     "cantActivatePrefix": "Não é possível activar a sua conta",
     "cantSendConfirmationPrefix": "Não é possível enviar o email de confirmação",
-    "cloudInvalidResponse": "A base de dados da Cloud retornou uma resposta inesperada",
     "notAuthorized": "Senha incorrecta",
     "brokenAccount": "Problema inesperado com a conta. <a href=\"/restore_password\">Restaurar conta</a>",
     "wrongParameters": "Alguns parâmetros no formulário estão incorretos",
     "wrongCode": "A conta já está activada ou o código de confirmação está incorreto",
     "wrongCodeRestore": "O código de confirmação já foi usado ou está incorreto",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "Não tem permissões para efectuar esta acção",
     "accountNotActivated": "Esta conta ainda não está activada. <a href=\"/activate\">Enviar link de activação novamente</a>",
     "accountBlocked": "Esta conta está temporariamente bloqueada. Por favor, tente novamente dentro de alguns minutos.",
@@ -147,18 +158,25 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Um dos servidores está listado como existente em ambos os sistemas – no selecionado e no atual.<br>Remova os servidores que estejam offline e incompatíveis de cada sistema e tente novamente.",
+    "mergedSystemIsOffline": "O Sistema <strong>{{failedSystem}}</strong> está offline.",
+    "INCOMPATIBLE": "Os sistemas têm versões de software diferentes. Por favor, actualize os dois para o <a href=\"/download\">build mais recente</a>.",
+    "FAIL": "O sistema <strong>{{failedSystem}}</strong> está actualmente inacessível.<br> Tente novamente em alguns instantes ou entre em contato com o <a href=\"%SUPPORT_LINK%\" target=\"_blank\">suporte</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Falha na fusão de Sistemas",
+    "commonText": "Falha na fusão dos sistemas <strong>{{primarySystem}}</strong> e <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "good",
-    "fair": "fair",
+    "good": "bom",
+    "fair": "justo",
+    "fairMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
     "minLength": "demasiado curta",
     "minLengthMessage": "A senha deve conter pelo menos 8 caracteres",
-    "required": "incorrect",
+    "required": "incorreta",
     "requiredMessage": "Use apenas letras latinas, números e símbolos do teclado, evite espaços à esquerda e à direita",
-    "weak": "weak",
+    "weak": "fraco",
     "weakMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
     "strongMessage": "Senha forte!",
     "common": "demasiado comum",
@@ -185,17 +203,19 @@
     "confirmRenameTitle": "Nome do Sistema",
     "confirmRenameAction": "Gravar",
     "successRename": "Nome do sistema guardado",
-    "confirmDisconnectTitle": "Disconnect System from %PRODUCT_NAME%?",
-    "confirmDisconnectAction": "Disconnect",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
+    "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está prestes a desconectar este Sistema da sua conta. Não poderá mais aceder a este Sistema. Tem certeza?",
     "confirmUnshareFromMeTitle": "Desconectar o Sistema?",
-    "confirmUnshareFromMeAction": "Disconnect",
+    "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este utilizador não será capaz de aceder ao sistema. Tem certeza?",
     "confirmUnshareTitle": "Apagar utilizador?",
     "confirmUnshareAction": "Apagar",
-    "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "successMerge": "System merge completed",
+    "mergeFailed": "Falha na fusão de Sistemas",
+    "mergeStart": "Systems have started merging",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "As permissões foram removidas de {{email}}",
     "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
@@ -203,75 +223,9 @@
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",
     "activationLinkSent": "Link de activação enviado",
     "passwordChangedSuccess": "A sua conta foi gravada com sucesso",
-    "changePassword": "Change Password",
+    "changePassword": "Alterar senha",
     "newPasswordLabel": "Nova senha",
     "saveChanges": "Gravar"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Instalar %VMS_NAME% para visualizar o seu sistema",
-    "action": "Baixar %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Somente cliente",
-      "server": "Somente servidor",
-      "bundle": "Cliente e Servidor",
-      "servertool": "Ferramenta de configuração"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Reenviar Link de Activação",
@@ -280,8 +234,8 @@
     "setNewPasswordLabel": "Nova senha"
   },
   "regActions": {
-    "passwordLabel": "Password",
-    "createAccount": "Create Account"
+    "passwordLabel": "Senha",
+    "createAccount": "Criar conta"
   },
   "header": {
     "allSystems": "Todos os sistemas",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "Sistema Offline",
     "systemHasNoCameras": "SEM CÂMARAS",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Offline",
       "error": "Erro",
@@ -334,5 +289,10 @@
       "stop listening": "parar de ouvir",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Recomendamos consultar com",
+    "b_support": "suporte",
+    "c_proceeding": "antes de proceder."
   }
 }

@@ -18,12 +18,10 @@
 
 using namespace nx::vms::client::desktop;
 
-QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
-    QObject* parent)
-    :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_model(nullptr),
+QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(QnResourceTreeModel* model):
+    base_type(model),
+    QnCommonModuleAware(model),
+    m_model(model),
     m_rootNode(),
     m_allNodes(),
     m_roles(),
@@ -35,7 +33,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(model, &QnResourceTreeModel::userChanged, this,
         &QnResourceTreeModelUserNodes::handleUserChanged);
 
     connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
@@ -57,7 +55,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         [this](const nx::vms::api::UserRoleData& role)
         {
-            ensureRoleNode(role)->update();
+            ensureRoleNode(role.id)->update();
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
@@ -80,11 +78,6 @@ QnResourceTreeModel* QnResourceTreeModelUserNodes::model() const
     return m_model;
 }
 
-void QnResourceTreeModelUserNodes::setModel(QnResourceTreeModel* value)
-{
-    m_model = value;
-}
-
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
 {
     return m_rootNode;
@@ -95,27 +88,25 @@ void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr&
     m_rootNode = node;
 }
 
-void QnResourceTreeModelUserNodes::initialize(QnResourceTreeModel* model,
-    const QnResourceTreeModelNodePtr& rootNode)
+void QnResourceTreeModelUserNodes::initialize(const QnResourceTreeModelNodePtr& rootNode)
 {
-    setModel(model);
     setRootNode(rootNode);
-    handleUserChanged(context()->user());
+    handleUserChanged(m_model->user());
 }
 
 void QnResourceTreeModelUserNodes::rebuild()
 {
     NX_ASSERT(m_valid);
 
-    for (const auto& role : userRolesManager()->userRoles())
+    for (const auto& role: userRolesManager()->userRoles())
         rebuildSubjectTree(role);
 
-    for (const auto& user : resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
         /* Current user moved to own node. */
         if (m_model->scope() == QnResourceTreeModel::FullScope)
         {
-            if (user == context()->user())
+            if (user == m_model->user())
                 continue;
         }
 
@@ -208,7 +199,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
     if (m_model->scope() != QnResourceTreeModel::FullScope)
         return false;
 
-    if (subject.user() && subject.user() == context()->user())
+    if (subject.user() && subject.user() == m_model->user())
         return false;
 
     if (layout->isFile())
@@ -268,24 +259,24 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
     if (subject.user())
         return ensureUserNode(subject.user());
 
-    return ensureRoleNode(subject.role());
+    return ensureRoleNode(subject.effectiveId());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const nx::vms::api::UserRoleData& role)
+    const QnUuid& roleId)
 {
-    auto pos = m_roles.find(role.id);
+    auto pos = m_roles.find(roleId);
     if (pos == m_roles.end())
     {
-        NX_ASSERT(!role.isNull());
+        NX_ASSERT(!roleId.isNull());
 
-        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, role.id,
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, roleId,
             NodeType::role));
         node->initialize();
         node->setParent(m_rootNode);
         m_allNodes.append(node);
 
-        pos = m_roles.insert(role.id, node);
+        pos = m_roles.insert(roleId, node);
     }
     return *pos;
 }
@@ -307,7 +298,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
         {
             auto role = userRolesManager()->userRole(user->userRoleId());
             if (!role.isNull())
-                parent = ensureRoleNode(role);
+                parent = ensureRoleNode(role.id);
         }
         node->setParent(parent);
         m_allNodes.append(node);
@@ -641,7 +632,7 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     if (!m_valid)
         return;
 
-    if (subject.user() == context()->user())
+    if (subject.user() == model()->user())
     {
         /* Rebuild will occur on context user change. */
         return;

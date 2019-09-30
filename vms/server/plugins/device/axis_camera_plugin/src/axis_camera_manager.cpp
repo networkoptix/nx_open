@@ -1,7 +1,4 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "axis_camera_manager.h"
 
@@ -14,11 +11,10 @@
 #include "axis_relayio_manager.h"
 #include "sync_http_client.h"
 
-
 AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
 :
     m_refManager( this ),
-    m_pluginRef( AxisCameraPlugin::instance() ),
+    m_pluginRef( nx::sdk::toPtr(AxisCameraPlugin::instance()) ),
     m_info( info ),
     m_audioEnabled( false ),
     m_relayIOInfoRead( false ),
@@ -75,7 +71,7 @@ int AxisCameraManager::releaseRef() const
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int AxisCameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = m_encoders.size();
+    *encoderCount = (int) m_encoders.size();
     return nxcip::NX_NO_ERROR;
 }
 

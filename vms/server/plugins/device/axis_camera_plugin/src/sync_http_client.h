@@ -1,16 +1,11 @@
-/**********************************************************
-* 18 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef SYNC_HTTP_CLIENT_H
-#define SYNC_HTTP_CLIENT_H
+#pragma once
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-
 
 class SyncHttpClientDelegate;
 
@@ -70,5 +65,3 @@ private:
         int defaultPort,
         const QAuthenticator& defaultCredentials );
 };
-
-#endif  //SYNC_HTTP_CLIENT_H

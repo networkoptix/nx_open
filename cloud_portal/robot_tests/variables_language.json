@@ -11,11 +11,13 @@
 
     "SYSTEM NO ACCESS TEXT"                :    "Failed to access System",
     "DISCONNECT MODAL WARNING TEXT"        :    "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
+    "SUCCESSFULLY DISCONNECTED"            :    "System is successfully disconnected from %PRODUCT_NAME%",
     "ALREADY ACTIVATED TEXT"               :    "Account is already activated or confirmation code is incorrect",
     "AUTOTESTS OFFLINE TEXT"               :    "offline",
     "NEW PERMISSIONS SAVED"                :    "New permissions saved",
     "PERMISSIONS WERE REMOVED FROM"        :    "Permissions were removed from %email%",
     "SYSYEM DELETED FROM ACCOUNT"          :    "System {{system_name}} is successfully deleted from your account",
+    "CHANGING OWN PERMISSIONS IS NOT ALLOWED"    :    "Changing own permissions is not allowed",
 
     "RESET SUCCESS MESSAGE TEXT"           :    "Password successfully saved",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED"   :    "Your account is successfully saved",
@@ -98,5 +100,21 @@
     "PASSWORD IS WEAK BADGE TEXT"          :    "weak",
     "PASSWORD IS FAIR BADGE TEXT"          :    "fair",
     "PASSWORD IS GOOD BADGE TEXT"          :    "good",
-    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect"
+    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect",
+
+    "IPVD TITLE TEXT"                      :    "Supported IP Video Devices",
+    "IPVD ADVANCED SEARCH BUTTON TEXT"     :    "Advanced Search",
+
+    "OK TEXT"                              :    "OK",
+    "MERGE SYSTEMS TEXT"                   :    "Merge Systems",
+    "SYSTEM MERGING TEXT"                  :    "Systems have started merging",
+    "MERGE NOT OWNER MESSAGE 1 TEXT"       :    "You can merge only those cloud Systems, where you have the \"Owner\" permissions.",
+    "MERGE NOT OWNER MESSAGE 2 TEXT"       :    "Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.",
+    "CANNOT MERGE WITH OFFLINE SYSTEM TEXT"    :    "%SYSTEM NAME% is offline and cannot be merged with the current one.",
+    "SYSTEMS MERGE FAILED TEXT"            :    "Systems merge failed",
+    "SYSTEM MERGE COMPLETED TEXT"          :    "System merge completed",
+    "MERGE CURRENT SYSTEM WITH TEXT"       :    "Merge current System with",
+    "YOU CAN ONLY MERGE AS OWNER TEXT"     :    "You can only merge Systems where you are the owner.",
+    "CHECKING TEXT"                        :    "Checking...",
+    "ENTER PASSWORD TO CONTINUE TEXT"      :    "Enter password for your account to continue"
 }

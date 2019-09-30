@@ -43,7 +43,11 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
     m_context = context;
     if (m_context)
     {
-        const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope, m_context);
+        const auto model = new QnResourceTreeModel(
+            QnResourceTreeModel::FullScope,
+            m_context->accessController(),
+            m_context->snapshotManager(),
+            m_context);
         model->setParent(this);
         setSourceModel(model);
     }

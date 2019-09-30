@@ -103,8 +103,9 @@ public:
     static void setKey(const QnResourcePtr& resource, Key key);
     static void clearKey(const QnResourcePtr& resource);
 
-    static QnResourceIconCache* instance();
+    static QString keyToString(Key key);
 
+    static QnResourceIconCache* instance();
 
 private:
     QHash<Key, QIcon> m_cache;

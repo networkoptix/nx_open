@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Unknown error: %1</source>
-      <translation>Errore sconosciuto: %1$s</translation>
+      <translation>Errore sconosciuto: %1</translation>
     </message>
   </context>
 </TS>

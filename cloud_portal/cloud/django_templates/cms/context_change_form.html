@@ -4,6 +4,11 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <!-- Import django's static jQuery because admin_tools template doesn't import by default -->
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script>window.$ = django.jQuery;</script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
 {% endblock %}
 <{% block breadcrumbs %}
@@ -13,10 +18,12 @@
         &rsaquo; <a href="{% url 'admin:cms_product_changelist' %}">{{ product_opts.verbose_name_plural|capfirst }}</a>
         &rsaquo; <a href="{% url 'admin:cms_product_change' product.id %}"> {{ product.name }}</a>
         &rsaquo; <a href="{% url 'admin:pages' product.id %}"> Pages </a>
-        &rsaquo; {% trans 'Edit'%} <span>{{ original.name }}</span>
+        &rsaquo; {% trans 'Edit'%} <span>{{ original.get_nice_name }}</span>
     </div>
 {% endblock %}
 {% block content %}
+{% autoescape off %}{{ original.description }}{% endautoescape %}
+<hr>
 <form id="context_form" class="aligned" action="" enctype="multipart/form-data" method="post" novalidate>
     {% csrf_token %}
     <input type="hidden" name="context_id" value="{{ original.id }}">
@@ -40,7 +47,7 @@
                 <p class="help">{{ field.name }}</p>
                 {% if not data_structure.optional %} <p class="help">required</p> {% endif %}
             </label>
-            <div id="{{ field.name }}" style="width: 100%">
+            <div id="{{ field.name }}" class="ml-160">
                 {% if field|is_ImageField and field.value %}
                     <div>
                         {% if data_structure.optional and record_exists %}
@@ -89,8 +96,8 @@
         </div>
     </div>
     {% endfor %}
-
-    {% if perms.cms.edit_content %}
+    {% has_permission user product 'cms.edit_content' as can_edit_content %}
+    {% if can_edit_content %}
         <div class="submit-row">
             {% if preview_link %}
                 <button class='btn btn-sm btn-default pull-left' onClick="openPreview();return false;">Open Preview</button>
@@ -100,17 +107,22 @@
                    href="{% url 'download_file' context.file_path %}?lang={{ language.code }}&draft"
                    download>Download Draft</a>
             {% endif %}
-            {% if context.product.product_type.can_preview %}
-                <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+            {% if product.can_preview_on_portal %}
+                <button class="btn btn-sm btn-info" type="submit" name="Preview">Save draft & Open preview</button>
+            {% else %}
+                <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
             {% endif %}
-            <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
-            <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
+            <button class="btn btn-sm btn-success" type="submit" name="SendReview">Submit & Review</button>
             <button class="btn btn-sm btn-danger" type="reset" name="Reset">Reset</button>
         </div>
     {% endif %}
 </form>
 
 <script>
+    {% if preview_link %}
+        window.open("{{ preview_link }}");
+    {% endif %}
+
     function openPreview() {
         window.open("{{ preview_link }}");
     }
@@ -146,11 +158,34 @@
         document.getElementById('context_form').submit();
     }
 
+    var brandVariables = document.getElementsByClassName('brand-variable');
+    for(var i = 0; i < brandVariables.length; i++) {
+        var cv = brandVariables[i];
+        cv.onclick = function(event) {
+            event.preventDefault();
+            inputId = this.closest('.variable-group').getAttribute('data-field-name');
+            inputElement = $('#' + inputId);
+            brandVar = this.getAttribute('data-name');
+            navigator.clipboard.writeText(brandVar);
+            if (inputElement.hasClass('tinymce')) {
+                tinymce.get(inputId).execCommand('mceInsertContent', false, brandVar);
+            } else {
+                carretPos = inputElement.prop('selectionEnd');
+                inputElement.val(
+                    inputElement.val().substring(0, carretPos) + brandVar + inputElement.val().substring(carretPos)
+                ).focus().prop(
+                    {'selectionStart': carretPos + brandVar.length, 'selectionEnd': carretPos + brandVar.length}
+                );
+            }
+
+        }
+        }
 
     var langSelector = document.getElementById('id_language');
     if (langSelector) {
         langSelector.addEventListener('change', languageChanged, false);
     }
+    $('[data-toggle="tooltip"]').tooltip();
 
     tinymce.init({
         selector: '.tinymce',

@@ -85,6 +85,7 @@ private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
     SystemManager m_systemManager;
+    std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
     SystemCapabilitiesProvider m_systemCapabilitiesProvider;
     VmsGateway m_vmsGateway;
     SystemMergeManager m_systemMergeManager;
@@ -103,7 +104,7 @@ private:
     void generateUserAuthRecords(nx::sql::QueryContext* queryContext);
 
     void initializeDataSynchronizationEngine();
-    
+
     nx::sql::DBResult copyExternalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,

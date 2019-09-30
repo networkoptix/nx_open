@@ -156,6 +156,10 @@ QnResourceList HanwhaResourceSearcher::findResources()
 
 void HanwhaResourceSearcher::addResourcesViaSunApi(QnResourceList& upnpResults)
 {
+    // NOTE: There is no waiting after sending and before receiving. Therefore, it will only read
+    // responses from the previous iteration of discovery. But there is a positive side-effect
+    // which makes this function almost non-blocking.
+
     sendSunApiProbe();
     readSunApiResponse(upnpResults);
 }

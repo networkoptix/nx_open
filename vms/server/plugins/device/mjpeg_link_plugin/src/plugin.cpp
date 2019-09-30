@@ -4,6 +4,7 @@
 
 #include "discovery_manager.h"
 
+#include <nx/sdk/ptr.h>
 #include <nx/utils/log/log.h>
 
 using namespace std::chrono;
@@ -52,9 +53,11 @@ void* HttpLinkPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
     {
         if (!m_discoveryManager)
-            m_discoveryManager.reset(new DiscoveryManager(
-                &m_refManager,
-                m_timeProvider.get()));
+        {
+            m_discoveryManager = std::make_unique<DiscoveryManager>(
+                &m_refManager, m_timeProvider.get());
+        }
+
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
@@ -98,8 +101,8 @@ void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*
 
 void HttpLinkPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider.reset(
-        static_cast<nxpl::TimeProvider*>(pluginContainer->queryInterface(nxpl::IID_TimeProvider)));
+    m_timeProvider = nx::sdk::queryInterfaceOfOldSdk<nxpl::TimeProvider>(
+        pluginContainer, nxpl::IID_TimeProvider);
 }
 
 nxpt::CommonRefManager* HttpLinkPlugin::refManager()

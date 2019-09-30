@@ -19,12 +19,12 @@ bool LoggerSettings::parse(const QString& str)
     const auto params = parseNameValuePairs<std::multimap>(
         str.toUtf8(),
         ',',
-        GroupToken::doubleQuotes | GroupToken::squareBraces);
+        GroupToken::doubleQuotes | GroupToken::squareBrackets);
     for (const auto& param: params)
     {
         if (param.first == "file")
         {
-            const auto filePath = std::filesystem::path(param.second.toStdString());
+            const auto filePath = nx::utils::filesystem::path(param.second.toStdString());
 
             logBaseName = QString::fromStdString(filePath.filename().string());
             if (filePath.has_parent_path())
@@ -55,10 +55,10 @@ bool LoggerSettings::parse(const QString& str)
     return parseSucceeded;
 }
 
-void LoggerSettings::updateDirectoryIfEmpty(const QString& dataDirectory)
+void LoggerSettings::updateDirectoryIfEmpty(const QString& logDirectory)
 {
     if (directory.isEmpty())
-        directory = dataDirectory + "/log";
+        directory = logDirectory;
 }
 
 bool LoggerSettings::operator==(const LoggerSettings& right) const
@@ -147,10 +147,10 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
         loadCompatibilityLogger(settings, prefix);
 }
 
-void Settings::updateDirectoryIfEmpty(const QString& dataDirectory)
+void Settings::updateDirectoryIfEmpty(const QString& logDirectory)
 {
     for (auto& logger: loggers)
-        logger.updateDirectoryIfEmpty(dataDirectory);
+        logger.updateDirectoryIfEmpty(logDirectory);
 }
 
 void Settings::loadCompatibilityLogger(

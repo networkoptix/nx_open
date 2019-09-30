@@ -9,7 +9,7 @@ extern "C" {
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/attribute.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/vms_server_plugins/analytics/deepstream/utils.h>
 
 namespace nx {

@@ -54,6 +54,8 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 footer_items = process_context_structure(product, context, footer_items,
                                                          None, product.version_id(), False, True)
 
+        integration_store_enabled = product.read_global_value("%INTEGRATION_STORE_ENABLED%")
+
         data = {
             'version_id': product.version_id(),
             'languages': customization.languages_list,
@@ -69,21 +71,29 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'smtp_tls': product.read_global_value('%SMTP_TLS%')
             },
             'config': {
+                'cloud_merge': product.read_global_value("%CLOUD_MERGE%"),
                 'copyright_year': product.read_global_value("%COPYRIGHT_YEAR%"),
                 'company_name': product.read_global_value("%COMPANY_NAME%"),
                 'company_link': product.read_global_value("%COMPANY_LINK%"),
+                'feedback_enabled': product.read_global_value("%FEEDBACK_ENABLED%"),
                 'footer_items': footer_items,
+                'integration_filter_items': product.read_global_value("%INTEGRATION_FILTER_ITEMS%"),
+                'integration_store_enabled': integration_store_enabled,
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
-                'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
+                'sort_supported_devices_by_popularity': product.read_global_value(
+                    "%SORT_SUPPORTED_DEVICES_BY_POPULARITY%"),
                 'support_link': product.read_global_value("%SUPPORT_LINK%"),
+                'privacy_link': product.read_global_value("%PRIVACY_LINK%"),
                 'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),
-                'product_name': product.read_global_value("%PRODUCT_NAME%"),
-                'vms_name': product.read_global_value("%VMS_NAME%"),
-                'landing_layout': product.read_global_value("%LAYOUT%"),
-                'landing_block1': product.read_global_value("%BLOCK1_CONTENT%")
+                'vendors_shown': product.read_global_value("%VENDORS_SHOWN%"),
+                'cloud_name': product.read_global_value("%CLOUD_NAME%"),
+                'vms_name': product.read_global_value("%VMS_NAME%")
+            },
+            'cloud_capabilities': {
+                'integration_store_enabled': integration_store_enabled
             }
         }
         cache.set(customization_name, data)
@@ -109,6 +119,14 @@ def rename_file(instance, filename):
     return os.path.join(product_name, file_info, filename)
 
 
+def get_integration_type():
+    # Prevents issue when migrating from empty db
+    integration = ProductType.objects.only('id', 'type').filter(type=ProductType.PRODUCT_TYPES.integration).first()
+    if integration:
+        return integration.id
+    return None
+
+
 # CMS structure (data structure). Only developers can change that
 class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -120,9 +138,8 @@ class Language(models.Model):
     @staticmethod
     def by_code(language_code, default_language=None):
         if language_code:
-            language = Language.objects.filter(code=language_code)
-            if language.exists():
-                return language.first()
+            language = Language.objects.filter(code=language_code).first()
+            return language or default_language
         return default_language
 
 
@@ -131,18 +148,18 @@ class Customization(models.Model):
         # Used to allow a user to see the customization in list of customizations
         # Cloud portal(s) are now a product so customization is not necessary for giving access anymore
         permissions = (
-            ('can_view_customization', 'Can view customization'),
+            ('access_customization', 'Can access customization'),
         )
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
-        Language, related_name='default_in_%(class)s')
+        Language, related_name='default_in_%(class)s', on_delete=models.CASCADE)
     languages = models.ManyToManyField(Language)
     filter_horizontal = ('languages',)
 
     public_release_history = models.BooleanField(default=False,
                                                  help_text="""Any user can view the release history page.""")
     public_downloads = models.BooleanField(default=True, help_text="""Any user can view the downloads page.""")
-
+    reveal_cloud_merge = models.BooleanField(default=False, help_text="Shows the cloud merge button for all systems.")
     parent = models.ForeignKey('Customization', default=None, null=True, blank=True,
                                related_name='children_customizations',
                                help_text="""Parent is the customization that the current customization depends on.<br>
@@ -153,7 +170,8 @@ class Customization(models.Model):
                                - If the parent rejects a review it will automatically be rejected for this
                                customization.<br><br>
                                If there is no parent selected or the parent is not in the review an integration
-                               can be reviewed whenever.""")
+                               can be reviewed whenever.""",
+                               on_delete=models.SET_DEFAULT)
     trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
                                                                    customization accepts.""")
 
@@ -174,15 +192,22 @@ class Customization(models.Model):
 
 
 class ProductType(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["name", "type"], name="Unique Product Type")
+        ]
     PRODUCT_TYPES = Choices((0, "cloud_portal", "Cloud Portal"),
                             (1, "vms", "Vms"),
-                            (2, "plugin", "Plugin"),
-                            (3, "integration", "Integration"))
+                            (2, "integration", "Integration"),
+                            (3, "other", "Other"))
+    name = models.CharField(max_length=255, default="", blank=True)
     can_preview = models.BooleanField(default=False)
     single_customization = models.BooleanField(default=False)
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):
+        if self.name:
+            return f"{self.name} - {ProductType.PRODUCT_TYPES[self.type]}"
         return ProductType.PRODUCT_TYPES[self.type]
 
     @staticmethod
@@ -200,25 +225,29 @@ class ProductType(models.Model):
 
 class Product(models.Model):
     class Meta:
-        # The can_access_product gives users the ability to see the product in product lists.
-        # In combination with other permission it allows them to edit the product and send reviews for their product
-        permissions = (
-            ('can_access_product', 'Can access product'),
-        )
+        verbose_name = 'asset'
+        verbose_name_plural = 'assets'
+
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.CASCADE)
+    contact_email = models.CharField(max_length=255, blank=True, default='')
     customizations = models.ManyToManyField(Customization, default=None, blank=True)
-    product_type = models.ForeignKey(ProductType, default=None, null=True)
+    product_type = models.ForeignKey(ProductType, default=get_integration_type, null=True, on_delete=models.CASCADE)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
 
     def __str__(self):
-        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if self.product_type and self.is_cloud_portal:
             return "{} - {}".format(self.name, self.customizations.first())
         return self.name
+
+    @property
+    def can_preview_on_portal(self):
+        return self.product_type.can_preview and \
+               self.customizations.filter(name=settings.CUSTOMIZATION).exists()
 
     @property
     def default_language(self):
@@ -238,9 +267,28 @@ class Product(models.Model):
 
     @property
     def product_root(self):
-        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if self.product_type and self.is_cloud_portal:
             return self.customizations.first().name
         return ""
+
+    @property
+    def is_cloud_portal(self):
+        return self.is_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+
+    @property
+    def is_integration(self):
+        return self.is_product_type(ProductType.PRODUCT_TYPES.integration)
+
+    def is_product_type(self, product_type):
+        return self.product_type.type == product_type
+
+    def version_id(self, customization=settings.CUSTOMIZATION):
+        accepted_review = ProductCustomizationReview.objects. \
+            filter(customization__name=customization,
+                   state=ProductCustomizationReview.REVIEW_STATES.accepted,
+                   version__product=self).last()
+
+        return accepted_review.version.id if accepted_review else 0
 
     def change_preview_status(self, new_status):
         self.preview_status = new_status
@@ -248,17 +296,9 @@ class Product(models.Model):
 
     def read_global_value(self, record_name):
         global_contexts = self.product_type.context_set.filter(is_global=True)
-        data_structure = None
-        for context in global_contexts:
-            data_structures = context.datastructure_set.filter(name=record_name)
-            if data_structures.exists():
-                data_structure = data_structures.last()
-                break
+        data_structure = DataStructure.objects.filter(name=record_name, context__in=global_contexts).last()
 
-        if not data_structure:
-            return None
-
-        return data_structure.find_actual_value(product=self, version_id=self.version_id())
+        return data_structure.find_actual_value(product=self, version_id=self.version_id()) if data_structure else None
 
     def save(self, *args, **kwargs):
         need_update = False
@@ -270,21 +310,10 @@ class Product(models.Model):
                 need_update = self.preview_status == orig.preview_status
 
         super(Product, self).save(*args, **kwargs)
-        if need_update and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal\
+        if need_update and self.is_cloud_portal \
                 and len(self.customizations.all()) == 1:
             cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
-
-    def version_id(self):
-        # I need this for local dev until cloud-portal gets updated to 18.4
-        # versions = ContentVersion.objects.filter(product=self)
-        # return versions.latest('accepted_date').id if versions.exists() else 0
-        accepted_review = ProductCustomizationReview.objects. \
-            filter(customization__name=settings.CUSTOMIZATION,
-                   state=ProductCustomizationReview.REVIEW_STATES.accepted,
-                   version__product=self)
-
-        return accepted_review.latest('id').version.id if accepted_review.exists() else 0
 
 
 class Context(models.Model):
@@ -294,20 +323,28 @@ class Context(models.Model):
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
-    # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    product = models.ForeignKey(Product, null=True)
-    product_type = models.ForeignKey(ProductType, null=True)
+        ordering = ['order', 'id']
+    # TODO: Remove this after release of 19.1 - Task: CLOUD-2299
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    product_type = models.ForeignKey(ProductType, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
+    label = models.CharField(max_length=1024, default="")
     description = models.TextField(blank=True, default="")
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
+    order = models.IntegerField(default=100000)
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
 
     def __str__(self):
+        if self.product_type:
+            return f"{self.product_type} - {self.name}"
         return self.name
+
+    def get_nice_name(self):
+        return self.label if self.label else self.name
 
     def template_for_language(self, language, default_language, skin):
 
@@ -330,8 +367,8 @@ class ContextTemplate(models.Model):
     class Meta:
         unique_together = ('context', 'language', 'skin')
 
-    context = models.ForeignKey(Context)
-    language = models.ForeignKey(Language, null=True)
+    context = models.ForeignKey(Context, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, null=True, on_delete=models.CASCADE)
     template = models.TextField()
     skin = models.CharField(max_length=16, default=settings.DEFAULT_SKIN, blank=True)
     # Skin is a bit hacky for now:
@@ -355,7 +392,8 @@ class DataStructure(models.Model):
         index_together = [
             ["context", "order"],
         ]
-    context = models.ForeignKey(Context)
+        ordering = ['order', 'id']
+    context = models.ForeignKey(Context, on_delete=models.CASCADE)
     name = models.CharField(max_length=1024)
     description = models.TextField()
     label = models.CharField(max_length=1024, blank=True, default='')
@@ -383,6 +421,7 @@ class DataStructure(models.Model):
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)
     public = models.BooleanField(default=True)
+    deprecated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -404,18 +443,19 @@ class DataStructure(models.Model):
         content_record = DataRecord.objects.filter(product=product, data_structure=self)
         if not draft:
             content_record = content_record.\
-                exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
+                exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected).\
+                order_by('version_id')
 
         # try to get translated content
         if self.translatable:
             if language:
                 content_record = content_record.filter(language=language)
-            elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+            elif product.is_cloud_portal:
                 content_record = content_record.filter(language=product.customizations.first().default_language)
 
-        if content_record and content_record.exists():
+        if content_record.exists():
             if not version_id:
-                content_value = content_record.latest('created_date').value
+                content_value = content_record.last().value
             else:  # Here find a datarecord with version_id
                 # which is not more than version_id
                 # filter only accepted content_records
@@ -426,11 +466,14 @@ class DataStructure(models.Model):
                                REVIEW_STATES.accepted)
                     # If new versions or records dont exist use old vay of getting records
                     if new_review_records.exists():
-                        content_record = new_review_records
+                        content_record = new_review_records.last()
                     else:
-                        content_record = content_record.filter(version__accepted_by__isnull=False)
-                if content_record.exists():
-                    content_value = content_record.latest('version_id').value
+                        content_record = content_record.filter(version__accepted_by__isnull=False).last()
+                else:
+                    content_record = content_record.last()
+
+                if content_record:
+                    content_value = content_record.value
 
         # if no value or optional and type file - use default value from structure
         if not content_value and (not self.optional or
@@ -449,8 +492,8 @@ class DataStructure(models.Model):
 
 # CMS settings. Release engineer can change that
 class UserGroupsToProductPermissions(models.Model):
-    group = models.ForeignKey(Group)
-    product = models.ForeignKey(Product, default=None, null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
 
     @staticmethod
     def check_permission(user, product, permission=None):
@@ -474,6 +517,16 @@ class UserGroupsToProductPermissions(models.Model):
         return UserGroupsToProductPermissions.\
             check_permission(user, get_cloud_portal_product(customization), permission)
 
+    @staticmethod
+    def check_customization_change_account(user, customization):
+        return UserGroupsToProductPermissions.\
+            check_customization_permission(user, customization, 'api.change_account')
+
+    @staticmethod
+    def check_customization_access(user, customization):
+        return UserGroupsToProductPermissions.\
+            check_customization_permission(user, customization, 'cms.access_customization')
+
 
 # CMS data. Partners can change that
 
@@ -484,19 +537,18 @@ class ContentVersion(models.Model):
         verbose_name_plural = 'revisions'
 
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, null=True)
-    product = models.ForeignKey(Product, default=1)
-    name = models.CharField(max_length=1024)
+    customization = models.ForeignKey(Customization, default=None, null=True, on_delete=models.SET_NULL)
+    product = models.ForeignKey(Product, default=1, on_delete=models.CASCADE)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.SET_NULL)
 
     accepted_date = models.DateTimeField(null=True, blank=True)
     accepted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.SET_NULL)
 
     def __str__(self):
         return str(self.id)
@@ -505,8 +557,17 @@ class ContentVersion(models.Model):
         blocked = ProductCustomizationReview.REVIEW_STATES.blocked
         pending = ProductCustomizationReview.REVIEW_STATES.pending
 
+        if self.product.product_type.single_customization:
+            ProductCustomizationReview(customization=self.product.customizations.first(),
+                                       version=self,
+                                       state=pending).save()
+            return
+
         for customization in self.product.customizations.all():
+            parent_in_review = False
             if customization.parent:
+                parent_in_review = self.product.customizations.filter(id=customization.parent.id).exists()
+            if parent_in_review:
                 ProductCustomizationReview(customization=customization, version=self, state=blocked).save()
             else:
                 ProductCustomizationReview(customization=customization, version=self, state=pending).save()
@@ -526,8 +587,8 @@ class ContentVersion(models.Model):
 
 class ProductCustomizationReview(models.Model):
     class Meta:
-        verbose_name = 'product review'
-        verbose_name_plural = 'product reviews'
+        verbose_name = 'review'
+        verbose_name_plural = 'reviews'
         permissions = (
             ("publish_version", "Can publish content to production"),
             ("force_update", "Can forcibly update content"),
@@ -537,14 +598,14 @@ class ProductCustomizationReview(models.Model):
                             (1, "accepted", "Accepted"),
                             (2, "rejected", "Rejected"),
                             (3, "blocked", "Blocked"))
-    customization = models.ForeignKey(Customization)
-    version = models.ForeignKey(ContentVersion)
+    customization = models.ForeignKey(Customization, on_delete=models.CASCADE)
+    version = models.ForeignKey(ContentVersion, on_delete=models.CASCADE)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
     notes = models.TextField(default="", blank=True)
     reviewed_date = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.version.product.__str__()
@@ -553,6 +614,9 @@ class ProductCustomizationReview(models.Model):
         reviews = self.version.productcustomizationreview_set.\
             filter(customization__in=self.customization.children_customizations.all())
 
+        can_show_customization = UserGroupsToProductPermissions. \
+            check_customization_access(self.version.created_by, self.customization)
+
         for review in reviews:
             review.reviewed_by = self.reviewed_by
             review.reviewed_date = self.reviewed_date
@@ -560,14 +624,19 @@ class ProductCustomizationReview(models.Model):
 
             if review.state == ProductCustomizationReview.REVIEW_STATES.accepted:
                 if review.customization.trust_parent:
-                    review.notes = "Automatically accepted by {}".format(self.customization)
+                    if can_show_customization:
+                        review.notes = f"Automatically accepted by {self.customization}"
+                    else:
+                        review.notes = "Automatically accepted"
                 else:
                     review.state = ProductCustomizationReview.REVIEW_STATES.pending
                     # If the child customization does not trust its parent we need to set reviewed by and date to blank.
                     review.reviewed_by = None
                     review.reviewed_date = None
-            else:
+            elif can_show_customization:
                 review.notes = "Automatically rejected by {}".format(self.customization)
+            else:
+                review.notes = "automatically rejected"
 
             review.save()
             if review.state == ProductCustomizationReview.REVIEW_STATES.rejected or review.customization.trust_parent:
@@ -580,19 +649,26 @@ class ProductCustomizationReview(models.Model):
         self.save()
         self.update_children_reviews()
 
-    @staticmethod
-    def anon_notes(notes):
-        if notes:
-            for i, email in enumerate(list(set(re.findall('(.*@*):', notes)))):
-                notes = notes.replace(email, 'User {}'.format(i+1))
-        return notes
+    def update_between_published_and_current(self, user, state):
+        product = self.version.product
+        customization_reviews = ProductCustomizationReview.objects.\
+            filter(version__id__gt=product.version_id(self.customization),
+                   version__id__lte=self.version_id,
+                   version__product=product,
+                   customization=self.customization).distinct()
+        for review in customization_reviews:
+            review.update_state(user, state)
+
+    @property
+    def can_preview_customization(self):
+        return self.customization.name == settings.CUSTOMIZATION and self.version.product.product_type.can_preview
 
 
 class ExternalFile(models.Model):
-    data_structure = models.ForeignKey(DataStructure, default=None, null=True)
+    data_structure = models.ForeignKey(DataStructure, default=None, null=True, on_delete=models.CASCADE)
     file = models.FileField(upload_to=rename_file, storage=MediaStorage())
     md5 = models.CharField(max_length=1024, default='')
-    product = models.ForeignKey(Product, default=None, null=True)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
     size = models.FloatField(default=0.0)
 
     def __str__(self):
@@ -600,20 +676,20 @@ class ExternalFile(models.Model):
 
 
 class DataRecord(models.Model):
-    data_structure = models.ForeignKey(DataStructure)
-    product = models.ForeignKey(Product, default=None, null=True)
-    language = models.ForeignKey(Language, null=True, blank=True)
+    data_structure = models.ForeignKey(DataStructure, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=None, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, null=True, blank=True, on_delete=models.CASCADE)
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
-    customization = models.ForeignKey(Customization, default=None, blank=True, null=True)
-    version = models.ForeignKey(ContentVersion, null=True, blank=True)
+    customization = models.ForeignKey(Customization, default=None, blank=True, null=True, on_delete=models.SET_NULL)
+    version = models.ForeignKey(ContentVersion, null=True, blank=True, on_delete=models.SET_NULL)
 
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
-        blank=True, related_name='created_%(class)s')
+        blank=True, related_name='created_%(class)s', on_delete=models.SET_NULL)
 
     value = models.TextField(default='', blank=True)
-    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.value
@@ -626,6 +702,12 @@ class DataRecord(models.Model):
     @property
     def context(self):
         return self.data_structure.context
+
+    @property
+    def get_data_structure_with_name(self):
+        if self.language:
+            return f"{self.data_structure.name}-{self.language.code}"
+        return self.data_structure.name
 
     def save(self, *args, **kwargs):
         if not self.data_structure.translatable:

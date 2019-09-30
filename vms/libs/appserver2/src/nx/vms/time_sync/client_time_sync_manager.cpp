@@ -5,9 +5,7 @@
 #include <api/global_settings.h>
 #include <api/common_message_processor.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 ClientTimeSyncManager::ClientTimeSyncManager(QnCommonModule* commonModule): base_type(commonModule), m_connection(nullptr)
 {
@@ -54,11 +52,19 @@ void ClientTimeSyncManager::updateTime()
     {
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))
             return;
-        if (loadTimeFromServer(route))
-            m_lastSyncTimeInterval.restart();
+        const auto result = loadTimeFromServer(route);
+        switch (result)
+        {
+            case Result::ok:
+                m_lastSyncTimeInterval.restart();
+                break;
+            case Result::incompatibleServer:
+                stop();
+                break;
+            default:
+                break;
+        }
     }
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

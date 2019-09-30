@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include <nx/cloud/db/client/data/maintenance_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>
@@ -11,6 +10,9 @@
 #include <nx/clusterdb/engine/command_data.h>
 #include <nx/clusterdb/engine/serialization/command_serializer.h>
 #include <nx/clusterdb/engine/command_log.h>
+
+#include <nx/cloud/db/client/data/maintenance_data.h>
+#include <nx/cloud/db/client/data/module_info.h>
 
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
@@ -28,6 +30,10 @@ public:
         clusterdb::engine::SynchronizationEngine* const synchronizationEngine,
         const nx::sql::InstanceController& dbInstanceController);
     ~MaintenanceManager();
+
+    void processPing(
+        const AuthorizationInfo& /*authzInfo*/,
+        std::function<void(api::Result, api::ModuleInfo)> completionHandler);
 
     void getVmsConnections(
         const AuthorizationInfo& authzInfo,
@@ -47,6 +53,7 @@ public:
     void getStatistics(
         const AuthorizationInfo& authzInfo,
         std::function<void(api::Result, data::Statistics)> completionHandler);
+
 
 private:
     const QnUuid m_moduleGuid;

@@ -11,6 +11,7 @@ class NX_KEY_VALUE_DB_API Settings
 {
 public:
     nx::clusterdb::engine::SynchronizationSettings synchronizationSettings;
+    bool enableCache = false;
 
     void load(const QnSettings& settings, std::string groupName = "cluster");
 };

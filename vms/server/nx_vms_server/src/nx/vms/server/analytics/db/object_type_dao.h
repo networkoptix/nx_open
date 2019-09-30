@@ -10,6 +10,9 @@ namespace nx::analytics::db {
 class ObjectTypeDao
 {
 public:
+    /**
+     * @return -1 if type name was not found.
+     */
     int64_t objectTypeIdFromName(const QString& name) const;
 
     QString objectTypeFromId(int64_t id) const;

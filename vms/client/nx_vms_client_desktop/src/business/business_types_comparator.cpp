@@ -75,7 +75,7 @@ QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype
         EventType::softwareTriggerEvent,
         EventType::analyticsSdkEvent,
         EventType::userDefinedEvent,
-        EventType::pluginEvent,
+        EventType::pluginDiagnosticEvent,
     };
 
     static const QList<EventType> failureEvents{

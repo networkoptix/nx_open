@@ -52,7 +52,7 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     connect(m_availabilityWatcher, &PtzAvailabilityWatcher::availabilityChanged,
         this, &ResourcePtzController::availableChanged);
     connect(this, &ResourcePtzController::resourceIdChanged, this,
-        [this](){ m_availabilityWatcher->setResourceId(QnUuid::fromStringSafe(resourceId()));});
+        [this](){ m_availabilityWatcher->setResourceId(resourceId());});
 
     setParent(parent);
 }
@@ -66,18 +66,17 @@ Ptz::Capabilities ResourcePtzController::operationalCapabilities() const
     return getCapabilities({nx::core::ptz::Type::operational});
 }
 
-QString ResourcePtzController::resourceId() const
+QnUuid ResourcePtzController::resourceId() const
 {
-    return m_resourceId.toString();
+    return m_resourceId;
 }
 
-void ResourcePtzController::setResourceId(const QString& value)
+void ResourcePtzController::setResourceId(const QnUuid& value)
 {
-    const auto id = QnUuid::fromStringSafe(value);
-    if (id == m_resourceId)
+    if (value == resourceId())
         return;
 
-    m_resourceId = id;
+    m_resourceId = value;
     emit resourceIdChanged();
 }
 

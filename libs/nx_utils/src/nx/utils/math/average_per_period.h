@@ -15,6 +15,7 @@ template<> struct LongType<unsigned int> { using type = unsigned long long; };
 } // namespace detail
 
 template<typename Value>
+// requires std::is_constructible_v<Value, int>
 class AveragePerPeriod
 {
 public:
@@ -34,12 +35,15 @@ public:
     {
         const auto cumulativeValue = m_cumulativeValuePerPeriod.getSumPerLastPeriod();
         const auto valueCount = m_valueCountPerPeriod.getSumPerLastPeriod();
-        return static_cast<Value>(valueCount == 0 ? 0 : cumulativeValue / valueCount);
+        if (valueCount == 0)
+            return Value(0);
+        else
+            return static_cast<Value>(cumulativeValue / valueCount);
     }
 
 private:
     SumPerPeriod<typename detail::LongType<Value>::type> m_cumulativeValuePerPeriod;
-    SumPerPeriod<typename detail::LongType<Value>::type> m_valueCountPerPeriod;
+    SumPerPeriod<unsigned long long> m_valueCountPerPeriod;
 };
 
 } // namespace math

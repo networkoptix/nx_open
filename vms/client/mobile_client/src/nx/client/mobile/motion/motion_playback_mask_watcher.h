@@ -2,9 +2,10 @@
 
 #include <QtCore/QObject>
 
-class QnCameraChunkProvider;
+class ChunkProvider;
 
 namespace nx::vms::client::core { class MediaPlayer; }
+namespace nx::client::core { class ChunkProvider; }
 
 namespace nx::client::mobile
 {
@@ -24,7 +25,7 @@ class MotionPlaybackMaskWatcher: public QObject
         WRITE setMediaPlayer
         NOTIFY mediaPlayerChanged)
 
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider
+    Q_PROPERTY(nx::client::core::ChunkProvider* chunkProvider
         READ chunkProvider
         WRITE setChunkProvider
         NOTIFY chunkProviderChanged)
@@ -41,8 +42,8 @@ public:
     nx::vms::client::core::MediaPlayer* mediaPlayer() const;
     void setMediaPlayer(nx::vms::client::core::MediaPlayer* player);
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* provider);
+    nx::client::core::ChunkProvider* chunkProvider() const;
+    void setChunkProvider(nx::client::core::ChunkProvider* provider);
 
 signals:
     void mediaPlayerChanged();

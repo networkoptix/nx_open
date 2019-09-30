@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -104,12 +93,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Nem lehet egyesíteni a rendszereket, mert legalább egy azonos azonosítójú szerverrel rendelkeznek. Kérjük, távolítsa el ezt a szervert, és próbálja újra.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>A felhő rendszerek különböző tulajdonosokkal rendelkeznek. Az egyesítés nem megengedett.</translation>
     </message>
   </context>
   <context>
@@ -332,19 +321,19 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Frissítse a firmware-t. A minimális támogatott verzió %1. A jelenlegi verzió %2</translation>
+      <translation>Frissítse a firmware-t. A minimálisan támogatott verzió %1. A jelenlegi verzió %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Plugin hiba. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>A plugin nem érhető el</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Belső Szerverhiba. %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +372,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Mintapufferek felszabadítása sikertelen</translation>
     </message>
   </context>
   <context>
@@ -417,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder %1 kodekhez.</translation>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -520,186 +509,186 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Idő licencek</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Idő licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Analóg licencek</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analóg licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Professzionális licencek</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professzionális licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n Végponti licencek</numerusform>
         <numerusform>%n Határ licencek</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Vmax licencek</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Analóg enkóder licencek</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analóg enkóder licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Videofal licencek</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Videofal licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O modul licencek</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O modul licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Induló licencek</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Induló licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Áthidaló licencek</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Áthidaló licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Érvénytelen licencek</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Érvénytelen licencek</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Szabad licencek</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Szabad licenc</numerusform>
+        <numerusform>%n Szabad licenc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Idő licencek</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Idő licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Analóg licencek</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analóg licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Professzionális licencek</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professzionális licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Határ licencek</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
+        <numerusform>%n Végponti licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Vmax licencek</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Analóg enkóder licencek</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analóg enkóder licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 videofal licencek</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 videofal licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 I/O modul licencek</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O modul licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Induló licencek</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Induló licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Szabad licencek</numerusform>
+        <numerusform>%n/%1 Szabad licenc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Áthidaló licencek</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Áthidaló licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Érvénytelen licencek</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Érvénytelen licencek</numerusform>
       </translation>
     </message>
   </context>
@@ -766,11 +755,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Rendszerenként csak egy induló licenc megengedett.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Már van egy aktív induló licenc.</translation>
     </message>
   </context>
   <context>
@@ -832,44 +821,44 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Kamerák</numerusform>
+        <numerusform>%n Kamerák</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamerák</numerusform>
+        <numerusform>%n kamerák</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O modulok</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O modul</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Eszközök</numerusform>
+        <numerusform>%n Eszközök</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n eszközök</numerusform>
+        <numerusform>%n eszközök</numerusform>
       </translation>
     </message>
   </context>
@@ -912,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -1028,19 +1017,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>A Zip-fájl sérült.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Nem sikerült megtalálni a célkönyvtárat.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Nem sikerült megnyitni a fájlt az íráshoz.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Nincs szabad hely a lemezen.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1048,22 +1037,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Kibontás megszakítva.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>A kicsomagoló foglalt.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Rossz titkosított adatfolyam méret.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Sérült titkosított adatfolyam fejléc.</translation>
     </message>
   </context>
   <context>
@@ -1332,7 +1321,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1551,43 +1540,43 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Nem sikerült a kamera idejét beállítani, túlságosan laggol, a rendszeridő lesz használva</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>A kameraidő visszaállt alaphelyzetbe</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Több %1 esemény történt</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Multicast címütközés észlelve. Cím %1 már használatban van az %2 a %3 -streamen</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>A %1 hálózati cím nem multicast-cím</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Az Analytics tárhely &quot;%1&quot; offline állapotban van.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Az Analytics &quot;%1&quot; tárhelye majdnem tele van.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Plugin diagnosztikai esemény</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Ismeretlen plugin diagnosztikai esemény</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>RAID hiba. %1.</translation>
     </message>
   </context>
   <context>

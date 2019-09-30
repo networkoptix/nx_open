@@ -2,8 +2,8 @@
 
 #include <QtQml/QtQml>
 
-#include <camera/camera_chunk_provider.h>
 #include <nx/client/core/media/media_player.h>
+#include <nx/client/core/media/chunk_provider.h>
 
 namespace nx::client::mobile
 {
@@ -19,8 +19,8 @@ public:
     nx::vms::client::core::MediaPlayer* mediaPlayer();
     void setMediaPlayer(nx::vms::client::core::MediaPlayer* value);
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* value);
+    nx::client::core::ChunkProvider* chunkProvider() const;
+    void setChunkProvider(nx::client::core::ChunkProvider* value);
 
 private:
     void setTimePeriods(const QnTimePeriodList& value);
@@ -31,7 +31,7 @@ public:
     bool activeWatcher = false;
     QnTimePeriodList periods;
     nx::vms::client::core::MediaPlayer* player = nullptr;
-    QnCameraChunkProvider* provider = nullptr;
+    nx::client::core::ChunkProvider* provider = nullptr;
 };
 
 MotionPlaybackMaskWatcher::Private::Private(MotionPlaybackMaskWatcher* q):
@@ -69,12 +69,12 @@ void MotionPlaybackMaskWatcher::Private::setMediaPlayer(nx::vms::client::core::M
     updatePlayerPeriods();
 }
 
-QnCameraChunkProvider* MotionPlaybackMaskWatcher::Private::chunkProvider() const
+nx::client::core::ChunkProvider* MotionPlaybackMaskWatcher::Private::chunkProvider() const
 {
     return provider;
 }
 
-void MotionPlaybackMaskWatcher::Private::setChunkProvider(QnCameraChunkProvider* value)
+void MotionPlaybackMaskWatcher::Private::setChunkProvider(nx::client::core::ChunkProvider* value)
 {
     if (provider == value)
         return;
@@ -91,9 +91,14 @@ void MotionPlaybackMaskWatcher::Private::setChunkProvider(QnCameraChunkProvider*
         return;
     }
 
-    const auto updatePeriods = [this]() { setTimePeriods(provider->timePeriods(Qn::MotionContent)); };
-    connect(provider, &QnCameraChunkProvider::timePeriodsUpdated, this, updatePeriods);
-    updatePeriods();
+    const auto updatePeriods =
+        [this](Qn::TimePeriodContent type)
+        {
+            if (type == Qn::MotionContent)
+                setTimePeriods(provider->periods(Qn::MotionContent));
+        };
+    connect(provider, &nx::client::core::ChunkProvider::periodsUpdated, this, updatePeriods);
+    updatePeriods(Qn::MotionContent);
 }
 
 void MotionPlaybackMaskWatcher::Private::setTimePeriods(const QnTimePeriodList& value)
@@ -150,12 +155,12 @@ void MotionPlaybackMaskWatcher::setMediaPlayer(nx::vms::client::core::MediaPlaye
     d->setMediaPlayer(player);
 }
 
-QnCameraChunkProvider* MotionPlaybackMaskWatcher::chunkProvider() const
+nx::client::core::ChunkProvider* MotionPlaybackMaskWatcher::chunkProvider() const
 {
     return d->chunkProvider();
 }
 
-void MotionPlaybackMaskWatcher::setChunkProvider(QnCameraChunkProvider* provider)
+void MotionPlaybackMaskWatcher::setChunkProvider(nx::client::core::ChunkProvider* provider)
 {
     d->setChunkProvider(provider);
 }

@@ -36,11 +36,11 @@ public:
 
     int count() const;
 
-    Q_INVOKABLE int rowByResourceId(const QString& resourceId) const;
-    Q_INVOKABLE QString resourceIdByRow(int row) const;
+    Q_INVOKABLE int rowByResourceId(const QnUuid& resourceId) const;
+    Q_INVOKABLE QnUuid resourceIdByRow(int row) const;
 
-    Q_INVOKABLE QString nextResourceId(const QString& resourceId) const;
-    Q_INVOKABLE QString previousResourceId(const QString& resourceId) const;
+    Q_INVOKABLE QnUuid nextResourceId(const QnUuid& resourceId) const;
+    Q_INVOKABLE QnUuid previousResourceId(const QnUuid& resourceId) const;
 
 public slots:
     void refreshThumbnail(int row);

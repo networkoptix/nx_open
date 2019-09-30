@@ -21,6 +21,7 @@ public:
 
     /** List of resources ids, the given user has access to (only given directly). */
     QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
+    bool hasSharedResource(const QnResourceAccessSubject& subject, const QnUuid& resourceId) const;
     void setSharedResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
 
 private:

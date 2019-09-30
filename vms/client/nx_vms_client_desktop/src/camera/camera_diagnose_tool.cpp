@@ -8,8 +8,8 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <api/app_server_connection.h>
-#include <api/media_server_connection.h>
 #include <api/server_rest_connection.h>
+#include <api/abstract_connection.h>
 
 #include <common/common_module.h>
 

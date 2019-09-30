@@ -78,6 +78,20 @@ public:
     Qt::MouseButtons mouseButtons;
     QPoint mouseScreenPos;
 
+    int m_skipUpdateMask = 0;
+
+    void setSkipUpdateOnSliderChange(const QSet<AbstractGraphicsSlider::SliderChange>& set)
+    {
+        m_skipUpdateMask = 0;
+        for (auto flag : set)
+            m_skipUpdateMask |= (1 << flag);
+    }
+
+    bool canSkipUpdate(AbstractGraphicsSlider::SliderChange change) const
+    {
+        return ((1 << change) & m_skipUpdateMask);
+    }
+
     inline void mouseEvent(QGraphicsSceneMouseEvent *event) {
         mouseWidget = event->widget();
         mouseScreenPos = event->screenPos();

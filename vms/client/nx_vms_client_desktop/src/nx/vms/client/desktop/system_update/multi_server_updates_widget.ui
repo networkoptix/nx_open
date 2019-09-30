@@ -204,7 +204,7 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="versionPage">
-         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0,0,0">
           <property name="spacing">
            <number>6</number>
           </property>
@@ -326,6 +326,19 @@ border-style: solid;
             </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="spaceErrorLabel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
            </widget>
           </item>
@@ -676,15 +689,18 @@ border-style: solid;
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="debugStateLabel">
+         <widget class="QnWordWrappedLabel" name="debugStateLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string/>
           </property>
           <property name="openExternalLinks">
            <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
           </property>
          </widget>
         </item>
@@ -725,6 +741,12 @@ border-style: solid;
    <class>nx::vms::client::desktop::TableView</class>
    <extends>QTableView</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/table_view.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

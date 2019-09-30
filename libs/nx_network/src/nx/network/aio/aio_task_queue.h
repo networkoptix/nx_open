@@ -4,6 +4,7 @@
 #include <deque>
 #include <memory>
 
+#include <nx/utils/math/abnormal_value_detector.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_pollset.h"
@@ -13,6 +14,8 @@
 #include "../detail/socket_sequence.h"
 
 namespace nx::network::aio::detail {
+
+//-------------------------------------------------------------------------------------------------
 
 // TODO: #ak Looks like a flags set, but somehow it is not.
 enum class TaskType
@@ -253,6 +256,8 @@ private:
     // TODO: #ak Get rid of map here to avoid undesired allocations.
     std::multimap<qint64, PeriodicTaskData> m_periodicTasksByClock;
     mutable QnMutex m_socketEventProcessingMutex;
+    nx::utils::math::AbnormalValueDetector<
+        std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
 
     void addSocketToPollset(
         Pollable* socket,
@@ -275,6 +280,14 @@ private:
     void cancelPeriodicTask(
         AioEventHandlingData* eventHandlingData,
         aio::EventType eventType);
+
+    template<typename Func>
+    void callAndReportAbnormalProcessingTime(Func func, const char* description);
+
+    void reportAbnormalProcessingTime(
+        std::chrono::microseconds value,
+        std::chrono::microseconds average,
+        const char* where_);
 };
 
 } // namespace nx::network::aio::detail

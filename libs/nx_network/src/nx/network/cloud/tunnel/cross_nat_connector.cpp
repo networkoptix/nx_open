@@ -197,6 +197,8 @@ void CrossNatConnector::issueConnectRequestToMediator()
                 m_cloudConnectController->settings(),
                 *m_mediatorAddress,
                 std::move(mediatorUdpClient));
+
+        m_connectionMediationInitiator->setTimeout(m_connectTimeout);
     }
 
     m_connectionMediationInitiator->start(

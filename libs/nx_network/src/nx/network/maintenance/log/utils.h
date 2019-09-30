@@ -26,7 +26,7 @@ NX_NETWORK_API std::vector<Filter> toEffectiveFilters(
     const nx::utils::log::LevelFilters& levelFilters);
 
 NX_NETWORK_API Logger toLoggerInfo(
-    const std::shared_ptr<nx::utils::log::AbstractLogger>& logger,
+    const nx::utils::log::AbstractLogger* logger,
     const std::set<nx::utils::log::Filter>& effectiveFilters,
     int id);
 

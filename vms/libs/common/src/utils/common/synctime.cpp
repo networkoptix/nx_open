@@ -6,7 +6,6 @@
 
 #include "synctime.h"
 #include "api/app_server_connection.h"
-#include "api/session_manager.h"
 //#include <nx/vms/time_sync/time_sync_manager.h>
 #include <nx_ec/ec_api.h>
 

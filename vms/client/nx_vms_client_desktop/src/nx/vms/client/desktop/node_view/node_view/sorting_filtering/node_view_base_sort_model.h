@@ -24,6 +24,9 @@ public:
     };
 
     void setFilter(const QString& filter, FilterScope scope = AnyNodeFilterScope);
+    using FilterFunctor =
+        std::function<bool(const QModelIndex& index, const QString& filterString)>;
+    void setFilterFunctor(FilterFunctor filterFunctor);
 
 protected:
     bool nextLessThan(

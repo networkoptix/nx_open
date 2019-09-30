@@ -1,4 +1,5 @@
 set(_withMediaServer ON)
+set(_supportVmsBenchmark OFF)
 set(_withMediaDbUtil OFF)
 set(_withTrayTool OFF)
 set(_withNxTool OFF)
@@ -30,6 +31,7 @@ if("${platform}" STREQUAL "linux")
         set(_withClouds OFF)
     elseif("${arch}" STREQUAL "x64")
         set(_withClouds ON)
+        set(_supportVmsBenchmark ON)
     endif()
 endif()
 
@@ -41,11 +43,11 @@ if("${platform}" MATCHES "android|ios")
 endif()
 
 if("${platform}" STREQUAL "macosx")
-    set(_withMediaServer OFF)
     set(_withClouds ON)
 endif()
 
 if(WINDOWS)
+    set(_supportVmsBenchmark ON)
     set(_withTrayTool ON)
     set(_withNxTool ${build_nxtool})
     if("${arch}" STREQUAL "x64")
@@ -91,9 +93,14 @@ cmake_dependent_option(withDistributions "Enable distributions build"
     ON
 )
 
-cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
-    OFF "NOT withDistributions"
-    ON
+cmake_dependent_option(withSdk "Enable nx_*_sdk build"
+    ON "withDistributions;NOT MACOSX"
+    OFF
+)
+
+cmake_dependent_option(withVmsBenchmark "Enable vms_benchmark build"
+    ON "_supportVmsBenchmark"
+    OFF
 )
 
 cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
@@ -108,6 +115,7 @@ if(enableHanwha OR developerBuild AND NOT targetDevice STREQUAL "edge1")
     set(enable_hanwha true)
 endif()
 
+unset(_supportVmsBenchmark)
 unset(_withMediaServer)
 unset(_withMediaDbUtil)
 unset(_withNxTool)

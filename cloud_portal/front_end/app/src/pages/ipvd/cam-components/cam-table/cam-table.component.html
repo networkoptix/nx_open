@@ -1,0 +1,61 @@
+<nx-pre-loader type="page" *ngIf="!pagedItems.length"></nx-pre-loader>
+
+<div class="nx-table-wrapper" id="nx-table">
+    <div class="table-wrapper">
+        <table class="table table-hover nx-table">
+            <thead>
+                <tr>
+                    <th *ngFor="let header of showHeaders"
+                        class="align-bottom"
+                        (click)="toggleHeaderSort(header)"
+                        [ngClass]="{'debug' : debug}">
+
+                        <div class="caption d-flex">
+                            <div class="" [innerHTML]="header"></div>
+                            <div class="sort-dir nav-arrow"
+                                 [style.visibility]="(header == selectedHeader) ? 'visible' : 'hidden'"
+                                 [ngClass]="{'up': !sortOrderASC}">
+
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of pagedItems;"
+                    [ngClass]="{'selected': item.sortKey == selectedCamera}"
+                    (click)="setClickedRow(item);">
+
+                    <td *ngFor="let p of showParametersFor(item)" class="text-left"
+                        [ngClass]="{'debug' : debug}">
+
+                        <div *ngIf="!isBoolean(item[p]) && item[p] !== 0 && item[p] !== '0x0'; else icon">{{item[p]}}</div>
+                        <ng-template #icon>
+                            <nx-bool-icon [param]="p" [value]="item[p]"></nx-bool-icon>
+                        </ng-template>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="vertical-align ml-0 clearfix">
+        <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
+            <ngb-pagination
+                    [collectionSize]="results"
+                    [maxSize]="pagerMaxSize"
+                    [pageSize]="pageSize"
+                    [page]="currentPage"
+                    (pageChange)="setPage($event, true)"></ngb-pagination>
+        </nav>
+
+        <div class="csv">
+            <nx-csv-button [data]="csvCameraData"
+                           filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
+                           [options]="csvOptions">
+            </nx-csv-button>
+        </div>
+    </div>
+</div>

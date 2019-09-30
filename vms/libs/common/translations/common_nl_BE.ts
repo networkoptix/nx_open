@@ -2,22 +2,11 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl-BE" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM jjjj</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Dutch</translation>
+      <translation>Dutch (Belguim)</translation>
     </message>
   </context>
   <context>

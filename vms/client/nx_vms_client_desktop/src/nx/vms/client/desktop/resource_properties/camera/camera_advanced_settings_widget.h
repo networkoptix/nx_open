@@ -27,17 +27,17 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void updateFromResource();
     void reloadData();
     bool hasChanges() const;
     void submitToResource();
 
+    bool shouldBeVisible() const;
+
 signals:
     void hasChangesChanged();
 
-private:
-    void updatePage();
-    bool hasManualPage() const;
+    // TODO: Reimplement using store.
+    void visibilityUpdateRequested();
 
 private:
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;

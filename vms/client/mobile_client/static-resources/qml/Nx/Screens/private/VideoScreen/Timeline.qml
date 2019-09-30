@@ -4,28 +4,25 @@ import com.networkoptix.qml 1.0
 
 Item
 {
-    id: root
+    id: control
 
+    property alias displayOffset: timeline.displayOffset
     property alias defaultWindowSize: timeline.defaultWindowSize
-    property alias windowStart: timeline.windowStart
-    property alias windowEnd: timeline.windowEnd
     property alias windowSize: timeline.windowSize
     property alias position: timeline.position
-    property alias positionDate: timeline.positionDate
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
     property alias chunkProvider: timeline.chunkProvider
     property alias startBound: timeline.startBound
-    property alias autoPlay: timeline.autoPlay
     property alias autoReturnToBounds: timeline.autoReturnToBounds
-    property alias serverTimeZoneShift: timeline.serverTimeZoneShift
     property alias motionSearchMode: timeline.motionSearchMode
     property alias changingMotionRoi: timeline.changingMotionRoi
 
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
+    property real bottomOverlap: 0
 
     signal positionTapped(real position)
 
@@ -49,11 +46,6 @@ Item
         timelineView.clearCorrection()
     }
 
-    function jumpTo(position)
-    {
-        timeline.setPositionImmediately(position)
-    }
-
     QnTimelineView
     {
         id: timeline
@@ -70,8 +62,6 @@ Item
         motionModeChunkColor: ColorTheme.transparent(ColorTheme.green_d2, 0.6)
         motionColor: ColorTheme.red_l2
         motionLoadingColor: ColorTheme.transparent(motionColor, 0.6)
-
-        timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 
         font.pixelSize: 15
 
@@ -107,7 +97,8 @@ Item
 
             property int pressX: -1
 
-            anchors.fill: parent
+            width: parent.width
+            height: parent.height + control.bottomOverlap
             acceptedButtons: Qt.LeftButton
             drag.threshold: 10
 

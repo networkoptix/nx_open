@@ -18,7 +18,7 @@ namespace {
 static std::string toLowerReversed(std::string domainName)
 {
     nx::utils::to_lower(&domainName);
-    return nx::utils::reverseWords(domainName, ".");
+    return nx::utils::reverseWords(domainName, '.');
 }
 
 } //namespace
@@ -100,24 +100,23 @@ void RemoteRelayPeerPool::findRelayByDomain(
     m_map->database().dataManager().getRangeWithPrefix(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](
-            ResultCode result, std::map<std::string, std::string> map)
+            ResultCode result, std::map<std::string, std::string> peerToRelayDomain)
         {
             if (result != ResultCode::ok)
             {
-                NX_WARNING(this, "getRangeWithPrefix returned error: %1 for key: %2",
+                NX_VERBOSE(this, "getRangeWithPrefix returned error: %1 for key: %2",
                     toString(result), domainName);
                 return handler(std::string());
             }
 
-            NX_VERBOSE(this, "getRangeWithPrefix returned result set: %2 for domainName: %3",
-                containerString(map), domainName);
+            NX_VERBOSE(this, "getRangeWithPrefix returned result set: %1 for domainName: %2",
+                containerString(peerToRelayDomain), domainName);
 
-            if (map.empty())
+            if (peerToRelayDomain.empty())
                 return handler(std::string());
 
-
             std::vector<std::string> relayDomains;
-            for (auto& peerAndRelayDomains : map)
+            for (auto& peerAndRelayDomains: peerToRelayDomain)
             {
                 // Avoid redirecting to this relay instance by not adding this relay to the list.
                 if (peerAndRelayDomains.second.find(m_domainName) == std::string::npos)
@@ -212,6 +211,16 @@ void RemoteRelayPeerPool::pleaseStopSync()
 {
     if (m_map)
         m_map->synchronizationEngine().pleaseStopSync();
+}
+
+const nx::sql::AsyncSqlQueryExecutor* RemoteRelayPeerPool::sqlQueryExecutor() const
+{
+    return m_queryExecutor.get();
+}
+
+const nx::clusterdb::map::EmbeddedDatabase* RemoteRelayPeerPool::peerDb() const
+{
+    return m_map.get();
 }
 
 void RemoteRelayPeerPool::startDiscovery()

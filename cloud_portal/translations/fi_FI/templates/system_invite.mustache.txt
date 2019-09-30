@@ -1,0 +1,13 @@
+Tervetuloa %PRODUCT_NAME%
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) kutsuu sinut liittymään %PRODUCT_NAME% ja jakamaan järjestelmänsä {{message.system_name}} kanssasi.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Sinua pyydetään liittymään %PRODUCT_NAME%.
+Sinulle on myönnetty pääsy kohteeseen %{verification_name}.
+{{/message.sharer_name}}
+
+Rekisteröi ja tarkastele järjestelmää: {{config.portal_url}}/Register/{{message.code}}
+

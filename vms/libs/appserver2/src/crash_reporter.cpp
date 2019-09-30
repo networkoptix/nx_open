@@ -30,7 +30,7 @@ static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* over 30mb is too big *
 static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
 static const uint KEEP_LAST_CRASHES = 10;
 
-static QFileInfoList readCrashes(const QString& prefix = QString())
+static QFileInfoList readCrashes([[maybe_unused]] const QString& prefix = QString())
 {
     #if defined( _WIN32 )
         const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
@@ -39,7 +39,6 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
-        nx::utils::unused(prefix);
         const QDir crashDir;
         const QString crashFilter;
         return QFileInfoList(); // do nothing. not implemented

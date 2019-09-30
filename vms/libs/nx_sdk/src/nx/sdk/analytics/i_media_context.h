@@ -14,7 +14,7 @@ namespace analytics {
 class IMediaContext: public Interface<IMediaContext>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IMediaContext"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IMediaContext"); }
 
     /**
      * @return pointer to codec specific blob of extradata or nullptr (if no extradata needed).

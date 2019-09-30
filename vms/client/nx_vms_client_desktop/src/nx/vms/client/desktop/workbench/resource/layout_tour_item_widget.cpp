@@ -262,6 +262,8 @@ void LayoutTourItemWidget::initOverlay()
 
             QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+
+            // Store visual data to the tour and then add it to the save queue.
             menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 

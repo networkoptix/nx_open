@@ -1,21 +1,5 @@
 /* Palette spec is here: http://4yppjt.axshare.com/#p=colors */
 
-$dark_core:    #212A2F;
-$dark_core_index: 7;
-$dark_offset:  #050708;
-
-@function dark($index) {
-  @return $dark_core + ($dark_core_index - $index) * $dark_offset;
-}
-
-$light_core:    #FFF;
-$light_core_index:  1;
-$light_offset:  #0A0807;
-
-@function light($index) {
-  @return $light_core - ($index - $light_core_index) * $light_offset;
-}
-
 $blue1: #2FA2DB;
 
 $green3: #223925;
@@ -75,7 +59,7 @@ $light15: #738F9D;
 $light16: #698796;
 $light17: #5F7F8F;
 
-$additional_light1: #FAFBFB;
-$additional_light2: #F0F3F4;
-$additional_light3: #E6EBED;
-$additional_light4: #DCE3E6;
+$additional_light1 : #FAFBFC;
+$additional_light2 : #F0F2F4;
+$additional_light3 : #E6EBED;
+$additional_light4 : #DCE3E6;

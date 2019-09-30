@@ -8,7 +8,7 @@
 #include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/compressed_video_packet.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx {
 namespace vms::server {
@@ -34,7 +34,8 @@ public:
         CLConstVideoDecoderOutputPtr uncompressedFrame,
         bool* missingUncompressedFrameWarningIssued)
         :
-        m_compressedFrame(compressedFrame ? new CompressedVideoPacket(compressedFrame) : nullptr),
+        m_compressedFrame(
+            compressedFrame ? nx::sdk::makePtr<CompressedVideoPacket>(compressedFrame) : nullptr),
         m_uncompressedFrame(std::move(uncompressedFrame)),
         m_missingUncompressedFrameWarningIssued(missingUncompressedFrameWarningIssued)
     {

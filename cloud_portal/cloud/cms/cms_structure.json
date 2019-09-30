@@ -7,6 +7,7 @@
       {
         "name": "Cloud maintenance page (503)",
         "old_name": "Service unavailable page (503)",
+        "label": "Cloud maintenance page (503)",
         "file_path": "static/503.html",
         "description": "This page is visible if Cloud service is unavailable",
         "url": "/503.html",
@@ -16,7 +17,7 @@
             "label": "Content",
             "name": "%CONTENT%",
             "old_name": "%BLOCK_CONTENT%",
-            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+            "value": "<h1>%CLOUD_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
             "description": "Message to show on Cloud maintenance page (503)",
             "type": "html"
           },
@@ -24,6 +25,7 @@
             "label": "Download Link",
             "name": "%DOWNLOAD_LINK%",
             "old_name": "{{downloadLink}}",
+            "type": "text",
             "value": "http://www.networkoptix.com/live-demo#fulltrial",
             "description": "Emergency link for downloading applications (in case if cloud is down)"
           },
@@ -49,16 +51,21 @@
       },
       {
         "name": "branding",
+        "label": "Branding",
         "is_global": true,
         "description": "Common branding information",
         "translatable": false,
         "values": [
           {
-            "label": "Product Name",
-            "name": "%PRODUCT_NAME%",
-            "old_name": "{{PRODUCT_NAME}}",
+            "label": "Cloud Name",
+            "name": "%CLOUD_NAME%",
+            "old_name": "%PRODUCT_NAME%",
+            "type": "text",
             "value": "VMS Demo Cloud",
-            "description": "Name for cloud"
+            "description": "Name for cloud",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Skin",
@@ -80,13 +87,18 @@
             "label": "VMS Name",
             "name": "%VMS_NAME%",
             "old_name": "{{VMS_NAME}}",
+            "type": "text",
             "value": "VMS Demonstration",
-            "description": "Name of the VMS customization. Must be short!"
+            "description": "Name of the VMS customization. Must be short!",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Cloud tab name",
             "name": "%CLOUD_TAB_NAME%",
             "old_name": "{{CLOUD_TAB_NAME}}",
+            "type": "text",
             "value": "Cloud",
             "description": "Cloud tab name in thick client"
           },
@@ -94,6 +106,7 @@
             "label": "Support Link",
             "name": "%SUPPORT_LINK%",
             "old_name": "{{supportLink}}",
+            "type": "text",
             "value": "/content/support",
             "description": "Support link. Use https://{{CLOUD_ADDRESS}}/content/support to use embedded page. If you use phone number here - make sure you format the link correctly like 'tel:...'"
           },
@@ -101,6 +114,7 @@
             "label": "Support Link Text",
             "name": "%SUPPORT_LINK_TEXT%",
             "old_name": "{{supportLinkText}}",
+            "type": "text",
             "value": "http://support.networkoptix.com",
             "description": "Text to be shown on the support link in emails"
           },
@@ -108,6 +122,7 @@
             "label": "Privacy policy link",
             "name": "%PRIVACY_LINK%",
             "old_name": "{{supportLink}}",
+            "type": "text",
             "value": "/content/privacy",
             "description": "Privacy policy link. Use https://{{CLOUD_ADDRESS}}/content/privacy to use embedded page."
           },
@@ -115,19 +130,28 @@
             "label": "Company web site",
             "name": "%COMPANY_LINK%",
             "old_name": "{{companyUrl}}",
+            "type": "text",
             "value": "http://networkoptix.com",
-            "description": "Company main web site"
+            "description": "Company main web site. Example: http://www.google.com, https://mail.yahoo.com",
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
           },
           {
             "label": "Company Name",
             "name": "%COMPANY_NAME%",
             "old_name": "%COMPANY_NAME%",
+            "type": "text",
             "value": "Network Optix",
-            "description": "The name of the company itself"
+            "description": "The name of the company itself",
+            "meta": {
+              "shortcut": true
+            }
           },
           {
             "label": "Copyright Year",
             "name": "%COPYRIGHT_YEAR%",
+            "type": "text",
             "value": "2019",
             "description": "Copyright information"
           },
@@ -135,6 +159,7 @@
             "label": "Client Protocol",
             "name": "%CLIENT_PROTOCOL%",
             "old_name": "{{CLIENT_PROTOCOL}}",
+            "type": "text",
             "value": "demo-vms",
             "description": "URL protocol for calling native clients from browser",
             "advanced": true
@@ -143,6 +168,7 @@
             "label": "IOS application ID",
             "name": "%IOS_APPLICATION_ID%",
             "old_name": "{{iOSappID}}",
+            "type": "text",
             "value": "L6FE34GJWM.com.networkoptix.NxMobile",
             "description": "App ID for iOS mobile application",
             "advanced": true
@@ -151,6 +177,7 @@
             "label": "IOS application link",
             "name": "%IOS_APPLICATION_LINK%",
             "old_name": "{{IOS_APP_LINK}}",
+            "type": "text",
             "value": "disabled",
             "description": "Link for iOS application in Apple AppStore",
             "advanced": true
@@ -159,6 +186,7 @@
             "label": "Android application link",
             "name": "%ANDROID_APPLICATION_LINK%",
             "old_name": "{{ANDROID_APP_LINK}}",
+            "type": "text",
             "value": "disabled",
             "description": "Link for Android application in Google Play",
             "advanced": true
@@ -166,12 +194,14 @@
           {
             "label": "Mail from - name",
             "name": "%MAIL_FROM_NAME%",
+            "type": "text",
             "value": "VMS Demo Cloud",
             "description": "Sender name for emails from cloud portal"
           },
           {
             "label": "Mail from - email",
             "name": "%MAIL_FROM_EMAIL%",
+            "type": "text",
             "value": "service@networkoptix.com",
             "description": "Sender email for emails from cloud portal. Case sensitive. (Needs to be verified by Amazon, contact Nx support team for assistance)",
             "advanced": true
@@ -217,6 +247,7 @@
       },
       {
         "name": "Landing page",
+        "label": "Landing page",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
         "translatable": true,
@@ -240,31 +271,34 @@
               "height_ge": 220
             }
           },
-          [
-            "Subtitle",
-            "%SUBTITLE%",
-            "Welcome!",
-            "Text under product name on landing page. One line (50-100 symbols)"
-          ],
-          [
-            "Left block title",
-            "%BLOCK1_TITLE%",
-            "Connect",
-            "1-3 words"
-          ],
+          {
+            "label": "Subtitle",
+            "name": "%SUBTITLE%",
+            "value": "Welcome!",
+            "description": "Text under product name on landing page. One line (50-100 symbols)",
+            "type": "text"
+          },
+          {
+            "label": "Left block title",
+            "name": "%BLOCK1_TITLE%",
+            "value": "Connect",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Left block text",
             "name": "%BLOCK1_CONTENT%",
-            "value": "Connect to your Systems with %PRODUCT_NAME% account",
+            "value": "Connect to your Systems with %CLOUD_NAME% account",
             "description": "8-10 words",
             "type": "long_text"
           },
-          [
-            "Middle block title",
-            "%BLOCK2_TITLE%",
-            "Share",
-            "1-3 words"
-          ],
+          {
+            "label": "Middle block title",
+            "name": "%BLOCK2_TITLE%",
+            "value": "Share",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Middle block text",
             "name": "%BLOCK2_CONTENT%",
@@ -272,12 +306,13 @@
             "description": "8-10 words",
             "type": "long_text"
           },
-          [
-            "Right block title",
-            "%BLOCK3_TITLE%",
-            "Access",
-            "1-3 words"
-          ],
+          {
+            "label": "Right block title",
+            "name": "%BLOCK3_TITLE%",
+            "value": "Access",
+            "description": "1-3 words",
+            "type": "text"
+          },
           {
             "label": "Right block text",
             "name": "%BLOCK3_CONTENT%",
@@ -289,6 +324,7 @@
       },
       {
         "name": "Support page",
+        "label": "Support page",
         "file_path": "static/lang_{{language}}/views/static/support.html",
         "url": "/content/support",
         "translatable": true,
@@ -304,6 +340,7 @@
       },
       {
         "name": "ARM support policy page",
+        "label": "ARM support policy page",
         "file_path": "static/lang_{{language}}/views/static/arm.html",
         "url": "/content/arm",
         "translatable": true,
@@ -327,7 +364,30 @@
         ]
       },
       {
+        "name": "Open Source Libraries Disclosure Page",
+        "file_path": "static/lang_{{language}}/views/static/arm.html",
+        "url": "/content/libraries",
+        "translatable": true,
+        "values":[
+          {
+            "label": "Libraries Page Title",
+            "name": "%TITLE%",
+            "value": "OPEN SOURCE SOFTWARE DISCLOSURE FOR %VMS_NAME%",
+            "type": "text",
+            "advanced": true
+          },
+          {
+            "label": "Libraries Page Content",
+            "name": "%CONTENT%",
+            "value": "<p>%VMS_NAME% includes third-party code licensed for use and redistribution under open-source licenses. Below is a list of disclosures and disclaimers in connection with %VMS_NAME% incorporation of certain open-source licensed software into its services. Notwithstanding any of the terms and conditions of your license agreement with %COMPANY_NAME%, the terms of certain open-source licenses may be applicable to your use of the %VMS_NAME% software, as set forth below.</p><p>This list of open-source code was compiled with reference to third-party software incorporated into the services as of the date the list was generated. This list may be updated from time to time and may not be complete.</p><p>ALL INFORMATION HERE IS PROVIDED 'AS IS.' %VMS_NAME% AND ITS SUPPLIERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, WITH REGARD TO THIS LIST OR ITS ACCURACY OR COMPLETENESS, OR WITH RESPECT TO ANY RESULTS TO BE OBTAINED FROM USE OR DISTRIBUTION OF THE LIST. BY USING OR DISTRIBUTING THIS LIST, YOU AGREE THAT IN NO EVENT SHALL %COMPANY_NAME% BE HELD LIABLE FOR ANY DAMAGES WHATSOEVER RESULTING FROM ANY USE OR DISTRIBUTION OF THIS LIST, INCLUDING, WITHOUT LIMITATION, ANY SPECIAL, CONSEQUENTIAL, INCIDENTAL OR OTHER DIRECT OR INDIRECT DAMAGES.</p><ol start='1'><li>Qt<br /><a href='https://www.google.com/url?q=https://www.qt.io/download&amp;sa=D&amp;ust=1560995424024000'>https://www.qt.io/download</a>&nbsp;<br />Copyright &copy; The Qt Company Ltd.<br />Licensed under the GNU Lesser General Public License (LGPL) version 3, which is available at <a href='https://www.google.com/url?q=https://doc.qt.io/qt-5/lgpl.html&amp;sa=D&amp;ust=1560995424024000'>https://doc.qt.io/qt-5/lgpl.html</a></li><li>QtWebkit<br /><a href='https://www.google.com/url?q=https://github.com/qt/qtwebkit&amp;sa=D&amp;ust=1560995424024000'>https://github.com/qt/qtwebkit</a>&nbsp;<br />Copyright &copy; The Qt Company Ltd.<br />Licensed under the GNU Lesser General Public License (LGPL) version 2.1, which is available at <a href='https://www.google.com/url?q=https://github.com/qt/qtwebkit/blob/5.212/LICENSE.LGPLv21&amp;sa=D&amp;ust=1560995424025000'>https://github.com/qt/qtwebkit/blob/5.212/LICENSE.LGPLv21</a></li><li>Boost<br /><a href='https://www.google.com/url?q=https://github.com/zeroclipboard/zeroclipboard&amp;sa=D&amp;ust=1560995424025000'>https://github.com/zeroclipboard/zeroclipboard</a>&nbsp;<br />Copyright Beman Dawes, David Abrahams, 1998-2005. Copyright Rene Rivera 2004-2007.<br />Licensed under the Boost Software License, Version 1.0, which is available at <a href='https://www.google.com/url?q=https://www.boost.org/users/license.html&amp;sa=D&amp;ust=1560995424026000'>https://www.boost.org/users/license.html</a></li><li>Festival<br /><a href='https://www.google.com/url?q=http://www.cstr.ed.ac.uk/projects/festival/&amp;sa=D&amp;ust=1560995424027000'>http://www.cstr.ed.ac.uk/projects/festival/</a><br />Copyright &copy; The University of Edinburgh.<br />Licensed under the free X11-type License, which is&nbsp;available at the %VMS_NAME% installation folder (Client\&lt;version&gt;\vox\dicts).</li><li>Qt Solutions (QtService, QtSingleApplication)<br /><a href='https://www.google.com/url?q=https://github.com/qtproject/qt-solutions&amp;sa=D&amp;ust=1560995424027000'>https://github.com/qtproject/qt-solutions</a><br />Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies)<br />Licensed under the BSD License, which is available below:</li></ol><p>Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).</p><p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p><ul><li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li><li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li><li>Neither the name of Digia Plc and its Subsidiary(-ies) nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li></ul><p>** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p><ol start='6'><li>Roboto Font<br /><a href='https://www.google.com/url?q=https://www.fontsquirrel.com/fonts/roboto&amp;sa=D&amp;ust=1560995424029000'>https://www.fontsquirrel.com/fonts/roboto</a>&nbsp;<br />Copyright Beman Dawes, David Abrahams, 1998-2005. Copyright Rene Rivera 2004-2007.<br />Licensed under the Apache License, Version 2.0, which is available at <a href='https://www.google.com/url?q=https://www.fontsquirrel.com/license/roboto&amp;sa=D&amp;ust=1560995424029000'>https://www.fontsquirrel.com/license/roboto</a></li><li>FFMpeg (with libogg, libvorbis)<br /><a href='https://www.google.com/url?q=http://ffmpeg.org/&amp;sa=D&amp;ust=1560995424030000'>http://ffmpeg.org/</a>&nbsp;<br />FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.<br />Licensed under GNU Lesser General Public License (LGPL) version 2.1, available at <a href='https://www.google.com/url?q=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html&amp;sa=D&amp;ust=1560995424030000'>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</a></li><li>GTest, GMock<br /><a href='https://www.google.com/url?q=https://github.com/google/googletest&amp;sa=D&amp;ust=1560995424031000'>https://github.com/google/googletest</a>, <a href='https://www.google.com/url?q=https://github.com/google/googlemock&amp;sa=D&amp;ust=1560995424031000'>https://github.com/google/googlemock</a>&nbsp;<br />Copyright 2008, Google Inc.<br />Licensed under the Google License, which is available at <a href='https://www.google.com/url?q=https://github.com/google/googletest/blob/master/googletest/LICENSE&amp;sa=D&amp;ust=1560995424032000'>https://github.com/google/googletest/blob/master/googletest/LICENSE</a></li><li>ICU<br /><a href='https://www.google.com/url?q=http://site.icu-project.org/home&amp;sa=D&amp;ust=1560995424032000'>http://site.icu-project.org/home</a>&nbsp;<br />Copyright &copy; 1991-2019 Unicode, Inc.<br />Licensed under the Unicode Open Source License, Version 1.0, which is available at <a href='https://www.google.com/url?q=http://www.unicode.org/copyright.html%23License&amp;sa=D&amp;ust=1560995424033000'>http://www.unicode.org/copyright.html#License</a></li><li>OpenAL Soft<br /><a href='https://www.google.com/url?q=https://openal-soft.org/&amp;sa=D&amp;ust=1560995424033000'>https://openal-soft.org/</a>&nbsp;<br />Copyright Beman Dawes, David Abrahams, 1998-2005. Copyright Rene Rivera 2004-2007.<br />Licensed under the GNU Lesser General Public License, version 2.1, which is available at <a href='https://www.google.com/url?q=https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html&amp;sa=D&amp;ust=1560995424033000'>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html</a></li><li>Sigar<br /><a href='https://www.google.com/url?q=https://github.com/hyperic/sigar&amp;sa=D&amp;ust=1560995424034000'>https://github.com/hyperic/sigar</a><br />Licensed under the Apache License, version 2.0, which is available at <a href='https://www.google.com/url?q=https://github.com/hyperic/sigar/blob/master/LICENSE&amp;sa=D&amp;ust=1560995424034000'>https://github.com/hyperic/sigar/blob/master/LICENSE</a></li><li>OpenSSL<br /><a href='https://www.google.com/url?q=https://www.openssl.org&amp;sa=D&amp;ust=1560995424035000'>https://www.openssl.org</a><br />Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com).<br />Licensed under the dual OpenSSL and SSLeay License, which is available at <a href='https://www.google.com/url?q=https://www.openssl.org/source/license-openssl-ssleay.txt&amp;sa=D&amp;ust=1560995424035000'>https://www.openssl.org/source/license-openssl-ssleay.txt</a></li><li>QuaZip<br /><a href='https://www.google.com/url?q=https://sourceforge.net/projects/quazip/&amp;sa=D&amp;ust=1560995424035000'>https://sourceforge.net/projects/quazip/</a><br />Licensed under the GNU Lesser General Public License, version 2.1, which is available at <a href='https://www.google.com/url?q=https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html&amp;sa=D&amp;ust=1560995424036000'>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html</a></li><li>Angular<br /><a href='https://www.google.com/url?q=https://angular.io&amp;sa=D&amp;ust=1560995424036000'>https://angular.io</a>&nbsp;<br />Copyright (c) 2010-2019 Google LLC.<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://angular.io/license&amp;sa=D&amp;ust=1560995424036000'>https://angular.io/license</a></li><li>bootstrap-sass<br /><a href='https://www.google.com/url?q=https://github.com/twbs/bootstrap-sass&amp;sa=D&amp;ust=1560995424037000'>https://github.com/twbs/bootstrap-sass</a><br />Copyright (c) 2011-2016 Twitter, Inc, Copyright (c) 2011-2016 The Bootstrap Authors<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/twbs/bootstrap-sass/blob/master/LICENSE&amp;sa=D&amp;ust=1560995424037000'>https://github.com/twbs/bootstrap-sass/blob/master/LICENSE</a></li><li>base-64<br /><a href='https://www.google.com/url?q=https://github.com/mathiasbynens/base64&amp;sa=D&amp;ust=1560995424037000'>https://github.com/mathiasbynens/base64</a>&nbsp;<br />Copyright Mathias Bynens<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/mathiasbynens/base64/blob/master/LICENSE-MIT.txt&amp;sa=D&amp;ust=1560995424038000'>https://github.com/mathiasbynens/base64/blob/master/LICENSE-MIT.txt</a></li><li>ChartJS<br /><a href='https://www.google.com/url?q=https://www.chartjs.org&amp;sa=D&amp;ust=1560995424038000'>https://www.chartjs.org</a><br />Copyright (c) 2018 Chart.js Contributors<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/chartjs/Chart.js/blob/master/LICENSE.md&amp;sa=D&amp;ust=1560995424039000'>https://github.com/chartjs/Chart.js/blob/master/LICENSE.md</a></li><li>hls.js<br /><a href='https://www.google.com/url?q=https://github.com/video-dev/hls.js/&amp;sa=D&amp;ust=1560995424039000'>https://github.com/video-dev/hls.js/</a><br />Copyright (c) 2017 Dailymotion (http://www.dailymotion.com)<br />Licensed under the Apache License, which is available at <a href='https://www.google.com/url?q=https://github.com/video-dev/hls.js/blob/master/LICENSE&amp;sa=D&amp;ust=1560995424039000'>https://github.com/video-dev/hls.js/blob/master/LICENSE</a></li><li>jquery<br /><a href='https://www.google.com/url?q=https://jquery.com/&amp;sa=D&amp;ust=1560995424040000'>https://jquery.com/</a>&nbsp;<br />Copyright 2019 The jQuery Foundation<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://jquery.org/license/&amp;sa=D&amp;ust=1560995424040000'>https://jquery.org/license/</a></li><li>json3<br /><a href='https://www.google.com/url?q=https://bestiejs.github.io/json3/&amp;sa=D&amp;ust=1560995424041000'>https://bestiejs.github.io/json3/</a>&nbsp;<br />Copyright 2012-2015 Kit Cambridge, Benjamin Tan<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://opensource.org/licenses/MIT&amp;sa=D&amp;ust=1560995424041000'>https://opensource.org/licenses/MIT</a></li><li>md5<br /><a href='https://www.google.com/url?q=https://www.npmjs.com/package/md5&amp;sa=D&amp;ust=1560995424042000'>https://www.npmjs.com/package/md5</a><br />Copyright &copy; 2011-2015, Paul Vorbach. Copyright &copy; 2009, Jeff Mott.</li><li>ngstorage<br /><a href='https://www.google.com/url?q=https://github.com/gsklee/ngStorage/&amp;sa=D&amp;ust=1560995424042000'>https://github.com/gsklee/ngStorage/</a><br />Copyright (c) 2015 Gias Kay Lee<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/gsklee/ngStorage/blob/master/LICENSE&amp;sa=D&amp;ust=1560995424043000'>https://github.com/gsklee/ngStorage/blob/master/LICENSE</a></li><li>qwebchannel<br /><a href='https://www.google.com/url?q=https://github.com/qt/qtwebchannel&amp;sa=D&amp;ust=1560995424043000'>https://github.com/qt/qtwebchannel</a>&nbsp;<br />Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;<br />Licensed under the GNU Lesser General Public License, version 3, which is available at <a href='https://www.google.com/url?q=https://github.com/qt/qtwebchannel/blob/5.12/LICENSE.LGPL3&amp;sa=D&amp;ust=1560995424044000'>https://github.com/qt/qtwebchannel/blob/5.12/LICENSE.LGPL3</a></li><li>rangeslider<br /><a href='https://www.google.com/url?q=https://rangeslider.js.org/&amp;sa=D&amp;ust=1560995424044000'>https://rangeslider.js.org/</a>&nbsp;<br />Copyright (c) 2016 Andr&eacute; Ruffert, http://andreruffert.com<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/andreruffert/rangeslider.js/blob/develop/LICENSE.md&amp;sa=D&amp;ust=1560995424045000'>https://github.com/andreruffert/rangeslider.js/blob/develop/LICENSE.md</a></li><li>screenfull<br /><a href='https://www.google.com/url?q=https://github.com/sindresorhus/screenfull.js&amp;sa=D&amp;ust=1560995424045000'>https://github.com/sindresorhus/screenfull.js</a>&nbsp;<br />Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com)<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/sindresorhus/screenfull.js/blob/gh-pages/license&amp;sa=D&amp;ust=1560995424045000'>https://github.com/sindresorhus/screenfull.js/blob/gh-pages/license</a></li><li>tc-anguar-charts<br /><a href='https://www.google.com/url?q=https://github.com/carlcraig/tc-angular-chartjs&amp;sa=D&amp;ust=1560995424046000'>https://github.com/carlcraig/tc-angular-chartjs</a>&nbsp;<br />Copyright (c) 2014 Carl Craig<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/carlcraig/tc-angular-chartjs/blob/master/LICENSE-MIT&amp;sa=D&amp;ust=1560995424046000'>https://github.com/carlcraig/tc-angular-chartjs/blob/master/LICENSE-MIT</a></li><li>underscore.js<br /><a href='https://www.google.com/url?q=https://github.com/jashkenas/underscore/&amp;sa=D&amp;ust=1560995424047000'>https://github.com/jashkenas/underscore/</a><br />Copyright (c) 2009-2018 Jeremy Ashkenas, DocumentCloud and Investigative Reporters &amp; Editors<br />Licensed under the MIT License, which is available at <a href='https://www.google.com/url?q=https://github.com/jashkenas/underscore/blob/master/LICENSE&amp;sa=D&amp;ust=1560995424047000'>https://github.com/jashkenas/underscore/blob/master/LICENSE</a></li></ol>",
+            "type": "html",
+            "advanced": true
+          }
+        ]
+      },
+      {
         "name": "Privacy policy page",
+        "label": "Privacy policy page",
         "description": "Embedded privacy policy page",
         "file_path": "static/lang_{{language}}/views/static/privacy.html",
         "url": "/content/privacy",
@@ -336,6 +396,7 @@
           {
             "label": "Privacy policy header",
             "name": "%TITLE%",
+            "type": "text",
             "value": "Personal data and privacy policy",
             "description": "Title for privacy policy"
           },
@@ -350,6 +411,7 @@
       },
       {
         "name": "License Agreement",
+        "label": "License Agreement",
         "old_name": "Eula",
         "description": "End User License Agreement",
         "file_path": "static/lang_{{language}}/views/static/eula.html",
@@ -364,34 +426,39 @@
             "type": "html",
             "advanced": true
           },
-          [
-            "Legal Company Name",
-            "%LEGAL_COMPANY_NAME%",
-            "Network Optix, Inc.",
-            "Legal name of the company (for EULA)"
-          ],
-          [
-            "Legal Company Location",
-            "%LEGAL_COMPANY_LOCATION%",
-            "California",
-            "Location of the company (for EULA)"
-          ],
-          [
-            "Legal Company Jurisdiction",
-            "%LEGAL_COMPANY_JURISDICTION%",
-            "State of California",
-            "Company's jurisdiction (for EULA)"
-          ],
-          [
-            "Legal Company Court",
-            "%LEGAL_COMPANY_COURT%",
-            "state and federal courts located in Los Angeles County, California",
-            "Court to handle disputes (for EULA)"
-          ]
+          {
+            "label": "Legal Company Name",
+            "name": "%LEGAL_COMPANY_NAME%",
+            "value": "Network Optix, Inc.",
+            "description": "Legal name of the company (for EULA)",
+            "type": "text"
+          },
+          {
+            "label": "Legal Company Location",
+            "name": "%LEGAL_COMPANY_LOCATION%",
+            "value": "California",
+            "description": "Location of the company (for EULA)",
+            "type": "text"
+          },
+          {
+            "label": "Legal Company Jurisdiction",
+            "name": "%LEGAL_COMPANY_JURISDICTION%",
+            "value": "State of California",
+            "description": "Company's jurisdiction (for EULA)",
+            "type": "text"
+          },
+          {
+            "label": "Legal Company Court",
+            "name": "%LEGAL_COMPANY_COURT%",
+            "value":"state and federal courts located in Los Angeles County, California",
+            "description": "Court to handle disputes (for EULA)",
+            "type": "text"
+          }
         ]
       },
       {
         "name": "SMTP Config",
+        "label": "SMTP Config",
         "is_global": true,
         "description": "Holds settings for smtp server",
         "translatable": false,
@@ -400,6 +467,7 @@
           {
             "label": "Host",
             "name": "%SMTP_HOST%",
+            "type": "text",
             "value": "email-smtp.us-east-1.amazonaws.com",
             "description": "Host url for smtp server",
             "advanced": true
@@ -407,6 +475,7 @@
           {
             "label": "User",
             "name": "%SMTP_USER%",
+            "type": "text",
             "value": "AKIAJ3DYMIZMDABS43UA",
             "description": "User for smtp server",
             "advanced": true
@@ -414,6 +483,7 @@
           {
             "label": "Password",
             "name": "%SMTP_PASSWORD%",
+            "type": "text",
             "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
             "description": "Password smtp server",
             "advanced": true
@@ -421,6 +491,7 @@
           {
             "label": "Port",
             "name": "%SMTP_PORT%",
+            "type": "text",
             "value": "587",
             "description": "Port for smtp server",
             "advanced": true
@@ -428,6 +499,7 @@
           {
             "label": "Tls",
             "name": "%SMTP_TLS%",
+            "type": "text",
             "value": true,
             "description": "Tls for smtp server",
             "advanced": true
@@ -436,6 +508,7 @@
       },
       {
         "name": "Settings",
+        "label": "Settings",
         "is_global": true,
         "description": "Settings for product",
         "hidden": true,
@@ -476,11 +549,39 @@
                 "windows"
               ]
             }
+          },
+          {
+            "label": "Reveal cloud merge",
+            "name": "%CLOUD_MERGE%",
+            "description": "Shows the cloud merge button for all systems.",
+            "type": "check_box",
+            "value": "false",
+            "optional": true,
+            "advanced": true
+          },
+          {
+            "label": "Enable feedback endpoint",
+            "name": "%FEEDBACK_ENABLED%",
+            "description": "If feedback is being abused disable this setting to block all feedback",
+            "type": "check_box",
+            "value": "true",
+            "optional": true,
+            "advanced": true
+          },
+          {
+            "label": "Enable integration store",
+            "name": "%INTEGRATION_STORE_ENABLED%",
+            "description": "Lets the desktop client know if the integration store is enabled.",
+            "type": "check_box",
+            "value": "false",
+            "optional": true,
+            "advanced": true
           }
         ]
       },
       {
         "name": "Camera page",
+        "label": "Camera page",
         "is_global": true,
         "description": "Settings for camera page",
         "hidden": true,
@@ -488,8 +589,8 @@
         "values": [
           {
             "label": "Sort supported devices by popularity",
-            "name": "%SORT_SUPPORTED_DEVICES%",
-            "value": "true",
+            "name": "%SORT_SUPPORTED_DEVICES_BY_POPULARITY%",
+            "value": "false",
             "description": "Sets supported devices (camera page) sorting order by popularity",
             "advanced": true,
             "optional": true,
@@ -592,6 +693,15 @@
             ]
           },
           {
+            "label": "Number of vendors shown",
+            "name": "%VENDORS_SHOWN%",
+            "type": "text",
+            "value": "30",
+            "description": "How many vendors will be shown on IPVD landing page",
+            "advanced": true,
+            "optional": false
+          },
+          {
             "label": "Search tags",
             "name": "%SEARCH_TAGS%",
             "description": "Defines search tags",
@@ -641,6 +751,7 @@
       },
       {
         "name": "Footer Menu",
+        "label": "Footer Menu",
         "is_global": true,
         "description": "Footer Menu",
         "hidden": true,
@@ -651,7 +762,7 @@
             "name": "%FOOTER_ITEMS%",
             "value": [
               {
-                "name": "About %PRODUCT_NAME%",
+                "name": "About %CLOUD_NAME%",
                 "url": "/content/about",
                 "newWindow": false,
                 "enabled": true
@@ -688,7 +799,7 @@
               },
               {
                 "name": "Supported Devices",
-                "url": "/campage",
+                "url": "/ipvd",
                 "newWindow": false,
                 "enabled": true
               }
@@ -699,24 +810,74 @@
             "type": "array"
           }
         ]
+      },
+      {
+        "name": "Integrations page",
+        "label": "Integrations page",
+        "is_global": true,
+        "description": "Customizing integrations page",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+            {
+                "label": "Tag Items",
+                "name": "%INTEGRATION_FILTER_ITEMS%",
+                "value": [
+                    {
+                        "name": "Access Control",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Connector",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Data Analytics",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Drone",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Health Monitor",
+                        "enabled": false
+                    },
+                    {
+                        "name": "Storage",
+                        "enabled": false
+                    }
+                ],
+                "description": "Defines the tags in the search for integrations",
+                "advanced": true,
+                "optional": false,
+                "type": "array"
+            }
+        ]
       }
     ]
   },
   {
     "type": "integration",
-    "can_preview": false,
+    "can_preview": true,
     "single_customization": false,
     "contexts": [
       {
-        "name": "Information",
+        "name": "information",
+        "old_name": "Information",
+        "label": "Information",
+        "description": "General information for the integration. This information will appear primarily on the integration's tile on the /integrations page.",
         "translatable": false,
         "values": [
           {
             "name": "name",
             "label": "Integration name",
             "value": "",
-            "description": "",
-            "type": "text"
+            "description": "Visible on the tile for the integrations page and the card header for the detailed view.",
+            "type": "text",
+            "meta": {
+              "char_limit": 64
+            }
           },
           {
             "name": "logo",
@@ -732,56 +893,14 @@
             }
           },
           {
-            "name": "contactEmail",
-            "label": "Contact Email",
-            "value": "",
-            "description": "Please provide an email which will be able to address all questions about this integration and support tickets. This email will not be visible on the Integration page, but will be used by us and our partners to address issues.",
-            "type": "text",
-            "optional": false,
-            "public": false
-          },
-          {
             "name": "shortDescription",
             "label": "Description",
             "value": "",
-            "description": "A short description for the integration tile.",
+            "description": "A short description for the integration tile located on the integrations page. The short description should be no more than 300 characters because the space is limited.",
             "type": "long_text",
-            "mata": {
-              "char_limit": 250
-            }
-          },
-          {
-            "name": "companyName",
-            "label": "Company Name",
-            "value": "",
-            "description": "A company name.",
-            "type": "text",
-            "mata": {
-              "char_limit": 50
-            }
-          },
-          {
-            "name": "companyInfo",
-            "label": "Company Info",
-            "value": "",
-            "description": "A short description for the company.",
-            "type": "long_text",
-            "mata": {
-              "char_limit": 250
-            }
-          },
-          {
-            "name": "testedVersions",
-            "label": "Tested software (VMS) versions",
-            "value": "",
-            "description": "Latest supported version",
-            "type": "select",
             "meta": {
-              "multi": true,
-              "options": [
-                "4.0.0",
-                "3.2"
-              ]
+              "char_limit": 500,
+              "brand_vars": true
             }
           },
           {
@@ -818,36 +937,21 @@
             "meta": {
               "multi": true,
               "options": [
-                "ARM",
-                "Linux - x86",
+                "Windows - x64",
                 "Linux - x64",
-                "MacOS",
-                "RPI",
-                "Windows - x86",
-                "Windows - x64"
+                "ARM 64bit / Nvidia Jetson",
+                "ARM 32bit / Raspberry PI",
+                "MacOS"
               ]
             }
-          },
-          {
-            "name": "version",
-            "label": "Version",
-            "value": "",
-            "description": "",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "changelog",
-            "label": "Version Changelog",
-            "value": "",
-            "description": "",
-            "type": "html",
-            "optional": true
           }
         ]
       },
       {
-        "name": "Overview",
+        "name": "overview",
+        "old_name": "Overview",
+        "label": "How does it work?",
+        "description": "Summary about the integration. Here you can include a video, images, and a text description. Overview information is located in the leftmost column of the integration's page.",
         "translatable": false,
         "values": [
           {
@@ -858,59 +962,418 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
-            }
-          },
-          {
-            "name": "overviewScreenshot1",
-            "label": "Screenshot 1",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824,
-              "format": "png"
-            }
-          },
-          {
-            "name": "overviewScreenshot2",
-            "label": "Screenshot 2",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824,
-              "format": "png"
-            }
-          },
-          {
-            "name": "overviewScreenshot3",
-            "label": "Screenshot 3",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824,
-              "format": "png"
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w-]+|vimeo\\.com\\/[\\d]+)$"
             }
           },
           {
             "name": "description",
             "label": "Full functionality overview",
             "value": "",
-            "description": "A description about what the integration does.",
-            "type": "html"
+            "description": "A description about what the integration does. The overview appears on the detailed view page for the integration in the leftmost column. Recommended length 1000 characters.",
+            "type": "html",
+            "optional": true,
+            "meta": {
+              "char_limit": 10000,
+              "brand_vars": true
+            }
+          },
+          {
+            "name": "overviewScreenshot1",
+            "label": "Screenshot 1",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot1caption",
+            "label": "Screenshot 1 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot2caption",
+            "label": "Screenshot 2 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot3caption",
+            "label": "Screenshot 3 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot4",
+            "label": "Screenshot 4",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot4caption",
+            "label": "Screenshot 4 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot5",
+            "label": "Screenshot 5",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot5caption",
+            "label": "Screenshot 5 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot6",
+            "label": "Screenshot 6",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot6caption",
+            "label": "Screenshot 6 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot7",
+            "label": "Screenshot 7",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot7caption",
+            "label": "Screenshot 7 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot8",
+            "label": "Screenshot 8",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot8caption",
+            "label": "Screenshot 8 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot9",
+            "label": "Screenshot 9",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot9caption",
+            "label": "Screenshot 9 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot10",
+            "label": "Screenshot 10",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot10caption",
+            "label": "Screenshot 10 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot11",
+            "label": "Screenshot 11",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot11caption",
+            "label": "Screenshot 11 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot12",
+            "label": "Screenshot 12",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot12caption",
+            "label": "Screenshot 12 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot13",
+            "label": "Screenshot 13",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot13caption",
+            "label": "Screenshot 13 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot14",
+            "label": "Screenshot 14",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot14caption",
+            "label": "Screenshot 14 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
+          },
+          {
+            "name": "overviewScreenshot15",
+            "label": "Screenshot 15",
+            "value": "",
+            "description": "Recommended 16:9 aspect ratio.",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot15caption",
+            "label": "Screenshot 15 caption",
+            "value": "",
+            "description": "Screenshot caption.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 1000
+            }
           }
         ]
       },
       {
-        "name": "Instructions",
+        "name": "instructions",
+        "old_name": "Instructions",
+        "label": "How to install?",
+        "description": "Instructions for setting up and/or using your integration. Here you can include a video, images, and text. The instructions block will appear either in the middle column of the integrations's page.",
         "translatable": false,
         "values": [
           {
@@ -921,19 +1384,21 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w-]+|vimeo\\.com\\/[\\d]+)$"
             }
           },
           {
             "name": "instructionScreenshot1",
             "label": "Screenshot 1",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -941,12 +1406,14 @@
             "name": "instructionScreenshot2",
             "label": "Screenshot 2",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -954,12 +1421,14 @@
             "name": "instructionScreenshot3",
             "label": "Screenshot 3",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -967,12 +1436,14 @@
             "name": "instructionScreenshot4",
             "label": "Screenshot 4",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -980,12 +1451,14 @@
             "name": "instructionScreenshot5",
             "label": "Screenshot 5",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -993,12 +1466,14 @@
             "name": "instructionScreenshot6",
             "label": "Screenshot 6",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1006,12 +1481,14 @@
             "name": "instructionScreenshot7",
             "label": "Screenshot 7",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1019,12 +1496,14 @@
             "name": "instructionScreenshot8",
             "label": "Screenshot 8",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1032,12 +1511,14 @@
             "name": "instructionScreenshot9",
             "label": "Screenshot 9",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
           },
@@ -1045,50 +1526,148 @@
             "name": "instructionScreenshot10",
             "label": "Screenshot 10",
             "value": "",
-            "description": "",
+            "description": "Recommended 16:9 aspect ratio.",
             "type": "external_image",
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824,
+              "size": 5242880,
+              "height_le": 1080,
+              "width_le": 1920,
               "format": "png"
             }
-          },
-          {
-            "name": "downloadLinks",
-            "label": "Download links or Instructions",
-            "value": "",
-            "description": "",
-            "type": "html"
           },
           {
             "name": "installationInstructions",
             "label": "Installation Instructions",
             "value": "",
-            "description": "",
-            "type": "html"
+            "description": "This section is visible in the detailed view page for the integration in the middle column. Recommended length 1500 characters. If you need more text its recommended that you create a pdf and add it to the download files section.",
+            "type": "html",
+            "meta": {
+              "char_limit": 10000,
+              "brand_vars": true
+            }
           }
         ]
       },
       {
-        "name": "Download Files",
+        "name": "company",
+        "label": "Company",
+        "description": "General information about the company that appears in the rightmost column of the integration's page.",
         "translatable": false,
-        "values":[
+        "values": [
           {
-            "name": "arm-file",
-            "label": "Download for ARM",
+            "name": "companyName",
+            "label": "Company Name",
             "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
+            "description": "A company name. The company's name is visible in the detailed view page for the integration in the rightmost column.",
+            "type": "text",
+            "optional": false,
             "meta": {
-              "size": 1073741824
+              "char_limit": 64
             }
           },
           {
-            "name": "linux-x86-file",
-            "label": "Download for Linux - x86",
+            "name": "companyInfo",
+            "label": "Company Info",
+            "value": "",
+            "description": "A short description about the company. The company's info is visible in the detailed view page for the integration in the rightmost column.",
+            "type": "long_text",
+            "optional": true,
+            "meta": {
+              "char_limit": 250
+            }
+          },
+          {
+            "name": "companyLogo",
+            "label": "Company Logo",
+            "value": "",
+            "description": "Company logo.<br>Must have a transparent background.",
+            "type": "external_image",
+            "optional": true,
+            "meta": {
+              "size": 512000,
+              "format": "png",
+              "height_le": 250,
+              "width_le": 500
+            }
+          },
+          {
+            "name": "companyWeb",
+            "label": "Company URL",
+            "value": "",
+            "description": "Company's web address. Example: http://www.google.com, https://mail.yahoo.com",
+            "type": "text",
+            "optional": false,
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
+          },
+          {
+            "name": "companyWebTitle",
+            "label": "Company URL Title",
+            "value": "",
+            "description": "Human friendly title for company's web address. Example: 'Visit our web site'",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "char_limit": 64
+            }
+          }
+        ]
+      },
+      {
+        "name": "support",
+        "old_name": "Support",
+        "label": "Support",
+        "description": "Support information for the integration that appear on the rightmost column of the integration's page.",
+        "translatable": false,
+        "values": [
+          {
+            "name": "supportEmail",
+            "label": "Support E-mail",
+            "value": "",
+            "description": "E-mail customers should use for support.",
+            "type": "text",
+            "optional": false,
+            "meta": {
+              "regex": "^[a-zA-Z0-9\\.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+            }
+          },
+          {
+            "name": "supportPhone",
+            "label": "Support phone",
+            "value": "",
+            "description": "Phone number customers should use for support. (Ex. (573) 884-1878 | +1 (573) 884-1878 | +(591) 7433433 | 0591 74339296 | +1 555 555 5554)",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^(([+]?[(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\\s*[)]?[-\\s\\.]?[(]?[0-9]{1,3}[)]?([-\\s\\.]?[0-9]{3})([-\\s\\.]?[0-9]{3,4})$"
+            }
+          },
+          {
+            "name": "supportWeb",
+            "label": "Support URL",
+            "value": "",
+            "description": "Web address customers should use for support. Example: http://support.google.com, https://www.yahoo.com/support",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$"
+            }
+          }
+        ]
+      },
+      {
+        "name": "downloadFiles",
+        "old_name": "Download Files",
+        "label": "Download Files",
+        "description": "Downloadable files for the integration that appear on the rightmost column of the integration's page.",
+        "translatable": false,
+        "values":[
+          {
+            "name": "windows-x64-file",
+            "label": "Package for Windows x64",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1100,7 +1679,33 @@
           },
           {
             "name": "linux-x64-file",
-            "label": "Download for Linux - x64",
+            "label": "Package for Linux - x64",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "arm-64-file",
+            "old_name": "arm-file",
+            "label": "Package for ARM 64bit / Nvidia Jetson",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "arm-32-file",
+            "old_name": "rpi-file",
+            "label": "Package for ARM 32bit/ Raspberry PI",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1112,43 +1717,7 @@
           },
           {
             "name": "macos-file",
-            "label": "Download for MacOs",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "rpi-file",
-            "label": "Download for RPI",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "windows-x86-file",
-            "label": "Download for Windows - x86",
-            "value": "",
-            "description": "",
-            "type": "external_file",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "windows-x64-file",
-            "label": "Download for Windows x64",
+            "label": "Package for MacOs",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -1170,7 +1739,7 @@
             "name": "additional-file-1",
             "label": "Additional file 1",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the supported platform files.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1190,7 +1759,7 @@
             "name": "additional-file-2",
             "label": "Additional file 2",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the first additional file.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1210,7 +1779,7 @@
             "name": "additional-file-3",
             "label": "Additional file 3",
             "value": "",
-            "description": "Upload any other necessary files.",
+            "description": "Upload any other necessary files. Shows up in the downloads section under the second additional file.",
             "type": "external_file",
             "optional": true,
             "public": true,
@@ -1219,59 +1788,20 @@
             }
           },
           {
-            "name": "url-file-1-name",
-            "label": "Url To File 1 Name",
+            "name": "external-link-name",
+            "label": "External link name",
             "value": "",
-            "description": "Name for downloadable url file 1.",
+            "description": "Name for external link.",
             "type": "text",
             "optional": true
           },
           {
-            "name": "url-file-1",
-            "label": "Url To File 1",
+            "name": "external-link",
+            "label": "External link",
             "value": "",
-            "description": "Provide a download url for your files.",
+            "description": "External link. Use of this field is discouraged. If you do want to use it contact a superuser to change it.",
             "type": "text",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
-            }
-          },
-          {
-            "name": "url-file-2-name",
-            "label": "Url To File 2 Name",
-            "value": "",
-            "description": "Name for downloadable url file 2.",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "url-file-2",
-            "label": "Url To File 2",
-            "value": "",
-            "description": "Provide a download url for your files.",
-            "type": "text",
-            "optional": true,
-            "public": true,
-            "meta": {
-              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
-            }
-          },
-          {
-            "name": "url-file-3-name",
-            "label": "Url To File 3 Name",
-            "value": "",
-            "description": "Name for downloadable url file 3.",
-            "type": "text",
-            "optional": true
-          },
-          {
-            "name": "url-file-3",
-            "label": "Url To File 3",
-            "value": "",
-            "description": "Provide a download url for your files.",
-            "type": "text",
+            "advanced": true,
             "optional": true,
             "public": true,
             "meta": {
@@ -1293,19 +1823,45 @@
           }
         ]
       },
-      {
-        "name": "Support",
+      {"name":  "versionDetails",
+        "label": "Version Details",
+        "description": "Details about supported software version, plugin version and changelog.",
         "translatable": false,
         "values": [
           {
-            "name": "supportInformation",
-            "label": "Support Information",
+            "name": "testedVersions",
+            "label": "Tested software (VMS) versions",
+            "value": "",
+            "description": "Latest supported version",
+            "type": "select",
+            "meta": {
+              "multi": true,
+              "options": [
+                "4.0.0",
+                "3.2"
+              ]
+            }
+          },
+          {
+            "name": "version",
+            "label": "Integration version",
             "value": "",
             "description": "",
-            "type": "html"
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "changelog",
+            "label": "Version Changelog",
+            "value": "",
+            "description": "This information is only visible to reviews and not users.",
+            "type": "html",
+            "optional": true,
+            "public": false
           }
         ]
       }
     ]
   }
 ]
+

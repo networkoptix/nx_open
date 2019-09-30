@@ -17,9 +17,6 @@ import json
 import sys
 from util.config import get_config
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
@@ -86,7 +83,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -193,17 +189,13 @@ CACHES = {
 
 
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-test.hdw.mx/cdb'
 
     # BROKER_URL = 'sqs://...'
     # This setting is removed because every developer needs personal AWS credentials
     # Ask Ivan V to provide you with config and credentials files for AWS and save them to ~/.aws/ directory
-    # Or go through file history in source control to find the last time it was here (changeset 49115a0427b3 or 4923e6b2575d)
-
-    CACHES["global"] = {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'portal_cache',
-    }
+    # Or go through file history in source control to find the last time it was here
+    # (changeset 49115a0427b3 or 4923e6b2575d)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -296,7 +288,7 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR + '/static/integrations/'
-MEDIA_URL = '/static/integrations/'
+MEDIA_URL = '/integrations/'
 # #End of s3 config
 
 
@@ -344,8 +336,8 @@ if not BROKER_URL:
     BROKER_URL = 'sqs://'
 
 BROKER_TRANSPORT_OPTIONS = {
-    'queue_name_prefix' : conf['queue_name'] + '-',
-    'region' : 'us-east-1'
+    'queue_name_prefix': conf['queue_name'] + '-',
+    'region': 'us-east-1'
 }
 
 RESULT_PERSISTENT = True
@@ -381,8 +373,21 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = DEBUG
-CORS_ALLOW_CREDENTIALS = DEBUG
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+"""
+A regex which restricts the URL's for which the CORS headers will be sent.
+Defaults to r'^.*$', i.e. match all URL's. Useful when you only need CORS
+on a part of your site, e.g. an API at /api/.
+
+Regex allows cors for the following api calls:
+1) /api/ping
+2) /api/login
+3) /api/systems/connect
+4) /api/systems/disconnect
+These urls need to be whitelisted because mediaserver use them.
+"""
+CORS_URLS_REGEX = r'^/api/(?:login|ping|systems/(?:dis)?connect)'
 
 SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
@@ -412,30 +417,24 @@ if os.path.isfile(common_list_file):
     with open(common_list_file) as data_file:
         PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
 else:
-    print >> sys.stderr, "Warning: Can't read from {}".format(common_list_file)
+    print("Warning: Can't read from {}".format(common_list_file), file=sys.stderr)
 
 
 NOTIFICATIONS_CONFIG = {
     'activate_account': {
         'engine': 'email'
     },
-    'restore_password': {
+    'cloud_invite': {
         'engine': 'email'
     },
-    'system_invite': {
-        'engine': 'email'
-    },
-    'system_shared': {
-        'engine': 'email'
-    },
-    'review_version': {
-        'engine': 'email'
-    },
-    'cloud_notification':{
+    'cloud_notification': {
         'engine': 'email',
         'queue': 'broadcast-notifications'
     },
-    'cloud_invite':{
+    'contact_sales': {
+        'engine': 'email'
+    },
+    'contact_support': {
         'engine': 'email'
     },
     'ipvd_feedback_page': {
@@ -444,10 +443,16 @@ NOTIFICATIONS_CONFIG = {
     'ipvd_feedback_detail': {
         'engine': 'email'
     },
-    'sales_inquiry': {
+    'restore_password': {
         'engine': 'email'
     },
-    'support_request': {
+    'review_version': {
+        'engine': 'email'
+    },
+    'system_invite': {
+        'engine': 'email'
+    },
+    'system_shared': {
         'engine': 'email'
     }
 }
@@ -455,7 +460,7 @@ NOTIFICATIONS_CONFIG = {
 BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = DEBUG
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
-
+IPVD_CONNECT = 'https://cameras.networkoptix.com/api/v1/cacameras/'
 UPDATE_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/updates.json'
 DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/downloads.json'
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
@@ -463,6 +468,12 @@ DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{custom
 MAX_RETRIES = conf['max_retries']
 CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
 CMS_MAX_FILE_SIZE = 9437184
+INTEGRATION_STORE_PAGE = '/integrations'
+
+# Filldata settings
+FILLDATA_TRIES = 15
+FILLDATA_TIMEOUT = 60
+
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

@@ -4,20 +4,22 @@ angular
     .module('cloudApp')
     .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process',
                                 'account', '$routeParams', 'systemsProvider', 'dialogs',
-                                'authorizationCheckService', 'nxConfigService', 'languageService',
+                                'authorizationCheckService', 'nxConfigService', 'languageService', 'nxPageService',
     function ($scope, cloudApi, $location, urlProtocol, process,
               account, $routeParams, systemsProvider, dialogs,
-              authorizationCheckService, nxConfigService, languageService) {
-
+              authorizationCheckService, nxConfigService, languageService, nxPageService) {
+        
         $scope.Config = nxConfigService.getConfig();
         $scope.Lang = languageService.lang;
-
-        authorizationCheckService.requireLogin().then(function(account){
-            $scope.account = account;
+        $scope.showSearch = false;
+        $scope.fetchComplete = false;
+    
+        nxPageService.setPageTitle($scope.Lang.pageTitles.systems);
+        
+        authorizationCheckService.requireLogin().then(function(newAccount){
+            $scope.account = newAccount;
             $scope.gettingSystems.run();
         });
-
-        $scope.showSearch = false;
 
         $scope.systemsProvider = systemsProvider;
         $scope.$watch('systemsProvider.systems', function(){
@@ -30,6 +32,7 @@ angular
         });
 
         $scope.gettingSystems = process.init(function () {
+            $scope.fetchComplete = true;
             return systemsProvider.forceUpdateSystems();
         }, {
             errorPrefix: $scope.Lang.errorCodes.cantGetSystemsListPrefix,

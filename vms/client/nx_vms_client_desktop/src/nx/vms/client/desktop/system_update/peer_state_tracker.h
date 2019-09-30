@@ -1,16 +1,14 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <chrono>
-
-#include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/software_version.h>
-#include <ui/customization/customized.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <nx/update/common_update_manager.h>
+#include <nx/update/update_information.h>
+#include <common/common_module.h>
 
 struct QnUpdateFreeSpaceReply;
 
@@ -42,8 +40,8 @@ struct UpdateItem
      * It is displayed only in debug mode.
      */
     QString debugMessage;
-    /** Message generated from nx::update::Status::errorCode. */
-    QString statusMessage;
+
+    QString statusMessage; /**< Message generated from nx::update::Status::errorCode. */
     ErrorCode errorCode = ErrorCode::noError;
 
     QString verificationMessage;
@@ -64,6 +62,7 @@ struct UpdateItem
     int protocol = 0;
     bool installing = false;
     bool storeUpdates = true;
+    bool hasInternet = false;
     /**
      * Actual status can become unknown when we just issue update command. We should wait for
      * another response from /ec2/updateStatus to get relevant state.
@@ -78,6 +77,9 @@ struct UpdateItem
 
     int freeSpace = -1;
     int requiredSpace = -1;
+
+    bool isServer() const;
+    bool isClient() const;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
@@ -88,15 +90,17 @@ using UpdateItemPtr = std::shared_ptr<UpdateItem>;
  * ServerUpdatesModel uses it as a data source, by subscribing to itemChanged/itemAdded/... events.
  * ServerUpdateTool passes mediaserver responses here.
  */
-class PeerStateTracker:
-    public Connective<QObject>,
-    public QnWorkbenchContextAware
+class NX_VMS_CLIENT_DESKTOP_API PeerStateTracker:
+    public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
     PeerStateTracker(QObject* parent = nullptr);
+
+    using ServerFilter = std::function<bool (const QnMediaServerResourcePtr&)>;
+    void setServerFilter(ServerFilter filter);
 
     /**
      * Attaches state tracker to a resource pool. All previous attachments are discarded.
@@ -121,7 +125,7 @@ public:
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
 
-    QnUuid getClientPeerId() const;
+    QnUuid getClientPeerId(QnCommonModule* commonModule) const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
@@ -130,7 +134,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
-    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
+
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
@@ -176,7 +180,7 @@ public:
 
     QList<UpdateItemPtr> allItems() const;
     QSet<QnUuid> allPeers() const;
-    QSet<QnUuid> peersInState(StatusCode state) const;
+    QSet<QnUuid> peersInState(StatusCode state, bool withClient = true) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
     QSet<QnUuid> offlineAndInState(StatusCode state) const;
@@ -198,6 +202,7 @@ public:
      * These functions should only affect task sets and do not change state for each item.
      */
     void processDownloadTaskSet();
+    void processReadyInstallTaskSet();
     void processInstallTaskSet();
 
     void skipFailedPeers();
@@ -221,7 +226,7 @@ public:
      * readyToInstall->installing or when we cancel current action.
      * It will reset all internal task sets.
      */
-    void setTask(const QSet<QnUuid>& targets);
+    void setTask(const QSet<QnUuid>& targets, bool reset = true);
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
     void addToTask(QnUuid id);
     void removeFromTask(QnUuid id);
@@ -233,7 +238,7 @@ public:
      * We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
      * peer state inside our task sets.
      */
-    void atClientupdateStateChanged(int state, int percentComplete);
+    void atClientUpdateStateChanged(int state, int percentComplete, const QString& message);
 
 signals:
     /**
@@ -263,7 +268,7 @@ protected:
 
 protected:
     UpdateItemPtr addItemForServer(QnMediaServerResourcePtr server);
-    UpdateItemPtr addItemForClient();
+    UpdateItemPtr addItemForClient(QnCommonModule* commonModule);
     /** Reads data from resource to UpdateItem. */
     bool updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item);
     bool updateClientData();
@@ -298,6 +303,10 @@ private:
      * this time expires.
      */
     UpdateItem::Clock::duration m_timeForServerToReturn;
+
+    QPointer<QnResourcePool> m_resourcePool;
+
+    ServerFilter m_serverFilter;
 };
 
 } // namespace nx::vms::client::desktop

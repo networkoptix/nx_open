@@ -1,0 +1,20 @@
+<br>
+<button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target="#{{ datastructure.name }}_vars">
+Show/hide branding variables
+</button>
+<div class="collapse" id="{{ datastructure.name }}_vars">
+    <p class="help">Click one of the available branding variables to insert it into the field.</p>
+    <div class="row variable-group" style="width: 900px" data-field-name="id_{{ datastructure.name }}">
+        {% for var, value in brands %}
+        <div class="col-xs-6">
+            <button
+                    data-container="body" data-animation="false" title="{{ var.description }}" data-toggle="tooltip"
+                    data-placement="top" data-name="{{ var.name }}"
+                    class="brand-variable list-group-item list-group-item-action">
+                <strong>{{ var.label }} ({{ value }})</strong>
+                <span class="badge badge-primary badge-pill">{{ var.name }}</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+</div>

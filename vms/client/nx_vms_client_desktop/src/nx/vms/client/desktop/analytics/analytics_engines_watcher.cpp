@@ -96,7 +96,7 @@ void AnalyticsEnginesWatcher::Private::at_engineNameChanged(const QnResourcePtr&
         return;
 
     it->name = resource->getName();
-    emit q->engineNameChanged(it->id, it->name);
+    emit q->engineUpdated(it->id);
 }
 
 void AnalyticsEnginesWatcher::Private::at_engineManifestChanged(
@@ -107,6 +107,7 @@ void AnalyticsEnginesWatcher::Private::at_engineManifestChanged(
         return;
 
     it->isDeviceDependent = engine->isDeviceDependent();
+    emit q->engineUpdated(it->id);
 }
 
 void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
@@ -124,7 +125,7 @@ void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
                 continue;
 
             it->settingsModel = settingsModel;
-            emit q->engineSettingsModelChanged(it->id, it->settingsModel);
+            emit q->engineSettingsModelChanged(it->id);
         }
     }
 }

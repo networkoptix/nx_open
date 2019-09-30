@@ -5,29 +5,28 @@
 #include <ui/models/resource/resource_tree_model_fwd.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <common/common_module_aware.h>
 
 #include <utils/common/connective.h>
 
 /**
  * Helper class for constructing users and roles part of the resource tree.
  */
-class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
+class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnCommonModuleAware
 {
     using base_type = Connective<QObject>;
     using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 public:
-    QnResourceTreeModelUserNodes(QObject* parent = nullptr);
+    QnResourceTreeModelUserNodes(QnResourceTreeModel* model);
     virtual ~QnResourceTreeModelUserNodes();
 
     QnResourceTreeModel* model() const;
     QnResourceTreeModelNodePtr rootNode() const;
 
-    void initialize(QnResourceTreeModel* model, const QnResourceTreeModelNodePtr& rootNode);
+    void initialize(const QnResourceTreeModelNodePtr& rootNode);
 
 protected:
-    void setModel(QnResourceTreeModel* value);
     void setRootNode(const QnResourceTreeModelNodePtr& node);
 
 private:
@@ -49,7 +48,7 @@ private:
     QnResourceTreeModelNodePtr ensureSubjectNode(const QnResourceAccessSubject& subject);
 
     /** Get or create user role node. */
-    QnResourceTreeModelNodePtr ensureRoleNode(const nx::vms::api::UserRoleData& role);
+    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
 
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);

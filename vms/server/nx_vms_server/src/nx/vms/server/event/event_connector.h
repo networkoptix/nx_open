@@ -130,7 +130,7 @@ public slots:
 
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
-    void at_pluginEvent(const nx::vms::event::PluginEventPtr& event);
+    void at_pluginDiagnosticEvent(const nx::vms::event::PluginDiagnosticEventPtr& event);
 
     void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
 

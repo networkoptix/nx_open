@@ -11,7 +11,6 @@ extern "C"
 
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/unused.h>
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
@@ -137,8 +136,7 @@ void CLPIStreamInfo::composeISRC(BitStreamWriter& writer) const
 
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 {
-    int length = reader.getBits(8);
-    nx::utils::unused(length);
+    [[maybe_unused]] int length = reader.getBits(8);
     m_stream_coding_type = reader.getBits(8);
 
     if (m_stream_coding_type==0x02 || m_stream_coding_type==0x1B || m_stream_coding_type==0xEA)
@@ -147,8 +145,7 @@ void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
         m_frame_rate_index = reader.getBits(4);
         m_aspect_ratio_index = reader.getBits(4);
         reader.skipBits(2); //reserved_for_future_use 2 bslbf
-        bool cc_flag  = reader.getBit();
-        nx::utils::unused(cc_flag);
+        [[maybe_unused]] bool cc_flag  = reader.getBit();
         reader.skipBits(17); // reserved_for_future_use 17 bslbf
         ISRC(reader);
         reader.skipBits(32); // reserved_for_future_use 32 bslbf
@@ -246,8 +243,7 @@ void CLPIParser::parseProgramInfo(quint8* buffer, quint8* end)
 {
     BitStreamReader reader;
     reader.setBuffer(buffer, end);
-    quint32 length = reader.getBits(32);
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
     reader.skipBits(8); // reserved
     quint8 number_of_program_sequences = reader.getBits(8);
     for (int i=0; i < number_of_program_sequences; i++)
@@ -295,9 +291,8 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer)
 
 void CLPIParser::TS_type_info_block(BitStreamReader& reader)
 {
-    quint16 length = reader.getBits(16);
-    quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
-    nx::utils::unused(length, Validity_flags);
+    [[maybe_unused]] quint16 length = reader.getBits(16);
+    [[maybe_unused]] quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
     CLPIStreamInfo::readString(m_format_identifier, reader, 4);    // HDMV
     //Network_information 8*9 bslbf zerro
     for (int i = 0; i < 9; i++)
@@ -326,8 +321,7 @@ void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
 
 void CLPIParser::parseClipInfo(BitStreamReader& reader)
 {
-    quint32 length = reader.getBits(32);
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
     reader.skipBits(16); //reserved_for_future_use 16 bslbf
     m_clip_stream_type = reader.getBits(8); // 1 - AV stream
     m_application_type = reader.getBits(8); // 1 - Main TS for a main-path of Movie
@@ -387,22 +381,18 @@ void CLPIParser::parseSequenceInfo(quint8* buffer, quint8* end)
 {
     BitStreamReader reader;
     reader.setBuffer(buffer, end);
-    quint32 length = reader.getBits(32);
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
     reader.skipBits(8); //reserved_for_word_align 8 bslbf
     quint8 number_of_ATC_sequences  = reader.getBits(8); // 1 is tipical value
     for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++)
     {
-        quint32 SPN_ATC_start = reader.getBits(32); // 0 is tipical value
-        nx::utils::unused(SPN_ATC_start);
+        [[maybe_unused]] quint32 SPN_ATC_start = reader.getBits(32); // 0 is tipical value
         quint8 number_of_STC_sequences = reader.getBits(8);
         int offset_STC_id = reader.getBits(8);
         for (int stc_id=offset_STC_id; stc_id < number_of_STC_sequences + offset_STC_id; stc_id++)
         {
-            int PCR_PID = reader.getBits(16);
-            nx::utils::unused(PCR_PID);
-            quint32 SPN_STC_start = reader.getBits(32);
-            nx::utils::unused(SPN_STC_start);
+            [[maybe_unused]] int PCR_PID = reader.getBits(16);
+            [[maybe_unused]] quint32 SPN_STC_start = reader.getBits(32);
             m_presentation_start_time = reader.getBits(32);
             m_presentation_end_time = reader.getBits(32);
         }
@@ -598,8 +588,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 void CLPIParser::parseClipMark(quint8* buffer, quint8* end) {
     BitStreamReader reader;
     reader.setBuffer(buffer, end);
-    quint32 length = reader.getBits(32);
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
 }
 
 void CLPIParser::composeClipMark(BitStreamWriter& writer)
@@ -736,8 +725,7 @@ void MPLSParser::parse(quint8* buffer, int len)
         CLPIStreamInfo::readString(version_number, reader, 4);
         int playList_start_address = reader.getBits(32);
         int playListMark_start_address = reader.getBits(32);
-        int extensionData_start_address =  reader.getBits(32);
-        nx::utils::unused(extensionData_start_address);
+        [[maybe_unused]] int extensionData_start_address =  reader.getBits(32);
 
         for (int i = 0; i < 5; i++)
             reader.skipBits(32); //reserved_for_future_use 160 bslbf
@@ -834,8 +822,7 @@ int MPLSParser::compose(quint8* buffer, int bufferSize, MPLSParser::DiskType dt)
 
 void MPLSParser::AppInfoPlayList(BitStreamReader& reader)
 {
-    quint32 length = reader.getBits(32);
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
     reader.skipBits(8); //reserved_for_future_use 8 bslbf
     m_PlayList_playback_type = reader.getBits(8); //8 bslbf
     if (m_PlayList_playback_type==2 || m_PlayList_playback_type==3) { // 1 == Sequential playback of PlayItems
@@ -1250,8 +1237,7 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
 {
     BitStreamReader reader;
     reader.setBuffer(buffer, buffer + len);
-    quint32 length = reader.getBits(32); //
-    nx::utils::unused(length);
+    [[maybe_unused]] quint32 length = reader.getBits(32);
     int number_of_PlayList_marks = reader.getBits(16); //16 uimsbf
     for(int PL_mark_id=0; PL_mark_id<number_of_PlayList_marks; PL_mark_id++)
     {
@@ -1259,9 +1245,8 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
         int mark_type = reader.getBits(8); //8 bslbf
         int ref_to_PlayItem_id = reader.getBits(16);
         quint32 mark_time_stamp = reader.getBits(32); //32 uimsbf
-        int entry_ES_PID = reader.getBits(16); //16 uimsbf
-        quint32 duration = reader.getBits(32); // 32 uimsbf
-        nx::utils::unused(entry_ES_PID, duration);
+        [[maybe_unused]] int entry_ES_PID = reader.getBits(16); //16 uimsbf
+        [[maybe_unused]] quint32 duration = reader.getBits(32); // 32 uimsbf
         if (mark_type == 1) //mark_type 0x01 = Chapter search
             m_marks.push_back(PlayListMark(ref_to_PlayItem_id, mark_time_stamp));
     }
@@ -1443,8 +1428,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer)
 
 void MPLSParser::STN_table(BitStreamReader& reader)
 {
-    int length = reader.getBits(16); //16 uimsbf
-    nx::utils::unused(length);
+    [[maybe_unused]] int length = reader.getBits(16); //16 uimsbf
     reader.skipBits(16); //reserved_for_future_use 16 bslbf
     int number_of_primary_video_stream_entries = reader.getBits(8); //8 uimsbf
     int number_of_primary_audio_stream_entries = reader.getBits(8); //8 uimsbf
@@ -1493,8 +1477,7 @@ void MPLSParser::STN_table(BitStreamReader& reader)
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
         //comb_info_Secondary_audio_Primary_audio(){
-        int number_of_primary_audio_ref_entries = reader.getBits(8); //8 uimsbf
-        nx::utils::unused(number_of_primary_audio_ref_entries);
+        [[maybe_unused]] int number_of_primary_audio_ref_entries = reader.getBits(8); //8 uimsbf
         reader.skipBits(8); //reserved_for_word_align  8 bslbf
         for (int i=0; i<number_of_primary_audio_ref_entries; i++)
             /*int primary_audio_stream_id_ref =*/ reader.skipBits(8); //8 uimsbf
@@ -1512,8 +1495,7 @@ void MPLSParser::STN_table(BitStreamReader& reader)
         reader.skipBits(8); //reserved_for_word_align 8 bslbf
 
         for (int i=0; i<number_of_secondary_audio_ref_entries; i++) {
-            int secondary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
-            nx::utils::unused(secondary_audio_stream_id_ref);
+           [[maybe_unused]] int secondary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
         }
         if (number_of_secondary_audio_ref_entries%2==1)
             reader.skipBits(8); //reserved_for_word_align 8 bslbf
@@ -1521,8 +1503,7 @@ void MPLSParser::STN_table(BitStreamReader& reader)
         int number_of_PiP_PG_textST_ref_entries = reader.getBits(8); //8 uimsbf
         reader.skipBits(8); //reserved_for_word_align 8 bslbf
         for (int i=0; i < number_of_PiP_PG_textST_ref_entries; i++) {
-            int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
-            nx::utils::unused(PiP_PG_textST_stream_id_ref);
+            [[maybe_unused]] int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
         }
         if (number_of_PiP_PG_textST_ref_entries%2==1)
             reader.skipBits(8); //reserved_for_word_align 8 bslbf
@@ -1780,8 +1761,7 @@ void MovieObject::parse(quint8* buffer, int len)
     char version_number[5];
     CLPIStreamInfo::readString(m_type_indicator, reader, 4);
     CLPIStreamInfo::readString(version_number, reader, 4);
-    quint32 ExtensionData_start_address = reader.getBits(32); //32 uimsbf
-    nx::utils::unused(ExtensionData_start_address);
+    [[maybe_unused]] quint32 ExtensionData_start_address = reader.getBits(32); //32 uimsbf
     for (int i = 0; i < 7; i++)
         reader.skipBits(32); //reserved_for_future_use 224 bslbf
     parseMovieObjects(reader);
@@ -1882,8 +1862,7 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
     bool iFlag2 = false;
     if (iFlag1 == 0)
     {
-        bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
-        nx::utils::unused(reg_flag1);
+        [[maybe_unused]] bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
         reader.skipBits(19);
         int regigsterNumber1 = reader.getBits(12);
         regigsterNumber1 = regigsterNumber1;
@@ -1898,8 +1877,7 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
     // next syntax only if iFlag for operand == 0
     if (iFlag2 == 0)
     {
-        bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
-        nx::utils::unused(reg_flag1);
+        [[maybe_unused]] bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
         reader.skipBits(19);
         int regigsterNumber1 = reader.getBits(12);
         regigsterNumber1 = regigsterNumber1;

@@ -7,6 +7,6 @@
 # release branch. Ask #akolesnikov for the details.
 # YOU MUST FIX THE COMMENT to make sure it will generate a merge conflict if somebody also updates
 # the protocol version. Prefer to use issue number and title as a comment.
-set(_vmsInVersionProtocolNumber 02) # VMS-14435: Support gzip compression for p2p transaction message bus
+set(_vmsInVersionProtocolNumber 00) # Update releaseVersion to 4.1.0
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

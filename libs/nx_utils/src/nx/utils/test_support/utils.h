@@ -69,3 +69,12 @@
         ASSERT_TRUE(false) << e.what(); \
     } \
 } while (0)
+
+#define NX_GTEST_WRAP(expr) \
+[&]() \
+{ \
+    expr; \
+}()
+
+#define NX_GTEST_ASSERT_NE(expected, actual) \
+    NX_GTEST_WRAP(ASSERT_NE(expected, actual))

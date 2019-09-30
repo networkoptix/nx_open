@@ -28,24 +28,22 @@ public:
     ArchivePlaylistManager(
         QnMediaServerModule* serverModule,
         const QnSecurityCamResourcePtr& camResource,
+        const QnUuid& clientUuid,
         qint64 startTimestamp,
         unsigned int maxChunkNumberInPlaylist,
         std::chrono::microseconds targetDuration,
         MediaQuality streamQuality);
     virtual ~ArchivePlaylistManager();
 
-    bool initialize();
-
-    virtual size_t generateChunkList(
+    virtual CameraDiagnostics::Result generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached) const override;
 
     virtual int getMaxBitrate() const override;
 
-    CameraDiagnostics::Result lastError() const;
-
 private:
     const QnSecurityCamResourcePtr m_camResource;
+    QnUuid m_clientUuid;
     qint64 m_startTimestamp;
     unsigned int m_maxChunkNumberInPlaylist;
     std::chrono::microseconds m_targetDuration;
@@ -66,9 +64,9 @@ private:
     /** Archive chunk, that holds last found position. */
     QnAbstractArchiveDelegate::ArchiveChunkInfo m_currentArchiveChunk;
 
-    void generateChunksIfNeeded();
-    bool addOneMoreChunk();
-    qint64 endTimestamp() const;
+    CameraDiagnostics::Result createDelegate(QnAbstractArchiveDelegatePtr& result);
+    CameraDiagnostics::Result generateChunksIfNeeded();
+    CameraDiagnostics::Result addOneMoreChunk();
 };
 
 /** Using std::shared_ptr for std::shared_ptr::unique(). */

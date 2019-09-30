@@ -37,7 +37,9 @@ private:
 private:
     nx::network::http::AsyncHttpClientPtr m_metaDataClient;
     QnMutex m_metaDataMutex;
-    std::atomic<bool> m_metaDataClientBusy = false;
+    mutable QnMutex m_httpMutex;
+    bool m_metaDataClientBusy = false;
+    QnWaitCondition m_httpWaitCondition;
     const int m_channelCount = 0;
     int m_currentChannel = 0;
     QnMetaDataV1Ptr m_metaData;

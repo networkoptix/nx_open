@@ -69,10 +69,7 @@ public:
     ErrorCode saveSync(const nx::vms::api::EventRuleData& rule)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [this, rule](impl::SimpleHandlerPtr handler)
-        {
-            this->save(rule, handler);
-        });
+            [this, rule](impl::SimpleHandlerPtr handler) { this->save(rule, handler); });
     }
 
     /*!

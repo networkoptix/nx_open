@@ -1,28 +1,38 @@
 {
   "language": "he_IL",
   "language_name": "עברית",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "אישור",
     "cancelButton": "ביטול",
-    "loginTitle": "היכנס ל- %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "התחבר",
     "logoutAuthorisedTitle": "אתה כבר מחובר",
     "logoutAuthorisedContinueButton": "המשך",
     "logoutAuthorisedLogoutButton": "יציאה",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "שליחת ההודעה נכשלה.",
+    "messageSent": "ההודעה נשלחה.",
+    "noClientDetectedTitle": "התקן את %VMS_NAME% כדי לצפות במערכת שלך",
+    "download": "הורד את %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "ברוכים הבאים ל",
     "register": "צור חשבון ב-",
     "changePassword": "שנה סיסמה -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "הופעל",
-    "merging": "merging",
+    "incompatible": "אינו תואם",
+    "merging": "מיזוג",
     "notActivated": "לא הופעל",
     "online": "מקוון",
     "offline": "לא מקוון",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "לא ניתן לשמור סיסמה",
     "cantActivatePrefix": "לא ניתן להפעיל את החשבון שלך",
     "cantSendConfirmationPrefix": "אין אפשרות לשלוח מייל אישור",
-    "cloudInvalidResponse": "בסיס הנתונים בענן החזיר תגובה לא צפויה",
     "notAuthorized": "סיסמה שגויה",
     "brokenAccount": "בעיה לא צפויה עם החשבון. <a href=\"/restore_password\">שחזר את החשבון</a>",
     "wrongParameters": "פרמטרים מסוימים בטופס אינם נכונים",
     "wrongCode": "החשבון כבר הופעל או שקוד האישור שגוי",
     "wrongCodeRestore": "קוד האישור כבר בשימוש או שגוי",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "אין לך הרשאות לביצוע פעולה זו",
     "accountNotActivated": "חשבון זה אינו פעיל עדיין. <a href=\"/activate\"> שלח שוב קישור להפעלה </a>",
     "accountBlocked": "חשבון זה נחסם באופן זמני. נסה שוב בעוד מספר דקות.",
@@ -147,13 +158,20 @@
     "lostConnection": "החיבור ל- {{systemName}} אבד",
     "thisSystem": "המערכת",
     "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
-    "DUPLICATE_MEDIASERVER_FOUND": "שרתים כפולים נמצאו באחת המערכות.<br>הסר שרתים ישנים מכל מערכת שאתה מנסה למזג ונסה שוב.",
-    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "מספר שרתים רשומים כקיימים במערכת - הן שנבחרו והן במערכת הנוכחית.<br>הסר שרתים לא מקוונים ובלתי תואמים מכל המערכות ונסה שוב.",
+    "mergedSystemIsOffline": "מערכת <strong>{{failedSystem}}</strong> לא מקוונת.",
+    "INCOMPATIBLE": "למערכות יש גרסאות תוכנה שונות. אנא עדכן את שניהם ל <a href=\"/download\">לגרסא האחרונה</a>.",
+    "FAIL": "המערכת <strong>{{failedSystem}}</strong> אינה זמינה כעת.<br>נסה שוב בעוד מספר דקות או צור קשר עם <a href=\"%SUPPORT_LINK%\" target=\"_blank\">תמיכה</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "מיזוג המערכות נכשל",
+    "commonText": "מיזוג מערכות נכשל<strong>{{primarySystem}}</strong> ו - <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "טוב",
     "fair": "הוגן",
+    "fairMessage": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "minLength": "קצר מדי",
     "minLengthMessage": "הסיסמה חייבת להכיל 8 תווים לפחות",
     "required": "שגוי",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "שם מערכת",
     "confirmRenameAction": "שמור",
     "successRename": "שם המערכת נשמר",
-    "confirmDisconnectTitle": "נתק את מערכת מ %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "נתק",
     "confirmUnshareFromMe": "אתה עומד לנתק את המערכת מהחשבון שלך. לא תוכל עוד לגשת למערכת זו. האם להמשיך?",
     "confirmUnshareFromMeTitle": "נתק מערכת?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "משתמש זה לא יוכל לגשת למערכת. האם אתה בטוח?",
     "confirmUnshareTitle": "מחק משתמש?",
     "confirmUnshareAction": "מחק",
-    "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "successMerge": "מיזוג המערכת הושלם",
+    "mergeFailed": "מיזוג המערכת נכשל",
+    "mergeStart": "מיזוג מערכות החל",
+    "mergeSuccess": "מיזוג המערכת הושלם",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "שם לא ידוע עבור מערכת (נגרמה על ידי מיזוג ענן)"
   },
   "account": {
     "accountSavedSuccess": "החשבון שלך נשמר בהצלחה",
@@ -206,72 +226,6 @@
     "changePassword": "שנה סיסמא",
     "newPasswordLabel": "סיסמה חדשה",
     "saveChanges": "שמור"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "התקן את %VMS_NAME% כדי לצפות במערכת שלך",
-    "action": "הורד את %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "לקוח בלבד",
-      "server": "שרת בלבד",
-      "bundle": "לקוח ושרת",
-      "servertool": "כלי תצורה"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "שלח את קישור ההפעלה שוב",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "השרת אינו זמין",
     "systemHasNoCameras": ". אין מצלמות",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "לא מקוון",
       "error": "שגיאה",
@@ -334,5 +289,10 @@
       "stop listening": "עצור האזנה",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "אנו ממליצים להתייעץ עם",
+    "b_support": "תמיכה",
+    "c_proceeding": "לפני המשך עיבוד."
   }
 }

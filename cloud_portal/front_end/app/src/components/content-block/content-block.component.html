@@ -1,8 +1,7 @@
-<div class="card {{type}}"
+<div class="card {{type}} {{headerStyle}}"
      [ngClass]="{
         'hoverable' : hoverable,
-        'fixed-height': fixedHeight,
-        'mb-3' : hasMargins}">
+        'fixed-height': fixedHeight}">
 
     <div class="card--header" #headerWrapper [hidden]="!haveHeader">
         <h4>

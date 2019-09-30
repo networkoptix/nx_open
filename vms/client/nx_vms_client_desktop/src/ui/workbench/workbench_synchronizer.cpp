@@ -61,7 +61,7 @@ void QnWorkbenchSynchronizer::submit()
         {
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
-            resource->setId(QnUuid::createUuid());
+            resource->setIdUnsafe(QnUuid::createUuid());
             resource->addFlags(Qn::local); // TODO: #Elric #EC2
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);

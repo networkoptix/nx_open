@@ -122,7 +122,7 @@ public:
     MockServer(QnCommonModule* commonModule):
         QnMediaServerResource(commonModule)
     {
-        setId(QnUuid::createUuid());
+        setIdUnsafe(QnUuid::createUuid());
     }
 
     void setSupportsTranscoding(bool supportsTranscoding)
@@ -176,7 +176,7 @@ public:
     MockCamera(QnUuid parentId):
         m_cameraType(Qn::LC_Professional)
     {
-        setId(QnUuid::createUuid());
+        setIdUnsafe(QnUuid::createUuid());
         setParentId(parentId);
 
         addFlags(Qn::server_live_cam);

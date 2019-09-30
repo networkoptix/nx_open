@@ -8,8 +8,7 @@
 
 using namespace nx::vms::event;
 
-namespace nx::vms::server::db::test
-{
+namespace nx::vms::server::db::test {
 
 TEST(MaxEventLimit, maxEventLimit)
 {

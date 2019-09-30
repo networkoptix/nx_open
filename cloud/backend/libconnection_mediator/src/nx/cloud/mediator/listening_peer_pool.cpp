@@ -7,6 +7,25 @@
 namespace nx {
 namespace hpm {
 
+namespace {
+
+MediaserverData toLowerCase(const MediaserverData& data)
+{
+    return MediaserverData(
+        data.systemId.toLower(),
+        data.serverId.toLower());
+}
+
+MediaserverData toMediaServerData(const nx::hpm::api::PeerConnectionSpeed& connectionSpeed)
+{
+    return toLowerCase(
+        MediaserverData(
+            connectionSpeed.systemId.c_str(),
+            connectionSpeed.serverId.c_str()));
+}
+
+} // namespace
+
 QString ListeningPeerData::toString() const
 {
     QStringList opts;
@@ -101,7 +120,6 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
     return m_peerIter->second;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
@@ -112,10 +130,15 @@ ListeningPeerPool::ListeningPeerPool(
     m_settings(settings),
     m_listeningPeerDb(listeningPeerDb)
 {
+    m_listeningPeerDb->subscribeToUplinkSpeedUpdated(
+        std::bind(&ListeningPeerPool::onUplinkSpeedUpdated, this, std::placeholders::_1),
+		&m_uplinkSpeedUpdatedId);
 }
 
 ListeningPeerPool::~ListeningPeerPool()
 {
+    m_listeningPeerDb->unsubscribeFromUplinkSpeedUpdated(m_uplinkSpeedUpdatedId);
+
     m_counter.wait();
 
     PeerContainer peers;
@@ -143,10 +166,13 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 
     NX_VERBOSE(this, "Saving new connection (%1) from peer %2", (void*) connection.get(), peerData);
 
-    const auto peerIterAndInsertionFlag = m_peers.emplace(peerData, ListeningPeerData());
+    const auto peerIterAndInsertionFlag =
+        m_peers.emplace(toLowerCase(peerData), ListeningPeerData());
     const auto peerIter = peerIterAndInsertionFlag.first;
     if (peerIterAndInsertionFlag.second)
     {
+        NX_DEBUG(this, "Peer %1 is now online", peerData.hostName());
+
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
@@ -194,13 +220,12 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 boost::optional<ListeningPeerPool::ConstDataLocker>
     ListeningPeerPool::findAndLockPeerDataByHostName(const nx::String& hostName) const
 {
-    QnMutexLocker lock(&m_mutex);
-
     // TODO: hostName alias resolution in cloud_db
 
-    const auto ids = hostName.split('.');
+    const auto ids = hostName.toLower().split('.');
     if (ids.size() == 2)
     {
+        QnMutexLocker lock(&m_mutex);
         //hostName is serverId.systemId
         const auto& systemId = ids[1];
         const auto& serverId = ids[0];
@@ -215,6 +240,35 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     else if (ids.size() == 1)
     {
         const auto& systemId = ids[0];
+
+        QnMutexLocker lock(&m_mutex);
+
+		auto uplinkSpeedIter = m_bestUplinkSpeeds.find(systemId);
+		if (uplinkSpeedIter == m_bestUplinkSpeeds.end())
+		{
+			auto uplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(systemId);
+			if (uplinkSpeed)
+			{
+				uplinkSpeedIter = m_bestUplinkSpeeds.emplace(
+					systemId,
+					std::move(*uplinkSpeed)).first;
+				NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %1",
+					uplinkSpeedIter->second);
+			}
+		}
+
+        if (uplinkSpeedIter != m_bestUplinkSpeeds.end())
+        {
+			NX_VERBOSE(this, "Locking peer data by best uplink speed: %1",
+				uplinkSpeedIter->second);
+            auto peerIter = m_peers.find(toMediaServerData(uplinkSpeedIter->second));
+            if (peerIter != m_peers.end())
+				return ConstDataLocker(std::move(lock), std::move(peerIter));
+        }
+
+		NX_VERBOSE(this, "Best uplink speed for system %1 not found, searching for any peer",
+			systemId);
+
         //resolving to any server of a system
         auto peerIter = m_peers.lower_bound(MediaserverData(systemId, nx::String()));
         if (peerIter != m_peers.end() && peerIter->first.systemId == systemId)
@@ -285,15 +339,16 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto peerIter = m_peers.find(peerData);
+    auto peerDataLowerCase = toLowerCase(peerData);
+
+    const auto peerIter = m_peers.find(peerDataLowerCase);
     if (peerIter == m_peers.end())
         return;
 
     if (peerIter->second.peerConnection.get() != connection)
         return; //< Peer has been bound to another connection.
 
-    NX_DEBUG(this, "Peer %1 has disconnected. Connection (%2)",
-        peerIter->first.hostName(), (void*) connection);
+    NX_DEBUG(this, "Peer %1 is now offline", peerIter->first.hostName());
 
     m_peers.erase(peerIter);
 
@@ -302,9 +357,19 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         {
             // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
             // this handler with "this" may happen after "this" has been destroyed.
-            NX_DEBUG(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
+            NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
                 hostName, removed);
         });
+
+	auto uplinkSpeedIter = m_bestUplinkSpeeds.find(peerData.systemId);
+    if (uplinkSpeedIter != m_bestUplinkSpeeds.end() &&
+        peerDataLowerCase.hostName() == toMediaServerData(uplinkSpeedIter->second).hostName())
+    {
+		NX_VERBOSE(this,
+			"Connection to peer with best uplink speed closed. Removing %1",
+			uplinkSpeedIter->second);
+		m_bestUplinkSpeeds.erase(uplinkSpeedIter);
+    }
 }
 
 void ListeningPeerPool::closeConnectionAsync(
@@ -320,6 +385,58 @@ void ListeningPeerPool::closeConnectionAsync(
             peerConnection->closeConnection(SystemError::connectionReset);
             peerConnection.reset();
         });
+}
+
+void ListeningPeerPool::onUplinkSpeedUpdated(api::PeerConnectionSpeed peerUplinkSpeed)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    // Ignoring non local peers
+	if (m_peers.find(toMediaServerData(peerUplinkSpeed)) == m_peers.end())
+		return;
+
+	auto [uplinkSpeedIter, firstInsertion] = m_bestUplinkSpeeds.emplace(
+		peerUplinkSpeed.systemId.c_str(),
+		peerUplinkSpeed);
+	// No existing entry to compare against.
+    if (firstInsertion)
+        return;
+
+    // Updating if new speed is better than current.
+	if (peerUplinkSpeed.connectionSpeed.bandwidth >
+		uplinkSpeedIter->second.connectionSpeed.bandwidth)
+	{
+		NX_VERBOSE(this, "Updating best peer uplink speed: %1", peerUplinkSpeed);
+		uplinkSpeedIter->second = std::move(peerUplinkSpeed);
+	}
+}
+
+std::optional<api::PeerConnectionSpeed>
+    ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(
+        const nx::String& systemId) const
+{
+    std::optional<api::PeerConnectionSpeed> bestUplinkSpeed;
+    for (const auto& status: m_listeningPeerDb->getListeningPeerStatus(nx::toStdString(systemId)))
+    {
+        const auto peerIter = m_peers.find(
+            MediaserverData(
+                status.second.systemId.c_str(),
+                status.second.serverId.c_str()));
+
+		if (peerIter == m_peers.end())
+			continue;
+
+		if (!bestUplinkSpeed ||
+			bestUplinkSpeed->connectionSpeed.bandwidth < status.second.uplinkSpeed.bandwidth)
+        {
+			bestUplinkSpeed = api::PeerConnectionSpeed{
+				status.second.serverId,
+				status.second.systemId,
+				status.second.uplinkSpeed};
+        }
+    }
+
+	return bestUplinkSpeed;
 }
 
 } // namespace hpm

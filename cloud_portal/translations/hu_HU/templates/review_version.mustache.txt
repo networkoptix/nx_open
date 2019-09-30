@@ -1,8 +1,8 @@
-{{ message.product }} egy újabb revíziója elérhető
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Kattintson a linkre {{ message.product }} {{ message.id }} vázlatának megtekintéséhez
 
-Link a felülvizsgálatjhoz: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 Ezen az oldalon
 1) Készíthet egy előnézetet a legutóbbi változtatások megtekintéséhez.

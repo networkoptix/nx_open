@@ -116,16 +116,16 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
     auto location = resolve(kTrafficRelay, trafficRelayNode.publicIpAddress);
     if (location)
     {
-        NX_VERBOSE(this, "Discovered resolved traffic relay: %1, location: %2",
+        NX_INFO(this, "Discovered resolved traffic relay: %1, location: %2",
             trafficRelayNode, location);
         QnMutexLocker lock(&m_mutex);
         m_resolvedRelays.emplace(
             location->continent,
-            RelayContext{std::move(*location), std::move(trafficRelayNode)});
+            RelayContext{*location, std::move(trafficRelayNode)});
     }
     else
     {
-        NX_WARNING(this, "Discoverd traffic relay: %1 but location resolution failed",
+        NX_WARNING(this, "Discovered traffic relay: %1 but location resolution failed",
             trafficRelayNode);
         QnMutexLocker lock(&m_mutex);
         m_unresolvedRelays.emplace(std::move(trafficRelayNode));
@@ -134,7 +134,7 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
 
 void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRelayNode)
 {
-    NX_VERBOSE(this, "Traffic relay: %1 was dropped by discovery service.", trafficRelayNode);
+    NX_WARNING(this, "Traffic relay: %1 was dropped by discovery service.", trafficRelayNode);
 
     QnMutexLocker lock(&m_mutex);
     for (auto it = m_resolvedRelays.begin(); it != m_resolvedRelays.end(); ++it)
@@ -188,7 +188,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
         if (!relay.second.urls.empty())
             urls.emplace_back(baseUrl(relay.second.urls.front()));
 
-        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int) urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 
@@ -197,13 +197,14 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
 
 std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() const
 {
+    QnMutexLocker lock(&m_mutex);
     std::vector<nx::utils::Url> urls;
     for (const auto& relay: m_unresolvedRelays)
     {
         if (!relay.urls.empty())
             urls.emplace_back(baseUrl(relay.urls.front()));
 
-        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int) urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 

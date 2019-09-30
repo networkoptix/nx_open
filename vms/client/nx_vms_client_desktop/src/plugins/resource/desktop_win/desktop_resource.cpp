@@ -17,7 +17,7 @@ QnWinDesktopResource::QnWinDesktopResource(QOpenGLWidget* mainWindow):
     const QString name = lit("Desktop");
     setName(name);
     setUrl(name);
-    setId(QnDesktopResource::getDesktopResourceUuid()); // only one desktop resource is allowed)
+    setIdUnsafe(QnDesktopResource::getDesktopResourceUuid()); // only one desktop resource is allowed)
 }
 
 QnWinDesktopResource::~QnWinDesktopResource()

@@ -4,5 +4,5 @@
 
 הפעל חשבון: {{config.portal_url}} / הפעל / {{message.code}}
 
-אם לא נרשמת ל- %PRODUCT_NAME%, פשוט התעלם מדוא"ל זה.
+If you didn't register in %CLOUD_NAME%, just ignore this email.
 אל תשתף את ההודעה או את הקישור עם אף אחד.

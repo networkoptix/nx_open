@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>Inizia con {{Config.productName}}</h2>
-        <p>Prima configura il server. <br> Scegli un'opzione.</p>
+        <p class="master-description">Prima configura il server. <br> Scegli un'opzione.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Imposta nuovo sistema</button>
 
@@ -269,7 +269,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Le passwords non corrispondono
+                Le password non corrispondono
             </div>
         </div>
     </form>
@@ -447,7 +447,7 @@
     <p class="master-description">Qualcosa è andato completamente storto. <br> Descrizione errore: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Riprovare</button>
+        <button class="btn btn-default" ng-click="retry()">Riprova</button>
     </p>
 </div>
 

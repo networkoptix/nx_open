@@ -9,7 +9,7 @@ void FakeVisualMetadataDebugger::push(const QnConstCompressedVideoDataPtr& /*vid
 }
 
 void FakeVisualMetadataDebugger::push(
-    const nx::common::metadata::DetectionMetadataPacketPtr& /*detectionMetadata*/)
+    const nx::common::metadata::ObjectMetadataPacketPtr& /*metadataPacket*/)
 {
     // Do nothing.
 }

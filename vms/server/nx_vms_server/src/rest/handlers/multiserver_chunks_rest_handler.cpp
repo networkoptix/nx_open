@@ -255,7 +255,7 @@ int QnMultiserverChunksRestHandler::executeGet(
     QElapsedTimer timer;
     timer.restart();
     NX_VERBOSE(this) << "Start executing request QnMultiserverChunksRestHandler::executeGet #"
-        << requestNum << ". cameras=" << toString(request.resList);
+        << requestNum << ". cameras=" << toString(request.resList) << ", params=" << params;
 
     if (!request.isValid())
     {
@@ -327,8 +327,10 @@ int QnMultiserverChunksRestHandler::executeGet(
         }
     }
 
-    NX_VERBOSE(this) << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
-        << requestNum << ". timeout=" << timer.elapsed();
-
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    {
+        NX_VERBOSE(this) << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
+            << requestNum << ". timeout=" << timer.elapsed() << "result=" << QJson::serialized(outputData);
+    }
     return nx::network::http::StatusCode::ok;
 }

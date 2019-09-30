@@ -30,7 +30,7 @@ public:
 
     virtual void dropConnections() override;
 
-    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
+    virtual ConnectionInfoList connectionsInfo() const override;
 
     virtual void setHandler(ECConnectionNotificationManager* handler) override;
     virtual void removeHandler(ECConnectionNotificationManager* handler) override;

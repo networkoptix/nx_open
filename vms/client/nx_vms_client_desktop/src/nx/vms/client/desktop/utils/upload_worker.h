@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/common/p2p/downloader/result_code.h>
+#include <rest/server/json_rest_result.h>
 #include "upload_state.h"
 
 namespace nx::vms::client::desktop {
@@ -34,10 +35,12 @@ signals:
 private:
     // TODO: Move to PIMPL.
     void emitProgress();
+    void createUpload();
+    void checkRemoteFile();
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
-
+    void handleWaitForFileOnServer(bool success, int handle, const QnJsonRestResult& result);
     void handleUpload();
     void handleChunkUploaded(bool success, int chunkIndex);
     void handleAllUploaded();

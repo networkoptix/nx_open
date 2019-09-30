@@ -13,7 +13,7 @@
 #include <core/resource/user_resource.h>
 
 #include <api/app_server_connection.h>
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 #include <api/global_settings.h>
 
 #include <ui/style/custom_style.h>
@@ -23,6 +23,7 @@
 #include <ui/models/user_roles_model.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/utils/guarded_callback.h>
 
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
@@ -77,24 +78,26 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     });
     m_timeoutTimer->start();
 
-    server->apiConnection()->testLdapSettingsAsync(settings,
-        this,
-        SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
+    server->restConnection()->testLdapSettingsAsync(settings,
+        nx::utils::guarded(this,
+        [this](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
+        {
+            at_testLdapSettingsFinished(success, handle, users, errorString);
+        }), thread());
 
     setHelpTopic(this, Qn::UserSettings_LdapFetch_Help);
 }
 
 QnLdapUsersDialog::~QnLdapUsersDialog() {}
 
-void QnLdapUsersDialog::at_testLdapSettingsFinished(int status,
-    const QnLdapUsers& users,
-    int /*handle*/,
-    const QString& errorString)
+void QnLdapUsersDialog::at_testLdapSettingsFinished(
+    bool success, [[maybe_unused]]int handle,
+    const QnLdapUsers &users, const QString &errorString)
 {
     if (!m_loading)
         return;
 
-    if (status != 0 || !errorString.isEmpty())
+    if (!success || !errorString.isEmpty())
     {
         QString result = tr("Error while loading users.");
         if (!errorString.isEmpty())
@@ -201,7 +204,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
-        user->fillId();
+        user->fillIdUnsafe();
         user->setEnabled(enableUsers);
         if (selectedRole == Qn::UserRole::customUserRole)
             user->setUserRoleId(selectedUserRoleId);

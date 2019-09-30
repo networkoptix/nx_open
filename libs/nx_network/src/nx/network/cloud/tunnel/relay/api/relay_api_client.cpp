@@ -55,6 +55,11 @@ SystemError::ErrorCode Client::prevRequestSysErrorCode() const
     return m_actualClient->prevRequestSysErrorCode();
 }
 
+void Client::setTimeout(std::optional<std::chrono::milliseconds> timeout)
+{
+    m_actualClient->setTimeout(timeout);
+}
+
 void Client::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();

@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">新：系統資源報告</a></h1>
 </div>
 <div class="container">
     <h1>進階伺服器設定</h1>
@@ -109,7 +109,7 @@
             沒有主要儲存裝置 - 影像將無法被儲存在此伺服器內.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            預留空間量大於剩餘的可用空間。 可刪除當前視頻片段以釋放一些儲存空間。
+            預留空間量大於剩餘的可用空間。 可刪除當前影像以釋放一些儲存空間。
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">修正所有標記的設定並儲存</div>
 
@@ -120,7 +120,7 @@
     <h2>日誌設定</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} 日誌級別</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">無︰關閉日誌.</option>
@@ -128,8 +128,8 @@
                     <option value="error">錯誤：只記錄錯誤日誌.</option>
                     <option value="warning">警告︰警告日誌和錯誤.</option>
                     <option value="info">訊息：記錄錯誤，警告和所有消息。</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="debug">除錯：記錄所有系統訊息以及除錯資訊.</option>
+                    <option value="verbose">詳細：記錄所有可用信息。</option>
                 </select>
             </div>
         </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>進階系統設定</h1>
     <div class="alert alert-danger" role="alert">
         <b>警告 ！</b>此頁面上的任何變更可能會導致伺服器無法正常工作.
     </div>

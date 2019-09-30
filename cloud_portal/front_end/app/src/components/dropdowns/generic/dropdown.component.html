@@ -21,7 +21,7 @@
                 <a class="dropdown-item inset"
                    [ngClass]="{ 'selected': selected.name === item.name }"
                    (click)="show = false; change(item)">
-                    <span>{{item.name}}</span>
+                    <span [innerHTML]="item.name"></span>
                 </a>
             </li>
         </ul>

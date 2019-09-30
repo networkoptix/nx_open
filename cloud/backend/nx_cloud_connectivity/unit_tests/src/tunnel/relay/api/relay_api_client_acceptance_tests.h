@@ -15,6 +15,37 @@
 
 namespace nx::cloud::relay::api::test {
 
+class DelayedAuthenticationManager:
+    public network::http::server::AbstractAuthenticationManager
+{
+public:
+    DelayedAuthenticationManager(std::chrono::milliseconds delay):
+        m_delay(delay)
+    {
+    }
+
+    virtual void authenticate(
+        const nx::network::http::HttpServerConnection& /*connection*/,
+        const nx::network::http::Request& /*request*/,
+        network::http::server::AuthenticationCompletionHandler completionHandler)
+    {
+        auto timer = std::make_unique<network::aio::Timer>();
+        auto timerPtr = timer.get();
+        timerPtr->start(
+            m_delay,
+            [timer = std::move(timer), completionHandler = std::move(completionHandler)]() mutable
+            {
+                timer.reset();
+                completionHandler(network::http::server::SuccessfulAuthenticationResult());
+            });
+    }
+
+private:
+    std::chrono::milliseconds m_delay;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 template<typename ClientTypeSet>
 class RelayApiClientAcceptance:
     public ::testing::Test
@@ -37,6 +68,16 @@ protected:
         m_authenticator = QAuthenticator();
         m_authenticator->setUser("username");
         m_authenticator->setPassword("password");
+    }
+
+    void setServerRequestProcessingDelay(std::chrono::milliseconds timeout)
+    {
+        m_serverRequestDelay = timeout;
+    }
+
+    void setClientTimeout(std::chrono::milliseconds timeout)
+    {
+        m_clientTimeout = timeout;
     }
 
     void givenBaseUrlWithTrailingSlash()
@@ -63,8 +104,7 @@ protected:
     void whenInvokedSomeRequest()
     {
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<typename ClientTypeSet::Client>(
-            m_baseUrl, nullptr);
+        initializeClient();
 
         nx::utils::promise<void> done;
         m_client->startSession(
@@ -95,9 +135,7 @@ protected:
         using namespace std::placeholders;
 
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<typename ClientTypeSet::Client>(
-            m_baseUrl,
-            std::bind(&RelayApiClientAcceptance::saveFeedback, this, _1));
+        initializeClient();
 
         m_client->beginListening(
             ::testing::UnitTest::GetInstance()->current_test_info()->name(),
@@ -146,10 +184,7 @@ protected:
         using namespace std::placeholders;
 
         initializeHttpServerIfNeeded();
-
-        m_client = std::make_unique<typename ClientTypeSet::Client>(
-            m_baseUrl,
-            std::bind(&RelayApiClientAcceptance::saveFeedback, this, _1));
+        initializeClient();
 
         m_client->startSession(
             "sessionId",
@@ -218,6 +253,11 @@ protected:
         m_prevClientTunnelResult = m_clientTunnelResults.pop();
     }
 
+    void andResultCodeIs(api::ResultCode expected)
+    {
+        ASSERT_EQ(expected, m_prevClientTunnelResult->resultCode);
+    }
+
     //---------------------------------------------------------------------------------------------
     // Common.
 
@@ -277,6 +317,10 @@ private:
     nx::utils::SyncQueue<ClientTunnelResult> m_clientTunnelResults;
     std::optional<ClientTunnelResult> m_prevClientTunnelResult;
 
+    std::optional<std::chrono::milliseconds> m_serverRequestDelay;
+    std::optional<std::chrono::milliseconds> m_clientTimeout;
+    std::unique_ptr<DelayedAuthenticationManager> m_delayedAuthenticationManager;
+
     void saveBeginListeningCompletionResult(
         ResultCode resultCode,
         BeginListeningResponse response,
@@ -312,13 +356,33 @@ private:
 
         if (m_authenticator)
         {
-            m_httpServer->setAuthenticationEnabled(true);
+            m_httpServer->enableAuthentication(".*");
             m_httpServer->registerUserCredentials(
                 m_authenticator->user().toUtf8(),
                 m_authenticator->password().toUtf8());
             m_baseUrl.setUserName(m_authenticator->user());
             m_baseUrl.setPassword(m_authenticator->password());
         }
+
+        if (m_serverRequestDelay)
+        {
+            m_delayedAuthenticationManager =
+                std::make_unique<DelayedAuthenticationManager>(*m_serverRequestDelay);
+            m_httpServer->authDispatcher().add(
+                std::regex(".*"),
+                m_delayedAuthenticationManager.get());
+        }
+    }
+
+    void initializeClient()
+    {
+        using namespace std::placeholders;
+
+        m_client = std::make_unique<typename ClientTypeSet::Client>(
+            m_baseUrl,
+            std::bind(&RelayApiClientAcceptance::saveFeedback, this, _1));
+
+        m_client->setTimeout(m_clientTimeout);
     }
 
     void prepareBeginListeningResponse()
@@ -442,12 +506,21 @@ TYPED_TEST_P(RelayApiClientAcceptance, establish_client_tunnel)
     this->andClientTunnelConnectionIsAvailable();
 }
 
-// TYPED_TEST_P(RelayApiClientAcceptance, sending_data_through_client_tunnel)
-
 TYPED_TEST_P(RelayApiClientAcceptance, provides_feedback_about_client_tunnel)
 {
     this->whenClientTunnelFailed();
     this->thenFeedbackIsReported();
+}
+
+TYPED_TEST_P(RelayApiClientAcceptance, timeout_is_supported)
+{
+    this->setServerRequestProcessingDelay(std::chrono::seconds(1));
+    this->setClientTimeout(std::chrono::milliseconds(1));
+
+    this->whenInitiateClientTunnel();
+
+    this->thenCreateClientTunnelFailed();
+    this->andResultCodeIs(api::ResultCode::timedOut);
 }
 
 REGISTER_TYPED_TEST_CASE_P(RelayApiClientAcceptance,
@@ -460,7 +533,7 @@ REGISTER_TYPED_TEST_CASE_P(RelayApiClientAcceptance,
     sending_data_through_server_tunnel,
     provides_feedback_about_server_tunnel,
     establish_client_tunnel,
-    //sending_data_through_client_tunnel,
-    provides_feedback_about_client_tunnel);
+    provides_feedback_about_client_tunnel,
+    timeout_is_supported);
 
 } // namespace nx::cloud::relay::api::test

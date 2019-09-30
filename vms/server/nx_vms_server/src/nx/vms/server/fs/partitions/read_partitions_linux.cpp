@@ -52,11 +52,21 @@ SystemError::ErrorCode readPartitionsInformation(
 
         decodeOctalEncodedPath(cPath);
 
-        const bool suitableForInsert = !deviceToPath.contains(cDevName)
-            || (int) strlen(cPath) < std::get<fsPath>(deviceToPath[cDevName]).size();
+        if (deviceToPath.contains(cDevName)
+            && (int) strlen(cPath) >= std::get<fsPath>(deviceToPath[cDevName]).size())
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 %3 - duplicate", cDevName, cPath, cFSName);
+            continue;
+        }
 
-        if (suitableForInsert && partitionsInfoProvider->isFolder(cPath))
-            deviceToPath[cDevName] = std::make_pair(cPath, cFSName);
+        if (!partitionsInfoProvider->isFolder(cPath))
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 %3 - not a folder", cDevName, cPath, cFSName);
+            continue;
+        }
+
+        deviceToPath[cDevName] = std::make_pair(cPath, cFSName);
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 %3 - added", cDevName, cPath, cFSName);
     }
 
     for (auto deviceKey: deviceToPath.keys())

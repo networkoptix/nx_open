@@ -19,9 +19,8 @@ Pane
     property alias ownerDescription: informationBlock.ownerDescription
     property bool reachable: false
     property bool compatible: true
+    property bool wrongCustomization: false
     property string invalidVersion
-
-    readonly property string kMinimimVersion: "1.3.1"
 
     padding: 0
 
@@ -168,17 +167,13 @@ Pane
 
         if (!compatible)
         {
-            if (NxGlobals.softwareVersion(invalidVersion)
-                    .isLessThan(NxGlobals.softwareVersion(kMinimimVersion))
-                || applicationInfo.oldMobileClientUrl() === "")
-            {
-                Workflow.openStandardDialog("",
-                    qsTr("This server has too old version. "
-                        + "Please update it to the latest version."))
-                return
-            }
+            if (invalidVersion && d.lessThanMinimumVersion(invalidVersion))
+                Workflow.openSessionsScreenWithWarning(systemName, d.kTooOldServerMessage)
+            else if (wrongCustomization || applicationInfo.oldMobileClientUrl() === "")
+                Workflow.openSessionsScreenWithWarning(systemName, d.kIncompatibleServerMessage)
+            else
+                Workflow.openOldClientDownloadSuggestion()
 
-            Workflow.openOldClientDownloadSuggestion()
             return
         }
 
@@ -222,8 +217,19 @@ Pane
     {
         id: d
 
+        readonly property var kMinimimVersion: NxGlobals.softwareVersion("1.3.1")
+        readonly property string kIncompatibleServerMessage:
+            LoginUtils.connectionErrorText(QnConnectionManager.IncompatibleInternalConnectionResult)
+        readonly property string kTooOldServerMessage:
+            qsTr("Server has too old version. Please update it to the latest one")
         readonly property string kFactorySystemDetailsText:
             qsTr("Connect to this server from web browser or through desktop client to set it up")
+
+        function lessThanMinimumVersion(versionString)
+        {
+            var version = NxGlobals.softwareVersion(versionString)
+            return version.isLessThan(kMinimimVersion)
+        }
 
         function openSavedSession()
         {

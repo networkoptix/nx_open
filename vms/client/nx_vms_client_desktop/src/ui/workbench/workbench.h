@@ -238,7 +238,7 @@ private slots:
     void at_layout_cellSpacingChanged();
 
     void updateSingleRoleItem();
-    void updateActiveRoleItem();
+    void updateActiveRoleItem(const QnWorkbenchItem* removedItem = nullptr);
     void updateCentralRoleItem();
 
 private:

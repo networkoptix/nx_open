@@ -20,6 +20,6 @@ function connectionErrorText(status, info)
     else if (status == Nx.QnConnectionManager.FactoryServerConnectionResult)
         return qsTr("Connect to this server from web browser or through desktop client to set it up")
     else if (status == Nx.QnConnectionManager.UserTemporaryLockedOut)
-        return lockoutConnectionErrorText
+        return lockoutConnectionErrorText()
     return ""
 }

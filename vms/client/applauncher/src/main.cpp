@@ -64,8 +64,8 @@ static bool initLogsFromConfigFile(const QString& logsDirectory)
 
 ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char* argv[])
 {
-    const QDir logsDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-    nx::utils::file_system::ensureDir(logsDirectory);
+    const QDir dataDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    nx::utils::file_system::ensureDir(dataDirectory);
 
     QString logLevel;
     QString logFileBaseName;
@@ -88,8 +88,8 @@ ApplauncherProcess::StartupParameters parseCommandLineParameters(int argc, char*
 
     if (!logFileBaseName.isEmpty() && !logLevel.isEmpty())
         initLogFromArgs(logLevel, logFileBaseName);
-    else if (!initLogsFromConfigFile(logsDirectory.absolutePath()))
-        initLogFromArgs("warning", logsDirectory.absoluteFilePath("log/applauncher"));
+    else if (!initLogsFromConfigFile(dataDirectory.absolutePath() + "/log"))
+        initLogFromArgs("warning", dataDirectory.absoluteFilePath("log/applauncher"));
 
     if (quitMode)
         startupParameters.mode = ApplauncherProcess::StartupParameters::Mode::Quit;

@@ -1,8 +1,8 @@
-Jest dostępna nowa wersja {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Kliknij link, aby przejrzeć opis wersji {{ message.id }} dla {{ message.product }}
 
-Link do przeglądu: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 Na tej stronie możesz
 1) Przejrzeć najnowsze zmiany.

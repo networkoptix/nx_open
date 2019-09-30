@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv-SE" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Någon typ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Välj område</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Välj ett område i videon...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I markerat område</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kunde inte köra plugin åtgärd</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Ange parametrar</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -944,6 +975,14 @@ om du vill visa fler bokmärken</translation>
       <source>Objects Frames and Info...</source>
       <translation>Objektramar och Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Fäst kalender</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Lossa upp kalendern</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1005,6 +1044,45 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vänligen skriv in lösenordet för layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Serverhändelser</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analyshändelse</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Någon händelse</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Någon enhet har problem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Någon kamera har problem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Någon serverhändelse</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Enhetsproblem</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>En analyshändelse</translation>
     </message>
   </context>
   <context>
@@ -1644,24 +1722,12 @@ om du vill visa fler bokmärken</translation>
       <translation>Server updated</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Affärsregel uppdaterad</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server borttagen</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Affärsregel borttagen</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Användaren borttagen</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Affärsregeln har återställts</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1757,6 +1823,18 @@ om du vill visa fler bokmärken</translation>
         <numerusform>%n åtgärder</numerusform>
         <numerusform>%n åtgärder</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Händelsesregel har ändrats</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Händelsesregel har tagits bort</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Händelseregler återställs till standard</translation>
     </message>
   </context>
   <context>
@@ -2037,7 +2115,7 @@ om du vill visa fler bokmärken</translation>
       <translation>Valfri kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Forcerad kvittering fungerar bara för generiska händelser om kamerans modifierare används i generiska händelse URL-er</translation>
     </message>
   </context>
@@ -3584,7 +3662,7 @@ till %1</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanaler</translation>
     </message>
   </context>
   <context>
@@ -4244,6 +4322,10 @@ till %1</translation>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Virtuell kamera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Virtual Camera&quot; är ett virtuellt lagringsutrymme för videofiler, som kan laddas upp till vilken server som helst på ditt system och nås av någon användare.</translation>
     </message>
   </context>
   <context>
@@ -5107,7 +5189,7 @@ till %1</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -5584,13 +5666,7 @@ till %1</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
-    </message>
-    <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Vad ska göras med aktuell analysdata?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5603,6 +5679,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktuella analysdata flyttas inte automatiskt till en annan plats och blir otillgängliga. Du kan behålla det och manuellt flytta senare eller radera permanent.
+Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta support innan du fortsätter.</translation>
     </message>
   </context>
   <context>
@@ -5653,11 +5735,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Använd för att lagra analysdata</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Lagrar analysdata</translation>
     </message>
   </context>
   <context>
@@ -5746,7 +5828,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -5925,10 +6007,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Innehåller inte någon personlig information och är helt anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-serveråtgärder kan fortfarande kräva statusuppdateringar för kameror oavsett inställningen.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktivera autodiscovery för enheter och servrar och automatisk kontroll av enhetsstatus</translation>
     </message>
@@ -5939,6 +6017,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>När den är aktiverad upptäcker systemet kontinuerligt nya kameror och servrar och skickar funktionsförfrågningar till kameror för statusuppdatering.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Om Failover är aktiverat kan servern fortfarande begära kamerastatusuppdateringar oavsett inställning.</translation>
     </message>
   </context>
   <context>
@@ -5958,44 +6040,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Kalkylblad (CSV) -fil</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Förskjutning</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tidszon</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tid</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ingen server har tillgång till internet. Tiden synkroniseras inte.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Systemtiden synkroniseras med Internet och beror inte på lokal tid på servrar.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Systemtiden synkroniseras med lokal tid på den valda servern och beror inte på lokal tid på andra servrar.</translation>
     </message>
   </context>
   <context>
@@ -7130,6 +7174,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Välj område på videon för att filtrera resultat</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I markerat område</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vald kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vald enhet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vald media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7177,7 +7249,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hej</translation>
+      <translation>Hög</translation>
     </message>
     <message>
       <source>Bst</source>
@@ -7345,12 +7417,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Okänt objekt</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>borttagen kamera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Okänt spår</translation>
     </message>
   </context>
   <context>
@@ -7369,38 +7441,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n objekt</numerusform>
         <numerusform>%n objekt</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Någon typ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Välj område</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Välj ett område i videon...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I markerat område</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>namnlös analysmotor</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kunde inte köra plugin åtgärd</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Ange parametrar</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
     </message>
   </context>
   <context>
@@ -7444,17 +7484,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Tillämpa ändringar...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Denna I / O-modul har inga avancerade inställningar</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Kameran har inga avancerade inställningar</translation>
     </message>
   </context>
   <context>
@@ -7521,7 +7550,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7582,6 +7611,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Denna åtgärd kan inte ångras.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Rörelsedetekteringsströmmen är inaktiverad</translation>
     </message>
   </context>
   <context>
@@ -7718,7 +7751,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Rörelsedetektering är inaktiverad, alla schemalagda poster &quot;Rörelse&quot; och &quot;Rörelse + Lo-Res&quot; kommer att ändras till &quot;Alltid&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dubbelströmning är inaktiverad, alla schemalagda poster &quot;Rörelse + Lo-Res&quot; kommer att ändras till &quot;Alltid&quot;</translation>
     </message>
   </context>
   <context>
@@ -8000,42 +8041,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Serverhändelser</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analyshändelse</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Någon enhet har problem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Någon kamera har problem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Någon serverhändelse</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Enhetsproblem</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Någon händelse</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>En analyshändelse</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Inga händelser</translation>
     </message>
@@ -8045,10 +8050,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n händelser</numerusform>
         <numerusform>%n händelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>namnlös analysmotor</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8438,8 +8439,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Det angivna IP-adressområdet har mer än 255 adresser.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Kan&apos;t börja sökprocessen</translation>
+      <source>Can not start the search process</source>
+      <translation>Kan inte starta sökprocessen</translation>
     </message>
   </context>
   <context>
@@ -8552,6 +8553,53 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Vissa servrar är offline och uppdateras inte. Hoppa över dem?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Saknar uppdateringspaket för klienten</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Det finns inga online-servrar att uppdatera.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Avbryt uppdatering och radera alla nedladdade data?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS-versioner av vissa komponenter stöds inte längre. Ta bort dem från systemet eller uppdatera deras operativsystem till en stödd version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS-versionen av klienten stöds inte längre. Vänligen uppdatera dess operativsystem till en stödd version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Misslyckades med att starta uppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Misslyckades med att avbryta uppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Misslyckades med att starta installationen</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Misslyckades med att hämta uppdateringspaket till vissa komponenter</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Om problemet kvarstår vänligen kontakta kundsupport.</translation>
@@ -8569,16 +8617,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Uppdatering slutförd</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client startas om till den uppdaterade versionen.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Uppdatering slutförd, men vissa komponenter har misslyckats med en uppdatering</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Uppdatera %1 manuellt med hjälp av en installationsfil.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Det uppstod ett fel när du installerade uppdateringar:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Hämtar uppdateringar...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Slutför uppdatering</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Senaste version är redan installerad</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Den här versionen är redan installerad</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installera uppdatering</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8597,12 +8677,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Hämta &amp;&amp; Installera</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Välj en annan uppdatering</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Bläddra efter en annan fil...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Välj en annan uppdatering</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8625,6 +8705,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Installera klientuppdateringar...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Börjar uppdatering till ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Uppdaterar till ...</translation>
     </message>
@@ -8633,12 +8717,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Klar att uppdatera till</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installera uppdatering</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>System uppdaterat till</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Vissa servrar har inga tillgängliga uppdateringspaket.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Vissa servrar har stött på ett internt fel.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Var vänlig kontakta support.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Vissa servrar har gått offline. Vänta tills de blir online för att fortsätta.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8647,6 +8743,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Fortsätt i bakgrunden</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Senaste tillgängliga version</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8660,101 +8760,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>Update from mediaservers</source>
       <translation>Uppdatering från mediaservers</translation>
     </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Senaste tillgängliga version</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
-        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Saknar uppdateringspaket för klienten</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Uppdatera %1 manuellt med hjälp av en installationsfil.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8767,7 +8772,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Du har inga layouter</translation>
     </message>
   </context>
   <context>
@@ -8786,37 +8791,33 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Enhet kopplades bort</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Kamera kopplades bort</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I/O-modul kopplades bort</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Okänd Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Inga nya notifieringar</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users don&apos;t have access to the selected layout. Action will not work for them.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
+      <translation>Ingen av de valda användare har tillgång till den valda layouten. Åtgärden fungerar inte.</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -8828,86 +8829,86 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>Lokala layouter kan bara visas för sina ägare.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Ingen av de valda användargrupperna innehåller användare. Åtgärden fungerar inte.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Servern tar för lång tid att svara</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Ingen uppdateringsuppgift</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Klar för nedladdning av uppdatering</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Hämtar uppdatering</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Klar att starta om till den nya versionen</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Installerar uppdateringen</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Installerad</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Det gick inte att hämta uppdateringen</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Väntar på peer-data</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Det finns inte tillräckligt med utrymme för att ladda ner uppdateringsfiler.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Det finns inte tillräckligt med utrymme för att extrahera uppdateringsfiler.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Det gick inte att hämta uppdateringspaket.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Uppdateringsinnehållet är ogiltigt.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Uppdateringsarkivet är skadat.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Uppdaterade filer kan inte extraheras.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Internt nedladdningsfel.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Internt klientfel.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8915,34 +8916,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Oväntad felkod.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Klar för att installera uppdatering</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Uppdateringspaketet hittades inte.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Det finns inte tillräckligt med utrymme för att installera uppdatering.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Internt serverfel.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Den här OS-versionen stöds inte längre.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>Tillagd</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>Lägger till</translation>
     </message>
   </context>
   <context>
@@ -9009,7 +9014,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Rörelse + Låg uppl</translation>
     </message>
   </context>
   <context>
@@ -9038,28 +9043,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Fler inställningar</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dubbla strömmar stöds inte för den här kameran</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation>Rörelsedetektering är inaktiverad eller stöds inte</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dubbla strömmar och rörelsedetektering stöds inte för den här kameran</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Rörelsedetektering avaktiverad</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>För att aktivera eller justera det går du till fliken &quot;Rörelsedetektering&quot; i kamerainställningar</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Rörelsedetektering avaktiverad eller inte stödd</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>För att säkerställa att det stöds och aktivera det, gå till fliken &quot;Motion&quot; i kamerainställningar.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Dubbelströmning är inaktiverad eller stöds inte</translation>
     </message>
   </context>
   <context>
@@ -9085,18 +9074,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Användare kommer automatiskt att loggas ut om deras session överstiger den angivna varaktigheten.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Vattenmärken kommer att visas över live, arkiv och exporterade videor för icke-administrativa användare. Du och andra administratörer ser inte dem.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Bibliotek</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Version</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9104,85 +9097,93 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>inget fel</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>bibliotekfilen kan inte laddas</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>ogiltigt eller inkompatibelt plugin-bibliotek</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>plugin-biblioteket kunde inte initieras</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin returnerade dålig manifest</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>API-versionen för plugin stöds inte längre</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>okänt Fel</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Inte laddad</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Laddad</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>plugin finns på den svarta listan</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>plugin är valfritt och finns inte på den vita listan</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>internt fel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Hoppades över</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Installerad</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installerar...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Nerladdat</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Väntar på svar från servern...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Ingen anslutning till Server.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Nätverksfel.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Serverfel.</translation>
     </message>
   </context>
   <context>
@@ -9197,7 +9198,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Spara uppdateringsfiler</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9205,11 +9206,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Komponent</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Installerad version</translation>
     </message>
   </context>
   <context>
@@ -9220,50 +9221,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Bokmärk det...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
       <source>No motion</source>
-      <translation type="unfinished">No motion</translation>
+      <translation>Ingen rörelse</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Ingen rörelse upptäckt</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
+      <translation>
+        <numerusform>%n rörelsehändelser</numerusform>
+        <numerusform>%n rörelsehändelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vald kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
     </message>
   </context>
   <context>
@@ -9277,9 +9253,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>E-postadressen är inte inställd för %n användare</numerusform>
+        <numerusform>E-postadressen är inte inställd för %n användare</numerusform>
       </translation>
     </message>
     <message>
@@ -9298,14 +9274,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Dubbelklicka för att lägga till kameror i den aktuella layouten eller ctrl + klicka för att öppna i en ny flik</numerusform>
+        <numerusform>Dubbelklicka för att lägga till kameror i den aktuella layouten eller ctrl + klicka för att öppna i en ny flik</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Inget tillgängligt arkiv</translation>
     </message>
   </context>
   <context>
@@ -9316,7 +9292,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Tidszon</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9324,42 +9300,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Server OS-tid</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-tid</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Tid, vanlig och synkroniserad mellan alla servrar. Kan vara annorlunda med OS-tid på en viss server.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Synkroniserad med Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Synkroniseras med lokal tid på den valda servern</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Inte synkroniserad. Varje server använder sin egen lokala tid.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Samma som serverns lokala tid</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Ingen internetanslutning. Tiden synkroniseras inte.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Time Server är offline. Tiden synkroniseras inte.</translation>
     </message>
   </context>
   <context>
@@ -9385,7 +9361,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Det gick inte att skapa uppladdning på serverns sida: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9399,16 +9375,24 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Filen var skadad medan den laddades upp till servern</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Fjärrfil &quot;%1&quot; är skadad</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Servern har redan den här filen &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Motion upptäcks endast under uppladdning av video.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Aktivera eller inaktivera denna inställning ändrar inte något i det befintliga arkivet.</translation>
     </message>
   </context>
   <context>
@@ -9448,7 +9432,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WebWidget</name>
     <message>
       <source>Failed to load page</source>
-      <translation type="unfinished">Failed to load page</translation>
+      <translation>Det gick inte att ladda sidan</translation>
     </message>
   </context>
   <context>
@@ -9507,27 +9491,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Börjar exportera...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Spara layout</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Sluta spara</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Misslyckades att spara</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Börjar spara...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
     </message>
   </context>
   <context>
@@ -9564,7 +9548,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Rekonstruera upplösning</translation>
     </message>
   </context>
   <context>
@@ -9602,17 +9586,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Någon plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i källan med något av de angivna sökorden.</translation>
+      <translation>Händelsen utlöses endast om det finns matchningar i rubriken med något av de angivna sökorden.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9736,7 +9720,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layouten är full</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9794,7 +9778,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Virtuella kameror kan inte flyttas mellan servrar</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9806,7 +9790,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Alla stöds</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9910,36 +9894,40 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Misslyckades med att byta lösenord på %n av %1 kameror</numerusform>
+        <numerusform>Misslyckades med att byta lösenord på %n av %1 kameror</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Varning! Denna version är endast för teständamål.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Öppna Serverinställningar</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Bekräfta lagringsplats för att lagra analysdata på &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation>den största tillgängliga partitionen</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>Analysdatabasen ska bara lagras på en lokal enhet och kan ta stora mängder utrymme.
+När en plats för lagring av analysdata har valts kan den inte enkelt ändras utan att förlora befintliga data. Vi rekommenderar att du väljer plats noggrant och undvik att använda systempartitionen eftersom det kan orsaka allvarligt systemfel.
+Analysdata lagras som standard den %1.
+Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i dialogrutan Serverinställningar.</translation>
     </message>
   </context>
   <context>

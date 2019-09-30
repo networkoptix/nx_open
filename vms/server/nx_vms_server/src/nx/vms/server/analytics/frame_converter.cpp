@@ -2,10 +2,11 @@
 
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/vms/server/analytics/uncompressed_video_frame.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
 
 namespace nx {
 namespace vms::server {

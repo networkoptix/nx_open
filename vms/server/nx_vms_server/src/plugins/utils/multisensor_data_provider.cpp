@@ -142,7 +142,7 @@ QnSecurityCamResourcePtr MultisensorDataProvider::initSubChannelResource(quint32
     resource->setForceUseLocalProperties(true);
     resource->setRole(nx::vms::server::resource::Camera::Role::subchannel);
 
-    resource->setId(params.resID);
+    resource->setIdUnsafe(params.resID);
     resource->setUrl(params.url);
     resource->setVendor(params.vendor);
     resource->setMAC(m_cameraResource->getMAC());;

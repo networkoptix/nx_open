@@ -29,28 +29,29 @@ Connector::~Connector()
 }
 
 void Connector::addNodeUrl(
-    const std::string& systemId,
+    const std::string& clusterId,
     const nx::utils::Url& url)
 {
     post(
-        [this, systemId, url]()
+        [this, clusterId, url]()
         {
             NodeContext nodeContext;
-            nodeContext.systemId = systemId;
+            nodeContext.clusterId = clusterId;
             nodeContext.retryTimer = std::make_unique<nx::network::aio::Timer>();
+            nodeContext.url = url;
             m_nodes.emplace(url, std::move(nodeContext));
             connectToNodeAsync(url);
         });
 }
 
 void Connector::removeNodeUrl(
-    const::std::string& systemId,
+    const::std::string& clusterId,
     const nx::utils::Url& url)
 {
-    post([this, systemId, url]()
+    post([this, clusterId, url]()
     {
         auto it = m_nodes.find(url);
-        if (it != m_nodes.end() && it->second.systemId == systemId)
+        if (it != m_nodes.end() && it->second.clusterId == clusterId)
         {
             if (it->second.connection)
             {
@@ -62,6 +63,11 @@ void Connector::removeNodeUrl(
             m_nodes.erase(it);
         }
     });
+}
+
+OnConnectCompletedSubscription& Connector::onConnectCompletedSubscription()
+{
+    return m_onConnectCompletedSubscription;
 }
 
 void Connector::stopWhileInAioThread()
@@ -84,36 +90,51 @@ void Connector::connectToNodeAsync(const nx::utils::Url& url)
     NX_CRITICAL(nodeIter != m_nodes.end());
     NodeContext& nodeContext = nodeIter->second;
 
+    if (!nodeContext.nodeId.empty() &&
+        m_connectionManager->isNodeConnected(nodeContext.clusterId, nodeContext.nodeId))
+    {
+        NX_VERBOSE(this, "Skipping connection to connected node %1.%2 (%3)",
+            nodeContext.nodeId, nodeContext.clusterId, url);
+        scheduleConnectRetry(&nodeContext);
+        return;
+    }
+
     nodeContext.connectionId = QnUuid::createUuid().toSimpleByteArray().toStdString();
 
     NX_DEBUG(this, "Initiating connection %1 to %2", nodeContext.connectionId, url);
 
     nodeContext.connector = m_transportManager->createConnector(
-        nodeContext.systemId,
+        nodeContext.clusterId,
         nodeContext.connectionId,
         url);
     nodeContext.connector->connect(
         [this, url](auto... result) { onConnectCompletion(url, std::move(result)...); });
 }
 
+void Connector::scheduleConnectRetry(NodeContext* nodeContext)
+{
+    nodeContext->retryTimer->start(
+        m_settings.nodeConnectRetryTimeout,
+        [url = nodeContext->url, this]() { connectToNodeAsync(url); });
+}
+
 void Connector::onConnectCompletion(
     const nx::utils::Url& url,
-    transport::ConnectResultDescriptor result,
+    transport::ConnectResult result,
     std::unique_ptr<transport::AbstractConnection> connection)
 {
     auto nodeIter = m_nodes.find(url);
     NX_CRITICAL(nodeIter != m_nodes.end());
     NodeContext& nodeContext = nodeIter->second;
 
+    m_onConnectCompletedSubscription.notify(url, result);
+
     auto connector = std::exchange(nodeContext.connector, nullptr);
 
     if (!connection)
     {
         NX_DEBUG(this, "Error connecting to %1. %2", url, result);
-
-        nodeContext.retryTimer->start(
-            m_settings.nodeConnectRetryTimeout,
-            [url, this]() { connectToNodeAsync(url); });
+        scheduleConnectRetry(&nodeContext);
         return;
     }
 
@@ -127,21 +148,26 @@ void Connector::registerConnection(
 {
     using ConnectionWithSequence = transport::CommandTransportDelegateWithData<int>;
 
-    NX_DEBUG(this, "Connection %1 to %2 established successfully",
-        nodeContext->connectionId, url);
+    nodeContext->nodeId = connection->commonTransportHeaderOfRemoteTransaction().peerId;
+
+    NX_DEBUG(this, "Connection %1 to %2.%3 (%4) established successfully",
+        nodeContext->connectionId, nodeContext->nodeId, nodeContext->clusterId, url);
 
     connection->connectionClosedSubscription().subscribe(
-        [this, url](auto... args) { onConnectionClosed(url, args...); },
+        [this, url](auto&&... args)
+        {
+            onConnectionClosed(url, std::forward<decltype(args)>(args)...);
+        },
         &nodeContext->connectionClosedSubscriptionId);
     auto connectionPtr = connection.get();
 
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.originatingNodeId = m_nodeId;
     connectionContext.connectionId = nodeContext->connectionId;
-    connectionContext.fullPeerName.systemId = nodeContext->systemId;
+    connectionContext.fullPeerName.clusterId = nodeContext->clusterId;
     connectionContext.fullPeerName.peerId =
         connection->commonTransportHeaderOfRemoteTransaction().peerId;
-    //connectionContext.userAgent = ;
+    // connectionContext.userAgent = connection->;
     const auto connectionSequence = ++m_connectionSequence;
     connectionContext.connection =
         std::make_unique<ConnectionWithSequence>(
@@ -189,9 +215,7 @@ void Connector::onConnectionClosed(
     nodeIter->second.connectionClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
 
     nodeIter->second.retryTimer->cancelSync();
-    nodeIter->second.retryTimer->start(
-        m_settings.nodeConnectRetryTimeout,
-        [url, this]() { connectToNodeAsync(url); });
+    scheduleConnectRetry(&nodeIter->second);
 }
 
 } // namespace nx::clusterdb::engine

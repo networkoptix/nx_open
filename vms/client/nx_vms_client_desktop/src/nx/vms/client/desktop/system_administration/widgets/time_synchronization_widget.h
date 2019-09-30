@@ -40,6 +40,7 @@ protected:
 
 private:
     void setupUi();
+    void setBaseOffsetIndex(int row);
     void loadState(const TimeSynchronizationWidgetState& state);
 
 private:

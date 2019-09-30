@@ -15,8 +15,12 @@
 
 #include <client_core/client_core_module.h>
 
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
@@ -325,6 +329,16 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
         usersButton->setDialogDelegate(new QnSendEmailActionDelegate(usersButton));
+        editorButton = usersButton;
+    }
+    else if (actionType == ActionType::openLayoutAction)
+    {
+        auto usersButton = new QnSelectUsersDialogButton(parent);
+        auto validator = new QnLayoutAccessValidationPolicy(commonModule());
+        validator->setLayout(
+            commonModule()->resourcePool()->getResourceById<QnLayoutResource>(
+                model->actionParams().actionResourceId));
+        usersButton->setSubjectValidationPolicy(validator);
         editorButton = usersButton;
     }
     else if (actionType == ActionType::showPopupAction)

@@ -21,3 +21,7 @@ endif()
 if(withVmsTools)
     add_subdirectory(tools)
 endif()
+
+if(withVmsBenchmark)
+    add_subdirectory(vms_benchmark)
+endif()

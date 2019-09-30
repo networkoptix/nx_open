@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
+#include <QtCore/QLocale>
 
 #include <nx/utils/log/log.h>
 
@@ -69,4 +70,10 @@ QWindow *getMainWindow()
         window->reportContentOrientationChange(orientation);
     }
 
+    bool is24HoursTimeFormat()
+    {
+        const auto format = QLocale::system().timeFormat();
+        return !format.contains("AP", Qt::CaseInsensitive);
+    }
 #endif // !defined(Q_OS_ANDROID)
+

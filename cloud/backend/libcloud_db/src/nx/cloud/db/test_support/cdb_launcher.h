@@ -222,13 +222,13 @@ public:
         const std::string& systemId);
 
     api::ResultCode getVmsConnections(api::VmsConnectionDataList* const vmsConnections);
-    
+
     api::ResultCode getTransactionLog(
         const std::string& accountEmail,
         const std::string& accountPassword,
         const std::string& systemId,
         nx::clusterdb::engine::CommandDataList* const transactions);
-    
+
     api::ResultCode getStatistics(api::Statistics* const statistics);
 
     api::ResultCode mergeSystems(

@@ -1,0 +1,9 @@
+<h1>您好, {{ message.userFullName }}</h1>
+
+<a href="mailto:{{ message.sender_email }}">{{ message.sender_name }}</a>給出了以下 {{ message.product }}的反饋：
+<div>{{ message.message }}</div>
+<br />
+<hr />
+<div>
+    可與使用者聯繫: {{ message.sender_to_be_contacted}}
+</div>

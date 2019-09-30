@@ -99,7 +99,8 @@ void WearableArchiveSynchronizer::at_resource_parentIdChanged(const QnResourcePt
         cancelAllTasks(camera);
 }
 
-void WearableArchiveSynchronizer::addTask(const QnResourcePtr& resource, const RemoteArchiveTaskPtr& task)
+void WearableArchiveSynchronizer::addTask(
+    const QnResourcePtr& /*resource*/, const RemoteArchiveTaskPtr& task)
 {
     m_workerPool->addTask(task);
 }

@@ -5,42 +5,54 @@ Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
 Resource          ${variables_file}
+Variables         getIds.py    ${ENV}
 
 
 *** variables ***
-${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${headless}    true
+@{chrome_arguments}    --disable-gpu    --no-sandbox    --log-level=3    --start-maximized
+@{chrome_arguments_headless}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 ${speed}    0
+${selenium_timeout}    20
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${options}"=="false"    Regular Open Browser
+    Run Keyword If    "${options}"=="false" or "${headless}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
     Set Selenium Speed    ${speed}
-    Set Selenium Timeout    20
+    Set Selenium Timeout    ${selenium_timeout}
     Check Language
     Go To    ${url}
 
 Regular Open Browser
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-    Set Window Size    1920    1080
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
+    Maximize Browser Window
+    Go To    ${ENV}
 
 Open Browser With Options
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    ${chrome_options}=    Set Chrome Options
+    ${chrome_options}=    Set Chrome Options Headless
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    Set Window Size    1920    1080
+    Maximize Browser Window
     Go to    ${ENV}
 
 Set Chrome Options
     [Documentation]    Set Chrome options for headless mode
     ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
+
+Set Chrome Options Headless
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments_headless}
     \    Call Method    ${options}    add_argument    ${option}
     [Return]    ${options}
 
@@ -53,7 +65,7 @@ Check Language
 
 Set Language
     [arguments]    ${lang}=${LANGUAGE}
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
@@ -72,7 +84,7 @@ Log In
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    5
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -118,9 +130,9 @@ Validate Register Email Received
     Close Mailbox
 
 Get Email Link
-    [arguments]    ${recipient}    ${link type}
+    [arguments]    ${recipient}    ${link type}    ${timeout}=120
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
+    ${email}    Wait For Email    recipient=${recipient}    timeout=${timeout}    status=UNSEEN
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
@@ -167,6 +179,7 @@ Restore password
 
 Share To
     [arguments]    ${email}    ${permissions}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
@@ -195,9 +208,8 @@ Edit User Permissions In Systems
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
-    [arguments]    ${user email}    ${permissions}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
-    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
+    [arguments]    ${user email}    ${permissions}    ${timeout}=${selenium_timeout}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]    ${timeout}
 
 Remove User Permissions
     [arguments]    ${user email}
@@ -212,8 +224,8 @@ Remove User Permissions
     Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
-    [arguments]    ${alert text}
-    Wait Until Element Is Visible    ${ALERT}
+    [arguments]    ${alert text}    ${timeout}=${selenium_timeout}
+    Wait Until Element Is Visible    ${ALERT}    ${timeout}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
     Wait Until Page Does Not Contain Element    ${ALERT}
@@ -229,12 +241,20 @@ Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
+Disconnect from cloud
+    Wait Until Element Is Visible    ${DISCONNECT FROM NX}
+    Click Element    ${DISCONNECT FROM NX}
+    Wait Until Elements Are Visible    ${DISCONNECT FORM CANCEL}    ${DISCONNECT FORM DISCONNECT BUTTON}    ${DISCONNECT PASSWORD INPUT}
+    Input Text    ${DISCONNECT PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${DISCONNECT FORM DISCONNECT BUTTON}
+    Check For Alert    ${SUCCESSFULLY DISCONNECTED}
+
 Failure Tasks
     [timeout]    5 minutes
     ${console}    Get Browser Log
     Log    ${console}
     Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
-    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True    folder=[Gmail]/All Mail
     Delete All Emails
     Close Mailbox
 
@@ -339,7 +359,23 @@ Make sure notowner is in the system
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    ${NOT OWNER IN SYSTEM}
-    Run Keyword Unless    ${status}    Add notowner
+    Run Keyword Unless    ${status}    Share To    ${EMAIL NOT OWNER}    ${VIEWER TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL VIEWER}    timeout=120    status=UNSEEN
+    Delete All Emails
+    Close Browser
+
+Make sure viewer is in the system
+    Register Keyword To Run On Failure    None
+    Open Browser and Go To URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    ${VIEWER IN SYSTEM}
+    Run Keyword Unless    ${status}    Share To    ${EMAIL VIEWER}    ${VIEWER TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL VIEWER}    timeout=120    status=UNSEEN
+    Delete All Emails
     Close Browser
 
 Reset System Names
@@ -365,3 +401,25 @@ Reset System Names
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests
     Close Browser
+
+Validate Input Field State
+    [arguments]    ${FIELD LOCATOR}    ${Valid True or False}
+    ${class}    Get Element Attribute    ${FIELD LOCATOR}    class
+    Run Keyword If    ${Valid True or False}==True    Should Contain    ${class}    ng-valid
+    Run Keyword If    ${Valid True or False}==False    Should Contain    ${class}    ng-invalid
+
+Get Checkbox Value
+    [arguments]    ${CHECKBOX ELEMENT}
+    ${id}    Get Element Attribute    ${CHECKBOX ELEMENT}    id
+    Should Not Be Empty    ${id}    'The specified checkbox element "${CHECKBOX ELEMENT}" does not have an id attribute and cannot be used with the Get Checkbox Value Keyword.'
+    Sleep    2    #Wait for form to load & dynamic control values to populate
+    ${checked}    Execute Javascript    return window.document.getElementById('${id}').checked;
+    [return]    ${checked}
+
+Set Checkbox Value
+    [arguments]    ${CHECKBOX ELEMENT}    ${Desired Bool Value}
+    ${Desired Bool Value}    Convert To Boolean    ${Desired Bool Value}    #input standardization
+    ${id}    Get Element Attribute    ${CHECKBOX ELEMENT}    id
+    Should Not Be Empty    ${id}    'The specified checkbox element "${CHECKBOX ELEMENT}" does not have an id attribute and cannot be used with the Set Checkbox Value Keyword.'
+    ${checked}    Get Checkbox Value    ${CHECKBOX ELEMENT}
+    Run Keyword If    ${checked} != ${Desired Bool Value}    Execute Javascript    window.document.getElementById('${id}').click()

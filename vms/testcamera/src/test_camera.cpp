@@ -164,14 +164,14 @@ bool QnTestCamera::doStreamingFile(
         }
 
         quint16 codecAndFlags = video->compressionType;
-        if (codecAndFlags == 0)
+        if (video->compressionType == 0)
         {
             qDebug() << "ERROR: Codec is 0";
         }
-        else if (codecAndFlags >= (1 << 5))
+        else if (video->compressionType >= (1 << 5) && video->compressionType != AV_CODEC_ID_H265)
         {
             qDebug() << "ERROR: Codec" << codecAndFlags << "exceeds" << (1 << 5)
-                << " which is not supported by testcamera; setting to 0";
+                << "which is not supported by testcamera; setting to 0";
             codecAndFlags = 0;
         }
         if (video->flags & AV_PKT_FLAG_KEY)

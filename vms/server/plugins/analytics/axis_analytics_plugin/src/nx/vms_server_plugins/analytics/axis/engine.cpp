@@ -11,6 +11,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
 
@@ -19,7 +20,6 @@ namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 const QString kAxisVendor("axis");
-const QString kSoapPath("/vapix/services");
 
 } // namespace
 
@@ -48,37 +48,38 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* outError)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    *outError = Error::noError;
-
     if (!isCompatible(deviceInfo))
-        return nullptr;
+    {
+        *outResult = error(ErrorCode::invalidParams, "Device is not compatible");
+        return;
+    }
 
     EngineManifest events = fetchSupportedEvents(deviceInfo);
-
     if (events.eventTypes.empty())
-        return nullptr;
+    {
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+        return;
+    }
 
-    return new DeviceAgent(this, deviceInfo, events);
+    *outResult = new DeviceAgent(this, deviceInfo, events);
 }
 
-const IString* Engine::manifest(Error* error) const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    *error = Error::noError;
-    return new nx::sdk::String(m_jsonManifest);
+    *outResult = new nx::sdk::String(m_jsonManifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
@@ -115,14 +116,13 @@ EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
     return result;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -135,12 +135,12 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "axis_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.axis",
     "name": "Axis analytics plugin",
+    "description": "Supports built-in analytics on Axis cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -152,7 +152,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

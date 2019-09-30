@@ -11,6 +11,18 @@ from django_celery_results.models import TaskResult
 admin.site.unregister(TaskResult)
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'object', 'type', 'user_email', 'created_date', 'enabled')
 
@@ -18,10 +30,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(Subscription, SubscriptionAdmin)
-
-
-class MessageAdmin(admin.ModelAdmin):
+@admin.register(Message)
+class MessageAdmin(NotificationAdmin):
     list_display = ('type', 'user_email', 'created_date', 'send_date', 'delivery_time_interval', 'task_id')
     readonly_fields = ('user_email', 'external_id', 'task_id', 'type', 'customization',
                        'message', 'created_date', 'send_date', 'delivery_time_interval', 'event')
@@ -44,19 +54,28 @@ class MessageAdmin(admin.ModelAdmin):
         .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
 
 
-admin.site.register(Message, MessageAdmin)
-
-
-class EventAdmin(admin.ModelAdmin):
+@admin.register(Event)
+class EventAdmin(NotificationAdmin):
     list_display = ('type', 'object', 'created_date', 'send_date', 'data')
+    list_filter = ('type', 'object', 'created_date')
 
     def has_delete_permission(self, request, obj=None):
         return False
 
 
-admin.site.register(Event, EventAdmin)
+@admin.register(Feedback)
+class FeedbackAdmin(NotificationAdmin):
+    list_display = ('product_name', 'target_product', 'type', 'sender_name', 'sender_email',
+                    'created_date', 'sender_to_be_contacted')
+    list_filter = ('sender_to_be_contacted', 'type', 'created_date')
+    readonly_fields = ('message',)
+    search_fields = ('product_name', 'sender_name', 'sender_email')
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display + self.readonly_fields
 
 
+@admin.register(CloudNotification)
 class CloudNotificationAdmin(admin.ModelAdmin):
     list_display = ('subject', 'body', 'sent_by', 'convert_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
@@ -96,13 +115,12 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         )
 
     def convert_date(self, obj):
-        session = self.request.session
         if obj.sent_date and 'timezone' in self.request.session and self.request.session['timezone']:
-            timezone = self.request.session['timezone']
+            user_timezone = self.request.session['timezone']
             utc = pytz.utc.localize(obj.sent_date)
-            converted_time = utc.astimezone(pytz.timezone(timezone))\
+            converted_time = utc.astimezone(pytz.timezone(user_timezone))\
                                 .replace(tzinfo=None).strftime("%b. %d, %Y, %H:%M")
-            return format_html('<span title="{}">{}</span>'.format(timezone,converted_time))
+            return format_html('<span title="{}">{}</span>'.format(timezone, converted_time))
         return obj.sent_date
     convert_date.short_description = "Sent date"
     convert_date.allow_tags = True
@@ -112,7 +130,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         self.request = request
         if obj and obj.sent_date:
             return False
-        return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
+        return super(CloudNotificationAdmin, self).has_delete_permission(request, obj=obj)
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.sent_date:
@@ -120,9 +138,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-admin.site.register(CloudNotification, CloudNotificationAdmin)
-
-
+@admin.register(TaskResult)
 class TaskResultAdmin(admin.ModelAdmin):
     list_display = ('task_id', 'date_done', 'status')
     readonly_fields = ('date_done', 'result', 'hidden', 'meta')
@@ -174,6 +190,3 @@ class TaskResultAdmin(admin.ModelAdmin):
 
     clean_old_tasks.short_description = "Remove tasks older than {} days"\
         .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
-
-
-admin.site.register(TaskResult, TaskResultAdmin)

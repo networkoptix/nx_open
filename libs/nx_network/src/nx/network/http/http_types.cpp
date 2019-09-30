@@ -66,15 +66,7 @@ bool isUrlSheme(const QString& scheme)
 
 int strcasecmp(const StringType& one, const StringType& two)
 {
-    if (one.size() < two.size())
-        return -1;
-    if (one.size() > two.size())
-        return 1;
-#ifdef _WIN32
-    return _strnicmp(one.constData(), two.constData(), one.size());
-#else
-    return strncasecmp(one.constData(), two.constData(), one.size());
-#endif
+    return nx::utils::stricmp(one, two);
 }
 
 int defaultPortForScheme(const StringType& scheme)
@@ -620,7 +612,7 @@ bool parseRequestOrResponse(
             break;  //no more data to parse
         curPos = lineSepPos;
         ++curPos;   //skipping separator
-        if (curPos < data.size() && (data[curPos] == '\r' || data[curPos] == '\n'))
+        if (curPos < data.size() && (data[lineSepPos] == '\r' && data[curPos] == '\n'))
             ++curPos;   //skipping complex separator (\r\n)
     }
 

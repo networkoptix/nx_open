@@ -103,7 +103,7 @@ public:
         nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const override;
 protected:
     const AbstractECConnectionFactory* m_connectionFactory;
     QueryProcessorType* m_queryProcessor;
@@ -521,7 +521,7 @@ TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus(
 }
 
 template<class QueryProcessorType>
-nx::vms::time_sync::AbstractTimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
+nx::vms::time::AbstractTimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
 {
     return m_connectionFactory->timeSyncManager();
 }

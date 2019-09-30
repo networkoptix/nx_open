@@ -1,58 +1,25 @@
 @import '../../../styles/custom/custom_palette';
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
-
-#selected-tag {
-    color: $light1;
-    padding-left: 12px !important;
-    padding-right: 0px !important;
-}
-
-button {
-    font-family: $font-family-regular;
-    font-size: rem(13px);
-    font-weight: 400;
-    white-space: nowrap;
-}
+@import '../../styles/mixins';
 
 .close-button {
     border-radius: 2px;
     display: flex;
     justify-content : center;
+    align-items     : center;
     height          : 32px;
     width           : 32px;
-}
-
-.tag-close-icon {
-    margin: auto !important;
-}
-
-@mixin badge-effects($default, $hover, $active) {
-    background-color: $default;
-    &:hover {
-        background-color : $hover;
-    }
+    cursor          : pointer;
     
-    &:active {
-        background-color : $active;
-    }
-}
-
-@mixin badge-selected($default, $hover, $active) {
-    @extend #selected-tag;
-    background-color : $default;
-    
-    & > span.close-button:hover {
-        background-color : $hover;
-    }
-    
-    & > span.close-button:active {
-        background-color : $active;
+    .tag-close-icon {
+        margin : 0 !important;
     }
 }
 
 .badge,
 .badge-brand {
+    font-family : $font-family-regular;
     color : $light16;
     background-color: $light4;
     line-height: 1rem;
@@ -66,12 +33,26 @@ button {
     }
 }
 
+.badge {
+    &-meduim {
+        font-family : $font-family-regular;
+        line-height           : 2rem;
+        padding : 0 12px;
+    }
+}
+
 .badge-selected {
-    @include badge-selected($light16, $light17, $light18)
+    @include badge-selected($light16, $light17, $light18);
+    cursor : default !important;
+    font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 .badge-brand-selected {
-    @include badge-selected($brand_core, $brand_d1, $brand_d2)
+    @include badge-selected($brand_core, $brand_d1, $brand_d2);
+    cursor : default !important;
+    font-family : $font-family-regular;
+    font-size : rem(13px);
 }
 
 $theme-colors : (
@@ -85,9 +66,11 @@ $theme-colors : (
     .badge-#{$color} {
         @extend .badge;
         padding: 0 12px !important;
+        font-family : $font-family-regular;
     }
     .badge-#{$color}-selected {
         color: $light1;
-        @include badge-selected($value, darken($value, 10%), darken($value, 15%))
+        @include badge-selected($value, darken($value, 10%), darken($value, 15%));
+        font-family : $font-family-regular;
     }
 }

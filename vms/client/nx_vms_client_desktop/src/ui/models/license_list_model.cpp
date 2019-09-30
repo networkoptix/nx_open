@@ -2,7 +2,7 @@
 
 #include <QtGui/QBrush>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -117,7 +117,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         case ExpirationDateColumn:
             return license->neverExpire()
                 ? tr("Never")
-                : datetime::toString(QDateTime::fromMSecsSinceEpoch(license->expirationTime()));
+                : nx::vms::time::toString(QDateTime::fromMSecsSinceEpoch(license->expirationTime()));
 
         case LicenseStatusColumn:
         {

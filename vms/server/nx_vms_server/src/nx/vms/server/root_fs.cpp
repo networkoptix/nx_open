@@ -102,7 +102,7 @@ RootFileSystem::RootFileSystem(bool useTool): m_ignoreTool(!useTool)
 
 Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path)
 {
-    #if defined (Q_OS_LINUX)
+    #if defined (Q_OS_LINUX) || defined (Q_OS_MAC)
         makeDirectory(path);
         auto mountResultToStorageInitResult =
             [&](SystemCommands::MountCode mountResult)
@@ -206,7 +206,7 @@ bool RootFileSystem::changeOwner(const QString& path, bool isRecursive)
     int userId = 0;
     int groupId = 0;
 
-    #if defined(Q_OS_LINUX)
+    #if defined(Q_OS_LINUX) || defined (Q_OS_MAC)
         userId = getuid();
         groupId = getgid();
     #endif
@@ -249,7 +249,7 @@ int RootFileSystem::open(const QString& path, QIODevice::OpenMode mode)
 {
     int sysFlags = 0;
 
-    #if defined(Q_OS_LINUX)
+    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         sysFlags = makeUnixOpenFlags(mode);
     #endif
 

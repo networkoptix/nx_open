@@ -1,16 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">המערכת שלך</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">שינוי שם מערכת</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">מיזוג עם מערכת אחרת</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">מיזוג עם מערכת אחרת</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">התנתק מ
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -35,22 +36,28 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong> ממוזגת למערכת זו</div>
-        <hr />
-        <div class="merge-info-text">בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות</div>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong> מוזגה למערכת זו</div>
+            <hr />
+            <div class="merge-info-text light-text">בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">מיזוג מערכות הושלם</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>מערכת זו ממוזגת ל- <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות.</p>
-            <p>עד לסיום המיזוג אתה יכול להיכנס למערכת זו ולצפות בוידאו, אבל לא יכול לשנות הגדרות.</p>
-            <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות ממערכת זו יהפכו לזמינים
-                במערכת "<span class="merge-system-name">{{mergeTargetSystem.name}}</span> ", ומערכת זו תימחק.</p>
+        <div ng-if="mergeTargetSystem.name">
+            <div>מערכת זו מוזגה עם- <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות.</p>
+                <p>עד לסיום המיזוג אתה יכול להיכנס למערכת זו ולצפות בוידאו, אבל לא יכול לשנות הגדרות.</p>
+                <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות ממערכת זו יהפכו לזמינים
+                במערכת "<strong>{{mergeTargetSystem.name}}</strong> ", ומערכת זו תימחק.</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">מיזוג מערכות הושלם</div>
     </div>
 </div>

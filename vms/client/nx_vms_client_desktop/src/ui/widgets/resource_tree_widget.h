@@ -156,6 +156,7 @@ private:
     void at_treeView_clicked(const QModelIndex& index);
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex& parent, int start, int end);
+    void at_resourceProxyModel_modelReset();
     void expandNodeIfNeeded(const QModelIndex& index);
 
     void initializeFilter();

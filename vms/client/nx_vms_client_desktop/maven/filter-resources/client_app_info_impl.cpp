@@ -75,4 +75,3 @@ QString QnClientAppInfo::metaVersion()
 {
     return QStringLiteral("${metaVersion}");
 }
-

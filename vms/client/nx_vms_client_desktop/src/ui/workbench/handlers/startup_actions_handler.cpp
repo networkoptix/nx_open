@@ -4,10 +4,12 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
+#include <QJSEngine>
 
 #include <common/common_module.h>
 
 #include <client/client_module.h>
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -22,6 +24,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/director/director.h>
 
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/widgets/main_window.h>
@@ -42,6 +45,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 
@@ -286,6 +290,11 @@ void StartupActionsHandler::handleStartupParameters()
 
     if (ini().developerMode || ini().profilerMode)
         menu()->trigger(ShowFpsAction);
+
+    if (!startupParameters.scriptFile.isEmpty())
+    {
+        handleScriptFile(startupParameters.scriptFile);
+    }
 }
 
 void StartupActionsHandler::handleInstantDrops(const QnResourceList& resources)
@@ -317,7 +326,7 @@ void StartupActionsHandler::handleAcsModeResources(
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
     resourcePool()->addResource(layout);
@@ -334,6 +343,34 @@ void StartupActionsHandler::handleAcsModeResources(
     timeSlider->setWindow(windowStart, windowStart + kAcsModeTimelineWindowSize, false);
 
     navigator()->setPosition(timeStampMs * 1000);
+}
+
+void StartupActionsHandler::handleScriptFile(const QString& path)
+{
+    QFile scriptFile(path);
+    if (!scriptFile.open(QIODevice::ReadOnly))
+    {
+        NX_ERROR(this, "Script file not found : %1", path);
+        return;
+    }
+
+    auto engine = new QJSEngine(this);
+    nx::vmx::client::desktop::Director::instance()->setupJSEngine(engine);
+
+    QTextStream stream(&scriptFile);
+    QString contents = stream.readAll();
+    scriptFile.close();
+
+    // TODO: Introduce modules support after switching to Qt 5.12+
+    QJSValue result = engine->evaluate(contents, path);
+    if (result.isError())
+    {
+        NX_ERROR(this, "Uncaught exception at %1:%2 : %3",
+            result.property("fileName").toString(),
+            result.property("lineNumber").toInt(),
+            result.toString());
+        return;
+    }
 }
 
 bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
@@ -356,7 +393,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     const bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
     if (systemIsCloud)
     {
-        qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+        qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
         NX_DEBUG(this, "Custom URI: System is cloud, connecting to the cloud first");
     }
 
@@ -415,10 +452,24 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
     if (connectUsingCustomUri(startupParameters.customUri))
         return true;
 
+    // A local file is being opened.
     if (!startupParameters.instantDrop.isEmpty() || haveInputFiles)
         return false;
 
-    return connectUsingCommandLineAuth(startupParameters);
+    if (connectUsingCommandLineAuth(startupParameters))
+        return true;
+
+    // Attempt auto-login, if needed.
+    if (qnSettings->autoLogin() && qnSettings->saveCredentialsAllowed()
+        && qnSettings->lastUsedConnection().url.isValid()
+        && !qnSettings->lastUsedConnection().localId.isNull())
+    {
+        menu()->trigger(ConnectAction,
+            Parameters().withArgument(Qn::LogonParametersRole, LogonParameters()));
+        return true;
+    }
+
+    return false;
 }
 
 bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& startupParameters)
@@ -436,7 +487,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
     const nx::vms::common::Credentials credentials(auth.user, auth.password);
 
     NX_DEBUG(this, "Custom URI: Connecting to cloud as %1", auth.user);
-    qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+    qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
     return true;
 }
 

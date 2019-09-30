@@ -36,7 +36,7 @@ signals:
     void disconnectRequested();
     void layoutIdChanged();
     void resourcesScreenRequested(const QVariant& filterIds);
-    void videoScreenRequested(const QString& cameraId, qint64 timestamp);
+    void videoScreenRequested(const QnUuid& cameraId, qint64 timestamp);
 
     void loginToCloudScreenRequested(
         const QString& user,

@@ -9,11 +9,13 @@ class NX_UTILS_API TestWithTemporaryDirectory
 {
 public:
     /**
-     * Temporary directory path can be passed explitly. In this case folder contents will be
-     * automatically cleared. Aternatively, global temp path variable will be used. If it is empty,
-     * home folder will be used. In these cases module name will be used as a distinction subfolder.
+     * Temporary directory path can be passed explicitly. In this case, folder contents will be
+     * automatically cleared. Aternatively, global temporary path variable
+     * (TestOptions::temporaryDirectoryPath) will be used.
+     * If it is empty, home folder will be used. In these cases TestOptions::moduleName()
+     * is used as a distinction subfolder.
      */
-    TestWithTemporaryDirectory(const QString& moduleName, const QString& tmpDir = QString());
+    TestWithTemporaryDirectory(const QString& tmpDir = QString());
     virtual ~TestWithTemporaryDirectory();
 
     QString testDataDir() const;

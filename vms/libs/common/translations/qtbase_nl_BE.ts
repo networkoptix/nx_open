@@ -721,7 +721,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Save</translation>
+      <translation>&amp;Opslaan</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>

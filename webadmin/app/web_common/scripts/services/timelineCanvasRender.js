@@ -510,7 +510,7 @@ window.TimelineCanvasRender = function (canvas, timelineConfig, recordsProvider,
                     img.onload = function () {
                         chunkLoadingTexture = context.createPattern(img, 'repeat');
                         context.fillStyle = chunkLoadingTexture;
-                        chunkLoadingTextureSize = self.width;
+                        chunkLoadingTextureSize = this.width;
                     };
                     var imagePath = self.hasHighDpi ? 'images/timeline-loading-filled@2x.png' : 'images/timeline-loading-filled.png';
                     img.src = Config.webclient.staticResources + imagePath;
@@ -562,7 +562,7 @@ window.TimelineCanvasRender = function (canvas, timelineConfig, recordsProvider,
                 img.onload = function () {
                     lastMinuteTexture = context.createPattern(img, 'repeat');
                     context.fillStyle = lastMinuteTexture;
-                    lastMinuteTextureSize = self.width;
+                    lastMinuteTextureSize = this.width;
                 };
                 var imagePath = self.hasHighDpi ? 'images/timeline-loading@2x.png' : 'images/timeline-loading.png';
                 img.src = Config.webclient.staticResources + imagePath;
@@ -579,7 +579,7 @@ window.TimelineCanvasRender = function (canvas, timelineConfig, recordsProvider,
         var height = timelineConfig.chunkHeight * self.canvas.height;
         
         var offset_x = -(start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize * self.pixelAspectRatio;
-        
+
         context.save();
         context.translate(offset_x, 0);
         context.fillRect(startCoordinate - self.pixelAspectRatio * timelineConfig.minChunkWidth / 2 - offset_x, top,

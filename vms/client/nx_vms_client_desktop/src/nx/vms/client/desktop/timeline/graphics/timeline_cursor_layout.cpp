@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 
@@ -53,13 +53,13 @@ void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool sh
         if (showDate)
         {
             QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos.count());
-            line1 = datetime::toString(dateTime.date(), datetime::Format::dd_MMMM_yyyy);
-            line2 = datetime::toString(dateTime.time());
+            line1 = nx::vms::time::toString(dateTime.date(), nx::vms::time::Format::dd_MMMM_yyyy);
+            line2 = nx::vms::time::toString(dateTime.time());
         }
         else
         {
-            const auto format = showHours ? datetime::Format::hh_mm_ss : datetime::Format::mm_ss;
-            line1 = datetime::toString(pos.count(), format);
+            const auto format = showHours ? nx::vms::time::Format::hh_mm_ss : nx::vms::time::Format::mm_ss;
+            line1 = nx::vms::time::toString(pos.count(), format);
         }
     }
 

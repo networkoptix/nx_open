@@ -6,6 +6,7 @@
 
 #include <nx/network/connection_server/multi_address_server.h>
 
+#include "server/authentication_dispatcher.h"
 #include "server/http_message_dispatcher.h"
 #include "server/http_server_base_authentication_manager.h"
 #include "server/http_server_plain_text_credentials_provider.h"
@@ -16,28 +17,6 @@
 namespace nx {
 namespace network {
 namespace http {
-
-class NX_NETWORK_API TestAuthenticationManager:
-    public nx::network::http::server::BaseAuthenticationManager
-{
-    typedef nx::network::http::server::BaseAuthenticationManager BaseType;
-
-public:
-    TestAuthenticationManager(
-        nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
-
-    virtual void authenticate(
-        const nx::network::http::HttpServerConnection& connection,
-        const nx::network::http::Request& request,
-        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
-
-    void setAuthenticationEnabled(bool value);
-
-private:
-    bool m_authenticationEnabled;
-};
-
-//-------------------------------------------------------------------------------------------------
 
 using ContentProviderFactoryFunction =
     nx::utils::MoveOnlyFunc<std::unique_ptr<nx::network::http::AbstractMsgBodySource>()>;
@@ -63,11 +42,9 @@ public:
     TestHttpServer(Args... args):
         m_authenticationManager(&m_credentialsProvider)
     {
-        m_authenticationManager.setAuthenticationEnabled(false);
-
         m_httpServer.reset(
             new nx::network::http::HttpStreamSocketServer(
-                &m_authenticationManager,
+                &m_authDispatcher,
                 &m_httpMessageDispatcher,
                 std::move(args)...));
     }
@@ -147,7 +124,12 @@ public:
     void setPersistentConnectionEnabled(bool value);
     void addModRewriteRule(QString oldPrefix, QString newPrefix);
 
-    void setAuthenticationEnabled(bool value);
+    server::AuthenticationDispatcher& authDispatcher() { return m_authDispatcher; }
+
+    /**
+     * Enables internal authentication manager to authenticate request under path.
+     */
+    void enableAuthentication(const std::string& pathRegex);
     void registerUserCredentials(const nx::String& userName, const nx::String& password);
     void registerUserCredentials(const Credentials& credentials);
 
@@ -159,7 +141,8 @@ public:
 private:
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::PlainTextCredentialsProvider m_credentialsProvider;
-    TestAuthenticationManager m_authenticationManager;
+    server::BaseAuthenticationManager m_authenticationManager;
+    server::AuthenticationDispatcher m_authDispatcher;
     std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
 };
 

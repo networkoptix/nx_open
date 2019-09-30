@@ -19,7 +19,8 @@
 }
 
 .dropdown-menu {
-    width : auto !important;
+    width          : auto !important;
+    padding-bottom : 4px;
 
     @media (max-width : $collapse-first-width) {
         right : 0;
@@ -84,7 +85,7 @@
         bottom              : 0 !important;
         position            : absolute !important;
         top                 : auto !important;
-        left                : 10px !important;
+        left                : 18px !important;
         z-index             : 9999 !important;
         border-bottom-color : $light6 !important;
 
@@ -130,6 +131,7 @@
         display : none;
         @media (min-width : $collapse-second-width + 1) {
             display : block;
+            bottom  : 14px;
         }
     }
 

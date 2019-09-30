@@ -49,7 +49,9 @@ endfunction()
 
 function(_git_branch dir var)
     execute_process(
-        COMMAND git -C "${dir}" rev-parse --abbrev-ref HEAD
+        COMMAND git -C "${dir}" show -s --format=%B
+        COMMAND sed -n "s/^Branch: \\(.*\\)$/\\1/p"
+        COMMAND tail -n1
         OUTPUT_VARIABLE branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

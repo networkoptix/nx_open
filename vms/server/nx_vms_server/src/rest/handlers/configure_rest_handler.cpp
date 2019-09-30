@@ -129,7 +129,6 @@ nx::network::http::StatusCode::Value ConfigureRestHandler::execute(
     }
 
     /* set system id and move tran log time */
-    const auto oldSystemId = owner->globalSettings()->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
         NX_DEBUG(this, lm("Changing local system id from %1 to %2")

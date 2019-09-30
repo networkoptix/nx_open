@@ -5,6 +5,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -26,7 +27,7 @@ using namespace nx::sdk::analytics;
 namespace {
 
 EventMetadataPacket* createCommonEventMetadataPacket(
-    const EventType& eventType, int logicalId)
+    const EventType& eventType, int /*logicalId*/)
 {
     using namespace std::chrono;
 
@@ -74,55 +75,54 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-Error DeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* /*metadataTypes*/)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
-    return Error::noError;
+    return {};
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     m_engine->unregisterCamera(m_cameraLogicalId);
-    return Error::noError;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    *error = Error::noError;
-    return new nx::sdk::String(m_deviceAgentManifest);
+    *outResult = new nx::sdk::String(m_deviceAgentManifest);
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
-
-    if (eventTypeIds->count() == 0)
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        stopFetchingMetadata();
-        return Error::noError;
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
     }
 
-    return startFetchingMetadata(metadataTypes);
+    stopFetchingMetadata();
+
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace ssc

@@ -12,7 +12,7 @@
 #include <QtWidgets/QOpenGLWidget>
 #include <QtGui/private/qopengltexturecache_p.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -1197,6 +1197,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     // If we are opening the widget for the first time, show info button by default if needed.
     else if (qnSettings->showInfoByDefault())
     {
+        // Block item signals to avoid dataChanged propagation to layout synchronizer. Otherwise it
+        // will queue changes and post them to the snapshot manager, which will display '*'.
+        QSignalBlocker blocker(widget->item());
         widget->setCheckedButtons(Qn::InfoButton);
     }
 
@@ -1213,6 +1216,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
+    {
+        const auto motionRegions = item->data(Qn::ItemMotionSelectionRole).value<QList<QRegion>>();
+        if (!motionRegions.empty())
+            mediaWidget->setMotionSelection(motionRegions);
+
+        const auto analyticsRect = item->data(Qn::ItemAnalyticsSelectionRole).value<QRectF>();
+        if (analyticsRect.isValid())
+            mediaWidget->setAnalyticsFilterRect(analyticsRect);
+    }
+
     emit widgetAdded(widget);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
@@ -1221,8 +1235,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
-        if (startDisplay)
-            mediaWidget->display()->start();
         if (mediaWidget->display()->archiveReader())
         {
             if (item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
@@ -1249,6 +1261,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
 
         }
+        if (startDisplay)
+            mediaWidget->display()->start();
 
         integrations::registerWidget(mediaWidget);
     }
@@ -2171,8 +2185,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc)
-                ? datetime::toString(displayTime)
-                : datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
+                ? nx::vms::time::toString(displayTime)
+                : nx::vms::time::toString(displayTime, nx::vms::time::Format::hh_mm_ss_zzz);
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 

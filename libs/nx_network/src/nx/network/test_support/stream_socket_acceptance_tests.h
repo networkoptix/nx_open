@@ -431,14 +431,18 @@ protected:
         ASSERT_TRUE(m_server->listen());
     }
 
-    void givenConnectedSocket()
+    void givenClientSocket()
     {
         if (m_connection)
             m_connection->pleaseStopSync();
 
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
-            << SystemError::getLastOSErrorText().toStdString();
+    }
+
+    void givenConnectedSocket()
+    {
+        givenClientSocket();
+        whenSynchronouslyConnectToServer();
     }
 
     void givenPingPongServer()
@@ -455,9 +459,16 @@ protected:
         whenConnectUsingHostName();
     }
 
+    void whenSynchronouslyConnectToServer()
+    {
+        ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
+    }
+
     template<typename AuxiliaryConnectCompletionHandler>
     void whenConnectToServer(AuxiliaryConnectCompletionHandler&& handler)
     {
+        givenClientSocket();
         whenConnectToServerAsync(serverEndpoint(), std::move(handler));
         thenConnectionIsEstablished();
     }
@@ -467,7 +478,6 @@ protected:
         const SocketAddress& endpoint,
         AuxiliaryConnectCompletionHandler&& handler)
     {
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
         ASSERT_TRUE(m_connection->setNonBlockingMode(true));
         m_connection->connectAsync(
             endpoint,
@@ -476,6 +486,11 @@ protected:
                 handler();
                 this->saveConnectResult(resultCode);
             });
+    }
+
+    void whenConnectToServerAsync()
+    {
+        whenConnectToServerAsync(serverEndpoint(), []() {});
     }
 
     void whenReceivedMessageFromServerAsync(
@@ -491,6 +506,7 @@ protected:
 
     void whenConnectUsingHostName()
     {
+        givenClientSocket();
         whenConnectToServerAsync(m_mappedEndpoint, [](){});
     }
 
@@ -759,6 +775,16 @@ protected:
             });
     }
 
+    void whenCancelAccept()
+    {
+        serverSocket()->cancelIOSync();
+    }
+
+    void whenStopServerSocket()
+    {
+        serverSocket()->pleaseStopSync();
+    }
+
     void waitUntilConnectionIsAcceptedInNonBlockingMode()
     {
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
@@ -848,14 +874,28 @@ protected:
         ASSERT_NE(nullptr, std::get<1>(m_prevAcceptResult));
     }
 
+    void thenNoConnectionCanBeAccepted()
+    {
+        auto connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(connection->setNonBlockingMode(true));
+        connection->connect(serverEndpoint(), nx::network::kNoTimeout);
+
+        ASSERT_FALSE(m_acceptedConnections.pop(std::chrono::milliseconds(10)));
+    }
+
     void thenConnectionIsEstablished()
     {
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
     }
 
+    void thenConnectionIsNotEstablished()
+    {
+        ASSERT_NE(SystemError::noError, m_connectResultQueue.pop());
+    }
+
     void thenEveryConnectionEstablishedSuccessfully()
     {
-        for (int i = 0; i < (int) m_clientConnections.size(); ++i)
+        for (std::size_t i = 0; i < m_clientConnections.size(); ++i)
         {
             ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
         }
@@ -1744,7 +1784,7 @@ TYPED_TEST_P(StreamSocketAcceptance, pollable_is_valid_after_shutdown)
 {
     this->givenSilentServer();
     this->givenConnectedSocket();
-    
+
     this->whenInvokeShutdown();
 
     this->thenPollableIsStillValid();
@@ -1855,6 +1895,20 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handle
     this->thenAcceptReported(SystemError::timedOut);
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, accept_is_cancelled_with_cancelIo)
+{
+    this->givenAcceptingServerSocket();
+    this->whenCancelAccept();
+    this->thenNoConnectionCanBeAccepted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, accept_is_cancelled_with_pleaseStop)
+{
+    this->givenAcceptingServerSocket();
+    this->whenStopServerSocket();
+    this->thenNoConnectionCanBeAccepted();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
 {
     auto server1 = this->createServerSocket();
@@ -1863,7 +1917,8 @@ TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
 
     auto server2 = this->createServerSocket();
     ASSERT_TRUE(server2->setReuseAddrFlag(true));
-    ASSERT_TRUE(server2->bind(SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
+    ASSERT_TRUE(server2->bind(
+        SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, reuse_port)
@@ -1940,7 +1995,10 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     server_socket_accept_async_times_out,
     accept_async_on_blocking_socket_results_in_error,
     server_socket_can_be_freed_in_accept_handler,
-    
+
+    accept_is_cancelled_with_cancelIo,
+    accept_is_cancelled_with_pleaseStop,
+
     //---------------------------------------------------------------------------------------------
     // Socket options.
     reuse_addr,

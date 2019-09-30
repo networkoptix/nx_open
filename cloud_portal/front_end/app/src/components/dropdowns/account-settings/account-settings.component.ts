@@ -15,21 +15,23 @@ export class NxAccountSettingsDropdown implements OnInit {
         is_superuser: false
     };
     show: boolean;
-    downloadsHistory: any;
 
     constructor(@Inject('account') private account: any) {
         this.show = false;
     }
 
     ngOnInit(): void {
-
         this.account
-            .get()
-            .then(result => {
-                this.settings.email = result.email;
-                this.settings.is_staff = result.is_staff;
-                this.settings.is_superuser = result.is_superuser;
-            })
+            .checkLoginState()
+            .then(() => {
+                this.account
+                    .get()
+                    .then(result => {
+                        this.settings.email = result.email;
+                        this.settings.is_staff = result.is_staff;
+                        this.settings.is_superuser = result.is_superuser;
+                    });
+            });
     }
 
     logout(): void {

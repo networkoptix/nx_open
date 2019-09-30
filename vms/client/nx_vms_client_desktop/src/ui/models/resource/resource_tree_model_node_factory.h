@@ -20,7 +20,7 @@ public:
     static QnResourceTreeModelNodePtr createNode(
         NodeType nodeType,
         const QnUuid& id,
-        QnResourceTreeModel* model, 
+        QnResourceTreeModel* model,
         bool initialize = true);
 
     static QnResourceTreeModelNodePtr createLocalSystemNode(const QString& systemName,

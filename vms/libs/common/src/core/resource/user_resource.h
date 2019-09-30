@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <nx/utils/uuid.h>
 
 #include <core/resource/resource_fwd.h>
@@ -87,8 +89,6 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const override;
 
-    //!Millis since epoch (1970-01-01, UTC)
-    qint64 passwordExpirationTimestamp() const;
     bool passwordExpired() const;
 
     void prolongatePassword();
@@ -97,11 +97,12 @@ public:
      * Fill ID field.
      * For regular users it is random value, for cloud users it's md5 hash from email address.
      */
-    void fillId();
+    void fillIdUnsafe();
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
     void setLdapPasswordExperationPeriod(std::chrono::milliseconds value);
+
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);
@@ -112,6 +113,7 @@ signals:
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
     void sessionExpired(const QnResourcePtr& user);
+
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
@@ -132,10 +134,10 @@ private:
     QByteArray m_digest;
     QByteArray m_cryptSha512Hash;
     QString m_realm;
-    GlobalPermissions m_permissions;
+    std::atomic<GlobalPermissions> m_permissions{0};
     QnUuid m_userRoleId;
-    bool m_isOwner;
-    bool m_isEnabled;
+    std::atomic<bool> m_isOwner{false};
+    std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;
     std::shared_ptr<nx::network::aio::Timer> m_ldapPasswordTimer;

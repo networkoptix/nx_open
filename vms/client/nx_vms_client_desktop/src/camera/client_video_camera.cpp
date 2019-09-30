@@ -172,11 +172,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         {
             archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
             // Additing filtering is required in case of.AVI export.
-                archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
-
-            // FIXME: #GDM Remove check when will be sure this function won't break base export.
-            if (nx::vms::client::desktop::ini().enableCaseExport)
-                archiveReader->setPlaybackMask(playbackMask);
+            archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            archiveReader->setPlaybackMask(playbackMask);
         }
 
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());

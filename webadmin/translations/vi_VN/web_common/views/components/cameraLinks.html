@@ -5,7 +5,7 @@
     <div class='camera-links-title'>Thông tin về camera</div>
     <table>
         <tr ng-if="debugMode"><td>Đang phát</td><td class="camera-links-info">{{transport}} - {{currentResolution}} với {{player}}</td></tr>
-        <tr><td>Tên người sử dụng</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+        <tr><td>Tên</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>

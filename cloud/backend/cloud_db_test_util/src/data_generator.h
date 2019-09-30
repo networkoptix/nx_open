@@ -7,9 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-namespace nx {
-namespace cdb {
-namespace test {
+namespace nx::cloud::db::test {
 
 class DataGenerator
 {
@@ -53,6 +51,4 @@ private:
         api::NonceData nonce);
 };
 
-} // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::test

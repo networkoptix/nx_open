@@ -14,7 +14,6 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <api/simple_network_proxy_factory.h>
@@ -54,10 +53,12 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>
+#include <nx/vms/time/formatter.h>
+#include <ui/window_utils.h>
 
 static const QString kQmlRoot = "qrc:///qml";
 
@@ -93,11 +94,6 @@ QnMobileClientModule::QnMobileClientModule(
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
-
-    // Work around crash on Android.
-    nx::network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
-        nx::network::cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-        (~(int)nx::network::cloud::ConnectType::udpHp));
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
@@ -199,6 +195,11 @@ QnMobileClientModule::QnMobileClientModule(
     if (QnAppInfo::applicationPlatform() == "ios")
         m_clientCoreModule->mainQmlEngine()->addImportPath("qt_qml");
 
+    if (QnAppInfo::isAndroid())
+    {
+        // We have to use android-specific code to check if we use 24-hours time format.
+        nx::vms::time::Formatter::forceSystemTimeFormat(is24HoursTimeFormat());
+    }
     m_context.reset(new QnContext());
     const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());
     connect(m_context->connectionManager(), &QnConnectionManager::connected, this,

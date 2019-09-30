@@ -36,6 +36,7 @@ namespace
         {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
+        {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"}};
 }
 
@@ -83,7 +84,7 @@ public:
         const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
-    bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isCompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
 
     nx::utils::ScopedConnections connections;
     InternalList internalData;
@@ -213,9 +214,11 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsCompatibleToMobileClient:
             return d->isCompatibleSystem(system);
         case IsCompatibleToDesktopClient:
-            return d->isCompatibleInternal(system);
+            return d->isCompatibleCustomization(system);
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
+        case WrongCustomizationRoleId:
+            return !d->isCompatibleCustomization(system);
         case WrongVersionRoleId:
         {
             const auto version = d->getIncompatibleVersion(system);
@@ -533,7 +536,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
         });
 }
 
-bool QnSystemsModelPrivate::isCompatibleInternal(
+bool QnSystemsModelPrivate::isCompatibleCustomization(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();

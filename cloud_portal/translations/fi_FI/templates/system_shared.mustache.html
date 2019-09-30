@@ -1,0 +1,11 @@
+<h1>Hei, {{message.userFullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> on jakanut pääsyn videonhallintajärjestelmään "{{message.system_name}}" kanssasi.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Sinulle on myönnetty pääsy videonhallintajärjestelmään "{{message.system_name}}".</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}"> Näytä %PRODUCT_NAME% portaalissa </a>

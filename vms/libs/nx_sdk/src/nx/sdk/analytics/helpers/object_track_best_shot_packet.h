@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 
 namespace nx {
@@ -17,11 +17,11 @@ class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 public:
     ObjectTrackBestShotPacket(Uuid trackId, int64_t timestampUs, Rect boundingBox = Rect());
 
-    virtual Uuid trackId() const override;
-
     virtual int64_t timestampUs() const override;
 
-    virtual Rect boundingBox() const override;
+protected:
+    virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
 
 private:
     Uuid m_trackId;

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 namespace nx::geo_ip {
 

@@ -4,6 +4,8 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <QtCore/QEventLoop>
+#include <QtCore/QTimer>
 
 #include <gtest/gtest.h>
 
@@ -30,7 +32,7 @@ namespace http {
 
 class HttpClientPoolTest
 :
-    public ::testing::Test
+    public ::testing::TestWithParam<Qt::ConnectionType>
 {
 public:
     HttpClientPoolTest()
@@ -38,6 +40,7 @@ public:
         m_testHttpServer(std::make_unique<nx::network::http::TestHttpServer>()),
         m_testHttpServer2(std::make_unique<nx::network::http::TestHttpServer>())
     {
+        m_connectionType = GetParam();
     }
 
     nx::network::http::TestHttpServer* testHttpServer()
@@ -54,9 +57,11 @@ protected:
     nx::network::SocketGlobals::InitGuard m_guard;
     std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer;
     std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer2;
+    // Connection type to be used for receiving signals from ClientPool.
+    Qt::ConnectionType m_connectionType;
 };
 
-TEST_F(HttpClientPoolTest, GeneralTest)
+TEST_P(HttpClientPoolTest, GeneralTest)
 {
     ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
         "/test",
@@ -75,33 +80,30 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     const nx::utils::Url url2(lit("http://127.0.0.1:%1/test2")
         .arg(testHttpServer2()->serverAddress().port));
 
-
     std::unique_ptr<nx::network::http::ClientPool> httpPool(new nx::network::http::ClientPool());
-
-    QByteArray expectedResponse;
 
     QnMutex mutex;
     QnWaitCondition waitCond;
-    int requestsFinished = 0;
+    std::atomic_int requestsFinished = 0;
 
     QObject::connect(
-        httpPool.get(), &nx::network::http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::requestIsDone,
         httpPool.get(),
-        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
+        [&](nx::network::http::ClientPool::ContextPtr context)
     {
-        ASSERT_FALSE(client->failed());
-        ASSERT_EQ(client->response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
-        QByteArray msgBody = client->fetchMessageBodyBuffer();
+        ASSERT_TRUE(context->hasResponse());
+        ASSERT_EQ(context->response.statusLine.statusCode, nx::network::http::StatusCode::ok);
+        QByteArray msgBody = context->response.messageBody;
         ASSERT_TRUE(msgBody.startsWith("SimpleTest"));
         if (msgBody == "SimpleTest2")
-            ASSERT_TRUE(client->contentType() == QByteArray("application/text2"));
+            ASSERT_TRUE(context->response.contentType == QByteArray("application/text2"));
         else
-            ASSERT_TRUE(client->contentType() ==  QByteArray("application/text"));
+            ASSERT_TRUE(context->response.contentType ==  QByteArray("application/text"));
 
         QnMutexLocker lock(&mutex);
         ++requestsFinished;
         waitCond.wakeAll();
-    }, Qt::DirectConnection);
+    }, m_connectionType);
 
     static const int kRequests = 100;
     for (int i = 0; i < kRequests; ++i)
@@ -110,12 +112,119 @@ TEST_F(HttpClientPoolTest, GeneralTest)
         httpPool->doGet(url2);
     }
 
-    QnMutexLocker lock(&mutex);
-    while (requestsFinished < kRequests * 2)
-        ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+    if (m_connectionType == Qt::QueuedConnection)
+    {
+        // Events are arriving to this thread. We need to start event loop to make it work.
+        QEventLoop loop;
+        while (requestsFinished < kRequests * 2)
+        {
+            mutex.lock();
+            waitCond.wait(&mutex, kWaitTimeoutMs);
+            mutex.unlock();
+            loop.processEvents();
+        }
+    }
+    else
+    {
+        // All events are arriving in separate thread.
+        // We just need to check requestsFinished value.
+        QnMutexLocker lock(&mutex);
+        while (requestsFinished < kRequests * 2)
+            ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+    }
 }
 
-TEST_F(HttpClientPoolTest, terminateTest)
+TEST_P(HttpClientPoolTest, GeneralNegativeTest)
+{
+    /**
+     * Testing negative scenarios, like requesting wrong URL.
+     */
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test",
+        "SimpleTest",
+        "application/text"));
+    ASSERT_TRUE(testHttpServer2()->registerStaticProcessor(
+        "/test2",
+        "SimpleTest2",
+        "application/text2"));
+
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+    ASSERT_TRUE(testHttpServer2()->bindAndListen());
+
+    nx::network::http::ClientPool httpPool;
+
+    QnMutex mutex;
+    QnWaitCondition waitCond;
+    int requestsFinished = 0;
+
+    static const int kRequests = 10;
+    const nx::utils::Url wrongUrl(lit("nothttp://127.0.0.0.0.1:%1/test")
+        .arg(testHttpServer()->serverAddress().port));
+
+    const nx::utils::Url wrongPathUrl(lit("http://127.0.0.1:%1/wrong_test2")
+        .arg(testHttpServer2()->serverAddress().port));
+
+    // We expect all requests to fail
+    QObject::connect(
+        &httpPool, &nx::network::http::ClientPool::requestIsDone,
+        &httpPool,
+        [&](nx::network::http::ClientPool::ContextPtr context)
+    {
+        EXPECT_GE(context->getTimeElapsed().count(), 0);
+
+        if (context->getUrl() == wrongUrl)
+        {
+            // We are expecting there are no proper response at all.
+            EXPECT_FALSE(context->hasResponse());
+            EXPECT_NE(context->systemError, SystemError::noError);
+        }
+        else if (context->getUrl() == wrongPathUrl)
+        {
+            // There should be some response with 404.
+            EXPECT_EQ(context->systemError, SystemError::noError);
+            EXPECT_TRUE(context->hasResponse());
+            EXPECT_EQ(context->getStatusCode(), StatusCode::notFound);
+        }
+
+        QnMutexLocker lock(&mutex);
+        ++requestsFinished;
+        waitCond.wakeAll();
+    }, m_connectionType);
+
+    int requestsSent = 0;
+    for (int i = 0; i < kRequests; ++i)
+    {
+        if (httpPool.doGet(wrongUrl))
+            ++requestsSent;
+        if (httpPool.doGet(wrongPathUrl))
+            ++requestsSent;
+    }
+
+    if (m_connectionType == Qt::QueuedConnection)
+    {
+        // Events are arriving to this thread. We need to start event loop to make it work.
+        QEventLoop loop;
+        while (requestsFinished < kRequests * 2)
+        {
+            mutex.lock();
+            waitCond.wait(&mutex, kWaitTimeoutMs);
+            mutex.unlock();
+            loop.processEvents();
+        }
+    }
+    else
+    {
+        // All events are arriving in separate thread.
+        // We just need to check requestsFinished value.
+        QnMutexLocker lock(&mutex);
+        while (requestsFinished < kRequests * 2)
+            ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+    }
+
+    ASSERT_TRUE(httpPool.size() == 0);
+}
+
+TEST_P(HttpClientPoolTest, terminateTest)
 {
     ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
         "/test",
@@ -129,23 +238,20 @@ TEST_F(HttpClientPoolTest, terminateTest)
 
     std::unique_ptr<nx::network::http::ClientPool> httpPool(new nx::network::http::ClientPool());
 
-    QByteArray expectedResponse;
-
     QnMutex mutex;
     QnWaitCondition waitCond;
     int requestsFinished = 0;
     QSet<int> requests;
 
     QObject::connect(
-        httpPool.get(), &nx::network::http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::requestIsDone,
         httpPool.get(),
-        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
+        [&](nx::network::http::ClientPool::ContextPtr)
     {
         QnMutexLocker lock(&mutex);
-        client->fetchMessageBodyBuffer();
         ++requestsFinished;
         waitCond.wakeAll();
-    }, Qt::DirectConnection);
+    }, m_connectionType);
 
     static const int kWaitTimeoutMs = 1000 * 10;
     static const int kRequests = 100;
@@ -173,6 +279,9 @@ TEST_F(HttpClientPoolTest, terminateTest)
 
     ASSERT_TRUE(httpPool->size() == 0);
 }
+
+INSTANTIATE_TEST_CASE_P(HttpClientPoolAllTests, HttpClientPoolTest,
+                        testing::Values(Qt::QueuedConnection, Qt::DirectConnection));
 
 } // namespace nx
 } // namespace network

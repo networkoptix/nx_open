@@ -23,7 +23,7 @@
 
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Bạn đã đăng ký tại %PRODUCT_NAME%</h1>
+            <h1>You have registered in %CLOUD_NAME%</h1>
             <p>Chúng tôi đã gửi cho bạn một email với liên kết kích hoạt đến {{data.email}}.<br>
                 Vui lòng kích hoạt tài khoản của bạn bằng cách truy cập liên kết này.</p>
         </div>
@@ -94,12 +94,14 @@
             </div>
         </form>
     </div>
-    <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
-            Thay đổi mật khẩu thành công
-        </h1>
-        <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login" translate>Đăng nhập</a>
+    <div ng-if="data.restoreCode || changeSuccess">
+        <div ng-if="change.success || changeSuccess">
+            <h1 class="process-success"  translate>
+                Thay đổi mật khẩu thành công
+            </h1>
+            <div class="process-success d-flex justify-content-center">
+                <a class="btn btn-default" href="/login" translate>Đăng nhập</a>
+            </div>
         </div>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"

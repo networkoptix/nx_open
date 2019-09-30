@@ -12,6 +12,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
+#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     d(new Private(this))
 {
     engine->addImageProvider("resource", new ResourceIconProvider());
+    engine->addImageProvider("right_panel", new RightPanelImageProvider());
 
     d->sceneWidget = new QQuickWidget(engine, this);
 

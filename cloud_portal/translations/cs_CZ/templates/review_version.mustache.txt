@@ -1,8 +1,8 @@
-K dispozici je nová verze pro {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Kliknutím na odkaz zobrazíte koncept revize {{ message.id }} pro {{ message.product }}
 
-Odkaz k zobrazení revize: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 Na této stránce můžete
 1) Vytvořit náhled pro zobrazení nejnovějších změn.

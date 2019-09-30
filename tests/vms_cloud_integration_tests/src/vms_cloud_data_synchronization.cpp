@@ -19,9 +19,6 @@ class VmsCloudDataSynchronization:
 {
 public:
     VmsCloudDataSynchronization():
-        nx::utils::test::TestWithTemporaryDirectory(
-            "vms_cloud_intergration.dataSynch",
-            QString()),
         CloudSystemFixture(testDataDir().toStdString())
     {
     }

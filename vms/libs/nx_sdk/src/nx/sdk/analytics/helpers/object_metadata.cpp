@@ -20,9 +20,9 @@ float ObjectMetadata::confidence() const
     return m_confidence;
 }
 
-Uuid ObjectMetadata::id() const
+void ObjectMetadata::getTrackId(Uuid* outValue) const
 {
-    return m_id;
+    *outValue = m_trackId;
 }
 
 const char* ObjectMetadata::subtype() const
@@ -30,7 +30,7 @@ const char* ObjectMetadata::subtype() const
     return m_subtype.data();
 }
 
-const IAttribute* ObjectMetadata::attribute(int index) const
+const IAttribute* ObjectMetadata::getAttribute(int index) const
 {
     if (index >= (int) m_attributes.size() || index < 0)
         return nullptr;
@@ -44,9 +44,9 @@ int ObjectMetadata::attributeCount() const
     return (int) m_attributes.size();
 }
 
-Rect ObjectMetadata::boundingBox() const
+void ObjectMetadata::getBoundingBox(Rect* outValue) const
 {
-    return m_rect;
+    *outValue = m_rect;
 }
 
 void ObjectMetadata::setTypeId(std::string typeId)
@@ -59,9 +59,9 @@ void ObjectMetadata::setConfidence(float confidence)
     m_confidence = confidence;
 }
 
-void ObjectMetadata::setId(const Uuid& value)
+void ObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_id = value;
+    m_trackId = value;
 }
 
 void ObjectMetadata::setSubtype(const std::string& value)
@@ -74,7 +74,7 @@ void ObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
     if (!NX_KIT_ASSERT(attribute))
         return;
 
-    auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+    const auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
         [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
         {
             return strcmp(attribute->name(), attributeName) == 0;

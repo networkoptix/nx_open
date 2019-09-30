@@ -4,5 +4,5 @@ Witaj {{message.userFullName}}
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Jeśli nie rejestrowałeś się w %PRODUCT_NAME%, po prostu zignoruj ​​ten e-mail.
+If you didn't register in %CLOUD_NAME%, just ignore this email.
 Nie udostępniaj nikomu wiadomości ani linku.

@@ -35,7 +35,7 @@ IqInvisionResponse IqInvisionRequestHelper::oid(const QString & oid)
     return doRequest(buildOidUrl(oid));
 }
 
-IqInvisionResponse IqInvisionRequestHelper::setOid(const QString & oid, const QString & value)
+IqInvisionResponse IqInvisionRequestHelper::setOid(const QString& oid, const QString& value)
 {
     return doRequest(buildSetOidUrl(oid, value));
 }
@@ -45,7 +45,7 @@ std::unique_ptr<nx::network::http::HttpClient> IqInvisionRequestHelper::makeHttp
     using namespace std::chrono;
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    auto auth = m_resource->getAuth();
+    const auto auth = m_resource->getAuth();
 
     httpClient->setSendTimeout(kSendTimeout);
     httpClient->setMessageBodyReadTimeout(kReceiveTimeout);
@@ -56,7 +56,7 @@ std::unique_ptr<nx::network::http::HttpClient> IqInvisionRequestHelper::makeHttp
     return httpClient;
 }
 
-nx::utils::Url IqInvisionRequestHelper::buildOidUrl(const QString & oid) const
+nx::utils::Url IqInvisionRequestHelper::buildOidUrl(const QString& oid) const
 {
     nx::utils::Url url(m_resource->getUrl());
     url.setPath(lit("/get.oid"));
@@ -64,13 +64,14 @@ nx::utils::Url IqInvisionRequestHelper::buildOidUrl(const QString & oid) const
     return url;
 }
 
-nx::utils::Url IqInvisionRequestHelper::buildSetOidUrl(const QString & oid, const QString & value) const
+nx::utils::Url IqInvisionRequestHelper::buildSetOidUrl(
+    const QString& /*oid*/, const QString& value) const
 {
     nx::utils::Url url(m_resource->getUrl());
     url.setPath(lit("set.oid"));
 
     QUrlQuery query;
-    // TODO: #dmihsin determine OID style denending on camera type.
+    // TODO: #dmishin determine OID style depending on the camera type.
     query.addQueryItem(lm("OidT%1%2").args(kOidStyle, value), value);
     url.setQuery(query);
 

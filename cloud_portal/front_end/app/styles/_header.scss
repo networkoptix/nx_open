@@ -31,6 +31,10 @@ $header-collapsing-width-1: 1px;
         background-color: #fff;
         padding: 0;
     }
+    
+    .app-header-right {
+        margin-top : -1px;
+    }
 
     .navbar-nav {
         flex-direction: row;
@@ -85,6 +89,7 @@ $header-collapsing-width-1: 1px;
             flex-direction : row;
             align-items    : center;
             position       : relative;
+            text-decoration : none;
 
             & > span.ellipsis {
                 white-space    : nowrap;

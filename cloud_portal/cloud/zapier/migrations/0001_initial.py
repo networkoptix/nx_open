@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('target', models.URLField(max_length=255, verbose_name=b'Target URL')),
+                ('target', models.URLField(max_length=255, verbose_name='Target URL')),
                 ('event', models.CharField(max_length=1024)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='zaphooks', to=settings.AUTH_USER_MODEL)),
             ],

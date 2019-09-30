@@ -26,28 +26,29 @@ public:
     Engine(nx::sdk::analytics::Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-    
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
-
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
-
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
-
-    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
-
-    virtual void executeAction(nx::sdk::analytics::IAction*, nx::sdk::Error*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
     std::chrono::microseconds currentTimeUs() const;
 
-    nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
+    void setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
+
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
+    virtual void doExecuteAction(
+        nx::sdk::Result<nx::sdk::analytics::IAction::Result>* outResult,
+        const nx::sdk::analytics::IAction* action) override;
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
@@ -58,6 +59,7 @@ private:
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
+    
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;

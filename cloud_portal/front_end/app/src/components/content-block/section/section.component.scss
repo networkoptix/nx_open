@@ -53,7 +53,8 @@
     
     &.gray {
         background-color : $light4;
-        border           : none;
+        border           : 1px solid $light4;
+        border-bottom    : none;
         
         .card--separator {
             border-bottom-color : $light6;

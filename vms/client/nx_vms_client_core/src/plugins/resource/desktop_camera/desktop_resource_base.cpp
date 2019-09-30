@@ -17,7 +17,7 @@ QnDesktopResource::QnDesktopResource()
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
     setName(kName);
     setUrl(kName);
-    setId(kDesktopResourceUuid);
+    setIdUnsafe(kDesktopResourceUuid);
 }
 
 QnDesktopResource::~QnDesktopResource()

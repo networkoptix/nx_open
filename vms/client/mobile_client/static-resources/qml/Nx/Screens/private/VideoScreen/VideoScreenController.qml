@@ -4,12 +4,13 @@ import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
+import nx.client.mobile 1.0
 
 Object
 {
-    id: videoScreenController
+    id: controller
 
-    property alias resourceId: resourceHelper.resourceId
+    readonly property alias resourceId: resourceHelper.resourceId
 
     readonly property bool serverOffline: ConnectionController.reconnecting
     readonly property bool cameraOffline:
@@ -30,6 +31,7 @@ Object
          noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported
     readonly property bool ioModuleAudioPlaying:
         noVideo && resourceHelper.isIoModule && resourceHelper.audioSupported
+    readonly property bool liveWearableCamera: resourceHelper.isWearableCamera && mediaPlayer.liveMode
 
     readonly property string dummyState:
     {
@@ -49,22 +51,85 @@ Object
             return "ioModuleWarning"
         if (ioModuleAudioPlaying)
             return "ioModuleAudioPlaying"
+        if (liveWearableCamera)
+            return "noLiveStream"
         if (failed)
             return "videoLoadingFailed"
         if (noLicenses)
             return "noLicenses";
         if (tooManyConnections)
             return "tooManyConnections"
-
         return ""
     }
 
     property alias resourceHelper: resourceHelper
     property alias accessRightsHelper: accessRightsHelper
     property alias mediaPlayer: mediaPlayer
+    property VideoNavigation navigator
 
-    signal playerJump(real position)
-    signal gotFirstPosition(real position)
+    Object
+    {
+        id: timelineController
+
+        readonly property bool mediaLoaded: mediaPlayer.mediaStatus === MediaPlayer.Loaded
+        readonly property bool loadingChunks: navigator.timeline.chunkProvider.loading
+            || navigator.timeline.chunkProvider.loadingMotion
+
+        onLoadingChunksChanged:
+        {
+            if (loadingChunks || !d.tryFixWearableCameraPosition)
+                return
+
+            d.tryFixWearableCameraPosition = false
+
+            if (controller.liveWearableCamera)
+                jumpBackward();
+        }
+
+        ChunkPositionWatcher
+        {
+            id: chunkPositionWatcher
+
+            motionSearchMode: navigator.motionSearchMode
+            position: mediaPlayer.position
+            chunkProvider: navigator.timeline.chunkProvider
+        }
+
+        onMediaLoadedChanged: timelineController.updateTimelinePosition()
+
+        Connections
+        {
+            target: mediaPlayer
+            onPositionChanged: timelineController.updateTimelinePosition()
+        }
+
+        function setTimelinePosition(position, immediate)
+        {
+            if (immediate)
+                navigator.timeline.timelineView.setPositionImmediately(position)
+            else
+                navigator.timeline.position = position
+        }
+
+        function updateTimelinePosition()
+        {
+            if (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                return
+
+            var liveMode = mediaPlayer.liveMode && !navigator.playback.paused
+            if (!liveMode && !navigator.timeline.moving)
+            {
+                navigator.timeline.autoReturnToBounds = false
+                navigator.timeline.position = mediaPlayer.position
+            }
+        }
+
+        function timelineJump(position)
+        {
+            navigator.timeline.autoReturnToBounds = false
+            navigator.timeline.timelineView.setPositionImmediately(position)
+        }
+    }
 
     QtObject
     {
@@ -72,6 +137,7 @@ Object
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
+        property bool tryFixWearableCameraPosition: false
         property bool playing: false
 
         property real lastPosition: -1
@@ -131,6 +197,8 @@ Object
     MediaPlayer
     {
         id: mediaPlayer
+        audioEnabled: audioController.audioEnabled
+
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
@@ -144,9 +212,8 @@ Object
 
             if (d.waitForFirstPosition)
             {
-                playerJump(mediaPlayer.position)
+                timelineController.timelineJump(mediaPlayer.position)
                 d.waitForFirstPosition = false
-                gotFirstPosition(mediaPlayer.position)
             }
         }
     }
@@ -176,7 +243,7 @@ Object
     {
         tryPlayTimer.restart();
 
-        playerJump(d.lastPosition)
+        timelineController.timelineJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
 
         if (mediaPlayer.position == -1)
@@ -186,7 +253,7 @@ Object
         else if (resourceHelper.resourceStatus !== MediaResourceHelper.Online)
         {
             d.waitForFirstPosition = false
-            gotFirstPosition(mediaPlayer.position)
+            timelineController.timelineJump(mediaPlayer.position)
         }
         else
         {
@@ -196,10 +263,9 @@ Object
 
     Component.onDestruction: setKeepScreenOn(false)
 
-    function start(timestamp)
+    function start(targetResourceId, timestamp)
     {
-        if (resourceId === "")
-            return
+        setResourceId(targetResourceId)
 
         mediaPlayer.maxTextureSize = getMaxTextureSize()
         if (timestamp && timestamp > 0)
@@ -245,10 +311,37 @@ Object
         mediaPlayer.preview()
     }
 
-    function setPosition(position, savePosition)
+    function setPosition(position, save)
     {
         mediaPlayer.position = position
-        if (savePosition)
+        if (save)
             d.savePosition()
+    }
+
+    // Forces timeline to visual jump to the specified position.
+    function forcePosition(position, save, immediate)
+    {
+        timelineController.setTimelinePosition(position, immediate)
+        setPosition(position, save)
+    }
+
+    function jumpForward()
+    {
+        var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
+        forcePosition(nextChunkStartTime)
+        if (nextChunkStartTime == -1)
+            play()
+    }
+
+    function jumpBackward()
+    {
+        forcePosition(chunkPositionWatcher.prevChunkStartTimeMs())
+    }
+
+    function setResourceId(id)
+    {
+        d.tryFixWearableCameraPosition = true
+        resourceHelper.resourceId = id
+        audioController.resourceId = id
     }
 }

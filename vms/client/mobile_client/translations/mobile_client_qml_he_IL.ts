@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>מושבת לפי לוח זמנים</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>לא מקוון</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>מודול קלט/פלט</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>חי</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>השרת אינו תואם %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>יותר מדי ניסיונות. נסה שוב בעוד דקה.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>התחבר לשרת זה מדפדפן אינטרנט או דרך תוכנת הלקוח כדי להגדיר אותו</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>חיפוש</translation>
@@ -584,7 +596,11 @@
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
       <comment>%1 is a system name</comment>
-      <translation>אין אפשרות להתחבר למערכת "%1";</translation>
+      <translation>אין אפשרות להתחבר למערכת "%1"</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>לא נמצא דבר</translation>
     </message>
   </context>
   <context>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>מחק</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>שמור</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>ניתן להשתמש במודול קלט / פלט של אפליקציה זו כמכשיר קלט קול בלבד. כדי להשתמש בו כמודול בקרה, אנא השתמש בגירסת שולחן העבודה של %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>האזור שסומן לא תקין. נא לסמן אזור מחדש.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>אודיו</translation>
     </message>
   </context>
   <context>

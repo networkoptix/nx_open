@@ -130,7 +130,8 @@ private:
         const nx::network::http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& requestParams,
-        QByteArray* serializedPlaylist);
+        QByteArray* serializedPlaylist,
+        QnJsonRestResult* error);
 
     nx::network::http::StatusCode::Value getResourceChunk(
         const nx::network::http::Request& request,
@@ -143,6 +144,7 @@ private:
         const Qn::UserAccessData& accessRight,
         const QString& requestedPlaylistPath,
         const QString& sessionID,
+        const QnUuid& clientUuid,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
         const nx::vms::server::VideoCameraPtr& videoCamera,
@@ -156,9 +158,11 @@ private:
         const nx::vms::server::VideoCameraPtr& videoCamera,
         MediaQuality streamQuality);
 
-    void ensureChunkCacheFilledEnoughForPlayback(
+    nx::network::http::StatusCode::Value ensureChunkCacheFilledEnoughForPlayback(
         Session* const session,
-        MediaQuality streamQuality);
+        MediaQuality streamQuality,
+        const QnSecurityCamResourcePtr& camResource,
+        QnJsonRestResult* error);
 
     AVCodecID detectAudioCodecId(
         const StreamingChunkCacheKey& chunkParams);

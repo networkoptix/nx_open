@@ -1,28 +1,38 @@
 {
   "language": "nl_NL",
   "language_name": "Nederlands",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
-    "loginTitle": "Log in op %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
     "logoutAuthorisedLogoutButton": "Uitloggen",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Bericht versturen mislukt.",
+    "messageSent": "Het Bericht werd verstuurd.",
+    "noClientDetectedTitle": "Installeer %VMS_NAME% om uw systeem te bekijken",
+    "download": "Download %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Welkom bij",
     "register": "Maak een account aan in",
     "changePassword": "Wachtwoord wijzigen -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "geactiveerd",
-    "merging": "merging",
+    "incompatible": "incompatibel",
+    "merging": "aan het samenvoegen",
     "notActivated": "niet geactiveerd",
     "online": "online",
     "offline": "offline",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Kan geen wachtwoord opslaan",
     "cantActivatePrefix": "Kan uw account niet activeren",
     "cantSendConfirmationPrefix": "Kan geen bevestigingsmail versturen",
-    "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
     "notAuthorized": "Wachtwoord onjuist",
     "brokenAccount": "Onverwacht probleem met account. <a href=\"/restore_password\">Account herstellen</a>",
     "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
     "wrongCode": "Account is al geactiveerd of de bevestigingscode is onjuist",
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",
     "accountNotActivated": "Dit account is nog niet geactiveerd. <a href=\"/activate\">Stuur de activeringslink opnieuw</a>",
     "accountBlocked": "Account is tijdelijk niet bereikbaar. Probeer het over een paar minuten nogmaals.",
@@ -147,13 +158,20 @@
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
     "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Sommige serverlijsten zoals aanwezig in beide systemen - in de geselecteerde en in de huidige.<br>Verwijder offline en incompatibele servers uit elk systeem en probeer het opnieuw.",
+    "mergedSystemIsOffline": "Systeem <strong>{{failedSystem}}</strong> is offline.",
+    "INCOMPATIBLE": "Systemen hebben verschillende softwareversies. Werk ze alstublieft bij naar de laatste <a href=\"/download\">build</a>.",
+    "FAIL": "Systeem <strong>{{failedSystem}}</strong> is momenteel niet bereikbaar.<br>Probeer het over een paar momenten opnieuw of neem contact op met <a href=\"%SUPPORT_LINK%\" target=\"_blank\">ondersteuning</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Het samenvoegen van systemen is mislukt",
+    "commonText": "Kan systemen <strong>{{primarySystem}}</strong> en <strong>{{secondarySystem}}</strong>niet samenvoegen."
   },
   "passwordRequirements": {
     "good": "goed",
     "fair": "redelijk",
+    "fairMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "minLength": "te kort",
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",
     "required": "incorrect",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
-    "confirmDisconnectTitle": "Verbinding verbreken met systeem %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Verbinding verbreken",
     "confirmUnshareFromMe": "U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
     "confirmUnshareFromMeTitle": "Systeem loskoppelen?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Deze gebruiker heeft geen toegang tot het systeem. Weet je het zeker?",
     "confirmUnshareTitle": "Gebruiker verwijderen?",
     "confirmUnshareAction": "Verwijder",
-    "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "successMerge": "System merge completed",
+    "mergeFailed": "Het samenvoegen van systemen is mislukt",
+    "mergeStart": "Systemen zijn begonnen samen te voegen",
+    "mergeSuccess": "Systeem samenvoegen voltooid",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Onbekende naam voor systeem (veroorzaakt door samenvoeging in de cloud)"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",
@@ -206,72 +226,6 @@
     "changePassword": "Wijzig wachtwoord",
     "newPasswordLabel": "Nieuw wachtwoord",
     "saveChanges": "Opslaan"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installeer %VMS_NAME% om uw systeem te bekijken",
-    "action": "Download %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Alleen client",
-      "server": "Alleen server",
-      "bundle": "Client en Server",
-      "servertool": "Configuratie tool"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Kandidaat",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Activatielink opnieuw verzenden",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "Systeem Offline",
     "systemHasNoCameras": "GEEN CAMERA'S",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Offline",
       "error": "Error",
@@ -334,5 +289,10 @@
       "stop listening": "stop met luisteren",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "We raden aan om te overleggen met",
+    "b_support": "ondersteuning",
+    "c_proceeding": ", alvorens verder te gaan."
   }
 }

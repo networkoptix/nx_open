@@ -15,6 +15,8 @@ public:
     vms::api::PeerData remotePeer;
     std::string contentEncoding;
     int remotePeerProtocolVersion = 0;
+    /** Value of User-Agent or Server HTTP header. */
+    std::string nodeName;
 
     void write(network::http::HttpHeaders* headers);
 

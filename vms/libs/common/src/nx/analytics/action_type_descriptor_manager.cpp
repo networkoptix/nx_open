@@ -68,7 +68,7 @@ ActionTypeDescriptorMap ActionTypeDescriptorManager::availableObjectActionTypeDe
     const QnVirtualCameraResourcePtr& device) const
 {
     const auto deviceParentServer = device->getParentServer();
-    if (!NX_ASSERT(deviceParentServer))
+    if (!deviceParentServer)
         return {};
 
     const auto runtimeInfoManager = commonModule()->runtimeInfoManager();

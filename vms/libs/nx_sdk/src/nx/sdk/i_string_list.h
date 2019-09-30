@@ -11,6 +11,8 @@ class IStringList: public Interface<IStringList>
 {
 public:
     virtual int count() const = 0;
+
+    /** @return Null if the index is invalid. */
     virtual const char* at(int index) const = 0;
 };
 

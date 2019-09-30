@@ -1,13 +1,9 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "media_encoder.h"
 
 #include "camera_manager.h"
 #include "stream_reader.h"
-
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,

@@ -48,7 +48,6 @@ QnScreenGrabber::QnScreenGrabber(
 {
     qRegisterMetaType<CaptureInfoPtr>();
     m_initialized = InitD3D(GetDesktopWindow());
-    m_timer.start();
     moveToThread(qApp->thread()); // to allow correct "InvokeMethod" call
 }
 
@@ -296,7 +295,7 @@ CaptureInfoPtr QnScreenGrabber::captureFrame()
         rez->height = m_ddm.Height;
 
     }
-    rez->pts = m_timer.elapsed();
+    rez->pts = m_timer->elapsed();
     m_currentIndex = m_currentIndex < m_pSurface.size()-1 ? m_currentIndex+1 : 0;
     return rez;
 }
@@ -628,11 +627,6 @@ bool QnScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* p
     return rez;
 }
 
-qint64 QnScreenGrabber::currentTime() const
-{
-    return m_timer.elapsed();
-}
-
 int QnScreenGrabber::width() const
 {
     return m_outWidth;
@@ -671,6 +665,5 @@ void QnScreenGrabber::pleaseStop()
 
 void QnScreenGrabber::restart()
 {
-    m_timer.restart();
     m_needStop = false;
 }

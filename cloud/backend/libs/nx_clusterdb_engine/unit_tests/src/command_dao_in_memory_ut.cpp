@@ -18,7 +18,7 @@ class TransactionDataObjectInMemory:
 {
 public:
     TransactionDataObjectInMemory():
-        nx::sql::test::TestWithDbHelper("clusterdb_engine_ut", ""),
+        nx::sql::test::TestWithDbHelper(""),
         m_peerGuid(QnUuid::createUuid()),
         m_peerDbId(QnUuid::createUuid()),
         m_systemId(QnUuid::createUuid().toSimpleByteArray().toStdString()),

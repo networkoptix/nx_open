@@ -13,7 +13,16 @@ namespace test {
 class TrafficRelay:
     public MediatorRelayIntegrationTestSetup
 {
+    using base_type = MediatorRelayIntegrationTestSetup;
+
 protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        server().setCloudConnectionMethodMask((int) network::cloud::ConnectType::all);
+    }
+
     void givenMultipleTrafficRelayUrls()
     {
         // Base type constructor adds a url, so only one more is needed.

@@ -1,0 +1,6 @@
+Uusi viesti
+
+Tyyppi: {{message.type}}
+Tiedot: {{{message.data}}}
+
+Tämäntyyppiselle viestille ei ole mallia

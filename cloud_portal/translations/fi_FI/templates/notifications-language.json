@@ -1,0 +1,20 @@
+{
+  "activate_account": {
+    "emailSubject": "Aktivoi tilisi"
+  },
+  "restore_password": {
+    "emailSubject": "Nollaa salasanasi"
+  },
+  "system_invite": {
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} kutsuu sinut %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Videohallintaärjestelmä {{message.system_name}} jaettiin kanssasi{{/message.sharer_name}}"
+  },
+  "system_shared": {
+    "emailSubject": "Videohallintajärjestelmä {{message.system_name}} jaettiin kanssasi"
+  },
+  "review_version": {
+    "emailSubject": "Versio {{message.id}} on valmis tarkistettavaksi"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
+  }
+}

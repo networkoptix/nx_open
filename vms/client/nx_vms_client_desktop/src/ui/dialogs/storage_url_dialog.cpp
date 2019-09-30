@@ -5,7 +5,6 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <api/media_server_connection.h>
 #include <api/runtime_info_manager.h>
 
 #include "common/common_module.h"
@@ -20,19 +19,23 @@
 
 #include <nx/vms/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <server/server_storage_manager.h>
 
 using namespace nx::vms::client::desktop;
 
 QnStorageUrlDialog::QnStorageUrlDialog(
     const QnMediaServerResourcePtr& server,
+    QnServerStorageManager* storageManager,
     QWidget* parent,
     Qt::WindowFlags windowFlags)
     :
     base_type(parent, windowFlags),
     ui(new Ui::StorageUrlDialog()),
+    m_storageManager(storageManager),
     m_server(server),
     m_okButton(new BusyIndicatorButton(this))
 {
+    NX_ASSERT(m_storageManager);
     ui->setupUi(this);
     ui->urlEdit->setFocus();
     connect(ui->protocolComboBox, QnComboboxCurrentIndexChanged, this,
@@ -154,9 +157,16 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
     return QString::fromUtf8(QUrl::toPercentEncoding(url.toString()));
 }
 
+void QnStorageUrlDialog::atStorageStatusReply(
+    bool success, int handle, const QnStorageStatusReply& reply)
+{
+    Q_UNUSED(handle);
+    m_replySuccess = success;
+    m_reply = reply;
+}
+
 void QnStorageUrlDialog::accept()
 {
-    QnConnectionRequestResult result;
     QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
     QString urlText = ui->urlEdit->text();
 
@@ -170,19 +180,26 @@ void QnStorageUrlDialog::accept()
         urlText = protocol.toLower() + lit("://") + urlText;
     }
 
-    QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
-    m_server->apiConnection()->getStorageStatusAsync(url,  &result, SLOT(processReply(int, const QVariant &, int)));
-
     enum {
         kFinished,
         kCancelled
     };
 
-    QEventLoop loop;
-    connect(&result, &QnConnectionRequestResult::replyProcessed, &loop,
-        [&loop]() { loop.exit(kFinished); });
-    connect(this, &QDialog::rejected, &loop,
-        [&loop]() { loop.exit(kCancelled); });
+    QSharedPointer<QEventLoop> loop(new QEventLoop());
+    QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
+    m_storageManager->requestStorageStatus(m_server, url,
+        [loop, tool = QPointer<QnStorageUrlDialog>(this)](
+            bool success, int handle, const QnStorageStatusReply& reply)
+        {
+            Q_UNUSED(success);
+            Q_UNUSED(handle);
+            if (tool)
+                tool->atStorageStatusReply(success, handle, reply);
+            loop->exit(kFinished);
+        });
+
+    connect(this, &QDialog::rejected, loop.get(),
+        [loop]() { loop->exit(kCancelled); });
 
     // Scoped event loop:
     {
@@ -194,20 +211,20 @@ void QnStorageUrlDialog::accept()
         QnScopedTypedPropertyRollback<bool, BusyIndicatorButton> buttonIndicatorRollback(m_okButton,
             &BusyIndicatorButton::showIndicator, &BusyIndicatorButton::isIndicatorVisible, true);
 
-        if (loop.exec() == kCancelled)
+        if (loop->exec() == kCancelled)
             return;
     }
 
-    m_storage = QnStorageModelInfo(result.reply().value<QnStorageStatusReply>().storage);
-    Qn::StorageInitResult initStatus = result.reply().value<QnStorageStatusReply>().status;
+    m_storage = QnStorageModelInfo(m_reply.storage);
+    Qn::StorageInitResult initStatus = m_reply.status;
 
-    if (result.status() == 0 && initStatus == Qn::StorageInit_WrongAuth)
+    if (m_replySuccess && initStatus == Qn::StorageInit_WrongAuth)
     {
         QnMessageBox::warning(this, tr("Invalid credentials for external storage"));
         return;
     }
 
-    if (!(result.status() == 0
+    if (!(m_replySuccess
             && initStatus == Qn::StorageInit_Ok
             && m_storage.isWritable
             && m_storage.isExternal))
@@ -231,8 +248,6 @@ void QnStorageUrlDialog::accept()
         if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;
     }
-
-
     base_type::accept();
 }
 

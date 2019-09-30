@@ -24,13 +24,12 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_external_resources_target(nx_vms_client_desktop_skin
-        "${CMAKE_CURRENT_LIST_DIR}/external_resources"
-        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
-        "${customization_dir}/nx_client_desktop/resources"
-        "${customization_dir}/icons/all/logo.png"
-    OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
+set(nx_vms_client_desktop_external_resources_file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat)
+nx_add_external_resources(${nx_vms_client_desktop_external_resources_file}
+    ${CMAKE_CURRENT_LIST_DIR}/external_resources
+    ${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}
+    ${customization_dir}/nx_client_desktop/resources
+    ${customization_dir}/icons/all/logo.png
 )
 
 file(GLOB_RECURSE QML_FILES qml/*)
@@ -42,6 +41,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
         ${uic_files}
         ${mac_sources}
+        ${nx_vms_client_desktop_external_resources_file}
     ADDITIONAL_RESOURCES
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
@@ -73,9 +73,6 @@ target_compile_definitions(nx_vms_client_desktop
     INTERFACE NX_VMS_CLIENT_DESKTOP_API=${API_IMPORT_MACRO})
 
 nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h)
-
-add_dependencies(nx_vms_client_desktop
-    nx_vms_client_desktop_skin)
 
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)

@@ -1124,17 +1124,17 @@ void Player::setSource(const QUrl& url)
 
     stop();
     d->url = newUrl;
-
-    const QString path(d->url.path().mid(1));
     d->isLocalFile = d->url.scheme() == "file";
+
     if (d->isLocalFile)
     {
-        d->resource.reset(new QnAviResource(path, commonModule()));
+        d->resource.reset(new QnAviResource(d->url.toString(), commonModule()));
         d->resource->setStatus(Qn::Online);
+        d->setLiveMode(false);
     }
     else
     {
-        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(d->url.path().mid(1)));
     }
 
     if (d->resource)

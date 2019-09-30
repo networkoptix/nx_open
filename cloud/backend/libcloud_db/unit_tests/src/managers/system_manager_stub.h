@@ -13,6 +13,11 @@ class SystemManagerStub:
 public:
     virtual ~SystemManagerStub() = default;
 
+    virtual void getSystems(
+        const AuthorizationInfo& authzInfo,
+        data::DataFilter filter,
+        std::function<void(api::Result, api::SystemDataExList)> completionHandler) override;
+
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
 
     virtual nx::sql::DBResult fetchSystemById(

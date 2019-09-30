@@ -593,9 +593,10 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
 }
 
 
-QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
+QnMotionEstimation::QnMotionEstimation(const Config& config):
+    m_config(config),
+    m_channelNum(0)
 {
-    m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
     //m_prevFrame.setUseExternalData(false);
     m_frames[0] = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
@@ -638,7 +639,7 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
 
 QnMotionEstimation::~QnMotionEstimation()
 {
-    delete m_decoder;
+    m_decoder.reset();
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
     qFreeAligned(m_frameDeltaBuffer);
@@ -1029,12 +1030,10 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
         return CLConstVideoDecoderOutputPtr{nullptr};
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
-        NX_VERBOSE(this) << lm("Recreating decoder, old codec_id: %1")
-            .arg(!m_decoder ? -1 : m_decoder->getContext()->codec_id);
-        delete m_decoder;
-        DecoderConfig config;
-        config.mtDecodePolicy = ini().allowMtDecoding ? MultiThreadDecodePolicy::autoDetect : MultiThreadDecodePolicy::disabled;
-        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame);
+        NX_VERBOSE(this, "Recreating decoder, old codec_id: %1",
+            !m_decoder ? -1 : m_decoder->getContext()->codec_id);
+        m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
+            m_config.decoderConfig, frame->compressionType, frame);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1056,10 +1055,8 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
         return false; //< No motion mask set.
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
-        delete m_decoder;
-        DecoderConfig config;
-        config.mtDecodePolicy = ini().allowMtDecoding ? MultiThreadDecodePolicy::autoDetect : MultiThreadDecodePolicy::disabled;
-        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame);
+        m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
+            m_config.decoderConfig, frame->compressionType, frame);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.

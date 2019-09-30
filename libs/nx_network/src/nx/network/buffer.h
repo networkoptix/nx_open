@@ -10,22 +10,14 @@
 
 #include <boost/functional/hash/hash.hpp>
 
+#include <nx/utils/buffer.h>
+
 #ifdef _WIN32
 #undef max
 #undef min
 #endif
 
 namespace nx {
-
-/**
- * Some effective buffer is required. Following is desired:\n
- * - substr O(1) complexity
- * - pop_front, pop_back O(1) complexity
- * - concatenation O(1) complexity. This implies readiness for readv and writev system calls
- * - buffer should implicit sharing but still minimize atomic operations where they not required
- * Currently, using QByteArray, but fully new implementation will be provided one day...
- */
-typedef QByteArray Buffer;
 
 /**
  * Some effective buffer is required. Following is desired:

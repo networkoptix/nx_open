@@ -30,13 +30,13 @@ const char* EventMetadata::description() const
     return m_description.c_str();
 }
 
-const IAttribute* EventMetadata::attribute(int index) const
+const IAttribute* EventMetadata::getAttribute(int index) const
 {
     if (index >= (int) m_attributes.size() || index < 0)
         return nullptr;
 
     m_attributes[index]->addRef();
-    return  m_attributes[index].get();
+    return m_attributes[index].get();
 }
 
 int EventMetadata::attributeCount() const

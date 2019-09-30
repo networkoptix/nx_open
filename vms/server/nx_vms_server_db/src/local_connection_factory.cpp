@@ -64,7 +64,7 @@ LocalConnectionFactory::LocalConnectionFactory(
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_serverConnector(new nx::vms::network::ReverseConnectionManager(tcpListener)),
-    m_timeSynchronizationManager(new nx::vms::time_sync::ServerTimeSyncManager(
+    m_timeSynchronizationManager(new nx::vms::time::ServerTimeSyncManager(
         commonModule, m_serverConnector.get())),
     m_terminated(false),
     m_runningRequests(0),
@@ -646,7 +646,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read additional camera attributes.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     field via /ec2/getCamerasEx) or MAC address (not
      *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of objects with additional camera attributes for all cameras, in the requested
      *     format.
@@ -758,7 +758,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read camera list.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     field via /ec2/getCamerasEx) or MAC address (not
      *     supported for certain cameras). If omitted, return data for all cameras.
      * %param[opt]:boolean showDesktopCameras Whether desktop cameras should be listed. False by
      *     default.
@@ -1357,6 +1357,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractVideowallManager::remove
     regUpdate<IdData>(p, ApiCommand::removeVideowall);
     regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
+    regUpdate<RuntimeData>(p, ApiCommand::runtimeInfoChanged);
 
     /**%apidoc GET /ec2/getWebPages
      * Return list of web pages
@@ -1383,7 +1384,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractWebPageManager::save
      */
     regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
-
 
     /**%apidoc POST /ec2/removeWebPage
      * Delete the specified web page.
@@ -1921,7 +1921,7 @@ void LocalConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handler
 }
 
 ErrorCode LocalConnectionFactory::fillConnectionInfo(
-    const ConnectionData& loginInfo,
+    [[maybe_unused]] const ConnectionData& loginInfo,
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
@@ -1979,9 +1979,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
             }
         });
     }
-#else
-    nx::utils::unused(loginInfo);
-#endif
+#endif // ENABLE_EXTENDED_STATISTICS
 
     return ErrorCode::ok;
 }
@@ -2089,7 +2087,7 @@ QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
     return m_distributedMutexManager.get();
 }
 
-nx::vms::time_sync::AbstractTimeSyncManager* LocalConnectionFactory::timeSyncManager() const
+nx::vms::time::AbstractTimeSyncManager* LocalConnectionFactory::timeSyncManager() const
 {
     return m_timeSynchronizationManager.get();
 }

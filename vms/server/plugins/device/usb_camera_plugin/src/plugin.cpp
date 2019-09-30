@@ -3,6 +3,8 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 } // extern "C"
 
+#include <nx/sdk/ptr.h>
+
 #include "discovery_manager.h"
 #include "device/audio/utils.h"
 
@@ -49,9 +51,11 @@ void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         sizeof(nxcip::IID_CameraDiscoveryManager)) == 0 )
     {
         if (!m_discoveryManager)
-            m_discoveryManager.reset(new DiscoveryManager(
-                &m_refManager,
-                m_timeProvider.get()));
+        {
+            m_discoveryManager = std::make_unique<DiscoveryManager>(
+                &m_refManager, m_timeProvider.get());
+        }
+
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
@@ -95,8 +99,8 @@ void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider.reset(
-        static_cast<nxpl::TimeProvider*>(pluginContainer->queryInterface(nxpl::IID_TimeProvider)));
+    m_timeProvider = nx::sdk::queryInterfaceOfOldSdk<nxpl::TimeProvider>(
+        pluginContainer, nxpl::IID_TimeProvider);
 }
 
 nxpt::CommonRefManager* Plugin::refManager()

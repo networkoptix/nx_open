@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl-BE" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Uitgeschakeld volgens schema</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Offline</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O module</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Incompatibele server versie %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Te veel pogingen. Probeer het over een minuut nog eens.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Verbinding maken met deze server vanuit een webbrowser of via een desktopclient om het in te stellen</translation>
     </message>
   </context>
   <context>
@@ -479,10 +491,10 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Kan geen verbinding maken met Systeem &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Verwijderen</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Bewaar</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>In deze app kan de I/O-module alleen als geluidsinvoerapparaat worden gebruikt. Gebruik de desktopversie van %1 om hem als een controlemodule te gebruiken</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Ongeldig aangepast gebied. Teken een juist gebied.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
     </message>
   </context>
   <context>

@@ -16,7 +16,10 @@
                     preloader: '=',
                     condition: '=ngIf'
                 },
-                templateUrl: CONFIG.viewsDirCommon + 'components/placeholder.html'
+                templateUrl: CONFIG.viewsDirCommon + 'components/placeholder.html',
+                link: function (scope) {
+                    scope.displayInfo = true;
+                }
             };
         }]);
 })();

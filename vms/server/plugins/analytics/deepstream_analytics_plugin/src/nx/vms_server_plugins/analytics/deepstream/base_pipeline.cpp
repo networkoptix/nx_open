@@ -3,7 +3,7 @@
 #define NX_PRINT_PREFIX "deepstream::BasePipeline::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
@@ -13,6 +13,9 @@ namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace deepstream {
+
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 BasePipeline::BasePipeline(const gstreamer::ElementName& pipelineName, Engine* engine):
     base_type(pipelineName),
@@ -27,7 +30,7 @@ void BasePipeline::setMetadataCallback(nx::gstreamer::MetadataCallback metadataC
     m_metadataCallback = std::move(metadataCallback);
 }
 
-bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
+bool BasePipeline::pushDataPacket(IDataPacket* dataPacket)
 {
     if (!dataPacket)
         return true;
@@ -35,8 +38,7 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
     std::lock_guard<std::mutex> guard(m_mutex);
     NX_OUTPUT << __func__ << " Pushing data packet! Queue size is: " << m_packetQueue.size();
 
-    if (const auto video =
-        nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(dataPacket))
+    if (const auto video = dataPacket->queryInterface<ICompressedVideoPacket>())
     {
         m_lastFrameTimestampUs = video->timestampUs();
         m_currentFrameWidth = video->width();
@@ -50,7 +52,7 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
     return true;
 }
 
-nx::sdk::analytics::IDataPacket* BasePipeline::nextDataPacket()
+IDataPacket* BasePipeline::nextDataPacket()
 {
     NX_OUTPUT << __func__ << " Fetching next data packet...";
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -67,7 +69,7 @@ nx::sdk::analytics::IDataPacket* BasePipeline::nextDataPacket()
     return packet;
 }
 
-void BasePipeline::handleMetadata(nx::sdk::analytics::IMetadataPacket* packet)
+void BasePipeline::handleMetadata(IMetadataPacket* packet)
 {
     NX_OUTPUT << __func__ << " Calling metadata handler";
     m_metadataCallback(packet);

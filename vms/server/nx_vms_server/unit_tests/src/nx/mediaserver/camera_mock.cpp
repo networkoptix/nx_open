@@ -11,7 +11,7 @@ CameraMock::CameraMock(QnMediaServerModule* serverModule): Camera(serverModule)
 {
     static std::atomic<int> number{0};
     const auto current = QString::number(number++);
-    setId(QnUuid::createUuid());
+    setIdUnsafe(QnUuid::createUuid());
     setPhysicalId("CMock_" + current);
     setUrl("http://cmock" + current + ":80/api");
 }
@@ -200,7 +200,7 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(
     std::function<void(CameraMock*)> setup) const
 {
     QnSharedResourcePointer<CameraMock> camera(new CameraMock(serverModule()));
-    camera->setId(QnUuid::createUuid());
+    camera->setIdUnsafe(QnUuid::createUuid());
 
     if (setup)
         setup(camera.data());

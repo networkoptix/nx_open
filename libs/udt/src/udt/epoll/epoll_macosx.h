@@ -11,13 +11,17 @@ public:
     EpollMacosx();
     virtual ~EpollMacosx() override;
 
-    virtual void add(const SYSSOCKET& s, const int* events) override;
+    virtual Result<> initialize() override;
+
+    virtual Result<> add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
-    virtual int poll(
+
+    virtual Result<int> poll(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds,
         std::chrono::microseconds timeout) override;
+
     virtual void interrupt() override;
 
 private:

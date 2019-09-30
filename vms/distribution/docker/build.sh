@@ -1,14 +1,17 @@
 #!/bin/bash
+# Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 # This is helper script for building docker image from debian package for mediaserver
 
 display_usage() {
+	set +x
 	echo "I am helper script for building docker image from debian package for mediaserver."
 	echo -e "Usage:\nbuild.sh [-u url ] | [-d deb] | path\n"
 	echo "Possible arguments:"
 	echo -e "\t-d|--deb PATH - uses deb file as a source"
 	echo -e "\t-b|--build PATH - uses build folder as a source"
 	echo -e "\t-u|--url URL - uses URL as a source for debian file"
+	echo -e "\t-v|--verbose - enables verbose mode. It will mirror all commands to stdout"
 }
 
 # Path to a folder with Dockerfile and necessary scripts
@@ -23,7 +26,9 @@ DOCKER_WS=`pwd`
 CONTAINER_NAME=mediaserver
 CLOUD_OVERRIDE=
 POSITIONAL=()
+ECHO_OUTPUT=false
 
+set -e
 
 # Processing command line arguments
 while [[ $# -gt 0 ]] ; do
@@ -59,12 +64,20 @@ while [[ $# -gt 0 ]] ; do
 		shift
 		shift
 		;;
-		*)
+	-v|--verbose)
+		ECHO_OUTPUT=true
+		shift
+		;;
+	*)
 		POSITIONAL+=("$1")
 		shift
 		;;
 	esac
 done
+
+if $ECHO_OUTPUT; then
+	set -x
+fi
 
 # Trying to guess what to do with positional arguments
 for path in "${POSITIONAL[@]}" ; do
@@ -78,7 +91,7 @@ for path in "${POSITIONAL[@]}" ; do
 done
 
 raise_error() {
-	>&2 echo -e "$1. Exiting..."
+	>&2 echo -e "ERROR: $1. Exiting..."
 	exit 1
 }
 
@@ -121,7 +134,7 @@ else
 		DEB_NAME=mediaserver.deb
 		check_dpkg "$DEB_NAME"
 	else
-		>&2 echo "Neither URL nor direct path are specified"
+		>&2 echo "ERROR: Neither URL nor direct path are specified"
 		display_usage
 		exit 1
 		# Trying to use build folder for nx_vms and take deb from there
@@ -135,4 +148,5 @@ fi
 
 echo -e "Building container at ${SS}${DOCKER_WS}${EE} using mediaserver_deb=$DEB_NAME name=$CONTAINER_NAME"
 cp "$DOCKER_SOURCE/manage.sh" "$DOCKER_WS"
-docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" --build-arg cloud_host="$CLOUD_OVERRIDE" -f - . < $DOCKERFILE
+cp "$DOCKER_SOURCE/Dockerfile" "$DOCKER_WS"
+docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" --build-arg cloud_host="$CLOUD_OVERRIDE" .

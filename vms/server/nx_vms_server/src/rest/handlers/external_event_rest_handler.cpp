@@ -17,6 +17,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 
 using namespace nx::network;
 
@@ -113,6 +114,7 @@ rest::Response ExternalEventRestHandler::executePost(const rest::Request& reques
     if (connector->createEventFromParams(businessParams, eventState, userId, &error))
         return rest::Response::result(rest::JsonResult());
 
+    serverModule()->eventRuleProcessor()->waitForRulesUpdate();
     return rest::Response::error(http::StatusCode::ok, rest::Result::InvalidParameter, error);
 }
 

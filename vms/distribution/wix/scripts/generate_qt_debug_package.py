@@ -57,7 +57,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     output_filename = os.path.join(args.output, 'qt_pdb.zip')
     generate_qt_debug_package(

@@ -81,6 +81,10 @@ protected:
         qreal rotation = 0.0;
         nx::vms::api::ImageCorrectionData contrastParams;
         nx::vms::api::DewarpingData dewarpingParams;
+        QnTimePeriod timelineWindow;
+        QnTimePeriod timelineSelection;
+        QList<QRegion> motionSelection;
+        QRectF analyticsSelection;
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params);
@@ -180,7 +184,7 @@ protected slots:
 
     void at_queueAppRestartAction_triggered();
     void at_selectTimeServerAction_triggered();
-    void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
+    void at_cameraListChecked(bool success, int handle, const QnCameraListReply& reply);
 
     void at_convertCameraToEntropix_triggered();
 

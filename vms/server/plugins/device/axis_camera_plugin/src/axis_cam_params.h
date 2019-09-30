@@ -1,15 +1,11 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef AXIS_CAM_PARAMS_H
-#define AXIS_CAM_PARAMS_H
+#pragma once
 
 static const int DEFAULT_AXIS_API_PORT = 80;
 static const int DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS = 5000;
-static const char* AXIS_DEFAULT_LOGIN = "root";
-static const char* AXIS_DEFAULT_PASSWORD = "root";
+static const char* const AXIS_DEFAULT_LOGIN = "root";
+static const char* const AXIS_DEFAULT_PASSWORD = "root";
 
 struct MaxFPS
 {
@@ -17,7 +13,7 @@ struct MaxFPS
     float fps;
 };
 
-static MaxFPS cameraFpsLimitArray[] = {
+static const MaxFPS cameraFpsLimitArray[] = {
     {"AXISQ7406Rack0Blade1Channel1", 30},
     {"AXISM7001Channel1", 30},
     {"AXISQ7401Channel1", 30},
@@ -126,5 +122,3 @@ static MaxFPS cameraFpsLimitArray[] = {
     {"AXISQ1921", 8},
     {"AXISQ1921E", 8}
 };
-
-#endif  //AXIS_CAM_PARAMS_H

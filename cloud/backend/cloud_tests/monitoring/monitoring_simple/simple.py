@@ -5,6 +5,7 @@ import time
 import sys
 import logging
 import json
+import base64
 import traceback
 from urllib.parse import quote
 from datetime import datetime
@@ -16,9 +17,13 @@ from requests.auth import HTTPDigestAuth
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-MEDIASERVER_VERSION = '3.1.0.17256'
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
+from monitoring_simple.ssl_helper import cert_valid_days
+
+SSL_CERT_RENEW_DAYS_WARNING = 20
 RETRY_TIMEOUT = 10  # seconds
+
+DEFAULT_LOGIN = 'admin'
+ADMIN_PASS = 'qweasd123'
 
 log = logging.getLogger('simple_cloud_test')
 
@@ -101,7 +106,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         if n_try == tries:
                             raise
 
-                        log.error('Test {}: failed. Exception {} occured. Retrying...'.format(f.__name__, type(e).__name__))
+                        log.error(
+                            'Test {}: failed. Exception {} occured. Retrying...'.format(f.__name__, type(e).__name__))
 
                         io = StringIO()
                         traceback.print_exc(file=io)
@@ -145,22 +151,26 @@ testmethod.counter = 1
 
 @testclass
 class CloudSession(object):
-    def __init__(self, host, debug):
+    def __init__(self, configuration):
         """
             This class defines tests to be run.
 
             Test are being run in order they appear in the code.
         """
-        self.host = host
-        self.debug = debug
+        self.host = configuration['host']
+        self.debug = configuration['debug'].lower() == 'true'
+        self.cloud_connect_test_util_version = configuration['cloud_connect_test_util_version']
+        self.metric_namespace = configuration['metric_namespace']
+        self.email_sqs_queue_name = configuration['email_sqs_queue_name']
+        self.dynamodb_table = configuration['dynamodb_table']
 
-        self.base_url = 'https://{}'.format(host)
+        self.base_url = 'https://{}'.format(self.host)
         self.session = requests.Session()
 
         self.cloud_sender = 'Nx Cloud <service@networkoptix.com>'
-        self.email = 'noptixqa-owner@hdw.mx'
-        self.password = 'qweasd123'
-        self.user_email = 'vasily@hdw.mx'
+        self.email = configuration['email']
+        self.password = configuration['password']
+        self.user_email = configuration['share_with_email']
 
         self.auth = HTTPDigestAuth(self.email, self.password)
 
@@ -265,12 +275,12 @@ class CloudSession(object):
 
         cloudwatch = boto3.client('cloudwatch')
         cloudwatch.put_metric_data(
-            Namespace='prod__monitoring',
+            Namespace=self.metric_namespace,
             MetricData=self._metric_data()
         )
 
         dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('prod-health-records')
+        table = dynamodb.Table(self.dynamodb_table)
         table.put_item(Item=self._dynamodb_item())
 
     def run_tests(self):
@@ -335,12 +345,12 @@ class CloudSession(object):
 
     def test_cctu_base(self, command):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
-            CLOUD_CONNECT_TEST_UTIL_VERSION)
+            self.cloud_connect_test_util_version)
 
         log.info('Running image: {} command: {}'.format(image, command))
 
         client = docker.client.from_env()
-        container = client.containers.run(image, command, detach=True)
+        container = client.containers.run(image, '{} {}'.format(self.host, command), detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
         out = container.logs(stdout=True, stderr=True)
@@ -394,6 +404,16 @@ class CloudSession(object):
         command = '--log-level=DEBUG2 --test-relay --relay-url=http://{}.vmsproxy.com/'.format(relay_name)
         self.test_cctu_base(command)
 
+    def test_traffic_relay_cert(self, relay_name):
+        domain = '{}.vmsproxy.com'.format(relay_name)
+        days = cert_valid_days(domain)
+
+        log.info('Certificate for {} is valid {} more days'.format(domain, days))
+
+        assert days > SSL_CERT_RENEW_DAYS_WARNING
+
+    # TODO: remove relay list hardcode(!!!!)
+
     @testmethod(metric='traffic_relay_failure', host='relay-la', continue_if_fails=True)
     def test_traffic_relay_la(self):
         self.test_traffic_relay('relay-la')
@@ -414,10 +434,30 @@ class CloudSession(object):
     def test_traffic_relay_si(self):
         self.test_traffic_relay('relay-si')
 
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-la', continue_if_fails=True)
+    def test_traffic_relay_cert_la(self):
+        self.test_traffic_relay_cert('relay-la')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-ny', continue_if_fails=True)
+    def test_traffic_relay_cert_ny(self):
+        self.test_traffic_relay_cert('relay-ny')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-fr', continue_if_fails=True)
+    def test_traffic_relay_cert_fr(self):
+        self.test_traffic_relay_cert('relay-fr')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-sy', continue_if_fails=True)
+    def test_traffic_relay_cert_sy(self):
+        self.test_traffic_relay_cert('relay-sy')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-si', continue_if_fails=True)
+    def test_traffic_relay_cert_si(self):
+        self.test_traffic_relay_cert('relay-si')
+
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
         sqs = boto3.resource('sqs')
-        queue = sqs.get_queue_by_name(QueueName='noptixqa-owner-queue')
+        queue = sqs.get_queue_by_name(QueueName=self.email_sqs_queue_name)
 
         self.purge_queue(queue)
 
@@ -496,7 +536,7 @@ class CloudSession(object):
         self.vms_user_id = user['vmsUserId']
 
         r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
-                      auth=self.auth)
+                         auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
 
         data = r.json()
@@ -539,7 +579,7 @@ class CloudSession(object):
 
         # get users from mediaserver
         r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
-                      auth=self.auth)
+                         auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
 
         data = r.json()
@@ -548,16 +588,19 @@ class CloudSession(object):
 
 
 @contextmanager
-def mediaserver():
-    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(MEDIASERVER_VERSION)
+def mediaserver(configuration):
+    cloud_host = configuration['host']
+    mediaserver_version = configuration['mediaserver_version']
+
+    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(mediaserver_version)
 
     client = docker.client.from_env()
 
     volumes = {'/srv/containers/mediaserver/etc': {'bind': '/opt/networkoptix/mediaserver/etc', 'mode': 'rw'},
-                '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
+               '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
 
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001},volumes=volumes,  detach=True)
+    container = client.containers.run(image, ports={7001: 7001}, volumes=volumes, command=[cloud_host], detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
@@ -566,23 +609,65 @@ def mediaserver():
             try:
                 log.info('Testing mediaserver connection...')
                 r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
-                assert r.status_code == 200, 'Status code != 200: {}'.format(r.status_code)
+                if r.status_code != 200:
+                    raise ConnectionError('moduleInformation: Status code != 200: {}'.format(r.status_code))
+
                 response_data = r.json()
-                system_id = response_data['reply']['cloudSystemId']
-                if system_id:
+                system_name = response_data['reply']['systemName']
+                if system_name:
                     break
 
                 time.sleep(RETRY_TIMEOUT)
             except ConnectionError as e:
                 assert False, "Couldn't connect to local mediaserver directly: {}".format(e)
 
-        assert system_id, 'Couldn\'t get System ID'
+        # Setup if not alread set up
+        log.info('Setting up system')
+        r = requests_retry_session().post('http://{}:7001/api/setupLocalSystem'.format(mediaserver_ip),
+                                         params={'systemName': 'monitoring',
+                                                 'password': ADMIN_PASS},
+                                         auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, 'admin'))
+        log.info('Status: {}'.format(r.status_code))
+
+        # Detach from the cloud
+        log.info('Detaching system from the cloud')
+        r = requests_retry_session().get('http://{}:7001/api/detachFromCloud'.format(mediaserver_ip),
+                                         auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, ADMIN_PASS))
+        assert r.status_code == 200, 'detachFromCloud: Status code != 200: {}'.format(r.status_code)
+
+        # Attach system to the cloud
+        log.info('Binding system to the cloud')
+        r = requests.post('https://{}/cdb/system/bind'.format(configuration['host']),
+                          json={
+                              "name": system_name,
+                              "customization": 'default'
+                          },
+                          auth=requests.auth.HTTPDigestAuth(configuration['email'], configuration['password']))
+
+        json_data = r.json()
+
+        log.info('Saving cloud system credentials')
+        r = requests.post('http://{}:7001/api/saveCloudSystemCredentials'.format(mediaserver_ip),
+                          json={
+                              "cloudAuthKey": json_data["authKey"],
+                              "cloudSystemID": json_data["id"],
+                              "cloudAccountName": json_data["ownerAccountEmail"]
+                          },
+                          auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, ADMIN_PASS))
+
+        assert r.status_code == 200, 'saveCloudSystemCredentials: Status code != 200: {}'.format(r.status_code)
+
+        r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
+        assert r.status_code == 200, 'moduleInformation (2): Status code != 200: {}'.format(r.status_code)
+
+        system_id = r.json()['reply']['cloudSystemId']
+        assert system_id, "Couldn't get System ID"
         log.info('System ID: {}'.format(system_id))
 
         try:
             log.info('Waiting for connection through proxy...')
 
-            r = requests_retry_session().get(
+            r = requests_retry_session(backoff_factor=1, retries=7).get(
                 'https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
             assert r.status_code == 200, "Status != 200: {}".format(r.status_code)
             assert system_id == r.json()['reply']['cloudSystemId'], "Wrong system id"
@@ -605,15 +690,10 @@ def mediaserver():
 def main():
     setup_logging()
 
-    host = sys.argv[1]
+    configuration = json.loads(base64.b64decode(sys.argv[1]))
 
-    debug = False
-
-    if len(sys.argv) == 3:
-        debug = sys.argv[2] == "debug"
-
-    with mediaserver():
-        session = CloudSession(host, debug)
+    with mediaserver(configuration):
+        session = CloudSession(configuration)
         status = session.run_tests()
         session.close()
 

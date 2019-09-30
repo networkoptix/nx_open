@@ -46,6 +46,11 @@ Description: I accept the EULA license terms.
  In order to install this package, you must accept the license terms. Not accepting will cancel the
  installation.
 
+Template: @deb.customization.company.name@-mediaserver/accepted-mediaserver-eula-version
+Type: string
+Default:
+Description: Accepted EULA version
+
 Template: @deb.customization.company.name@-mediaserver/error-mediaserver-eula
 Type: error
 Description: Declined EULA

@@ -2,8 +2,8 @@
 
 #include <QtQml/QtQml>
 
-#include <camera/camera_chunk_provider.h>
 #include <nx/utils/datetime.h>
+#include <nx/client/core/media/chunk_provider.h>
 
 namespace {
 
@@ -25,7 +25,7 @@ qint64 chooseNearestTimeMs(
         ? jumpTimeMs < targetTimeMs
         : jumpTimeMs > targetTimeMs;
 
-    return useJumpTime && periods.containTime(jumpTimeMs)
+    return useJumpTime && periods.containTime(jumpTimeMs) && jumpTimeMs <= QDateTime::currentMSecsSinceEpoch()
         ? jumpTimeMs
         : targetTimeMs;
 }
@@ -83,7 +83,7 @@ struct ChunkPositionWatcher::Private: public QObject
     qint64 prevChunkStartTimeMs = DATETIME_INVALID;
     qint64 nextChunkStartTimeMs = DATETIME_INVALID;
 
-    QPointer<QnCameraChunkProvider> provider;
+    QPointer<nx::client::core::ChunkProvider> provider;
     QnTimePeriodList periods;
 
     bool motionSearchMode = false;
@@ -112,7 +112,7 @@ void ChunkPositionWatcher::Private::updateProviderConnections()
         return;
 
     disconnectCurrentProvider();
-    connect(provider, &QnCameraChunkProvider::timePeriodsUpdated,
+    connect(provider, &nx::client::core::ChunkProvider::periodsUpdated,
         this, &Private::updateTimePeriods);
 
     updateTimePeriods();
@@ -121,7 +121,7 @@ void ChunkPositionWatcher::Private::updateProviderConnections()
 void ChunkPositionWatcher::Private::updateTimePeriods()
 {
     periods = provider
-        ? provider->timePeriods(motionSearchMode ? Qn::MotionContent : Qn::RecordingContent)
+        ? provider->periods(motionSearchMode ? Qn::MotionContent : Qn::RecordingContent)
         : QnTimePeriodList();
     periods.detach();
     updateChunksInformation();
@@ -168,16 +168,16 @@ void ChunkPositionWatcher::setPosition(qint64 value)
     if (d->position == value)
         return;
 
-    d->position = value;
+    d->position = value == -1 ? DATETIME_NOW : value;
     emit positionChanged();
 }
 
-QnCameraChunkProvider* ChunkPositionWatcher::chunkProvider() const
+nx::client::core::ChunkProvider* ChunkPositionWatcher::chunkProvider() const
 {
     return d->provider;
 }
 
-void ChunkPositionWatcher::setChunkProvider(QnCameraChunkProvider* value)
+void ChunkPositionWatcher::setChunkProvider(nx::client::core::ChunkProvider* value)
 {
     if (d->provider == value)
         return;

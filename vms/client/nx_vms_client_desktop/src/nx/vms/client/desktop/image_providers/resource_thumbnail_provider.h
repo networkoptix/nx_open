@@ -32,9 +32,11 @@ public:
     virtual Qn::ThumbnailStatus status() const override;
 
     nx::api::ResourceImageRequest requestData() const;
-    void setRequestData(const nx::api::ResourceImageRequest& data);
+    void setRequestData(const nx::api::ResourceImageRequest& data, bool resetStatus = false);
 
     std::chrono::microseconds timestamp() const; //< For cameras returns precise frame timestamp.
+
+    QnResourcePtr resource() const;
 
     virtual bool tryLoad() override;
 

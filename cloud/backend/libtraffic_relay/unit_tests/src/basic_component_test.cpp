@@ -14,7 +14,7 @@ namespace relay {
 namespace test {
 
 BasicComponentTest::BasicComponentTest(Mode /*mode*/):
-    base_type("traffic_relay", QString())
+    base_type(QString())
 {
     NX_ASSERT(m_discoveryServer.bindAndListen());
     m_relayCluster = std::make_unique<TrafficRelayCluster>(m_discoveryServer.url());

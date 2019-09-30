@@ -85,8 +85,6 @@ copyBuildLibs()
         libnx_sql
         libnx_vms_api
         libnx_vms_rules
-        libnx_sdk
-        libnx_plugin_utils
 
         # ffmpeg
         libavcodec

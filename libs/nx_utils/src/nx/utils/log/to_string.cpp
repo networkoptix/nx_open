@@ -1,6 +1,5 @@
 #include "to_string.h"
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 
 #include <boost/algorithm/string.hpp>
@@ -44,6 +43,11 @@ QString toString(const std::string& value)
 QString toString(const std::wstring& value)
 {
     return QString::fromStdWString(value);
+}
+
+QString toString(const std::string_view& value)
+{
+    return QString::fromUtf8(value.data(), value.size());
 }
 
 QString toString(const QChar& value)
@@ -136,18 +140,48 @@ QString toString(const std::type_info& value)
 
 QString demangleTypeName(const char* type)
 {
-    auto typeName = boost::core::demangle(type);
-
     #if defined(_MSC_VER)
-        static const std::vector<std::string> kTypePrefixes = {"struct ", "class "};
-        for (const auto& prefix: kTypePrefixes)
-        {
-            if (boost::starts_with(typeName, prefix))
-                typeName = typeName.substr(prefix.size());
-        }
-    #endif
+        static constexpr const char* kTypePrefixes[] = {"struct ", "class "};
+        static const size_t kTypePrefixesSize[] = {
+            strlen(kTypePrefixes[0]),
+            strlen(kTypePrefixes[1]),
+        };
 
-    return QString::fromStdString(typeName);
+        QString result;
+        result.reserve(strlen(type)); //< Result is not shorter than the input.
+
+        const char* p = type;
+        for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
+        {
+            if (strncmp(type, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
+            {
+                p += kTypePrefixesSize[i];
+                break;
+            }
+        }
+
+        while (*p != '\0')
+        {
+            const char c = *p;
+            result += c;
+            if (c == '<' || c == ' ' || c == ',')
+            {
+                for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
+                {
+                     if (strncmp(p + 1, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
+                     {
+                         p += kTypePrefixesSize[i];
+                         break;
+                     }
+                }
+            }
+            ++p;
+        }
+
+        return result;
+    #else
+        return QString::fromStdString(boost::core::demangle(type));
+    #endif
 }
 
 QString pointerTypeName(const void* /*value*/)
@@ -218,7 +252,7 @@ static void findFunctionScope(
  *     not included.
  */
 std::string scopeOfFunction(
-    const std::type_info& scopeTagTypeInfo, const char* functionMacro)
+    const std::type_info& scopeTagTypeInfo, [[maybe_unused]] const char* functionMacro)
 {
     std::string demangledType;
     #if defined(_MSC_VER)
@@ -235,7 +269,6 @@ std::string scopeOfFunction(
             boost::replace_all(demangledType, "* __ptr64", "*");
         }
     #else
-        nx::utils::unused(functionMacro);
         demangledType = boost::core::demangle(scopeTagTypeInfo.name());
     #endif
 

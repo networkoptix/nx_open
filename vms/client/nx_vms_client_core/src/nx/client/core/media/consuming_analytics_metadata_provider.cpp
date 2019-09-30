@@ -1,6 +1,6 @@
 #include "consuming_analytics_metadata_provider.h"
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <core/resource/camera_resource.h>
 #include <nx/media/caching_metadata_consumer.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -26,16 +26,16 @@ ConsumingAnalyticsMetadataProvider::~ConsumingAnalyticsMetadataProvider()
 {
 }
 
-DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
+ObjectMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
     microseconds timestamp, int channel) const
 {
     const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(
         d->metadataConsumer->metadata(timestamp, channel));
 
-    return fromMetadataPacket(compressedMetadata);
+    return fromCompressedMetadataPacket(compressedMetadata);
 }
 
-QList<DetectionMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
+QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
     int channel,
@@ -44,12 +44,12 @@ QList<DetectionMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRa
     const auto& metadataList = d->metadataConsumer->metadataRange(
         startTimestamp, endTimestamp, channel, maximumCount);
 
-    QList<DetectionMetadataPacketPtr> result;
+    QList<ObjectMetadataPacketPtr> result;
     for (const auto& metadata: metadataList)
     {
         const auto compressedMetadata =
             std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-        result.append(fromMetadataPacket(compressedMetadata));
+        result.append(fromCompressedMetadataPacket(compressedMetadata));
     }
     return result;
 }

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx::hpm {
 
 /**
@@ -22,4 +24,8 @@ struct MediatorEndpoint
     bool operator !=(const MediatorEndpoint& other) const;
 };
 
-}
+#define MediatorEndpoint_Fields (domainName)(httpPort)(httpsPort)(stunUdpPort)
+
+QN_FUSION_DECLARE_FUNCTIONS(MediatorEndpoint, (json))
+
+} // namespace nx::hpm

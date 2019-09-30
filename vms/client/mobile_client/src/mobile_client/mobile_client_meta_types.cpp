@@ -12,12 +12,10 @@
 #include <ui/qml/text_input.h>
 #include <ui/models/systems_model.h>
 #include <models/camera_list_model.h>
-#include <models/calendar_model.h>
 #include <models/layouts_model.h>
 #include <resources/camera_access_rights_helper.h>
 #include <utils/mobile_app_info.h>
 #include <mobile_client/mobile_client_settings.h>
-#include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <camera/thumbnail_cache_accessor.h>
 #include <watchers/cloud_status_watcher.h>
@@ -32,14 +30,17 @@
 #include <nx/mobile_client/helpers/inter_client_message.h>
 #include <nx/mobile_client/controllers/resource_ptz_controller.h>
 #include <nx/mobile_client/models/ptz_preset_model.h>
+#include <nx/mobile_client/controllers/audio_controller.h>
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
+#include <nx/client/core/media/chunk_provider.h>
+#include <nx/client/core/time/calendar_model.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
 #include <nx/client/mobile/models/action_buttons_model.h>
-#include <nx/client/mobile/software_trigger/software_triggers_controller.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 #include <nx/client/mobile/motion/motion_playback_mask_watcher.h>
 #include <nx/client/mobile/motion/chunk_position_watcher.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 
 using namespace nx::client::mobile;
 
@@ -72,18 +73,15 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
         "Nx.Settings", 1, 0, "MobileSettings", "Cannot create an instance of MobileSettings.");
 
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
-    qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
     qmlRegisterType<nx::vms::client::core::resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
     qmlRegisterType<nx::vms::client::core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
-    qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
+    qmlRegisterType<nx::client::core::ChunkProvider>("com.networkoptix.qml", 1, 0, "ChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<nx::vms::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "UserWatcher");
-
-
 
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
@@ -105,8 +103,11 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     nx::client::mobile::ActionButtonsModel::registerQmlType();
-    nx::client::mobile::SoftwareTriggersController::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
     nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
     nx::client::mobile::ChunkPositionWatcher::registerQmlType();
+    nx::client::mobile::AudioController::registerQmlType();
+    nx::client::core::TimePeriodsStore::registerQmlType();
+    nx::client::core::CalendarModel::registerQmlType();
+    nx::vms::client::core::SoftwareTriggersController::registerQmlType();
 }

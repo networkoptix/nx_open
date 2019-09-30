@@ -30,6 +30,8 @@ QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
     m_indicatorPosition(0),
     m_indicatorVisible(true)
 {
+    setSkipUpdateOnSliderChange({ SliderRangeChange, SliderStepsChange, SliderValueChange, SliderMappingChange });
+
     setAcceptHoverEvents(true);
 }
 

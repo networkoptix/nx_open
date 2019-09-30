@@ -23,9 +23,11 @@ Object
     {
         d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(url,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo, forcedSystemName)
+                if (forcedSystemName)
+                    systemName = forcedSystemName
+                d.connectionCallback(state, result, extraInfo, systemName)
             })
     }
 
@@ -33,9 +35,11 @@ Object
     {
         d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(address, user, password, cloudConnection,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo, forcedSystemName)
+                if (forcedSystemName)
+                    systemName = forcedSystemName
+                d.connectionCallback(state, result, extraInfo, systemName)
             })
     }
 
@@ -45,10 +49,12 @@ Object
         connectedCallback)
     {
         connectionManager.connectByUserInput(url, user, password,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
+                if (forcedSystemName)
+                    systemName = forcedSystemName
                 d.connectionCallback(
-                    state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
+                    state, result, extraInfo, systemName, failedCallback, connectedCallback)
             })
     }
 
@@ -68,43 +74,52 @@ Object
             ? connectionManager.restoringConnection
             : false
 
+        function currentScreenName()
+        {
+            var currentItem = stackView ? stackView.currentItem : undefined
+            return currentItem ? currentItem.objectName : ""
+        }
+
         function managerAvailable() //< We need it to prevent "undefined variable" warning at exit.
         {
             return typeof(connectionManager) !== 'undefined'
         }
 
         function connectionCallback(
-            state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
+            state, result, extraInfo, systemName, failedCallback, connectedCallback)
         {
             switch (state)
             {
                 case QnConnectionManager.Disconnected: //< Connection failed.
-                    if (!failedCallback || stackView.depth <= 1)
-                        Workflow.openSessionsScreenWithWarning(connectionManager.systemName)
-                    else
-                        stackView.pop(stackView.currentItem)
+                    if (currentScreenName() != "sessionsScreen")
+                    {
+                        if (!failedCallback || stackView.depth <= 1)
+                        {
+                            var errorText = LoginUtils.connectionErrorText(result)
+                            Workflow.openSessionsScreenWithWarning(systemName, errorText)
+                        }
+                        else
+                        {
+                            stackView.pop(stackView.currentItem)
+                        }
+                    }
 
                     if (failedCallback)
                         failedCallback(result, extraInfo)
                     break
 
                 case QnConnectionManager.Connected: //< Connected and loading resources now.
-                    showConnectionPreloader(forcedSystemName)
+                    showConnectionPreloader(systemName)
                     if (connectedCallback)
                         connectedCallback()
                     break
             }
         }
 
-        function showConnectionPreloader(forcedSystemName)
+        function showConnectionPreloader(systemName)
         {
-            var currentItem = stackView ? stackView.currentItem : undefined
-            if (currentItem && currentItem.objectName === "resourcesScreen")
-                return
-
-            Workflow.openResourcesScreen(forcedSystemName
-                ? forcedSystemName
-                : connectionManager.systemName)
+            if (currentScreenName() != "resourcesScreen")
+                Workflow.openResourcesScreen(systemName ? systemName : connectionManager.systemName)
         }
     }
 }

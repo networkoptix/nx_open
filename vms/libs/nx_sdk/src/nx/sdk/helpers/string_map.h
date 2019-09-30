@@ -17,7 +17,7 @@ class StringMap: public RefCountable<IStringMap>
     using Map = std::map<std::string, std::string>;
 
 public:
-    void addItem(const std::string& key, const std::string& value);
+    void setItem(const std::string& key, const std::string& value);
 
     void clear();
 

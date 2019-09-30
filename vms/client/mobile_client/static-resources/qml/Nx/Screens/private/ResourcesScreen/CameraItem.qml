@@ -247,7 +247,7 @@ Control
 
                     resourceId: cameraItem.resourceId
                     Component.onCompleted: playLive()
-                    videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
+                    videoQuality: mediaResourceHelper.livePreviewVideoQuality
                     audioEnabled: false
                 }
 

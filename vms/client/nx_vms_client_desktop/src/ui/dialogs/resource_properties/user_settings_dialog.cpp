@@ -239,7 +239,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
             /* Kinda hack to change user type: we have to recreate user resource: */
             QnUserResourcePtr newUser(new QnUserResource(isCloud ? QnUserType::Cloud : QnUserType::Local));
             newUser->setFlags(m_user->flags());
-            newUser->setId(m_user->getId());
+            newUser->setIdUnsafe(m_user->getId());
             newUser->setRawPermissions(m_user->getRawPermissions());
             m_user = newUser;
             m_model->setUser(m_user);
@@ -495,7 +495,7 @@ void QnUserSettingsDialog::applyChanges()
             //here accessible resources will also be filled to model
             applyChangesInternal();
             if (m_user->getId().isNull())
-                m_user->fillId();
+                m_user->fillIdUnsafe();
         };
 
     // Handle new user creating.

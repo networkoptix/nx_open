@@ -16,7 +16,7 @@ namespace analytics {
 class IUncompressedMediaFrame: public Interface<IUncompressedMediaFrame, IDataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedMediaFrame"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedMediaFrame"); }
 
     /**
      * @return Number of planes which contain raw byte data.

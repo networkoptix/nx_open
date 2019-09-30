@@ -4,6 +4,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/connection_server/server_statistics.h>
+#include <nx/network/http/server/http_statistics.h>
 
 #include "geo_ip_statistics.h"
 #include "stats_manager.h"
@@ -16,8 +17,8 @@ class StatsManager;
 
 struct Statistics
 {
-    nx::network::server::Statistics http;
-    nx::network::server::Statistics stun;
+    network::http::server::HttpStatistics http;
+    network::server::Statistics stun;
     CloudConnectStatistics cloudConnect;
     geo_ip::ListeningPeerStatistics listeningPeers;
 };
@@ -33,16 +34,16 @@ class Provider
 public:
     Provider(
         const StatsManager& statsManager,
-        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-        const nx::network::server::AbstractStatisticsProvider& stunServerStatisticsProvider,
+        const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
+        const network::server::AbstractStatisticsProvider& stunServerStatisticsProvider,
         geo_ip::StatisticsProvider geoIpStatisticsProvider);
 
     Statistics getAllStatistics() const;
 
 private:
     const StatsManager& m_statsManager;
-    const nx::network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
-    const nx::network::server::AbstractStatisticsProvider& m_stunServerStatisticsProvider;
+    const network::http::server::AbstractHttpStatisticsProvider& m_httpServerStatisticsProvider;
+    const network::server::AbstractStatisticsProvider& m_stunServerStatisticsProvider;
     geo_ip::StatisticsProvider m_geoIpStatisticsProvider;
 };
 

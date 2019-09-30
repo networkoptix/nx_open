@@ -1,5 +1,7 @@
 #include "peer_wrapper.h"
 
+#include <nx/utils/math/graph.h>
+
 #include <api/auth_util.h>
 #include <rest/request_params.h>
 
@@ -114,6 +116,8 @@ bool PeerWrapper::saveCloudSystemCredentials(
     m_cloudCredentials.key = authKey.c_str();
     m_cloudCredentials.serverId = id().toSimpleByteArray();
 
+    m_ownerEmail = ownerAccountEmail;
+
     return true;
 }
 
@@ -199,6 +203,11 @@ nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
     return m_cloudCredentials;
 }
 
+std::string PeerWrapper::ownerEmail() const
+{
+    return m_ownerEmail;
+}
+
 std::unique_ptr<MediaServerClientEx> PeerWrapper::mediaServerClient() const
 {
     return prepareMediaServerClient();
@@ -261,31 +270,19 @@ bool PeerWrapper::allPeersHaveSameTransactionLog(
 bool PeerWrapper::peersInterconnected(
     std::vector<const PeerWrapper*> peers)
 {
-    // For now just checking that each peer is connected to every other.
-
-    std::vector<QnUuid> peerIds;
-    for (const auto& peer: peers)
-        peerIds.push_back(peer->id());
+    nx::utils::math::Graph<QnUuid /*peerId*/> peerNetworkGraph;
 
     for (const auto& peer: peers)
     {
         const auto connectedPeers =
             peer->m_process.moduleInstance()->commonModule()->
-                ec2Connection()->messageBus()->directlyConnectedServerPeers();
+            ec2Connection()->messageBus()->directlyConnectedServerPeers();
 
-        for (const auto& peerId: peerIds)
-        {
-            if (peerId == peer->id())
-                continue;
-            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) ==
-                    connectedPeers.end())
-            {
-                return false;
-            }
-        }
+        for (const auto& connectedPeerId: connectedPeers)
+            peerNetworkGraph.addEdge(peer->id(), connectedPeerId);
     }
 
-    return true;
+    return peerNetworkGraph.connected();
 }
 
 bool PeerWrapper::peersInterconnected(

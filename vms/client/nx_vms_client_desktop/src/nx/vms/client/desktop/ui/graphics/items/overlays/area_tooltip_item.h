@@ -5,6 +5,8 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtGui/QFont>
 
+#include <nx/vms/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>
+
 namespace nx::vms::client::desktop {
 
 class AreaTooltipItem: public QGraphicsItem
@@ -18,8 +20,9 @@ public:
     QString text() const;
     void setText(const QString& text);
 
-    QFont font() const;
-    void setFont(const QFont& font);
+    using Fonts = HighlightedAreaTextPainter::Fonts;
+    Fonts fonts() const;
+    void setFonts(const Fonts& fonts);
 
     QColor textColor() const;
     void setTextColor(const QColor& color);

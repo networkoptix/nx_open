@@ -101,6 +101,7 @@ public:
     aio::AioThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;
+    std::vector<AbstractAioThread*> getAllAioThreads() const;
     bool isInAnyAioThread() const;
 
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);

@@ -8,7 +8,8 @@
 
 class QnTimelinePrivate;
 class QSGGeometryNode;
-class QnCameraChunkProvider;
+
+namespace nx::client::core { class ChunkProvider; }
 
 class QnTimeline: public QQuickItem
 {
@@ -16,20 +17,19 @@ class QnTimeline: public QQuickItem
 
     Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
     Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
-    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
-    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
+    Q_PROPERTY(qint64 windowStart READ windowStart NOTIFY windowStartChanged)
+    Q_PROPERTY(qint64 windowEnd READ windowEnd NOTIFY windowEndChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
-    Q_PROPERTY(QDateTime positionDate READ positionDate NOTIFY positionDateChanged)
     Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
-    Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
     Q_PROPERTY(bool autoReturnToBounds
         READ isAutoReturnToBoundsEnabled WRITE setAutoReturnToBoundsEnabled
         NOTIFY autoReturnToBoundsEnabledChanged)
-    Q_PROPERTY(int timeZoneShift
-        READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
-    Q_PROPERTY(int serverTimeZoneShift
-        READ serverTimeZoneShift WRITE setServerTimeZoneShift NOTIFY serverTimeZoneShiftChanged)
+    Q_PROPERTY(int displayOffset
+        READ displayOffset WRITE setDisplayOffset NOTIFY displayOffsetChanged)
+
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale
+        NOTIFY localeChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
@@ -70,7 +70,7 @@ class QnTimeline: public QQuickItem
         READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
     Q_PROPERTY(int textY READ textY WRITE setTextY NOTIFY textYChanged)
 
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider
+    Q_PROPERTY(nx::client::core::ChunkProvider* chunkProvider
         READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
     Q_PROPERTY(bool motionSearchMode
@@ -135,15 +135,8 @@ public:
     qint64 defaultWindowSize() const;
 
     qint64 windowStart() const;
-    void setWindowStart(qint64 windowStart);
-
     qint64 windowEnd() const;
-    void setWindowEnd(qint64 windowEnd);
 
-    QDateTime windowEndDate() const;
-    void setWindowEndDate(const QDateTime &dateTime);
-
-    Q_INVOKABLE void setWindow(qint64 windowStart, qint64 windowEnd);
     qint64 windowSize() const;
     void setWindowSize(qint64 windowSize);
 
@@ -157,8 +150,6 @@ public:
     bool changingMotionRoi() const;
     void setChangingMotionRoi(bool value);
 
-    QDateTime positionDate() const;
-
     QnTimePeriodList timePeriods(Qn::TimePeriodContent type) const;
     void setTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods);
 
@@ -168,17 +159,14 @@ public:
     qint64 startBound() const;
     void setStartBound(qint64 startBound);
 
-    bool autoPlay() const;
-    void setAutoPlay(bool autoPlay);
-
     bool isAutoReturnToBoundsEnabled() const;
     void setAutoReturnToBoundsEnabled(bool enabled);
 
-    int timeZoneShift() const;
-    void setTimeZoneShift(int timeZoneShift);
+    int displayOffset() const;
+    void setDisplayOffset(int value);
 
-    int serverTimeZoneShift() const;
-    void setServerTimeZoneShift(int timeZoneShift);
+    void setLocale(const QLocale& locale);
+    QLocale locale() const;
 
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
@@ -196,8 +184,8 @@ public:
 
     Q_INVOKABLE qint64 positionAtX(qreal x) const;
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* chunkProvider);
+    nx::client::core::ChunkProvider* chunkProvider() const;
+    void setChunkProvider(nx::client::core::ChunkProvider* chunkProvider);
 
 signals:
     void zoomLevelChanged();
@@ -206,14 +194,11 @@ signals:
     void windowStartChanged();
     void windowEndChanged();
     void positionChanged();
-    void positionDateChanged();
     void stickToEndChanged();
     void startBoundChanged();
-    void autoPlayChanged();
     void autoReturnToBoundsEnabledChanged();
-
-    void timeZoneShiftChanged();
-    void serverTimeZoneShiftChanged();
+    void displayOffsetChanged();
+    void localeChanged();
 
     void textColorChanged();
     void chunkColorChanged();

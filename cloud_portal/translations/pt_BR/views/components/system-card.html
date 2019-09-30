@@ -1,16 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">O seu Sistema</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Alterar o nome do Sistema</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fazer o "Merge" com outro Sistema</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Fazer o "Merge" com outro Sistema</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Desconectar de
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -25,7 +26,7 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Renomear sistema</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Alterar o nome do Sistema</button>
         </p>
         <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Desligar da minha conta</button>
     </div>
@@ -36,24 +37,30 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong>
-            está efetuando o "Merge" com este sistema</div>
-        <hr />
-        <div class="merge-info-text">Dependendo do tamanho da base de dados, poderá levar várias horas</div>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
+                está sendo mesclado para este sistema</div>
+            <hr />
+            <div class="merge-info-text light-text">Dependendo do tamanho da base de dados, poderá levar várias horas</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Terminando a junção de sistemas</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>Efetuando o "merge" deste sistema para
-            <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>Dependendo do tamanho da base de dados, poderá levar várias horas.</p>
-            <p>Até que o "Merge" seja concluído, pode efetuar o login nesse sistema e reproduzir vídeo, mas não pode alterar as definições.</p>
-            <p>Quando o "Merge" terminar, todos os utilizadores e câmaras deste sistema ficarão disponíveis
-                no Sistema <span class="merge-system-name">{{mergeTargetSystem.name}}</span>.</p>
+        <div ng-if="mergeTargetSystem.name">
+            <div>Este sistema está sendo mesclado para
+                0>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>Dependendo do tamanho da base de dados, poderá levar várias horas.</p>
+                <p>Até que o "Merge" seja concluído, pode efetuar o login nesse sistema e reproduzir vídeo, mas não pode alterar as definições.</p>
+                <p>Quando a fusão estiver concluída, todos os usuários e câmeras deste sistema ficarão disponíveis
+                    em <strong>{{mergeTargetSystem.name}}</strong> sistema, e este sistema será excluído.</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">Terminando a junção de sistemas</div>
     </div>
 </div>

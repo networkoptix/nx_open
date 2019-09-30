@@ -7,6 +7,7 @@ Control
 {
     id: control
 
+    property bool enabledMask: true
     property bool alwaysCompleteHighlightAnimation: true
     property color normalIconColor: "transparent"
     property color checkedIconColor: normalIconColor
@@ -54,7 +55,7 @@ Control
         id: iconLabel
 
         anchors.centerIn: parent
-        opacity: control.enabled ? 1.0 : 0.3
+        opacity: control.enabled && control.enabledMask ? 1.0 : 0.3
     }
 
     background: MouseArea
@@ -67,8 +68,6 @@ Control
 
         function mouseOutsideButton(mouse)
         {
-            var x = mouse.x
-            var y = mouse.y
             return mouse.x < 0 || mouse.y < 0
                 || mouse.x >= control.width || mouse.y >= control.height
         }
@@ -114,7 +113,9 @@ Control
             anchors.fill: parent
             radius: Math.min(width, height) / 2
             visible: !control.down
-            color: control.enabled ? control.backgroundColor : control.disabledBackgroundColor
+            color: control.enabled && control.enabledMask
+                ? control.backgroundColor
+                : control.disabledBackgroundColor
         }
 
         Rectangle

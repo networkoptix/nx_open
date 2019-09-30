@@ -17,7 +17,8 @@ void ZipExtractor::extractAsync(
         {
             extractHandler(
                 static_cast<QnZipExtractor::Error>(error),
-                m_extractor->dir().absolutePath());
+                m_extractor->dir().absolutePath(),
+                m_extractor->bytesExtracted());
         });
     m_extractor->start();
 }

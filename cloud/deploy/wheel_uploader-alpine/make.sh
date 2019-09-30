@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=wheel_uploader
-VERSION=3.7.3-alpine3.9
+VERSION=3.7.3-alpine3.10
 REPOSITORY_HOST=009544449203.dkr.ecr.us-west-1.amazonaws.com
 REPOSITORY_PATH=/devtools
 BUILD_ARGS=(--build-arg VERSION=$VERSION)

@@ -13,6 +13,7 @@ struct UploadState
         Initial,
         CalculatingMD5,
         CreatingUpload,
+        WaitingFileOnServer,
         Uploading,
         Checking,
         Done,
@@ -52,6 +53,9 @@ struct UploadState
 
     /** Recreate file if it exists. */
     bool recreateFile = false;
+
+    /** Allow uploader to create file on mediaserver. */
+    bool allowFileCreation = true;
 
     // Error message, if any.
     QString errorMessage;

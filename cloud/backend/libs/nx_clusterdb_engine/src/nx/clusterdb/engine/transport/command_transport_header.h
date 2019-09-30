@@ -16,7 +16,7 @@ using VmsTransportHeader = ::ec2::QnTransactionTransportHeader;
 class CommandTransportHeader
 {
 public:
-    std::string systemId;
+    std::string clusterId;
     std::string peerId;
     network::SocketAddress endpoint;
     std::string connectionId;
@@ -30,7 +30,7 @@ public:
 
     QString toString() const
     {
-        return lm("(%1.%2; %3)").arg(vmsTransportHeader.sender).arg(systemId).arg(endpoint);
+        return lm("(%1.%2; %3)").args(vmsTransportHeader.sender, clusterId, endpoint);
     }
 };
 

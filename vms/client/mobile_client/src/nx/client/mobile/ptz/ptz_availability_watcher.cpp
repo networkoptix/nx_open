@@ -11,6 +11,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <core/resource/client_core_camera.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 

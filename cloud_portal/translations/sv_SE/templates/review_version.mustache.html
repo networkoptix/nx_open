@@ -1,6 +1,6 @@
-<h1>Det finns en ny revision för {{ message.product }}</h1>
+<h1>There is a new version for {{ message.product }} ({{ message.product_type }}) to review</h1>
 <p>Klicka på länken för att se utkast {{ message.id }} för {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/version/{{ message.id }}/">Granska versionen</a>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/">Granska versionen</a>
 <h4>På den här sidan kan du</h4>
 <ul>
 	<li>Skapa en förhandsgranskning för att se de senaste ändringarna.</li>

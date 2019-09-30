@@ -247,7 +247,7 @@ int64_t DeviceFileCatalog::occupiedSpace(int storageIndex) const
     return m_chunks.occupiedSpace(storageIndex);
 }
 
-void DeviceFileCatalog::addChunks(const nx::vms::server::ChunksDeque& chunks)
+void DeviceFileCatalog::addChunks(nx::vms::server::ChunksDeque chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
 

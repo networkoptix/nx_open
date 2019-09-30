@@ -18,11 +18,13 @@ ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 
 ${BACKDROP}                           //ngb-modal-window
 
+${COMBO TEXT}                         Кенг☿☂⊗⅓您都可以`~!@#$%계정이 이
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH TEXT}                         您都可以享受源源不絕的好禮及優惠
+${GLYPH TEXT}                         您都可以享受源源不あなたのアカウント
 ${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
 ${TM TEXT}                            qweasdzxc123®™
+${KOREAN TEXT}                        계정이 이미 활성
 
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
@@ -35,18 +37,18 @@ ${REMEMBER ME CHECKBOX REAL}          //form[@name='loginForm']//input[@id='reme
 
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
-${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
+${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//div[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTIVATION LINK BUTTON TEXT}']
-${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//label[text()="${WRONG PASSWORD}"]
-${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//label[text()="${ACCOUNT DOES NOT EXIST}"]
-${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//label[text()="${TOO MANY ATTEMPTS TEXT}"]
+${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//div[text()="${WRONG PASSWORD}"]
+${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//div[text()="${ACCOUNT DOES NOT EXIST}"]
+${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//div[text()="${TOO MANY ATTEMPTS TEXT}"]
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
 
 #Header
 ${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect' and @data-toggle="dropdown"]
-${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
+${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a/span[contains(text(), "${LOG OUT BUTTON TEXT}")]/..
 ${LOGO LINK}                          //header//a[@href='/']
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
 ${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
@@ -96,7 +98,7 @@ ${TERMS AND CONDITIONS CHECKBOX REAL}       //form[@name= 'registerForm']//input
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${WEBSITE URL}${PRIVACY POLICY URL}']
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY POLICY URL FULL}']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 ${REGISTER EYE ICON OPEN}             ${REGISTER FORM}${EYE ICON OPEN}
 ${REGISTER EYE ICON CLOSED}           ${REGISTER FORM}${EYE ICON CLOSED}
@@ -137,6 +139,7 @@ ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='sys
 ${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),"${SYSTEM NAME IS REQUIRED TEXT}")]
 
 ${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
+${OWNER LABEL}                        //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]/../h2[contains(text(), "${OWNER TEXT}")]
 ${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
 ${YOUR PERMISSIONS}                   //ng-include[@src="$root.C.viewsDir + 'components/system-card.html'"]//p[contains(text(), "${YOUR PERMISSIONS TEXT}")]
 
@@ -156,15 +159,40 @@ ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEM SEARCH X BUTTON}             //a[@ng-click="search.value=''"]
 
+#Merge
+${MERGE BUTTON SYSTEM}                //button[@ng-click="mergeSystems()"]
+${MERGE DIALOG}                       //nx-modal-merge-content
+${MERGE FORM}                         //form[@name="mergeForm"]
+${MERGE SYSTEM DROPDOWN}              ${MERGE DIALOG}//button[@id="genericSelect"]
+${MERGE X BUTTON}                     ${MERGE DIALOG}//button[@class="close"]
+${MERGE OK BUTTON}                    ${MERGE DIALOG}//button[contains(@class,"btn btn-primary") and contains(text(),"${OK TEXT}")]
+${MERGE CANCEL BUTTON}                ${MERGE DIALOG}//button[@class="btn btn-default"]
+${MERGE BUTTON MODAL}                 ${MERGE DIALOG}//button[@class="btn btn-primary" and contains(text(),"${MERGE SYSTEMS TEXT}")]
+${MERGE PASSWORD INPUT}               ${MERGE DIALOG}//input[@id="mergePassword"]
+${CURRENTLY MERGING CARD}             //div[@ng-if="currentlyMerging"]
+${CURRENTLY MERGING DOTS}             ${CURRENTLY MERGING CARD}//div[contains(@class, "circleG circleG_")]
+${MERGE NOT OWNER MESSAGE 2}          ${MERGE DIALOG}//p[@class='help-block-no-height'][2]
+${MERGE FAILED DIALOG HEADER}         //nx-modal-generic-content//h1[contains(text(),"${SYSTEMS MERGE FAILED TEXT}")]
+${MERGE FAILED OK BUTTON}             //nx-modal-generic-content//button[contains(text(),"${OK TEXT}")]
+${MERGE FAILED X BUTTON}              //nx-modal-generic-content//button[@class="close"]
+${MERGE CURRENT SYSTEM WITH}          ${MERGE DIALOG}//label[contains(text(),"${MERGE CURRENT SYSTEM WITH TEXT}")]
+${MERGE ONLY AS OWNER}                ${MERGE DIALOG}//p[contains(text(),"${YOU CAN ONLY MERGE AS OWNER TEXT}")]
+${MERGE CHECKING HINT}                ${MERGE DIALOG}//p[contains(text(),"${CHECKING TEXT}")]
+${MERGE ENTER YOUR PASSWORD}          ${MERGE FORM}//label[contains(text(),"${ENTER PASSWORD TO CONTINUE TEXT}")]
+${MERGE PASSWORD REQUIRED}            ${MERGE FORM}//label[@class="input-error" and contains(text(),"${PASSWORD IS REQUIRED TEXT}")]
+${MERGE PASSWORD INCORRECT}           ${MERGE FORM}//label[@class="input-error" and contains(text(),"${WRONG PASSWORD}")]
+
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']
+${DISCONNECT FORM CANCEL}             ${DISCONNECT FORM}//button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
+${DISCONNECT PASSWORD INPUT}          ${DISCONNECT FORM}//input[@id="password"]
+${DISCONNECT FORM DISCONNECT BUTTON}    ${DISCONNECT FORM}//button[contains(text(), "${DISCONNECT BUTTON TEXT}")]
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), "${DISCONNECT MODAL WARNING TEXT}")]
 # extra spaces here temporarily
-${DISCONNECT MODAL CANCEL}               //button[text()='Cancel ']
+${DISCONNECT MODAL CANCEL}               //button[text()='${CANCEL BUTTON TEXT} ']
 ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='${DISCONNECT BUTTON TEXT} ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
@@ -201,21 +229,53 @@ ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-cl
 
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["Downloads"]
-${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client only"]/../..
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client and Server"]/../..
 ${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - Client only"]/../..
 ${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - Client only"]/../..
 ${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
 ${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
-${WINDOWS TAB}                        //a[@id="Windows"]
-${UBUNTU TAB}                         //a[@id="Linux"]
-${MAC OS TAB}                         //a[@id="MacOS"]
+${WINDOWS TAB}                        //a[@id="windows"]
+${UBUNTU TAB}                         //a[@id="linux"]
+${MAC OS TAB}                         //a[@id="macos"]
 
 #History
 ${RELEASES TAB}                       //span[@class='tab-heading' and text()='Releases']/..
 ${PATCHES TAB}                        //span[@class='tab-heading' and text()='Patches']/..
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='Betas']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
+
+#IPVD
+${IPVD TITLE}                        //header//li[@class="active"]/a[contains(text(),"${IPVD TITLE TEXT}")]
+${IPVD SEARCH BAR}                   //ipvd//input[@name="query"]
+${IPVD ADVANCED SEARCH BUTTON}       //ipvd//span[contains(text(),"${IPVD ADVANCED SEARCH BUTTON TEXT}")]
+${IPVD MANFUACTURERS PANE}           //ipvd//header/span[contains(text(),"manufacturers")]/../../../..
+${IPVD DEVICES PANE}                 //ipvd//header/span[contains(text(),"devices")]/../../../..
+${IPVD DEVICE DETAILS}               //ipvd//nx-cam-view
+${IPVD DEVICE MAKE}                  ${IPVD DEVICE DETAILS}//div[@class="camera-vendor-model"]//span[1]
+${IPVD DEVICE MODEL}                 ${IPVD DEVICE DETAILS}//div[@class="camera-vendor-model"]//span[2]
+${IPVD CLEAR FILTERS BUTTON}         //ipvd//span[@class="close-button"]
+${IPVD TABLE}                        //ipvd//table
+${IPVD TABLE FIRST ITEM}             ${IPVD TABLE}/tbody/tr[1]
+${IPVD TABLE LAST ITEM}              ${IPVD TABLE}/tbody/tr[0=count(following-sibling::tr)]//td
+${IPVD PREVIOUS BUTTON}              //ipvd//a/span[contains(text(),"«")]
+${IPVD NEXT BUTTON}                  //ipvd//a/span[contains(text(),"»")]
+${IPVD LAST PAGE BUTTON}             //ipvd//ul/[@class="pagination"]/li[@class="page-item disabled"]/following-sibling::li/a
+${IPVD CLOSE DETAILS BUTTON}         //ipvd//header//span[@class="glyphicon close-icon detailsClose"]
+#IPVD Feedback
+${SUBMIT A REQUEST}     //ipvd//a[contains(text(),'submit a request')]
+${SEND DEVICE FEEDBACK}     //ipvd//a[contains(text(),'Send feedback about this device')]
+${IPVD FEEDBACK}                     //nx-modal-message-content//form[@name='messageForm']
+${IPVD FEEDBACK TITLE}               ${IPVD FEEDBACK}//h1
+${IPVD FEEDBACK YOUR NAME}           ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_name']
+${IPVD FEEDBACK EMAIL}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@id='user_email']
+${IPVD FEEDBACK MESSAGE}             ${IPVD FEEDBACK}//form[@name='feedbackForm']//textarea[@id='message']
+${IPVD FEEDBACK CONTACT ME}          ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='contact']
+${IPVD FEEDBACK AGREE}               ${IPVD FEEDBACK}//form[@name='feedbackForm']//input[@type='checkbox' and @id='agree']
+${IPVD FEEDBACK PRIVACY POLICY}      ${IPVD FEEDBACK}//form[@name='feedbackForm']//a[text()='Privacy Policy']
+${IPVD FEEDBACK SEND BUTTON}         ${IPVD FEEDBACK}//button[text()='Send']
+${IPVD FEEDBACK CANCEL BUTTON}       ${IPVD FEEDBACK}//button[text()='Cancel']
+${IPVD FEEDBACK CLOSE BUTTON}        ${IPVD FEEDBACK}//button[@class='close']
 
 #Footer
 ${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
@@ -235,6 +295,8 @@ ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ub
 ${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+
+${PRIVACY POLICY HEADER}              //h1[contains(text(),'Personal data and privacy policy')]
 
 #Password badges
 ${PASSWORD BADGE}                     //span[contains(@class,"badge")]

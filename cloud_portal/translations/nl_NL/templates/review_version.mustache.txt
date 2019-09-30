@@ -1,8 +1,8 @@
-Er is een nieuwe revisie voor {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Klik op de link om het concept te beoordelen {{ message.id }} voor {{ message.product }}
 
-Link naar concept beoordeling: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 Op deze pagina kunt u
 1) Een voorbeeld maken om de meest recente wijzigingen te zien.

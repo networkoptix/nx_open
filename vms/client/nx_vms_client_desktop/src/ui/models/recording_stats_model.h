@@ -43,7 +43,7 @@ public:
 
     enum DataRoles
     {
-        RowKind = Qn::ItemDataRole::RoleCount,
+        RowKind = Qn::ItemDataRoleCount,
         StatsData,
         ChartData
     };

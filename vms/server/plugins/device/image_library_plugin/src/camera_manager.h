@@ -1,8 +1,10 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <plugins/plugin_tools.h>
 #include "dir_contents_manager.h"

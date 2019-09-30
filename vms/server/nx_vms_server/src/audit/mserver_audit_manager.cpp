@@ -265,6 +265,11 @@ std::vector<QnAuditRecord> QnMServerAuditManager::processDelayedRecordsInternal(
     return recordsToAdd;
 }
 
+// Specialization is used in unit test.
+template
+std::vector<QnAuditRecord> QnMServerAuditManager::processDelayedRecordsInternal<QnMServerAuditManager::CameraPlaybackInfo>(
+    QVector<CameraPlaybackInfo>& recordsToAggregate, int recordAggregationTimeMs);
+
 template <class T>
 void QnMServerAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
 {

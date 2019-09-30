@@ -77,6 +77,8 @@ public:
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher);
 
+    ~CommandLog();
+
     /**
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
      * @note nx::sql::DBResult::retryLater can be reported to onDbUpdateCompleted if
@@ -172,6 +174,28 @@ public:
             systemId,
             transactionHash,
             std::move(transactionSerializer));
+    }
+
+    /**
+     * Invokes dbFunc(queryContext, transactionData) and generates a synchronization command with
+     * the same transactionData. Throws exception on failure.
+     * NOTE: DbFunc should return void and throw an exception on failure.
+     */
+    template<typename CommandDescriptor, typename DbFunc>
+    void saveDbOperationToLog(
+        nx::sql::QueryContext* queryContext,
+        const std::string& clusterId,
+        typename CommandDescriptor::Data transactionData,
+        DbFunc dbFunc)
+    {
+        dbFunc(queryContext, transactionData);
+        // TODO: refactor or overload this function to throw exceptions
+        const auto dbResult = generateTransactionAndSaveToLog<CommandDescriptor>(
+            queryContext,
+            clusterId,
+            std::move(transactionData));
+        if (dbResult != nx::sql::DBResult::ok)
+            throw nx::sql::Exception(dbResult, "generateTransactionAndSaveToLog failed");
     }
 
     /**

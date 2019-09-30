@@ -1729,6 +1729,7 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
     switch (accessRole)
     {
         case api::SystemAccessRole::none:
+        case api::SystemAccessRole::system:
             NX_ASSERT(false);
             break;
 

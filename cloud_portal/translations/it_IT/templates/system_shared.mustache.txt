@@ -8,4 +8,4 @@ Buongiorno, {{message.userFullName}}
 Le è stato concesso l'accesso al sistema di gestione video "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Visualizzi nel %PRODUCT_NAME% Portale: {{config.portal_url}}/systems/{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

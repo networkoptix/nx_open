@@ -175,7 +175,7 @@ QnLayoutResourcePtr LiteClientLayoutHelper::createLayoutForServer(const QnUuid& 
         return QnLayoutResourcePtr();
 
     auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(serverId);
     layout->setName(server->getName());
 

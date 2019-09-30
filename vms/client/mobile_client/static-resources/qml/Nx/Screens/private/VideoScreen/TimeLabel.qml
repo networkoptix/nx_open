@@ -3,16 +3,19 @@ import Nx 1.0
 
 Item
 {
-    id: timeLabel
+    id: control
 
-    property date dateTime
+    readonly property int kFontSize: 24
+
+    property alias hours: hoursText.text
+    property alias minutes: minutesText.text
+    property string seconds
+    property string suffix
+
     property color color: ColorTheme.windowText
 
     implicitHeight: contentRow.implicitHeight
     implicitWidth: contentRow.implicitWidth
-
-    readonly property var _locale: Qt.locale()
-    readonly property int _fontSize: 24
 
     Row
     {
@@ -20,17 +23,15 @@ Item
 
         Text
         {
-            text: dateTime.toLocaleTimeString(_locale, "hh")
+            id: hoursText
 
-            width: 32
             height: 28
-
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: _fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Bold
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
@@ -43,24 +44,22 @@ Item
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: _fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
         {
-            text: dateTime.toLocaleTimeString(_locale, "mm")
+            id: minutesText
 
-            width: 32
             height: 28
-
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: _fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Normal
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
@@ -73,24 +72,24 @@ Item
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: _fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
         {
-            text: dateTime.toLocaleTimeString(_locale, "ss")
+            text: suffix.length
+                  ? "%1 %2".arg(control.seconds).arg(control.suffix)
+                  : control.seconds
 
-            width: 32
             height: 28
-
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: _fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
+            color: control.color
         }
     }
 }

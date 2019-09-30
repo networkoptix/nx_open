@@ -52,7 +52,7 @@
   <onvifMedia2:GetVideoEncoderConfigurationsResponse>
    <!-- std::vector<tt__VideoEncoder2Configuration *> Configurations -->
    <!-- a repetition of 0 or more of the following -->
-   <onvifMedia2:Configurations GovLength="0" Profile="" token="">
+   <onvifMedia2:Configurations GovLength="0" Profile="" GuaranteedFrameRate="false" token="">
     <!-- std::string Name -->
     <tt:Name></tt:Name>
     <!-- int UseCount -->

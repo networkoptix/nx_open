@@ -53,6 +53,7 @@ NX_UTILS_API QString toString(const char* value);
 NX_UTILS_API QString toString(const wchar_t* value);
 NX_UTILS_API QString toString(const std::string& value);
 NX_UTILS_API QString toString(const std::wstring& value);
+NX_UTILS_API QString toString(const std::string_view& value);
 
 NX_UTILS_API QString toString(const QChar& value);
 NX_UTILS_API QString toString(const QByteArray& value);

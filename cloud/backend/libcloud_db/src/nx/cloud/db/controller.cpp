@@ -8,7 +8,6 @@
 #include <nx/vms/api/protocol_version.h>
 
 #include "ec2/vms_command_descriptor.h"
-#include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx::cloud::db {
@@ -46,6 +45,7 @@ Controller::Controller(
     m_vmsP2pCommandBus(&m_ec2SynchronizationEngine),
     m_systemHealthInfoProvider(
         SystemHealthInfoProviderFactory::instance().create(
+            settings,
             &m_ec2SynchronizationEngine.connectionManager(),
             &m_dbInstanceController.queryExecutor())),
     m_systemManager(
@@ -56,6 +56,7 @@ Controller::Controller(
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SynchronizationEngine),
+    m_authDataProviders({&m_accountManager, &m_systemManager}),
     m_systemCapabilitiesProvider(
         &m_systemManager,
         &m_ec2SynchronizationEngine.connectionManager()),
@@ -70,7 +71,9 @@ Controller::Controller(
         &m_dbInstanceController.queryExecutor(),
         &m_accountManager,
         &m_systemManager,
+        &m_systemManager,
         m_tempPasswordManager,
+        m_authDataProviders,
         &m_vmsP2pCommandBus),
     m_maintenanceManager(
         &m_ec2SynchronizationEngine,
@@ -211,7 +214,7 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kPingPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
@@ -225,11 +228,8 @@ void Controller::initializeSecurity()
     m_transportSecurityManager =
         std::make_unique<AccessBlocker>(m_settings);
 
-    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
-    authDataProviders.push_back(&m_accountManager);
-    authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
-        std::move(authDataProviders),
+        m_authDataProviders,
         *m_authRestrictionList,
         m_streeManager,
         m_transportSecurityManager.get());

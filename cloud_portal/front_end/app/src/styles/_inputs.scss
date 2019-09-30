@@ -53,7 +53,7 @@
     font-family : $font-family-regular;
     font-size   : rem(13px);
     line-height : 1rem;
-    color       : $error;
+    color       : $error !important;
 
     @include media-breakpoint-down(sm) {
         margin-top : .5rem;

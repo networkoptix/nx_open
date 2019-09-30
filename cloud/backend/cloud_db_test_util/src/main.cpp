@@ -1,46 +1,60 @@
 #include "load_emulator.h"
 
 #include <iostream>
+#include <regex>
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
-
-#include <utils/common/command_line_parser.h>
+#include <nx/utils/log/log_initializer.h>
 
 #include "fetch_data.h"
 #include "generate_data.h"
 #include "load_tests.h"
 
-int main(int argc, char* argv[])
+void printHelp()
 {
+    std::cout << R"(
+Common arguments:
+-c, --cdb               CloudDb url. E.g., https://cloud-test.hdw.mx
+-u, --user              Account login
+-p, --password          Account password
+-h, --help              This help message
+
+Data generation mode:
+-s, --generate-systems= Number of random systems to generate
+Creates active systems with name load_test_system_{some_id}
+
+)";
+
+    nx::cloud::db::client::LoadTest::printHelp(std::cout);
+
+    std::cout <<
+        "--fetch                 Fetch data. Values: systems. TODO" <<
+        std::endl <<
+        std::endl;
+}
+
+int main(int argc, const char* argv[])
+{
+    nx::utils::ArgumentParser args(argc, argv);
+    if (args.get("help"))
+    {
+        printHelp();
+        return 0;
+    }
+
+    QString cdbUrl = args.get("cdb", "c").value_or(QString());
+    QString accountEmail = args.get("user", "u").value_or(QString());
+    QString accountPassword = args.get("password", "p").value_or(QString());
+    bool loadMode = static_cast<bool>(args.get("load", "l"));
+    int testSystemsToGenerate = args.get<int>("generate-systems", "s").value_or(-1);
+    int testRequestCount = args.get<int>("api-requests").value_or(0);
+    QString fetchRequest = args.get("fetch").value_or(QString());
+
+    nx::utils::log::initializeGlobally(args);
+
     nx::network::SocketGlobals::InitGuard socketGlobals;
-
-    QString cdbUrl;
-    QString accountEmail;
-    QString accountPassword;
-    bool loadMode = false;
-    int connectionCount = 100;
-    int testSystemsToGenerate = -1;
-    int testRequestCount = 0;
-    QString fetchRequest;
-    QString maxDelayBeforeConnectStr;
-
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&cdbUrl, "--cdb", "-c", "Cloud db url");
-    commandLineParser.addParameter(&accountEmail, "--user", "-u", "Account login");
-    commandLineParser.addParameter(&accountPassword, "--password", "-p", "Account password");
-    commandLineParser.addParameter(&loadMode, "--load", "-l", "Establish many connections");
-    commandLineParser.addParameter(&connectionCount, "--connections", "", "Test connection count");
-    commandLineParser.addParameter(
-        &maxDelayBeforeConnectStr,
-        "--max-delay", "",
-        "Maximum delay before starting connection. By default, no delay");
-    commandLineParser.addParameter(
-        &testSystemsToGenerate, "--generate-systems", "-s", "Number of random systems to generate");
-    commandLineParser.addParameter(&fetchRequest, "--fetch", nullptr, "Fetch data. Values: systems");
-    commandLineParser.addParameter(&testRequestCount, "--api-requests", nullptr, "Make api requests");
-
-    commandLineParser.parse(argc, (const char**)argv, stderr);
+    nx::network::SocketGlobals::applyArguments(args);
 
     if (cdbUrl.isEmpty() || accountEmail.isEmpty() || accountPassword.isEmpty())
     {
@@ -49,16 +63,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const auto maxDelayBeforeConnect = nx::utils::parseTimerDuration(maxDelayBeforeConnectStr);
-
     if (loadMode)
     {
-        return nx::cloud::db::client::establishManyConnections(
+        return nx::cloud::db::client::LoadTest::establishManyConnections(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
-            connectionCount,
-            maxDelayBeforeConnect);
+            args);
     }
 
     if (testSystemsToGenerate > 0)
@@ -81,13 +92,14 @@ int main(int argc, char* argv[])
 
     if (testRequestCount > 0)
     {
-        return nx::cloud::db::client::makeApiRequests(
+        return nx::cloud::db::client::LoadTest::makeApiRequests(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
-            testRequestCount,
-            maxDelayBeforeConnect);
+            testRequestCount);
     }
+
+    std::cerr << "Nothing to do. Specify some command" << std::endl;
 
     return 0;
 }

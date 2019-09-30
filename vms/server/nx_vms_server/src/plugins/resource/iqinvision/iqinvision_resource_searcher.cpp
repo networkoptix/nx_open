@@ -43,23 +43,21 @@ QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnMediaServerModule* serverModule
 QnResourcePtr QnPlIqResourceSearcher::createResource(
     const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
 {
-    QnNetworkResourcePtr result;
-
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
     {
         qDebug() << "No resource type for ID = " << resourceTypeId;
-        return result;
+        return {};
     }
 
     if (resourceType->getManufacturer() != manufacturer())
     {
         //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
-        return result;
+        return {};
     }
 
-    result = QnVirtualCameraResourcePtr(new QnPlIqResource(m_serverModule));
+    const auto result = QnVirtualCameraResourcePtr(new QnPlIqResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString();

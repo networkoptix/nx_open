@@ -14,7 +14,7 @@ class PlayListManagerWeakRefProxy:
 public:
     PlayListManagerWeakRefProxy(AbstractPlaylistManagerPtr target);
 
-    virtual size_t generateChunkList(
+    virtual CameraDiagnostics::Result generateChunkList(
         std::vector<ChunkData>* const chunkList,
         bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;

@@ -358,7 +358,8 @@ BaseTile
                 context.connectToLocalSystem(
                     control.systemId, tile.selectedHost,
                     tile.selectedUser, tile.selectedPassword,
-                    tile.savePassword, tile.autoLogin);
+                    tile.savePassword && context.saveCredentialsAllowed, 
+                    tile.autoLogin && context.saveCredentialsAllowed);
 
                 tile.forcePasswordFocus()
             }

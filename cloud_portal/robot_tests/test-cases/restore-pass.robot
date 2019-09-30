@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 
 
@@ -29,7 +29,7 @@ restores password
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -50,7 +50,6 @@ can still log in if you don't finish the process
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
@@ -72,7 +71,7 @@ should be able to set new password (which is same as old), redirect
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -90,7 +89,7 @@ should set new password, login with new password
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -113,7 +112,7 @@ displays password masked, shows password and changes eye icon when clicked
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -138,7 +137,7 @@ should not allow to use one restore link twice
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -224,7 +223,7 @@ Check restore password email links, colors, cloud name, and open link in new tab
     Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Email Link    ${random email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
@@ -233,7 +232,7 @@ Check restore password email links, colors, cloud name, and open link in new tab
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
-    log    ${email text}
+    ${email text}    Decode Bytes To String    ${email text}    UTF-8
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
     Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}

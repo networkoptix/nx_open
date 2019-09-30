@@ -8,8 +8,7 @@
 #include <platform/platform_abstraction.h>
 #include <nx/vms/server/command_line_parameters.h>
 
-MediaServerModuleFixture::MediaServerModuleFixture():
-    nx::utils::test::TestWithTemporaryDirectory("MediaServerModuleTest", QString())
+MediaServerModuleFixture::MediaServerModuleFixture()
 {
 }
 

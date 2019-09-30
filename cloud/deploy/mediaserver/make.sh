@@ -4,13 +4,21 @@
 . ../common.sh
 
 MODULE=mediaserver
-VERSION=3.1.0.17256
+CLOUD_HOST=stage.nxvms.com
+VERSION=3.1.0.17256-optix1
+
+BUILD=${VERSION##*.}
+
+function run ()
+{
+    docker run --rm -v $PWD/state/etc:/opt/networkoptix/mediaserver/etc -v $PWD/state/var:/opt/networkoptix/mediaserver/var -p 7001:7001 -ti mediaserver:$VERSION $CLOUD_HOST
+}
 
 function publish_state
 {
-    local state_file=mediaserver-state-$VERSION-$(date +%Y-%m-%d).tar.gz
+    local state_file=mediaserver-state-$VERSION-$CLOUD_HOST-$(date +%Y-%m-%d).tar.gz
 
-    tar -C /opt/networkoptix/mediaserver -czf $state_file etc var
+    tar -C state -czf $state_file etc var
     aws s3 cp $state_file s3://nxcloud-prod-internal-data/monitoring/$state_file
     rm $state_file
 
@@ -21,7 +29,9 @@ function build ()
 {
     rm -rf build
     mkdir build
-    (cd build; ar x ../deb/*$VERSION*.deb; tar xJf data.tar.xz)
+
+    (mkdir -p deb; cd deb; wget -N http://updates.hdwitness.com.s3.amazonaws.com/default/$BUILD/linux/nxwitness-server-${VERSION}-linux64.deb)
+    (cd build; ar x ../deb/*$VERSION*.deb; tar xJf data.tar.xz; rm control.tar.gz data.tar.xz debian-binary)
 }
 
 function stage ()

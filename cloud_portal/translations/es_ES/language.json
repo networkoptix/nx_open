@@ -1,28 +1,38 @@
 {
   "language": "es_ES",
   "language_name": "Español",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "Aceptar",
     "cancelButton": "Cancelar",
-    "loginTitle": "Inicie sesión en %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Inicia sesión",
     "logoutAuthorisedTitle": "Ya se ha conectado",
     "logoutAuthorisedContinueButton": "Continuar",
     "logoutAuthorisedLogoutButton": "Cerrar Sessión",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "El mensaje no se ha podido enviar.",
+    "messageSent": "El mensaje ha sido enviado.",
+    "noClientDetectedTitle": "Instalar %VMS_NAME% para ver su sistema",
+    "download": "Descargar %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Bienvenido a",
     "register": "Crear cuenta en",
     "changePassword": "Cambiar contraseña -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "activado",
-    "merging": "merging",
+    "incompatible": "incompatible",
+    "merging": "fusionando",
     "notActivated": "no activado",
     "online": "en línea",
     "offline": "desconectado",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "No se puede guardar la contraseña",
     "cantActivatePrefix": "No puede activar su cuenta",
     "cantSendConfirmationPrefix": "No se puede enviar el correo electrónico de confirmación",
-    "cloudInvalidResponse": "El BD de la Nube ha devuelto una respuesta inesperada",
     "notAuthorized": "Contraseña incorrecta",
     "brokenAccount": "Problema inesperado con cuenta. <a href=\"/restore_password\"> restaurar cuenta</a>",
     "wrongParameters": "Algunos parámetros en el formulario son incorrectos",
     "wrongCode": "Ya está activada la cuenta o el código de confirmación es incorrecto",
     "wrongCodeRestore": "Código de confirmación ya sea usado o está incorrecta",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "No tiene permisos para realizar esta acción",
     "accountNotActivated": "Esta cuenta no ha sido activada. <a href=\"/activate\"> Enviar enlace de activación de nuevo</a>",
     "accountBlocked": "Esta cuenta está bloqueada. Por favor, intente nuevamente en unos minutos.",
@@ -147,13 +158,20 @@
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
     "thisSystem": "el sistema",
     "oldSafariNotSupported": "Las versiones de Safari anteriores a 10 no son compatibles",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Algunas listas de servidores existen en ambos sistemas, en el seleccionado y en el actual.<br>Elimine los servidores fuera de línea e incompatibles de cada sistema e intente nuevamente.",
+    "mergedSystemIsOffline": "El sistema <strong>{{failedSystem}}</strong> está desconectado.",
+    "INCOMPATIBLE": "Los sistemas tienen diferentes versiones de software. Por favor, actualice ambos a la <a href=\"/download\">última versión</a>.",
+    "FAIL": "El sistema <strong>{{failedSystem}}</strong> es actualmente inalcanzable.<br>Vuelva a intentarlo en unos momentos o póngase en contacto con <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "La fusión de sistemas falló",
+    "commonText": "Error al fusionar los sistemas <strong>{{primarySystem}}</strong> y <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "bueno",
     "fair": "regular",
+    "fairMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "minLength": "demasiado corto",
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
     "required": "incorrecto",
@@ -161,7 +179,7 @@
     "weak": "débil",
     "weakMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "strongMessage": "¡Contraseña segura!",
-    "common": "demasiado común",
+    "common": "muy común",
     "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo",
     "missingMessage": "Se requiere contraseña"
   },
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
     "successRename": "Nombre del sistema guardado",
-    "confirmDisconnectTitle": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está a punto de desconectar este sistema de su cuenta. Usted no podrá acceder a este sistema. ¿Está seguro?",
     "confirmUnshareFromMeTitle": "Desconectar el Sistema?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Este usuario no podrá acceder el sistema. ¿Está seguro?",
     "confirmUnshareTitle": "¿Eliminar el usuario?",
     "confirmUnshareAction": "Borrar",
-    "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
-    "successMerge": "System merge completed",
+    "mergeFailed": "La fusión de sistemas falló",
+    "mergeStart": "Los sistemas han comenzado a fusionarse",
+    "mergeSuccess": "Fusión del sistema completada",
     "permissionsRemoved": "Los permisos fueron removidos de {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Nombre desconocido para el sistema (causado por la fusión en la nube)"
   },
   "account": {
     "accountSavedSuccess": "Su cuenta se ha guardado",
@@ -206,72 +226,6 @@
     "changePassword": "Cambiar contraseña",
     "newPasswordLabel": "Nueva contraseña",
     "saveChanges": "Guardar"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Instalar %VMS_NAME% para ver su sistema",
-    "action": "Descargar %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Cliente solamente",
-      "server": "Servidor solamente",
-      "bundle": "Cliente y Servidor",
-      "servertool": "Herramienta de configuración"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Candidato de Lanzamiento",
-      "release": "Publicar",
-      "releases": "Ediciones",
-      "patch": "Parche",
-      "patches": "Parches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Reenviar enlace de activación",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "Sistema está desconectado",
     "systemHasNoCameras": "NO CÁMARAS",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Desconectado",
       "error": "Error",
@@ -334,5 +289,10 @@
       "stop listening": "detener escucha",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Recomendamos consultar con",
+    "b_support": "asistencia",
+    "c_proceeding": "antes de continuar."
   }
 }

@@ -1,0 +1,12 @@
+Здравствуйте,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+используя свой текущий адрес электронной почты, и следуйте дальнейшим инструкциям.
+
+Зарегистрируйте свою учетную запись используя эту ссылку: {{ config.portal_url }}/ регистрация /{{ message.code }}

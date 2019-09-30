@@ -442,7 +442,7 @@ bool resolutionGreaterThan(
 }
 
 nx::vms::server::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDriver(
-    StreamIndex streamIndex)
+    StreamIndex /*streamIndex*/)
 {
     using namespace nx::vms::server::resource;
 
@@ -865,9 +865,9 @@ bool QnPlAxisResource::setOutputPortState(
     // Wait - delay before the next action in milliseconds.
     //
     // Examples:
-    // activate Port1: action=Port1:/
-    // deactivate Port2: action=Port2:\
-    // activate Port3 for 5 seconds: action=Port3:/5000\
+    // `activate Port1: action=Port1:/`
+    // `deactivate Port2: action=Port2:\`
+    // `activate Port3 for 5 seconds: action=Port3:/5000\`
     //
     // All characters not allowed in a URI must be properly percent-encoded.
 
@@ -1680,10 +1680,8 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
         int statusCode = http::StatusCode::undefined;
         QByteArray body;
-        SystemError::ErrorCode errorCode = http::downloadFileSync(
-            url,
-            &statusCode,
-            &body);
+        [[maybe_unused]] const SystemError::ErrorCode errorCode =
+            http::downloadFileSync(url, &statusCode, &body);
 
         if (statusCode == http::StatusCode::ok)
         {

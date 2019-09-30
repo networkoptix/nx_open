@@ -1,16 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">Hệ thống của bạn</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Đổi tên hệ thống</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Hợp nhất với một hệ thống khác</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Hợp nhất với một hệ thống khác</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Ngắt kết nối với
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -35,24 +36,30 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong> 
-            được sáp nhập để hệ thống này</div>
-        <hr />
-        <div class="merge-info-text">Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ</div>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
+                đang được hợp nhất vào hệ thống này</div>
+            <hr />
+            <div class="merge-info-text light-text">Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Hoàn tất việc hợp nhất hệ thống</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>Hệ thống này được sáp nhập để 
-            <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ.</p>
-            <p>Cho đến khi hợp nhất xong bạn có thể đăng nhập vào hệ thống này và xem video, nhưng không thể thay đổi bất kỳ cài đặt.</p>
-            <p>Khi hợp nhất kết thúc, tất cả người dùng và camera từ hệ thống này sẽ có
-                trong hệ thống  "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", và hệ thống này sẽ bị xóa.</p>
+        <div ng-if="mergeTargetSystem.name">
+            <div>Hệ thống này đang được hợp nhất thành
+                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ.</p>
+                <p>Cho đến khi hợp nhất xong bạn có thể đăng nhập vào hệ thống này và xem video, nhưng không thể thay đổi bất kỳ cài đặt.</p>
+                <p>Khi hợp nhất kết thúc, tất cả người dùng và máy ảnh từ hệ thống này sẽ sẵn sàng
+                    trong <strong>{{mergeTargetSystem.name}}</strong> Hệ thống, và hệ thống này sẽ bị xóa.</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">Hoàn tất việc hợp nhất hệ thống</div>
     </div>
 </div>

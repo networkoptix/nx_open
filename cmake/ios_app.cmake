@@ -19,7 +19,8 @@ function(add_ios_ipa target)
 endfunction()
 
 function(setup_ios_application target)
-    cmake_parse_arguments(APP "" "QML_ROOT" "ADDITIONAL_PLUGINS" ${ARGN})
+    set(multivalue_args ADDITIONAL_PLUGINS TRANSLATIONS)
+    cmake_parse_arguments(APP "" "QML_ROOT" "${multivalue_args}" ${ARGN})
 
     if(NOT APP_QML_ROOT)
         message(FATAL_ERROR "QML_ROOT is not specified.")
@@ -117,4 +118,15 @@ function(setup_ios_application target)
             --output "${app_dir}/qt_qml"
         COMMENT "Copying QML imports for ${target}"
     )
+
+    if(APP_TRANSLATIONS)
+        add_custom_command(
+            TARGET ${target}
+            PRE_LINK
+            DEPENDS ${APP_TRANSLATIONS}
+            COMMAND ${CMAKE_COMMAND} -E copy ${APP_TRANSLATIONS} ${app_dir}
+            COMMENT "Copying translations for ${target}"
+        )
+    endif()
+
 endfunction()

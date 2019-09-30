@@ -7,10 +7,12 @@
 #include <nx/geo_ip/test_support/memory_resolver.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/url/url_parse_helper.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
+#include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_parse_helper.h>
 
 namespace nx::network::cloud::test {
 
@@ -46,32 +48,11 @@ private:
 } // namespace
 
 class MultipleRelays:
-    public BasicTestFixture,
-    public testing::Test
+    public BasicTestFixture<::testing::Test>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::Test>;
 
 public:
-    ~MultipleRelays()
-    {
-        discoveryServer().unsubscribeFromNodeDiscovered(m_nodeDiscoveredSubscriptionId);
-
-        for (int i = 0; i < relayClusterSize(); ++i)
-            trafficRelay(i).stop();
-
-        if (m_geoIpFactoryFuncBak)
-        {
-            nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
-                std::move(m_geoIpFactoryFuncBak));
-        }
-
-        if (m_relayClusterClientFuncBak)
-        {
-            nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
-                std::move(m_relayClusterClientFuncBak));
-        }
-    }
-
     void addIpAndRegion(const std::string& ipAddress, const nx::geo_ip::Location& location)
     {
         m_geoIpResolver->add(ipAddress, location);
@@ -85,6 +66,16 @@ public:
     void reportTrafficRelayUrlForClient(const nx::utils::Url& trafficRelayUrl)
     {
         m_reportedRelayUrlForClientPromise.set_value(trafficRelayUrl);
+    }
+
+    void reportClientHostAddress(const network::HostAddress& hostAddress)
+    {
+        m_reportedClientHostAddressPromise.set_value(hostAddress);
+    }
+
+    const std::string& hardCodedClientIp()
+    {
+        return m_hardCodedClientIp;
     }
 
 protected:
@@ -111,10 +102,10 @@ protected:
 
         setRelayCount(3);
         m_clientRelayIndex = 2; //< Client connects to Australia relay.
+        m_hardCodedClientIp = "127.0.0.2";
 
-
-        m_nodeDiscoveredSubscriptionId = discoveryServer().subscribeToNodeDiscovered(
-            [this](std::string clusterId, nx::cloud::discovery::NodeInfo nodeInfo)
+        discoveryServer().subscribeToNodeDiscovered(
+            [this](const auto& clusterId, const auto& nodeInfo)
             {
                 if (clusterId == relayClusterId())
                 {
@@ -137,7 +128,8 @@ protected:
 
                     m_relayIpMockup.emplace(std::move(url), publicIpAddress);
                 }
-            });
+            },
+            &m_nodeDiscoveredSubscriptionId);
         ASSERT_NE(nx::utils::kInvalidSubscriptionId, m_nodeDiscoveredSubscriptionId);
 
         m_geoIpFactoryFuncBak = nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
@@ -148,7 +140,6 @@ protected:
                 mockupRelayRegions(m_geoIpResolver);
                 return geoIpResolver;
             });
-
         m_relayClusterClientFuncBak = RelayClusterClientFactory::instance().setCustomFunc(
             [this](const conf::Settings& settings, nx::geo_ip::AbstractResolver* resolver)
             {
@@ -163,6 +154,28 @@ protected:
         base_type::SetUp(); //< Manually calling BasicTestFixture::SetUp
     }
 
+    virtual void TearDown() override
+    {
+        discoveryServer().unsubscribeFromNodeDiscovered(m_nodeDiscoveredSubscriptionId);
+
+        for (int i = 0; i < relayClusterSize(); ++i)
+            trafficRelay(i).stop();
+
+        if (m_geoIpFactoryFuncBak)
+        {
+            nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
+                std::move(m_geoIpFactoryFuncBak));
+        }
+
+        if (m_relayClusterClientFuncBak)
+        {
+            nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
+                std::move(m_relayClusterClientFuncBak));
+        }
+
+        base_type::TearDown();
+    }
+
     void whenServerConnectsToMediator()
     {
         startServer();
@@ -171,6 +184,36 @@ protected:
     void whenConnectToMediator()
     {
         assertCloudConnectionCanBeEstablished();
+    }
+
+    network::http::HttpHeader xForwardedForHeader() const
+    {
+        return network::http::HttpHeader(
+            network::http::header::XForwardedFor::NAME,
+            (m_hardCodedClientIp + ", 1.2.3.5, 1.2.3.6").c_str());
+    }
+
+    network::http::HttpHeader forwardedHeader()
+    {
+        return network::http::HttpHeader(
+            network::http::header::Forwarded::NAME,
+            ("for=" + m_hardCodedClientIp + "; for=1.2.3.5; for=1.2.3.6").c_str());
+    }
+
+    void whenClientBehindProxyConnectsToMediator(const network::http::HttpHeader& header)
+    {
+        //Need to start a mediaserver to avoid 404 result because systemId does not exist
+        startServer(0);
+
+        prepareMediatorClientBehindProxy(header);
+
+        auto url = nx::network::url::Builder(mediator(0).httpUrl()).appendPath(
+            nx::network::http::rest::substituteParameters(
+            nx::hpm::api::kServerSessionsPath, {cloudSystemCredentials().systemId}));
+
+        m_mediatorClientBehindProxy.doPost(
+            url,
+            [this]() { processClientBehindProxyConnectResponse(); });
     }
 
     void thenClientReceivesRelayUrl()
@@ -210,7 +253,58 @@ protected:
         waitForServerAvailableOnReportedRelays();
     }
 
+    void thenMediatorHasCorrectClientHostAddress()
+    {
+        const auto clientHostAddress =
+            m_reportedClientHostAddressPromise.get_future().get().toStdString();
+        ASSERT_EQ(m_hardCodedClientIp, clientHostAddress);
+    }
+
+    void andConnectRequestBehindProxySucceeds()
+    {
+        // Verifying that the url reported to client is the expected one
+        thenClientReceivesRelayUrl();
+        andClientAndReportedRelayAreInTheSameRegion();
+
+        const auto [resultCode, connectResponse] = m_clientBehindProxyConnectResponse.pop();
+        ASSERT_EQ(nx::hpm::api::ResultCode::ok, resultCode);
+        ASSERT_EQ(cloudSystemCredentials().hostName(), connectResponse.destinationHostFullName);
+    }
+
 private:
+    void prepareMediatorClientBehindProxy(const network::http::HttpHeader& header)
+    {
+        nx::hpm::api::ConnectRequest connectRequest;
+        connectRequest.destinationHostName = cloudSystemCredentials().systemId;
+        connectRequest.originatingPeerId = nx::utils::generateRandomName(7);
+        connectRequest.connectSessionId = nx::utils::generateRandomName(7);
+        connectRequest.connectionMethods = nx::hpm::api::ConnectionMethod::all;
+
+        m_mediatorClientBehindProxy.addAdditionalHeader(header.first, header.second);
+
+        m_mediatorClientBehindProxy.setRequestBody(
+            std::make_unique<nx::network::http::BufferSource>(
+                nx::network::http::header::ContentType::kJson,
+                QJson::serialized(connectRequest)));
+    }
+
+    void processClientBehindProxyConnectResponse()
+    {
+        bool ok = false;
+        const auto connectResponse = QJson::deserialized(
+            m_mediatorClientBehindProxy.fetchMessageBodyBuffer(),
+            nx::hpm::api::ConnectResponse(),
+            &ok);
+
+        const auto resultCode = nx::hpm::api::Client::getResultCode(
+            m_mediatorClientBehindProxy.lastSysErrorCode(),
+            m_mediatorClientBehindProxy.response(),
+            network::http::FusionRequestResult(),
+            connectResponse);
+
+        m_clientBehindProxyConnectResponse.push({resultCode, std::move(connectResponse)});
+    }
+
     void waitForServerAvailableOnReportedRelays()
     {
         std::string systemId = cloudSystemCredentials().systemId.toStdString();
@@ -316,15 +410,15 @@ private:
         using namespace nx::geo_ip;
         geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(0)),
-            Location(Continent::northAmerica));
+            Continent::northAmerica);
 
         geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(1)),
-            Location(Continent::northAmerica));
+            Continent::northAmerica);
 
         geoIpResolver->add(
             m_relayIpMockup.at(relayUrl(2)),
-            Location(Continent::australia));
+            Continent::australia);
 
         for (int i = 0; i < relayClusterSize(); ++i)
         {
@@ -340,6 +434,7 @@ private:
 
 private:
     int m_clientRelayIndex;
+    std::string m_hardCodedClientIp;
     nx::utils::SubscriptionId m_nodeDiscoveredSubscriptionId =
         nx::utils::kInvalidSubscriptionId;
 
@@ -365,6 +460,12 @@ private:
 
     std::mutex m_mutex;
     std::set<std::string> m_reportedRelayDomains;
+
+    network::http::AsyncClient m_mediatorClientBehindProxy;
+    std::promise<network::HostAddress> m_reportedClientHostAddressPromise;
+    nx::utils::SyncQueue<std::pair<
+        nx::hpm::api::ResultCode,
+        nx::hpm::api::ConnectResponse>> m_clientBehindProxyConnectResponse;
 };
 
 namespace {
@@ -400,14 +501,20 @@ void NotifyingRelayClusterClient::selectRelayInstanceForListeningPeer(
 
 void NotifyingRelayClusterClient::findRelayInstanceForClient(
     const std::string& peerId,
-    const nx::network::HostAddress& /*clientHost*/,
+    const nx::network::HostAddress& clientHost,
     nx::hpm::RelayInstanceSearchCompletionHandler completionHandler)
 {
-    m_testFixture->addIpAndRegion("127.0.0.2", nx::geo_ip::Continent::australia);
+    // Reporting the actual client host address to verify that http "forwarded*" headers are
+    // considered.
+    m_testFixture->reportClientHostAddress(clientHost);
+
+    m_testFixture->addIpAndRegion(
+        m_testFixture->hardCodedClientIp(),
+        nx::geo_ip::Continent::australia);
 
     base_type::findRelayInstanceForClient(
         peerId,
-        nx::network::HostAddress("127.0.0.2"),
+        m_testFixture->hardCodedClientIp(),
         [this, completionHandler = std::move(completionHandler)](
             nx::cloud::relay::api::ResultCode resultCode,
             nx::utils::Url relayUrl)
@@ -450,6 +557,24 @@ TEST_F(MultipleRelays, mediator_reports_traffic_relay_in_same_region_as_client)
 
     thenClientReceivesRelayUrl();
     andClientAndReportedRelayAreInTheSameRegion();
+}
+
+TEST_F(MultipleRelays, client_host_address_is_reported_to_mediator_via_x_forwarded_for_header)
+{
+    whenClientBehindProxyConnectsToMediator(xForwardedForHeader());
+
+    thenMediatorHasCorrectClientHostAddress();
+
+    andConnectRequestBehindProxySucceeds();
+}
+
+TEST_F(MultipleRelays, client_host_address_is_reported_to_mediator_via_forwarded_header)
+{
+    whenClientBehindProxyConnectsToMediator(forwardedHeader());
+
+    thenMediatorHasCorrectClientHostAddress();
+
+    andConnectRequestBehindProxySucceeds();
 }
 
 } //namespace nx::network::cloud::test

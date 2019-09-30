@@ -19,9 +19,10 @@ void filterOut(
         std::remove_if(
             list->begin(), list->end(),
             [partitionType](const QnPlatformMonitor::PartitionSpace& partition)
-    {
-        return partition.type == partitionType;
-    }), list->end());
+            {
+                return partition.type == partitionType;
+            }),
+        list->end());
 }
 
 class PathAmender

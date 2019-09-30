@@ -10,11 +10,11 @@ struct TestCameraIni: public nx::kit::IniConfig
         "for Server's auto camera discovery feature.");
     NX_INI_INT(4985, mediaPort, "Port on which test camera serves the media stream.");
     NX_INI_STRING(
-        "Network Optix Camera Emulator 3.0 discovery\n",
+        "Network Optix Camera Emulator 3.0 discovery",
         findMessage,
         "Message expected from the Server when discovering the test camera.");
     NX_INI_STRING(
-        "Network Optix Camera Emulator 3.0 discovery response\n",
+        "Network Optix Camera Emulator 3.0 discovery response",
         idMessage,
         "Message that is sent by the test camera to the server when the camera gets discovered.");
 };

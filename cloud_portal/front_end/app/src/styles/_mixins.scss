@@ -33,3 +33,33 @@
     max-width     : 100%;
     line-height   : initial;
 }
+
+@mixin badge-effects($default, $hover, $active) {
+    background-color : $default;
+    &:hover {
+        background-color : $hover;
+    }
+    
+    &:active {
+        background-color : $active;
+    }
+}
+
+#selected-tag {
+    color         : $light1;
+    padding-left  : 12px;
+    padding-right : 0;
+}
+
+@mixin badge-selected($default, $hover, $active) {
+    @extend #selected-tag;
+    background-color : $default;
+    
+    & > span.close-button:hover {
+        background-color : $hover;
+    }
+    
+    & > span.close-button:active {
+        background-color : $active;
+    }
+}

@@ -1,19 +1,14 @@
 #include "mediator_endpoint.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::hpm {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((MediatorEndpoint), (json), _Fields)
 
 std::string MediatorEndpoint::toString() const
 {
-    std::string s("{ domainName: ");
-    s += domainName;
-    s += ", httpPort: ";
-    s += std::to_string(httpPort);
-    s += ", httpsPort: ";
-    s += std::to_string(httpsPort);
-    s += ", stunUdpPort: ";
-    s += std::to_string(stunUdpPort);
-    s += " }";
-    return s;
+    return QJson::serialized(*this).toStdString();
 }
 
 bool MediatorEndpoint::operator==(const MediatorEndpoint& other) const

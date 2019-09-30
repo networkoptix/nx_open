@@ -29,9 +29,20 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 
-signals:
-    void dataDropped(QnArchiveStreamReader* reader);
+    /**
+     * Debug log representation. Used by toString(const T*).
+     */
+    virtual QString idForToStringFromPtr() const override;
 
+signals:
+    void dataDropped();
+
+protected slots:
+    virtual void resetCachedValues() override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+private:
+    Qn::ResourceFlags calculateFlags() const;
+private:
+    mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
 };
