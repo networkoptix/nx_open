@@ -3,6 +3,7 @@
 #include <QtWidgets/QAction>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <common/common_module.h>
 
@@ -1707,10 +1708,13 @@ ActionVisibility ReachableServerCondition::check(
     if (server->getId() == context->commonModule()->remoteGUID())
         return InvisibleAction;
 
-    const auto discoveryManager = context->commonModule()->moduleDiscoveryManager();
-
-    if (!server->isOnline() || !discoveryManager->getEndpoint(server->getId()))
+    if (!server->isOnline()
+        || !context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId())
+        || (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
+            && !context->commonModule()->globalSettings()->cloudSystemId().isEmpty()))
+    {
         return DisabledAction;
+    }
 
     return EnabledAction;
 }
