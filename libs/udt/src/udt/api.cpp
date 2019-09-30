@@ -114,7 +114,7 @@ Result<> CUDTUnited::initializeUdtLibrary()
     wVersionRequested = MAKEWORD(2, 2);
 
     if (0 != WSAStartup(wVersionRequested, &wsaData))
-        return Result<>(ErrorInfo(1, 1, GetLastError()));
+        return Result<>(Error());
 #endif
 
     //init CTimer::EventLock
@@ -163,7 +163,7 @@ Result<> CUDTUnited::deinitializeUdtLibrary()
 Result<UDTSOCKET> CUDTUnited::newSocket(int af, int type)
 {
     if ((type != SOCK_STREAM) && (type != SOCK_DGRAM))
-        return ErrorInfo(5, 3, 0);
+        return Error(OsErrorCode::protocolNotSupported);
 
     auto ns = std::make_shared<CUDTSocket>();
     ns->m_pUDT = std::make_shared<CUDT>();
@@ -196,9 +196,8 @@ Result<int> CUDTUnited::createConnection(
     CHandShake* hs)
 {
     std::shared_ptr<CUDTSocket> ls = locate(listen);
-
     if (!ls)
-        return ErrorInfo(1, 1, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::shared_ptr<CUDTSocket> ns;
     // if this connection has already been processed
@@ -233,7 +232,7 @@ Result<int> CUDTUnited::createConnection(
 
     // exceeding backlog, refuse the connection request
     if (ls->m_pQueuedSockets.size() >= ls->m_uiBackLog)
-        return ErrorInfo(1, 1, 0);
+        return Error(OsErrorCode::connectionRefused);
 
     ns = std::make_shared<CUDTSocket>();
     ns->m_pUDT = std::make_shared<CUDT>(*(ls->m_pUDT));
@@ -267,7 +266,7 @@ Result<int> CUDTUnited::createConnection(
         ns->m_Status = CLOSED;
         ns->m_TimeStamp = CTimer::getTime();
 
-        return result.errorInfo();
+        return result.error();
     }
 
     ns->m_Status = CONNECTED;
@@ -305,9 +304,8 @@ Result<std::shared_ptr<CUDT>> CUDTUnited::lookup(const UDTSOCKET u)
     std::lock_guard<std::mutex> lock(m_ControlLock);
 
     auto i = m_Sockets.find(u);
-
     if ((i == m_Sockets.end()) || (i->second->m_Status == CLOSED))
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     return success(i->second->m_pUDT);
 }
@@ -336,24 +334,24 @@ Result<> CUDTUnited::bind(const UDTSOCKET u, const sockaddr* name, int namelen)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::lock_guard<std::mutex> lock(s->m_ControlLock);
 
     // cannot bind a socket more than once
     if (INIT != s->m_Status)
-        return ErrorInfo(5, 0, 0);
+        return Error(OsErrorCode::invalidData);
 
     // check the size of SOCKADDR structure
     if (AF_INET == s->m_iIPversion)
     {
         if (namelen != sizeof(sockaddr_in))
-            return ErrorInfo(5, 3, 0);
+            return Error(OsErrorCode::invalidData);
     }
     else
     {
         if (namelen != sizeof(sockaddr_in6))
-            return ErrorInfo(5, 3, 0);
+            return Error(OsErrorCode::invalidData);
     }
 
     s->m_pUDT->open();
@@ -370,18 +368,18 @@ Result<> CUDTUnited::bind(UDTSOCKET u, UDPSOCKET udpsock)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::lock_guard<std::mutex> lock(s->m_ControlLock);
 
     // cannot bind a socket more than once
     if (INIT != s->m_Status)
-        return ErrorInfo(5, 0, 0);
+        return Error(OsErrorCode::invalidData);
 
     detail::SocketAddress socketAddress;
 
     if (-1 == ::getsockname(udpsock, socketAddress.get(), &socketAddress.length()))
-        return ErrorInfo(5, 3);
+        return OsError();
 
     s->m_pUDT->open();
     updateMux(s.get(), socketAddress, &udpsock);
@@ -397,7 +395,7 @@ Result<> CUDTUnited::listen(const UDTSOCKET u, int backlog)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::lock_guard<std::mutex> lock(s->m_ControlLock);
 
@@ -407,14 +405,14 @@ Result<> CUDTUnited::listen(const UDTSOCKET u, int backlog)
 
     // a socket can listen only if is in OPENED status
     if (OPENED != s->m_Status)
-        return ErrorInfo(5, 5, 0);
+        return Error(OsErrorCode::invalidData);
 
     // listen is not supported in rendezvous connection setup
     if (s->m_pUDT->rendezvous())
-        return ErrorInfo(5, 7, 0);
+        return Error(OsErrorCode::invalidData, UDT::ProtocolError::cannotListenInRendezvousMode);
 
     if (backlog <= 0)
-        return ErrorInfo(5, 3, 0);
+        return Error(OsErrorCode::invalidData);
 
     s->m_uiBackLog = backlog;
 
@@ -429,19 +427,19 @@ Result<> CUDTUnited::listen(const UDTSOCKET u, int backlog)
 Result<UDTSOCKET> CUDTUnited::accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen)
 {
     if ((nullptr != addr) && (nullptr == addrlen))
-        return ErrorInfo(5, 3, 0);
+        return Error(OsErrorCode::invalidData);
 
     std::shared_ptr<CUDTSocket> ls = locate(listen);
     if (!ls)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     // the "listen" socket must be in LISTENING status
     if (LISTENING != ls->m_Status)
-        return ErrorInfo(5, 6, 0);
+        return Error(OsErrorCode::invalidData);
 
     // no "accept" in rendezvous connection setup
     if (ls->m_pUDT->rendezvous())
-        return ErrorInfo(5, 7, 0);
+        return Error(OsErrorCode::invalidData, UDT::ProtocolError::cannotListenInRendezvousMode);
 
     UDTSOCKET u = CUDT::INVALID_SOCK;
     bool accepted = false;
@@ -478,10 +476,10 @@ Result<UDTSOCKET> CUDTUnited::accept(const UDTSOCKET listen, sockaddr* addr, int
     {
         // non-blocking receiving, no connection available
         if (!ls->m_pUDT->synRecving())
-            return ErrorInfo(6, 2, 0);
+            return Error(OsErrorCode::wouldBlock);
 
         // listening socket is closed
-        return ErrorInfo(5, 6, 0);
+        return Error(OsErrorCode::badDescriptor);
     }
 
     if ((addr != nullptr) && (addrlen != nullptr))
@@ -502,7 +500,7 @@ Result<> CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namele
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::lock_guard<std::mutex> lock(s->m_ControlLock);
 
@@ -510,16 +508,16 @@ Result<> CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namele
     if (AF_INET == s->m_iIPversion)
     {
         if (namelen != sizeof(sockaddr_in))
-            return ErrorInfo(5, 3, 0);
+            return Error(OsErrorCode::invalidData);
     }
     else
     {
         if (namelen != sizeof(sockaddr_in6))
-            return ErrorInfo(5, 3, 0);
+            return Error(OsErrorCode::invalidData);
     }
 
     if (name->sa_family != s->m_iIPversion)
-        return ErrorInfo(5, 3, 0);
+        return Error(OsErrorCode::invalidData);
 
     // a socket can "connect" only if it is in INIT or OPENED status
     if (INIT == s->m_Status)
@@ -532,12 +530,12 @@ Result<> CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namele
         }
         else
         {
-            return ErrorInfo(5, 8, 0);
+            return Error(OsErrorCode::invalidData);
         }
     }
     else if (OPENED != s->m_Status)
     {
-        return ErrorInfo(5, 2, 0);
+        return Error(OsErrorCode::isConnected);
     }
 
     // connect_complete() may be called before connect() returns.
@@ -559,7 +557,7 @@ Result<> CUDTUnited::connect_complete(const UDTSOCKET u)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     // copy address information of local node
     // the local port must be correctly assigned BEFORE CUDT::connect(),
@@ -576,7 +574,7 @@ Result<> CUDTUnited::shutdown(const UDTSOCKET u, int how)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     return s->m_pUDT->shutdown(how);
 }
@@ -585,7 +583,7 @@ Result<> CUDTUnited::close(const UDTSOCKET u)
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     std::lock_guard<std::mutex> lock(s->m_ControlLock);
 
@@ -637,14 +635,14 @@ Result<> CUDTUnited::close(const UDTSOCKET u)
 Result<> CUDTUnited::getpeername(const UDTSOCKET u, sockaddr* name, int* namelen)
 {
     if (CONNECTED != getStatus(u))
-        return ErrorInfo(2, 2, 0);
+        return Error(OsErrorCode::notConnected);
 
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     if (!s->m_pUDT->connected() || s->m_pUDT->broken())
-        return ErrorInfo(2, 2, 0);
+        return Error(OsErrorCode::notConnected);
 
     if (AF_INET == s->m_iIPversion)
         *namelen = sizeof(sockaddr_in);
@@ -661,13 +659,13 @@ Result<> CUDTUnited::getsockname(const UDTSOCKET u, sockaddr* name, int* namelen
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::badDescriptor);
 
     if (s->m_pUDT->broken())
-        return ErrorInfo(5, 4, 0);
+        return Error(OsErrorCode::notConnected);
 
     if (INIT == s->m_Status)
-        return ErrorInfo(2, 2, 0);
+        return Error(OsErrorCode::notConnected);
 
     // copy address information of local node
     s->m_pSelfAddr.copy(name, namelen);
@@ -702,7 +700,7 @@ Result<int> CUDTUnited::select(ud_set* readfds, ud_set* writefds, ud_set* except
             }
             else if (nullptr == (s = locate(*i1)))
             {
-                return ErrorInfo(5, 4, 0);
+                return Error(OsErrorCode::badDescriptor);
             }
             else
             {
@@ -720,7 +718,7 @@ Result<int> CUDTUnited::select(ud_set* readfds, ud_set* writefds, ud_set* except
             }
             else if (nullptr == (s = locate(*i2)))
             {
-                return ErrorInfo(5, 4, 0);
+                return Error(OsErrorCode::badDescriptor);
             }
             else
             {
@@ -738,7 +736,7 @@ Result<int> CUDTUnited::select(ud_set* readfds, ud_set* writefds, ud_set* except
             }
             else if (nullptr == (s = locate(*i3)))
             {
-                return ErrorInfo(5, 4, 0);
+                return Error(OsErrorCode::badDescriptor);
             }
             else
             {
@@ -883,7 +881,7 @@ Result<> CUDTUnited::epoll_add_usock(const int eid, const UDTSOCKET u, const int
 {
     std::shared_ptr<CUDTSocket> s = locate(u);
     if (!s)
-        return ErrorInfo(5, 4);
+        return Error(OsErrorCode::badDescriptor);
 
     auto result = m_EPoll.add_usock(eid, u, events);
     s->addEPoll(eid);
@@ -1108,13 +1106,13 @@ void CUDTUnited::removeSocket(
     }
 }
 
-void CUDTUnited::setError(ErrorInfo e)
+void CUDTUnited::setError(Error e)
 {
     std::lock_guard<std::mutex> lk(m_TLSLock);
     m_mTLSRecord[GetCurrentThreadId()] = e;
 }
 
-const ErrorInfo& CUDTUnited::getError() const
+const Error& CUDTUnited::getError() const
 {
     std::lock_guard<std::mutex> lk(m_TLSLock);
 
@@ -1122,7 +1120,7 @@ const ErrorInfo& CUDTUnited::getError() const
     if (it != m_mTLSRecord.end())
         return it->second;
 
-    static ErrorInfo noError;
+    static Error noError(OsErrorCode::ok, UDT::ProtocolError::none);
     return noError;
 }
 

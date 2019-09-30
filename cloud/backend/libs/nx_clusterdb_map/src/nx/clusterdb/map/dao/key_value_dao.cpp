@@ -118,12 +118,14 @@ void KeyValueDao::insertOrUpdate(
     query->exec();
 }
 
-void KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string& key)
+bool KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kRemoveKeyValuePairTemplate).arg(kSchemaName));
     query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
+
+    return query->numRowsAffected() > 0;
 }
 
 std::optional<std::string> KeyValueDao::get(

@@ -134,7 +134,7 @@ private:
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Counter m_counter;
     nx::utils::SubscriptionId m_uplinkSpeedUpdatedId;
-    mutable std::optional<nx::hpm::api::PeerConnectionSpeed> m_bestUplinkSpeed;
+    mutable std::map<nx::String /*systemId*/, api::PeerConnectionSpeed> m_bestUplinkSpeeds;
 
     void onListeningPeerConnectionClosed(
         const MediaserverData& peerData,

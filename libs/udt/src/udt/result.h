@@ -5,6 +5,9 @@
 
 #include "udt.h"
 
+// TODO: #ak The following using should be removed.
+using UDT::Error;
+
 class BasicResult
 {
 public:
@@ -16,9 +19,9 @@ public:
     /**
      * Constructs error result.
      */
-    BasicResult(ErrorInfo errorInfo):
+    BasicResult(Error error):
         m_ok(false),
-        m_errorInfo(std::move(errorInfo))
+        m_error(std::move(error))
     {
     }
 
@@ -32,17 +35,17 @@ public:
     /**
      * Behavior is undefined in case of success result.
      */
-    const ErrorInfo& errorInfo() const { return *m_errorInfo; }
+    const Error& error() const { return *m_error; }
 
 private:
     bool m_ok = true;
-    std::optional<ErrorInfo> m_errorInfo;
+    std::optional<Error> m_error;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Is used to report any error within library except the public API
+ * Intended to report any error within library except the public API
  * which follows C API style by returning int (0 - success, -1 - error).
  * Intended to protect against mixing int and bool return codes and misused if (result) {...}.
  * @param Payload Result value.
@@ -57,7 +60,7 @@ public:
     /**
      * Constructs success result.
      */
-    explicit Result(Payload payload):
+    Result(Payload payload):
         m_payload(std::move(payload))
     {
     }
@@ -65,7 +68,7 @@ public:
     /**
      * Constructs error result.
      */
-    Result(ErrorInfo errorInfo):
+    Result(Error errorInfo):
         base_type(std::move(errorInfo))
     {
     }

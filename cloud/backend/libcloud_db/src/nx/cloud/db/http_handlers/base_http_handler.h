@@ -76,6 +76,9 @@ protected:
                 this->m_actionType,
                 authzInfo)) //< Using same object since we can move it.
         {
+            NX_VERBOSE(this, "Request %1 was not authorized",
+                requestContext.request.requestLine.url.path());
+
             api::ResultCode resultCode = api::ResultCode::forbidden;
             if (auto resultCodeStr = authzInfo->get<QString>(attr::resultCode))
             {
@@ -97,6 +100,10 @@ protected:
             this->requestCompleted(std::move(result));
             return false;
         }
+
+        NX_VERBOSE(this, "Request %1 authorized successfully",
+            requestContext.request.requestLine.url.path());
+
         return true;
     }
 

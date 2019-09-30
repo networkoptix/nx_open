@@ -21,11 +21,9 @@ public:
      * @param lrfds Sockets, available for reading. map<{socket handle}, {bitmap of UDT_EPOLL_* values}>.
      * @param lwfds Sockets, available for writing. map<{socket handle}, {bitmap of UDT_EPOLL_* values}>.
      * @param std::chrono::microseconds::max() means no timeout.
-     * @return Number of events triggered. -1 in case of error. 0 in case of timeout expiration
-     *   or interruption due to AbstractEpoll::interrupt called prior to this method or
-     *   within another thread simultaneously.
+     * @return Number of events triggered. 0 in case of timeout.
      */
-    virtual int poll(
+    virtual Result<int> poll(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds,
         std::chrono::microseconds timeout) = 0;

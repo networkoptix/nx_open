@@ -9,6 +9,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "../common.h"
+
 static constexpr int USER_EVENT_IDENT = 11;
 
 EpollMacosx::EpollMacosx():
@@ -26,16 +28,17 @@ Result<> EpollMacosx::initialize()
 {
     m_kqueueFd = kqueue();
     if (m_kqueueFd < 0)
-        return ErrorInfo(-1, 0, errno);
+        return OsError();
 
     //registering filter for interrupting poll
     struct kevent _newEvent;
     EV_SET(&_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
     if (kevent(m_kqueueFd, &_newEvent, 1, NULL, 0, NULL) != 0)
     {
+        auto error = Error();
         ::close(m_kqueueFd);
         m_kqueueFd = -1;
-        return ErrorInfo(-1, 0, errno);
+        return error;
     }
 
     return success();
@@ -60,7 +63,7 @@ Result<> EpollMacosx::add(const SYSSOCKET& s, const int* events)
 
     //adding new fd to set
     if (kevent(m_kqueueFd, ev, evCount, NULL, 0, NULL) != 0)
-        return ErrorInfo(-1, 0, errno);
+        return OsError();
 
     int& eventMask = m_sLocals[s];
     eventMask |= *events;
@@ -85,7 +88,7 @@ std::size_t EpollMacosx::socketsPolledCount() const
     return m_sLocals.size();
 }
 
-int EpollMacosx::poll(
+Result<int> EpollMacosx::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -113,6 +116,8 @@ int EpollMacosx::poll(
         ev,
         MAX_EVENTS_TO_READ,
         isTimeoutSpecified ? &systemTimeout : NULL);
+    if (nfds < 0)
+        return OsError();
 
     int result = nfds;
     for (int i = 0; i < nfds; ++i)
@@ -143,7 +148,7 @@ int EpollMacosx::poll(
         }
     }
 
-    return result;
+    return success(result);
 }
 
 void EpollMacosx::interrupt()
