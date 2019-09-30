@@ -11,6 +11,12 @@
 namespace nx::vms::server::metrics {
 
 using namespace std::chrono;
+using Value = StorageController::Value;
+using Resource = StorageController::Resource;
+
+static const std::chrono::seconds kIoRateUpdateInterval(5);
+static const std::chrono::minutes kIssuesRateUpdateInterval(1);
+static const qint64 kBytesInGb = 1000000000;
 
 StorageController::StorageController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -45,21 +51,29 @@ void StorageController::start()
         });
 }
 
-utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
+Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
 {
-    static const std::chrono::seconds kIoRateUpdateInterval(5);
-    static const std::chrono::minutes kIssuesRateUpdateInterval(1);
-    static const qint64 kBytesInGb = 1000000000;
+    const auto bytes = resource->getAndResetMetric(metric);
+    const auto kBps = bytes / 1000.0 / kIoRateUpdateInterval.count();
+    return Value(kBps);
+}
 
-    static auto ioRate =
-        [](const auto& r, const auto& metric)
-        {
-            const auto bytes = r->getAndResetMetric(metric);
-            const auto kBps = bytes / 1000.0 / kIoRateUpdateInterval.count();
-            return StorageController::Value(kBps);
-        };
+auto transactionsPerSecond(const Resource& storage)
+{
+    const auto resourcePool = storage->commonModule()->resourcePool();
+    const auto ownMediaServer = resourcePool->getOwnMediaServer();
+    if (!ownMediaServer || ownMediaServer->metadataStorageId() != storage->getId())
+        return Value();
+    auto statistics = storage->serverModule()->analyticsEventsStorage()->statistics();
+    if (!statistics)
+        return Value();
+    return Value(statistics->requestsSucceeded
+        / (double)duration_cast<seconds>(statistics->statisticalPeriod).count());
+}
 
-    return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+auto infoGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -71,7 +85,12 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             utils::metrics::makeSystemValueProvider<Resource>(
                 "type", [](const auto& r) { return Value(r->getStorageType()); }
             )
-        ),
+        );
+}
+
+auto stateGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "state",
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -87,7 +106,12 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                     },
                     nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
             )
-        ),
+        );
+}
+
+auto activityGroupProvider()
+{
+    return
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -104,21 +128,14 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                     nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "transactionsPerSecond",
-                [](const auto& r)
-                {
-                    const auto resourcePool = r->commonModule()->resourcePool();
-                    const auto ownMediaServer = resourcePool->getOwnMediaServer();
-                    if (!ownMediaServer || ownMediaServer->metadataStorageId() != r->getId())
-                        return Value();
-                    auto statistics = r->serverModule()->analyticsEventsStorage()->statistics();
-                    if (!statistics)
-                        return Value();
-                    return Value(statistics->requestsSucceeded
-                        / (double) duration_cast<seconds>(statistics->statisticalPeriod).count());
-                }
+                "transactionsPerSecond", [](const auto& r) { return transactionsPerSecond(r); }
             )
-        ),
+        );
+}
+
+auto spaceGroupProvider()
+{
+    return
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -134,7 +151,16 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                 "mediaSpaceGB",
                     [](const auto& r) { return r->nxOccupedSpace() / (double) kBytesInGb; }
             )
-        )
+        );
+}
+
+utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
+{
+    return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+        infoGroupProvider(),
+        stateGroupProvider(),
+        activityGroupProvider(),
+        spaceGroupProvider()
     );
 
 }

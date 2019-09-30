@@ -139,7 +139,7 @@ std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
 {
     if (m_dbController)
         return m_dbController->statisticsCollector().getQueryStatistics();
-    return std::optional<nx::sql::QueryStatistics>();
+    return std::nullopt;
 }
 
 void EventsStorage::createLookupCursor(
@@ -656,7 +656,7 @@ std::optional<nx::sql::QueryStatistics> MovableAnalyticsDb::statistics() const
 {
     if (const auto db = getDb())
         return db->statistics();
-    return std::optional<nx::sql::QueryStatistics>();
+    return std::nullopt;
 }
 
 bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
