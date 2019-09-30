@@ -4,6 +4,11 @@
 
 namespace nx::utils {
 
+bool isIdentifier(const QChar& letter)
+{
+    return letter.isLetter() || letter.isDigit() || letter == L'_';
+}
+
 QString stringTemplate(
     const QString& template_,
     const QString& variableMark,
@@ -20,7 +25,7 @@ QString stringTemplate(
             break;
 
         auto end = begin + 1;
-        while (end < template_.size() && template_[end].isLetter())
+        while (end < template_.size() && isIdentifier(template_[end]))
             end++;
 
         result += template_.midRef(processed, begin - processed);
