@@ -291,7 +291,7 @@ ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMoni
 {
     FormulaBuilder builder(formula, monitors);
     auto parsed = builder.build();
-    return ValueGeneratorResult{std::move(parsed), builder.isLocal() ? Scope::local : Scope::system};
+    return {std::move(parsed), builder.isLocal() ? Scope::local : Scope::system};
 }
 
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
