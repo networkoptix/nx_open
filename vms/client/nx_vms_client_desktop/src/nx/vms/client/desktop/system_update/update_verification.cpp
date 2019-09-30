@@ -175,6 +175,7 @@ bool verifyUpdateContents(
     contents.missingUpdate.clear();
     contents.unsuportedSystemsReport.clear();
     contents.peersWithUpdate.clear();
+    contents.manualPackages.clear();
     contents.noServerWithInternet = true;
 
     // Check if some packages from manifest do not exist.
@@ -420,7 +421,7 @@ bool verifyUpdateContents(
             files.append(pkg.file);
 
         NX_WARNING(logTag, "detected some servers can not download update packages: %1",
-            files.join(","));
+            files.join(", "));
     }
 
     return contents.isValidToInstall();
