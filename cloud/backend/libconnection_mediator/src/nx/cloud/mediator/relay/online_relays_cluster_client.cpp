@@ -121,7 +121,7 @@ void OnlineRelaysClusterClient::onRelayDiscovered(nx::cloud::discovery::Node tra
         QnMutexLocker lock(&m_mutex);
         m_resolvedRelays.emplace(
             location->continent,
-            RelayContext{std::move(*location), std::move(trafficRelayNode)});
+            RelayContext{*location, std::move(trafficRelayNode)});
     }
     else
     {
@@ -188,7 +188,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
         if (!relay.second.urls.empty())
             urls.emplace_back(baseUrl(relay.second.urls.front()));
 
-        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int) urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 
@@ -197,13 +197,14 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
 
 std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() const
 {
+    QnMutexLocker lock(&m_mutex);
     std::vector<nx::utils::Url> urls;
     for (const auto& relay: m_unresolvedRelays)
     {
         if (!relay.urls.empty())
             urls.emplace_back(baseUrl(relay.urls.front()));
 
-        if ((int)urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
+        if ((int) urls.size() >= m_settings.geoIp().resolveErrorUrlCount)
             break;
     }
 

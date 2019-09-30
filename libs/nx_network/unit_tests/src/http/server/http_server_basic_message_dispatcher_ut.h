@@ -35,11 +35,13 @@ public:
 
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
-        nx::network::http::RequestProcessedHandler /*completionHandler*/) override
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
         m_requests->push_back({
             m_pathTemplate,
             std::exchange(requestContext.requestPathParams, {})});
+
+        completionHandler(StatusCode::ok);
     }
 
 private:
@@ -92,7 +94,7 @@ protected:
                 nullptr,
                 prepareDummyRequest(method, path),
                 nx::utils::stree::ResourceContainer(),
-                detail::OnRequestProcessedHandler()));
+                [](auto&&...) {}));
     }
 
     void assertDefaultHandlerFound(
@@ -113,7 +115,7 @@ protected:
                 nullptr,
                 prepareDummyRequest(method, path),
                 nx::utils::stree::ResourceContainer(),
-                detail::OnRequestProcessedHandler()));
+                [](auto&&...) {}));
     }
 
     detail::RequestContext issuedRequest()

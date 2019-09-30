@@ -9,6 +9,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/random.h>
 
 #include <nx/cloud/relay/statistics_provider.h>
 
@@ -35,17 +36,18 @@ public:
 protected:
     virtual void SetUp() override
     {
-        const auto certificateFilePath =
-            lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
+         m_certificateFilePath =
+			lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
 
-        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
-            certificateFilePath.c_str(),
-            "traffic_relay/https test", "US", "Nx"));
+		ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
+			m_certificateFilePath.c_str(),
+			"traffic_relay/https test", "US", "Nx"));
 
         addRelayInstance({
             "--https/listenOn=0.0.0.0:0",
+			"--https/certificateMonitorTimeout=20ms",
             "-https/certificatePath",
-            certificateFilePath.c_str()});
+			m_certificateFilePath.c_str()});
     }
 
     nx::utils::Url basicHttpsUrl() const
@@ -58,9 +60,16 @@ protected:
 
     void whenEstablishSecureConnection()
     {
-        m_connection = std::make_unique<network::ssl::ClientStreamSocket>(
-            std::make_unique<network::TCPSocket>(AF_INET));
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+		m_connection = std::make_unique<network::ssl::ClientStreamSocket>(
+			std::make_unique<network::TCPSocket>(AF_INET));
+		ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+		m_connection->setVerifyCertificateCallback(
+			[this](const nx::network::ssl::Certificate& certificate)
+			{
+				m_sslCertificateVerifiedEvent.push(certificate.serialNumber);
+				return true;//< Returning true intentionally so that ut can verify serialNumber.
+			});
 
         m_connection->connectAsync(
             network::url::getEndpoint(basicHttpsUrl()),
@@ -79,6 +88,25 @@ protected:
             std::bind(&Https::saveStatisticsRequestResult, this, _1, _2, _3));
     }
 
+	void whenCertificateFileIsModified()
+	{
+		relay().moduleInstance()->setOnStartedEventHandler(
+			[this](bool isStarted) { m_relayRestartedEvent.push(isStarted); });
+
+		// At least on Windows, file modification events have a resolution of one second.
+		// A file that is created and then modified within one second of its creation
+		// will not be detected, so sleep needs to be for at least one second.
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		modifyCertificateFile();
+	}
+
+	void thenRelayIsRestarted()
+	{
+		ASSERT_TRUE(m_relayRestartedEvent.pop());
+		NX_DEBUG(this, "Relay was restarted");
+	}
+
     void thenConnectionIsEstablished()
     {
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
@@ -89,6 +117,15 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, m_apiResponseQueue.pop());
     }
 
+	void andNewCertificateIsInUse()
+	{
+		whenEstablishSecureConnection();
+		thenConnectionIsEstablished();
+
+		const long verifiedSslCertificateSerialNumber = m_sslCertificateVerifiedEvent.pop();
+		ASSERT_EQ(m_sslCertificateSerialNumber, verifiedSslCertificateSerialNumber);
+	}
+
 private:
     using GetStatisticsHttpClient =
         nx::network::http::FusionDataHttpClient<void, nx::cloud::relay::Statistics>;
@@ -97,6 +134,15 @@ private:
     std::unique_ptr<network::ssl::ClientStreamSocket> m_connection;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
     nx::utils::SyncQueue<api::ResultCode> m_apiResponseQueue;
+	long m_sslCertificateSerialNumber = 0;
+	nx::utils::SyncQueue<long> m_sslCertificateVerifiedEvent;
+	std::string m_certificateFilePath;
+	nx::utils::SyncQueue<bool> m_relayRestartedEvent;
+
+	void createSslCertificateFile()
+	{
+		m_sslCertificateSerialNumber = nx::utils::random::number<long>();
+	}
 
     void saveConnectResult(SystemError::ErrorCode systemErrorCode)
     {
@@ -114,6 +160,24 @@ private:
                 response->statusLine.statusCode))
             : api::ResultCode::networkError);
     }
+
+	void modifyCertificateFile()
+	{
+		m_sslCertificateSerialNumber = nx::utils::random::number<long>();
+
+		const auto certificateData = nx::network::ssl::Engine::makeCertificateAndKey(
+			"traffic_relay/https test",
+			"US",
+			"Nx",
+			m_sslCertificateSerialNumber);
+
+		NX_DEBUG(this, "Modifying certificate file");
+
+		QFile file(m_certificateFilePath.c_str());
+		ASSERT_TRUE(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+		ASSERT_TRUE(file.write(certificateData) == certificateData.size());
+		file.close();
+	}
 };
 
 TEST_F(Https, ssl_connections_are_accepted_as_configured)
@@ -126,6 +190,13 @@ TEST_F(Https, http_api_is_available_via_ssl)
 {
     whenPerformApiCallUsingHttps();
     thenApiCallSucceeded();
+}
+
+TEST_F(Https, relay_restarts_if_certificate_file_is_modified)
+{
+	whenCertificateFileIsModified();
+	thenRelayIsRestarted();
+	andNewCertificateIsInUse();
 }
 
 } // namespace test

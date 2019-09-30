@@ -59,11 +59,6 @@ protected:
         RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) = 0;
 
-    virtual void sendRawHttpResponse(RequestResult requestResult)
-    {
-        base_type::sendResponse(std::move(requestResult));
-    }
-
     void requestCompleted(FusionRequestResult result);
 
     /**
@@ -144,11 +139,6 @@ private:
     boost::optional<nx::network::http::ConnectionEvents> m_connectionEvents;
     Qn::SerializationFormat m_inputFormat = Qn::UnsupportedFormat;
     Qn::SerializationFormat m_outputFormat = Qn::UnsupportedFormat;
-
-    virtual void sendResponse(RequestResult requestResult) override
-    {
-        sendRawHttpResponse(std::move(requestResult));
-    }
 };
 
 

@@ -167,7 +167,11 @@ void Server::serveGetStreamingLogger(
 {
     LoggerSettings loggerSettings;
     if (!loggerSettings.parse(requestContext.request.requestLine.url.query()))
+    {
+        NX_DEBUG(this, "Failed to parse log settings %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::StatusCode::badRequest);
+    }
 
     auto messageBody = std::make_unique<WritableMessageBody>("text/plain");
     auto logWriter = std::make_unique<StreamingLogWriter>(messageBody.get());
@@ -185,13 +189,21 @@ void Server::serveGetStreamingLogger(
         utils::toFilters(loggerSettings.level.filters),
         std::move(logWriter));
     if (!newLogger)
+    {
+        NX_DEBUG(this, "Failed to create logger %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::StatusCode::internalServerError);
+    }
 
     std::shared_ptr<AbstractLogger> sharedNewLogger(std::move(newLogger));
 
     int loggerId = m_loggerCollection->add(sharedNewLogger);
     if (loggerId == LoggerCollection::kInvalidId)
+    {
+        NX_DEBUG(this, "Failed to install logger %1",
+            requestContext.request.requestLine.url.query());
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
+    }
 
     messageBody->setOnBeforeDestructionHandler(
         [this, sharedNewLogger, logWriterPtr, loggerId]()

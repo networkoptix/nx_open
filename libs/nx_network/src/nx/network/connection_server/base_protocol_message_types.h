@@ -20,6 +20,13 @@ enum class ParserState
     failed,
 };
 
+NX_NETWORK_API const char* toString(ParserState);
+
+inline std::ostream& operator<<(std::ostream& s, ParserState state)
+{
+    return s << toString(state);
+}
+
 enum class SerializerState
 {
     needMoreBufferSpace = 1,

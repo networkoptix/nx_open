@@ -182,20 +182,9 @@ int CUnitQueue::init(int size, int mss, int version)
     CUnit* tempu = nullptr;
     char* tempb = nullptr;
 
-    try
-    {
-        tempq = new CQEntry;
-        tempu = new CUnit[size];
-        tempb = new char[size * mss];
-    }
-    catch (...)
-    {
-        delete tempq;
-        delete[] tempu;
-        delete[] tempb;
-
-        return -1;
-    }
+    tempq = new CQEntry;
+    tempu = new CUnit[size];
+    tempb = new char[size * mss];
 
     for (int i = 0; i < size; ++i)
     {
@@ -246,20 +235,9 @@ int CUnitQueue::increase()
     // all queues have the same size
     int size = m_pQEntry->m_iSize;
 
-    try
-    {
-        tempq = new CQEntry;
-        tempu = new CUnit[size];
-        tempb = new char[size * m_iMSS];
-    }
-    catch (...)
-    {
-        delete tempq;
-        delete[] tempu;
-        delete[] tempb;
-
-        return -1;
-    }
+    tempq = new CQEntry;
+    tempu = new CUnit[size];
+    tempb = new char[size * m_iMSS];
 
     for (int i = 0; i < size; ++i)
     {
@@ -516,7 +494,7 @@ CSndQueue::~CSndQueue()
 
 void CSndQueue::start()
 {
-    // TODO: #ak std::thread can throw. Convert exception to CUDTException(3, 1)?
+    // TODO: #ak std::thread can throw.
     m_WorkerThread = std::thread([this]() { worker(); });
 }
 
@@ -842,8 +820,8 @@ CRcvQueue::~CRcvQueue()
 
 void CRcvQueue::start()
 {
+    // TODO: #ak std::thread can throw.
     m_WorkerThread = std::thread(&CRcvQueue::worker, this);
-    // TODO: #ak Convert std::thread exception to CUDTException(3, 1)?
 }
 
 void CRcvQueue::stop()
@@ -857,7 +835,6 @@ void CRcvQueue::stop()
 void CRcvQueue::worker()
 {
     detail::SocketAddress addr(m_UnitQueue.m_iIPversion);
-    int32_t id;
 
     while (!m_bClosing)
     {
@@ -878,7 +855,7 @@ void CRcvQueue::worker()
 
         // find next available slot for incoming packet
         CUnit* unit = m_UnitQueue.getNextAvailUnit();
-        if (nullptr == unit)
+        if (!unit)
         {
             // no space, skip this packet
             CPacket temp;
@@ -886,102 +863,111 @@ void CRcvQueue::worker()
             temp.setLength(m_iPayloadSize);
             m_channel->recvfrom(addr, temp);
             delete[] temp.m_pcData;
-            goto TIMER_CHECK;
+            timerCheck();
+            continue;
         }
 
         unit->m_Packet.setLength(m_iPayloadSize);
 
-        // reading next incoming packet, recvfrom returns -1 is nothing has been received
-        if (m_channel->recvfrom(addr, unit->m_Packet) < 0)
-            goto TIMER_CHECK;
-
-        id = unit->m_Packet.m_iID;
-
-        try
+        // Reading next incoming packet, recvfrom returns -1 if nothing has been received.
+        if (!m_channel->recvfrom(addr, unit->m_Packet).ok())
         {
-            // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
-            if (0 == id)
-            {
-                if (auto listener = m_listener.lock())
-                {
-                    listener->processConnectionRequest(addr, unit->m_Packet);
-                }
-                else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
-                {
-                    // asynchronous connect: call connect here
-                    // otherwise wait for the UDT socket to retrieve this packet
-                    if (!u->synRecving())
-                        u->connect(unit->m_Packet);
-                    else
-                        storePkt(id, unit->m_Packet.clone());
-                }
-            }
-            else if (id > 0)
-            {
+            timerCheck();
+            continue;
+        }
+
+        processUnit(unit, addr);
+        // Ignoring error since the socket could be removed before connect finished.
+
+        timerCheck();
+    }
+}
+
+void CRcvQueue::timerCheck()
+{
+    uint64_t currtime;
+    CTimer::rdtsc(currtime);
+
+    CRNode* ul = m_pRcvUList->m_nodeListHead;
+    uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
+    while ((nullptr != ul) && (ul->timestamp < ctime))
+    {
+        std::shared_ptr<CUDT> u = ul->socket.lock();
+
+        if (u && u->connected() && !u->broken() && !u->isClosing())
+        {
+            u->checkTimers(false);
+            m_pRcvUList->update(ul->socketId);
+        }
+        else
+        {
+            // the socket must be removed from Hash table first, then RcvUList
+            m_socketByIdDict.remove(ul->socketId);
+            m_pRcvUList->remove(ul);
+        }
+
+        ul = m_pRcvUList->m_nodeListHead;
+    }
+
+    // Check connection requests status for all sockets in the RendezvousQueue.
+    m_pRendezvousQueue->updateConnStatus();
+}
+
+Result<> CRcvQueue::processUnit(
+    CUnit* unit,
+    const detail::SocketAddress& addr)
+{
+    int32_t id = unit->m_Packet.m_iID;
+
+    // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
+    if (0 == id)
+    {
+        if (auto listener = m_listener.lock())
+        {
+            listener->processConnectionRequest(addr, unit->m_Packet);
+        }
+        else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
+        {
+            // asynchronous connect: call connect here
+            // otherwise wait for the UDT socket to retrieve this packet
+            if (!u->synRecving())
+                u->connect(unit->m_Packet); // TODO: #ak The result code is ignored here.
+            else
+                storePkt(id, unit->m_Packet.clone());
+        }
+    }
+    else if (id > 0)
+    {
 #ifdef DEBUG_RECORD_PACKET_HISTORY
-                packetVerifier.packetReceived(unit->m_Packet);
+        packetVerifier.packetReceived(unit->m_Packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-                if (auto u = m_socketByIdDict.lookup(id))
+        if (auto u = m_socketByIdDict.lookup(id))
+        {
+            if (addr == u->peerAddr())
+            {
+                if (u->connected() && !u->broken() && !u->isClosing())
                 {
-                    if (addr == u->peerAddr())
-                    {
-                        if (u->connected() && !u->broken() && !u->isClosing())
-                        {
-                            if (unit->m_Packet.getFlag() == PacketFlag::Data)
-                                u->processData(unit);
-                            else
-                                u->processCtrl(unit->m_Packet);
-
-                            u->checkTimers(false);
-                            m_pRcvUList->update(id);
-                        }
-                    }
-                }
-                else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
-                {
-                    if (!u->synRecving())
-                        u->connect(unit->m_Packet);
+                    if (unit->m_Packet.getFlag() == PacketFlag::Data)
+                        u->processData(unit); // TODO: #ak It is unclear why the result is ignored.
                     else
-                        storePkt(id, unit->m_Packet.clone());
+                        u->processCtrl(unit->m_Packet);
+
+                    u->checkTimers(false);
+                    m_pRcvUList->update(id);
                 }
             }
         }
-        catch (const CUDTException& /*e*/)
+        else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
-            //socket has been removed before connect finished? ignoring error...
-        }
-
-    TIMER_CHECK:
-        // take care of the timing event for all UDT sockets
-
-        uint64_t currtime;
-        CTimer::rdtsc(currtime);
-
-        CRNode* ul = m_pRcvUList->m_nodeListHead;
-        uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
-        while ((nullptr != ul) && (ul->timestamp < ctime))
-        {
-            std::shared_ptr<CUDT> u = ul->socket.lock();
-
-            if (u && u->connected() && !u->broken() && !u->isClosing())
-            {
-                u->checkTimers(false);
-                m_pRcvUList->update(ul->socketId);
-            }
+            if (!u->synRecving())
+                u->connect(unit->m_Packet); // TODO: #ak The result code is ignored here.
             else
-            {
-                // the socket must be removed from Hash table first, then RcvUList
-                m_socketByIdDict.remove(ul->socketId);
-                m_pRcvUList->remove(ul);
-            }
-
-            ul = m_pRcvUList->m_nodeListHead;
+                storePkt(id, unit->m_Packet.clone());
         }
-
-        // Check connection requests status for all sockets in the RendezvousQueue.
-        m_pRendezvousQueue->updateConnStatus();
     }
+
+    return success();
 }
 
 int CRcvQueue::recvfrom(int32_t id, CPacket& packet)

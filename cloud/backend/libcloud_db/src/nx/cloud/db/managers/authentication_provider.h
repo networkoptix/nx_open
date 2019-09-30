@@ -98,12 +98,12 @@ private:
         const std::string& nonce,
         const std::string& systemId,
         std::shared_ptr<bool> isNonceValid);
-    
+
     std::tuple<api::Result, api::AuthResponse>
         prepareAuthenticationResponse(
             const std::string& systemId,
             const data::AuthRequest& authRequest);
-    
+
     api::AuthResponse prepareResponse(
         std::string nonce,
         api::SystemSharingEx systemSharing,

@@ -44,9 +44,11 @@ Yunhong Gu, last updated 08/20/2010
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 
 #include "common.h"
+#include "result.h"
 #include "udt.h"
 
 
@@ -69,9 +71,9 @@ public: // for CUDTUnited API
         // Parameters:
         //    None.
         // Returned value:
-        //    new EPoll ID if success, otherwise an error number.
+        //    new EPoll ID.
 
-    int create();
+    Result<int> create();
 
     // Functionality:
     //    add a UDT socket to an EPoll.
@@ -79,10 +81,8 @@ public: // for CUDTUnited API
     //    0) [in] eid: EPoll ID.
     //    1) [in] u: UDT Socket ID.
     //    2) [in] events: events to watch.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int add_usock(const int eid, const UDTSOCKET& u, const int* events = NULL);
+    Result<> add_usock(const int eid, const UDTSOCKET& u, const int* events = NULL);
 
     // Functionality:
     //    add a system socket to an EPoll.
@@ -90,30 +90,24 @@ public: // for CUDTUnited API
     //    0) [in] eid: EPoll ID.
     //    1) [in] s: system Socket ID.
     //    2) [in] events: events to watch.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int add_ssock(const int eid, const SYSSOCKET& s, const int* events = NULL);
+    Result<> add_ssock(const int eid, const SYSSOCKET& s, const int* events = NULL);
 
     // Functionality:
     //    remove a UDT socket event from an EPoll; socket will be removed if no events to watch
     // Parameters:
     //    0) [in] eid: EPoll ID.
     //    1) [in] u: UDT socket ID.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int remove_usock(const int eid, const UDTSOCKET& u);
+    Result<> remove_usock(const int eid, const UDTSOCKET& u);
 
     // Functionality:
     //    remove a system socket event from an EPoll; socket will be removed if no events to watch
     // Parameters:
     //    0) [in] eid: EPoll ID.
     //    1) [in] s: system socket ID.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int remove_ssock(const int eid, const SYSSOCKET& s);
+    Result<> remove_ssock(const int eid, const SYSSOCKET& s);
 
     // Functionality:
     //    wait for EPoll events or timeout.
@@ -127,29 +121,25 @@ public: // for CUDTUnited API
     // Returned value:
     //    number of sockets available for IO.
 
-    int wait(
+    Result<int> wait(
         const int eid,
         std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
         std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds);
 
     // Functionality:
-    //    Interrupt one wait call: the one running simultaneously 
+    //    Interrupt one wait call: the one running simultaneously
     //    in another thread or the next one to be made.
     // Parameters:
     //    0) [in] eid: EPoll ID.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int interruptWait(const int eid);
+    Result<> interruptWait(const int eid);
 
     // Functionality:
     //    close and release an EPoll.
     // Parameters:
     //    0) [in] eid: EPoll ID.
-    // Returned value:
-    //    0 if success, otherwise an error number.
 
-    int release(const int eid);
+    Result<> release(const int eid);
 
     void RemoveEPollEvent(UDTSOCKET socket);
 
@@ -178,9 +168,9 @@ private:
     pthread_mutex_t m_SeedLock;
 
     CEPollDescMap m_mPolls;       // all epolls
-    mutable pthread_mutex_t m_EPollLock;
+    mutable std::mutex m_EPollLock;
 
-    EpollImpl* getEpollById(int eid) const;
+    Result<EpollImpl*> getEpollById(int eid) const;
 };
 
 #endif

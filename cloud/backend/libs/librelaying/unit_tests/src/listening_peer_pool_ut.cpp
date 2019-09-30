@@ -271,7 +271,7 @@ protected:
 
     void thenGetConnectionRequestIs(relay::api::ResultCode expectedResultCode)
     {
-        thenGetConnectionRequestIs({{expectedResultCode}});
+        thenGetConnectionRequestIs(std::vector<relay::api::ResultCode>({expectedResultCode}));
     }
 
     void thenConnectRequestHasCompleted()

@@ -192,6 +192,8 @@ protected:
     }
 
 private:
+    QnMutex m_mutex;
+    std::vector<http::RequestProcessedHandler> m_unrespondedRequestHandlers;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
     Server<> m_tunnelingServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
@@ -289,8 +291,10 @@ private:
 
     void leaveRequestWithoutResponse(
         http::RequestContext /*requestContext*/,
-        http::RequestProcessedHandler /*completionHandler*/)
+        http::RequestProcessedHandler completionHandler)
     {
+        QnMutexLocker lock(&m_mutex);
+        m_unrespondedRequestHandlers.push_back(std::move(completionHandler));
     }
 };
 
