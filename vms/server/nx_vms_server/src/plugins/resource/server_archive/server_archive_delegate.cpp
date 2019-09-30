@@ -163,7 +163,7 @@ void QnServerArchiveDelegate::close()
 
     m_currentChunkCatalog[QnServer::StoragePool::Normal].clear();
     m_currentChunkCatalog[QnServer::StoragePool::Backup].clear();
-    m_currentChunk = DeviceFileCatalog::Chunk();
+    m_currentChunk = nx::vms::server::Chunk();
 
     m_aviDelegate->close();
 
@@ -186,7 +186,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //QTime t;
     //t.start();
 
-    DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+    nx::vms::server::UniqueChunkCont ignoreChunks;
     qint64 seekTimeMs = time/1000;
     static const int kSeekStep = 75 * 1000; // 75 seconds
 
@@ -195,7 +195,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         m_newQualityTmpData.reset();
         m_newQualityAviDelegate.clear();
 
-        DeviceFileCatalog::TruncableChunk newChunk;
+        nx::vms::server::TruncableChunk newChunk;
         DeviceFileCatalogPtr newChunkCatalog;
 
         DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
@@ -258,9 +258,9 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     // every time we find file that can not be opened.
                     // In forward mode - same, but opposite direction
                     if (m_reverseMode) {
-                        seekTimeMs = std::min(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
+                        seekTimeMs = std::min<int64_t>(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
                     } else {
-                        seekTimeMs = std::max(seekTimeMs, newChunk.startTimeMs - kSeekStep);
+                        seekTimeMs = std::max<int64_t>(seekTimeMs, newChunk.startTimeMs - kSeekStep);
                     }
                     continue;
                 }
@@ -305,15 +305,15 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     return seekInternal(time, findIFrame, true);
 }
 
-DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
+nx::vms::server::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
 {
     int index = catalog->findFileIndex(time, findMethod);
     return catalog->chunkAt(index);
 }
 
-bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& chunk,
+bool QnServerArchiveDelegate::getNextChunk(nx::vms::server::TruncableChunk& chunk,
                                            DeviceFileCatalogPtr& chunkCatalog,
-                                           DeviceFileCatalog::UniqueChunkCont &ignoreChunks)
+                                           nx::vms::server::UniqueChunkCont &ignoreChunks)
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -358,13 +358,13 @@ begin_label:
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
         DeviceFileCatalogPtr chunkCatalog;
-        DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+        nx::vms::server::UniqueChunkCont ignoreChunks;
         bool switchResult;
-        DeviceFileCatalog::Chunk fallbackChunk;
+        nx::vms::server::Chunk fallbackChunk;
 
         do
         {
-            DeviceFileCatalog::TruncableChunk chunk;
+            nx::vms::server::TruncableChunk chunk;
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {
@@ -512,7 +512,7 @@ bool QnServerArchiveDelegate::setAudioChannel(unsigned num)
     return m_aviDelegate->setAudioChannel(num);
 }
 
-bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
+bool QnServerArchiveDelegate::switchToChunk(const nx::vms::server::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
     if (newChunk.startTimeMs == -1)
         return false;

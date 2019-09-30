@@ -3,7 +3,7 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/analytics/types.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
@@ -54,7 +54,7 @@ private:
     api::analytics::EngineManifest fetchManifest() const;
 
 private:
-    CachedValue<api::analytics::EngineManifest> m_cachedManifest;
+    nx::utils::CachedValue<api::analytics::EngineManifest> m_cachedManifest;
     mutable QnMutex m_cacheMutex;
 };
 

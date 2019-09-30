@@ -100,8 +100,8 @@ TestFileOperation generateFileOperation(RecordType type)
 
     result.chunksCatalog = nx::utils::random::number(0, 1);
     result.fileIndex = nx::utils::random::number(0, 1) == 0
-        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
-        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+        ? nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION
+        : nx::vms::server::Chunk::FILE_INDEX_NONE;
 
     return result;
 }
@@ -235,7 +235,7 @@ public:
 
     struct TestChunk
     {
-        DeviceFileCatalog::Chunk chunk;
+        nx::vms::server::Chunk chunk;
         bool isDeleted;
         bool isVisited;
         Catalog *catalog;
@@ -272,7 +272,7 @@ public:
         if (chunkExists(fileOp.startTime))
             return boost::none;
 
-        DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex,  fileOp.fileIndex,
+        nx::vms::server::Chunk chunk(fileOp.startTime, m_storageIndex,  fileOp.fileIndex,
             fileOp.duration, fileOp.timeZone, (quint16)(fileOp.fileSize >> 32),
             (quint32)(fileOp.fileSize));
 
@@ -300,7 +300,7 @@ public:
         return chunk;
     }
 
-    std::pair<Catalog, std::deque<DeviceFileCatalog::Chunk>> generateReplaceOperation(int size)
+    std::pair<Catalog, nx::vms::server::ChunksDeque> generateReplaceOperation(int size)
     {
         Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
         for (auto& chunk: m_chunks)
@@ -312,14 +312,14 @@ public:
                 ((TestChunk&)chunk).isDeleted = true;
         }
 
-        std::deque<DeviceFileCatalog::Chunk> ret;
+        nx::vms::server::ChunksDeque ret;
         for (int i = 0; i < size; ++i)
         {
             TestFileOperation fileOp = generateFileOperation(RecordType::FileOperationAdd);
             if (chunkExists(fileOp.startTime))
                 continue;
 
-            DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex, fileOp.fileIndex,
+            nx::vms::server::Chunk chunk(fileOp.startTime, m_storageIndex, fileOp.fileIndex,
                 fileOp.duration, fileOp.timeZone, (quint16)((fileOp.fileSize) >> 32),
                 (quint32)(fileOp.fileSize));
 
@@ -536,9 +536,9 @@ TEST(MediaFileOperations, MediaFileOP_ResetValues)
     mfop.setFileSize(newFileSize);
     ASSERT_EQ((qint64) newFileSize, mfop.getFileSize());
 
-    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_NONE);
-    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
-    ASSERT_EQ(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, mfop.getFileTypeIndex());
+    mfop.setFileTypeIndex(nx::vms::server::Chunk::FILE_INDEX_NONE);
+    mfop.setFileTypeIndex(nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION);
+    ASSERT_EQ(nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION, mfop.getFileTypeIndex());
 
     mfop.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
     mfop.setRecordType(nx::media_db::RecordType::FileOperationAdd);
@@ -717,17 +717,22 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
             QString::number(i),
             i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
             QnServer::StoragePool::Normal));
-        std::deque<DeviceFileCatalog::Chunk> chunks;
+        nx::vms::server::ChunksDeque chunks;
         for (size_t j = 0; j < kMaxChunks; ++j)
-            chunks.push_back(DeviceFileCatalog::Chunk((j + 10) * j + 10, 0, DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
+        {
+            chunks.push_back(nx::vms::server::Chunk(
+                (j + 10) * j + 10, 0, nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION,
+                1, 0, 1, 1));
+        }
         catalog->addChunks(chunks);
 
         referenceCatalogs.push_back(catalog);
     }
 
-    /*  Two thirds of reference chunks (from the beginning) we will write to sqlite db and two thirds (from the end) - to the new media db.
-    *   After migration routine executed, result should be equal to the reference catalogs.
-    */
+    /* Two thirds of reference chunks (from the beginning) we will write to sqlite db and two
+     * thirds (from the end) - to the new media db.
+     *  After migration routine executed, result should be equal to the reference catalogs.
+     */
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
@@ -735,15 +740,16 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             QSqlQuery query(sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
+            const nx::vms::server::Chunk chunk =
+                referenceCatalogs[i]->getChunksUnsafe().at(j).chunk();
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
-            query.addBindValue(chunk.startTimeMs); // start_time
+            query.addBindValue(static_cast<qint64>(chunk.startTimeMs)); // start_time
             query.addBindValue(chunk.timeZone); // timezone
             query.addBindValue(chunk.fileIndex); // file_index
-            query.addBindValue(chunk.durationMs); // duration
-            query.addBindValue(chunk.getFileSize()); // filesize
+            query.addBindValue(static_cast<qint64>(chunk.durationMs)); // duration
+            query.addBindValue(static_cast<qint64>(chunk.getFileSize())); // filesize
 
             ASSERT_TRUE(query.exec());
         }
@@ -758,9 +764,9 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     {
         for (size_t j = k13MaxChunks; j < kMaxChunks; ++j)
         {
-            sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
-                           referenceCatalogs[i]->getCatalog(),
-                           referenceCatalogs[i]->getChunksUnsafe().at(j));
+            sdb->addRecord(
+                referenceCatalogs[i]->cameraUniqueId(), referenceCatalogs[i]->getCatalog(),
+                referenceCatalogs[i]->getChunksUnsafe().at(j).chunk());
         }
     }
 
@@ -769,10 +775,14 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-        auto mergedIt = std::find_if(mergedCatalogs.cbegin(), mergedCatalogs.cend(),
-                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c)
-                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
-                                              c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
+        auto mergedIt = std::find_if(
+            mergedCatalogs.cbegin(), mergedCatalogs.cend(),
+            [&referenceCatalogs, i](const DeviceFileCatalogPtr &c)
+            {
+                return
+                    c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId()
+                    && c->getCatalog() == referenceCatalogs[i]->getCatalog();
+            });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
         auto left = (*mergedIt)->getChunksUnsafe();
         auto right = referenceCatalogs[i]->getChunksUnsafe();
@@ -802,7 +812,7 @@ TEST_F(MediaDbTest, StorageDB)
             {
             case 0:
             {
-                std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+                std::pair<TestChunkManager::Catalog, nx::vms::server::ChunksDeque> p;
                 QnMutexLocker lk(&mutex);
                 p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
                 sdb->replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
@@ -869,12 +879,13 @@ TEST_F(MediaDbTest, StorageDB)
              ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt =
-                std::find_if(tcm.get().begin(), tcm.get().end(),
+                std::find_if(
+                    tcm.get().begin(), tcm.get().end(),
                     [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
                     {
                         return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
                             && tc.catalog->quality == (*catalogIt)->getCatalog()
-                            && !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                            && !tc.isVisited && !tc.isDeleted && tc.chunk == (*chunkIt).chunk();
                     });
             bool tcmChunkFound = tcmIt != tcm.get().end();
             ASSERT_TRUE(tcmChunkFound);
@@ -920,10 +931,10 @@ TEST_F(MediaDbTest, ReplaceRecord)
     const QString id2("2");
     const QString id3("3");
 
-    DeviceFileCatalog::Chunk chunk;
+    nx::vms::server::Chunk chunk;
     chunk.startTimeMs = 10;
     chunk.durationMs = 5;
-    chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+    chunk.fileIndex = nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION;
     chunk.storageIndex = serverModule().storageDbPool()->getStorageIndex(storage);
 
     sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);

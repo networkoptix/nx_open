@@ -1,5 +1,13 @@
 #include "hardware_information.h"
 
+#if !defined(__arm__)
+    #if defined(_MSC_VER)
+        #include <intrin.h>
+    #else
+        #include <cpuid.h>
+    #endif
+#endif
+
 static const QString CPU_X86 = "x86";
 static const QString CPU_X86_64 = "x86_64";
 static const QString CPU_IA64 = "ia64";
@@ -69,6 +77,21 @@ const QString& compileCpuArchicture()
                 cpuModelName = QString::fromWCharArray(buffer);
             RegCloseKey(key);
         }
+
+        logicalCores = std::thread::hardware_concurrency();
+        physicalCores = logicalCores;
+
+        #if !defined(__arm__)
+            int cpuinfo[4];
+            #if defined(_MSC_VER)
+                __cpuid(cpuinfo, 1);
+            #else
+                __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
+            #endif
+            const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
+            if (hasHyperThreading)
+                physicalCores /= 2;
+        #endif
     }
 
 #elif defined(Q_OS_LINUX)

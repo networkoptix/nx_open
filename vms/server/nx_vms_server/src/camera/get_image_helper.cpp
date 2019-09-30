@@ -280,7 +280,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig(), video->compressionType, video);
+        DecoderConfig(),
+        serverModule()->commonModule()->metrics(),
+        video->compressionType, video);
 
     if (!isArchiveVideoPacket)
     {
@@ -668,6 +670,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
         DecoderConfig(),
+        serverModule()->commonModule()->metrics(),
         firstFrame->compressionType, firstFrame);
     for (int i = 0; i < randomAccess.size(); ++i)
     {

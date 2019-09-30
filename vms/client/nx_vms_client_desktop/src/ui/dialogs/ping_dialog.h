@@ -21,10 +21,10 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 public slots:
-    void at_pingUtility_pingResponce(const QnPingUtility::PingResponce &responce);
+    void at_pingUtility_pingResponse(const QnPingUtility::PingResponse &response);
 
 private:
-    QString responceToString(const QnPingUtility::PingResponce &responce) const;
+    QString responseToString(const QnPingUtility::PingResponse &response) const;
 
 private:
     QTextEdit *m_pingText;

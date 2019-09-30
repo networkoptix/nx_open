@@ -54,8 +54,6 @@ public:
 
     virtual void setUrl(const QString& value) override; // URL for Layout File is always plain file path!
 
-    virtual QIODevice* open(const QString& url, QIODevice::OpenMode openMode) override;
-
     virtual int getCapabilities() const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
@@ -98,7 +96,8 @@ public:
     void dumpStructure();
 
     QnMutex& streamMutex(); // This is used to prevent deadlock when using stream objects.
-
+protected:
+    virtual QIODevice* openInternal(const QString& url, QIODevice::OpenMode openMode) override;
 private:
     bool readIndexHeader();
     bool writeIndexHeader();

@@ -83,7 +83,7 @@ int VmsGatewayProcess::serviceMain(
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
         {
-            NX_ALWAYS(this, "No HTTP address to listen");
+            NX_ERROR(this, "No HTTP address to listen");
             return 1;
         }
 
@@ -141,22 +141,19 @@ int VmsGatewayProcess::serviceMain(
 
         if (!multiAddressHttpServer.listen())
             return 5;
-        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-        NX_ALWAYS(this, lm("%1 has been started on %2")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
-            .container(m_httpEndpoints));
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
+        NX_INFO(this, "%1 has been started on %2",
+            QnLibVmsGatewayAppInfo::applicationDisplayName(),
+            containerString(m_httpEndpoints));
 
         const auto result = runMainLoop();
-
-        NX_ALWAYS(this, lm("%1 has been stopped")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()));
-
+        NX_INFO(this, "%1 has been stopped", QnLibVmsGatewayAppInfo::applicationDisplayName());
         return result;
     }
     catch (const std::exception& e)
     {
-        NX_ALWAYS(this, lit("Failed to start application. %1").arg(e.what()));
+        NX_ERROR(this, "Failed to start application. %1", e.what());
         return 3;
     }
 }

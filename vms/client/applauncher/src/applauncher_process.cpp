@@ -189,8 +189,7 @@ int ApplauncherProcess::run()
     m_taskServer.pleaseStop();
     m_taskServer.wait();
 
-    NX_ALWAYS(this, "run() - exited gracefully");
-
+    NX_INFO(this, "run() - exited gracefully");
     return 0;
 }
 

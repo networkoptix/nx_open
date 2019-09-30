@@ -895,6 +895,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
                     QnFfmpegVideoDecoder decoder(
                         DecoderConfig(),
+                        commonModule()->metrics(),
                         mediaData->compressionType, videoData);
                     decoder.decode(videoData, &outFrame);
                     if (m_role == StreamRecorderRole::fileExport)

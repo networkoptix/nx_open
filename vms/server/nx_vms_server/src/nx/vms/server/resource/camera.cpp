@@ -32,7 +32,8 @@ const float Camera::kMaxEps = 0.01f;
 Camera::Camera(QnMediaServerModule* serverModule):
     QnVirtualCameraResource(serverModule ? serverModule->commonModule() : nullptr),
     nx::vms::server::ServerModuleAware(serverModule),
-    m_channelNumber(0)
+    m_channelNumber(0),
+    m_metrics(std::make_shared<Metrics>())
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
@@ -176,6 +177,16 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
     }
 
     return result;
+}
+
+void Camera::atStreamIssue()
+{
+    m_metrics->streamIssues++;
+}
+
+void Camera::atIpConflict()
+{
+    m_metrics->ipConflicts++;
 }
 
 boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
@@ -815,6 +826,53 @@ bool Camera::fixMulticastParametersIfNeeded(
     }
 
     return somethingIsFixed;
+}
+
+std::optional<QnLiveStreamParams> Camera::targetParams(StreamIndex streamIndex)
+{
+    if (auto reader = findReader(streamIndex))
+        return reader->getLiveParams();
+    return std::optional<QnLiveStreamParams>();
+}
+
+std::optional<QnLiveStreamParams> Camera::actualParams(StreamIndex streamIndex)
+{
+    if(auto reader = findReader(streamIndex))
+        return reader->getActualParams();
+    return std::optional<QnLiveStreamParams>();
+}
+
+QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return nullptr;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+    return reader;
+}
+
+qint64 Camera::getAndResetMetric(std::atomic<qint64> Metrics::* parameter)
+{
+    return (*m_metrics.*parameter).exchange(0);
+}
+
+std::chrono::milliseconds Camera::nxOccupiedDuration() const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->nxOccupiedDuration(ptr) +
+        serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
+}
+
+double Camera::recordingBitrateKBps(std::chrono::milliseconds bitratePeriod) const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->recordingBitrateKBps(ptr, bitratePeriod) +
+        serverModule()->backupStorageManager()->recordingBitrateKBps(ptr, bitratePeriod);
 }
 
 } // namespace resource

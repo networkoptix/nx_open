@@ -12,7 +12,8 @@ class AviMotionArchiveDelegate: public QnAviArchiveDelegate
     using base_type = QnAviArchiveDelegate;
 
 public:
-    AviMotionArchiveDelegate(const QnMotionEstimation::Config& config);
+    AviMotionArchiveDelegate(
+        const QnMotionEstimation::Config& config, nx::metrics::Storage* metrics);
     virtual ~AviMotionArchiveDelegate() override;
 
     virtual QnAbstractMediaDataPtr getNextData() override;

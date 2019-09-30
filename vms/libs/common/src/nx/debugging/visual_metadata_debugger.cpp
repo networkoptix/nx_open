@@ -142,6 +142,7 @@ CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnConstCompressedVi
 
         m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
             config,
+            /*metrics*/ nullptr,
             video->compressionType,
             video);
 

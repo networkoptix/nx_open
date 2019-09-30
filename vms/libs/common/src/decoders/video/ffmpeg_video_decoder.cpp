@@ -34,6 +34,7 @@ extern "C" {
 
 #include <nx/streaming/av_codec_media_context.h>
 #include <utils/media/utils.h>
+#include <nx/metrics/metrics_storage.h>
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -76,6 +77,7 @@ struct FffmpegLog
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     const DecoderConfig& config,
+    nx::metrics::Storage* metrics,
     AVCodecID codec_id,
     const QnConstCompressedVideoDataPtr& data)
     :
@@ -100,10 +102,11 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_spsFound(false),
     m_mtDecodingPolicy(config.mtDecodePolicy),
     m_useMtDecoding(false),
-    m_needRecreate(false)
-
+    m_needRecreate(false),
+    m_metrics(metrics)
 {
-
+    if (m_metrics)
+        m_metrics->decoders()++;
     setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
 
     if (data->context)
@@ -125,6 +128,8 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 
     QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
     m_passedContext = 0;
+    if (m_metrics)
+        m_metrics->decoders()--;
 }
 
 void QnFfmpegVideoDecoder::flush()
@@ -370,7 +375,8 @@ int QnFfmpegVideoDecoder::decodeVideo(
     const AVPacket *avpkt)
 {
     int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
-
+    if (result > 0 && m_metrics)
+        m_metrics->decodedPixels() += picture->width * picture->height;
     if (result > 0 && avpkt && avpkt->dts != AV_NOPTS_VALUE)
         m_dtsQueue.push_back(avpkt->dts);
 

@@ -397,8 +397,6 @@ using DownloadCompletionHandler = std::function<void(
     SystemError::ErrorCode, int /*statusCode*/, nx::network::http::BufferType /*message body*/,
     nx::network::http::HttpHeaders /*response headers*/)>;
 
-AsyncHttpClient::Timeouts NX_NETWORK_API defaultDownloadTimeouts();
-
 /**
  * Helper function that uses nx::network::http::AsyncHttpClient for file download.
  * @param completionHandler <OS error code, status code, message body, http response headers>.
@@ -414,7 +412,7 @@ void NX_NETWORK_API downloadFileAsync(
     DownloadCompletionHandler completionHandler,
     const nx::network::http::HttpHeaders& extraHeaders = nx::network::http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
-    AsyncHttpClient::Timeouts timeouts = defaultDownloadTimeouts());
+    AsyncHttpClient::Timeouts timeouts = {});
 
 /**
  * Calls previous function and waits for completion.
@@ -423,7 +421,7 @@ SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
     const nx::utils::Url& url,
     int* const statusCode,
     nx::network::http::BufferType* const msgBody,
-    AsyncHttpClient::Timeouts timeouts = defaultDownloadTimeouts());
+    AsyncHttpClient::Timeouts timeouts = {});
 
 using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, int /*statusCode*/,
     nx::network::http::StringType /*content type*/, nx::network::http::BufferType /*message body*/,
@@ -437,7 +435,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     DownloadCompletionHandlerEx completionHandlerEx,
     const nx::network::http::HttpHeaders& extraHeaders = nx::network::http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
-    AsyncHttpClient::Timeouts timeouts = defaultDownloadTimeouts(),
+    AsyncHttpClient::Timeouts timeouts = {},
     nx::network::http::Method::ValueType method = nx::network::http::Method::get);
 
 void downloadFileAsyncEx(

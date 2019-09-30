@@ -1,6 +1,7 @@
 
 #include "sigar_monitor.h"
 
+#include <thread>
 #include <cassert>
 
 #include <QtCore/QElapsedTimer>
@@ -60,7 +61,7 @@ class QnSigarMonitorPrivate {
 public:
     QnSigarMonitorPrivate() {
         sigar = NULL;
-        memset(&cpu, 0, sizeof(cpu));
+        memset(&m_lastCpu, 0, sizeof(m_lastCpu));
     }
 
     virtual ~QnSigarMonitorPrivate() {
@@ -213,7 +214,7 @@ private:
 
 private:
     sigar_t *sigar;
-    sigar_cpu_t cpu;
+    sigar_cpu_t m_lastCpu;
     QHash<QString, sigar_disk_usage_t> lastUsageByHddName;
     QHash<QString, NetworkStat> lastNetworkStatByInterfaceName;
 
@@ -246,40 +247,70 @@ QnSigarMonitor::~QnSigarMonitor() {
 qreal QnSigarMonitor::totalCpuUsage() {
     Q_D(QnSigarMonitor);
 
-    if(!d->sigar)
+    if (!d->sigar)
         return 0.0;
 
     sigar_cpu_t cpu;
-    if(INVOKE(sigar_cpu_get(d->sigar, &cpu)) != SIGAR_OK)
+    if (INVOKE(sigar_cpu_get(d->sigar, &cpu)) != SIGAR_OK)
         return 0.0;
 
-    if(d->cpu.total == 0) { /* Is this the first call? */
-        d->cpu = cpu;
+    if (d->m_lastCpu.total == 0) { /* Is this the first call? */
+        d->m_lastCpu = cpu;
         return 0.0;
     }
 
-    if(cpu.total == d->cpu.total)
+    if (cpu.total == d->m_lastCpu.total)
         return 0.0;
 
     sigar_cpu_perc_t result;
-    if(INVOKE(sigar_cpu_perc_calculate(&d->cpu, &cpu, &result)) != SIGAR_OK)
+    if (INVOKE(sigar_cpu_perc_calculate(&d->m_lastCpu, &cpu, &result)) != SIGAR_OK)
         return 0.0;
 
-    d->cpu = cpu;
+    d->m_lastCpu = cpu;
     return result.combined;
 }
 
-qreal QnSigarMonitor::totalRamUsage() {
+quint64 QnSigarMonitor::totalRamUsage() {
+    Q_D(QnSigarMonitor);
+
+    if (!d->sigar)
+        return 0;
+
+    sigar_mem_t mem;
+    if (INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
+        return 0;
+
+    return mem.used;
+}
+
+qreal QnSigarMonitor::thisProcessCpuUsage()
+{
+    Q_D(QnSigarMonitor);
+
+    if (!d->sigar)
+        return 0.0;
+
+    sigar_pid_t pid = sigar_pid_get(d->sigar);
+    sigar_proc_cpu_t cpu;
+    if (INVOKE(sigar_proc_cpu_get(d->sigar, pid, &cpu)) != SIGAR_OK)
+        return 0.0;
+
+    return cpu.percent / qreal(std::thread::hardware_concurrency());
+}
+
+quint64 QnSigarMonitor::thisProcessRamUsage()
+{
     Q_D(QnSigarMonitor);
 
     if(!d->sigar)
-        return 0.0;
+        return 0;
 
-    sigar_mem_t mem;
-    if(INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
-        return 0.0;
+    sigar_pid_t pid = sigar_pid_get(d->sigar);
+    sigar_proc_mem_t mem;
+    if (INVOKE(sigar_proc_mem_get(d->sigar, pid, &mem)) != SIGAR_OK)
+        return 0;
 
-    return mem.used_percent / 100.0;
+    return mem.resident;
 }
 
 QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {

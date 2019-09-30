@@ -16,7 +16,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -134,7 +134,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return lm("Begin: %1<br>End: %2<br>Duration: %3").args( //< Not translatable debug string.
                 nx::utils::timestampToDebugString(chunk.startTimeMs),
                 nx::utils::timestampToDebugString(chunk.endTimeMs()),
-                core::HumanReadable::timeSpan(chunk.duration())).toQString();
+                text::HumanReadable::timeSpan(chunk.duration())).toQString();
         }
 
         case Qn::PreviewTimeRole:

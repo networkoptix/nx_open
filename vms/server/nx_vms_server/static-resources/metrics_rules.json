@@ -1,0 +1,492 @@
+{
+    "systems": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "panel"
+                },
+                "recommendedMaxServers": {
+                    "calculate": "const 100"
+                },
+                "servers": {
+                    "display": "panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThan %servers %recommendedMaxServers",
+                        "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
+                    }]
+                },
+                "users": {
+                    "display": "panel"
+                },
+                "storages": {
+                    "name": "Storage locations",
+                    "display": "panel"
+                },
+                "recommendedMaxCameras": {
+                    "calculate": "const 10000"
+                },
+                "cameras": {
+                    "name": "Camera channels",
+                    "display": "panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThan %servers %recommendedMaxCameras",
+                        "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
+                    }]
+                },
+                "version": {
+                    "display": "panel"
+                }
+            }
+        }
+    },
+    "servers": {
+        "info": {
+            "values": {
+                "name": {
+                    "name": "Name",
+                    "display": "table|panel"
+                },
+                "cpu": {
+                    "name": "CPU",
+                    "display": "panel"
+                },
+                "ram": {
+                    "name": "RAM",
+                    "unit": "B",
+                    "display": "panel"
+                },
+                "os": {
+                    "name": "OS",
+                    "display": "panel"
+                },
+                "public_ip": {
+                    "name": "Public IP",
+                    "display": "table|panel"
+                },
+                "vmsTime": {
+                    "name": "VMS time",
+                    "display": "table|panel"
+                },
+                "osTime": {
+                    "name": "OS time",
+                    "display": "table|panel"
+                },
+                "cores": {
+                    "display": "panel"
+                },
+                "timeChanged24h": {
+                    "name": "Time changedevents (24h)",
+                    "display": "table|panel",
+                    "calculate": "sum %timeChanged 24h",
+                    "insert": "timeChanged",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThan %timeChanged24h 5",
+                            "text": "has changed time %timeChanged24h times in last 24 hours"
+                        }
+                    ]
+                }
+            }
+        },
+        "availability": {
+            "values": {
+                "status": {
+                    "display": "table|panel",
+                    "alarms": [{
+                        "level": "error",
+                        "condition": "notEqual %status Online",
+                        "text": "Status is %status"
+                    }]
+                },
+                "offlineEvents": {
+                    "name": "Server Offline events (24h)",
+                    "display": "table|panel",
+                    "calculate": "countValues %status 24h Offline",
+                    "insert": "uptimeS",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThan %offlineEvents 1",
+                        "text": "went Offline %offlineEvents times in last 24 hours"
+                    }]
+                },
+                "uptimeS": {
+                    "name": "Uptime",
+                    "unit": "s",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "serverLoad": {
+            "values": {
+                "cpuUsageP": {
+                    "name": "CPU %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "serverCpuUsageP": {
+                    "name": "CPU (VMS Server) %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "ramUsage": {
+                    "name": "RAM Usage",
+                    "unit": "B",
+                    "display": "panel"
+                },
+                "ramUsageP": {
+                    "name": "RAM %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "serverRamUsage": {
+                    "name": "RAM (VMS Server)",
+                    "unit": "B",
+                    "display": "panel"
+                },
+                "serverRamUsageP": {
+                    "name": "RAM (VMS Server) %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "incomingConnections": {
+                    "name": "Incoming connections",
+                    "display": "panel"
+                },
+                "encodingThreads": {
+                    "name": "Encoding threads",
+                    "display": "panel"
+                },
+                "decodingThreads": {
+                    "name": "Decoding threads",
+                    "display": "panel"
+                },
+                "cameras": {
+                    "name": "Cameras",
+                    "display": "panel"
+                },
+                "transactionsPerSecond1m": {
+                    "name": "Transactions per second",
+                    "display": "panel",
+                    "unit": "Transactions/s",
+                    "calculate": "average %transactionsPerSecond 1m",
+                    "insert": "transactionsPerSecond"
+                },
+                "decodingSpeed3s": {
+                    "name": "Decoding speed",
+                    "display": "panel",
+                    "unit": "Mp/s",
+                    "calculate": "average %decodingSpeed 3s",
+                    "insert": "decodingSpeed"
+                },
+                "encodingSpeed3s": {
+                    "name": "Encoding speed",
+                    "display": "panel",
+                    "unit": "Mp/s",
+                    "calculate": "average %encodingSpeed 3s",
+                    "insert": "encodingSpeed"
+                },
+                "actionsTriggered1m": {
+                    "name": "Event rules triggering/s",
+                    "display": "panel",
+                    "calculate": "average %actionsTriggered 1m",
+                    "insert": "actionsTriggered"
+                },
+                "thumbnails1m": {
+                    "name": "Thumbnails per second",
+                    "display": "panel",
+                    "calculate": "average %thumbnails 1m",
+                    "insert": "thumbnails"
+                },
+                "apiCalls1m": {
+                    "name": "Rest API calls per second",
+                    "display": "panel",
+                    "calculate": "average %apiCalls 1m",
+                    "insert": "apiCalls"
+                },
+                "primaryStreams": {
+                    "name": "Primary streams",
+                    "display": "panel"
+                },
+                "secondaryStreams": {
+                    "name": "Secondary streams",
+                    "display": "panel"
+                }
+            }
+        }
+    },
+    "cameras": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "type": {
+                    "display": "table|panel"
+                },
+                "ip": {
+                    "name": "IP",
+                    "display": "table|panel"
+                },
+                "vendor": {
+                    "display": "panel"
+                },
+                "model": {
+                    "display": "panel"
+                },
+                "firmware": {
+                    "display": "panel"
+                },
+                "recording": {
+                    "name": "Recording",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "availability": {
+            "values": {
+                "status": {
+                    "display": "table|panel",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "equal %status Unauthorized",
+                            "text": "Status is %status"
+                        },
+                        {
+                            "level": "error",
+                            "condition": "equal %status Offline",
+                            "text": "Status is %status"
+                        }
+                    ]
+                },
+                "offlineEvents": {
+                    "name": "Camera Offline events (24h)",
+                    "display": "table|panel",
+                    "calculate": "countValues %status 24h Offline",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThan %offlineEvents 1",
+                            "text": "went Offline %offlineEvents times in last 24 hours"
+                        }
+                    ]
+                },
+                "streamIssues1h": {
+                    "name": "Stream issues (1h)",
+                    "display": "table|panel",
+                    "calculate": "sum %streamIssues 1h",
+                    "insert": "streamIssues",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThan %streamIssues1h 0",
+                            "text": "has stream issues %streamIssues1h times in last hour"
+                        },
+                        {
+                            "level": "error",
+                            "condition": "greaterThan %streamIssues1h 5",
+                            "text": "has stream issues %streamIssues1h times in last hour"
+                        }
+                    ]
+                },
+                "ipConflicts3min": {
+                    "name": "IP conflicts (3min)",
+                    "display": "panel",
+                    "calculate": "sum %ipConflicts 3m",
+                    "insert": "ipConflicts",
+                    "alarms": [
+                        {
+                            "level": "error",
+                            "condition": "greaterThan %ipConflicts3min 0",
+                            "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
+                        }
+                    ]
+                }
+            }
+        },
+        "primaryStream": {
+            "values": {
+                "resolution": {
+                    "name": "Resolution",
+                    "display": "table|panel"
+                },
+                "targetFps": {
+                    "display": "Target fps"
+                },
+                "actualFps": {
+                    "display": "Actual fps"
+                },
+                "fpsDeltaAvarage": {
+                    "name": "Primary stream fps drops avarage (10m)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m",
+                    "alarms": [
+                    {
+                        "level": "warning",
+                        "condition": "greaterThan %fpsDelta 5",
+                        "text": "has actual fps less for %fpsDelta frames/s"
+                    },
+                    {
+                        "level": "error",
+                        "condition": "greaterThan %fpsDelta 10",
+                        "text": "has actual fps less for %fpsDelta frames/s"
+                    }
+                    ]
+                },
+                "actualBitrateKBps": {
+                    "name": "Bitrate",
+                    "display": "panel",
+                    "unit": "KBps"
+                }
+            }
+        },
+        "secondaryStream": {
+            "values": {
+                "resolution": {
+                    "name": "Resolution",
+                    "display": "table|panel"
+                },
+                "targetFps": {
+                    "display": "Target fps"
+                },
+                "actualFps": {
+                    "display": "Actual fps"
+                },
+                "actualBitrateKBps": {
+                    "name": "Bitrate",
+                    "display": "panel",
+                    "unit": "KBps"
+                },
+                "fpsDeltaAvarage": {
+                    "name": "Secondary stream fps drops avarage (10m)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m"
+                }
+            }
+        },
+        "analytics": {
+            "values": {
+                "archiveLength": {
+                    "name": "Archive length",
+                    "display": "table|panel"
+                },
+                "recordingBitrateKBps": {
+                    "name": "Recording Bitrate (24h)",
+                    "display": "table|panel",
+                    "unit": "KBps"
+                },
+                "minArchiveLengths": {
+                    "name": "Minimum archive length",
+                    "display": "panel"
+                }
+            }
+        }
+    },
+    "storages": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "type": {
+                    "display": "table|panel"
+                }
+            }
+        },
+        "state": {
+            "values": {
+                "status": {
+                    "display": "table|panel"
+                },
+                "issues24h": {
+                    "name": "Issues (24h)",
+                    "display": "table|panel",
+                    "calculate": "sum %issues 24h",
+                    "insert": "issues"
+                }
+            }
+        },
+        "activity": {
+            "values": {
+                "readRateKBps1m": {
+                    "name": "Read rate",
+                    "display": "table|panel",
+                    "unit": "KBps",
+                    "calculate": "average %readRateKBps 1m",
+                    "insert": "readRateKBps"
+                },
+               "writeRateKBps1m": {
+                    "name": "Write rate",
+                    "display": "table|panel",
+                    "unit": "KBps",
+                    "calculate": "average %writeRateKBps 1m",
+                    "insert": "writeRateKBps"
+                },
+               "transactionsPerSecond": {
+                    "name": "Transactions/s",
+                    "display": "panel",
+                    "unit": "Transactions/s"
+                }
+            }
+        },
+        "space": {
+            "values": {
+                "totalSpaceGB": {
+                    "name": "Total space",
+                    "display": "table|panel",
+                    "unit": "GB"
+                },
+                "mediaSpaceP": {
+                    "name": "VMS Media(%)",
+                    "display": "table|panel",
+                    "unit": "%"
+                },
+                "mediaSpaceGB": {
+                    "name": "VMS Media",
+                    "display": "panel",
+                    "unit": "GB"
+                }
+            }
+        }
+    },
+    "networkInterfaces": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "ip": {
+                    "name": "IP",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "rates": {
+            "name": "I/O rates",
+            "values": {
+                "inBps": {
+                    "name": "IN rate",
+                    "unit": "bps",
+                    "display": "table|panel"
+                },
+                "outBps": {
+                    "name": "OUT rate",
+                    "unit": "bps",
+                    "display": "table|panel"
+                }
+            }
+        }
+    }
+}

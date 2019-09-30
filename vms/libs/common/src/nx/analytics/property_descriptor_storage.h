@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/data_structures/map_helper.h>
 #include <core/resource/resource.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -78,7 +78,7 @@ private:
     const QString m_propertyName;
 
     mutable QnMutex m_mutex;
-    mutable CachedValue<Container> m_cachedContainer;
+    mutable nx::utils::CachedValue<Container> m_cachedContainer;
 
     NotifyWhenUpdated m_notifier;
     PropertyDescriptorStorageHelper m_helper;

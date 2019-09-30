@@ -81,7 +81,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
         config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
-        m_motionEstimation.emplace_back(std::make_unique<QnMotionEstimation>(config));
+        m_motionEstimation.emplace_back(
+            std::make_unique<QnMotionEstimation>(config, res->commonModule()->metrics()));
         m_motionMaskBinData[i] =
             (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
         memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
@@ -524,6 +525,19 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
     QnMutexLocker lock(&m_liveMutex);
     return mergeWithAdvancedParams(m_liveParams);
+}
+
+QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
+{
+    QnLiveStreamParams result;
+    result.bitrateKbps = getBitrateMbps() * 1000;
+    result.fps = getFrameRate();
+    const auto streamInfo = m_cameraRes->streamInfo(encoderIndex());
+    const auto sizeParts = streamInfo.resolution.split('x');
+    if (sizeParts.size() >= 2)
+        result.resolution = QSize(sizeParts[0].toInt(), sizeParts[1].toInt());
+    result.codec = toString(streamInfo.codec);
+    return result;
 }
 
 QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()

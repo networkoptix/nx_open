@@ -78,7 +78,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_previousRtpTimestamp(-1),
     m_previousScaledRtpTimestamp(-1),
     m_framesSinceRangeCheck(0),
-    m_videoChannels(1)
+    m_videoChannels(1),
+    m_streamMetricHelper(owner->commonModule()->metrics())
 {
     m_timer.start();
     m_keepAliveTimer.restart();
@@ -518,6 +519,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     const bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     const bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
     const bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+
+    StreamIndex index = isSecondaryProvider ? StreamIndex::secondary : StreamIndex::primary;
+    m_streamMetricHelper.setStream(index);
 
     if (isVideo || isAudio)
     {

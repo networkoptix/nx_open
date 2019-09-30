@@ -1,7 +1,8 @@
-#ifndef __ABSTRACT_STORAGE_H__
-#define __ABSTRACT_STORAGE_H__
+#pragma once
 
 #include "resource.h"
+#include <nx/utils/url.h>
+
 #include <QtCore/QtCore>
 #include <memory>
 
@@ -26,24 +27,25 @@ public:
 
     class FileInfo
     {
-        typedef std::shared_ptr<QFileInfo> QFileInfoPtr;
-
-    public: // ctors
-        explicit
-        FileInfo(const QString& uri, qint64 size, bool isDir = false)
-            : m_fpath(uri),
-              m_size(size),
-              m_isDir(isDir)
+    public:
+        explicit FileInfo(const QString& uri, qint64 size, bool isDir = false):
+            m_fpath(QDir::toNativeSeparators(uri)), m_size(size), m_isDir(isDir)
         {
-            parseUri();
         }
 
-        explicit
-        FileInfo(const QFileInfo& qfi)
-            : m_qfi(new QFileInfo(qfi))
-        {}
+        explicit FileInfo(const QFileInfo& qfi) : m_qFileInfo(new QFileInfo(qfi)) {}
+        FileInfo() = default;
 
-    public:
+        bool operator==(const FileInfo& other) const
+        {
+            return absoluteFilePath() == other.absoluteFilePath();
+        }
+
+        bool operator !=(const FileInfo& other) const
+        {
+            return !operator==(other);
+        }
+
         static FileInfo fromQFileInfo(const QFileInfo &fi)
         {
             return FileInfo(fi);
@@ -51,75 +53,84 @@ public:
 
         bool isDir() const
         {
-            return m_qfi ? m_qfi->isDir() : m_isDir;
+            return m_qFileInfo ? m_qFileInfo->isDir() : m_isDir;
         }
 
         QString absoluteFilePath() const
         {
-            return m_qfi ? m_qfi->absoluteFilePath() : m_fpath;
+            return m_qFileInfo ? m_qFileInfo->absoluteFilePath() : m_fpath;
+        }
+
+        QString absoluteDirPath() const
+        {
+            if (m_qFileInfo)
+                return m_qFileInfo->absoluteDir().path();
+
+            if (m_isDir)
+                return m_fpath;
+
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            if (lastSeparatorIndex == -1)
+                return m_fpath;
+
+            return m_fpath.left(lastSeparatorIndex);
         }
 
         QString fileName() const
         {
-            return m_qfi ? m_qfi->fileName() : m_fname;
+            if (m_qFileInfo)
+                return m_qFileInfo->fileName();
+
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            if (lastSeparatorIndex == -1)
+                return m_fpath;
+
+            return m_fpath.mid(lastSeparatorIndex + 1);
         }
 
         QString baseName() const
         {
-            return m_qfi ? m_qfi->baseName() : m_basename;
+            if (m_qFileInfo)
+                return m_qFileInfo->baseName();
+
+            const auto fileName = this->fileName();
+            const int dotIndex = fileName.indexOf('.');
+            if (dotIndex == -1)
+                return fileName;
+
+            return fileName.left(dotIndex);
         }
 
         qint64 size() const
         {
-            return m_qfi ? m_qfi->size() : m_size;
+            return m_qFileInfo ? m_qFileInfo->size() : m_size;
         }
 
         QDateTime created() const
         {
-            return m_qfi ? m_qfi->created() : m_created;
+            return m_qFileInfo ? m_qFileInfo->created() : QDateTime();
         }
 
-    private:
-        void parseUri()
+        QString extension() const
         {
-            QStringList pathEntries = m_fpath.split(lit("/"));
-            bool found = false;
+            const auto fileName = this->fileName();
+            const int lastDotIndex = fileName.lastIndexOf('.');
+            if (lastDotIndex == -1)
+                return "";
 
-            auto assignBN = [this]()
-            {
-                int dotIndex = m_fname.lastIndexOf(lit("."));
-                if (dotIndex != -1)
-                    m_basename = m_fname.left(dotIndex);
-                else
-                    m_basename = m_fname;
-            };
+            return fileName.mid(lastDotIndex + 1);
+        }
 
-            for (int i = pathEntries.size() - 1; i >= 0; --i)
-            {
-                if (!pathEntries[i].isEmpty())
-                {
-                    found = true;
-                    m_fname = pathEntries[i];
-                    assignBN();
-                    break;
-                }
-            }
-
-            if (!found && !m_fpath.isEmpty())
-            {
-                m_fname = m_fpath;
-                assignBN();
-            }
+        QString toString() const
+        {
+            return nx::utils::url::hidePassword(absoluteFilePath());
         }
 
     private:
-        QString         m_fpath;
-        QString         m_basename;
-        QString         m_fname;
-        qint64          m_size = 0;
-        bool            m_isDir = false;
-        QFileInfoPtr    m_qfi;
-        QDateTime       m_created;
+        QString m_fpath;
+        qint64 m_size = 0;
+        bool m_isDir = false;
+        std::shared_ptr<QFileInfo> m_qFileInfo;
     };
 
     typedef QList<FileInfo> FileInfoList;
@@ -205,5 +216,3 @@ public:
      */
     virtual qint64 getFileSize(const QString& url) const = 0;
 };
-
-#endif // __ABSTRACT_STORAGE_H__

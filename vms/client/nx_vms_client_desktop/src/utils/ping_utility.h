@@ -7,12 +7,12 @@ class QnPingUtility : public QThread {
     Q_OBJECT
 public:
 
-    enum ResponceCode {
+    enum ResponseCode {
         UnknownError = -1,
         Timeout = -2
     };
 
-    struct PingResponce {
+    struct PingResponse {
         int type;
         quint16 code;
         quint32 bytes;
@@ -32,10 +32,10 @@ protected:
     virtual void run() override;
 
 signals:
-    void pingResponce(const PingResponce &responce);
+    void pingResponse(const PingResponse &response);
 
 private:
-    PingResponce ping(quint16 seq);
+    PingResponse ping(quint16 seq);
 
 private:
     bool m_stop;
@@ -43,6 +43,6 @@ private:
     int m_timeout;
 };
 
-Q_DECLARE_METATYPE(QnPingUtility::PingResponce)
+Q_DECLARE_METATYPE(QnPingUtility::PingResponse)
 
 #endif // PING_UTILITY_H

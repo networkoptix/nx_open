@@ -1,0 +1,58 @@
+<div class="container">
+    <div ng-repeat="(resourceType, parameters) in manifest">
+        <h1>
+            {{resourceType}}
+        </h1>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th colspan="2"></th>
+                    <th ng-repeat="parameter in parameters" colspan="{{parameter.group.length || 1}}">
+                        <span ng-if="parameter.group">
+                            {{parameter.name || parameter.id}}
+                        </span>
+                    </th>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>parent</td>
+
+                    <td ng-repeat-start="parameter in parameters" ng-if="!parameter.group">
+                        {{parameter.name || parameter.id}}
+                    </td>
+                    <td ng-repeat="subParameter in parameter.group">
+                        {{subParameter.name || subParameter.id}}
+                    </td>
+                    <td ng-repeat-end ng-if="false"></td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr ng-repeat="(resourceId, resource) in values[resourceType]">
+                    <td class="url-column">{{resource.name}}</td>
+                    <td class="url-column">{{resource.parent}}</td>
+
+                    <td ng-repeat-start="parameter in parameters" ng-if="!parameter.group"
+                        ng-class="resource.values[parameter.id].status" class="url-column">
+                        {{resource.values[parameter.id].value}} {{parameter.unit}}
+                        <span class="glyphicon glyphicon-warning-sign"
+                            ng-if="resource.values[parameter.id].status=='danger'"></span>
+                        <span class="glyphicon glyphicon-bell"
+                            ng-if="resource.values[parameter.id].status=='warning'"></span>
+                    </td>
+                    <td ng-repeat="subParameter in parameter.group"
+                        ng-class="resource.values[parameter.id][subParameter.id].status" class="url-column">
+                        {{resource.values[parameter.id][subParameter.id].value}} {{subParameter.unit}}
+                        <span class="glyphicon glyphicon-warning-sign"
+                              ng-if="resource.values[parameter.id][subParameter.id].status=='danger'"></span>
+                        <span class="glyphicon glyphicon-bell"
+                              ng-if="resource.values[parameter.id][subParameter.id].status=='warning'"></span>
+                    </td>
+                    <td ng-repeat-end ng-if="false"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

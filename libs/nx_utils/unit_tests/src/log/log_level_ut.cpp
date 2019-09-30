@@ -17,10 +17,6 @@ TEST(LogLevel, FromString)
     ASSERT_EQ(Level::none, levelFromString("NONE"));
     ASSERT_EQ(Level::none, levelFromString("n"));
 
-    ASSERT_EQ(Level::always, levelFromString("always"));
-    ASSERT_EQ(Level::always, levelFromString("ALWAYS"));
-    ASSERT_EQ(Level::always, levelFromString("a"));
-
     ASSERT_EQ(Level::error, levelFromString("error"));
     ASSERT_EQ(Level::error, levelFromString("ERROR"));
     ASSERT_EQ(Level::error, levelFromString("e"));
@@ -31,6 +27,7 @@ TEST(LogLevel, FromString)
 
     ASSERT_EQ(Level::info, levelFromString("info"));
     ASSERT_EQ(Level::info, levelFromString("INFO"));
+    ASSERT_EQ(Level::info, levelFromString("ALWAYS"));
     ASSERT_EQ(Level::info, levelFromString("i"));
 
     ASSERT_EQ(Level::debug, levelFromString("debug"));
@@ -55,7 +52,6 @@ TEST(LogLevel, ToString)
 {
     ASSERT_EQ("undefined", toString(Level::undefined));
     ASSERT_EQ("none", toString(Level::none));
-    ASSERT_EQ("always", toString(Level::always));
     ASSERT_EQ("error", toString(Level::error));
     ASSERT_EQ("warning", toString(Level::warning));
     ASSERT_EQ("info", toString(Level::info));

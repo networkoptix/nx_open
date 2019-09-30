@@ -26,6 +26,7 @@
 #include <utils/math/math.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/app_info.h>
+#include <nx/fusion/model_functions.h>
 
 namespace {
 
@@ -783,3 +784,11 @@ bool QnVirtualCameraResource::hasDualStreamingInternal() const
     return base_type::hasDualStreamingInternal();
 }
 
+Qn::RecordingState QnVirtualCameraResource::recordingState() const
+{
+    if (!isLicenseUsed())
+        return Qn::RecordingState::Off;
+    if (getStatus() == Qn::Recording)
+        return Qn::RecordingState::On;
+    return Qn::RecordingState::Scheduled;
+}

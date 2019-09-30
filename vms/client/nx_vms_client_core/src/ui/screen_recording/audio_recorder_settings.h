@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
 
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include "audio_device_info.h"
 
@@ -40,6 +40,6 @@ private:
 
 private:
     QnMutex* m_mutex; //< For m_devices.
-    CachedValue<DeviceList> m_devices;
+    nx::utils::CachedValue<DeviceList> m_devices;
     QSettings m_settings;
 };

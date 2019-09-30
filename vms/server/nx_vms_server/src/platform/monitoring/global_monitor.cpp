@@ -1,4 +1,3 @@
-
 #include "global_monitor.h"
 
 #ifdef __linux__
@@ -14,200 +13,59 @@
 #endif
 
 #include <iostream>
-#include <QtCore/QBasicTimer>
-#include <QtCore/QCoreApplication>
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/mutex.h>
-
-#include <utils/common/warnings.h>
-#include <utils/common/delete_later.h>
 #include <nx/utils/log/log.h>
+#include <nx_vms_server_ini.h>
+#include <utils/common/delete_later.h>
+#include <platform/hardware_information.h>
 
-// Uncomment to enable malloc statistics debug output
-//#define MALLOC_STATISTICS
+namespace nx::vms::server {
 
-// -------------------------------------------------------------------------- //
-// QnStubMonitor
-// -------------------------------------------------------------------------- //
-class QnStubMonitor: public QnPlatformMonitor {
+using namespace std::chrono_literals;
+const std::chrono::milliseconds GlobalMonitor::kCacheExpirationTime = 2s;
+
+namespace {
+
+class StubMonitor: public QnPlatformMonitor {
 public:
-    QnStubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
+    StubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
 
     virtual qreal totalCpuUsage() override { return 0.0; }
-    virtual qreal totalRamUsage() override { return 0.0; }
-    virtual QList<HddLoad> totalHddLoad() override { return QList<HddLoad>(); }
-    virtual QList<NetworkLoad> totalNetworkLoad() override { return QList<NetworkLoad>(); }
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return QList<PartitionSpace>(); }
-    virtual QString partitionByPath(const QString &) override { return QString(); }
+    virtual quint64 totalRamUsage() override { return 0; }
+    virtual qreal thisProcessCpuUsage() override { return 0.0; }
+    virtual quint64 thisProcessRamUsage() override { return 0; }
+    virtual QList<HddLoad> totalHddLoad() override { return {}; }
+    virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
+    virtual QString partitionByPath(const QString &) override { return {}; }
 };
 
-
-// -------------------------------------------------------------------------- //
-// QnGlobalMonitorPrivate
-// -------------------------------------------------------------------------- //
-class QnGlobalMonitorPrivate {
-public:
-    QnGlobalMonitorPrivate()
-    :
-        base(NULL),
-        updatePeriod(0),
-        stopped(true),
-        requestCount(0),
-        totalCpuUsage(0.0),
-        totalRamUsage(0.0),
-        prevCpuUsageLoggingClock(0),
-        prevMemUsageLoggingClock(0),
-        prevHddUsageLoggingClock(0),
-        prevNetworkUsageLoggingClock(0)
-    {
-        upTimeTimer.start();
-    }
-
-    virtual ~QnGlobalMonitorPrivate() {}
-
-    void restartTimersLocked() {
-        updateTimer.start(updatePeriod, q_func());
-        stopTimer.start(updatePeriod * 64, q_func());
-    }
-
-    void updateCacheLocked() {
-        totalCpuUsage = base->totalCpuUsage();
-        totalRamUsage = base->totalRamUsage();
-        totalHddLoad = base->totalHddLoad();
-        totalNetworkLoad = base->totalNetworkLoad();
-    }
-
-private:
-    mutable QnMutex mutex;
-
-    QnPlatformMonitor *base;
-    qint64 updatePeriod;
-    bool stopped;
-    int requestCount;
-
-    qreal totalCpuUsage;
-    qreal totalRamUsage;
-    QList<QnPlatformMonitor::HddLoad> totalHddLoad;
-    QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad;
-
-    QBasicTimer updateTimer;
-    QBasicTimer stopTimer;
-    QElapsedTimer upTimeTimer;
-
-    qint64 prevCpuUsageLoggingClock;
-    qint64 prevMemUsageLoggingClock;
-    qint64 prevHddUsageLoggingClock;
-    qint64 prevNetworkUsageLoggingClock;
-
-private:
-    Q_DECLARE_PUBLIC(QnGlobalMonitor)
-    QnGlobalMonitor *q_ptr;
-};
-
-
-// -------------------------------------------------------------------------- //
-// QnGlobalMonitor
-// -------------------------------------------------------------------------- //
-QnGlobalMonitor::QnGlobalMonitor(
-    QnPlatformMonitor *base,
-    QObject *parent)
-:
-    base_type(parent),
-    d_ptr(new QnGlobalMonitorPrivate())
+#if defined (__linux__)
+void logMallocStatistics()
 {
-    Q_D(QnGlobalMonitor);
+    FILE* stream;
+    char* buffer;
+    size_t len;
 
-    d_ptr->q_ptr = this;
+    stream = open_memstream(&buffer, &len);
+    if (stream == NULL)
+        NX_INFO(typeid(GlobalMonitor), "Error with open_memstream: %1", strerror(errno));
 
-    if(!base)
-    {
-        qnNullWarning(base);
-        base = new QnStubMonitor();
-    }
-
-    if(base->thread() != thread()) {
-        qnWarning("Cannot use a base monitor that lives in another thread.");
-        qnDeleteLater(base); /* Claim ownership. */
-        base = new QnStubMonitor();
-    }
-
-    base->setParent(this); /* Claim ownership. */
-    d->base = base;
-    if (d->updatePeriod > 0)
-    {
-        d->updateCacheLocked();
-        d->restartTimersLocked();
-    }
+    malloc_info(0, stream);
+    fclose(stream);
+    NX_INFO(typeid(GlobalMonitor), "malloc statistics: \n%1", buffer);
+    free(buffer);
 }
-
-QnGlobalMonitor::~QnGlobalMonitor() {
+#else
+void logMallocStatistics()
+{
+    // Not implemented
     return;
 }
-
-qint64 QnGlobalMonitor::updatePeriodMs() const
-{
-    Q_D(const QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    return d->updatePeriod;
-}
-
-void QnGlobalMonitor::setUpdatePeriodMs(qint64 updatePeriod)
-{
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    if(d->updatePeriod == updatePeriod)
-        return;
-
-    d->updatePeriod = updatePeriod;
-    d->restartTimersLocked();
-}
-
-static const int STATISTICS_LOGGING_PERIOD_MS = 30 * 60 * 1000;
-
-qreal QnGlobalMonitor::totalCpuUsage() {
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    d->requestCount++;
-    d->stopped = false;
-
-    //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
-    if( d->upTimeTimer.elapsed() - d->prevCpuUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
-    {
-        NX_WARNING(this, lit("Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2));
-        d->prevCpuUsageLoggingClock = d->upTimeTimer.elapsed();
-    }
-
-    return d->totalCpuUsage;
-}
-
-qreal QnGlobalMonitor::totalRamUsage() {
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    d->requestCount++;
-    d->stopped = false;
-
-    //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
-    if( d->upTimeTimer.elapsed() - d->prevMemUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
-    {
-        NX_WARNING(this, lit("Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2));
-        d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
-
-#ifdef __linux__
-        std::cerr << std::endl << "-----------------------------> malloc_stats info start " << std::endl;
-        malloc_stats();
-        std::cerr << "-----------------------------> malloc_stats info end" << std::endl << std::endl;
 #endif
-    }
 
-    return d->totalRamUsage;
-}
-
-#if defined (Q_OS_LINUX)
+// TODO: Should be implemented like other statistics
+#if defined (__linux__)
 void logOpenedHandleCount()
 {
     int fdCount = 0;
@@ -219,9 +77,7 @@ void logOpenedHandleCount()
     DIR *dir = opendir(buf);
     if (dir == nullptr)
     {
-        NX_WARNING(
-            typeid(QnGlobalMonitor),
-            lm("Failed to open a directory %1, the error is: %2").args(buf, strerror(errno)));
+        NX_INFO(typeid(GlobalMonitor), "Failed to open a directory %1: %2", buf, strerror(errno));
         return;
     }
 
@@ -229,7 +85,7 @@ void logOpenedHandleCount()
         fdCount++;
 
     closedir(dir);
-    NX_WARNING(typeid(QnGlobalMonitor), lm("Opened: %1").args(fdCount));
+    NX_INFO(typeid(GlobalMonitor), lm("Opened: %1").args(fdCount));
 }
 #elif defined (Q_OS_WIN)
 void logOpenedHandleCount()
@@ -265,109 +121,138 @@ void logOpenedHandleCount()
         }
     }
 
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Disk files: %1").arg(typeDisk));
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Character devices: %1").arg(typeChar));
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
+    NX_INFO(typeid(GlobalMonitor), lit("Disk files: %1").arg(typeDisk));
+    NX_INFO(typeid(GlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
+    NX_INFO(typeid(GlobalMonitor), lit("Character devices: %1").arg(typeChar));
+    NX_INFO(typeid(GlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
 }
 #else
 void logOpenedHandleCount()
 {
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Not implemented for this platform"));
+    NX_WARNING(typeid(GlobalMonitor), lit("Not implemented for this platform"));
 }
 #endif
 
-QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
+} // namespace
 
-    d->requestCount++;
-    d->stopped = false;
+GlobalMonitor::GlobalMonitor(QnPlatformMonitor* base, QObject* parent):
+    QnPlatformMonitor(parent),
+    m_cachedTotalCpuUsage(
+        [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedTotalRamUsage(
+        [this]() { return m_monitorBase->totalRamUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedThisProcessCpuUsage(
+        [this]() { return m_monitorBase->thisProcessCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedThisProcessRamUsage(
+        [this]() { return m_monitorBase->thisProcessRamUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedTotalHddLoad(
+        [this]() { return m_monitorBase->totalHddLoad(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedTotalNetworkLoad(
+        [this]() { return m_monitorBase->totalNetworkLoad(); }, &m_mutex, kCacheExpirationTime)
+{
+    if (!NX_ASSERT(base != nullptr))
+        base = new StubMonitor();
 
-    //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
-    if( d->upTimeTimer.elapsed() - d->prevHddUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
+    if (base->thread() != thread()) {
+        NX_ASSERT(false, "Cannot use a base monitor that lives in another thread.");
+        qnDeleteLater(base);
+        base = new StubMonitor();
+    }
+
+    m_uptimeTimer.restart();
+
+    base->setParent(this);
+    m_monitorBase = base;
+}
+
+GlobalMonitor::~GlobalMonitor() {
+}
+
+void GlobalMonitor::logStatistics()
+{
+    NX_INFO(this, lm("OS CPU usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
+    NX_INFO(this, lm("Process CPU usage %1%").arg(thisProcessCpuUsage() * 100, 0, 'f', 2));
+    NX_INFO(this, lm("OS memory usage %1%").arg(
+        ramUsageToPercentages(totalRamUsage()) * 100, 0, 'f', 2));
+    NX_INFO(this, lm("Process memory usage %1%").arg(
+        ramUsageToPercentages(thisProcessRamUsage()) * 100, 0, 'f', 2));
+
+    NX_INFO(this, "HDD usage:");
+    for (const HddLoad& hddLoad: totalHddLoad())
+        NX_INFO(this, lm("\t%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
+
+    NX_INFO(this, "File handles:");
+    logOpenedHandleCount();
+
+    NX_INFO(this, "Network usage:");
+    for (const NetworkLoad& networkLoad: totalNetworkLoad())
     {
-        NX_WARNING(this, lit("HDD usage:"));
-        for( const HddLoad& hddLoad : d->totalHddLoad )
-            NX_WARNING(this, lit("%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
-        NX_WARNING(this, lit("File handles:"));
-        logOpenedHandleCount();
-        d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
-
-        #if defined(__linux__) && defined(MALLOC_STATISTICS)
-            const size_t memStatBufSize = 64*1024;
-            std::vector<char> memStatBuf;
-            memStatBuf.resize(memStatBufSize);
-            FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
-            malloc_info(0, memStatStr);
-            fclose(memStatStr);
-            NX_WARNING(this, lit("malloc statistics: \n%1").arg(memStatBuf.data()));
-        #endif
+        NX_INFO(this, "\t%1. in %2KBps, out %3KBps",
+            networkLoad.interfaceName,
+            networkLoad.bytesPerSecIn / 1024,
+            networkLoad.bytesPerSecOut / 1024);
     }
 
-    return d->totalHddLoad;
+    if (ini().enableMallocStatisticsLogging)
+        logMallocStatistics();
+
 }
 
-QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    d->requestCount++;
-    d->stopped = false;
-
-    //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
-    if( d->upTimeTimer.elapsed() - d->prevNetworkUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
-    {
-        NX_WARNING(this, lit("Network usage:"));
-        for( const NetworkLoad& networkLoad : d->totalNetworkLoad )
-            NX_WARNING(this, lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).
-                arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024));
-        d->prevNetworkUsageLoggingClock = d->upTimeTimer.elapsed();
-    }
-
-    return d->totalNetworkLoad;
-}
-
-QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo()
+qint64 GlobalMonitor::updatePeriodMs() const
 {
-    Q_D(QnGlobalMonitor);
-    return d_func()->base->totalPartitionSpaceInfo();
+    return kCacheExpirationTime.count();
 }
 
-QString QnGlobalMonitor::partitionByPath(const QString &path) {
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
-    return d_func()->base->partitionByPath(path);
+qreal GlobalMonitor::totalCpuUsage() {
+    return m_cachedTotalCpuUsage.get();
 }
 
-void QnGlobalMonitor::timerEvent(QTimerEvent *event) {
-    Q_D(QnGlobalMonitor);
-
-    QnMutexLocker locker( &d->mutex );
-
-    if(event->timerId() == d->updateTimer.timerId()) {
-        if(!d->stopped)
-            d->updateCacheLocked();
-    } else if(event->timerId() == d->stopTimer.timerId()) {
-        if(d->requestCount == 0) {
-            d->stopped = true;
-        } else {
-            d->requestCount = 0;
-        }
-    } else {
-        locker.unlock();
-        base_type::timerEvent(event);
-    }
+quint64 GlobalMonitor::totalRamUsage() {
+    return m_cachedTotalRamUsage.get();
 }
 
-qint64 QnGlobalMonitor::upTimeMs() const
+qreal GlobalMonitor::thisProcessCpuUsage()
 {
-    Q_D(const QnGlobalMonitor);
-    return d->upTimeTimer.elapsed();
+    return m_cachedThisProcessCpuUsage.get();
 }
 
-void QnGlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
+quint64 GlobalMonitor::thisProcessRamUsage()
 {
-    d_ptr->base->setServerModule(serverModule);
+    return m_cachedThisProcessRamUsage.get();
 }
+
+QList<QnPlatformMonitor::HddLoad> GlobalMonitor::totalHddLoad() {
+    return m_cachedTotalHddLoad.get();
+}
+
+QList<QnPlatformMonitor::NetworkLoad> GlobalMonitor::totalNetworkLoad() {
+    return m_cachedTotalNetworkLoad.get();
+}
+
+QList<QnPlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_monitorBase->totalPartitionSpaceInfo();
+}
+
+QString GlobalMonitor::partitionByPath(const QString &path) {
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_monitorBase->partitionByPath(path);
+}
+
+std::chrono::milliseconds GlobalMonitor::processUptime() const
+{
+    return m_uptimeTimer.elapsed();
+}
+
+void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
+{
+    m_monitorBase->setServerModule(serverModule);
+}
+
+qreal ramUsageToPercentages(quint64 bytes)
+{
+    return bytes / qreal(HardwareInformation::instance().physicalMemory);
+}
+
+} // namespace nx::vms::server

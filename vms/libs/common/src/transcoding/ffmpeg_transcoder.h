@@ -14,6 +14,7 @@ extern "C"
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include <export/signer.h>
+#include <nx/metrics/streams_metric_helper.h>
 
 class QnLicensePool;
 
@@ -84,6 +85,7 @@ private:
     PacketTimestamp m_lastPacketTimestamp;
     bool m_inMiddleOfStream;
     qint64 m_startTimeOffset;
+    nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

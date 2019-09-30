@@ -4,7 +4,6 @@
 #include <QtCore/QTimeZone>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/unused.h>
 
 #if defined(Q_OS_LINUX)
     #include <time.h>
@@ -39,7 +38,7 @@ struct TimeFunctionTag{};
  * @return On Linux - time zone file name, or a null string if time zone id is not valid; on
  *     other platforms - an empty string.
  */
-static QString getTimeZoneFile(const QString& timeZoneId)
+static QString getTimeZoneFile([[maybe_unused]] const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
         QString timeZoneFile = QString("/usr/share/zoneinfo/%1").arg(timeZoneId);
@@ -47,7 +46,6 @@ static QString getTimeZoneFile(const QString& timeZoneId)
             return QString();
         return timeZoneFile;
     #else
-        nx::utils::unused(timeZoneId);
         return "";
     #endif
 }
@@ -74,7 +72,7 @@ steady_clock::time_point monotonicTime()
     return steady_clock::now() + monotonicTimeShift;
 }
 
-bool setTimeZone(const QString& timeZoneId)
+bool setTimeZone([[maybe_unused]] const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
         const QString& timeZoneFile = getTimeZoneFile(timeZoneId);
@@ -109,7 +107,6 @@ bool setTimeZone(const QString& timeZoneId)
         return true;
     #else
         NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unsupported platform"));
-        nx::utils::unused(timeZoneId);
         return false;
     #endif
 }
@@ -168,7 +165,7 @@ QString getCurrentTimeZoneId()
     return id;
 }
 
-bool setDateTime(qint64 millisecondsSinceEpoch)
+bool setDateTime([[maybe_unused]] qint64 millisecondsSinceEpoch)
 {
     #if defined(Q_OS_LINUX)
         struct timeval tv;
@@ -190,7 +187,6 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
         NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): \"hwclock -w\" fails"));
         return false;
     #else
-        nx::utils::unused(millisecondsSinceEpoch);
         NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): unsupported platform"));
     #endif
 

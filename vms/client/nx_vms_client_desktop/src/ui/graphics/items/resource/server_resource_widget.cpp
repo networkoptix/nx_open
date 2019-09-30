@@ -37,7 +37,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 
 using namespace nx::vms::client::desktop::ui;
 
@@ -765,7 +765,7 @@ QString QnServerResourceWidget::calculateTitleText() const
         return name;
 
     const auto uptimeMs = std::chrono::milliseconds(m_manager->uptimeMs(m_resource));
-    return tr("%1 (up %2)").arg(name, nx::vms::client::core::HumanReadable::timeSpan(uptimeMs));
+    return tr("%1 (up %2)").arg(name, nx::vms::text::HumanReadable::timeSpan(uptimeMs));
 }
 
 int QnServerResourceWidget::calculateButtonsVisibility() const

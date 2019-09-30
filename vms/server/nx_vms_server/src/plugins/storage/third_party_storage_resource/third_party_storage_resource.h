@@ -4,21 +4,23 @@
 #include <storage/third_party_storage.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/sdk/ptr.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 namespace nx::vms::server { class Settings; }
 
-class QnThirdPartyStorageResource: public QnStorageResource
+class QnThirdPartyStorageResource: public nx::vms::server::StorageResource
 {
+    using base_type = nx::vms::server::StorageResource;
 public:
     static QnStorageResource* instance(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         const QString& url,
         nx_spl::StorageFactory* sf,
         const nx::vms::server::Settings* settings
     );
 
     QnThirdPartyStorageResource(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         nx_spl::StorageFactory* sf,
         const QString& storageUrl,
         const nx::vms::server::Settings* settings
@@ -29,7 +31,6 @@ public:
     ~QnThirdPartyStorageResource() = default;
 
 public: // Inherited interface overrides.
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual int getCapabilities() const override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace()const override;
@@ -41,7 +42,8 @@ public: // Inherited interface overrides.
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFileSize(const QString& url) const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
-
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 private:
     void openStorage(const char* storageUrl, nx_spl::StorageFactory* storageFactory);
 

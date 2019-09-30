@@ -1,7 +1,7 @@
 #include "recording_threshold_widget.h"
 #include "ui_recording_threshold_widget.h"
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>

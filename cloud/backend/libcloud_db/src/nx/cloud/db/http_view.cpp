@@ -69,7 +69,7 @@ void HttpView::bind()
     const auto& httpAddrToListenList = m_settings.endpointsToListen();
     if (httpAddrToListenList.empty())
     {
-        NX_ALWAYS(this, "No HTTP address to listen");
+        NX_ERROR(this, "No HTTP address to listen");
         throw std::runtime_error("No HTTP address to listen");
     }
 

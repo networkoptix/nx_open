@@ -19,7 +19,7 @@
 #include <core/dataconsumer/data_copier.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/resource/resource_fwd.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/analytics/metadata_logger.h>
 
@@ -49,6 +49,7 @@ public:
 
     void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
+    QnLiveStreamParams getActualParams() const;
 
     virtual bool needMetadata();
 

@@ -135,6 +135,13 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
     NX_VERBOSE(this, "Saving packet (4) took %1ms", t.elapsed());
 }
 
+std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
+{
+    if (m_dbController)
+        return m_dbController->statisticsCollector().getQueryStatistics();
+    return std::optional<nx::sql::QueryStatistics>();
+}
+
 void EventsStorage::createLookupCursor(
     Filter filter,
     CreateCursorCompletionHandler completionHandler)
@@ -645,6 +652,13 @@ void MovableAnalyticsDb::flush(StoreCompletionHandler completionHandler)
     return db->flush(std::move(completionHandler));
 }
 
+std::optional<nx::sql::QueryStatistics> MovableAnalyticsDb::statistics() const
+{
+    if (const auto db = getDb())
+        return db->statistics();
+    return std::optional<nx::sql::QueryStatistics>();
+}
+
 bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
 {
     auto db = getDb();
@@ -658,6 +672,12 @@ bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* ou
 }
 
 std::shared_ptr<EventsStorage> MovableAnalyticsDb::getDb()
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_db;
+}
+
+std::shared_ptr<const EventsStorage> MovableAnalyticsDb::getDb() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_db;

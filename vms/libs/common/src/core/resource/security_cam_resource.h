@@ -10,7 +10,7 @@
 #include <nx/core/resource/device_type.h>
 #include <nx/utils/std/optional.h>
 
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
@@ -139,9 +139,8 @@ public:
 
     bool isMultiSensorCamera() const;
 
-    nx::core::resource::DeviceType deviceType() const;
-
     void setDeviceType(nx::core::resource::DeviceType);
+    nx::core::resource::DeviceType deviceType() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -386,6 +385,8 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    void vendorChanged(const QnResourcePtr &resource);
+    void modelChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
@@ -415,6 +416,7 @@ signals:
         qint64 timestamp );
 
     void recordingActionChanged(const QnResourcePtr& resource);
+
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();
@@ -428,11 +430,11 @@ protected:
 
     virtual Qn::LicenseType calculateLicenseType() const;
 
+    nx::core::resource::DeviceType enforcedDeviceType() const;
 private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     MotionStreamIndex calculateMotionStreamIndex() const;
-
 private:
     int m_recActionCnt;
     QString m_groupName;
@@ -441,18 +443,18 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    CachedValue<Qn::LicenseType> m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming;
-    CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
-    CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
-    CachedValue<bool> m_cachedIsDtsBased;
-    CachedValue<Qn::MotionType> m_motionType;
-    CachedValue<bool> m_cachedIsIOModule;
-    CachedValue<bool> m_cachedCanConfigureRemoteRecording;
-    CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
-    CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
-    CachedValue<bool> m_cachedHasVideo;
-    CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
+    nx::utils::CachedValue<Qn::LicenseType> m_cachedLicenseType;
+    nx::utils::CachedValue<bool> m_cachedHasDualStreaming;
+    nx::utils::CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
+    nx::utils::CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
+    nx::utils::CachedValue<bool> m_cachedIsDtsBased;
+    nx::utils::CachedValue<Qn::MotionType> m_motionType;
+    nx::utils::CachedValue<bool> m_cachedIsIOModule;
+    nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
+    nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    nx::utils::CachedValue<nx::core::resource::DeviceType> m_cachedExplicitDeviceType;
+    nx::utils::CachedValue<bool> m_cachedHasVideo;
+    nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
 protected slots:
     virtual void resetCachedValues();

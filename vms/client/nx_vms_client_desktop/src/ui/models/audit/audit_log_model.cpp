@@ -23,7 +23,7 @@
 #include <client/client_settings.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -32,7 +32,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <utils/math/math.h>
 
 using namespace nx;
@@ -304,7 +304,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
     const auto duration = std::chrono::seconds(durationSecs);
     static const QString kSeparator(L' ');
 
-    using HumanReadable = nx::vms::client::core::HumanReadable;
+    using HumanReadable = nx::vms::text::HumanReadable;
     return HumanReadable::timeSpan(duration,
         HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
         HumanReadable::SuffixFormat::Short,

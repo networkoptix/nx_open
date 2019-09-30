@@ -139,16 +139,16 @@ void LicenseWatcher::validateData()
             if (state == nx::network::http::AsyncClient::State::sFailed)
             {
                 NX_WARNING(this,
-                    lm("Can't update license list. HTTP request to the license server failed: %1")
-                        .arg(SystemError::toString(m_httpClient->lastSysErrorCode())));
+                    "Can't update license list. HTTP request to the license server failed: %1",
+                    SystemError::toString(m_httpClient->lastSysErrorCode()));
                 return;
             }
 
             const int statusCode = m_httpClient->response()->statusLine.statusCode;
             if (statusCode != nx::network::http::StatusCode::ok)
             {
-                NX_WARNING(this, lm("Can't read response from the license server. Http error code %1")
-                    .arg(statusCode));
+                NX_WARNING(this, "Can't read response from the license server. Http error code %1",
+                    statusCode);
                 return;
             }
 
@@ -171,7 +171,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     CheckLicenseResponse response;
     if (!QJson::deserialize(responseData, &response))
     {
-        NX_WARNING(this, lm("Can't deserialize response from the license server."));
+        NX_WARNING(this, "Can't deserialize response from the license server.");
         return;
     }
 
@@ -180,15 +180,15 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     {
         QByteArray licenseKey = itr.key().toUtf8();
         auto errorInfo = itr.value();
-        NX_ALWAYS(this, lm("License %1 has been removed. Reason: '%2'. Error code: %3")
-            .args(licenseKey, errorInfo.text, errorInfo.code));
+        NX_INFO(this, "License %1 has been removed. Reason: '%2'. Error code: %3",
+            licenseKey, errorInfo.text, errorInfo.code);
 
         auto licenseObject = QnLicense::createFromKey(licenseKey);
         auto error = licenseManager->removeLicenseSync(licenseObject);
         if (error != ec2::ErrorCode::ok)
         {
-            NX_WARNING(this, lm("Can't remove license key %1 from the database. DB error %2")
-                .args(licenseKey, error));
+            NX_WARNING(this, "Can't remove license key %1 from the database. DB error %2",
+                licenseKey, error);
         }
     }
 
@@ -210,13 +210,13 @@ void LicenseWatcher::processResponse(QByteArray responseData)
         {
             nx::vms::api::LicenseData rawData;
             ec2::fromResourceToApi(license, rawData);
-            NX_ALWAYS(this,
-                lm("License '%1' has been updated. New value: %2"), rawData.key, rawData.licenseBlock);
+            NX_INFO(this, "License '%1' has been updated. New value: %2",
+                rawData.key, rawData.licenseBlock);
         }
     }
     else
     {
-        NX_WARNING(this, lm("Can't update licenses into the database. DB error %1").arg(error));
+        NX_WARNING(this, "Can't update licenses into the database. DB error %1", error);
     }
 }
 

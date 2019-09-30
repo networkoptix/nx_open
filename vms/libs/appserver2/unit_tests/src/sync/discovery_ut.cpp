@@ -41,8 +41,8 @@ protected:
         module->commonModule()->updateRunningInstanceGuid();
         ASSERT_TRUE(module);
         initServerData(module);
-        NX_ALWAYS(this, lm("Server %1 started at %2").args(
-            module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
+        NX_INFO(this, "Server %1 started at %2",
+            module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint());
 
         const auto discoveryManager = module->commonModule()->moduleDiscoveryManager();
         discoveryManager->setReconnectPolicy(kReconnectPolicy);
@@ -135,16 +135,16 @@ protected:
             if (const auto module = discoveryManager->getModule(server.first))
             {
                 ++totalDiscoveryLinks;
-                NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
-                    searcher->moduleGUID(), module->id, module->endpoint));
+                NX_INFO(this, "Module %1 discovered %2 with endpoint %3",
+                    searcher->moduleGUID(), module->id, module->endpoint);
 
                 EXPECT_EQ(module->id.toString(), server.first.toString());
                 EXPECT_EQ(module->endpoint.port, server.second->moduleInstance()->endpoint().port);
             }
             else
             {
-                NX_WARNING(this, lm("Module %1 failed to discover %2").args(
-                    searcher->moduleGUID(), server.first));
+                NX_WARNING(this, "Module %1 failed to discover %2",
+                    searcher->moduleGUID(), server.first);
             }
         }
 

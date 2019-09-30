@@ -33,6 +33,7 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     QHostAddress subNetworkAddress() const;
     QHostAddress broadcastAddress() const;
     bool isHostBelongToIpv4Network(const QHostAddress& address) const;
+    QString toString() const;
 
     QString name;
     QHostAddress address;

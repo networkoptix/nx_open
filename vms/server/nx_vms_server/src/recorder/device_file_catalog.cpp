@@ -32,13 +32,14 @@
 
 #include <nx/utils/concurrent.h>
 #include "storage_db_pool.h"
+#include <nx/vms/server/resource/storage_resource.h>
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
-const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_NONE = 0xffff;
-const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
-const int DeviceFileCatalog::Chunk::UnknownDuration = -1;
+
+using namespace nx::vms::server;
+using namespace std::chrono;
 
 namespace {
     std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
@@ -61,45 +62,9 @@ QnServer::ChunksCatalog DeviceFileCatalog::catalogByPrefix(const QString &prefix
     return QnServer::LowQualityCatalog; //default value
 }
 
-qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
-{
-    if (timeMs >= startTimeMs)
-        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
-    else
-        return startTimeMs - timeMs;
-}
-
-qint64 DeviceFileCatalog::Chunk::endTimeMs() const
-{
-    if (durationMs == -1)
-        return DATETIME_NOW;
-    else
-        return startTimeMs + durationMs;
-}
-
-bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
-{
-    if (startTimeMs == -1)
-        return false;
-    else
-        return qBetween(startTimeMs, timeMs, endTimeMs());
-}
-
-void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
-{
-    if (!isTruncated)
-    {
-        originalDuration = durationMs;
-        isTruncated = true;
-    }
-    durationMs = qMax(0ll, timeMs - startTimeMs);
-}
-
 DeviceFileCatalog::DeviceFileCatalog(
-    QnMediaServerModule* serverModule,
-    const QString           &cameraUniqueId,
-    QnServer::ChunksCatalog catalog,
-    QnServer::StoragePool   storagePool)
+    QnMediaServerModule* serverModule, const QString& cameraUniqueId,
+    QnServer::ChunksCatalog catalog, QnServer::StoragePool storagePool)
     :
     nx::vms::server::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
@@ -118,17 +83,11 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
 
     for (const auto& chunk: m_chunks)
     {
-        if (chunk.storageIndex == storageIndex)
-            result += chunk.getFileSize();
+        if (chunk.chunk().storageIndex == storageIndex)
+            result += chunk.chunk().getFileSize();
     }
 
     return result;
-}
-
-bool DeviceFileCatalog::hasArchive(int storageIndex) const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_chunks.hasArchive(storageIndex);
 }
 
 QString getDirName(const QString& prefix, int currentParts[4], int i)
@@ -222,22 +181,24 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
 
 void DeviceFileCatalog::removeChunks(int storageIndex)
 {
-    replaceChunks(storageIndex, std::deque<Chunk>());
+    replaceChunks(storageIndex, nx::vms::server::ChunksDeque());
 }
 
-void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
+void DeviceFileCatalog::replaceChunks(
+    int storageIndex, const nx::vms::server::ChunksDeque& newCatalog)
 {
     NX_ASSERT(std::is_sorted(newCatalog.begin(), newCatalog.end()));
 
     QnMutexLocker lock( &m_mutex );
 
-    std::deque<Chunk> filteredData;
+    nx::vms::server::ChunksDeque filteredData;
     filteredData.swap( m_chunks );
-    const auto filteredDataEndIter = std::remove_if( filteredData.begin(), filteredData.end(),
-        [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
+    const auto filteredDataEndIter = std::remove_if(
+        filteredData.begin(), filteredData.end(),
+        [storageIndex](const auto& chunk){ return chunk.chunk().storageIndex == storageIndex; } );
+
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
-    m_chunks.reCalcArchivePresence();
 }
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
@@ -248,7 +209,7 @@ QSet<QDate> DeviceFileCatalog::recordedMonthList()
     if (m_chunks.empty())
         return rez;
 
-    std::deque<DeviceFileCatalog::Chunk>::iterator curItr = m_chunks.begin();
+    auto curItr = m_chunks.begin();
     QDate monthStart(1970, 1, 1);
 
     curItr = std::lower_bound(curItr, m_chunks.end(), QDateTime(monthStart).toMSecsSinceEpoch());
@@ -267,49 +228,68 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     QnMutexLocker lk( &m_mutex );
 
-    if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].startTimeMs) {
+    if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].chunk().startTimeMs) {
         m_chunks.push_back(chunk);
     }
     else {
-        ChunkMap::iterator itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+        auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
-    if (m_chunks.size() > 1 && m_chunks[m_chunks.size()-1].startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+    if (m_chunks.size() > 1 && m_chunks[m_chunks.size()-1].chunk().startTimeMs == m_chunks[m_chunks.size()-2].chunk().endTimeMs() + 1)
     {
         // update catalog to fix bug from previous version
-        m_chunks[m_chunks.size()-2].durationMs = m_chunks[m_chunks.size()-1].startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+        auto chunkToUpdate = m_chunks[m_chunks.size()-2].chunk();
+        chunkToUpdate.startTimeMs =
+            m_chunks[m_chunks.size()-1].chunk().startTimeMs - chunkToUpdate.startTimeMs;
+        m_chunks[m_chunks.size()-2] = chunkToUpdate;
         return true;
     }
     return false;
 }
 
-void DeviceFileCatalog::addChunks(std::deque<Chunk> chunks)
+int64_t DeviceFileCatalog::occupiedSpace(int storageIndex) const
 {
-    std::sort(chunks.begin(), chunks.end());
+    QnMutexLocker lk( &m_mutex );
+    return m_chunks.occupiedSpace(storageIndex);
+}
+
+milliseconds DeviceFileCatalog::occupiedDuration(int storageIndex) const
+{
+    QnMutexLocker lk( &m_mutex );
+    return m_chunks.occupiedDuration(storageIndex);
+}
+
+void DeviceFileCatalog::addChunks(nx::vms::server::ChunksDeque chunks)
+{
+    NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
 
     QnMutexLocker lk( &m_mutex );
 
-    std::deque<Chunk> existChunks;
+    ChunksDeque existChunks;
     existChunks.swap( m_chunks );
     m_chunks.resize(existChunks.size() + chunks.size());
-    auto itr = std::set_union(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
+    auto itr = std::set_union(
+        existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
     if (!m_chunks.empty())
         m_chunks.resize(itr - m_chunks.begin());
-    m_chunks.reCalcArchivePresence();
 }
 
-std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
+std::deque<Chunk> DeviceFileCatalog::mergeChunks(
+    const std::deque<Chunk>& chunks1, const std::deque<Chunk>& chunks2)
 {
     std::deque<Chunk> result;
-    result.resize(chunk1.size() + chunk2.size());
-    std::merge(chunk1.begin(), chunk1.end(), chunk2.begin(), chunk2.end(), result.begin());
+    result.resize(chunks1.size() + chunks2.size());
+    std::merge(chunks1.begin(), chunks1.end(), chunks2.begin(), chunks2.end(), result.begin());
     return result;
 }
 
 int DeviceFileCatalog::detectTimeZone(qint64 startTimeMs, const QString& fileName)
 {
     QDateTime datetime1 = QDateTime::fromMSecsSinceEpoch(startTimeMs).toUTC();
-    datetime1 = datetime1.addMSecs(-(datetime1.time().minute()*60*1000ll + datetime1.time().second()*1000ll + datetime1.time().msec()));
+    datetime1 = datetime1.addMSecs(
+        -(datetime1.time().minute()*60*1000ll
+            + datetime1.time().second()*1000ll
+            + datetime1.time().msec()));
 
     QStringList dateParts = fileName.split(getPathSeparator(fileName));
     if (dateParts.size() < 5)
@@ -325,10 +305,8 @@ int DeviceFileCatalog::detectTimeZone(qint64 startTimeMs, const QString& fileNam
     return result;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
-    const QnStorageResourcePtr  &storage,
-    const QString               &fileName
-)
+nx::vms::server::Chunk DeviceFileCatalog::chunkFromFile(
+    const QnStorageResourcePtr& storage, const QString& fileName)
 {
     Chunk chunk;
     if (fileName.indexOf(lit(".txt")) != -1)
@@ -474,8 +452,9 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
-    QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
+void DeviceFileCatalog::scanMediaFiles(
+    const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks,
+    QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
@@ -491,7 +470,8 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             return; // canceled
         }
 
-        if (fi.isDir()) {
+        if (fi.isDir())
+        {
             QnTimePeriod folderPeriod = timePeriodFromDir(storage, fi.absoluteFilePath());
             if (!filter.isEmpty() && !filter.intersects(folderPeriod))
                 continue;
@@ -519,63 +499,55 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             break;
         }
 
-        nx::utils::concurrent::run( &tp, [&]()
-        {
-            //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
-            QString fileName = fi.absoluteFilePath();
-            qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
-
-            if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
-                return;
-
-            Chunk chunk = chunkFromFile(storage, fileName);
-            chunk.setFileSize(fi.size());
-            if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+        nx::utils::concurrent::run(
+            &tp,
+            [&]()
             {
-                return;
-            }
+                //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
+                QString fileName = fi.absoluteFilePath();
+                qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
 
-            QnMutexLocker lock(&scanFilesMutex);
-            if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
-                QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
-                if (itr != allChunks.begin())
+                if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
+                    return;
+
+                Chunk chunk = chunkFromFile(storage, fileName);
+                chunk.setFileSize(fi.size());
+                if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+                    return;
+
+                QnMutexLocker lock(&scanFilesMutex);
+                if (chunk.durationMs > 0 && chunk.startTimeMs > 0)
                 {
-                    Chunk& prevChunk = *(itr-1);
-                    qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION_MS && !fi.baseName().contains("_") /*Old version file*/)
-                        prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                    QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
+                    if (itr != allChunks.begin())
+                    {
+                        Chunk& prevChunk = *(itr-1);
+                        qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
+                        if (delta < MAX_FRAME_DURATION_MS
+                            && !fi.baseName().contains("_")) //< An old version file.
+                        {
+                            prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                        }
+                    }
+
+                    if (allChunks.size() % 1000 == 0)
+                        qWarning() << allChunks.size() << "media files processed...";
+
                 }
-
-                if (allChunks.size() % 1000 == 0)
-                    qWarning() << allChunks.size() << "media files processed...";
-
-            }
-            else if (fi.fileName().indexOf(".txt") == -1) {
-                qDebug() << "remove file" << fi.absoluteFilePath() << "because of empty chunk. duration=" << chunk.durationMs << "startTime=" << chunk.startTimeMs;
-                emptyFileList
-                    << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
-                           chunk.startTimeMs,
-                           fi.absoluteFilePath()
-                       );
-            }
-        }
-        );
+                else if (fi.fileName().indexOf(".txt") == -1)
+                {
+                    qDebug()
+                        << "remove file" << fi.absoluteFilePath()
+                        << "because of empty chunk. duration=" << chunk.durationMs
+                        << "startTime=" << chunk.startTimeMs;
+                    emptyFileList << EmptyFileInfo(chunk.startTimeMs, fi.absoluteFilePath());
+                }
+            });
     }
     tp.waitForDone();
 
     NX_DEBUG(this, "[Scan] finished for directory: %1, %2 files processed",
         nx::utils::url::hidePassword(folder), allChunks.size());
-}
-
-void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter)
-{
-    scanMediaFiles(
-        rootFolder(storage, catalog),
-        storage,
-        allChunks,
-        emptyFileList,
-        scanFilter
-    );
 }
 
 QString DeviceFileCatalog::rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const
@@ -590,41 +562,6 @@ QString DeviceFileCatalog::cameraUniqueId() const {
     return m_cameraUniqueId;
 }
 
-bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period)
-{
-//     QElapsedTimer t;
-//     t.restart();
-//     qWarning() << "start rebuilding archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog);
-    //m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
-
-    QMap<qint64, Chunk> allChunks;
-    if (getMyStorageMan()->needToStopMediaScan())
-        return false;
-
-    QVector<EmptyFileInfo> emptyFileList;
-    readStorageData(
-        storage,
-        m_catalog,
-        allChunks,
-        emptyFileList,
-        period
-    );
-
-    for(const EmptyFileInfo& emptyFile: emptyFileList) {
-        if (emptyFile.startTimeMs < period.endTimeMs())
-            storage->removeFile(emptyFile.fileName);
-    }
-
-    QnMutexLocker lk( &m_mutex );
-
-    for(const Chunk& chunk: allChunks)
-        m_chunks.push_back(chunk);
-
-    //qWarning() << "rebuild archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
-
-    return true;
-}
-
 QnServer::ChunksCatalog DeviceFileCatalog::getRole() const
 {
     return m_catalog; // it is a const data
@@ -636,16 +573,11 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk, bool sideRecorder)
 
     QnMutexLocker lock( &m_mutex );
 
-    ChunkMap::iterator itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
-    if( itr != m_chunks.end() )
-    {
-        itr = m_chunks.insert(itr, chunk);  //triggers NX_ASSERT if itr == end()
-    }
+    auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+    if (itr != m_chunks.end())
+        m_chunks.insert(itr, chunk);  //triggers NX_ASSERT if itr == end()
     else
-    {
         m_chunks.push_back( chunk );
-        itr = m_chunks.begin() + (m_chunks.size()-1);
-    }
 
     if (!sideRecorder)
         m_recordingChunkTime = chunk.startTimeMs;
@@ -659,29 +591,36 @@ void DeviceFileCatalog::removeRecord(int idx)
         m_chunks.erase(m_chunks.begin() + idx);
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
+Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
     QnMutexLocker lock( &m_mutex );
 
-    ChunkMap::iterator itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     if (itr > m_chunks.begin())
         --itr;
     while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
         --itr;
 
     if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
-        Chunk result = *itr;
+        ChunksDeque::ProxyChunk result = *itr;
         int idx = itr - m_chunks.begin();
         removeRecord(idx);
-        return result;
+        return result.chunk();
     }
 
     return Chunk();
 }
 
+void DeviceFileCatalog::assignChunksUnsafe(
+    std::deque<nx::vms::server::Chunk>::iterator begin,
+    std::deque<nx::vms::server::Chunk>::iterator end)
+{
+    m_chunks.assign(begin, end);
+}
+
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
+    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].chunk().startTimeMs;
 }
 
 qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
@@ -695,11 +634,8 @@ qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
     return 0;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(
-    int durationMs,
-    qint64 fileSize,
-    bool indexWithDuration,
-    qint64 startTimeMs)
+Chunk DeviceFileCatalog::updateDuration(
+    int durationMs, qint64 fileSize, bool indexWithDuration, qint64 startTimeMs)
 {
     NX_ASSERT(durationMs < 1000 * 1000);
     QnMutexLocker lock( &m_mutex );
@@ -711,14 +647,16 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(
     auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), timeToFind);
     if (itr != m_chunks.end() && itr->startTimeMs == timeToFind)
     {
-        DeviceFileCatalog::Chunk& chunk = *itr;
+        Chunk chunk = (*itr).chunk();
         chunk.durationMs = durationMs;
         chunk.setFileSize(fileSize);
         if (indexWithDuration)
             chunk.fileIndex = Chunk::FILE_INDEX_WITH_DURATION;
+        *itr = chunk;
         return chunk;
     }
-    else {
+    else
+    {
         return Chunk();
     }
 }
@@ -736,7 +674,7 @@ QVector<qint64> DeviceFileCatalog::deleteRecordBeforeDays(int days)
 }
 */
 
-QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx)
+QVector<Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx;
     QVector<Chunk> result;
@@ -766,16 +704,15 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
     for (int i = 0; i < m_chunks.size();)
     {
-        if (m_chunks[i].storageIndex == storageIndex)
+        if (m_chunks[i].chunk().storageIndex == storageIndex)
         {
-            if (m_chunks[i].startTimeMs < timeMs) {
+            if (m_chunks[i].chunk().startTimeMs < timeMs)
                 removeRecord(i);
-            }
             else
                 break;
-
         }
-        else {
+        else
+        {
             ++i;
         }
     }
@@ -787,9 +724,9 @@ bool DeviceFileCatalog::isEmpty() const
     return m_chunks.empty();
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
+Chunk DeviceFileCatalog::deleteFirstRecord()
 {
-    QnStorageResourcePtr storage;
+    StorageResourcePtr storage;
     QString delFileName;
     int storageIndex;
     Chunk deletedChunk;
@@ -797,26 +734,23 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
         QnMutexLocker lock( &m_mutex );
 
         if (m_chunks.empty())
+        {
             return deletedChunk;
+        }
         else
         {
-            storageIndex = m_chunks[0].storageIndex;
-            delFileName = fullFileName(m_chunks[0]);
-            deletedChunk = m_chunks[0];
-
+            storageIndex = m_chunks[0].chunk().storageIndex;
+            delFileName = fullFileName(m_chunks[0].chunk());
+            deletedChunk = m_chunks[0].chunk();
             removeRecord(0);
         }
     }
 
     storage = getMyStorageMan()->storageRoot(storageIndex);
-    if (storage) {
-        if (!delFileName.isEmpty())
-        {
-            //storage->addWritedSpace(-deletedSize);
-            storage->removeFile(delFileName);
-        }
-    }
+    if (!storage || delFileName.isEmpty())
+        return deletedChunk; //< Nothing to delete.
 
+    serverModule()->fileDeletor()->deleteFile(delFileName, storage->getId());
     return deletedChunk;
 }
 
@@ -825,30 +759,18 @@ int DeviceFileCatalog::findNextFileIndex(qint64 startTimeMs) const
     QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return -1;
-    ChunkMap::const_iterator itr = std::upper_bound(
-        m_chunks.begin(),
-        m_chunks.end(),
-        startTimeMs
-    );
+    auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     return itr == m_chunks.end() ? -1 : itr - m_chunks.begin();
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
 {
-/*
-    QString msg;
-    QTextStream str(&msg);
-    str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
-    str.flush();
-    NX_WARNING(this, msg);
-    str.flush();
-*/
     QnMutexLocker lock( &m_mutex );
 
     if (m_chunks.empty())
         return -1;
 
-    ChunkMap::const_iterator itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     if (itr > m_chunks.begin())
     {
         --itr;
@@ -871,20 +793,9 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
 void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 {
     QnMutexLocker lock( &m_mutex );
-    ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if (itr != m_chunks.end() && itr->startTimeMs == chunk.startTimeMs)
         chunk.durationMs = itr->durationMs;
-}
-
-QString DeviceFileCatalog::Chunk::fileName() const
-{
-    QString baseName = (fileIndex != FILE_INDEX_NONE && fileIndex != FILE_INDEX_WITH_DURATION) ?
-                       strPadLeft(QString::number(fileIndex), 3, '0') :
-                       QString::number(startTimeMs) +
-                       (fileIndex == FILE_INDEX_WITH_DURATION ? lit("_") + QString::number(durationMs) :
-                                                                lit(""));
-
-    return baseName + QString(".mkv");
 }
 
 QString DeviceFileCatalog::fileDir(const Chunk& chunk) const
@@ -910,7 +821,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTimeMs;
+        return m_chunks[0].chunk().startTimeMs;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
@@ -918,10 +829,10 @@ qint64 DeviceFileCatalog::maxTime() const
     QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
-    else if (m_chunks[m_chunks.size()-1].durationMs == -1)
+    else if (m_chunks[m_chunks.size()-1].chunk().durationMs == -1)
         return DATETIME_NOW;
     else
-        return m_chunks[m_chunks.size()-1].startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].durationMs);
+        return m_chunks[m_chunks.size()-1].chunk().startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].chunk().durationMs);
 }
 
 bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
@@ -931,7 +842,7 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
     if (m_chunks.empty())
         return false;
 
-    ChunkMap::const_iterator itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), timeMs);
+    auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), timeMs);
     if (itr != m_chunks.end() && itr->startTimeMs - timeMs <= eps)
         return true;
     if (itr > m_chunks.begin())
@@ -946,7 +857,7 @@ bool DeviceFileCatalog::containTime(const QnTimePeriod& period) const
     if (m_chunks.empty())
         return false;
 
-    ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), period.startTimeMs);
+    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), period.startTimeMs);
     if (itr != m_chunks.end() && itr->startTimeMs < period.endTimeMs())
         return true;
     if (itr == m_chunks.begin())
@@ -961,16 +872,16 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
     if (m_chunks.empty())
         return true;
     else
-        return m_chunks[m_chunks.size()-1].startTimeMs == startTimeMs;
+        return m_chunks[m_chunks.size()-1].chunk().startTimeMs == startTimeMs;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
+nx::vms::server::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QnMutexLocker lock( &m_mutex );
     if (index >= 0 && (size_t)index < m_chunks.size() )
-        return m_chunks.at(index);
+        return m_chunks.at(index).chunk();
     else
-        return DeviceFileCatalog::Chunk();
+        return Chunk();
 }
 
 qint64 DeviceFileCatalog::firstTime() const
@@ -979,7 +890,7 @@ qint64 DeviceFileCatalog::firstTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTimeMs;
+        return m_chunks[0].chunk().startTimeMs;
 }
 
 void DeviceFileCatalog::close()
@@ -999,7 +910,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(
     if (m_chunks.empty())
         return result;
 
-    ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     /* Checking if we should include a chunk, containing startTime. */
     if (itr != m_chunks.begin())
     {
@@ -1011,7 +922,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(
     if (itr == m_chunks.end() || itr->startTimeMs >= endTimeMs)
         return result;
 
-    ChunkMap::const_iterator endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
+    auto endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
     return QnTimePeriodList::filterTimePeriods(
         itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
 }
@@ -1040,7 +951,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         if (fields.size() < 4 + timeZoneExist) {
             continue;
         }
-        int coeff = 1; // compabiliy with previous version (convert usec to ms)
+        int coeff = 1; // compatibility with previous version (convert us to ms)
         if (fields[0+timeZoneExist].length() >= 16)
             coeff = 1000;
         qint16 timeZone = timeZoneExist ? fields[0].toInt() : -1;
@@ -1064,45 +975,42 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     if (m_chunks.empty())
         return QnRecordingStatsData();
 
-    qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0 // bitrateAnalyzePeriodMs or all archive
-        ? bitrateAnalyzePeriodMs
-        : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().startTimeMs);
+    result.recordedBytes = occupiedSpace();
+    result.recordedSecs = duration_cast<seconds>(occupiedDuration()).count();
+    for (const auto&[index, data]: m_chunks.archivePresence())
+    {
+        if (auto storage = getMyStorageMan()->storageRoot(index))
+            result.recordedBytesPerStorage[storage->getId()] = data.space;
+    }
 
-    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch()
-        -  m_chunks.front().startTimeMs) / 1000);
+    result.archiveDurationSecs =
+        qMax(
+            0ll,
+            (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks.front().chunk().startTimeMs) / 1000);
 
-    auto itrLeft = m_chunks.cbegin();
-    auto itrRight = m_chunks.cend();
-
-    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0 ? m_chunks.back().startTimeMs - bitrateAnalyzePeriodMs : 0;
+    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
+        ? m_chunks.back().chunk().startTimeMs - bitrateAnalyzePeriodMs : 0;
 
     qint64 recordedMsForPeriod = 0;
     qint64 recordedBytesForPeriod = 0;
-    qint64 totalRecordedMs = 0;
-    qint64 totalRecordedBytes = 0;
-    for (auto itr = itrLeft; itr != itrRight; ++itr)
+
+    for (auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), averagingStartTime);
+        itr != m_chunks.end(); ++itr)
     {
-        const Chunk& chunk = *itr;
-        auto storage = getMyStorageMan()->storageRoot(chunk.storageIndex);
+        const auto& chunk = (*itr).chunk();
         if (chunk.durationMs != Chunk::UnknownDuration)
         {
-            totalRecordedBytes += chunk.getFileSize();
-            if (storage)
-                result.recordedBytesPerStorage[storage->getId()] += chunk.getFileSize();
-            totalRecordedMs += chunk.durationMs;
-
-            if (chunk.startTimeMs >= averagingStartTime)
-            {
-                recordedBytesForPeriod += chunk.getFileSize();
-                recordedMsForPeriod += chunk.durationMs;
-            }
+            recordedBytesForPeriod += chunk.getFileSize();
+            recordedMsForPeriod += chunk.durationMs;
         }
     }
-    result.recordedBytes = totalRecordedBytes;
-    result.recordedSecs = totalRecordedMs / 1000; // msec to sec
 
     if (recordedBytesForPeriod > 0)
     {
+        qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0 // bitrateAnalyzePeriodMs or all archive
+            ? bitrateAnalyzePeriodMs
+            : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().chunk().startTimeMs);
+
         result.averageDensity = recordedBytesForPeriod / (qreal) averagingPeriodMs * 1000; // msec to sec
         if (recordedMsForPeriod > 0)
             result.averageBitrate = recordedBytesForPeriod / (qreal) recordedMsForPeriod * 1000; // msec to sec
@@ -1112,28 +1020,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     return result;
 }
 
-bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
+bool DeviceFileCatalog::ScanFilter::intersects(const QnTimePeriod& period) const
 {
-    return first < other.startTimeMs;
-}
-
-bool operator < (const DeviceFileCatalog::Chunk& first, qint64 other)
-{
-    return first.startTimeMs < other;
-}
-
-bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other)
-{
-    return first.startTimeMs < other.startTimeMs;
-}
-
-bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs)
-{
-    return lhs.startTimeMs == rhs.startTimeMs && lhs.durationMs == rhs.durationMs &&
-           lhs.fileIndex == rhs.fileIndex && lhs.getFileSize() == rhs.getFileSize() &&
-           lhs.timeZone == rhs.timeZone && lhs.storageIndex == rhs.storageIndex;
-}
-
-bool DeviceFileCatalog::ScanFilter::intersects(const QnTimePeriod& period) const {
     return QnTimePeriod(scanPeriod.startTimeMs, scanPeriod.durationMs).intersects(period);
 }

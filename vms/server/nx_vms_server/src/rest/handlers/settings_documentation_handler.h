@@ -3,9 +3,10 @@
 #include "rest/server/request_handler.h"
 #include "rest/server/json_rest_handler.h"
 
-class QnGlobalMonitor;
-
-namespace nx { namespace vms::server { class Settings; }}
+namespace nx::vms::server {
+    class Settings;
+    class GlobalMonitor;
+} // namespace nx::vms::server
 
 class QnSettingsDocumentationHandler: public QnJsonRestHandler
 {

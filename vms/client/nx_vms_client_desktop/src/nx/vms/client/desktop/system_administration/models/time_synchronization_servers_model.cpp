@@ -2,11 +2,11 @@
 
 #include <algorithm>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 #include <translation/datetime_formatter.h>
 #include <ui/style/resource_icon_cache.h>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/utils/guarded_callback.h>
 
 #include <translation/datetime_formatter.h>

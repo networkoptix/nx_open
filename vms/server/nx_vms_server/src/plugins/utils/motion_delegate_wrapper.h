@@ -12,7 +12,9 @@ class MotionDelegateWrapper: public ArchiveDelegateWrapper
     using base_type = ArchiveDelegateWrapper;
 public:
     MotionDelegateWrapper(
-        const QnMotionEstimation::Config& config, std::unique_ptr<QnAbstractArchiveDelegate> delegate);
+        const QnMotionEstimation::Config& config,
+        nx::metrics::Storage* metrics,
+        std::unique_ptr<QnAbstractArchiveDelegate> delegate);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
 

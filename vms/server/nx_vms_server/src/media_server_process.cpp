@@ -294,6 +294,13 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
+#include <nx/vms/server/metrics/camera_controller.h>
+#include <nx/vms/server/metrics/network_controller.h>
+#include <nx/vms/server/metrics/rest_handlers.h>
+#include <nx/vms/server/metrics/server_controller.h>
+#include <nx/vms/server/metrics/storage_controller.h>
+#include <nx/vms/server/metrics/system_controller.h>
+
 using namespace nx::vms::server;
 
 // This constant is used while checking for compatibility.
@@ -577,7 +584,7 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
         storages.append(storage);
         NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
     }
-    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+    bigStorageThreshold /= QnStorageManager::kBigStorageTreshold;
 
     for (int i = 0; i < storages.size(); ++i) {
         QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
@@ -879,16 +886,15 @@ void MediaServerProcess::saveStorages(
     }
 }
 
-static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
+static const std::chrono::milliseconds kSystemUsageDumpTimeout = std::chrono::minutes(30);
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
     if (!m_platform->monitor())
         return;
 
-    m_platform->monitor()->totalCpuUsage();
-    m_platform->monitor()->totalRamUsage();
-    m_platform->monitor()->totalHddLoad();
+    if (!serverModule()->settings().noMonitorStatistics())
+        m_platform->monitor()->logStatistics();
 
     // TODO: #muskov
     //  - Add some more fields that might be interesting.
@@ -903,18 +909,14 @@ void MediaServerProcess::dumpSystemUsageStats()
         }
     }
     const auto networkIfInfo = networkIfList.join(", ");
-    if (m_mediaServer->setProperty(
-        ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
-    {
+    if (m_mediaServer->setProperty(ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
         m_mediaServer->saveProperties();
-    }
 
-    QnMutexLocker lk(&m_mutex);
-    if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    if (m_dumpSystemResourceUsageTaskId == 0)  // Monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
-        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 }
 
 #ifdef Q_OS_WIN
@@ -1006,13 +1008,8 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     addCommandLineParametersFromConfig(settings.get());
 
-    const bool isStatisticsDisabled =
-        settings->settings().noMonitorStatistics();
-
     m_platform.reset(new QnPlatformAbstraction());
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
-    m_platform->setUpdatePeriodMs(
-        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
     const QString raidEventLogName = system_log::ini().logName;
     const QString raidEventProviderName = system_log::ini().providerName;
@@ -1322,7 +1319,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
-            NX_ALWAYS(this, "New external address %1 has been mapped", address);
+            NX_INFO(this, "New external address %1 has been mapped", address);
 
             it->second = mappedAddress.port;
             updateAddressesList();
@@ -1333,7 +1330,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_ALWAYS(this, "External address %1:%2 has been unmapped",
+            NX_INFO(this, "External address %1:%2 has been unmapped",
                 oldIp->first.toString(), oldIp->second);
 
             m_forwardedAddresses.erase(oldIp);
@@ -2918,6 +2915,22 @@ void MediaServerProcess::registerRestHandlers(
     reg(nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
+
+    reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
+        m_metricsController.get()));
+
+    /**%apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
+     *
+     * %apidoc GET /ec2/metrics/manifest
+     * %return:object Metrics parameter manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/values
+     * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     */
+    reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
+        m_metricsController.get(), serverModule()));
 }
 
 void MediaServerProcess::registerRestHandler(
@@ -3839,6 +3852,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
+    m_metricsController.reset();
 
     stopAsync();
 }
@@ -4015,17 +4029,14 @@ void MediaServerProcess::loadPlugins()
     for (nx_spl::StorageFactory* const storagePlugin:
     pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
-        auto settings = &serverModule()->settings();
         storagePlugins->registerStoragePlugin(
             storagePlugin->storageType(),
-            std::bind(
-                &QnThirdPartyStorageResource::instance,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                storagePlugin,
-                settings
-            ),
-            false);
+            [this, storagePlugin](QnCommonModule*, const QString& path)
+            {
+                auto settings = &serverModule()->settings();
+                return QnThirdPartyStorageResource::instance(
+                    serverModule(), path, storagePlugin, settings);
+            }, /*isDefaultProtocol*/ false);
     }
 
     storagePlugins->registerStoragePlugin(
@@ -4580,6 +4591,26 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+void MediaServerProcess::initMetricsController()
+{
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::SystemController>();
+
+    using namespace nx::vms;
+    m_metricsController->add(std::make_unique<server::metrics::SystemResourceController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::ServerController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::CameraController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::StorageController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(commonModule()->moduleGUID()));
+
+    QFile rulesFile(":/metrics_rules.json");
+    const auto rulesJson = rulesFile.open(QIODevice::ReadOnly) ? rulesFile.readAll() : QByteArray();
+    api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(rulesJson, &rules), rulesJson);
+    m_metricsController->setRules(std::move(rules));
+
+    m_metricsController->start();
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4708,6 +4739,8 @@ void MediaServerProcess::run()
 
     initResourceTypes();
 
+    initMetricsController();
+
     if (needToStop())
         return;
 
@@ -4802,8 +4835,7 @@ void MediaServerProcess::run()
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
-        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 
     nx::mserver_aux::makeFakeData(
         cmdLineArguments().createFakeData, m_ec2Connection, commonModule()->moduleGUID());

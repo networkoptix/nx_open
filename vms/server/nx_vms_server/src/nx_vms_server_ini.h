@@ -6,7 +6,9 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_server.ini") { reload(); }
 
-    NX_INI_FLAG(0, verboseAutoRequestForwarder,
+    NX_INI_FLAG(0, enableMallocStatisticsLogging,
+        "Enables info-level logging of malloc statistics. Only Linux is supported.");
+    NX_INI_FLAG(0, verboseAutoRequestForwarder, 
         "Sets log level to Verbose for AutoRequestForwarder.");
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");
     NX_INI_FLAG(0, enableApiDebug, "Enables /api/debug RestAPI method.");

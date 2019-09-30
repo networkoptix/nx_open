@@ -11,6 +11,7 @@
 
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
+class QnLiveStreamProvider;
 
 namespace nx::vms::server::resource { struct MulticastParameters; }
 
@@ -194,10 +195,24 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
+    std::optional<QnLiveStreamParams> targetParams(StreamIndex streamIndex);
+    std::optional<QnLiveStreamParams> actualParams(StreamIndex streamIndex);
+
     bool fixMulticastParametersIfNeeded(
         nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
         nx::vms::api::StreamIndex streamIndex);
 
+    struct Metrics
+    {
+        std::atomic<qint64> streamIssues{0};
+        std::atomic<qint64> ipConflicts{0};
+    };
+
+    void atStreamIssue();
+    void atIpConflict();
+    qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
+    std::chrono::milliseconds nxOccupiedDuration() const;
+    double recordingBitrateKBps(std::chrono::milliseconds bitratePeriod) const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -244,11 +259,10 @@ protected:
     /** Override to support input port monitoring. */
     virtual void startInputPortStatesMonitoring();
     virtual void stopInputPortStatesMonitoring();
-
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
-
+    QSharedPointer<QnLiveStreamProvider> findReader(nx::vms::api::StreamIndex streamIndex);
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 
@@ -272,6 +286,7 @@ private:
     QnMutex m_ioPortStatesMutex;
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
     Role m_role = Role::regular;
+    std::shared_ptr<Metrics> m_metrics;
 };
 
 } // namespace resource

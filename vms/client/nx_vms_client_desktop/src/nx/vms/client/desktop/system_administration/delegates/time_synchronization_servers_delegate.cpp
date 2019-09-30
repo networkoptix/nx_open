@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -53,7 +53,7 @@ QString offsetString(std::chrono::seconds offset)
     if (!offset.count())
         return QString();
 
-    using nx::vms::client::core::HumanReadable;
+    using nx::vms::text::HumanReadable;
     QString result = HumanReadable::timeSpan(offset,
         HumanReadable::TimeSpanUnit::DaysAndTime,
         HumanReadable::SuffixFormat::Short,

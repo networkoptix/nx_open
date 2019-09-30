@@ -13,7 +13,8 @@ enum class DeviceType
     nvr,
     encoder,
     ioModule,
-    hornSpeaker
+    hornSpeaker,
+    multisensorCamera,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DeviceType)
 
@@ -23,4 +24,4 @@ bool isProxyDeviceType(DeviceType deviceType);
 } // namespace core
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::core::resource::DeviceType, (numeric)(lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::core::resource::DeviceType, (metatype)(lexical));

@@ -17,6 +17,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/metrics/metrics_storage.h>
+#include <utils/media/utils.h>
 
 namespace {
 
@@ -149,16 +150,12 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
 
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    QnFfmpegVideoDecoder decoder(
-        DecoderConfig(),
-        video->compressionType, video);
-    QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
-    decoder.decode(video, &decodedVideoFrame);
+    QSize streamResolution = nx::media::getFrameSize(video);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         QSize srcResolution = findSavedResolution(video);
         if (srcResolution.isEmpty())
-            srcResolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
+            srcResolution = streamResolution;
 
         m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
         // Round resolution height.
@@ -172,7 +169,7 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
     {
-        m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
+        m_resolution = streamResolution;
     }
 
     m_sourceResolution = m_resolution;
@@ -197,10 +194,10 @@ QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Stor
     m_initialized(false),
     m_initializedAudio(false),
     m_initializedVideo(false),
+    m_metrics(metrics),
     m_eofCounter(0),
     m_packetizedMode(false),
-    m_useRealTimeOptimization(false),
-    m_metrics(metrics)
+    m_useRealTimeOptimization(false)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority);
 }

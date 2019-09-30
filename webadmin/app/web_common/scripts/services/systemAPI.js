@@ -313,6 +313,21 @@ angular.module('nxCommon')
             var serverConnection = serverId?('/proxy/' + serverId):'';
             return $http.get(serverConnection + '/web/api/metrics');
         };
+
+
+
+        ServerConnection.prototype.getHealthManifest = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/ec2/metrics/manifest');
+        };
+
+
+        ServerConnection.prototype.getHealthValues = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/ec2/metrics/values');
+        };
+
+
         ServerConnection.prototype.getServerStatistics = function(serverId){
             var serverConnection = serverId?('/proxy/' + serverId):'';
             return $http.get(serverConnection + '/web/api/statistics');

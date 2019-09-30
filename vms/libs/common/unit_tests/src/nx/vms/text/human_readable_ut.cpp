@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <chrono>
 
-namespace nx::vms::client::core {
+namespace nx::vms::text {
 
 using namespace std::chrono;
 
@@ -105,4 +105,4 @@ TEST(HumanReadableTest, digitalVolumeSizePrecise)
 
 
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::text

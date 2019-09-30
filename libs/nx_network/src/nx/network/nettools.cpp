@@ -92,6 +92,11 @@ bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) 
         broadcastAddress().toIPv4Address());
 }
 
+QString QnInterfaceAndAddr::toString() const
+{
+    return nx::utils::log::makeMessage("%1: %2 %3", name, address, netMask);
+}
+
 QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ignoreLoopback)
 {
     struct LocalCache
@@ -278,7 +283,7 @@ QSet<QString> getLocalIpV4AddressList()
         if (!ipv4Addr.isEmpty())
             result << ipv4Addr;
     }
-    
+
     return result;
 }
 
@@ -301,7 +306,7 @@ bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_e
             return true;
 
     }
-    
+
     return false;
 }
 

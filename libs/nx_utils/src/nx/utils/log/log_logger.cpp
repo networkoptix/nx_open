@@ -160,7 +160,7 @@ std::optional<QString> Logger::filePath() const
 void Logger::writeLogHeader()
 {
     const nx::utils::log::Tag kStart(QLatin1String("START"));
-    const auto write = [&](const Message& message) { log(Level::always, kStart, message); };
+    const auto write = [&](const Message& message) { log(Level::info, kStart, message); };
     write(QByteArray(80, '='));
     write(lm("%1 started, version: %2, revision: %3").args(
         m_applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));

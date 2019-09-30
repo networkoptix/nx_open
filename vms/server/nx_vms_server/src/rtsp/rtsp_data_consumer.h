@@ -11,6 +11,7 @@
 #include <camera/video_camera.h>
 
 #include <nx/analytics/metadata_logger.h>
+#include <nx/metrics/streams_metric_helper.h>
 
 class QnRtspConnectionProcessor;
 
@@ -159,4 +160,5 @@ private:
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_primarypPutDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;
+    nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
 };

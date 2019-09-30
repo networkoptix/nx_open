@@ -246,7 +246,7 @@ public:
     * @param maxDataSize maximum buffer size
     * @return amount of readed bytes
     */
-    int readBinaryResponce(quint8 *data, int maxDataSize);
+    int readBinaryResponse(quint8 *data, int maxDataSize);
 
     /*
     * Demuxe RTSP binary data.
@@ -254,7 +254,7 @@ public:
     * @param channelNumber buffer number
     * @return amount of readed bytes
     */
-    int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
+    int readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
@@ -283,11 +283,11 @@ private:
     bool sendKeepAlive();
     bool sendSetupIfNotPlaying();
 
-    bool readTextResponce(QByteArray &responce);
+    bool readTextResponse(QByteArray &response);
     void addAuth( nx::network::http::Request* const request );
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
-    void updateTransportHeader(QByteArray &responce);
+    void updateTransportHeader(QByteArray &response);
 
     void parseSDP(const QByteArray& data);
 
@@ -377,5 +377,5 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responce );
+    bool sendRequestAndReceiveResponse(nx::network::http::Request&& request, QByteArray& response);
 };

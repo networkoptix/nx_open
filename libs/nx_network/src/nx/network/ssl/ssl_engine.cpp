@@ -189,7 +189,7 @@ bool Engine::useOrCreateCertificate(
         return true;
     }
 
-    NX_ALWAYS(typeid(Engine), "Unable to find valid SSL certificate '%1', generate new one",
+    NX_INFO(typeid(Engine), "Unable to find valid SSL certificate '%1', generate new one",
         filePath);
 
     const auto certData = makeCertificateAndKey(name, country, company);
@@ -206,7 +206,6 @@ bool Engine::useOrCreateCertificate(
         }
     }
 
-    NX_INFO(typeid(Engine), "Using auto-generated certificate");
     return useCertificateAndPkey(certData);
 }
 

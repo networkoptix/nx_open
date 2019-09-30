@@ -3,6 +3,7 @@
 #include <atomic>
 #include "core/resource/storage_resource.h"
 #include <platform/platform_abstraction.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 #if defined(Q_OS_WIN)
 #include <wtypes.h>
@@ -17,9 +18,9 @@ class QnMediaServerModule;
 
 namespace nx { namespace vms::server { class RootFileSystem; } }
 
-class QnFileStorageResource: public QnStorageResource
+class QnFileStorageResource: public nx::vms::server::StorageResource
 {
-    using base_type = QnStorageResource;
+    using base_type = nx::vms::server::StorageResource;
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
@@ -32,7 +33,6 @@ public:
 
     static QnStorageResource* instance(QnMediaServerModule* serverModule, const QString&);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
     virtual float getAvarageWritingUsage() const override;
@@ -64,7 +64,9 @@ public:
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);
-
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
+    QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
     QString removeProtocolPrefix(const QString& url);
@@ -92,7 +94,7 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
-    bool isMounted() const;
+    virtual bool isMounted() const;
     nx::vms::server::RootFileSystem* rootTool() const;
 
 public:
@@ -115,6 +117,5 @@ private:
     mutable QnMutex      m_writeTestMutex;
     bool m_isSystem;
     bool m_isMounted = true;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;

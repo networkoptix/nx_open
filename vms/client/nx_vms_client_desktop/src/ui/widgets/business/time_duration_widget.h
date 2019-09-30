@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 namespace Ui { class TimeDurationWidget; }
 

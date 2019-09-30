@@ -111,7 +111,7 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
     int bytesRead;
     if (m_transport == nx::vms::api::RtpTransportType::tcp)
-        bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+        bytesRead = m_owner->readBinaryResponse((quint8*) data, maxSize); // demux binary data from TCP socket
     else
         bytesRead = m_mediaSocket->recv(data, maxSize);
 
@@ -723,11 +723,11 @@ bool QnRtspClient::sendSetup()
         if(!m_SessionId.isEmpty())
             request.headers.insert(nx::network::http::HttpHeader("Session", m_SessionId.toLatin1()));
 
-        QByteArray responce;
-        if (!sendRequestAndReceiveResponse(std::move(request), responce))
+        QByteArray response;
+        if (!sendRequestAndReceiveResponse(std::move(request), response))
             return false;
 
-        if (!responce.startsWith("RTSP/1.0 200"))
+        if (!response.startsWith("RTSP/1.0 200"))
         {
             if (m_transport == nx::vms::api::RtpTransportType::automatic
                 && m_actualTransport == nx::vms::api::RtpTransportType::tcp)
@@ -741,7 +741,7 @@ bool QnRtspClient::sendSetup()
         }
         track.setupSuccess = true;
 
-        QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
+        QString sessionParam = extractRTSPParam(QLatin1String(response), QLatin1String("Session:"));
         if (sessionParam.size() > 0)
         {
             QStringList tmpList = sessionParam.split(QLatin1Char(';'));
@@ -763,7 +763,7 @@ bool QnRtspClient::sendSetup()
             }
         }
 
-        QString transportParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Transport:"));
+        QString transportParam = extractRTSPParam(QLatin1String(response), QLatin1String("Transport:"));
         if (transportParam.size() > 0)
         {
             QStringList tmpList = transportParam.split(QLatin1Char(';'));
@@ -813,7 +813,7 @@ bool QnRtspClient::sendSetup()
                 }
             }
         }
-        updateTransportHeader(responce);
+        updateTransportHeader(response);
     }
     return true;
 }
@@ -934,7 +934,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
         QString cseq = extractRTSPParam(QLatin1String(response), QLatin1String("CSeq:"));
         if (cseq.toInt() == (int)m_csec-1)
             break;
-        else if (!readTextResponce(response))
+        else if (!readTextResponse(response))
             return false; // try next response
     }
 
@@ -1064,7 +1064,7 @@ bool QnRtspClient::processTextResponseInsideBinData()
     return true;
 }
 
-int QnRtspClient::readBinaryResponce(quint8* data, int maxDataSize)
+int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
 {
     while (m_tcpSock->isConnected())
     {
@@ -1113,7 +1113,7 @@ quint8* QnRtspClient::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData,
     return (quint8*) dataVect->data() + dataVect->size();
 }
 
-int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber)
+int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber)
 {
     while (m_tcpSock->isConnected())
     {
@@ -1176,7 +1176,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
 }
 
 // demux text data only
-bool QnRtspClient::readTextResponce(QByteArray& response)
+bool QnRtspClient::readTextResponse(QByteArray& response)
 {
     int ignoreDataSize = 0;
     bool needMoreData = m_responseBufferLen == 0;
@@ -1203,7 +1203,7 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
         if (m_responseBuffer[0] == '$') {
             // binary data
             quint8 tmpData[1024*64];
-            int bytesRead = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+            int bytesRead = readBinaryResponse(tmpData, sizeof(tmpData)); // skip binary data
 
             int rtpChannelNum = tmpData[1];
             if (isRtcp(rtpChannelNum))
@@ -1268,9 +1268,9 @@ QString QnRtspClient::extractRTSPParam(const QString& buffer, const QString& par
         return QString();
 }
 
-void QnRtspClient::updateTransportHeader(QByteArray& responce)
+void QnRtspClient::updateTransportHeader(QByteArray& response)
 {
-    QString tmp = extractRTSPParam(QLatin1String(responce), QLatin1String("Transport:"));
+    QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Transport:"));
     if (tmp.size() > 0)
     {
         QStringList tmpList = tmp.split(QLatin1Char(';'));
@@ -1457,7 +1457,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
             return false;
         }
 
-        if( !readTextResponce(responseBuf) )
+        if( !readTextResponse(responseBuf) )
         {
             NX_VERBOSE(this, "Failed to read response");
             return false;

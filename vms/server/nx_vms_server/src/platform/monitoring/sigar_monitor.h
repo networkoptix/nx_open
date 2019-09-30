@@ -14,13 +14,11 @@ public:
     virtual ~QnSigarMonitor();
 
     virtual qreal totalCpuUsage() override;
-
-    virtual qreal totalRamUsage() override;
-
+    virtual quint64 totalRamUsage() override;
+    virtual qreal thisProcessCpuUsage() override;
+    virtual quint64 thisProcessRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
-
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
-
     virtual QList<NetworkLoad> totalNetworkLoad() override;
 
 private:

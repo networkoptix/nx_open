@@ -28,7 +28,7 @@
 
 #include <recording/time_period_list.h>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>

@@ -24,11 +24,15 @@
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/log/log.h>
+#include "../helpers/storage_space_helper.h"
 
-namespace
-{
-    const QString kFastRequestKey("fast");
-}
+namespace {
+
+static const QString kFastRequestKey("fast");
+
+} // namespace
+
+const QString QnStorageSpaceRestHandler::kOwndedOnlyKey("ownedOnly");
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -44,34 +48,9 @@ int QnStorageSpaceRestHandler::executeGet(
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
 
     QnStorageSpaceReply reply;
+    reply.storages = nx::rest::helpers::availableStorages(serverModule());
 
-    auto enumerate = [fastRequest, &reply, this](
-        const QnStorageResourceList& storages,
-        const QSet<QnStorageResourcePtr>& writableStorages)
-        {
-            for (const auto& storage: storages)
-            {
-                QnStorageSpaceData data(storage, fastRequest);
-                data.url = QnStorageResource::urlWithoutCredentials(data.url);
-                if (!fastRequest)
-                    data.isWritable = writableStorages.contains(storage);
-                data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
-                reply.storages.push_back(data);
-            }
-        };
-
-    enumerate(
-        serverModule()->normalStorageManager()->getStorages(),
-        fastRequest
-            ? QSet<QnStorageResourcePtr>()
-            : serverModule()->normalStorageManager()->getAllWritableStorages());
-    enumerate(
-        serverModule()->backupStorageManager()->getStorages(),
-        fastRequest
-            ? QSet<QnStorageResourcePtr>()
-            : serverModule()->backupStorageManager()->getAllWritableStorages());
-
-    if (!fastRequest)
+    if (!fastRequest && !params.contains(kOwndedOnlyKey))
     {
         for (const QnStorageSpaceData& optionalStorage: getOptionalStorages(owner->commonModule()))
             reply.storages.push_back(optionalStorage);
@@ -115,16 +94,10 @@ QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
     return storagePaths;
 }
 
-QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonModule* commonModule) const
+QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
+    QnCommonModule* commonModule) const
 {
     QnStorageSpaceDataList result;
-
-    auto partitionEnoughSpace = [this](QnPlatformMonitor::PartitionType ptype, qint64 size)
-    {
-        if (size == QnStorageResource::kUnknownSize)
-            return true;
-        return size >= QnFileStorageResource(serverModule()).calcSpaceLimit(ptype);
-    };
 
     /* Enumerate auto-generated storages on all possible partitions. */
     QnPlatformMonitor* monitor = serverModule()->platform()->monitor();
@@ -146,12 +119,6 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             continue;
         }
 
-        if (!partitionEnoughSpace(partition.type, partition.sizeBytes))
-        {
-            NX_VERBOSE(this, "Ignore small optional partition %1", partition);
-            continue;
-        }
-
         bool hasStorage = std::any_of(
             storagePaths.cbegin(), storagePaths.cend(),
             [&partition](const QString &storagePath)
@@ -169,55 +136,64 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
         data.url = partition.path + QnAppInfo::mediaFolderName();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = QnFileStorageResource(serverModule()).calcSpaceLimit(partition.type);
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.storageType = QnLexical::serialized(partition.type);
 
-        QnStorageResourcePtr storage = QnStorageResourcePtr(
-            commonModule->storagePluginFactory()->createStorage(commonModule, data.url, false));
+        auto storage = QnStorageResourcePtr(
+            commonModule->storagePluginFactory()->createStorage(
+                commonModule,
+                data.url,
+                false)).dynamicCast<QnFileStorageResource>();
 
-        if (storage)
+        if (!storage)
         {
-            storage->setUrl(data.url);
-            if (storage->getStorageType().isEmpty())
-                storage->setStorageType(data.storageType);
-
-            data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
-            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
-            if (data.isOnline)
-            {
-                if (storage->getId().isNull())
-                    storage->setIdUnsafe(QnUuid::createUuid());
-                storage->setStatus(Qn::Online);
-                if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
-                    storage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
-            }
-
-            QnStorageResourceList additionalStorages;
-            additionalStorages.append(storage);
-            auto writableStoragesIfCurrentWasAdded = serverModule()->normalStorageManager()->getAllWritableStorages(
-                &additionalStorages);
-
-            bool wouldBeWritableIfAmongstServerStorages =
-                writableStoragesIfCurrentWasAdded.contains(storage);
-            data.isWritable = data.isOnline
-                && storage->isWritable()
-                && wouldBeWritableIfAmongstServerStorages;
-
-            NX_VERBOSE(
-                this,
-                lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
-                    .args(storage->getUrl(), data.isOnline, data.isWritable,
-                        wouldBeWritableIfAmongstServerStorages));
-
-            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && data.isOnline)
-                data.reservedSpace = fileStorage->calcInitialSpaceLimit();
+            NX_WARNING(this, "Failed to create a storage for the path %1", data.url);
+            continue;
         }
-        else
+
+        if (!QnStorageManager::canStorageBeUsedByVms(storage))
         {
-            NX_VERBOSE(this, "Unable to create storage for partition %1", partition);
+            NX_DEBUG(
+                this, "Storage for the path %1 is too small. Won't be added in the result",
+                data.url);
+            continue;
         }
+
+        data.reservedSpace = storage->getSpaceLimit();
+
+        storage->setUrl(data.url);
+        if (storage->getStorageType().isEmpty())
+            storage->setStorageType(data.storageType);
+
+        data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
+        data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
+        if (data.isOnline)
+        {
+            if (storage->getId().isNull())
+                storage->setIdUnsafe(QnUuid::createUuid());
+            storage->setStatus(Qn::Online);
+            if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+                storage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
+        }
+
+        auto writableStoragesIfCurrentWasAdded =
+            serverModule()->normalStorageManager()->getAllWritableStorages({storage});
+
+        bool wouldBeWritableIfAmongstServerStorages =
+            writableStoragesIfCurrentWasAdded.contains(storage);
+        data.isWritable = data.isOnline
+            && storage->isWritable()
+            && wouldBeWritableIfAmongstServerStorages;
+
+        NX_VERBOSE(
+            this,
+            lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
+                .args(storage->getUrl(), data.isOnline, data.isWritable,
+                    wouldBeWritableIfAmongstServerStorages));
+
+        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage && data.isOnline)
+            data.reservedSpace = fileStorage->calcInitialSpaceLimit();
 
         result.push_back(data);
     }

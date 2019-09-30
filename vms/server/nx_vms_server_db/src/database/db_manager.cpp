@@ -134,12 +134,11 @@ static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 using std::nullptr_t;
 
 template <class T>
-void assertSorted(std::vector<T> &data) {
-#ifdef _DEBUG
-    assertSorted(data, &T::id);
-#else
-    nx::utils::unused(data);
-#endif // DEBUG
+void assertSorted([[maybe_unused]] std::vector<T> &data)
+{
+    #ifdef _DEBUG
+        assertSorted(data, &T::id);
+    #endif
 }
 
 /**

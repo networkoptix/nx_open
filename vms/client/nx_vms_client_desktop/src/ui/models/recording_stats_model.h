@@ -89,7 +89,6 @@ private:
 
     QString formatBitrateString(qint64 bitrate) const;
     QString formatBytesString(qint64 bytes) const;
-    QString formatDurationString(const QnCamRecordingStatsData& data) const;
 
     QnCameraStatsData m_data;
 

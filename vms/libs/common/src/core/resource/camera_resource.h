@@ -156,6 +156,7 @@ public:
 
     virtual bool hasDualStreamingInternal() const override;
 
+    Qn::RecordingState recordingState() const;
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
@@ -195,11 +196,11 @@ private:
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
     QnMutex m_mediaStreamsMutex;
 
-    CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
-    CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
-    CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
-    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
-    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+    nx::utils::CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
+    nx::utils::CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
+    nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
+    nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
+    nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
 
     mutable QnMutex m_cacheMutex;
 };

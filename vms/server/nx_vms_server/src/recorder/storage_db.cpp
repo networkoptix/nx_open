@@ -177,7 +177,7 @@ void QnStorageDb::deleteRecords(
 void QnStorageDb::addRecord(
     const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog,
-    const DeviceFileCatalog::Chunk& chunk)
+    const nx::vms::server::Chunk& chunk)
 {
     serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
         [this, cameraUniqueId, catalog, chunk]()
@@ -206,13 +206,12 @@ void QnStorageDb::addRecord(
 }
 
 void QnStorageDb::replaceChunks(
-    const QString& cameraUniqueId,
-    QnServer::ChunksCatalog catalog,
-    const std::deque<DeviceFileCatalog::Chunk>& chunks)
+    const QString& cameraUniqueId, QnServer::ChunksCatalog catalog,
+    const nx::vms::server::ChunksDeque& chunks)
 {
     deleteRecords(cameraUniqueId, catalog, -1);
-    for (const auto &chunk : chunks)
-        addRecord(cameraUniqueId, catalog, chunk);
+    for (const auto &chunk: chunks)
+        addRecord(cameraUniqueId, catalog, chunk.chunk());
 }
 
 bool QnStorageDb::open(const QString& fileName)
@@ -448,7 +447,7 @@ void QnStorageDb::putRecordsToCatalog(
     QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
     int cameraId,
     int catalogIndex,
-    std::deque <DeviceFileCatalog::Chunk> chunks,
+    std::deque <nx::vms::server::Chunk> chunks,
     const UuidToHash& uuidToHash)
 {
     auto cameraUuidIt = uuidToHash.right.find(cameraId);
@@ -469,10 +468,10 @@ void QnStorageDb::putRecordsToCatalog(
     deviceFileCatalog->push_back(newFileCatalog);
 }
 
-DeviceFileCatalog::Chunk QnStorageDb::toChunk(
+nx::vms::server::Chunk QnStorageDb::toChunk(
     const nx::media_db::MediaFileOperation& mediaData) const
 {
-    return DeviceFileCatalog::Chunk(
+    return nx::vms::server::Chunk(
         mediaData.getStartTime(),
         m_storageIndex,
         mediaData.getFileTypeIndex(),
@@ -505,7 +504,7 @@ void QnStorageDb::processDbContent(
         int index = itr->first;
         auto& catalog = itr->second;
 
-        std::deque <DeviceFileCatalog::Chunk> chunks;
+        std::deque <nx::vms::server::Chunk> chunks;
         auto& removeCatalog = parsedData.removeRecords[index];
         for (size_t i = 0; i < catalog.size(); ++i)
         {

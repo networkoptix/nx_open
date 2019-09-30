@@ -27,9 +27,9 @@ class QnScheduleSync:
 private:
     struct ChunkKey
     {
-        DeviceFileCatalog::Chunk chunk;
-        QString                  cameraId;
-        QnServer::ChunksCatalog  catalog;
+        nx::vms::server::Chunk chunk;
+        QString cameraId;
+        QnServer::ChunksCatalog catalog;
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
 
@@ -82,7 +82,7 @@ public:
     virtual void run() override;
     virtual void pleaseStop() override;
 private:
-    DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
+    nx::vms::server::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
@@ -138,31 +138,27 @@ private:
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
 
     ChunkKey getOldestChunk(
-        const QString           &cameraId,
-        QnServer::ChunksCatalog catalog,
-        qint64                  fromTimeMs,
-        SyncData                *syncData = nullptr
-    ) const;
+        const QString &cameraId, QnServer::ChunksCatalog catalog, qint64 fromTimeMs,
+        SyncData* syncData = nullptr) const;
 
 private:
-    std::atomic<bool>       m_backupSyncOn;
-    std::atomic<bool>       m_syncing;
-    std::atomic<bool>       m_forced;
-
+    std::atomic<bool> m_backupSyncOn;
+    std::atomic<bool> m_syncing;
+    std::atomic<bool> m_forced;
     // Interrupted by user OR current backup session is over
-    std::atomic<bool>       m_interrupted;
-    bool                    m_failReported;
+    std::atomic<bool> m_interrupted;
+    bool m_failReported;
     nx::vms::api::DayOfWeek m_curDow;
 
-    QnServerBackupSchedule  m_schedule;
-    qint64                  m_syncTimePoint;
-    qint64                  m_syncEndTimePoint;
-    QnMutex                 m_syncPointMutex;
+    QnServerBackupSchedule m_schedule;
+    int64_t m_syncTimePoint;
+    int64_t m_syncEndTimePoint;
+    QnMutex m_syncPointMutex;
 
-    SyncDataMap           m_syncData;
-    mutable QnMutex       m_syncDataMutex;
-    CopyError             m_lastError;
-    nx::utils::promise<void>    m_stopPromise;
+    SyncDataMap m_syncData;
+    mutable QnMutex m_syncDataMutex;
+    CopyError m_lastError;
+    nx::utils::promise<void> m_stopPromise;
 };
 
 #endif

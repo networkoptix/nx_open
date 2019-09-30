@@ -5,6 +5,8 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QIODevice>
 
+#include <nx/utils/log/log.h>
+
 
 void QnMdnsPacket::toDatagram(QByteArray& datagram)
 {
@@ -61,7 +63,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         auto nameLength = parseName(message, currentOffset, query.queryName);
 
-        if(nameLength == -1)
+        if (nameLength == -1)
             return false;
 
         currentOffset += nameLength;
@@ -98,7 +100,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         auto nameLength = parseName(message, currentOffset, record.recordName);
 
-        if(nameLength == -1)
+        if (nameLength == -1)
             return false;
 
         currentOffset += nameLength;
@@ -123,7 +125,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         currentOffset += fixedSizeFieldSize;
 
-        if(currentOffset + record.dataLength > bufferSize)
+        if (currentOffset + record.dataLength > bufferSize)
             return false;
 
         record.data.append(bufferStart + currentOffset, record.dataLength);
@@ -188,7 +190,7 @@ void QnMdnsPacket::parseNameInternal(
 
         nameStart++;
 
-        if (nameOffset + nameSize > (int)bufferSize)
+        if (nameOffset + 1 + labelLength > (int)bufferSize)
         {
             nameSize = -1;
             return;
@@ -247,7 +249,7 @@ void QnMdnsPacket::addQuery()
 
 void QnMdnsSrvData::decode(const QByteArray& raw)
 {
-    QDataStream stream(const_cast<QByteArray*>(&raw), QIODevice::ReadOnly);
+    QDataStream stream(raw);
     stream.setByteOrder(QDataStream::BigEndian);
 
     stream
@@ -267,6 +269,54 @@ void QnMdnsSrvData::decode(const QByteArray& raw)
         sizeof(decltype(port));
 
     target.append(position, targetLength);
+}
+
+void QnMdnsTextData::decode(const QByteArray& raw)
+{
+    QDataStream stream(raw);
+
+    while (!stream.atEnd())
+    {
+        quint8 length;
+        stream >> length;
+        QByteArray text(length, '\0');
+        stream.readRawData(text.data(), length);
+
+        QByteArray key;
+        Attribute attribute;
+        const auto equalSignPosition = text.indexOf('=');
+        if (equalSignPosition == -1)
+        {
+            key = text;
+            attribute = {Attribute::Presence::noValue, {}};
+        }
+        else
+        {
+            key = text.left(equalSignPosition).toLower();
+            const auto value = text.mid(equalSignPosition + 1);
+            attribute = {Attribute::Presence::withValue, value};
+        }
+
+        if (key.isEmpty())
+            continue;
+
+        const auto [it, isInserted] = m_attributes.emplace(key, attribute);
+        if (!isInserted)
+        {
+            NX_WARNING(this,
+               lm("Duplicate key %1: the old value %2 is preferred over the new value %3")
+               .args(key, it->second, attribute));
+            continue;
+        }
+    }
+}
+
+QnMdnsTextData::Attribute QnMdnsTextData::getAttribute(const QByteArray& key) const
+{
+    auto attrIt = m_attributes.find(key.toLower());
+    if (attrIt == m_attributes.end())
+        return {Attribute::Presence::absent, {}};
+    return attrIt->second;
 }
 
 #endif // ENABLE_MDNS

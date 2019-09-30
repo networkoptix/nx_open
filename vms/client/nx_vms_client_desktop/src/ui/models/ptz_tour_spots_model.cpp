@@ -4,7 +4,7 @@
 
 #include <core/ptz/ptz_preset.h>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/style/globals.h>
 

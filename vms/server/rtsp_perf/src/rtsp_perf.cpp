@@ -190,7 +190,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     m_lastFrameTime = std::chrono::system_clock::now();
     while (true)
     {
-        int bytesRead = rtspClient.readBinaryResponce(dataArrays, rtpChannelNum);
+        int bytesRead = rtspClient.readBinaryResponse(dataArrays, rtpChannelNum);
         if (rtpChannelNum >= 0 && (int)dataArrays.size() > rtpChannelNum && dataArrays[rtpChannelNum])
         {
             if (bytesRead > 0 && config.printTimestamps)

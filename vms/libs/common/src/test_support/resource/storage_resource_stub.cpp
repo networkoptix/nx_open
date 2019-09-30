@@ -12,7 +12,7 @@ StorageResourceStub::~StorageResourceStub()
 {
 }
 
-QIODevice* StorageResourceStub::open(const QString&, QIODevice::OpenMode)
+QIODevice* StorageResourceStub::openInternal(const QString&, QIODevice::OpenMode)
 {
     NX_ASSERT(false);
     return NULL;

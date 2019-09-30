@@ -18,10 +18,6 @@ static android_LogPriority toAndroidLogLevel(Level logLevel)
         case Level::none:
             return ANDROID_LOG_SILENT;
 
-        case Level::always:
-            // The highest log level, treated as error just to be sure it makes it to the log.
-            return ANDROID_LOG_ERROR;
-
         case Level::error:
             return ANDROID_LOG_ERROR;
 

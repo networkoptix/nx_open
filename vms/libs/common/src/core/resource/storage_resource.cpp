@@ -46,6 +46,7 @@ void QnStorageResource::setStorageType(const QString& type)
 {
     QnMutexLocker lock(&m_mutex);
     m_storageType = type;
+    emit typeChanged(::toSharedPointer(this));
 }
 
 QString QnStorageResource::getStorageType() const
@@ -235,6 +236,11 @@ void QnStorageResource::setStatusFlag(Qn::StorageStatuses status)
 {
     QnMutexLocker lock(&m_mutex);
     m_status = status;
+}
+
+QIODevice* QnStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+{
+    return openInternal(fileName, openMode);
 }
 
 Qn::StorageStatuses QnStorageResource::statusFlag() const

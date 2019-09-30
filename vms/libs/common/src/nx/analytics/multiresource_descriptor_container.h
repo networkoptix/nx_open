@@ -5,7 +5,7 @@
 #include <nx/analytics/multiresource_descriptor_container_helper.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 #include <common/common_module_aware.h>
 #include <common/common_module.h>
 
@@ -232,7 +232,7 @@ private:
     MultiresourceDescriptorContainerHelper m_helper;
 
     mutable QnMutex m_mutex;
-    CachedValue<DescriptorMap> m_cachedMergedDescriptors;
+    nx::utils::CachedValue<DescriptorMap> m_cachedMergedDescriptors;
 };
 
 } // namespace nx::analytics

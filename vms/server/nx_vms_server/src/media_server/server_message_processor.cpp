@@ -3,7 +3,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/layout_resource.h>
@@ -23,6 +22,7 @@
 #include "api/app_server_connection.h"
 #include "network/router.h"
 #include <nx/vms/discovery/manager.h>
+#include <core/resource/media_server_resource.h>
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
@@ -31,7 +31,10 @@
 #include <media_server/media_server_module.h>
 #include "nx_ec/ec_api.h"
 
+
 using namespace nx;
+using namespace nx::vms::api;
+using namespace nx::vms::server;
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnMediaServerModule* serverModule):
     base_type(serverModule->commonModule()),

@@ -128,7 +128,7 @@ public:
 
     bool isNvr() const;
     bool isProxiedAnalogEncoder() const;
-    HanwhaDeviceType deviceType() const;
+    HanwhaDeviceType hanwhaDeviceType() const;
     HanwhaDeviceType bypassDeviceType() const;
 
     bool hasSerialPort() const;

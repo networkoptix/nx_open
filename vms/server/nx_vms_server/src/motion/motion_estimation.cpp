@@ -593,9 +593,10 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
 }
 
 
-QnMotionEstimation::QnMotionEstimation(const Config& config):
+QnMotionEstimation::QnMotionEstimation(const Config& config, nx::metrics::Storage* metrics):
     m_config(config),
-    m_channelNum(0)
+    m_channelNum(0),
+    m_metrics(metrics)
 {
     //m_outFrame.setUseExternalData(false);
     //m_prevFrame.setUseExternalData(false);
@@ -1033,7 +1034,7 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
         NX_VERBOSE(this, "Recreating decoder, old codec_id: %1",
             !m_decoder ? -1 : m_decoder->getContext()->codec_id);
         m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
-            m_config.decoderConfig, frame->compressionType, frame);
+            m_config.decoderConfig, m_metrics, frame->compressionType, frame);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1056,7 +1057,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
-            m_config.decoderConfig, frame->compressionType, frame);
+            m_config.decoderConfig, m_metrics, frame->compressionType, frame);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.

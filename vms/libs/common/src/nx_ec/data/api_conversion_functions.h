@@ -98,14 +98,6 @@ void fromResourceListToApi(const QnStorageResourceList& src, nx::vms::api::Stora
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, nx::vms::api::MediaServerData& dst);
 void fromApiToResource(const nx::vms::api::MediaServerData& src, QnMediaServerResourcePtr& dst);
-void fromApiToResourceList(
-    const nx::vms::api::MediaServerDataList& src,
-    QnResourceList& dst,
-    QnCommonModule* commonModule);
-void fromApiToResourceList(
-    const nx::vms::api::MediaServerDataList& src,
-    QnMediaServerResourceList& dst,
-    QnCommonModule* commonModule);
 void fromResourceToApi(
     const QnMediaServerUserAttributesPtr& src,
     nx::vms::api::MediaServerUserAttributesData& dst);

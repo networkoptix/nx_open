@@ -7,7 +7,6 @@
 
 #include <nx/utils/std/cppnx.h>
 #include <nx/utils/std/future.h>
-#include <nx/utils/unused.h>
 
 #include <nx/network/http/buffer_source.h>
 

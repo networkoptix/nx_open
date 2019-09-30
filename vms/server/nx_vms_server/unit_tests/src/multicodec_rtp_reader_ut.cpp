@@ -111,7 +111,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     size_t readsCount = 0;
     for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
-        int bytesRead = rtspClient.readBinaryResponce( buf, sizeof(buf) );
+        int bytesRead = rtspClient.readBinaryResponse( buf, sizeof(buf) );
         if( bytesRead <= 0 )
             break;
         totalBytesRead += bytesRead;

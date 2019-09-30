@@ -11,7 +11,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,7 +22,7 @@ const int kInfoFontPixelSize = 16;
 
 QString durationMsToString(qint64 durationMs)
 {
-    using HumanReadable = core::HumanReadable;
+    using HumanReadable = text::HumanReadable;
 
     static const QString kSeparator(L' ');
 

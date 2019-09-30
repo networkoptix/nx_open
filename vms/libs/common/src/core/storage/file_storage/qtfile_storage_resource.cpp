@@ -15,7 +15,7 @@ QString removeProtocolPrefix(const QString& url)
 
 } // namespace
 
-QIODevice* QnQtFileStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+QIODevice* QnQtFileStorageResource::openInternal(const QString& fileName, QIODevice::OpenMode openMode)
 {
     const QString cleanFileName = removeProtocolPrefix(fileName);
 

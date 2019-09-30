@@ -8,7 +8,7 @@
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/instance_storage.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/core/core_fwd.h>
 #include <nx/utils/url.h>

@@ -38,7 +38,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <utils/media/audio_player.h>
 #include <nx/network/http/http_types.h>
 
@@ -1351,7 +1351,7 @@ QString QnBusinessRuleViewModel::getAggregationText() const
     const auto duration = std::chrono::seconds(m_aggregationPeriodSec);
     static const QString kSeparator(L' ');
 
-    using HumanReadable = nx::vms::client::core::HumanReadable;
+    using HumanReadable = nx::vms::text::HumanReadable;
     const auto timespan = HumanReadable::timeSpan(duration,
         HumanReadable::DaysAndTime,
         HumanReadable::SuffixFormat::Full,

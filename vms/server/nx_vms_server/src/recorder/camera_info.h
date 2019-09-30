@@ -57,7 +57,8 @@ class Writer
 {
 public:
     Writer(WriterHandler* writeHandler);
-    void write();
+    void writeAll();
+    void writeFile(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
 
 private:
     void writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData);

@@ -66,6 +66,7 @@ public:
 
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 
+    virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
 private:
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
@@ -153,12 +154,14 @@ public:
 
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 
+    virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::shared_ptr<EventsStorage> m_db;
 
     std::shared_ptr<EventsStorage> getDb();
+    std::shared_ptr<const EventsStorage> getDb() const;
 };
 
 //-------------------------------------------------------------------------------------------------

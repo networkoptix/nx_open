@@ -20,6 +20,8 @@ struct AVCodecContext;
 struct AVFrame;
 struct MpegEncContext;
 
+namespace nx::metrics { struct Storage; }
+
 /**
  * Client of this class is responsible for encoded data buffer to meet ffmpeg
  * restrictions (see the comment for decoding functions for details).
@@ -32,6 +34,7 @@ public:
     */
     QnFfmpegVideoDecoder(
         const DecoderConfig& config,
+        nx::metrics::Storage* metrics,
         AVCodecID codec, const QnConstCompressedVideoDataPtr& data);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
@@ -126,6 +129,7 @@ private:
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;
     bool m_needRecreate;
+    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

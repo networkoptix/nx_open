@@ -22,7 +22,7 @@ QnStorageResource* QnDbStorageResource::instance(QnCommonModule* commonModule, c
     return new QnDbStorageResource(commonModule);
 }
 
-QIODevice* QnDbStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+QIODevice* QnDbStorageResource::openInternal(const QString& fileName, QIODevice::OpenMode openMode)
 {
     m_filePath = removeProtocolPrefix(fileName);
 

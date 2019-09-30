@@ -12,6 +12,7 @@
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 namespace nx {
 namespace vms::server {
@@ -75,6 +76,9 @@ void EventConnector::at_cameraDisconnected(const QnResourcePtr& resource, qint64
 void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
     vms::api::EventReason reasonCode, const QnResourcePtr& storage)
 {
+    if (auto serverStorage = storage.dynamicCast<StorageResource>())
+        serverStorage->atStorageFailure();
+
     QString url;
     if (storage)
         url = storage->getUrl();
@@ -138,6 +142,13 @@ void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 time
 void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
     const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
+    for (const auto& mac: macAddrList)
+    {
+        auto resource = serverModule()->resourcePool()->getResourceByMacAddress(mac);
+        if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
+            camera->atIpConflict();
+    }
+
     vms::event::IpConflictEventPtr event(new vms::event::IpConflictEvent(
         resource, hostAddress, macAddrList, timeStamp));
 
@@ -147,6 +158,9 @@ void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
 void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
     vms::api::EventReason reasonCode, const QString &reasonParamsEncoded)
 {
+    if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
+        camera->atStreamIssue();
+
     vms::event::NetworkIssueEventPtr event(new vms::event::NetworkIssueEvent(
         resource, timeStamp, reasonCode, reasonParamsEncoded));
 

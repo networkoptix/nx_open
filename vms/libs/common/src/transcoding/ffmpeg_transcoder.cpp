@@ -17,6 +17,8 @@ extern "C"
 
 static const int IO_BLOCK_SIZE = 1024*16;
 
+using namespace nx::vms::api;
+
 static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
 {
     switch (value)
@@ -88,7 +90,8 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
     m_formatCtx(0),
     m_baseTime(AV_NOPTS_VALUE),
     m_inMiddleOfStream(false),
-    m_startTimeOffset(0)
+    m_startTimeOffset(0),
+    m_streamMetricHelper(metrics)
 {
     NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
@@ -209,7 +212,8 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             int videoHeight = video->height;
             if (!video || video->width < 1 || video->height < 1)
             {
-                QnFfmpegVideoDecoder decoder(m_config.decoderConfig, video->compressionType, video);
+                QnFfmpegVideoDecoder decoder(
+                    m_config.decoderConfig, m_metrics, video->compressionType, video);
                 QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();
@@ -344,6 +348,10 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     packet.dts = packet.pts;
     m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
     m_lastPacketTimestamp.rtpTimestamp = packet.pts;
+
+    const bool isSecondary = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_LowQuality);
+    StreamIndex index = isSecondary ? StreamIndex::secondary : StreamIndex::primary;
+    m_streamMetricHelper.setStream(index);
 
     int status = av_write_frame(m_formatCtx, &packet);
     if (status < 0)

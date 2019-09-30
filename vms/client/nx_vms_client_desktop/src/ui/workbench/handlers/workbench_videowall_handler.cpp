@@ -2408,11 +2408,10 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(
-    const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallPcData& pc)
+    [[maybe_unused]] const QnVideoWallResourcePtr& videoWall,
+    [[maybe_unused]] const QnVideoWallPcData& pc)
 {
-    // TODO: #GDM #VW implement screen size changes handling
-    nx::utils::unused(videoWall, pc);
+    // TODO: #GDM #VW implement screen size changes handling.
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(

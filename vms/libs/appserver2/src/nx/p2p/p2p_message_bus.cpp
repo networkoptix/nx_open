@@ -20,6 +20,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/qmetaobject_helper.h>
 
 namespace nx {
 namespace p2p {
@@ -28,6 +29,7 @@ const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;
 using namespace vms::api;
+using namespace nx::utils;
 
 struct GotTransactionFuction
 {
@@ -491,7 +493,7 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
-        emit remotePeerUnauthorized(remotePeer.id);
+        emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id);
 }
 
 void MessageBus::at_stateChanged(
@@ -561,9 +563,8 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
 bool MessageBus::selectAndSendTransactions(
     const P2pConnectionPtr& connection,
     vms::api::TranState newSubscription,
-    bool addImplicitData)
+    [[maybe_unused]] bool addImplicitData)
 {
-    nx::utils::unused(addImplicitData);
     context(connection)->sendDataInProgress = false;
     context(connection)->remoteSubscription = newSubscription;
     return true;
@@ -933,9 +934,8 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
+    [[maybe_unused]] const TransportHeader& transportHeader)
 {
-    nx::utils::unused(transportHeader);
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
@@ -1225,7 +1225,6 @@ ConnectionInfoList MessageBus::connectionsInfo() const
 
 void MessageBus::emitPeerFoundLostSignals()
 {
-    // TODO: need to refactor it. Signals should not be emitted with locked mutex.
     std::set<vms::api::PeerData> newAlivePeers;
 
     for (const auto& connection: m_connections)
@@ -1266,7 +1265,7 @@ void MessageBus::emitPeerFoundLostSignals()
             lit("Peer %1 has found peer %2")
             .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
             .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-        emit peerFound(peer.id, peer.peerType);
+        emitAsync(this, &MessageBus::peerFound, peer.id, peer.peerType);
     }
 
     for (const auto& peer: lostPeers)
@@ -1282,7 +1281,7 @@ void MessageBus::emitPeerFoundLostSignals()
                 lit("Peer %1 has lost peer %2")
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-            emit peerLost(peer.id, peer.peerType);
+            emitAsync(this, &MessageBus::peerLost, peer.id, peer.peerType);
             sendRuntimeInfoRemovedToClients(peer.id);
         }
     }
@@ -1319,9 +1318,8 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
     return m_lastRuntimeInfo;
 }
 
-void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
+void MessageBus::sendInitialDataToCloud([[maybe_unused]] const P2pConnectionPtr& connection)
 {
-    nx::utils::unused(connection);
     NX_ASSERT(0, "Not implemented");
 }
 

@@ -44,14 +44,14 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
 private:
-    bool switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog);
+    bool switchToChunk(const nx::vms::server::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    bool getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog,
-                      DeviceFileCatalog::UniqueChunkCont &ignoreChunks);
+    bool getNextChunk(nx::vms::server::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog,
+                      nx::vms::server::UniqueChunkCont &ignoreChunks);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
     void setCatalogs() const;
 
-    DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
+    nx::vms::server::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
 
 private:
     typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
@@ -66,7 +66,7 @@ private:
     mutable PoolToCatalogMap m_catalogLow;
     //QnChunkSequence* m_chunkSequenceHi;
     //QnChunkSequence* m_chunkSequenceLow;
-    DeviceFileCatalog::Chunk m_currentChunk;
+    nx::vms::server::Chunk m_currentChunk;
     PoolToCatalogMap m_currentChunkCatalog;
 
     QnAviArchiveDelegatePtr m_aviDelegate;
@@ -82,7 +82,7 @@ private:
     //QnMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     //QnAbstractMediaDataPtr m_tmpData;
 
-    DeviceFileCatalog::Chunk m_newQualityChunk;
+    nx::vms::server::Chunk m_newQualityChunk;
     DeviceFileCatalogPtr m_newQualityCatalog;
     QnAbstractMediaDataPtr m_newQualityTmpData;
     QnAviResourcePtr m_newQualityFileRes;

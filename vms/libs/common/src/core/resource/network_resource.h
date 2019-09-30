@@ -6,7 +6,7 @@
 
 #include <nx/utils/mac_address.h>
 #include <nx/utils/url.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 class QnNetworkResource: public QnResource
 {
@@ -124,7 +124,7 @@ private:
 
     QDateTime m_lastDiscoveredTime;
 
-    CachedValue<QString> m_cachedHostAddress;
+    nx::utils::CachedValue<QString> m_cachedHostAddress;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)

@@ -25,12 +25,6 @@ public:
 
 public:
     //!Implementation of QnStorageResource::open
-    /*!
-        Returns already created IO device with path \a fileName.
-        \note Ownership of returned object is passed to the caller
-        \note Returned object is no longer accessible via this storage
-    */
-    virtual QIODevice* open( const QString& fileName, QIODevice::OpenMode openMode ) override;
 
     //!Implementation of QnStorageResource::getFreeSpace
     virtual qint64 getFreeSpace() override { return 0; }
@@ -63,7 +57,13 @@ public:
     void registerResourceData( const QString& path, QIODevice* data );
 
     void setIsIoDeviceOwner(bool isIoDeviceOwner);
-
+protected:
+    /**
+     * Returns already created IO device with path \a fileName.
+     *note Ownership of returned object is passed to the caller
+     *note Returned object is no longer accessible via this storage
+    */
+    virtual QIODevice* openInternal( const QString& fileName, QIODevice::OpenMode openMode ) override;
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
     mutable QnMutex m_mutex;

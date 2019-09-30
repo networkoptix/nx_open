@@ -691,7 +691,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     QTextStream str(&s);
     str << "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
     str.flush();
-    NX_ALWAYS(this, s);
+    NX_INFO(this, s);
     */
 
 
