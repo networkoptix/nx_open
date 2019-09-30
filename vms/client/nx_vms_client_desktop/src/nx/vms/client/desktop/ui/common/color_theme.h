@@ -20,7 +20,11 @@ public:
 
     QVariantMap colors() const;
 
-    QMap<QString, QString> getColorSubstitutions() const; //< Returns pairs of basic and current skin color values.
+    /*!
+    Returns color value pairs of basic and current skins.
+    \return Pairs of basic and current skin color values.
+    */
+    QMap<QString, QString> getColorSubstitutions() const;
 
     QColor color(const char* name) const;
     QColor color(const QString& name) const;
