@@ -60,11 +60,11 @@ TEST_F(MetricsGenerators, ValueBinary)
     const auto number7 = parseFormulaOrThrow("const 7", monitors).generator;
     EXPECT_EQ(number7(), api::metrics::Value(7));
 
-    const auto plusAB = parseFormulaOrThrow("+ %a %b", monitors).generator;
-    const auto minusAB = parseFormulaOrThrow("- %a %b", monitors).generator;
-    const auto equalAB = parseFormulaOrThrow("= %a %b", monitors).generator;
-    const auto notEqualAB = parseFormulaOrThrow("!= %a %b", monitors).generator;
-    const auto greaterAB = parseFormulaOrThrow("> %a %b", monitors).generator;
+    const auto plusAB = parseFormulaOrThrow("add %a %b", monitors).generator;
+    const auto minusAB = parseFormulaOrThrow("sub %a %b", monitors).generator;
+    const auto equalAB = parseFormulaOrThrow("equal %a %b", monitors).generator;
+    const auto notEqualAB = parseFormulaOrThrow("notEqual %a %b", monitors).generator;
+    const auto greaterAB = parseFormulaOrThrow("greaterThan %a %b", monitors).generator;
 
     EXPECT_EQ(plusAB(), api::metrics::Value());
     EXPECT_EQ(minusAB(), api::metrics::Value());

@@ -329,12 +329,12 @@
                     "alarms": [
                     {
                         "level": "warning",
-                        "condition": "greaterThen %fpsDelta 5",
+                        "condition": "greaterThan %fpsDelta 5",
                         "text": "has actual fps less for %fpsDelta frames/s"
                     },
                     {
                         "level": "error",
-                        "condition": "greaterThen %fpsDelta 10",
+                        "condition": "greaterThan %fpsDelta 10",
                         "text": "has actual fps less for %fpsDelta frames/s"
                     }
                     ]

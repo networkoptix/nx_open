@@ -124,10 +124,10 @@ public:
         if (function() == "!=" || function() == "notEqual")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 != v2; });
 
-        if (function() == ">" || function() == "greaterThen")
+        if (function() == ">" || function() == "greaterThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
-        if (function() == "<" || function() == "lessThen")
+        if (function() == "<" || function() == "lessThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
 
         if (function() == ">=" || function() == "greaterOrEqual")
