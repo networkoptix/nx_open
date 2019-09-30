@@ -36,6 +36,8 @@ ApplicationWindow
     visible: true
     color: ColorTheme.windowBackground
 
+    font.family: Qt.application.font //< For some reason QGuiApplication::setFont() does not work.
+
     SideNavigation
     {
         id: sideNavigation
