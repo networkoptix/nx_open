@@ -107,8 +107,8 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                 "transactionsPerSecond",
                 [](const auto& r)
                 {
-                    QnMediaServerResourcePtr ownMediaServer = r->commonModule()->resourcePool()
-                        ->getResourceById<QnMediaServerResource>(r->commonModule()->moduleGUID());
+                    const auto resourcePool = r->commonModule()->resourcePool();
+                    const auto ownMediaServer = resourcePool->getOwnMediaServer();
                     if (!ownMediaServer || ownMediaServer->metadataStorageId() != r->getId())
                         return Value();
                     auto statistics = r->serverModule()->analyticsEventsStorage()->statistics();

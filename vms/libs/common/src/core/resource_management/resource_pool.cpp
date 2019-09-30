@@ -20,6 +20,7 @@
 #include <api/helpers/camera_id_helper.h>
 
 #include "private/resource_pool_p.h"
+#include <common/common_module.h>
 
 namespace {
 
@@ -348,6 +349,11 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(
     }
 
     return result;
+}
+
+QnMediaServerResourcePtr QnResourcePool::getOwnMediaServer() const
+{
+    return getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
 }
 
 QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus status) const
