@@ -51,6 +51,17 @@ public:
             m_readCallback(result);
         return result;
     }
+
+    virtual qint64 bytesAvailable() const override { return m_source->bytesAvailable(); }
+    virtual qint64 bytesToWrite() const override { return m_source->bytesToWrite(); }
+    virtual bool canReadLine() const override { return m_source->canReadLine();  }
+    virtual bool isSequential() const override { return m_source->isSequential();  }
+    virtual bool reset() override { return m_source->reset();  }
+    virtual bool waitForBytesWritten(int msecs) override
+    {
+        return m_source->waitForBytesWritten(msecs);
+    }
+    virtual bool waitForReadyRead(int msecs) override { return m_source->waitForReadyRead(msecs); }
 private:
     std::unique_ptr<QIODevice> m_source = nullptr;
     Callback m_readCallback = nullptr;
