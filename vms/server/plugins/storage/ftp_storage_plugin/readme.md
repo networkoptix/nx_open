@@ -6,3 +6,7 @@ This is a dynamic library that implements remote storage functionality with an F
 backend, as a Storage Plugin for the VMS Server, built using Storage SDK.
 
 This plugin is provided as an example of integration and is not intended for production purpose.
+
+# Known issues
+
+- Write access to the root folder of FTP storage is needed.
