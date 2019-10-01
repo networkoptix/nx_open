@@ -42,11 +42,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 
     foreach(sanitizer ${enabledSanitizers})
         add_compile_options(-fsanitize=${sanitizer})
+        string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${sanitizer}")
+        string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${sanitizer}")
 
         if(sanitizer STREQUAL "address")
             add_compile_options(-fno-omit-frame-pointer)
-            string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=address")
-            string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=address")
+        endif()
+
+        if(sanitizer STREQUAL "undefined")
+            string(APPEND CMAKE_EXE_LINKER_FLAGS " -lubsan")
         endif()
     endforeach()
 endif()
