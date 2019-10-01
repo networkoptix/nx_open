@@ -39,9 +39,7 @@ public:
             m_resuming = false;
         }
 
-        m_paused = m_maxNumberOfPauses > 0
-            ? rand() % m_randModulus == 0
-            : false;
+        m_paused = m_maxNumberOfPauses > 0 && rand() % m_randModulus == 0;
 
         if (m_paused)
             m_pauseStartTime = std::chrono::high_resolution_clock::now();

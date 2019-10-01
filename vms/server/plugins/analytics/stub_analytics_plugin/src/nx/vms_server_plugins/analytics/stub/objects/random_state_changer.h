@@ -20,9 +20,7 @@ public:
 
     void update()
     {
-        m_stateChanged = m_maxStateChanges >= 0
-            ? rand() % m_randModulus == 0
-            : false;
+        m_stateChanged = m_maxStateChanges >= 0 && rand() % m_randModulus == 0;
 
         if (m_stateChanged)
             --m_maxStateChanges;
