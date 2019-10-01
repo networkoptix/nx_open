@@ -57,8 +57,7 @@ Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
 - If `ssh <boxHostnameOrIp>` on the host machine requires to enter credentials, specify them in 
     `boxLogin` and `boxPassword` fields.
-- In order to test the ability of the box to process the load of the desired number of cameras,
-    set `testCamerasTestSequence` accordingly.
+- Set the desired number of cameras in `virtualCamerasCount` field.
 
 Then simply run the command `vms_benchmark` without arguments, and watch or capture its output.
 

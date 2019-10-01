@@ -4,6 +4,7 @@ import platform
 import signal
 import sys
 import time
+import os
 import logging
 
 logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
@@ -56,6 +57,7 @@ from vms_benchmark import exceptions
 
 import urllib
 import click
+import threading
 
 
 def to_megabytes(bytes_count):
@@ -95,7 +97,7 @@ def load_configs(conf_file, ini_file):
             "type": "string",
             "default": "admin",
         },
-        "testCamerasTestSequence": {
+        "virtualCamerasCount": {
             "optional": True,
             "type": "integers",
         },
@@ -106,7 +108,7 @@ def load_configs(conf_file, ini_file):
         "streamingTestDurationMinutes": {
             "optional": True,
             "type": 'integer',
-            "default": 1
+            "default": 1 if os.path.exists('.not_installed') else 4 * 60
         },
         "cameraDiscoveryTimeoutMinutes": {
             "optional": True,
@@ -266,6 +268,7 @@ def main(conf_file, ini_file):
 
     if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled().call()
+
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
                 "ERROR: sshpass is not on PATH" +
@@ -434,9 +437,7 @@ def main(conf_file, ini_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in conf.get(
-            'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
-
+    for test_cameras_count in conf.get('virtualCamerasCount', [1]):
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
@@ -507,6 +508,7 @@ def main(conf_file, ini_file):
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=(camera.id for camera in cameras),
                 streams_per_camera=conf.get('streamsPerTestCamera', len(cameras)),
+                archive_streams_count=1,
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
@@ -520,7 +522,7 @@ def main(conf_file, ini_file):
 
                 while time.time() - stream_opening_started_at < 25:
                     if stream_reader_context.poll() is not None:
-                        raise exceptions.RtspPerfError('FOOO')
+                        raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
                     line = stream_reader_context.stdout.readline().decode('UTF-8')
                     import re
@@ -554,73 +556,140 @@ def main(conf_file, ini_file):
                 frames = {}
                 frame_drops = {}
                 lags = {}
-                streaming_succeeded = False
+                streaming_ended_expected = False
+                issues = []
+                cpu_usage_max_collector = [None]
 
-                while time.time() - streaming_started_at < streaming_duration_mins*60:
-                    if stream_reader_context.poll() is not None:
-                        raise exceptions.RtspPerfError('asdf')
+                box_poller_thread_stop_event = threading.Event()
+                box_poller_thread_exceptions_collector = []
 
-                    line = stream_reader_context.stdout.readline().decode('UTF-8')
+                def box_poller(stop_event, exception_collector, cpu_usage_max_collector):
+                    while not stop_event.isSet():
+                        try:
+                            statistics = api.get_statistics()
+                            cannot_get_exception = exceptions.ServerApiError(
+                                "Can't get server statistics through the REST API."
+                            )
+                            if not statistics:
+                              raise cannot_get_exception
+                            cpu_usage_search_result = [e['value'] for e in statistics if e['description'] == 'CPU']
+                            if len(cpu_usage_search_result) != 1:
+                                raise cannot_get_exception
+                            cpu_usage = cpu_usage_search_result[0]
+                            if not cpu_usage_max_collector[0] is None:
+                                cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage)
+                            if cpu_usage > ini['cpuUsageThreshold']:
+                                raise exceptions.CPUUsageThresholdExceededIssue(
+                                    cpu_usage,
+                                    ini['cpuUsageThreshold']
+                                )
+                            stop_event.wait(15)
+                        except Exception as e:
+                            exception_collector.append(e)
+                            return
 
-                    match_res = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
-                    if not match_res:
-                        continue
+                box_poller_thread = threading.Thread(
+                    target=box_poller,
+                    args=(
+                        box_poller_thread_stop_event,
+                        box_poller_thread_exceptions_collector,
+                        cpu_usage_max_collector
+                    )
+                )
 
-                    pts = int(match_res.group(2))/1000
+                box_poller_thread.start()
 
-                    pts_camera_id = match_res.group(1)
+                try:
+                    while time.time() - streaming_started_at < streaming_duration_mins*60:
+                        if stream_reader_context.poll() is not None:
+                            raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
 
-                    frames[pts_camera_id] = frames.get(pts_camera_id, 0) + 1
+                        if not box_poller_thread.is_alive():
+                            if (
+                                len(box_poller_thread_exceptions_collector) > 0 and
+                                    isinstance(
+                                        box_poller_thread_exceptions_collector[0], exceptions.VmsBenchmarkIssue
+                                    )
+                            ):
+                                issues.append(box_poller_thread_exceptions_collector[0])
+                            else:
+                                issues.append(
+                                    exceptions.TestCameraStreamingIssue(
+                                        (
+                                            'Unexpected error during acquiaring VMS server CPU usage. ' +
+                                            'Can be caused by network issues or Server issues.'
+                                        ),
+                                        original_exception=box_poller_thread_exceptions_collector
+                                    )
+                                )
+                            streaming_ended_expected = True
+                            break
 
-                    if pts_camera_id not in first_tses:
-                        first_tses[pts_camera_id] = time.time()
-                    else:
-                        lags[pts_camera_id] = max(
-                            lags.get(pts_camera_id, 0),
-                            time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(ini['testFileFps'])))
-                        )
+                        line = stream_reader_context.stdout.readline().decode('UTF-8')
 
-                    ts = time.time()
+                        match_res = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
+                        if not match_res:
+                            continue
 
-                    pts_diff_deviation_factor_max = 0.01
-                    pts_diff_expected = 1000.0/float(ini['testFileFps'])
-                    pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
-                    pts_diff_max = (1000./float(ini['testFileFps']))*1.05
+                        pts = int(match_res.group(2))/1000
 
-                    # The value is negative because the first PTS of new loop is less than last PTS of the previous
-                    # loop.
-                    pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
+                        pts_camera_id = match_res.group(1)
 
-                    if pts_diff is not None:
-                        pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
+                        frames[pts_camera_id] = frames.get(pts_camera_id, 0) + 1
 
-                        if (
-                                pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
-                                pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
-                        ):
-                            frame_drops[pts_camera_id] = frame_drops.get(pts_camera_id, 0) + 1
-                            print(f'Detected framedrop from camera {pts_camera_id}: {pts - last_ptses.get(pts_camera_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
+                        if pts_camera_id not in first_tses:
+                            first_tses[pts_camera_id] = time.time()
+                        else:
+                            lags[pts_camera_id] = max(
+                                lags.get(pts_camera_id, 0),
+                                time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(ini['testFileFps'])))
+                            )
 
-                    if time.time() - streaming_started_at > streaming_duration_mins*60:
-                        streaming_succeeded = True
-                        print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
-                        break
+                        ts = time.time()
 
-                    last_ptses[pts_camera_id] = pts
+                        pts_diff_deviation_factor_max = 0.01
+                        pts_diff_expected = 1000.0/float(ini['testFileFps'])
+                        pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
+                        pts_diff_max = (1000./float(ini['testFileFps']))*1.05
 
-                if not streaming_succeeded:
+                        # The value is negative because the first PTS of new loop is less than last PTS of the previous
+                        # loop.
+                        pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
+
+                        if pts_diff is not None:
+                            pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
+
+                            if (
+                                    pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
+                                    pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
+                            ):
+                                frame_drops[pts_camera_id] = frame_drops.get(pts_camera_id, 0) + 1
+                                print(f'Detected framedrop from camera {pts_camera_id}: {pts - last_ptses.get(pts_camera_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
+
+                        if time.time() - streaming_started_at > streaming_duration_mins*60:
+                            streaming_ended_expected = True
+                            print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
+                            break
+
+                        last_ptses[pts_camera_id] = pts
+                finally:
+                    box_poller_thread_stop_event.set()
+
+                cpu_usage_max = cpu_usage_max_collector[0]
+
+                if not streaming_ended_expected:
                     raise exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
                         'the stream has unexpectedly finished; ' +
-                        'can be caused by network issues or Server issues.')
+                        'can be caused by network issues or Server issues.',
+                        original_exception=issues
+                    )
 
                 if time.time() - ts > 5:
                     raise exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
                         'the stream had been hanged; ' +
                         'can be caused by network issues or Server issues.')
-
-                issues = []
 
                 try:
                     ram_available_bytes = box_platform.ram_available_bytes()
@@ -631,20 +700,11 @@ def main(conf_file, ini_file):
                         original_exception=e
                     ))
 
-                try:
-                    cpu_usage_summarized = box_combined_cpu_usage(box) / box_platform.cpu_count
-                except exceptions.VmsBenchmarkError as e:
-                    issues.append(exceptions.UnableToFetchDataFromBox(
-                        'Unable to fetch box cpu usage',
-                        original_exception=e
-                    ))
-                    cpu_usage_summarized = None
-
                 frame_drops_sum = sum(frame_drops.values())
 
                 print(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
-                if cpu_usage_summarized is not None:
-                    print(f"    CPU usage: {str(cpu_usage_summarized) if cpu_usage_summarized else '-'}")
+                if cpu_usage_max is not None:
+                    print(f"    CPU usage: {str(cpu_usage_max) if cpu_usage_max else '-'}")
                 if ram_free_bytes is not None:
                     print(f"    Free RAM: {to_megabytes(ram_free_bytes)} MB")
 
@@ -657,12 +717,6 @@ def main(conf_file, ini_file):
                     report_server_storage_failures(api, round(streaming_started_at*1000))
                 except exceptions.VmsBenchmarkIssue as e:
                     issues.append(e)
-
-                if cpu_usage_summarized is not None and cpu_usage_summarized > ini['cpuUsageThreshold']:
-                    issues.append(exceptions.CPUUsageThresholdExceededIssue(
-                        cpu_usage_summarized,
-                        ini['cpuUsageThreshold']
-                    ))
 
                 max_allowed_lag_seconds = 5
                 max_lag = max(lags.values())

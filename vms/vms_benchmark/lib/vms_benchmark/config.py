@@ -14,9 +14,9 @@ class InvalidConfigOption(exceptions.VmsBenchmarkError):
 
 
 class ConfigOptionValueError(exceptions.VmsBenchmarkError):
-    def __init__(self, config_file, name, value, original_exception=None):
+    def __init__(self, conf_file, name, value, original_exception=None):
         super(ConfigOptionValueError, self).__init__(
-            f"Error in config '{config_file}' processing value '{value}' of option '{name}'."
+            f"Error in config '{conf_file}' processing value '{value}' of option '{name}'."
         )
         self.original_exception = original_exception
 

@@ -11,8 +11,21 @@ debug = False
 
 
 @contextmanager
-def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip, vms_port):
+def stream_reader_running(
+    camera_ids,
+    streams_per_camera,
+    archive_streams_count,
+    user,
+    password,
+    box_ip,
+    vms_port
+):
     camera_ids = list(camera_ids)
+
+    archive_streams_list = []
+
+    for i in range(archive_streams_count):
+        archive_streams_list.append(camera_ids[i % len(camera_ids)])
 
     args = [
         binary_file,
@@ -26,8 +39,13 @@ def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip
     ]
 
     for stream_url in (
-        f"rtsp://{box_ip}:{vms_port}/{camera_id}"
-        for camera_id in camera_ids
+        [
+            f"rtsp://{box_ip}:{vms_port}/{camera_id}"
+            for camera_id in camera_ids
+        ] + [
+            f"rtsp://{box_ip}:{vms_port}/{camera_id}?pos=0"
+            for camera_id in archive_streams_list
+        ]
     ):
         args.append('--url')
         args.append(stream_url)
