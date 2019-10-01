@@ -28,7 +28,7 @@ public:
     ExtraValueMonitor(ValueGeneratorResult formula = {});
     void setGenerator(ValueGenerator generator);
 
-    api::metrics::Value current() const override;
+    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 private:
@@ -48,7 +48,7 @@ public:
         TextGenerator text);
 
     Scope scope() const { return m_scope; }
-    std::optional<api::metrics::Alarm> currentAlarm();
+    std::optional<api::metrics::Alarm> alarm();
 
 private:
     const Scope m_scope = Scope::local;

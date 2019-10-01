@@ -14,7 +14,7 @@ public:
     void start();
 
     api::metrics::SystemManifest manifest() const;
-    api::metrics::SystemValues values(Scope requestScope) const;
+    api::metrics::SystemValues values(Scope requestScope, bool formatted) const;
     std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
 
     api::metrics::SystemRules rules() const;

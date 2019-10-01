@@ -8,6 +8,14 @@
 
 namespace nx::vms::server::metrics {
 
+static const QString kRulesApi("/rules");
+static const QString kManifestApi("/manifest");
+static const QString kValuesApi("/values");
+static const QString kAlarmsApi("/alarms");
+
+static const QString kSystemParam("system");
+static const QString kFormattedParam("formatted");
+
 LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller):
     m_controller(controller)
 {
@@ -15,14 +23,13 @@ LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller)
 
 JsonRestResponse LocalRestHandler::executeGet(const JsonRestRequest& request)
 {
-    auto scope = utils::metrics::Scope::local;
-    if (request.params.contains("system"))
-        scope = utils::metrics::Scope::system;
+    using utils::metrics::Scope;
+    const Scope scope = request.params.contains(kSystemParam) ? Scope::system : Scope::local;
 
-    if (request.path.endsWith("/values"))
-        return JsonRestResponse(m_controller->values(scope));
+    if (request.path.endsWith(kValuesApi))
+        return JsonRestResponse(m_controller->values(scope, request.params.contains(kFormattedParam)));
 
-    if (request.path.endsWith("/alarms"))
+    if (request.path.endsWith(kAlarmsApi))
         return JsonRestResponse(m_controller->alarms(scope));
 
     return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
@@ -38,15 +45,15 @@ SystemRestHandler::SystemRestHandler(
 
 template<typename Values>
 JsonRestResponse queryAndMerge(
-    Values values, const QString& api,
+    Values values, const QString& api, const QString& query,
     const QnSharedResourcePointerList<QnMediaServerResource>& servers);
 
 JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
 {
-    if (request.path.endsWith("/rules"))
+    if (request.path.endsWith(kRulesApi))
          return JsonRestResponse(m_controller->rules());
 
-    if (request.path.endsWith("/manifest"))
+    if (request.path.endsWith(kManifestApi))
         return JsonRestResponse(m_controller->manifest());
 
     QnSharedResourcePointerList<QnMediaServerResource> otherServers;
@@ -56,11 +63,16 @@ JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
             otherServers.push_back(std::move(s));
     }
 
-    if (request.path.endsWith("/values"))
-        return queryAndMerge(m_controller->values(utils::metrics::Scope::system), "values", otherServers);
+    using utils::metrics::Scope;
+    if (request.path.endsWith(kValuesApi))
+    {
+        const auto formatted = request.params.contains(kFormattedParam);
+        const auto query = formatted ? kFormattedParam : QString();
+        return queryAndMerge(m_controller->values(Scope::system, formatted), kValuesApi, query, otherServers);
+    }
 
-    if (request.path.endsWith("/alarms"))
-        return queryAndMerge(m_controller->alarms(utils::metrics::Scope::system), "alarms", otherServers);
+    if (request.path.endsWith(kAlarmsApi))
+        return queryAndMerge(m_controller->alarms(Scope::system), kAlarmsApi, QString(), otherServers);
 
     return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
 }
@@ -78,7 +90,7 @@ static void logResponse(const nx::utils::Url& url, const api::metrics::Alarms& a
 
 template<typename Values>
 JsonRestResponse queryAndMerge(
-    Values values, const QString& api,
+    Values values, const QString& api, const QString& query,
     const QnSharedResourcePointerList<QnMediaServerResource>& servers)
 {
     static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
@@ -89,7 +101,8 @@ JsonRestResponse queryAndMerge(
         client.setUserPassword(server->getAuthKey());
 
         nx::utils::Url url(server->getUrl());
-        url.setPath("/api/metrics/" + api);
+        url.setPath("/api/metrics" + api);
+        url.setQuery(query);
         if (!client.doGet(url) || !client.response())
         {
             NX_DEBUG(kTag, "Query [ %1 ] has failed", url);

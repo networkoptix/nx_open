@@ -15,7 +15,8 @@ static const QByteArray kRules(R"json({
             "values": {
                 "i": {
                     "name": "int parameter",
-                    "display": "panel|table"
+                    "display": "panel|table",
+                    "format": "KB"
                 },
                 "t": {
                     "name": "text parameter",
@@ -144,12 +145,12 @@ public:
         }
     }
 
-    void testValues(Scope scope, bool includeRules)
+    void testValues(Scope scope, bool includeRules, bool formatted)
     {
         for (const auto& resource: m_resources)
             resource->setDefaults();
         {
-            auto systemValues = m_systemController.values(scope);
+            auto systemValues = m_systemController.values(scope, formatted);
             EXPECT_EQ(systemValues.size(), 1);
 
             auto testResources = systemValues["tests"];
@@ -160,7 +161,7 @@ public:
             {
                 auto group1 = local1["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
-                EXPECT_EQ(group1["i"], 1);
+                EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.001 KB") : api::metrics::Value(1));
                 EXPECT_EQ(group1["t"], "first of 0");
                 if (includeRules)
                 {
@@ -189,7 +190,7 @@ public:
             {
                 auto group1 = local2["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
-                EXPECT_EQ(group1["i"], 21);
+                EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
                 EXPECT_EQ(group1["t"], "first of 2");
                 if (includeRules)
                 {
@@ -224,21 +225,21 @@ public:
             }
         }
 
-        m_resources[0]->update("i1", 666);
+        m_resources[0]->update("i1", 1024);
         m_resources[1]->update("t2", "hello");
         {
-            auto systemValues = m_systemController.values(scope);
+            auto systemValues = m_systemController.values(scope, formatted);
             EXPECT_EQ(systemValues.size(), 1);
 
             auto testResources = systemValues["tests"];
             ASSERT_EQ(testResources.size(), scope == Scope::system ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            EXPECT_EQ(local1["g1"]["i"], 666);
+            EXPECT_EQ(local1["g1"]["i"], formatted ? api::metrics::Value("1 KB") : api::metrics::Value(1024));
             EXPECT_EQ(local1["g1"]["t"], "first of 0");
             if (includeRules)
             {
-                EXPECT_EQ(local1["g1"]["ip"], 667);
+                EXPECT_EQ(local1["g1"]["ip"], 1025);
                 if (scope == Scope::system)
                 {
                     EXPECT_EQ(local1["g1"]["c"], "hello");
@@ -251,7 +252,7 @@ public:
             }
 
             auto local2 = testResources["R2"];
-            EXPECT_EQ(local2["g1"]["i"], 21);
+            EXPECT_EQ(local2["g1"]["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
             EXPECT_EQ(local2["g1"]["t"], "first of 2");
             if (includeRules)
             {
@@ -310,16 +311,16 @@ public:
             const auto alarms = m_systemController.alarms(scope);
             ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 4 : 2);
 
-            EXPECT_ALARM(alarms[0], "R0", "g1.ip", warning, "i = 150 (>100), ip = 151");
+            EXPECT_ALARM(alarms[0], "R0", "g1.ip", warning, "i = 0.146 KB (>100), ip = 151");
             if (scope == Scope::system)
             {
                 EXPECT_ALARM(alarms[1], "R0", "g2.i", warning, "i is 50 (>30)");
                 EXPECT_ALARM(alarms[2], "R1", "g2.i", warning, "i is 70 (>30)");
-                EXPECT_ALARM(alarms[3], "R2", "g1.ip", danger, "i = -2 (<0), ip = -1");
+                EXPECT_ALARM(alarms[3], "R2", "g1.ip", danger, "i = -0.002 KB (<0), ip = -1");
             }
             else
             {
-                EXPECT_ALARM(alarms[1], "R2", "g1.ip", danger, "i = -2 (<0), ip = -1");
+                EXPECT_ALARM(alarms[1], "R2", "g1.ip", danger, "i = -0.002 KB (<0), ip = -1");
             }
         }
 
@@ -361,33 +362,49 @@ TEST_F(MetricsControllerTest, ManifestScenario)
 
 TEST_F(MetricsControllerTest, LocalValues)
 {
-    testValues(Scope::local, /*includeRules*/ false);
+    testValues(Scope::local, /*includeRules*/ false, /*formatted*/ false);
 }
 
 TEST_F(MetricsControllerTest, LocalValuesWithRules)
 {
     setRules();
-    testValues(Scope::local, /*includeRules*/ true);
+    testValues(Scope::local, /*includeRules*/ true, /*formatted*/ false);
 }
 
 TEST_F(MetricsControllerTest, SystemValues)
 {
-    testValues(Scope::system, /*includeRules*/ false);
+    testValues(Scope::system, /*includeRules*/ false, /*formatted*/ false);
 }
 
 TEST_F(MetricsControllerTest, SystemValuesWithRules)
 {
     setRules();
-    testValues(Scope::system, /*includeRules*/ true);
+    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ false);
+}
+
+TEST_F(MetricsControllerTest, FormattedLocalValues)
+{
+    setRules();
+    testValues(Scope::local, /*includeRules*/ true, /*formatted*/ true);
+}
+
+TEST_F(MetricsControllerTest, FormattedSystemValues)
+{
+    setRules();
+    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ true);
 }
 
 TEST_F(MetricsControllerTest, ValuesScenario)
 {
-    testValues(Scope::local, /*includeRules*/ false);
-    testValues(Scope::system, /*includeRules*/ false);
+    testValues(Scope::local, /*includeRules*/ false, /*formatted*/ false);
+    testValues(Scope::system, /*includeRules*/ false, /*formatted*/ false);
+
     setRules();
-    testValues(Scope::local, /*includeRules*/ true);
-    testValues(Scope::system, /*includeRules*/ true);
+    testValues(Scope::local, /*includeRules*/ true, /*formatted*/ false);
+    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ false);
+
+    testValues(Scope::local, /*includeRules*/ true, /*formatted*/ true);
+    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ true);
 }
 
 TEST_F(MetricsControllerTest, LocalAlarms)

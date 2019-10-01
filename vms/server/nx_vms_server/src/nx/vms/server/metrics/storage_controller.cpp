@@ -54,8 +54,7 @@ void StorageController::start()
 Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
 {
     const auto bytes = resource->getAndResetMetric(metric);
-    const auto kBps = bytes / 1000.0 / kIoRateUpdateInterval.count();
-    return Value(kBps);
+    return StorageController::Value(bytes / kIoRateUpdateInterval.count());
 }
 
 auto transactionsPerSecond(const Resource& storage)
@@ -115,12 +114,12 @@ auto activityGroupProvider()
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "readRateKBps",
+                "readRateBps",
                     [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
                     nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "writeRateKBps",
+                "writeRateBps",
                     [](const auto& r)
                     {
                         return ioRate(r, &StorageResource::Metrics::bytesWritten);
@@ -139,17 +138,13 @@ auto spaceGroupProvider()
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "totalSpaceGB",
-                    [](const auto& r) { return r->getTotalSpace() / (double) kBytesInGb; }
+                "totalSpaceB", [](const auto& r) { return r->getTotalSpace(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceP",
-                    [](const auto& r)
-                    { return r->nxOccupedSpace() / (double) r->getTotalSpace() * 100; }
+                "mediaSpaceP", [](const auto& r) { return r->nxOccupedSpace() / (double) r->getTotalSpace(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceGB",
-                    [](const auto& r) { return r->nxOccupedSpace() / (double) kBytesInGb; }
+                "mediaSpaceB", [](const auto& r) { return r->nxOccupedSpace(); }
             )
         );
 }

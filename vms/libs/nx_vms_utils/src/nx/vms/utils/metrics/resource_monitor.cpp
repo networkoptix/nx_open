@@ -12,12 +12,12 @@ ResourceMonitor::ResourceMonitor(
 {
 }
 
-api::metrics::ResourceValues ResourceMonitor::current(Scope requestScope) const
+api::metrics::ResourceValues ResourceMonitor::values(Scope requestScope, bool formatted) const
 {
     api::metrics::ResourceValues values;
     for (const auto& [id, monitor]: m_monitors)
     {
-        if (auto v = monitor->current(requestScope); !v.empty())
+        if (auto v = monitor->values(requestScope, formatted); !v.empty())
             values[id] = std::move(v);
     }
 

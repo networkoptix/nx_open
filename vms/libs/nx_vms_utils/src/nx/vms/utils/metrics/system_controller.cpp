@@ -37,13 +37,13 @@ api::metrics::SystemManifest SystemController::manifest() const
     return *m_manifestCache;
 }
 
-api::metrics::SystemValues SystemController::values(Scope requestScope) const
+api::metrics::SystemValues SystemController::values(Scope requestScope, bool formatted) const
 {
     const auto start = std::chrono::steady_clock::now();
     api::metrics::SystemValues systemValues;
     for (const auto& [label, controller]: m_resourceControllers)
     {
-        if (auto values = controller->values(requestScope); !values.empty())
+        if (auto values = controller->values(requestScope, formatted); !values.empty())
             systemValues[label] = std::move(values);
     }
 

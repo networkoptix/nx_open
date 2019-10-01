@@ -18,7 +18,7 @@ public:
     virtual void start() = 0;
     virtual api::metrics::ResourceManifest manifest() const = 0;
 
-    api::metrics::ResourceGroupValues values(Scope requestScope) const;
+    api::metrics::ResourceGroupValues values(Scope requestScope, bool formatted) const;
     std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
 
     api::metrics::ResourceRules rules() const;

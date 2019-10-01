@@ -11,7 +11,7 @@ ValueGroupMonitor::ValueGroupMonitor(ValueMonitors monitors):
 {
 }
 
-api::metrics::ValueGroup ValueGroupMonitor::current(Scope requiredScope) const
+api::metrics::ValueGroup ValueGroupMonitor::values(Scope requiredScope, bool formatted) const
 {
     // TODO: Use RW lock.
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -22,8 +22,8 @@ api::metrics::ValueGroup ValueGroupMonitor::current(Scope requiredScope) const
         if (requiredScope == Scope::local && monitor->scope() == Scope::system)
             continue;
 
-        if (auto v = monitor->current(); !v.isNull())
-            values[id] = std::move(v);
+        if (auto value = formatted ? monitor->formattedValue() : monitor->value(); !value.isNull())
+            values[id] = std::move(value);
     }
 
     return values;
@@ -37,7 +37,7 @@ std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms(Scope requiredScope) 
         if (requiredScope == Scope::local && monitor->scope() == Scope::system)
             continue;
 
-        if (auto alarm = monitor->currentAlarm())
+        if (auto alarm = monitor->alarm())
             alarms.push_back(std::move(*alarm));
     }
 
@@ -67,6 +67,13 @@ void ValueGroupMonitor::setRules(
     {
         if (!rule.calculate.isEmpty())
             updateExtraValue(parameterId, rule, skipOnMissingArgument);
+    }
+
+    for (const auto& [id, monitor]: m_valueMonitors)
+    {
+        const auto rule = rules.find(id);
+        monitor->setFormatter(api::metrics::makeFormatter(
+            rule != rules.end() ? rule->second.format : QString()));
     }
 
     m_alarmMonitors.clear();

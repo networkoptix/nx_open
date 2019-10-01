@@ -139,7 +139,7 @@ Format:
         {
           "id": "<parameterId>",
           "name": "<parameterName>",
-          "unit": "<unit>", //< Optional, should be bound to parameter name when shown to the user.
+          "format": "<format>", //< Optional, should be bound to parameter name when shown to the user.
           "display": "<display>", //< Optional, specifies where this values should be shown to the user.
         }
       ]
@@ -188,18 +188,18 @@ Example:
         { "id": "name", "name": "Name", "display": "table|panel" },
         { "id": "status", "name": "Status", "display": "table|panel" },
         { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
-        { "id": "uptime", "name": "Uptime", "unit": "s", "display": "table|panel" },
+        { "id": "uptimeS", "name": "Uptime", "format": "durationS", "display": "table|panel" },
         ...
       ],
     }, {
       "id": "load",
       "name": "Load",
       "values": [
-        { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table|panel" },
-        { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "table|panel" },
-        { "id": "recommendedCpuUsageP", "unit": "%", "display": ""}, //< May be omitted by compact option.
-        { "id": "ramUsageB", "name": "RAM Usage", "unit": "b", "display": "panel" },
-        { "id": "ramUsageP", "name": "RAM Usage", "unit": "%", "display": "table|panel" },
+        { "id": "totalCpuUsageP", "name": "CPU Usage", "format": "%", "display": "table|panel" },
+        { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "format": "%", "display": "table|panel" },
+        { "id": "recommendedCpuUsageP", "format": "%", "display": ""}, //< May be omitted by compact option.
+        { "id": "ramUsageB", "name": "RAM Usage", "format": "GB", "display": "panel" },
+        { "id": "ramUsageP", "name": "RAM Usage", "format": "%", "display": "table|panel" },
         ...
       ]
     },
@@ -229,9 +229,9 @@ Example:
       "id": "primaryStream",
       "name": "Primary Stream",
       "values": [
-        { "id": "targetFps", "name": "Target FPS", "unit": "fps", "display": "table|panel" },
-        { "id": "actualFps", "name": "Actual FPS", "unit": "fps", "display": "table|panel" },
-        { "id": "fpsDrops", "unit": "fps", "display": "" }, //< May be omitted by compact option.
+        { "id": "targetFps", "name": "Target FPS", "format": "fps", "display": "table|panel" },
+        { "id": "actualFps", "name": "Actual FPS", "format": "fps", "display": "table|panel" },
+        { "id": "fpsDrops", "format": "fps", "display": "" }, //< May be omitted by compact option.
         ...
       ]
     }

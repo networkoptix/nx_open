@@ -65,7 +65,7 @@ public:
     ValueGenerator value(const QString& id) const
     {
         if (id.startsWith(kVariableMark))
-            return [m = monitor(id.mid(kVariableMark.size()))] { return m->current(); };
+            return [m = monitor(id.mid(kVariableMark.size()))] { return m->value(); };
 
         bool isNumber = false;
         if (const auto n = id.toDouble(&isNumber); isNumber)
@@ -308,15 +308,12 @@ ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMoni
 
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
 {
-    // TODO: Cache up template before hand.
     const auto value =
         [monitors = &monitors](const QString& name) -> QString
         {
             if (const auto it = monitors->find(name); it != monitors->end())
-            {
-                // TODO: Introduce some kind of a fancy formatting?
-                return it->second->current().toVariant().toString();
-            }
+                return it->second->formattedValue().toVariant().toString();
+
             return nx::utils::log::makeMessage("{%1 IS NOT FOUND}", name);
         };
 
@@ -338,14 +335,14 @@ void ExtraValueMonitor::setGenerator(ValueGenerator generator)
     m_generator = std::move(generator);
 }
 
-api::metrics::Value ExtraValueMonitor::current() const
+api::metrics::Value ExtraValueMonitor::value() const
 {
     return m_generator();
 }
 
 void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) const
 {
-    iterator(current(), maxAge);
+    iterator(value(), maxAge);
 }
 
 AlarmMonitor::AlarmMonitor(
@@ -362,7 +359,7 @@ AlarmMonitor::AlarmMonitor(
 {
 }
 
-std::optional<api::metrics::Alarm> AlarmMonitor::currentAlarm()
+std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
     if (!m_condition().toBool())
         return std::nullopt;

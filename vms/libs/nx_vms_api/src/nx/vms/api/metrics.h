@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <functional>
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonObject>
 
@@ -49,11 +50,11 @@ Q_DECLARE_FLAGS(Displays, Display)
 struct NX_VMS_API ValueManifest: Label
 {
     Displays display;
-    QString unit;
+    QString format;
 
-    ValueManifest(Label label = {}, Displays display = Display::none, QString unit = {});
+    ValueManifest(Label label = {}, Displays display = Display::none, QString format = {});
 };
-#define ValueManifest_Fields (id)(name)(unit)(display)
+#define ValueManifest_Fields (id)(name)(format)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
 
 struct NX_VMS_API ValueGroupManifest: Label
@@ -135,6 +136,8 @@ void merge(std::vector<Value>* destination, std::vector<Value>* source)
 {
     destination->insert(destination->end(), source->begin(), source->end());
 }
+
+NX_VMS_API std::function<Value(const Value&)> makeFormatter(const QString& targetFormat);
 
 } // namespace nx::vms::api::metrics
 

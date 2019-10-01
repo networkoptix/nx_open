@@ -6,25 +6,6 @@
 
 namespace nx::vms::api::metrics::test {
 
-TEST(Metrics, Declarations)
-{
-    const auto expectEq =
-        [](const auto& v, const QString& s) { EXPECT_EQ(QJson::serialized(v), s); };
-
-    expectEq(
-        ValueManifest({"status"}),
-        R"j({"display":"","id":"status","name":"Status","unit":""})j");
-    expectEq(
-        ValueManifest({"ip", "IP"}),
-        R"j({"display":"","id":"ip","name":"IP","unit":""})j");
-    expectEq(
-        ValueManifest({"model"}, Display::panel),
-        R"j({"display":"panel","id":"model","name":"Model","unit":""})j");
-    expectEq(
-        ValueManifest({"fps", "FPS"}, Display::both, "fps"),
-        R"j({"display":"table|panel","id":"fps","name":"FPS","unit":"fps"})j");
-}
-
 template<typename T>
 void expectSerialization(const QByteArray& expectedJson, const T& value)
 {
@@ -118,8 +99,8 @@ static const QByteArray kManifestExample(R"json({
         "id": "load",
         "name": "Load",
         "values": [
-            { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table" },
-            { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "panel" }
+            { "id": "totalCpuUsageP", "name": "CPU Usage", "format": "%", "display": "table" },
+            { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "format": "%", "display": "panel" }
         ]
     }
   ],
@@ -181,13 +162,13 @@ TEST(Metrics, Manifest)
         const auto cpuUsage = load.values[0];
         EXPECT_EQ(cpuUsage.id, "totalCpuUsageP");
         EXPECT_EQ(cpuUsage.name, "CPU Usage");
-        EXPECT_EQ(cpuUsage.unit, "%");
+        EXPECT_EQ(cpuUsage.format, "%");
         EXPECT_EQ(cpuUsage.display, Displays(Display::table));
 
         const auto serverCpuUsage = load.values[1];
         EXPECT_EQ(serverCpuUsage.id, "serverCpuUsageP");
         EXPECT_EQ(serverCpuUsage.name, "CPU Usage (VMS Server)");
-        EXPECT_EQ(serverCpuUsage.unit, "%");
+        EXPECT_EQ(serverCpuUsage.format, "%");
         EXPECT_EQ(serverCpuUsage.display, Displays(Display::panel));
     }
 
@@ -384,6 +365,31 @@ TEST(Metrics, Alarms)
     EXPECT_EQ(c2.parameter, "issues.offlineEvents");
     EXPECT_EQ(c2.level, AlarmLevel::warning);
     EXPECT_EQ(c2.text, "Offline Events is 2");
+}
+
+TEST(Metrics, Formatting)
+{
+    #define EXPECT_FORMAT(FORMAT, VALUE, RESULT) \
+        EXPECT_EQ(makeFormatter(FORMAT)(Value(VALUE)), Value(RESULT))
+
+    EXPECT_FORMAT("", 100.0, 100);
+    EXPECT_FORMAT("pixels", 100.0, "100 pixels");
+
+    EXPECT_FORMAT("KB", 100.0, "0.098 KB");
+    EXPECT_FORMAT("KB", 5000.0, "4.883 KB");
+    EXPECT_FORMAT("KB", 5000555.0, "4883 KB");
+
+    EXPECT_FORMAT("MB", 100.0, "0 MB");
+    EXPECT_FORMAT("MB", 6000666.0, "5.723 MB");
+    EXPECT_FORMAT("MB", 6000666000.0, "5722 MB");
+
+    EXPECT_FORMAT("KBps", 5000555.0, "4883 KBps");
+    EXPECT_FORMAT("Mp/s", 6000666000.0, "6000 Mp/s");
+
+    EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
+    EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");
+
+    #undef EXPECT_FORMAT
 }
 
 } // namespace nx::vms::api::metrics::test

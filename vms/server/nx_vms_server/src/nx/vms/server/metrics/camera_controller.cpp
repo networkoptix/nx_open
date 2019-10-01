@@ -169,11 +169,11 @@ auto makePrimaryStreamGroupProvider()
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrateKBps",
+                "actualBitrateBps",
                 [](const auto& r)
                 {
                     if (auto params = r->actualParams(StreamIndex::primary))
-                        return Value(params->bitrateKbps);
+                        return Value(params->bitrateKbps * 1024);
                     return Value();
                 }
             )
@@ -213,11 +213,11 @@ auto makeSecondaryStreamGroupProvider()
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrateKBps",
+                "actualBitrateBps",
                 [](const auto& r)
                 {
                     if (auto params = r->actualParams(StreamIndex::secondary))
-                        return Value(params->bitrateKbps);
+                        return Value(params->bitrateKbps * 1024);
                     return Value();
                 }
             ),
@@ -242,46 +242,25 @@ auto makeAnalyticsGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "analytics",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "archiveLength",
+                "archiveLengthS",
                 [](const auto& r)
                 {
                     const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
-                    if (value.count() > 0)
-                        return Value(ArchiveDuration::durationToString(value));
-                    return Value();
+                    return value.count() > 0 ? Value((double) value.count()) : Value();
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "minArchiveLength",
+                "minArchiveLengthS",
                 [](const auto& r)
                 {
                     if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
-                        return Value(ArchiveDuration::durationToString(hours(days * 24)));
+                        return Value((double) duration_cast<seconds>(hours(days * 24)).count());
                     return Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "archiveLengthSec",
-                [](const auto& r)
-                {
-                    const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
-                    if (value.count() > 0)
-                        return Value((qint64) value.count());
-                    return Value();
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "minArchiveLengthSec",
-                [](const auto& r)
-                {
-                    if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
-                        return Value((qint64) duration_cast<seconds>((hours(days * 24))).count());
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "recordingBitrateKBps",
-                [](const auto& r) { return Value(r->recordingBitrateKBps(kBitratePeriod)); }
+                "recordingBitrateBps",
+                [](const auto& r) { return Value(r->recordingBitrateKBps(kBitratePeriod) * 1024); }
             )
         );
 }

@@ -11,6 +11,7 @@ namespace nx::vms::utils::metrics {
 
 using Duration = std::chrono::milliseconds;
 using ValueIterator = std::function<void(const api::metrics::Value& value, Duration age)>;
+using ValueFormatter = std::function<api::metrics::Value(const api::metrics::Value& value)>;
 
 /**
  * Allows to monitor parameter value.
@@ -24,11 +25,15 @@ public:
     Scope scope() const { return m_scope; }
     void setScope(Scope scope) { m_scope = scope; }
 
-    virtual api::metrics::Value current() const = 0;
+    virtual api::metrics::Value value() const = 0;
     virtual void forEach(Duration maxAge, const ValueIterator& iterator) const = 0;
+
+    void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); };
+    api::metrics::Value formattedValue() const { return m_formatter ? m_formatter(value()) : value(); }
 
 private:
     Scope m_scope = Scope::local;
+    ValueFormatter m_formatter;
 };
 
 using ValueMonitors = std::map<QString, std::unique_ptr<ValueMonitor>>;
@@ -49,7 +54,7 @@ class RuntimeValueMonitor: public ValueMonitor
 {
 public:
     RuntimeValueMonitor(Scope scope, const ResourceType& resource, const Getter<ResourceType>& getter);
-    api::metrics::Value current() const override;
+    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 protected:
@@ -70,7 +75,7 @@ public:
         const Getter<ResourceType>& getter,
         const Watch<ResourceType>& watch);
 
-    api::metrics::Value current() const override;
+    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 private:
@@ -96,7 +101,7 @@ RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
 }
 
 template<typename ResourceType>
-api::metrics::Value RuntimeValueMonitor<ResourceType>::current() const
+api::metrics::Value RuntimeValueMonitor<ResourceType>::value() const
 {
     return m_getter(m_resource);
 }
@@ -105,7 +110,7 @@ template<typename ResourceType>
 void RuntimeValueMonitor<ResourceType>::forEach(
     Duration maxAge, const ValueIterator& iterator) const
 {
-    iterator(current(), maxAge);
+    iterator(value(), maxAge);
 }
 
 template<typename ResourceType>
@@ -122,7 +127,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
 }
 
 template<typename ResourceType>
-api::metrics::Value ValueHistoryMonitor<ResourceType>::current() const
+api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const
 {
     return m_history.current();
 }

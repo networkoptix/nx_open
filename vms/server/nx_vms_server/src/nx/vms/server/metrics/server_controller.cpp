@@ -117,7 +117,6 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
     static const std::chrono::seconds kUpdateInterval(5);
     static const std::chrono::minutes kTimeChangedInterval(1);
     static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
-    static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;
 
@@ -211,7 +210,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 [platform](const auto&) { return Value(platform->thisProcessCpuUsage()); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ramUsage",
+                "ramUsageB",
                 [platform](const auto&) { return Value(qint64(platform->totalRamUsage())); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -254,19 +253,14 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "decodingSpeed",
-                [this](const auto&)
-                {
-                    return Value(getMetric( Metrics::decodedPixels) / kPixelsToMegapixels);
-                },
+                "decodedPixels",
+                [this](const auto&) { return Value(getMetric(Metrics::decodedPixels)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "encodingSpeed",
+                "encodedPixels",
                 [this](const auto&)
-                {
-                    return Value(getMetric(Metrics::encodedPixels) / kPixelsToMegapixels);
-                },
+                { return Value(getMetric(Metrics::encodedPixels)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(

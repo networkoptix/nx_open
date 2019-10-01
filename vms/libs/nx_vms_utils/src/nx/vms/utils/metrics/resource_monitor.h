@@ -14,7 +14,7 @@ public:
 
     QString id() const { return m_resource->id; }
 
-    api::metrics::ResourceValues current(Scope requestScope) const;
+    api::metrics::ResourceValues values(Scope requestScope, bool formatted) const;
     std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
 
     void setRules(const api::metrics::ResourceRules& rules);

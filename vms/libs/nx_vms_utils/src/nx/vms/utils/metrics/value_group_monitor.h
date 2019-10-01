@@ -18,7 +18,7 @@ class NX_VMS_UTILS_API ValueGroupMonitor
 public:
     ValueGroupMonitor(ValueMonitors monitors);
 
-    api::metrics::ValueGroup current(Scope requiredScope) const;
+    api::metrics::ValueGroup values(Scope requiredScope, bool formatted) const;
     std::vector<api::metrics::Alarm> alarms(Scope requiredScope) const;
 
     void setRules(

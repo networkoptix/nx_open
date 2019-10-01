@@ -54,7 +54,7 @@
                 },
                 "ram": {
                     "name": "RAM",
-                    "unit": "B",
+                    "format": "GB",
                     "display": "panel"
                 },
                 "os": {
@@ -114,7 +114,7 @@
                 },
                 "uptimeS": {
                     "name": "Uptime",
-                    "unit": "s",
+                    "format": "durationS",
                     "display": "table|panel"
                 }
             }
@@ -123,32 +123,32 @@
             "values": {
                 "cpuUsageP": {
                     "name": "CPU %",
-                    "unit": "%",
+                    "format": "%",
                     "display": "table|panel"
                 },
                 "serverCpuUsageP": {
                     "name": "CPU (VMS Server) %",
-                    "unit": "%",
+                    "format": "%",
                     "display": "table|panel"
                 },
-                "ramUsage": {
+                "ramUsageB": {
                     "name": "RAM Usage",
-                    "unit": "B",
+                    "format": "GB",
                     "display": "panel"
                 },
                 "ramUsageP": {
                     "name": "RAM %",
-                    "unit": "%",
+                    "format": "%",
                     "display": "table|panel"
                 },
                 "serverRamUsage": {
                     "name": "RAM (VMS Server)",
-                    "unit": "B",
+                    "format": "GB",
                     "display": "panel"
                 },
                 "serverRamUsageP": {
                     "name": "RAM (VMS Server) %",
-                    "unit": "%",
+                    "format": "%",
                     "display": "table|panel"
                 },
                 "incomingConnections": {
@@ -177,23 +177,23 @@
                 "transactionsPerSecond1m": {
                     "name": "Transactions per second",
                     "display": "panel",
-                    "unit": "Transactions/s",
+                    "format": "Transactions/s",
                     "calculate": "average %transactionsPerSecond 1m",
                     "insert": "transactionsPerSecond"
                 },
                 "decodingSpeed3s": {
                     "name": "Decoding speed",
                     "display": "panel",
-                    "unit": "Mp/s",
-                    "calculate": "average %decodingSpeed 3s",
-                    "insert": "decodingSpeed"
+                    "format": "Mp/s",
+                    "calculate": "average %decodedPixels 3s",
+                    "insert": "decodedPixels"
                 },
                 "encodingSpeed3s": {
                     "name": "Encoding speed",
                     "display": "panel",
-                    "unit": "Mp/s",
-                    "calculate": "average %encodingSpeed 3s",
-                    "insert": "encodingSpeed"
+                    "format": "Mp/s",
+                    "calculate": "average %encodedPixels 3s",
+                    "insert": "encodedPixels"
                 },
                 "actionsTriggered1m": {
                     "name": "Event rules triggering/s",
@@ -346,15 +346,15 @@
                     }
                     ]
                 },
-                "actualBitrateKBps": {
+                "actualBitrateBps": {
                     "name": "Bitrate",
                     "display": "panel",
-                    "unit": "KBps",
+                    "format": "KBps",
                     "alarms": [
                         {
                             "level": "error",
-                            "condition": "equal %actualBitrateKBps 0",
-                            "text": "Actual bitrate is 0KBps"
+                            "condition": "equal %actualBitrateBps 0",
+                            "text": "Actual bitrate is 0 KBps"
                         }
                     ]
                 }
@@ -379,15 +379,15 @@
                 "actualFps": {
                     "display": "Actual fps"
                 },
-                "actualBitrateKBps": {
+                "actualBitrateBps": {
                     "name": "Bitrate",
                     "display": "panel",
-                    "unit": "KBps",
+                    "format": "KBps",
                     "alarms": [
                         {
                             "level": "error",
-                            "condition": "equal %actualBitrateKBps 0",
-                            "text": "Actual bitrate is 0KBps"
+                            "condition": "equal %actualBitrateBps 0",
+                            "text": "Actual bitrate is 0 KBps"
                         }
                     ]
                 },
@@ -400,31 +400,25 @@
         },
         "analytics": {
             "values": {
-                "archiveLength": {
+                "archiveLengthS": {
                     "name": "Archive length",
-                    "display": "table|panel"
+                    "display": "table|panel",
+                    "format": "durationS"
                 },
-                "recordingBitrateKBps": {
+                "recordingBitrateBps": {
                     "name": "Recording Bitrate (24h)",
                     "display": "table|panel",
-                    "unit": "KBps"
+                    "format": "KBps"
                 },
-                "minArchiveLength": {
+                "minArchiveLengthS": {
                     "name": "Minimum archive length",
                     "display": "panel",
+                    "format": "durationS",
                     "alarms": [{
                         "level": "error",
-                        "condition": "greaterThan %minArchiveLengthSec %archiveLengthSec",
-                        "text": "Actual archive length '%archiveLength' is less than user defined minumal archive length '%minArchiveLength'"
+                        "condition": "greaterThan %minArchiveLengthS %archiveLengthS",
+                        "text": "Actual archive length %archiveLengthS is less than user defined minumal archive length %minArchiveLengthS"
                     }]
-                },
-                "archiveLengthSec": {
-                    "name": "Archive length",
-                    "display": "table|panel"
-                },
-                "minArchiveLengthSec": {
-                    "name": "Minimum archive length",
-                    "display": "panel"
                 }
             }
         }
@@ -458,43 +452,43 @@
         },
         "activity": {
             "values": {
-                "readRateKBps1m": {
+                "readRateBps1m": {
                     "name": "Read rate",
                     "display": "table|panel",
-                    "unit": "KBps",
-                    "calculate": "average %readRateKBps 1m",
-                    "insert": "readRateKBps"
+                    "format": "KBps",
+                    "calculate": "average %readRateBps 1m",
+                    "insert": "readRateBps"
                 },
-               "writeRateKBps1m": {
+               "writeRateBps1m": {
                     "name": "Write rate",
                     "display": "table|panel",
-                    "unit": "KBps",
-                    "calculate": "average %writeRateKBps 1m",
-                    "insert": "writeRateKBps"
+                    "format": "KBps",
+                    "calculate": "average %writeRateBps 1m",
+                    "insert": "writeRateBps"
                 },
                "transactionsPerSecond": {
                     "name": "Transactions/s",
                     "display": "panel",
-                    "unit": "Transactions/s"
+                    "format": "Transactions/s"
                 }
             }
         },
         "space": {
             "values": {
-                "totalSpaceGB": {
+                "totalSpaceB": {
                     "name": "Total space",
                     "display": "table|panel",
-                    "unit": "GB"
+                    "format": "GB"
                 },
                 "mediaSpaceP": {
                     "name": "VMS Media(%)",
                     "display": "table|panel",
-                    "unit": "%"
+                    "format": "%"
                 },
-                "mediaSpaceGB": {
+                "mediaSpaceB": {
                     "name": "VMS Media",
                     "display": "panel",
-                    "unit": "GB"
+                    "format": "GB"
                 }
             }
         }
@@ -519,12 +513,12 @@
             "values": {
                 "inBps": {
                     "name": "IN rate",
-                    "unit": "bps",
+                    "format": "kbps",
                     "display": "table|panel"
                 },
                 "outBps": {
                     "name": "OUT rate",
-                    "unit": "bps",
+                    "format": "kbps",
                     "display": "table|panel"
                 }
             }

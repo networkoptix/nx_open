@@ -1,5 +1,7 @@
 #include "metrics.h"
 
+#include <cmath>
+
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::api::metrics {
@@ -32,16 +34,92 @@ Label::Label(QString id, QString name):
 {
 }
 
-ValueManifest::ValueManifest(Label label, Displays display, QString unit):
+ValueManifest::ValueManifest(Label label, Displays display, QString format):
     Label(std::move(label)),
     display(display),
-    unit(std::move(unit))
+    format(std::move(format))
 {
 }
 
 ValueGroupManifest::ValueGroupManifest(Label label):
     Label(std::move(label))
 {
+}
+
+static QString durationString(int64_t duration)
+{
+    const auto seconds = duration % 60;
+    duration /= 60;
+
+    const auto minutes = duration % 60;
+    duration /= 60;
+
+    const auto hours = duration % 24;
+    duration /= 24;
+
+    return QString("%1%2:%3:%4")
+        .arg(duration ? QString("%1 day(s) ").arg(duration) : QString())
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'))
+        .arg(seconds, 2, 10, QChar('0'));
+}
+
+template<typename Convert>
+std::function<Value(const Value&)> numericFormatter(const QString& units, Convert convert)
+{
+    return
+        [units, convert = std::move(convert)](Value value)
+        {
+            if (!value.isDouble())
+                return value;
+
+            const auto data = qRound64(convert(value.toDouble()) * 1000);
+            const auto sign = data < 0 ? "-" : "";
+            const auto integral = std::abs(data) / 1000;
+            const auto fraction = std::abs(data) % 1000;
+            if (integral < 1000 && fraction != 0)
+                value = QString("%1%2.%3").arg(sign).arg(integral).arg(fraction, 3, 10, QChar('0'));
+            else
+                value = data / 1000;
+
+            return units.isEmpty() ? value : Value(value.toVariant().toString() + " " + units);
+        };
+}
+
+std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
+{
+    if (targetFormat == "%")
+        return numericFormatter(targetFormat, [](double v) { return v * 100; });
+
+    if (targetFormat == "durationS")
+        return [](Value v) { return Value(durationString((int64_t) v.toDouble())); };
+
+    if (targetFormat == "Kbps" || targetFormat == "Kp/s")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1000); });
+
+    if (targetFormat == "KB"|| targetFormat == "KBps")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1024); });
+
+    if (targetFormat == "Mbps" || targetFormat == "Mp/s")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1000 * 1000); });
+
+    if (targetFormat == "MB" || targetFormat == "MBps")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1024 * 1024); });
+
+    if (targetFormat == "Gbps" || targetFormat == "Gp/s")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1000 * 1000 * 1000); });
+
+    if (targetFormat == "GB" || targetFormat == "GBps")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1024 * 1024 * 1024); });
+
+    if (targetFormat == "Tbps" || targetFormat == "Tp/s")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1000 * 1000 * 1000 * 1000); });
+
+    if (targetFormat == "TB" || targetFormat == "TBps")
+        return numericFormatter(targetFormat, [](double v) { return v / double(1024 * 1024 * 1024 * 1024); });
+
+    // All unknown formats stay unchanged, but rounded.
+    return numericFormatter(targetFormat, [](const double& value) { return value; });
 }
 
 } // namespace nx::vms::api::metrics

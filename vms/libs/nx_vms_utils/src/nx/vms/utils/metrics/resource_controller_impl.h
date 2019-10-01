@@ -63,7 +63,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
                 if (!valueRule.name.isEmpty())
                     existing->name = valueRule.name;
                 existing->display = valueRule.display;
-                existing->unit = valueRule.unit;
+                existing->format = valueRule.format;
                 continue;
             }
 
@@ -72,7 +72,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
                 groupIt->values.begin(), groupIt->values.end(),
                 [r = &valueRule](const auto& m) { return m.id == r->insert; });
             groupIt->values.insert(position, api::metrics::ValueManifest{
-                {valueId, valueRule.name}, valueRule.display, valueRule.unit});
+                {valueId, valueRule.name}, valueRule.display, valueRule.format});
         }
     }
 
