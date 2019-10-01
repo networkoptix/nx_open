@@ -62,7 +62,7 @@ class ConfigParser:
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
                 if name not in self.options.keys():
-                    raise ConfigOptionNotFound(f"Mandatory config option '{name}' is not defined in config {filepath}.")
+                    raise ConfigOptionNotFound(f"Mandatory option '{name}' is not defined in {filepath}.")
 
             for name, _ in option_descriptions.items():
                 try:
@@ -84,7 +84,7 @@ class ConfigParser:
 
             for name, value in self.options.items():
                 if name not in option_descriptions.keys():
-                    raise InvalidConfigOption(f"Unexpected option '{name}' in config {filepath}.")
+                    raise InvalidConfigOption(f"Unexpected option '{name}' in {filepath}.")
 
     def __getitem__(self, item):
         return self.options[item]

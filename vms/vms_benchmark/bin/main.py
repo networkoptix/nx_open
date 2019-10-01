@@ -66,8 +66,8 @@ def to_percentage(share_0_1):
     return round(share_0_1 * 100)
 
 
-def load_configs(config_file, sys_config_file):
-    option_descriptions = {
+def load_configs(conf_file, ini_file):
+    conf_option_descriptions = {
         "boxHostnameOrIp": {
             "type": 'string',
         },
@@ -115,9 +115,9 @@ def load_configs(config_file, sys_config_file):
         },
     }
 
-    config = ConfigParser(config_file, option_descriptions)
+    conf = ConfigParser(conf_file, conf_option_descriptions)
 
-    sys_option_descriptions = {
+    ini_option_descriptions = {
         "testCameraBin": {
             "optional": True,
             "type": 'string',
@@ -175,19 +175,19 @@ def load_configs(config_file, sys_config_file):
         },
     }
 
-    sys_config = ConfigParser(sys_config_file, sys_option_descriptions, is_file_optional=True)
+    ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
-    if sys_config['testCameraBin']:
-        test_camera_runner.binary_file = sys_config['testCameraBin']
-    if sys_config['rtspPerfBin']:
-        stream_reader_runner.binary_file = sys_config['rtspPerfBin']
-    if sys_config['testFileHighResolution']:
-        test_camera_runner.test_file_high_resolution = sys_config['testFileHighResolution']
-    if sys_config['testFileLowResolution']:
-        test_camera_runner.test_file_low_resolution = sys_config['testFileLowResolution']
-    test_camera_runner.debug = sys_config['testCameraDebug']
+    if ini['testCameraBin']:
+        test_camera_runner.binary_file = ini['testCameraBin']
+    if ini['rtspPerfBin']:
+        stream_reader_runner.binary_file = ini['rtspPerfBin']
+    if ini['testFileHighResolution']:
+        test_camera_runner.test_file_high_resolution = ini['testFileHighResolution']
+    if ini['testFileLowResolution']:
+        test_camera_runner.test_file_low_resolution = ini['testFileLowResolution']
+    test_camera_runner.debug = ini['testCameraDebug']
 
-    return config, sys_config
+    return conf, ini
 
 
 def log_exception(context_name, exception):
@@ -226,7 +226,7 @@ def report_server_storage_failures(api, streaming_started_at):
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
-def get_writable_storages(api, sys_config):
+def get_writable_storages(api, ini):
     try:
         storages = api.get_storage_spaces()
     except exceptions.VmsBenchmarkError as e:
@@ -239,7 +239,7 @@ def get_writable_storages(api, sys_config):
         free_space = int(storage['freeSpace'])
         reserved_space = int(storage['reservedSpace'])
 
-        return free_space >= reserved_space + sys_config['minimumStorageFreeBytes']
+        return free_space >= reserved_space + ini['minimumStorageFreeBytes']
 
     try:
         result = [storage for storage in storages if storage_is_writable(storage)]
@@ -250,23 +250,22 @@ def get_writable_storages(api, sys_config):
 
 
 @click.command()
-@click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
-@click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
-@click.option('--sys-config', 'sys_config_file', default='vms_benchmark.ini', help='Input internal system config file.')
-def main(config_file, sys_config_file):
-    # TODO: Rename dictionaries to `conf` and `ini` respectively, and files to `conf_file` and `ini_file`.
-    config, sys_config = load_configs(config_file, sys_config_file)
+@click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
+@click.option('-C', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
+@click.option('--ini-config', 'ini_file', default='vms_benchmark.ini',
+    help='Internal configuration file for experimenting and debugging.')
+def main(conf_file, ini_file):
+    conf, ini = load_configs(conf_file, ini_file)
 
-    if sys_config.ORIGINAL_OPTIONS is not None:
-        print(f"Override default options from INI config '{sys_config_file}':")
-        for k, v in sys_config.ORIGINAL_OPTIONS.items():
+    if ini.ORIGINAL_OPTIONS is not None:
+        print(f"Overriding default options via '{ini_file}':")
+        for k, v in ini.ORIGINAL_OPTIONS.items():
             print(f"    {k}={v}")
 
-    password = config.get('boxPassword', None)
+    password = conf.get('boxPassword', None)
 
     if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled().call()
-
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
                 "ERROR: sshpass is not on PATH" +
@@ -275,10 +274,10 @@ def main(config_file, sys_config_file):
             )
 
     box = BoxConnection(
-        host=config['boxHostnameOrIp'],
-        login=config.get('boxLogin', None),
+        host=conf['boxHostnameOrIp'],
+        login=conf.get('boxLogin', None),
         password=password,
-        port=config['boxSshPort']
+        port=conf['boxSshPort']
     )
 
     res = box_tests.SshHostKeyIsKnown(box).call()
@@ -304,7 +303,7 @@ def main(config_file, sys_config_file):
 
     print(f"Box IP: {box.ip}")
     if box.is_root:
-        print(f"ssh user is root.")
+        print(f"Box ssh user is root.")
 
     linux_distribution = LinuxDistributionDetector.detect(box)
 
@@ -377,7 +376,7 @@ def main(config_file, sys_config_file):
     print('Server restarted successfully.')
     print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
-    api = ServerApi(box.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
+    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
 
     def wait_for_api(timeout=60):
         started_at = time.time()
@@ -405,7 +404,7 @@ def main(config_file, sys_config_file):
     print('REST API authentication test is OK.')
 
     try:
-        storages = get_writable_storages(api, sys_config)
+        storages = get_writable_storages(api, ini)
     except Exception as e:
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
@@ -435,7 +434,7 @@ def main(config_file, sys_config_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in config.get(
+    for test_cameras_count in conf.get(
             'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
 
         ram_available_bytes = box_platform.ram_available_bytes()
@@ -453,8 +452,8 @@ def main(config_file, sys_config_file):
         test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=box.local_ip,
             count=test_cameras_count,
-            primary_fps=sys_config['testStreamFpsHigh'],
-            secondary_fps=sys_config['testStreamFpsLow'],
+            primary_fps=ini['testStreamFpsHigh'],
+            secondary_fps=ini['testStreamFpsLow'],
         )
         with test_camera_context_manager as test_camera_context:
             print(f"    Started {test_cameras_count} virtual cameras.")
@@ -481,7 +480,7 @@ def main(config_file, sys_config_file):
                 return False, None
 
             try:
-                discovering_timeout_mins = config['cameraDiscoveryTimeoutMinutes']
+                discovering_timeout_mins = conf['cameraDiscoveryTimeoutMinutes']
 
                 print(
                     ("    Waiting for virtual cameras discovery and going live " +
@@ -496,7 +495,7 @@ def main(config_file, sys_config_file):
                 time.sleep(test_cameras_count * 2)
 
                 for camera in cameras:
-                    if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):
+                    if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
                         print(f"    Recording on camera {camera.id} enabled.")
                     else:
                         raise exceptions.TestCameraError(
@@ -507,9 +506,9 @@ def main(config_file, sys_config_file):
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=(camera.id for camera in cameras),
-                streams_per_camera=config.get('streamsPerTestCamera', len(cameras)),
-                user=config['vmsUser'],
-                password=config['vmsPassword'],
+                streams_per_camera=conf.get('streamsPerTestCamera', len(cameras)),
+                user=conf['vmsUser'],
+                password=conf['vmsPassword'],
                 box_ip=box.ip,
                 vms_port=vms.port,
             )
@@ -547,7 +546,7 @@ def main(config_file, sys_config_file):
 
                 print("All streams opened.")
 
-                streaming_duration_mins = config['streamingTestDurationMinutes']
+                streaming_duration_mins = conf['streamingTestDurationMinutes']
                 streaming_started_at = time.time()
 
                 last_ptses = {}
@@ -578,19 +577,19 @@ def main(config_file, sys_config_file):
                     else:
                         lags[pts_camera_id] = max(
                             lags.get(pts_camera_id, 0),
-                            time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(sys_config['testFileFps'])))
+                            time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(ini['testFileFps'])))
                         )
 
                     ts = time.time()
 
                     pts_diff_deviation_factor_max = 0.01
-                    pts_diff_expected = 1000.0/float(sys_config['testFileFps'])
+                    pts_diff_expected = 1000.0/float(ini['testFileFps'])
                     pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
-                    pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+                    pts_diff_max = (1000./float(ini['testFileFps']))*1.05
 
                     # The value is negative because the first PTS of new loop is less than last PTS of the previous
                     # loop.
-                    pts_diff_expected_new_loop = -float(sys_config['testFileHighDurationMs'])
+                    pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
 
                     if pts_diff is not None:
                         pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
@@ -659,10 +658,10 @@ def main(config_file, sys_config_file):
                 except exceptions.VmsBenchmarkIssue as e:
                     issues.append(e)
 
-                if cpu_usage_summarized is not None and cpu_usage_summarized > sys_config['cpuUsageThreshold']:
+                if cpu_usage_summarized is not None and cpu_usage_summarized > ini['cpuUsageThreshold']:
                     issues.append(exceptions.CPUUsageThresholdExceededIssue(
                         cpu_usage_summarized,
-                        sys_config['cpuUsageThreshold']
+                        ini['cpuUsageThreshold']
                     ))
 
                 max_allowed_lag_seconds = 5
