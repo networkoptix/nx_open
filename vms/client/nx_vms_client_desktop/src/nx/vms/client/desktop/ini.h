@@ -202,6 +202,8 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(1, limitAnalyticsTimePeriodsLoading,
         "Send analytics time period requests only when these periods are visible.");
+    NX_INI_STRING("", updateFeedUrl,
+        "Overrides URL update server. Leave empty value to use built-in path.");
 };
 
 inline Ini& ini()

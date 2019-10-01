@@ -36,7 +36,7 @@ struct UpdateItem;
  * It also deals with uploading offline update files to the server.
  * Note: this class should survive some time until its internal threads are dead.
  */
-class ServerUpdateTool:
+class NX_VMS_CLIENT_DESKTOP_API ServerUpdateTool:
     public Connective<QObject>,
     public QnConnectionContextAware
 {
@@ -255,6 +255,10 @@ public:
      * This data is extracted from /ec2/updateInformation
      */
     QSet<QnUuid> getServersInstalling() const;
+
+    /** Get current update feed url. */
+    static QString updateFeedUrl();
+    static QString updateGeneratorUrl();
 
     static QString toString(InternalError errorCode);
 

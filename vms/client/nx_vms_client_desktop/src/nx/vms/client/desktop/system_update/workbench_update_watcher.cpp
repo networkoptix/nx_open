@@ -166,7 +166,7 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
         NX_VERBOSE(this, "atStartCheckUpdate() - there is already an active update check");
         return;
     }
-    QString updateUrl = QnAppInfo::updateFeedUrl();
+    QString updateUrl = ServerUpdateTool::updateFeedUrl();
     NX_ASSERT(!updateUrl.isEmpty());
     NX_VERBOSE(this, "atStartCheckUpdate() from %1", updateUrl);
 
