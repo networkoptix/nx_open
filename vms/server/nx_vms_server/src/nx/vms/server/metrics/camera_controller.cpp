@@ -266,7 +266,7 @@ auto makeAnalyticsGroupProvider()
                 {
                     const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
                     if (value.count() > 0)
-                        return Value(value.count());
+                        return Value((qint64) value.count());
                     return Value();
                 }
             ),
@@ -275,7 +275,7 @@ auto makeAnalyticsGroupProvider()
                 [](const auto& r)
                 {
                     if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
-                        return Value(duration_cast<seconds>((hours(days * 24))).count());
+                        return Value((qint64) duration_cast<seconds>((hours(days * 24))).count());
                     return Value();
                 }
             ),
