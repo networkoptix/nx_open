@@ -5,6 +5,7 @@
 #include <client_core/connection_context_aware.h>
 
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/core/access/access_types.h>
 
 /*
 * Proxy model that works with QnResourceListModel (or its proxy) as a source
@@ -40,7 +41,7 @@ public:
     void setAllChecked(bool value);
 
 private:
-    QString getTooltip(const QnResourceList& providers) const;
+    QString getTooltip(const QnResourceList& providers, nx::core::access::Source source) const;
 
     void accessChanged();
 

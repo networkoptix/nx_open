@@ -93,8 +93,9 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                 case Qt::ToolTipRole:
                 {
                     QnResourceList providers;
-                    resourceAccessProvider()->accessibleVia(m_subject, resource, &providers);
-                    return getTooltip(providers);
+                    const auto source =
+                        resourceAccessProvider()->accessibleVia(m_subject, resource, &providers);
+                    return getTooltip(providers, source);
                 }
 
                 default:
@@ -143,10 +144,15 @@ void QnAccessibleResourcesModel::setAllChecked(bool value)
         { Qt::CheckStateRole });
 }
 
-QString QnAccessibleResourcesModel::getTooltip(const QnResourceList& providers) const
+QString QnAccessibleResourcesModel::getTooltip(
+    const QnResourceList& providers,
+    nx::core::access::Source source) const
 {
     if (providers.empty())
         return QString();
+
+    if (source == nx::core::access::Source::childDevice)
+        return tr("Access to server monitor is granted with access to cameras on this server");
 
     static const QString kSpacer = lit("<br>&nbsp;&nbsp;&nbsp;");
 
