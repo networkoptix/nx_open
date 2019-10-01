@@ -22,6 +22,7 @@
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -172,6 +173,10 @@ std::string DeviceAgent::manifestString() const
         {
             "id": ")json" + kBicycleObjectType + R"json(",
             "name": "Bicycle"
+        },
+        {
+            "id": ")json" + kBlinkingObjectType + R"json(",
+            "name": "Blinking Object"
         }
     ]
 }
@@ -190,10 +195,10 @@ Result<const IStringMap*> DeviceAgent::settingsReceived()
 /** @param func Name of the caller for logging; supply __func__. */
 void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
 {
-    if (m_deviceAgentSettings.additionalFrameProcessingDelay.load()
+    if (m_deviceAgentSettings.additionalFrameProcessingDelayMs.load()
         > std::chrono::milliseconds::zero())
     {
-        std::this_thread::sleep_for(m_deviceAgentSettings.additionalFrameProcessingDelay.load());
+        std::this_thread::sleep_for(m_deviceAgentSettings.additionalFrameProcessingDelayMs.load());
     }
 
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
@@ -218,8 +223,8 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
 
     const int64_t frameTimestamp = videoFrame->timestampUs();
     m_lastVideoFrameTimestampUs = frameTimestamp;
-    if (m_frameTimestampQueue.empty() || m_frameTimestampQueue.back() < frameTimestamp)
-        m_frameTimestampQueue.push_back(frameTimestamp);
+    if (m_frameTimestampUsQueue.empty() || m_frameTimestampUsQueue.back() < frameTimestamp)
+        m_frameTimestampUsQueue.push_back(frameTimestamp);
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
@@ -250,19 +255,12 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    const char* logMessage = "";
+    std::string logMessage = "No need to generate metadata packets";
     if (m_deviceAgentSettings.needToGenerateObjects())
     {
-        const std::vector<IMetadataPacket*> result = cookSomeObjects();
-        if (!result.empty())
-        {
-            *metadataPackets = result;
-            logMessage = "Generated 1 metadata packet";
-        }
-        else
-        {
-            logMessage = "Generated 0 metadata packets";
-        }
+        *metadataPackets = cookSomeObjects();
+        logMessage =
+            nx::kit::utils::format("Generated %d metadata packet(s)", metadataPackets->size());
     }
 
     m_lastVideoFrameTimestampUs = 0;
@@ -363,9 +361,9 @@ void DeviceAgent::getPluginSideSettings(
 //-------------------------------------------------------------------------------------------------
 // private
 
-static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
+static Ptr<IObjectMetadata> makeObjectMetadata(const AbstractObject* object)
 {
-    auto objectMetadata = new ObjectMetadata();
+    auto objectMetadata = makePtr<ObjectMetadata>();
     objectMetadata->setTypeId(object->typeId());
     objectMetadata->setTrackId(object->id());
     const auto position = object->position();
@@ -373,17 +371,6 @@ static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
     objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));
     objectMetadata->addAttributes(object->attributes());
     return objectMetadata;
-}
-
-static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
-    const Uuid& objectTrackId,
-    int64_t timestampUs,
-    Rect boundingBox)
-{
-    return new ObjectTrackBestShotPacket(
-        objectTrackId,
-        timestampUs,
-        std::move(boundingBox));
 }
 
 void DeviceAgent::setObjectCount(int objectCount)
@@ -401,7 +388,7 @@ void DeviceAgent::setObjectCount(int objectCount)
 void DeviceAgent::cleanUpTimestampQueue()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
-    m_frameTimestampQueue.clear();
+    m_frameTimestampUsQueue.clear();
     m_lastVideoFrameTimestampUs = 0;
 }
 
@@ -461,32 +448,92 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     return eventMetadataPacket;
 }
 
+Ptr<IObjectMetadata> DeviceAgent::cookBlinkingObjectIfNeeded(int64_t metadataTimestampUs)
+{
+    const int64_t blinkingObjectPeriodUs =
+        m_deviceAgentSettings.blinkingObjectPeriodMs.load().count() * 1000;
+
+    if (blinkingObjectPeriodUs == 0)
+        return nullptr;
+
+    if (m_lastBlinkingObjectTimestampUs != 0 //< Not first time.
+        && metadataTimestampUs - m_lastBlinkingObjectTimestampUs < blinkingObjectPeriodUs)
+    {
+        return nullptr;
+    }
+
+    m_lastBlinkingObjectTimestampUs = metadataTimestampUs;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kBlinkingObjectType);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
+
+    return objectMetadata;
+}
+
+/**
+ * Cooks an object and either packs it into a new metadata packet inserting it into the given list,
+ * or adds it to the existing metadata packet - depending on the settings. This is needed to test
+ * the ability of the Server to receive multiple metadata packets.
+ */
+void DeviceAgent::addBlinkingObjectIfNeeded(
+    int64_t metadataTimestampUs,
+    std::vector<IMetadataPacket*>* metadataPackets,
+    Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    auto blinkingObjectMetadata = cookBlinkingObjectIfNeeded(metadataTimestampUs);
+    if (!blinkingObjectMetadata)
+        return;
+
+    if (m_deviceAgentSettings.blinkingObjectInDedicatedPacket)
+    {
+        if (!NX_KIT_ASSERT(metadataPackets))
+            return;
+
+        auto dedicatedMetadataPacket = makePtr<ObjectMetadataPacket>();
+        dedicatedMetadataPacket->setTimestampUs(metadataTimestampUs);
+        dedicatedMetadataPacket->setDurationUs(0);
+
+        dedicatedMetadataPacket->addItem(blinkingObjectMetadata.releasePtr());
+        metadataPackets->push_back(dedicatedMetadataPacket.releasePtr());
+    }
+    else
+    {
+        objectMetadataPacket->addItem(blinkingObjectMetadata.releasePtr());
+    }
+}
+
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
 
     std::vector<IMetadataPacket*> result;
+
     if (m_lastVideoFrameTimestampUs == 0)
-        return {};
+        return result;
 
-    if (m_frameTimestampQueue.empty())
-        return {};
+    if (m_frameTimestampUsQueue.empty())
+        return result;
 
-    const std::chrono::microseconds delay(
-        m_lastVideoFrameTimestampUs - m_frameTimestampQueue.front());
+    const auto metadataTimestampUs = m_frameTimestampUsQueue.front();
 
-    if (delay < m_deviceAgentSettings.overallMetadataDelay.load())
-        return {};
+    auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+    objectMetadataPacket->setTimestampUs(metadataTimestampUs);
+    objectMetadataPacket->setDurationUs(0);
+
+    addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
+
+    const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
+
+    if (delay < m_deviceAgentSettings.overallMetadataDelayMs.load())
+        return result;
+
+    m_frameTimestampUsQueue.pop_front();
 
     if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
-        return {};
-
-    const auto metadataTimestamp = m_frameTimestampQueue.front();
-    m_frameTimestampQueue.pop_front();
-
-    auto objectMetadataPacket = new ObjectMetadataPacket();
-    objectMetadataPacket->setTimestampUs(metadataTimestamp);
-    objectMetadataPacket->setDurationUs(0);
+        return result;
 
     for (auto& context: m_objectContexts)
     {
@@ -496,7 +543,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
         if (!context)
             continue;
 
-        auto& object = context.object;
+        const auto& object = context.object;
         object->update();
 
         if (!object->inBounds())
@@ -505,9 +552,9 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
         if (!object)
             continue;
 
-        ++(context.frameCounter);
+        ++context.frameCounter;
 
-        bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
+        const bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
             && context.frameCounter > m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration
             && !context.isPreviewGenerated;
 
@@ -515,23 +562,18 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
         {
             const auto position = object->position();
             const auto size = object->size();
-            auto bestShotPacket = makeObjectTrackBestShotPacket(
+            result.push_back(new ObjectTrackBestShotPacket(
                 object->id(),
-                metadataTimestamp,
-                Rect(position.x, position.y, size.width, size.height));
-
-            if (bestShotPacket)
-            {
-                result.push_back(bestShotPacket);
-                context.isPreviewGenerated = true;
-            }
+                metadataTimestampUs,
+                Rect(position.x, position.y, size.width, size.height)));
+            context.isPreviewGenerated = true;
         }
 
-        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
-        objectMetadataPacket->addItem(objectMetadata.get());
+        auto objectMetadata = makeObjectMetadata(object.get());
+        objectMetadataPacket->addItem(objectMetadata.releasePtr());
     }
 
-    result.push_back(objectMetadataPacket);
+    result.push_back(objectMetadataPacket.releasePtr());
     return result;
 }
 
@@ -693,10 +735,17 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generatePedestrians = toBool(settingValue(kGeneratePedestriansSetting));
     m_deviceAgentSettings.generateHumanFaces = toBool(settingValue(kGenerateHumanFacesSetting));
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
+
+    assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
+        &m_deviceAgentSettings.blinkingObjectPeriodMs);
+
+    m_deviceAgentSettings.blinkingObjectInDedicatedPacket =
+        toBool(settingValue(kBlinkingObjectInDedicatedPacketSetting));
+
     m_deviceAgentSettings.generatePreviews = toBool(settingValue(kGeneratePreviewPacketSetting));
     m_deviceAgentSettings.throwPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
-    m_deviceAgentSettings.leakFrames = toBool(settingValue(kLeakFrames));
+    m_deviceAgentSettings.leakFrames = toBool(settingValue(kLeakFramesSetting));
 
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,
@@ -707,12 +756,12 @@ void DeviceAgent::parseSettings()
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
 
     assignIntegerSetting(
-        kAdditionalFrameProcessingDelayMs,
-        &m_deviceAgentSettings.additionalFrameProcessingDelay);
+        kAdditionalFrameProcessingDelayMsSetting,
+        &m_deviceAgentSettings.additionalFrameProcessingDelayMs);
 
     assignIntegerSetting(
         kOverallMetadataDelayMsSetting,
-        &m_deviceAgentSettings.overallMetadataDelay,
+        &m_deviceAgentSettings.overallMetadataDelayMs,
         [this]() { cleanUpTimestampQueue(); });
 
     assignIntegerSetting(

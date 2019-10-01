@@ -76,6 +76,9 @@ const std::string kGeneratePedestriansSetting{"generatePedestrians"};
 const std::string kGenerateHumanFacesSetting{"generateHumanFaces"};
 const std::string kGenerateBicyclesSetting{"generateBicycles"};
 
+const std::string kBlinkingObjectPeriodMsSetting{"blinkingObjectPeriodMs"};
+const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedicatedPacket"};
+
 const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
 const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
 const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
@@ -85,8 +88,8 @@ const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
 
 const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
-const std::string kLeakFrames{"leakFrames"};
-const std::string kAdditionalFrameProcessingDelayMs{"additionalFrameProcessingDelayMs"};
+const std::string kLeakFramesSetting{"leakFrames"};
+const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
 const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
 
 } // namespace stub
