@@ -68,7 +68,7 @@ private:
     nx::media::CameraTraits m_mediaTraits;
     bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
-    QnAbstractPtzController* m_ptzController;
+    QnAbstractPtzController* m_ptzController = nullptr;
 };
 
 class CameraTest: public testing::Test
