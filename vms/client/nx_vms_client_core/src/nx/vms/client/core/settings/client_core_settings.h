@@ -5,7 +5,7 @@
 #include <utils/common/credentials.h>
 
 #include <nx/fusion/model_functions_fwd.h>
-
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
