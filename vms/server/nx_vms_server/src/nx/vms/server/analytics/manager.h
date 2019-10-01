@@ -11,12 +11,15 @@
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
+#include <nx/vms/api/data/analytics_data.h>
+
 #include <nx/vms/server/analytics/device_analytics_context.h>
 #include <nx/vms/server/analytics/proxy_video_data_receptor.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/rule_holder.h>
+#include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/json.h>
@@ -29,7 +32,8 @@ namespace nx::vms::server::analytics {
 
 class Manager final:
     public Connective<QObject>,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
+    public nx::vms::server::metrics::IPluginMetricsProvider
 {
     Q_OBJECT
 
@@ -44,6 +48,8 @@ public:
 
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
+
+    virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
 
     void registerMetadataSink(
         const QnResourcePtr& deviceResource,

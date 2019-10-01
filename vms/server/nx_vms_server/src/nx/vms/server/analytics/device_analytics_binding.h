@@ -48,6 +48,8 @@ public:
     bool restartAnalytics(const QVariantMap& settings);
     bool updateNeededMetadataTypes();
 
+    bool hasAliveDeviceAgent() const;
+
     QVariantMap getSettings() const;
     void setSettings(const QVariantMap& settings);
 

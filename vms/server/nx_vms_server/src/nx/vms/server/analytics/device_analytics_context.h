@@ -47,6 +47,9 @@ public:
     void setSettings(const QString& engineId, const QVariantMap& settings);
     QVariantMap getSettings(const QString& engineId) const;
 
+    // @return map Engine id -> has alive DeviceAgent
+    std::map<QnUuid, bool> bindingStatuses() const;
+
     virtual bool needsCompressedFrames() const override;
     virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
     virtual void putFrame(

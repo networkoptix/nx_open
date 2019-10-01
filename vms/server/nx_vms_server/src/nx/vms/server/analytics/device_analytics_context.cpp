@@ -287,6 +287,16 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
     return jsonEngine.values();
 }
 
+std::map<QnUuid, bool> DeviceAnalyticsContext::bindingStatuses() const
+{
+    QnMutexLocker lock(&m_mutex);
+    std::map<QnUuid, bool> result;
+    for (const auto& [engineId, binding]: m_bindings)
+        result[engineId] = binding->hasAliveDeviceAgent();
+
+    return result;
+}
+
 bool DeviceAnalyticsContext::needsCompressedFrames() const
 {
     return m_cachedNeedCompressedFrames;

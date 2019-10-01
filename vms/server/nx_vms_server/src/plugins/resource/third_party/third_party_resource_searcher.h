@@ -11,6 +11,8 @@
 
 #include <camera/camera_plugin.h>
 
+#include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
+
 #include <plugins/resource/third_party/third_party_resource.h>
 #include <plugins/resource/mdns/mdns_resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
@@ -19,10 +21,10 @@
 /*!
     \note One object is created for all loaded plugin
 */
-class ThirdPartyResourceSearcher
-:
+class ThirdPartyResourceSearcher:
     public QnMdnsResourceSearcher,
-    public QnUpnpResourceSearcherAsync
+    public QnUpnpResourceSearcherAsync,
+    public nx::vms::server::metrics::IPluginMetricsProvider
 {
 public:
     /*!
@@ -46,6 +48,8 @@ public:
 
     static void initStaticInstance(ThirdPartyResourceSearcher* _instance);
     static ThirdPartyResourceSearcher* instance();
+
+    virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
 
 protected:
     /** Implementation of QnUpnpResourceSearcherAsync::processPacket */
@@ -77,7 +81,11 @@ private:
         const nxcip::CameraInfo2& cameraInfo);
 private:
     QnMediaServerModule* m_serverModule = nullptr;
-    std::list<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
+
+    using DiscoveryManagerByPluginName =
+        std::map<QString, std::shared_ptr<nxcip_qt::CameraDiscoveryManager>>;
+
+    DiscoveryManagerByPluginName m_discoveryManagerByPluginName;
 };
 
 #endif // ENABLE_THIRD_PARTY

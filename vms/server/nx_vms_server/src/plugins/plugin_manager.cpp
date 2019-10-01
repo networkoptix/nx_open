@@ -23,7 +23,10 @@
 #include <nx/vms/server/sdk_support/error.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/analytics/wrappers/plugin.h>
+#include <nx/vms/server/discovery/discovery_common.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
+
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <media_server/media_server_module.h>
 
@@ -34,6 +37,7 @@ using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
 using nx::vms::api::PluginInfo;
 using namespace nx::vms::server::analytics;
+using namespace nx::vms::server::metrics;
 
 static QStringList stringToListViaComma(const QString& s)
 {
@@ -71,6 +75,32 @@ nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
     }
 
     return m_cachedPluginInfo;
+}
+
+std::vector<PluginMetrics> PluginManager::metrics() const
+{
+    const auto analyticsManager = serverModule()->analyticsManager();
+    if (!NX_ASSERT(analyticsManager))
+        return {};
+
+    std::vector<PluginMetrics> result = analyticsManager->metrics();
+
+    const auto resourceDiscoveryManager = serverModule()->resourceDiscoveryManager();
+    if (!NX_ASSERT(resourceDiscoveryManager))
+        return result;
+
+    const auto thirdPartyResourceSearcher =
+        dynamic_cast<nx::vms::server::metrics::IPluginMetricsProvider*>(
+            resourceDiscoveryManager->searcherByManufacturer(
+                nx::vms::server::discovery::kThirdPartyManufacturerName));
+
+    if (!thirdPartyResourceSearcher)
+        return result;
+
+    const auto devicePluginsResult = thirdPartyResourceSearcher->metrics();
+    result.insert(result.end(), devicePluginsResult.cbegin(), devicePluginsResult.cend());
+
+    return result;
 }
 
 std::shared_ptr<const PluginInfo> PluginManager::pluginInfo(

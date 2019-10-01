@@ -34,6 +34,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::debugging;
 using nx::vms::server::resource::AnalyticsEngineResource;
+using namespace nx::vms::server::metrics;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -324,6 +325,37 @@ void Manager::at_enginePropertyChanged(
 void Manager::at_engineInitializationStateChanged(const AnalyticsEngineResourcePtr& engine)
 {
     updateCompatibilityWithDevices(engine);
+}
+
+std::vector<PluginMetrics> Manager::metrics() const
+{
+    std::map</*Engine id*/ QnUuid, PluginMetrics> engineMetrics;
+    for (const auto& [deviceId, context]: m_deviceAnalyticsContexts)
+    {
+        const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+        if (!device || !isLocalDevice(device))
+            continue;
+
+        const auto bindingStatuses = context->bindingStatuses();
+        for (const auto& [engineId, hasAliveDeviceAgent]: bindingStatuses)
+        {
+            ++engineMetrics[engineId].numberOfBoundResources;
+            if (hasAliveDeviceAgent)
+                ++engineMetrics[engineId].numberOfAliveBoundResources;
+
+            if (engineMetrics[engineId].name.isEmpty())
+            {
+                if (const auto engineResource = resourcePool()->getResourceById(engineId))
+                    engineMetrics[engineId].name = engineResource->getName();
+            }
+        }
+    }
+
+    std::vector<PluginMetrics> result;
+    for (auto& [engineId, metrics]: engineMetrics)
+        result.push_back(std::move(metrics));
+
+    return result;
 }
 
 void Manager::registerMetadataSink(

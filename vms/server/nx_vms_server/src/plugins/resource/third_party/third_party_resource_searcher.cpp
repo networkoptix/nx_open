@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/server/discovery/discovery_common.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -20,7 +21,8 @@
 #include "plugins/plugin_manager.h"
 #include <media_server/media_server_module.h>
 
-static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+using namespace nx::vms::server::metrics;
+
 static const QString kUpnpBasicDeviceType("Basic");
 
 ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serverModule)
@@ -33,23 +35,58 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serv
 {
     auto pluginManager = serverModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
-    QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
-    std::copy(
-        pluginList.begin(),
-        pluginList.end(),
-        std::back_inserter(m_thirdPartyCamPlugins) );
 
-    //reading and registering camera driver restrictions
-    for( auto
-        it = m_thirdPartyCamPlugins.cbegin();
-        it != m_thirdPartyCamPlugins.cend();
-        ++it )
+    const auto interfaceList = pluginManager->findNxPlugins<nxpl::PluginInterface>(
+        nxpl::IID_PluginInterface);
+
+    for (auto& pluginInterface: interfaceList)
     {
-        const QList<QString>& modelList = it->getReservedModelList();
+        nx::sdk::Ptr<nxpl::PluginInterface> interfacePtr = nx::sdk::toPtr(pluginInterface);
+        auto discoveryManagerPtr =
+            nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager>(
+                interfacePtr,
+                nxcip::IID_CameraDiscoveryManager);
+
+        if (!discoveryManagerPtr)
+            continue;
+
+        auto discoveryManagerWrapper =
+            std::make_shared<nxcip_qt::CameraDiscoveryManager>(discoveryManagerPtr.releasePtr());
+
+        nx::sdk::Ptr<nxpl::Plugin> pluginPtr =
+            nx::sdk::queryInterfaceOfOldSdk<nxpl::Plugin>(interfacePtr, nxpl::IID_Plugin);
+
+        QString pluginName;
+        if (pluginPtr)
+            pluginName = pluginPtr->name();
+
+        if (pluginName.isEmpty())
+            pluginName = discoveryManagerWrapper->getVendorName();
+
+        if (pluginName.isEmpty())
+            pluginName = "<Unknown Plugin>";
+
+        if (m_discoveryManagerByPluginName.find(pluginName)
+            != m_discoveryManagerByPluginName.cend())
+        {
+            NX_WARNING(this, "Plugins with equal names (%1) are found", pluginName);
+            pluginName += "_" + QnUuid::createUuid().toString();
+        }
+
+        m_discoveryManagerByPluginName[pluginName] = discoveryManagerWrapper;
+    }
+
+    // Reading and registering device driver restrictions
+    for(const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
+    {
+        const QList<QString>& modelList = discoveryManager->getReservedModelList();
         for(const QString& modelMask: modelList)
         {
             m_serverModule->commonModule()->cameraDriverRestrictionList()
-                ->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask);
+                ->allow(
+                    nx::vms::server::discovery::kThirdPartyManufacturerName,
+                    discoveryManager->getVendorName(),
+                    modelMask);
         }
     }
 }
@@ -80,11 +117,11 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource(
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
     // Vendor is required to find plugin to use.
     // Choosing correct plugin.
-    for (auto it = m_thirdPartyCamPlugins.begin(); it != m_thirdPartyCamPlugins.end(); ++it)
+    for (auto& [pluginName, manager]: m_discoveryManagerByPluginName)
     {
-        if (params.vendor.startsWith(it->getVendorName()))
+        if (params.vendor.startsWith(manager->getVendorName()))
         {
-            discoveryManager = &*it;
+            discoveryManager = manager.get();
             break;
         }
     }
@@ -114,17 +151,14 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource(
 
 QString ThirdPartyResourceSearcher::manufacturer() const
 {
-    return THIRD_PARTY_MANUFACTURER_NAME;
+    return nx::vms::server::discovery::kThirdPartyManufacturerName;
 }
 
 QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     QVector<nxcip::CameraInfo2> cameraInfoTempArray;
 
-    for( auto
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
-        ++it )
+    for(const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
     {
         QString addressStr = url.scheme();
         if( url.scheme().isEmpty() )
@@ -140,7 +174,7 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils:
         }
         const QString& userName = auth.user();
         const QString& password = auth.password();
-        int result = it->checkHostAddress(
+        int result = discoveryManager->checkHostAddress(
             &cameraInfoTempArray,
             addressStr,
             &userName,
@@ -148,7 +182,7 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils:
         if( result == nxcip::NX_NOT_AUTHORIZED )
         {
             //trying one again with no login/password (so that plugin can use default ones)
-            result = it->checkHostAddress(
+            result = discoveryManager->checkHostAddress(
                 &cameraInfoTempArray,
                 addressStr,
                 NULL,
@@ -156,9 +190,39 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils:
         }
         if( result <= 0 )
             continue;
-        return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
+        return createResListFromCameraInfoList(discoveryManager.get(), cameraInfoTempArray);
     }
     return QList<QnResourcePtr>();
+}
+
+std::vector<PluginMetrics> ThirdPartyResourceSearcher::metrics() const
+{
+    std::map</*plugin name*/ QString, PluginMetrics> pluginMetrics;
+    const auto thirdPartyResources = resourcePool()->getAllCameras(
+        resourcePool()->getOwnMediaServer()).filtered<QnThirdPartyResource>();
+
+    for (const auto& thirdPartyResource: thirdPartyResources)
+    {
+        for (const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
+        {
+            if (thirdPartyResource->getVendor().startsWith(discoveryManager->getVendorName()))
+            {
+                pluginMetrics[pluginName].name = pluginName;
+                ++pluginMetrics[pluginName].numberOfBoundResources;
+                const Qn::ResourceStatus status = thirdPartyResource->getStatus();
+                if (status == Qn::Online || status == Qn::Recording)
+                    ++pluginMetrics[pluginName].numberOfAliveBoundResources;
+
+                break;
+            }
+        }
+    }
+
+    std::vector<PluginMetrics> result;
+    for (auto& [pluginName, pluginMetrics]: pluginMetrics)
+        result.push_back(std::move(pluginMetrics));
+
+    return result;
 }
 
 static ThirdPartyResourceSearcher* globalInstance = NULL;
@@ -181,18 +245,19 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 {
     QList<QnNetworkResourcePtr> localResults;
 
-    for( auto
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
-        ++it )
+    for (const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
     {
         nxcip::CameraInfo cameraInfo;
-        if( !it->fromMDNSData( responseData, foundHostAddress, &cameraInfo ) )
+        if (!discoveryManager->fromMDNSData(responseData, foundHostAddress, &cameraInfo))
             continue;
 
-        QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );
-        if( res )
-            localResults.push_back( res );
+        QnNetworkResourcePtr res = createResourceFromCameraInfo(
+            discoveryManager.get(),
+            cameraInfo);
+
+        if (res)
+            localResults.push_back(res);
+
         break;
     }
 
@@ -208,18 +273,19 @@ void ThirdPartyResourceSearcher::processPacket(
 {
     QList<QnNetworkResourcePtr> localResults;
 
-    for( auto
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
-        ++it )
+    for(const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
     {
         nxcip::CameraInfo cameraInfo;
-        if( !it->fromUpnpData( xmlDevInfo, &cameraInfo ) )
+        if (!discoveryManager->fromUpnpData(xmlDevInfo, &cameraInfo))
             continue;
 
-        QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );
-        if( res )
-            result.push_back( res );
+        QnNetworkResourcePtr res = createResourceFromCameraInfo(
+            discoveryManager.get(),
+            cameraInfo);
+
+        if (res)
+            result.push_back(res);
+
         return;
     }
 }
@@ -244,18 +310,16 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 
     QVector<nxcip::CameraInfo2> cameraInfoTempArray;
 
-    for( auto
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
-        ++it )
+    for(const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
     {
-        int result = it->findCameras(&cameraInfoTempArray, dafaultURL);
+        int result = discoveryManager->findCameras(&cameraInfoTempArray, dafaultURL);
         NX_VERBOSE(this, "Find cameras for custom plugin [%1] (URL: %2) returned [%3]",
-            it->getVendorName(), dafaultURL, result);
-        if( result <= 0 )
+            discoveryManager->getVendorName(), dafaultURL, result);
+
+        if (result <= 0)
             continue;
 
-        return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
+        return createResListFromCameraInfoList(discoveryManager.get(), cameraInfoTempArray);
     }
 
     NX_VERBOSE(this, "Custom search did not find any cameras");
