@@ -16,10 +16,6 @@ static uint qHash(const QColor& color)
     return color.rgb();
 }
 
-template<>
-nx::vms::client::desktop::ColorTheme* Singleton<nx::vms::client::desktop::ColorTheme>::s_instance =
-    nullptr;
-
 namespace nx::vms::client::desktop {
 
 static const auto kBaseSkinFileName = "customization_common.json";
