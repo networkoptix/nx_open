@@ -215,7 +215,8 @@ QnResourceTreeModel::QnResourceTreeModel(
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::server) && !accessController()->hasGlobalPermission(GlobalPermission::admin))
+            const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+            if (resource->hasFlags(Qn::server) && !isAdmin)
                 updateSystemHasManyServers();
         });
 
