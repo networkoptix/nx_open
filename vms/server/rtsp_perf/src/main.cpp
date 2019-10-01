@@ -71,6 +71,9 @@ int main(int argc, char** argv)
     QCommandLineOption logLevelOption(QStringList() << "log-level",
         "Log level(NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE)", "level", "");
     parser.addOption(logLevelOption);
+    QCommandLineOption disableRestart(QStringList() << "disable-restart",
+        "Start every RTSP session only once.");
+    parser.addOption(disableRestart);
     parser.process(app);
 
 
@@ -85,6 +88,7 @@ int main(int argc, char** argv)
     config.useSsl = parser.isSet(sslOption);
     config.printTimestamps = parser.isSet(timestampsOption);
     config.urls = parser.values(urlOption);
+    config.disableRestart = parser.isSet(disableRestart);
 
     if (parser.isSet(logLevelOption))
     {

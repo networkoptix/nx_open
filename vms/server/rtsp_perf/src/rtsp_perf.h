@@ -24,10 +24,11 @@ public:
         std::chrono::milliseconds timeout{5000};
         std::chrono::milliseconds startInterval{0};
         bool printTimestamps = false;
+        bool disableRestart = false;
     };
 
 public:
-    RtspPerf(const Config& config): m_sessions(config.count), m_config(config) {}
+    RtspPerf(const Config& config);
     void run();
 
 private:
@@ -38,6 +39,7 @@ private:
     {
         void run(const QString& url, const Config& config, bool live);
         std::atomic<uint64_t> totalBytesRead = 0;
+        std::atomic<uint64_t> failedCount = 0;
         std::atomic<bool> failed = true;
         std::thread worker;
     private:
@@ -52,7 +54,6 @@ private:
 
 private:
     std::vector<Session> m_sessions;
-    std::atomic<int64_t> m_totalFailed = 0;
     std::chrono::milliseconds m_currentStartInterval;
     Config m_config;
 };

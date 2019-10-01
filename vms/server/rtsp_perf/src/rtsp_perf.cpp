@@ -36,6 +36,12 @@ private:
     int64_t m_prevBytesRead = 0;
 };
 
+RtspPerf::RtspPerf(const Config& config):
+    m_sessions(config.count),
+    m_config(config)
+{
+}
+
 bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
 {
     std::vector<QString> result;
@@ -86,24 +92,26 @@ void RtspPerf::startSessionsThread(const std::vector<QString>& urls)
     {
         for (int i = 0; i < (int)m_sessions.size(); ++i)
         {
-            if (m_sessions[i].failed)
+            if (!m_sessions[i].failed)
+                continue;
+
+            bool live = i < m_config.count * m_config.livePercent / 100;
+            QString url = urls[i % urls.size()];
+            m_sessions[i].failed = false;
+            if (m_sessions[i].worker.joinable())
+                m_sessions[i].worker.join();
+            m_sessions[i].worker = std::thread([url, live, this, i]()
             {
-                bool live = i < m_config.count * m_config.livePercent / 100;
-                QString url = urls[i % urls.size()];
-                m_sessions[i].failed = false;
-                if (m_sessions[i].worker.joinable())
-                    m_sessions[i].worker.join();
-                m_sessions[i].worker = std::thread([url, live, this, i]() {
-                    m_sessions[i].run(url, m_config, live);
-                });
-                ++m_totalFailed;
+                m_sessions[i].run(url, m_config, live);
+            });
 
-                if (m_totalFailed > 0 && m_config.startInterval == std::chrono::milliseconds::zero())
-                    m_currentStartInterval = std::min(m_currentStartInterval * 2, kMaxStartInterval);
+            if (m_sessions[i].failedCount > 0 && m_config.startInterval == std::chrono::milliseconds::zero())
+                m_currentStartInterval = std::min(m_currentStartInterval * 2, kMaxStartInterval);
 
-                std::this_thread::sleep_for(m_currentStartInterval);
-            }
+            std::this_thread::sleep_for(m_currentStartInterval);
         }
+        if (m_config.disableRestart)
+            return;
         std::this_thread::sleep_for(m_currentStartInterval);
     }
 }
@@ -126,7 +134,6 @@ void RtspPerf::run()
             urls.push_back(url);
     }
 
-    m_totalFailed = -m_config.count;
     m_currentStartInterval = m_config.startInterval != std::chrono::milliseconds::zero() ?
         m_config.startInterval : kMinStartInterval;
     BitrateCounter bitrateCounter;
@@ -136,15 +143,17 @@ void RtspPerf::run()
         std::this_thread::sleep_for(kStatisticPrintInterval);
         int64_t totalBytesRead = 0;
         int64_t successSessions = 0;
+        int64_t failedSessions = 0;
         for (const auto& session: m_sessions)
         {
             totalBytesRead += session.totalBytesRead;
             if (!session.failed)
                 ++successSessions;
+            failedSessions += session.failedCount;
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
         NX_INFO(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
-            QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
+            QString::number(bitrate, 'f', 3), successSessions, failedSessions, totalBytesRead);
     }
 }
 
@@ -163,11 +172,6 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
 
-    const QString cameraId = url.endsWith('/') ?
-        url.mid(url.left(url.size() - 1).lastIndexOf('/') + 1) : url.mid(url.lastIndexOf('/') + 1);
-    if (cameraId.isEmpty())
-        NX_ERROR(this, "Failed to parse camera id from url: %1", url);
-
     QAuthenticator auth;
     auth.setUser(config.user);
     auth.setPassword(config.password);
@@ -182,6 +186,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     {
         NX_ERROR(this, "Failed to open rtsp stream: %1", result.toString(nullptr));
         failed = true;
+        ++failedCount;
         return;
     }
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
@@ -198,7 +203,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
                 parsePacketTimestamp(
                     (uint8_t*)dataArrays[rtpChannelNum]->data() + kInterleavedRtpOverTcpPrefixLength,
                     dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength,
-                    cameraId,
+                    url,
                     config.timeout);
             }
             dataArrays[rtpChannelNum]->clear();
@@ -207,6 +212,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
         {
             NX_ERROR(this, "Failed to read data");
             failed = true;
+            ++failedCount;
             break;
         }
         totalBytesRead += bytesRead;
