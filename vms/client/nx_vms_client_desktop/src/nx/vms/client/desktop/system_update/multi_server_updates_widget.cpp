@@ -1500,7 +1500,7 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
     if (!item->offline)
     {
         // TODO: this triggers too often, when server goes offline, online, added or removed.
-        // We need to get this events here.
+        // We need to get these events here.
         NX_VERBOSE(this,
            "peer %1 has changed online status. We should repeat validation.", item->id);
         repeatUpdateValidation();
@@ -2036,7 +2036,7 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
     {
         // Should check all downloading servers and resume uploads if there are not any.
         auto serversDownloading = m_stateTracker->peersInState(StatusCode::downloading,
-            /*withClient=*/false);
+            /*withClient*/false);
         for (const auto id: serversDownloading)
         {
             bool hasUploads = m_serverUpdateTool->hasActiveUploadsTo(id);

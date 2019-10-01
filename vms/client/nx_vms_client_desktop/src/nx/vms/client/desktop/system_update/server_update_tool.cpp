@@ -646,13 +646,11 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
 
 bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
 {
-    QStringList idsToRemove;
-    for (const auto& record: m_uploadStateById)
-    {
-        if (record.second.uuid == id)
-            return true;
-    }
-    return false;
+    return std::any_of(m_uploadStateById.begin(), m_uploadStateById.end(),
+        [id](const std::pair<QString, nx::vms::client::desktop::UploadState>& pair)
+        {
+            return pair.second.uuid == id;
+        });
 }
 
 bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting)
