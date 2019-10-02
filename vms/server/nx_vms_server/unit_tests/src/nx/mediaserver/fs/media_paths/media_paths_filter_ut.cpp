@@ -28,17 +28,17 @@ protected:
 
     void givenWindowsPartitons()
     {
-        appendPartition("C:\\", QnPlatformMonitor::LocalDiskPartition);
-        appendPartition("D:\\", QnPlatformMonitor::LocalDiskPartition);
-        appendPartition("E:\\", QnPlatformMonitor::RemovableDiskPartition);
-        appendPartition(R"(\\external)", QnPlatformMonitor::NetworkPartition);
+        appendPartition("C:\\", nx::vms::server::PlatformMonitor::LocalDiskPartition);
+        appendPartition("D:\\", nx::vms::server::PlatformMonitor::LocalDiskPartition);
+        appendPartition("E:\\", nx::vms::server::PlatformMonitor::RemovableDiskPartition);
+        appendPartition(R"(\\external)", nx::vms::server::PlatformMonitor::NetworkPartition);
     }
 
     void givenLinuxPartitions()
     {
-        appendPartition("/", QnPlatformMonitor::LocalDiskPartition);
-        appendPartition("/mnt/external", QnPlatformMonitor::NetworkPartition);
-        appendPartition("/mnt/flash", QnPlatformMonitor::RemovableDiskPartition);
+        appendPartition("/", nx::vms::server::PlatformMonitor::LocalDiskPartition);
+        appendPartition("/mnt/external", nx::vms::server::PlatformMonitor::NetworkPartition);
+        appendPartition("/mnt/flash", nx::vms::server::PlatformMonitor::RemovableDiskPartition);
     }
 
     void whenNonHdd(bool allowed)
@@ -175,9 +175,9 @@ private:
     bool m_isMultipleInstances = false;
     bool m_isWindows = false;
 
-    void appendPartition(const QString& path, QnPlatformMonitor::PartitionType type)
+    void appendPartition(const QString& path, nx::vms::server::PlatformMonitor::PartitionType type)
     {
-        QnPlatformMonitor::PartitionSpace partition;
+        nx::vms::server::PlatformMonitor::PartitionSpace partition;
         partition.path = path;
         partition.type = type;
         m_filterConfig.partitions.append(partition);

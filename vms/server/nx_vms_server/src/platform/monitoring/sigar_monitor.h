@@ -7,16 +7,16 @@
 
 class QnSigarMonitorPrivate;
 
-class QnSigarMonitor: public QnPlatformMonitor {
+class QnSigarMonitor: public nx::vms::server::PlatformMonitor {
     Q_OBJECT
 public:
     QnSigarMonitor(QObject *parent = NULL);
     virtual ~QnSigarMonitor();
 
     virtual qreal totalCpuUsage() override;
-    virtual quint64 totalRamUsage() override;
+    virtual quint64 totalRamUsageBytes() override;
     virtual qreal thisProcessCpuUsage() override;
-    virtual quint64 thisProcessRamUsage() override;
+    virtual quint64 thisProcessRamUsageBytes() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;

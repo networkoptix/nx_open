@@ -131,13 +131,13 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
     const auto getRamUsageP =
         [platform](const auto&)
         {
-            return Value(ramUsageToPercentages(platform->totalRamUsage()));
+            return Value(ramUsageToPercentages(platform->totalRamUsageBytes()));
         };
 
     const auto getServerRamUsageP =
         [platform](const auto&)
         {
-            return Value(ramUsageToPercentages(platform->thisProcessRamUsage()));
+            return Value(ramUsageToPercentages(platform->thisProcessRamUsageBytes()));
         };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
@@ -211,14 +211,14 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "ramUsageB",
-                [platform](const auto&) { return Value(qint64(platform->totalRamUsage())); }
+                [platform](const auto&) { return Value(qint64(platform->totalRamUsageBytes())); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "ramUsageP", getRamUsageP
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "serverRamUsage",
-                [platform](const auto&) { return Value(qint64(platform->thisProcessRamUsage())); }
+                [platform](const auto&) { return Value(qint64(platform->thisProcessRamUsageBytes())); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "serverRamUsageP", getServerRamUsageP

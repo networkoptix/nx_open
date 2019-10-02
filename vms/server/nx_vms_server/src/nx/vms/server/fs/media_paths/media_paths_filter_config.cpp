@@ -23,10 +23,10 @@ FilterConfig FilterConfig::createDefault(
         : static_cast<bool>(settings->allowRemovableStorages());
     result.isNetworkDrivesAllowed = includeNonHdd;
 
-    result.partitions = ((QnPlatformMonitor *)platform->monitor())->totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition
-        | QnPlatformMonitor::NetworkPartition
-        | QnPlatformMonitor::RemovableDiskPartition);
+    result.partitions = ((nx::vms::server::PlatformMonitor *)platform->monitor())->totalPartitionSpaceInfo(
+        nx::vms::server::PlatformMonitor::LocalDiskPartition
+        | nx::vms::server::PlatformMonitor::NetworkPartition
+        | nx::vms::server::PlatformMonitor::RemovableDiskPartition);
 
     result.dataDirectory = settings->dataDir();
     result.mediaFolderName = QnAppInfo::mediaFolderName();

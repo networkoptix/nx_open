@@ -17,7 +17,7 @@ struct FilterConfig
     FilterConfig& operator=(FilterConfig&&) = default;
     FilterConfig() = default;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions;
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace> partitions;
     bool isMultipleInstancesAllowed = false;
     bool isNetworkDrivesAllowed = false;
     bool isRemovableDrivesAllowed = false;

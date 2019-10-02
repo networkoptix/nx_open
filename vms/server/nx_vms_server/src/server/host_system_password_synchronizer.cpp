@@ -44,9 +44,9 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
     if (QnAppInfo::isNx1())
     {
         //#5785 changing root password on nx1 only if DB is located on HDD
-        QList<QnPlatformMonitor::PartitionSpace> partitions =
-            serverModule()->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-                QnPlatformMonitor::LocalDiskPartition);
+        QList<nx::vms::server::PlatformMonitor::PartitionSpace> partitions =
+            serverModule()->platform()->monitor()->nx::vms::server::PlatformMonitor::totalPartitionSpaceInfo(
+                nx::vms::server::PlatformMonitor::LocalDiskPartition);
 
         for (int i = 0; i < partitions.size(); ++i)
         {

@@ -47,18 +47,18 @@ int QnStatisticsRestHandler::executeGet(
 
     QnStatisticsDataList memory;
     memory.append(QnStatisticsDataItem("RAM",
-        nx::vms::server::ramUsageToPercentages(monitor->totalRamUsage()),
+        nx::vms::server::ramUsageToPercentages(monitor->totalRamUsageBytes()),
         Qn::StatisticsRAM));
     reply.statistics << memory;
 
     QnStatisticsDataList storages;
-    for(const QnPlatformMonitor::HddLoad &hddLoad: monitor->totalHddLoad()) {
+    for(const nx::vms::server::PlatformMonitor::HddLoad &hddLoad: monitor->totalHddLoad()) {
         storages.append(QnStatisticsDataItem(hddLoad.hdd.partitions, hddLoad.load, Qn::StatisticsHDD));
     }
     reply.statistics << storages;
 
     QnStatisticsDataList network;
-    for(const QnPlatformMonitor::NetworkLoad &networkLoad: monitor->totalNetworkLoad())
+    for(const nx::vms::server::PlatformMonitor::NetworkLoad &networkLoad: monitor->totalNetworkLoad())
     {
         qint64 bytesIn = networkLoad.bytesPerSecIn;
         qint64 bytesOut = networkLoad.bytesPerSecOut;

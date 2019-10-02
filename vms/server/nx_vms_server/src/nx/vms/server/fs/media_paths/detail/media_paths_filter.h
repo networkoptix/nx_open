@@ -16,7 +16,7 @@ public:
 private:
     FilterConfig m_filterConfig;
 
-    QList<QnPlatformMonitor::PartitionSpace> filteredPartitions() const;
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace> filteredPartitions() const;
     void appendServerGuidPostFix(QStringList* paths) const;
     QString amendPath(const QString& path) const;
 };

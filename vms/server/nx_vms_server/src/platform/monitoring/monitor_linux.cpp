@@ -40,6 +40,8 @@ static const int MS_PER_SEC = 1000;
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 static const size_t MAX_LINE_LENGTH = 512;
 
+using PlatformMonitor = nx::vms::server::PlatformMonitor;
+
 // -------------------------------------------------------------------------- //
 // QnLinuxMonitorPrivate
 // -------------------------------------------------------------------------- //
@@ -89,8 +91,8 @@ public:
         }
     };
 
-    typedef QnPlatformMonitor::Hdd Hdd;
-    typedef QnPlatformMonitor::HddLoad HddLoad;
+    typedef PlatformMonitor::Hdd Hdd;
+    typedef PlatformMonitor::HddLoad HddLoad;
 
     //!Timeout (in seconds) during which partition list expires (needed to detect mounts/umounts)
     static const time_t PARTITION_LIST_EXPIRE_TIMEOUT_SEC = 60;
@@ -182,11 +184,11 @@ public:
         return result;
     }
 
-    QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad()
+    QList<PlatformMonitor::NetworkLoad> totalNetworkLoad()
     {
         calcNetworkStat();
 
-        QList<QnPlatformMonitor::NetworkLoad> netStat;
+        QList<PlatformMonitor::NetworkLoad> netStat;
         for( std::map<QString, InterfaceStatisticsContext>::const_iterator
             it = m_ifNameToStatistics.begin();
             it != m_ifNameToStatistics.end();
@@ -302,18 +304,18 @@ protected:
                     switch( sysType )
                     {
                         case ARPHRD_LOOPBACK:
-                            ctx.type = QnPlatformMonitor::LoopbackInterface;
+                            ctx.type = PlatformMonitor::LoopbackInterface;
                             break;
 
                         case ARPHRD_TUNNEL:
                         case ARPHRD_TUNNEL6:
                         case ARPHRD_IPDDP:
                         case ARPHRD_IPGRE:
-                            ctx.type = QnPlatformMonitor::VirtualInterface;
+                            ctx.type = PlatformMonitor::VirtualInterface;
                             break;
 
                         default:
-                            ctx.type = QnPlatformMonitor::PhysicalInterface;
+                            ctx.type = PlatformMonitor::PhysicalInterface;
                     }
                 }
 
@@ -345,7 +347,7 @@ protected:
 private:
     class InterfaceStatisticsContext
     :
-        public QnPlatformMonitor::NetworkLoad
+        public PlatformMonitor::NetworkLoad
     {
     public:
         uint64_t bytesReceived;
@@ -438,7 +440,7 @@ qreal QnLinuxMonitor::totalCpuUsage()
     return 1.0 - cpuTimeIdleDiff / (qreal)cpuTimeTotalDiff;
 }
 
-quint64 QnLinuxMonitor::totalRamUsage()
+quint64 QnLinuxMonitor::totalRamUsageBytes()
 {
     std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/meminfo", "r"), fclose );
     if(!file)
@@ -483,7 +485,7 @@ quint64 QnLinuxMonitor::totalRamUsage()
     return (memTotalKB.get() - memFreeKB.get() - memCachedKB.get()) * 1024;
 }
 
-quint64 QnLinuxMonitor::thisProcessRamUsage()
+quint64 QnLinuxMonitor::thisProcessRamUsageBytes()
 {
     const char* kStatmFilename = "/proc/self/statm";
     std::ifstream statm(kStatmFilename);
@@ -500,97 +502,97 @@ quint64 QnLinuxMonitor::thisProcessRamUsage()
     return rss_in_pages * sysconf(_SC_PAGE_SIZE);
 }
 
-QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()
+QList<PlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()
 {
     return d_ptr->totalHddLoad();
 }
 
-QList<QnPlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
+QList<PlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
 {
     return d_ptr->totalNetworkLoad();
 }
 
-static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
+static PlatformMonitor::PartitionType fsNameToType( const QString& fsName )
 {
     if( fsName == "sysfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "rootfs" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "ramfs" )
-        return QnPlatformMonitor::RamDiskPartition;
+        return PlatformMonitor::RamDiskPartition;
     else if( fsName == "bdev" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "proc" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "cgroup" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "cpuset" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "tmpfs" )
-        return QnPlatformMonitor::RamDiskPartition;
+        return PlatformMonitor::RamDiskPartition;
     else if( fsName == "devtmpfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "debugfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "securityfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "sockfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "pipefs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "anon_inodefs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "devpts" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "ext3" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "ext2" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "ext4" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "exfat" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "hugetlbfs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "vfat" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "ecryptfs" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "fuseblk" )  //NTFS
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "fuse" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "fusectl" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "xfs" )
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else if( fsName == "pstore" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "mqueue" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "rpc_pipefs" )
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
     else if( fsName == "nfs" )
-        return QnPlatformMonitor::NetworkPartition;
+        return PlatformMonitor::NetworkPartition;
     else if( fsName == "nfs4" )
-        return QnPlatformMonitor::NetworkPartition;
+        return PlatformMonitor::NetworkPartition;
     else if( fsName == "nfsd" )
-        return QnPlatformMonitor::NetworkPartition;
+        return PlatformMonitor::NetworkPartition;
     else if( fsName == "cifs" )
-        return QnPlatformMonitor::NetworkPartition;
+        return PlatformMonitor::NetworkPartition;
     else if( fsName == "fuse.osxfs" ) // Mounted volumes when Docker host is macOS.
-        return QnPlatformMonitor::LocalDiskPartition;
+        return PlatformMonitor::LocalDiskPartition;
     else
-        return QnPlatformMonitor::UnknownPartition;
+        return PlatformMonitor::UnknownPartition;
 }
 
 /*!
     \note If same device mounted to multiple points, returns mount point with shortest name
 */
-QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
+QList<PlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
     std::list<nx::vms::server::fs::PartitionInfo> partitions;
-    QList<QnPlatformMonitor::PartitionSpace> result;
+    QList<PlatformMonitor::PartitionSpace> result;
 
     const auto errCode = nx::vms::server::fs::readPartitionsInformation(
         d_ptr->partitionsInfoProvider.get(),
@@ -603,11 +605,11 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 
     for (const auto& data: partitions)
     {
-        QnPlatformMonitor::PartitionSpace partitionInfo;
+        PlatformMonitor::PartitionSpace partitionInfo;
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
         partitionInfo.type = data.isUsb
-            ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
+            ? PlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);

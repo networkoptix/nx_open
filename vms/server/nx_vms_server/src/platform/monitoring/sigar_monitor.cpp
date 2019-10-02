@@ -17,6 +17,7 @@ extern "C"
 #include <sigar/sigar_format.h>
 }
 
+using PlatformMonitor = nx::vms::server::PlatformMonitor;
 
 namespace {
     /**
@@ -87,7 +88,7 @@ public:
         return status;
     }
 
-    qreal hddLoad(const QnPlatformMonitor::Hdd &hdd) {
+    qreal hddLoad(const PlatformMonitor::Hdd &hdd) {
         if(!sigar)
             return 0.0;
 
@@ -110,27 +111,27 @@ public:
         return result;
     }
 
-    QnPlatformMonitor::PartitionType partitionType(sigar_file_system_type_e type) {
+    PlatformMonitor::PartitionType partitionType(sigar_file_system_type_e type) {
         switch(type) {
         case SIGAR_FSTYPE_LOCAL_DISK:
-            return QnPlatformMonitor::LocalDiskPartition;
+            return PlatformMonitor::LocalDiskPartition;
         case SIGAR_FSTYPE_NETWORK:
-            return QnPlatformMonitor::NetworkPartition;
+            return PlatformMonitor::NetworkPartition;
         case SIGAR_FSTYPE_RAM_DISK:
-            return QnPlatformMonitor::RamDiskPartition;
+            return PlatformMonitor::RamDiskPartition;
         case SIGAR_FSTYPE_CDROM:
-            return QnPlatformMonitor::OpticalDiskPartition;
+            return PlatformMonitor::OpticalDiskPartition;
         case SIGAR_FSTYPE_SWAP:
-            return QnPlatformMonitor::SwapPartition;
+            return PlatformMonitor::SwapPartition;
         case SIGAR_FSTYPE_UNKNOWN:
         case SIGAR_FSTYPE_NONE:
         default:
-            return QnPlatformMonitor::UnknownPartition;
+            return PlatformMonitor::UnknownPartition;
         }
     }
 
-    QnPlatformMonitor::PartitionSpace partitionUsage(const sigar_file_system_t &fileSystem) {
-        QnPlatformMonitor::PartitionSpace result;
+    PlatformMonitor::PartitionSpace partitionUsage(const sigar_file_system_t &fileSystem) {
+        PlatformMonitor::PartitionSpace result;
 
         if(!sigar)
             return result;
@@ -145,7 +146,7 @@ public:
         if( strcmp( fileSystem.sys_type_name, "fuseblk" ) == 0 ||
             strcmp( fileSystem.sys_type_name, "exfat" ) == 0 )
         {
-            result.type = QnPlatformMonitor::LocalDiskPartition;      //TODO #ak this is workaround, have to fix it correctly
+            result.type = PlatformMonitor::LocalDiskPartition;      //TODO #ak this is workaround, have to fix it correctly
         }
         else
         {
@@ -155,8 +156,8 @@ public:
         return result;
     }
 
-    QnPlatformMonitor::NetworkLoad networkLoad(const QString &interfaceName) {
-        QnPlatformMonitor::NetworkLoad result;
+    PlatformMonitor::NetworkLoad networkLoad(const QString &interfaceName) {
+        PlatformMonitor::NetworkLoad result;
         result.interfaceName = interfaceName;
 
         if(!sigar)
@@ -228,7 +229,7 @@ private:
 // QnSigarMonitor
 // -------------------------------------------------------------------------- //
 QnSigarMonitor::QnSigarMonitor(QObject *parent):
-    QnPlatformMonitor(parent),
+    PlatformMonitor(parent),
     d_ptr(new QnSigarMonitorPrivate())
 {
     Q_D(QnSigarMonitor);
@@ -270,7 +271,7 @@ qreal QnSigarMonitor::totalCpuUsage() {
     return result.combined;
 }
 
-quint64 QnSigarMonitor::totalRamUsage() {
+quint64 QnSigarMonitor::totalRamUsageBytes() {
     Q_D(QnSigarMonitor);
 
     if (!d->sigar)
@@ -298,7 +299,7 @@ qreal QnSigarMonitor::thisProcessCpuUsage()
     return cpu.percent / qreal(std::thread::hardware_concurrency());
 }
 
-quint64 QnSigarMonitor::thisProcessRamUsage()
+quint64 QnSigarMonitor::thisProcessRamUsageBytes()
 {
     Q_D(QnSigarMonitor);
 
@@ -313,7 +314,7 @@ quint64 QnSigarMonitor::thisProcessRamUsage()
     return mem.resident;
 }
 
-QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
+QList<PlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     Q_D(QnSigarMonitor);
 
     QList<HddLoad> result;
@@ -339,7 +340,7 @@ QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     return result;
 }
 
-QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo() {
+QList<PlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo() {
     Q_D(QnSigarMonitor);
 
     QList<PartitionSpace> result;
@@ -356,7 +357,7 @@ QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo
     return result;
 }
 
-QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
+QList<PlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     Q_D(QnSigarMonitor);
 
     QList<NetworkLoad> result;

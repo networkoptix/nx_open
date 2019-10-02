@@ -11,10 +11,12 @@
 
 class QnMediaServerModule;
 
+namespace nx::vms::server {
+
 /**
  * Interface for monitoring performance in a platform-independent way.
  */
-class QnPlatformMonitor: public QObject {
+class PlatformMonitor: public QObject {
     Q_OBJECT
     Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
 
@@ -130,8 +132,8 @@ public:
         qint64 bytesPerSecMax;
     };
 
-    QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
-    virtual ~QnPlatformMonitor() {}
+    PlatformMonitor(QObject *parent = NULL): QObject(parent) {}
+    virtual ~PlatformMonitor() {}
 
     virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
 
@@ -144,7 +146,7 @@ public:
     /**
      * @returns RAM currently consumed by all running processes, a number of bytes.
      */
-    virtual quint64 totalRamUsage() = 0;
+    virtual quint64 totalRamUsageBytes() = 0;
 
     /**
      * @returns Percent of CPU time (both user and kernel) consumed by the current process at
@@ -155,7 +157,7 @@ public:
     /**
      * @returns RAM currently consumed by the current process, a number of bytes.
      */
-    virtual quint64 thisProcessRamUsage() = 0;
+    virtual quint64 thisProcessRamUsageBytes() = 0;
 
     /**
      * @returns A list of HDD load entries for all HDDs on this PC.
@@ -193,11 +195,13 @@ public:
     virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
 
 private:
-    Q_DISABLE_COPY(QnPlatformMonitor)
+    Q_DISABLE_COPY(PlatformMonitor)
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionType, (metatype)(lexical));
-QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionTypes, (metatype)(lexical));
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
+QString toString(const PlatformMonitor::PartitionSpace& value);
 
-QString toString(const QnPlatformMonitor::PartitionSpace& value);
+} // namespace nx::vms::server
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::PlatformMonitor::PartitionType, (metatype)(lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::PlatformMonitor::PartitionTypes, (metatype)(lexical));
+Q_DECLARE_OPERATORS_FOR_FLAGS(nx::vms::server::PlatformMonitor::PartitionTypes);

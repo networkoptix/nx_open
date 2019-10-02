@@ -14,7 +14,7 @@ qreal ramUsageToPercentages(quint64 bytes);
  *
  * Updates on regular time intervals and is thread-safe.
  */
-class GlobalMonitor: public QnPlatformMonitor
+class GlobalMonitor: public nx::vms::server::PlatformMonitor
 {
     Q_OBJECT;
 
@@ -27,7 +27,7 @@ public:
      * \param parent                    Parent of this object.
      * \param updatePeriodMs            statistics update period. It's disabled if 0.
      */
-    GlobalMonitor(QnPlatformMonitor *base, QObject *parent);
+    GlobalMonitor(nx::vms::server::PlatformMonitor *base, QObject *parent);
     virtual ~GlobalMonitor();
 
     void logStatistics();
@@ -43,9 +43,9 @@ public:
     std::chrono::milliseconds processUptime() const;
 
     virtual qreal totalCpuUsage() override;
-    virtual quint64 totalRamUsage() override;
+    virtual quint64 totalRamUsageBytes() override;
     virtual qreal thisProcessCpuUsage() override;
-    virtual quint64 thisProcessRamUsage() override;
+    virtual quint64 thisProcessRamUsageBytes() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
@@ -54,7 +54,7 @@ public:
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
 
 private:
-    QnPlatformMonitor* m_monitorBase;
+    nx::vms::server::PlatformMonitor* m_monitorBase;
     mutable QnMutex m_mutex;
     nx::utils::ElapsedTimer m_uptimeTimer;
 
@@ -62,8 +62,8 @@ private:
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
     nx::utils::CachedValue<qreal> m_cachedThisProcessCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
-    nx::utils::CachedValue<QList<QnPlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
-    nx::utils::CachedValue<QList<QnPlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
+    nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
+    nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
 };
 
 } // namespace nx::vms::server

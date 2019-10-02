@@ -9,7 +9,7 @@ void SystemController::add(std::unique_ptr<ResourceController> resourceControlle
     const auto label = resourceController->label();
     const auto [it, isOk] = m_resourceControllers.emplace(label, std::move(resourceController));
     NX_ASSERT(isOk, "Label duplicate: %1", label);
-    NX_VERBOSE(this, "Added [%1] controller", label);
+    NX_DEBUG(this, "Added [%1] controller: %2", label, resourceController);
 }
 
 void SystemController::start()

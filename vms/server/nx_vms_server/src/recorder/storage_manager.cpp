@@ -715,8 +715,8 @@ private:
         if (fileStorage)
             return fileStorage->isLocal();
 
-        const auto localDiskType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
-        const auto removableDiskType = QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
+        const auto localDiskType = QnLexical::serialized(nx::vms::server::PlatformMonitor::LocalDiskPartition);
+        const auto removableDiskType = QnLexical::serialized(nx::vms::server::PlatformMonitor::RemovableDiskPartition);
         const auto storageType = storage->getStorageType();
 
         return storageType == localDiskType || storageType == removableDiskType;
@@ -3137,8 +3137,8 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     Qn::StorageStatuses result = Qn::StorageStatus::none;
     auto partitionType =
-        QnLexical::deserialized<QnPlatformMonitor::PartitionType>(storage->getStorageType());
-    if (partitionType == QnPlatformMonitor::RemovableDiskPartition)
+        QnLexical::deserialized<nx::vms::server::PlatformMonitor::PartitionType>(storage->getStorageType());
+    if (partitionType == nx::vms::server::PlatformMonitor::RemovableDiskPartition)
         result |= Qn::StorageStatus::removable;
 
     if (storage->isSystem())

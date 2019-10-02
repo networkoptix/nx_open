@@ -100,18 +100,18 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
     QnStorageSpaceDataList result;
 
     /* Enumerate auto-generated storages on all possible partitions. */
-    QnPlatformMonitor* monitor = serverModule()->platform()->monitor();
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
+    nx::vms::server::PlatformMonitor* monitor = serverModule()->platform()->monitor();
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace> partitions =
         monitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition
-            | QnPlatformMonitor::NetworkPartition
-            | QnPlatformMonitor::RemovableDiskPartition);
+            nx::vms::server::PlatformMonitor::LocalDiskPartition
+            | nx::vms::server::PlatformMonitor::NetworkPartition
+            | nx::vms::server::PlatformMonitor::RemovableDiskPartition);
 
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
 
     const QList<QString> storagePaths = getStoragePaths();
-    for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
+    for(const nx::vms::server::PlatformMonitor::PartitionSpace &partition: partitions)
     {
         if (partition.path.indexOf(QnFileStorageResource::tempFolderName()) != -1)
         {
@@ -136,7 +136,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
         data.url = partition.path + QnAppInfo::mediaFolderName();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
+        data.isExternal = partition.type == nx::vms::server::PlatformMonitor::NetworkPartition;
         data.storageType = QnLexical::serialized(partition.type);
 
         auto storage = QnStorageResourcePtr(

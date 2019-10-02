@@ -69,7 +69,7 @@ public:
         UpdateIntervalMSec = 25
     };
 
-    typedef QnPlatformMonitor::Hdd Hdd;
+    typedef nx::vms::server::PlatformMonitor::Hdd Hdd;
 
     struct HddItem {
         HddItem() {}
@@ -296,7 +296,7 @@ public:
                                                   ifInfo.dwDescrLen - 1 );
 
                 p.first->second.load.macAddress = nx::utils::MacAddress( physicalAddress );
-                p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
+                p.first->second.load.type = nx::vms::server::PlatformMonitor::PhysicalInterface;
                 p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;
                 p.first->second.prevMeasureClock = currentClock;
                 p.first->second.inOctets = ifInfo.dwInOctets;
@@ -325,9 +325,9 @@ public:
         }
     }
 
-    QList<QnPlatformMonitor::NetworkLoad> networkInterfacelLoadData()
+    QList<nx::vms::server::PlatformMonitor::NetworkLoad> networkInterfacelLoadData()
     {
-        QList<QnPlatformMonitor::NetworkLoad> loadData;
+        QList<nx::vms::server::PlatformMonitor::NetworkLoad> loadData;
         for( const std::pair<QByteArray, NetworkInterfaceStatData>& ifStatData: m_interfaceLoadByMAC )
             loadData.push_back( ifStatData.second.load );
         return loadData;
@@ -338,7 +338,7 @@ private:
 
     struct NetworkInterfaceStatData
     {
-        QnPlatformMonitor::NetworkLoad load;
+        nx::vms::server::PlatformMonitor::NetworkLoad load;
         ULONG64 inOctets;
         ULONG64 outOctets;
         qint64 prevMeasureClock;
@@ -404,7 +404,7 @@ namespace {
 class WindowsDrivesInfoFetcher
 {
 public:
-    QList<QnPlatformMonitor::PartitionSpace> getInfoList()
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace> getInfoList()
     {
         if (!fillDriveNamesBuf())
             return m_infoList;
@@ -464,12 +464,12 @@ private:
         }
 
         bool ok() const { return m_ok; }
-        QnPlatformMonitor::PartitionSpace partition() const { return m_partition; }
+        nx::vms::server::PlatformMonitor::PartitionSpace partition() const { return m_partition; }
     private:
         QString m_drivePath;
         HANDLE m_driveHandle = INVALID_HANDLE_VALUE;
         bool m_ok = false;
-        QnPlatformMonitor::PartitionSpace m_partition;
+        nx::vms::server::PlatformMonitor::PartitionSpace m_partition;
 
         bool openHandle()
         {
@@ -494,23 +494,23 @@ private:
                 case DRIVE_NO_ROOT_DIR:
                     return false;
                 case DRIVE_REMOVABLE:
-                    m_partition.type = QnPlatformMonitor::RemovableDiskPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::RemovableDiskPartition;
                     break;
                 case DRIVE_FIXED:
-                    m_partition.type = QnPlatformMonitor::LocalDiskPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::LocalDiskPartition;
                     break;
                 case DRIVE_REMOTE:
-                    m_partition.type = QnPlatformMonitor::NetworkPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::NetworkPartition;
                     break;
                 case DRIVE_CDROM:
-                    m_partition.type = QnPlatformMonitor::OpticalDiskPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::OpticalDiskPartition;
                     break;
                 case DRIVE_RAMDISK:
-                    m_partition.type = QnPlatformMonitor::RamDiskPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::RamDiskPartition;
                     break;
                 case DRIVE_UNKNOWN:
                 default:
-                    m_partition.type = QnPlatformMonitor::UnknownPartition;
+                    m_partition.type = nx::vms::server::PlatformMonitor::UnknownPartition;
                     break;
             }
             return true;
@@ -518,7 +518,7 @@ private:
 
         bool isRemovable() const
         {
-            return m_partition.type == QnPlatformMonitor::RemovableDiskPartition;
+            return m_partition.type == nx::vms::server::PlatformMonitor::RemovableDiskPartition;
         }
 
         bool isMediaOk() const
@@ -569,7 +569,7 @@ private:
         }
     };
 
-    QList<QnPlatformMonitor::PartitionSpace> m_infoList;
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace> m_infoList;
     std::array<WCHAR, 512> m_driveNamesBuf;
     const WCHAR* m_bufPtr = nullptr;
 
@@ -609,17 +609,17 @@ private:
 
 } // <anonymous>
 
-QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
+QList<nx::vms::server::PlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
 {
     return WindowsDrivesInfoFetcher().getInfoList();
 }
 
-QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
+QList<nx::vms::server::PlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     Q_D(QnWindowsMonitor);
 
     d->collectQuery();
 
-    QList<QnPlatformMonitor::HddLoad> result;
+    QList<nx::vms::server::PlatformMonitor::HddLoad> result;
     for(const QnWindowsMonitorPrivate::HddItem &item: d->itemByDiskId) {
         qreal load = 0.0;
         if(d->lastItemByDiskId.contains(item.hdd.id))
@@ -630,7 +630,7 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     return result;
 }
 
-QList<QnPlatformMonitor::NetworkLoad> QnWindowsMonitor::totalNetworkLoad()
+QList<nx::vms::server::PlatformMonitor::NetworkLoad> QnWindowsMonitor::totalNetworkLoad()
 {
     Q_D(QnWindowsMonitor);
 

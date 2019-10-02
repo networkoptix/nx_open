@@ -61,12 +61,13 @@ static const auto MS_NOSUID = MNT_NOSUID;
 static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
-
 namespace {
 
 const qint64 kMaxNasStorageSpaceLimit = 100ll * 1024 * 1024 * 1024; // 100 Gb
 const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
+
+using PlatformMonitor = nx::vms::server::PlatformMonitor;
 
 #if defined(Q_OS_WIN)
 static QString getDevicePath(QnMediaServerModule* /*serverModule*/, const QString& path)
@@ -373,12 +374,13 @@ bool QnFileStorageResource::checkDBCap() const
     }
 
     // Same for mounted by hand remote storages (NAS)
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        serverModule()->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::NetworkPartition );
+    QList<PlatformMonitor::PartitionSpace> partitions =
+        serverModule()->platform()->monitor()->
+            PlatformMonitor::totalPartitionSpaceInfo(
+            PlatformMonitor::NetworkPartition);
 
     bool dbReady = true;
-    for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
+    for(const PlatformMonitor::PartitionSpace& partition: partitions)
     {
         if(getPath().startsWith(partition.path))
             dbReady = false;
@@ -876,7 +878,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? QnPlatformMonitor::LocalDiskPartition : QnPlatformMonitor::NetworkPartition);
+        local ? PlatformMonitor::LocalDiskPartition : PlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
         return baseSpaceLimit;
@@ -891,12 +893,12 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     return baseSpaceLimit;
 }
 
-qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype) const
+qint64 QnFileStorageResource::calcSpaceLimit(PlatformMonitor::PartitionType ptype) const
 {
     const qint64 defaultStorageSpaceLimit = serverModule()->settings().minStorageSpace();
     const bool isLocal =
-        ptype == QnPlatformMonitor::LocalDiskPartition
-        || ptype == QnPlatformMonitor::RemovableDiskPartition;
+        ptype == PlatformMonitor::LocalDiskPartition
+        || ptype == PlatformMonitor::RemovableDiskPartition;
 
     return isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;
 }
@@ -910,12 +912,12 @@ bool QnFileStorageResource::isLocal()
     auto storageTypeString = getStorageType();
     if (!storageTypeString.isEmpty())
     {
-        return storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition)
-            || storageTypeString == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
+        return storageTypeString == QnLexical::serialized(PlatformMonitor::LocalDiskPartition)
+            || storageTypeString == QnLexical::serialized(PlatformMonitor::RemovableDiskPartition);
     }
 
-    auto platformMonitor = static_cast<QnPlatformMonitor*>(serverModule()->platform()->monitor());
-    auto partitions = platformMonitor->totalPartitionSpaceInfo(QnPlatformMonitor::NetworkPartition);
+    auto platformMonitor = static_cast<PlatformMonitor*>(serverModule()->platform()->monitor());
+    auto partitions = platformMonitor->totalPartitionSpaceInfo(PlatformMonitor::NetworkPartition);
 
     for (const auto &partition : partitions)
     {

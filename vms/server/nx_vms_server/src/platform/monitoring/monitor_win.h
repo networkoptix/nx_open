@@ -13,11 +13,11 @@ public:
     QnWindowsMonitor(QObject *parent = NULL);
     virtual ~QnWindowsMonitor();
 
-    //!Implementation of \a QnPlatformMonitor::totalPartitionSpaceInfo
+    //!Implementation of \a nx::vms::server::PlatformMonitor::totalPartitionSpaceInfo
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
-    //!Implementation of \a QnPlatformMonitor::totalHddLoad
+    //!Implementation of \a nx::vms::server::PlatformMonitor::totalHddLoad
     virtual QList<HddLoad> totalHddLoad() override;
-    //!Implementation of \a QnPlatformMonitor::totalNetworkLoad
+    //!Implementation of \a nx::vms::server::PlatformMonitor::totalNetworkLoad
     virtual QList<NetworkLoad> totalNetworkLoad() override;
 
 private:

@@ -506,12 +506,12 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
-        [&](const QnPlatformMonitor::PartitionSpace& part)
+        [&](const nx::vms::server::PlatformMonitor::PartitionSpace& part)
     { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end())
         ? it->type
-        : QnPlatformMonitor::NetworkPartition;
+        : nx::vms::server::PlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
@@ -634,17 +634,17 @@ QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePt
                 storageType = QUrl(storage->getUrl()).scheme();
             if (storageType.isEmpty())
             {
-                storageType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
+                storageType = QnLexical::serialized(nx::vms::server::PlatformMonitor::LocalDiskPartition);
                 const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
                 const auto it = std::find_if(partitions.begin(), partitions.end(),
-                    [&](const QnPlatformMonitor::PartitionSpace& partition)
+                    [&](const nx::vms::server::PlatformMonitor::PartitionSpace& partition)
                 { return storagePath.startsWith(QnStorageResource::toNativeDirPath(partition.path)); });
                 if (it != partitions.end())
                     storageType = QnLexical::serialized(it->type);
             }
             storage->setStorageType(
                     storageType.isEmpty()
-                    ? QnLexical::serialized(QnPlatformMonitor::UnknownPartition)
+                    ? QnLexical::serialized(nx::vms::server::PlatformMonitor::UnknownPartition)
                     : storageType);
             modified = true;
         }
@@ -902,7 +902,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     QStringList networkIfList;
     for (const auto& iface: m_platform->monitor()->totalNetworkLoad())
     {
-        if (iface.type != QnPlatformMonitor::LoopbackInterface)
+        if (iface.type != nx::vms::server::PlatformMonitor::LoopbackInterface)
         {
             networkIfList.push_back(
                 lm("%1: %2 bps").args(iface.interfaceName, iface.bytesPerSecMax));

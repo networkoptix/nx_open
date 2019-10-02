@@ -12,13 +12,13 @@ namespace detail {
 namespace {
 
 void filterOut(
-    QList<QnPlatformMonitor::PartitionSpace>* list,
-    QnPlatformMonitor::PartitionType partitionType)
+    QList<nx::vms::server::PlatformMonitor::PartitionSpace>* list,
+    nx::vms::server::PlatformMonitor::PartitionType partitionType)
 {
     list->erase(
         std::remove_if(
             list->begin(), list->end(),
-            [partitionType](const QnPlatformMonitor::PartitionSpace& partition)
+            [partitionType](const nx::vms::server::PlatformMonitor::PartitionSpace& partition)
     {
         return partition.type == partitionType;
     }), list->end());
@@ -120,14 +120,14 @@ QStringList Filter::get() const
     return result;
 }
 
-QList<QnPlatformMonitor::PartitionSpace> Filter::filteredPartitions() const
+QList<nx::vms::server::PlatformMonitor::PartitionSpace> Filter::filteredPartitions() const
 {
     auto partitions = m_filterConfig.partitions;
     if (!m_filterConfig.isRemovableDrivesAllowed)
-        filterOut(&partitions, QnPlatformMonitor::RemovableDiskPartition);
+        filterOut(&partitions, nx::vms::server::PlatformMonitor::RemovableDiskPartition);
 
     if (!m_filterConfig.isNetworkDrivesAllowed)
-        filterOut(&partitions, QnPlatformMonitor::NetworkPartition);
+        filterOut(&partitions, nx::vms::server::PlatformMonitor::NetworkPartition);
 
     return partitions;
 }

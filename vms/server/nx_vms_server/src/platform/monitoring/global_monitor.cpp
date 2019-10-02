@@ -26,14 +26,14 @@ const std::chrono::milliseconds GlobalMonitor::kCacheExpirationTime = 2s;
 
 namespace {
 
-class StubMonitor: public QnPlatformMonitor {
+class StubMonitor: public nx::vms::server::PlatformMonitor {
 public:
-    StubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
+    StubMonitor(QObject *parent = NULL): nx::vms::server::PlatformMonitor(parent) {}
 
     virtual qreal totalCpuUsage() override { return 0.0; }
-    virtual quint64 totalRamUsage() override { return 0; }
+    virtual quint64 totalRamUsageBytes() override { return 0; }
     virtual qreal thisProcessCpuUsage() override { return 0.0; }
-    virtual quint64 thisProcessRamUsage() override { return 0; }
+    virtual quint64 thisProcessRamUsageBytes() override { return 0; }
     virtual QList<HddLoad> totalHddLoad() override { return {}; }
     virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
@@ -135,16 +135,16 @@ void logOpenedHandleCount()
 
 } // namespace
 
-GlobalMonitor::GlobalMonitor(QnPlatformMonitor* base, QObject* parent):
-    QnPlatformMonitor(parent),
+GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* parent):
+    nx::vms::server::PlatformMonitor(parent),
     m_cachedTotalCpuUsage(
         [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalRamUsage(
-        [this]() { return m_monitorBase->totalRamUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
     m_cachedThisProcessCpuUsage(
         [this]() { return m_monitorBase->thisProcessCpuUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedThisProcessRamUsage(
-        [this]() { return m_monitorBase->thisProcessRamUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalHddLoad(
         [this]() { return m_monitorBase->totalHddLoad(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalNetworkLoad(
@@ -173,9 +173,9 @@ void GlobalMonitor::logStatistics()
     NX_INFO(this, lm("OS CPU usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
     NX_INFO(this, lm("Process CPU usage %1%").arg(thisProcessCpuUsage() * 100, 0, 'f', 2));
     NX_INFO(this, lm("OS memory usage %1%").arg(
-        ramUsageToPercentages(totalRamUsage()) * 100, 0, 'f', 2));
+        ramUsageToPercentages(totalRamUsageBytes()) * 100, 0, 'f', 2));
     NX_INFO(this, lm("Process memory usage %1%").arg(
-        ramUsageToPercentages(thisProcessRamUsage()) * 100, 0, 'f', 2));
+        ramUsageToPercentages(thisProcessRamUsageBytes()) * 100, 0, 'f', 2));
 
     NX_INFO(this, "HDD usage:");
     for (const HddLoad& hddLoad: totalHddLoad())
@@ -207,7 +207,7 @@ qreal GlobalMonitor::totalCpuUsage() {
     return m_cachedTotalCpuUsage.get();
 }
 
-quint64 GlobalMonitor::totalRamUsage() {
+quint64 GlobalMonitor::totalRamUsageBytes() {
     return m_cachedTotalRamUsage.get();
 }
 
@@ -216,20 +216,20 @@ qreal GlobalMonitor::thisProcessCpuUsage()
     return m_cachedThisProcessCpuUsage.get();
 }
 
-quint64 GlobalMonitor::thisProcessRamUsage()
+quint64 GlobalMonitor::thisProcessRamUsageBytes()
 {
     return m_cachedThisProcessRamUsage.get();
 }
 
-QList<QnPlatformMonitor::HddLoad> GlobalMonitor::totalHddLoad() {
+QList<nx::vms::server::PlatformMonitor::HddLoad> GlobalMonitor::totalHddLoad() {
     return m_cachedTotalHddLoad.get();
 }
 
-QList<QnPlatformMonitor::NetworkLoad> GlobalMonitor::totalNetworkLoad() {
+QList<nx::vms::server::PlatformMonitor::NetworkLoad> GlobalMonitor::totalNetworkLoad() {
     return m_cachedTotalNetworkLoad.get();
 }
 
-QList<QnPlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
+QList<nx::vms::server::PlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_monitorBase->totalPartitionSpaceInfo();

@@ -20,10 +20,10 @@ public:
     virtual ~QnLinuxMonitor();
 
     virtual qreal totalCpuUsage() override;
-    virtual quint64 totalRamUsage() override;
-    virtual quint64 thisProcessRamUsage() override;
+    virtual quint64 totalRamUsageBytes() override;
+    virtual quint64 thisProcessRamUsageBytes() override;
     virtual QList<HddLoad> totalHddLoad() override;
-    virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
+    virtual QList<nx::vms::server::PlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
