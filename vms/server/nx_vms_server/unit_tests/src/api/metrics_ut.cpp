@@ -73,10 +73,10 @@ TEST_F(MetricsApi, Api)
     expectCounts("manifest", manifest, "systems", 1, "servers", 3, "cameras", 5, "storages", 4);
 
     const auto localValues = get<SystemValues>("/api/metrics/values");
-    expectCounts("localValues", localValues,"systems", 0, "servers", 1, "cameras", 1, "storages", 0);
+    expectCounts("localValues", localValues, "systems", 0, "servers", 1, "cameras", 0, "storages", 0);
 
     const auto systemValues = get<SystemValues>("/ec2/metrics/values");
-    expectCounts("systemValues", systemValues,"systems", 1, "servers", 1, "cameras", 1, "storages", 0);
+    expectCounts("systemValues", systemValues, "systems", 1, "servers", 1, "cameras", 0, "storages", 0);
 
     const auto localAlarms = get<Alarms>("/api/metrics/alarms");
     EXPECT_EQ(localAlarms.size(), 0);

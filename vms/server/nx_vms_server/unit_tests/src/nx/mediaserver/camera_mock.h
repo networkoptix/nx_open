@@ -22,6 +22,8 @@ public:
     template<template<typename> class ApiProvider>
     void makeApiAdvancedParametersProvider(const std::vector<QString>& parameters);
 
+    void blockInitialization(bool value = true) { m_blockInitialization = value; }
+
     boost::optional<QString> getApiParameter(const QString& id);
     bool setApiParameter(const QString& id, const QString& value);
 
@@ -69,6 +71,7 @@ private:
     bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
     QnAbstractPtzController* m_ptzController = nullptr;
+    std::atomic<bool> m_blockInitialization = false;
 };
 
 class CameraTest: public testing::Test

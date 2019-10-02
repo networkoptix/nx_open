@@ -129,8 +129,12 @@ QnAbstractStreamDataProvider* CameraMock::createLiveDataProvider()
 {
     return new LiveStreamProviderMock(toSharedPointer(this));
 }
+
 CameraDiagnostics::Result CameraMock::initializeCameraDriver()
 {
+    if (m_blockInitialization)
+        return CameraDiagnostics::IOErrorResult("Initialization is blocked");
+
     return CameraDiagnostics::NoErrorResult();
 }
 

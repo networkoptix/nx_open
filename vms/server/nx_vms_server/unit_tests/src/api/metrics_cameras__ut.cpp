@@ -36,8 +36,8 @@ public:
         launcher = std::make_unique<MediaServerLauncher>();
         EXPECT_TRUE(launcher->start());
 
-        m_camera.reset(
-            new resource::test::CameraMock(launcher->serverModule()));
+        m_camera.reset(new resource::test::CameraMock(launcher->serverModule()));
+        m_camera->blockInitialization();
         m_camera->setPhysicalId("testCamera 1");
         m_camera->setName(kCameraName);
         m_camera->setModel(kCameraModel);
@@ -45,7 +45,6 @@ public:
         m_camera->setParentId(launcher->commonModule()->moduleGUID());
         m_camera->setHostAddress(kCameraHostAddress);
         m_camera->setFirmware(kCameraFirmware);
-
 
         launcher->commonModule()->resourcePool()->addResource(m_camera);
         m_dataProviderStub.reset(new DataProviderStub(m_camera));
