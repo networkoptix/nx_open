@@ -7,8 +7,5 @@ class QnDirectParentServerMonitorAccessProviderTest: public QnDirectAccessProvid
     using base_type = QnDirectAccessProviderTestFixture;
 
 protected:
-    virtual void SetUp() override;
-    virtual void TearDown() override;
-
     virtual QnAbstractResourceAccessProvider* accessProvider() const override;
 };

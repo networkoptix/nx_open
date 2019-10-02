@@ -3,16 +3,6 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/parent_server_monitor_access_provider.h>
 
-void QnDirectParentServerMonitorAccessProviderTest::SetUp()
-{
-    base_type::SetUp();
-}
-
-void QnDirectParentServerMonitorAccessProviderTest::TearDown()
-{
-    base_type::TearDown();
-}
-
 QnAbstractResourceAccessProvider* QnDirectParentServerMonitorAccessProviderTest::accessProvider() const
 {
     for (auto provider: resourceAccessProvider()->providers())
