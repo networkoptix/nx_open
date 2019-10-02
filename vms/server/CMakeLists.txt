@@ -4,9 +4,9 @@ endif()
 
 if(withMediaServer)
     if(withSdk) #< Should come before nx_vms_server because the latter packs sdk zips to resources.
-        # TODO: Combine all SDKs (storage_sdk, camera_sdk, metadata_sdk) into one.
+        # TODO: Combine all SDKs (storage_sdk, video_source_sdk, metadata_sdk) into one.
         add_subdirectory(nx_metadata_sdk)
-        add_subdirectory(nx_camera_sdk)
+        add_subdirectory(nx_video_source_sdk)
         add_subdirectory(nx_storage_sdk)
     endif()
 

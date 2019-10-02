@@ -8,8 +8,8 @@ set(depends mediaserver server_plugins) #< Not required technically, but useful 
 
 message(STATUS "Generating files for Camera SDK")
 
-set(sdk_name camera_sdk)
-set(zip_file ${distribution_output_dir}/${camera_sdk_distribution_name}.zip)
+set(sdk_name video_source_sdk)
+set(zip_file ${distribution_output_dir}/${video_source_sdk_distribution_name}.zip)
 set(server_resource_zip_file ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
@@ -134,4 +134,4 @@ add_custom_command(OUTPUT ${zip_file} ${server_resource_zip_file}
         ${copied_sample_files}
 )
 
-add_custom_target(nx_camera_sdk ALL DEPENDS ${zip_file})
+add_custom_target(nx_video_source_sdk ALL DEPENDS ${zip_file})
