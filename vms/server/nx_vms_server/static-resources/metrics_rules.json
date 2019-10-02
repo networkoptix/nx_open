@@ -61,7 +61,7 @@
                     "name": "OS",
                     "display": "panel"
                 },
-                "public_ip": {
+                "publicIp": {
                     "name": "Public IP",
                     "display": "table|panel"
                 },
@@ -124,7 +124,12 @@
                 "cpuUsageP": {
                     "name": "CPU %",
                     "format": "%",
-                    "display": "table|panel"
+                    "display": "table|panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThan %cpuUsageP 0.9",
+                        "text": "Total CPU Usage is %cpuUsageP. VMS is using %serverCpuUsageP."
+                    }]
                 },
                 "serverCpuUsageP": {
                     "name": "CPU (VMS Server) %",
@@ -139,7 +144,12 @@
                 "ramUsageP": {
                     "name": "RAM %",
                     "format": "%",
-                    "display": "table|panel"
+                    "display": "table|panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThan %ramUsageP 0.8",
+                        "text": "Total RAM usage is %ramUsageP. VMS is using %serverRamUsageP."
+                    }]
                 },
                 "serverRamUsage": {
                     "name": "RAM (VMS Server)",
