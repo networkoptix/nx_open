@@ -30,6 +30,7 @@
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 
 #include <statistics/statistics_manager.h>
+#include <ui/statistics/modules/generic_statistics_module.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
@@ -94,6 +95,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     // Adds statistics modules
 
     auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
+
+    const auto genericStatModule = instance<QnGenericStatisticsModule>();
+    statisticsManager->registerStatisticsModule("generic", genericStatModule);
 
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
     actionsStatModule->setActionManager(m_menu.data());
