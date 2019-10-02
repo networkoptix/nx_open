@@ -1,5 +1,7 @@
 #include "ios_device_info.h"
 
+#include <QtCore/QList>
+
 #if defined(Q_OS_IOS)
 
 #include <sys/utsname.h>
@@ -44,6 +46,29 @@ IosDeviceInformation IosDeviceInformation::currentInformation()
     #else
         return {};
 #endif
+}
+
+bool IosDeviceInformation::isBionicProcessor() const
+{
+    enum BionicIPhonesMajorVersion
+    {
+        iPhoneXsLike = 11,
+        iPhone11 = 12
+    };
+
+    enum BionicIPadsMajorVersion
+    {
+        iPadPro3rdGen = 8,
+        iPadMini5rdAndAir3rdGen = 11,
+    };
+
+    static const QList<IosDeviceInformation> kBionicDevices = {
+        {Type::iPhone, iPhoneXsLike},
+        {Type::iPhone, iPhone11},
+        {Type::iPad, iPadPro3rdGen},
+        {Type::iPad, iPadMini5rdAndAir3rdGen}};
+
+    return kBionicDevices.contains(*this);
 }
 
 } // namespace nx::media

@@ -15,11 +15,8 @@ struct NX_UTILS_API IosDeviceInformation
 
     enum Version
     {
-        iPhoneXs = 11,
-        iPhone6 = 7,
-
-        iPadAir2 = 5,
-        iPadProA12XBionic = 8
+        iPhone6 = 7,        
+        iPadAir2 = 5
     };
 
     Type type = Type::unknown;
@@ -27,6 +24,8 @@ struct NX_UTILS_API IosDeviceInformation
     int minorVersion = 0;
 
     bool operator==(const IosDeviceInformation& other) const;
+
+    bool isBionicProcessor() const;
 
     static IosDeviceInformation currentInformation();
 };
