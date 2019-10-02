@@ -6,11 +6,14 @@
 #include "test_api_requests.h"
 #include <nx/mediaserver/camera_mock.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/metrics/helpers.h>
 
 namespace nx::test {
 
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
+using namespace std::chrono;
 
 static const QString kCameraName("Camera1");
 static const QString kCameraHostAddress("192.168.0.2");
@@ -33,6 +36,8 @@ public:
 
     static void SetUpTestCase()
     {
+        nx::vms::server::metrics::setTimerMultiplier(100);
+
         launcher = std::make_unique<MediaServerLauncher>();
         EXPECT_TRUE(launcher->start());
 
@@ -45,6 +50,7 @@ public:
         m_camera->setParentId(launcher->commonModule()->moduleGUID());
         m_camera->setHostAddress(kCameraHostAddress);
         m_camera->setFirmware(kCameraFirmware);
+        m_camera->setMAC(nx::utils::MacAddress(QLatin1String("12:12:12:12:12:12")));
 
         launcher->commonModule()->resourcePool()->addResource(m_camera);
         m_dataProviderStub.reset(new DataProviderStub(m_camera));
@@ -113,7 +119,7 @@ TEST_F(MetricsCameraApi, infoGroup)
     ASSERT_EQ("Scheduled", infoData["recording"].toString());
 }
 
-TEST_F(MetricsCameraApi, offlineEvents)
+TEST_F(MetricsCameraApi, availabilityGroup)
 {
     auto systemValues = get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
@@ -142,6 +148,22 @@ TEST_F(MetricsCameraApi, offlineEvents)
     m_camera->setStatus(Qn::Online);
     systemAlarms = get<Alarms>("/ec2/metrics/alarms");
     ASSERT_EQ(1, systemAlarms.size());
+
+    auto eventConnector = launcher->serverModule()->eventConnector();
+    QStringList macAddrList;
+    macAddrList << m_camera->getMAC().toString();
+    eventConnector->at_cameraIPConflict(
+        m_camera, QHostAddress(m_camera->getHostAddress()), macAddrList, /*time*/ 0);
+
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    do
+    {
+        systemAlarms = get<Alarms>("/ec2/metrics/alarms");
+    } while (systemAlarms.size() != 2 && !timer.hasExpired(15s));
+
+    ASSERT_EQ(2, systemAlarms.size());
+    ASSERT_EQ("availability.ipConflicts3min", systemAlarms[0].parameter);
 }
 
 } // nx::test
