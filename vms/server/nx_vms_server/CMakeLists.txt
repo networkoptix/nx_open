@@ -55,7 +55,7 @@ set(old_sdk_static_resources "")
 if(TARGET nx_storage_sdk)
     list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
 endif()
-if(TARGET nx_camera_sdk)
+if(TARGET nx_video_source_sdk)
     list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
 endif()
 
@@ -106,8 +106,8 @@ nx_add_target(nx_vms_server LIBRARY
 if(TARGET nx_storage_sdk)
     add_dependencies(nx_vms_server nx_storage_sdk)
 endif()
-if(TARGET nx_camera_sdk)
-    add_dependencies(nx_vms_server nx_camera_sdk)
+if(TARGET nx_video_source_sdk)
+    add_dependencies(nx_vms_server nx_video_source_sdk)
 endif()
 
 nx_force_include(nx_vms_server
