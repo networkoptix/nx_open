@@ -27,6 +27,7 @@
 #include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
@@ -331,7 +332,8 @@ void EventRibbon::Private::updateTilePreview(int index)
     const auto modelIndex = m_model->index(index);
 
     const auto previewResource = modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (!previewResource.dynamicCast<QnMediaResource>())
+    const auto mediaResource = previewResource.dynamicCast<QnMediaResource>();
+    if (!mediaResource)
         return;
 
     const auto defaultThumbnailWidth = headersEnabled()
@@ -339,7 +341,11 @@ void EventRibbon::Private::updateTilePreview(int index)
         : kAlternativeThumbnailWidth;
 
     const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
-    const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
+
+    const auto rotation = int(mediaResource->defaultRotation());
+    const auto previewCropRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
+        modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>(), rotation / 90);
+
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? defaultThumbnailWidth
         : qMin<int>(defaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
@@ -351,7 +357,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.resource = previewResource;
     request.usecSinceEpoch =
         previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
-    request.rotation = nx::api::ImageRequest::kDefaultRotation;
+    request.rotation = rotation;
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
