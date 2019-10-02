@@ -746,6 +746,35 @@ QRectF Geometry::encloseRotatedGeometry(
     return geom;
 }
 
+QRectF Geometry::rotatedRelativeRectangle(
+    const QRectF& source,
+    int numberOf90DegreeRotations)
+{
+    numberOf90DegreeRotations = numberOf90DegreeRotations % 4;
+    if (numberOf90DegreeRotations < 0)
+        numberOf90DegreeRotations += 4;
+
+    switch (numberOf90DegreeRotations)
+    {
+        case 0: // 0 degrees.
+            return source;
+
+        case 1: // 90 degrees.
+            return QRectF(source.top(), 1.0 - source.right(), source.height(), source.width());
+
+        case 2: // 180 degrees.
+            return QRectF(
+                1.0 - source.right(), 1.0 - source.bottom(), source.width(), source.height());
+
+        case 3: // 270 degrees.
+            return QRectF(1.0 - source.bottom(), source.left(), source.height(), source.width());
+
+        default: // Should never happen.
+            NX_ASSERT(false);
+            return source;
+    }
+}
+
 void Geometry::registerQmlType()
 {
     qmlRegisterSingletonType<Geometry>("nx.client.core", 1, 0, "Geometry", &createInstance);

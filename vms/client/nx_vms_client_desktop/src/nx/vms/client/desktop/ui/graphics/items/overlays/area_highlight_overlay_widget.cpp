@@ -8,8 +8,9 @@
 #include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <nx/client/core/utils/geometry.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include "area_rect_item.h"
@@ -204,7 +205,8 @@ void AreaHighlightOverlayWidget::Private::updateArea(
     if (!area.rectItem || !area.tooltipItem)
         return;
 
-    area.rotatedRectangle = rotatedRectangle(area.info.rectangle);
+    area.rotatedRectangle = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
+        area.info.rectangle, angle / 90);
 
     const bool highlighted = highlightedAreaId == area.info.id;
 

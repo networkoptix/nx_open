@@ -395,6 +395,17 @@ public:
         qreal aspectRatio,
         qreal rotation);
 
+    /**
+     * Rotate a rectangle around a {0.5, 0.5} point by a multiple of 90 degrees.
+     * Intended to be used for a relative rectangles normalized to [0...1] range.
+     *
+     * @param source Source rectangle.
+     * @param numberOf90DegreeRotations A multiplier for 90 degrees.
+     */
+    Q_INVOKABLE static QRectF rotatedRelativeRectangle(
+        const QRectF& source,
+        int numberOf90DegreeRotations);
+
     static void registerQmlType();
 };
 
