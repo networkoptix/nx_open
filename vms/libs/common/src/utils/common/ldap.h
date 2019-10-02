@@ -23,7 +23,6 @@ struct QnLdapSettings
 /**
 * Used only to hide passwords from logs.
 */
-
 QString toString(const QnLdapSettings& settings);
 
 #define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)(searchTimeoutS)
