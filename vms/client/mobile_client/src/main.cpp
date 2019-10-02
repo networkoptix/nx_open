@@ -76,21 +76,9 @@ namespace {
 
 bool forceSoftwareDecoding()
 {
-    if (nx::utils::AppInfo::isIos())
-    {
-        using IosDeviceInformation = nx::utils::IosDeviceInformation;
-        using Type = IosDeviceInformation::Type;
-        using Version = IosDeviceInformation::Version;
-
-        static const QList<IosDeviceInformation> blacklist{
-            IosDeviceInformation{Type::iPhone, Version::iPhoneXs},
-            IosDeviceInformation{Type::iPad, Version::iPadProA12XBionic}
-        };
-
-        return blacklist.contains(IosDeviceInformation::currentInformation());
-    }
-
-    return false;
+    return nx::utils::AppInfo::isIos()
+        ? nx::utils::IosDeviceInformation::currentInformation().isBionicProcessor()
+        : false;
 }
 
 } // namespace
