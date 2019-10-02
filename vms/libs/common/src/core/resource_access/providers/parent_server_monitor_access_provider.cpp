@@ -15,6 +15,13 @@ QnParentServerMonitorAccessProvider::QnParentServerMonitorAccessProvider(
     base_type(mode, parent),
     m_sourceProviders(sourceProviders)
 {
+    if (mode == Mode::direct)
+    {
+        connect(resourcePool(), &QnResourcePool::resourceAdded,
+            this, &QnParentServerMonitorAccessProvider::addToCameraIndex);
+        connect(resourcePool(), &QnResourcePool::resourceRemoved,
+            this, &QnParentServerMonitorAccessProvider::removeFromCameraIndex);
+    }
     for (const auto& sourceProvider: m_sourceProviders)
     {
         connect(sourceProvider, &QnAbstractResourceAccessProvider::accessChanged,
@@ -81,22 +88,13 @@ void QnParentServerMonitorAccessProvider::fillProviders(
 
 void QnParentServerMonitorAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (resource.dynamicCast<QnVirtualCameraResource>()
-        && !resource->flags().testFlag(Qn::desktop_camera))
-    {
-        m_devicesByServerId[resource->getParentId()].insert(resource);
-        connect(resource, &QnResource::parentIdChanged,
-            this, &QnParentServerMonitorAccessProvider::onDeviceParentIdChanged);
-    }
-
+    addToCameraIndex(resource);
     base_type::handleResourceAdded(resource);
 }
 
 void QnParentServerMonitorAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    if (resource.dynamicCast<QnVirtualCameraResource>())
-        m_devicesByServerId[resource->getParentId()].remove(resource);
-
+    removeFromCameraIndex(resource);
     base_type::handleResourceRemoved(resource);
 }
 
@@ -121,10 +119,11 @@ void QnParentServerMonitorAccessProvider::onDeviceParentIdChanged(const QnResour
         {
             const auto oldParentServerId = it.key();
             m_devicesByServerId[resource->getParentId()].insert(resource);
-
-            updateAccessToResource(resource->resourcePool()->getResourceById(oldParentServerId));
-            updateAccessToResource(resource->getParentResource());
-
+            if (mode() == Mode::cached)
+            {
+                updateAccessToResource(resource->resourcePool()->getResourceById(oldParentServerId));
+                updateAccessToResource(resource->getParentResource());
+            }
             return;
         }
     }
@@ -139,4 +138,21 @@ bool QnParentServerMonitorAccessProvider::hasAccessBySourceProviders(
         {
             return sourceProvider->hasAccess(subject, resource);
         });
+}
+
+void QnParentServerMonitorAccessProvider::addToCameraIndex(const QnResourcePtr& resource)
+{
+    if (resource.dynamicCast<QnVirtualCameraResource>()
+        && !resource->flags().testFlag(Qn::desktop_camera))
+    {
+        m_devicesByServerId[resource->getParentId()].insert(resource);
+        connect(resource, &QnResource::parentIdChanged,
+            this, &QnParentServerMonitorAccessProvider::onDeviceParentIdChanged);
+    }
+}
+
+void QnParentServerMonitorAccessProvider::removeFromCameraIndex(const QnResourcePtr& resource)
+{
+    if (resource.dynamicCast<QnVirtualCameraResource>())
+        m_devicesByServerId[resource->getParentId()].remove(resource);
 }

@@ -38,6 +38,9 @@ private:
     bool hasAccessBySourceProviders(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
 
+    void addToCameraIndex(const QnResourcePtr& resource);
+    void removeFromCameraIndex(const QnResourcePtr& resource);
+
 private:
     AccessProviderList m_sourceProviders;
     QHash<QnUuid, QSet<QnResourcePtr>> m_devicesByServerId;
