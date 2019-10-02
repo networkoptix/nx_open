@@ -44,6 +44,8 @@ public:
     SearchAutoHandler(
         nx::network::upnp::DeviceSearcher* deviceSearcher, const QString& devType = QString());
     virtual ~SearchAutoHandler() override;
+
+    nx::network::upnp::DeviceSearcher* deviceSearcher() const;
 private:
     nx::network::upnp::DeviceSearcher* m_deviceSearcher = nullptr;
 };

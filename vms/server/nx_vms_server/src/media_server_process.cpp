@@ -915,7 +915,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (m_dumpSystemResourceUsageTaskId == 0)  // Monitoring cancelled
         return;
-    m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
+    m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
         std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 }
 
@@ -3755,7 +3755,7 @@ void MediaServerProcess::stopObjects()
         m_dumpSystemResourceUsageTaskId = 0;
     }
     if (dumpSystemResourceUsageTaskID)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+        commonModule()->timerManager()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     commonModule()->setNeedToStop(true);
     m_universalTcpListener->stop();
@@ -3803,7 +3803,7 @@ void MediaServerProcess::stopObjects()
     if (m_initStoragesAsyncPromise)
         m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
-    nx::utils::TimerManager::instance()->stop();
+    commonModule()->timerManager()->stop();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
@@ -4834,7 +4834,7 @@ void MediaServerProcess::run()
 
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
-    m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
+    m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
         std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 
     nx::mserver_aux::makeFakeData(

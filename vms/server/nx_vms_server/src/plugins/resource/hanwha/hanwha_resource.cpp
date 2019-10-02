@@ -457,7 +457,9 @@ static QString physicalIdForChannel(const QString& groupId, int value)
 
 } // namespace
 
-HanwhaResource::HanwhaResource(QnMediaServerModule* serverModule): QnPlOnvifResource(serverModule)
+HanwhaResource::HanwhaResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule),
+    m_timerHolder(serverModule->timerManager())
 {
 }
 

@@ -256,7 +256,7 @@ bool FcResource::setOutputPortState(
             auto portTimerEntry = it->second;
             if (it->second.portId == outputId)
             {
-                nx::utils::TimerManager::instance()->deleteTimer(timerId);
+                commonModule()->timerManager()->deleteTimer(timerId);
                 it = m_autoResetTimers.erase(it);
                 break;
             }
@@ -265,7 +265,7 @@ bool FcResource::setOutputPortState(
 
     if (isActive && autoResetTimeoutMs)
     {
-        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
+        auto autoResetTimer = commonModule()->timerManager()->addTimer(
             [this](quint64  timerId)
         {
             QnMutexLocker lock(&m_mutex);

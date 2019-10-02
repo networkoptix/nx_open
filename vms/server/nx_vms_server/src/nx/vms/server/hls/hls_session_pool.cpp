@@ -172,6 +172,11 @@ SessionPool::SessionContext::SessionContext(
 {
 }
 
+SessionPool::SessionPool(nx::utils::TimerManager* timerManager) :
+    m_timerManager(timerManager)
+{
+}
+
 SessionPool::~SessionPool()
 {
     while (!m_sessionById.empty())
@@ -187,7 +192,7 @@ SessionPool::~SessionPool()
         }
 
         sessionCtx.session.reset();
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskId);
+        m_timerManager->joinAndDeleteTimer(sessionCtx.removeTaskId);
     }
 }
 
@@ -267,7 +272,7 @@ void SessionPool::unlockSessionID(const QString& id)
     if (it == m_sessionById.end() || (it->second.keepAliveTimeout == std::chrono::milliseconds::zero()))
         return;
 
-    it->second.removeTaskId = nx::utils::TimerManager::instance()->addTimer(
+    it->second.removeTaskId = m_timerManager->addTimer(
         this, it->second.keepAliveTimeout);
     m_taskToSessionId.emplace(it->second.removeTaskId, id);
 }

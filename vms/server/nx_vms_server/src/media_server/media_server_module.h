@@ -155,6 +155,7 @@ public:
     QnServerConnector* serverConnector () const;
     QnResourceStatusWatcher* statusWatcher() const;
     QnMdnsListener* mdnsListener() const;
+    nx::utils::TimerManager* timerManager() const;
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
     nx::vms::server::hls::SessionPool* hlsSessionPool() const;
     nx::vms::server::network::MulticastAddressRegistry* multicastAddressRegistry() const;

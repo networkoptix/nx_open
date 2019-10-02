@@ -5,10 +5,11 @@
 namespace nx {
 namespace hpm {
 
-Controller::Controller(const conf::Settings& settings):
+Controller::Controller(nx::utils::TimerManager* timerManager, const conf::Settings& settings):
     m_cloudDataProvider(
         settings.cloudDB().runWithCloud
         ? AbstractCloudDataProviderFactory::create(
+            timerManager,
             settings.cloudDB().url,
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),

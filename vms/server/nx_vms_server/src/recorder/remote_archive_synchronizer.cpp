@@ -27,7 +27,7 @@ using namespace nx::core::resource;
 RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),
     m_tasks(std::make_unique<RemoteArchiveSynchronizer::TaskMap>()),
-    m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
+    m_workerPool(std::make_unique<RemoteArchiveWorkerPool>(serverModule->timerManager()))
 {
     NX_DEBUG(this, lit("Creating remote archive synchronizer."));
 

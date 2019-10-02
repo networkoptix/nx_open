@@ -79,7 +79,7 @@ CrashReporter::~CrashReporter()
     }
 
     if (timerId)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
+        commonModule()->timerManager()->joinAndDeleteTimer(*timerId);
 
     // wait for the last scanAndReportAsync
     m_activeCollection.cancel();
@@ -188,7 +188,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 
     QnMutexLocker lk(&m_mutex);
     if (!m_terminated)
-        m_timerId = nx::utils::TimerManager::instance()->addTimer(
+        m_timerId = commonModule()->timerManager()->addTimer(
             std::bind(&CrashReporter::scanAndReportByTimer, this, settings),
             std::chrono::milliseconds(SCAN_TIMER_CYCLE));
 }

@@ -5,6 +5,7 @@
 #include <QtCore/QDateTime>
 
 #include <nx/utils/log/log.h>
+#include "upnp_device_searcher.h"
 
 static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
 static const size_t BREAK_TIME_PER_FAULT = 1 * 60; // wait 1 minute per fault in a row
@@ -31,7 +32,7 @@ PortMapper::PortMapper(
     m_description(description),
     m_checkMappingsInterval(checkMappingsInterval)
 {
-    m_timerId = nx::utils::TimerManager::instance()->addTimer(
+    m_timerId = deviceSearcher->timerManager()->addTimer(
         this,
         std::chrono::milliseconds(m_checkMappingsInterval));
 }
@@ -45,7 +46,7 @@ PortMapper::~PortMapper()
         m_timerId = 0;
     }
 
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
+    deviceSearcher()->timerManager()->joinAndDeleteTimer(timerId);
     m_upnpClient.reset();
 }
 
@@ -200,7 +201,7 @@ void PortMapper::onTimer(const quint64& /*timerID*/)
 
     if (m_timerId)
     {
-        m_timerId = nx::utils::TimerManager::instance()->addTimer(
+        m_timerId = deviceSearcher()->timerManager()->addTimer(
             this, std::chrono::milliseconds(m_checkMappingsInterval));
     }
 }

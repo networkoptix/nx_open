@@ -106,7 +106,7 @@ void QnAdamModbusIOManager::stopIOMonitoring()
     }
 
     if (timerId)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
+        m_resource->commonModule()->timerManager()->joinAndDeleteTimer(timerId);
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)
@@ -424,7 +424,7 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
 {
     if (m_monitoringIsInProgress)
     {
-        m_inputMonitorTimerId = nx::utils::TimerManager::instance()->addTimer(
+        m_inputMonitorTimerId = m_resource->commonModule()->timerManager()->addTimer(
             [this](quint64 timerId)
             {
                 if (timerId == m_inputMonitorTimerId)

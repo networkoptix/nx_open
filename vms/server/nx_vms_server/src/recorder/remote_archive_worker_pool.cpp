@@ -12,6 +12,11 @@ static const std::chrono::milliseconds kGrabTasksCycleDuration(5000);
 
 } // namespace
 
+RemoteArchiveWorkerPool::RemoteArchiveWorkerPool(nx::utils::TimerManager* timerManager):
+    m_timerManager(timerManager)
+{
+}
+
 RemoteArchiveWorkerPool::~RemoteArchiveWorkerPool()
 {
     decltype(m_workers) workers;
@@ -21,7 +26,7 @@ RemoteArchiveWorkerPool::~RemoteArchiveWorkerPool()
         workers.swap(m_workers);
     }
 
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_timerId);
+    m_timerManager->joinAndDeleteTimer(m_timerId);
 
     for (auto& entry: workers)
     {
@@ -86,7 +91,7 @@ void RemoteArchiveWorkerPool::setTaskMapAccessor(
 
 nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
 {
-    return nx::utils::TimerManager::instance()->addTimer(
+    return m_timerManager->addTimer(
         [this](nx::utils::TimerId timerId)
         {
             QnMutexLocker lock(&m_mutex);

@@ -43,7 +43,6 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new Settings());
     settings_migration::migrate();
 
-    NX_ASSERT(nx::utils::TimerManager::instance());
     m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
         m_commonModule,
         qnStaticCommon->localPeerType(),

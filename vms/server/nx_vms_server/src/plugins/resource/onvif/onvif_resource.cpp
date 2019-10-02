@@ -172,11 +172,11 @@ void QnPlOnvifResource::updateTimer(
     if (*timerId != 0)
     {
         // Can be called from IO thread. Non blocking call should be used here.
-        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        commonModule()->timerManager()->deleteTimer(*timerId);
         *timerId = 0;
     }
 
-    *timerId = nx::utils::TimerManager::instance()->addTimer(
+    *timerId = commonModule()->timerManager()->addTimer(
         [operationGuard = m_asyncConnectGuard.sharedGuard(),
         function = std::move(function)](nx::utils::TimerId timerId) mutable
         {
@@ -484,7 +484,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
             lk.unlock();
 
             // Guarantees that no onTimer(timerID) is running on return.
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerID);
+            commonModule()->timerManager()->joinAndDeleteTimer(timerID);
             if (!outputTask.active)
             {
                 //returning port to inactive state
@@ -1986,7 +1986,7 @@ bool QnPlOnvifResource::setOutputPortState(
     QnMutexLocker lk(&m_ioPortMutex);
 
     using namespace std::placeholders;
-    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
+    const quint64 timerID = commonModule()->timerManager()->addTimer(
         std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, active,
             autoResetTimeoutMS),
         std::chrono::milliseconds::zero());
@@ -3773,9 +3773,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
     }
 
     if (nextPullMessagesTimerIDBak > 0)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
+        commonModule()->timerManager()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
     if (renewSubscriptionTimerIDBak > 0)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
+        commonModule()->timerManager()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
     //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -4252,7 +4252,7 @@ void QnPlOnvifResource::onPullMessagesDone(
     using namespace std::placeholders;
     NX_ASSERT(m_nextPullMessagesTimerID == 0);
     if (m_nextPullMessagesTimerID == 0)    //otherwise, we already have timer somehow
-        m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
+        m_nextPullMessagesTimerID = commonModule()->timerManager()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
 }
@@ -4624,7 +4624,7 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
         QnMutexLocker lk(&m_ioPortMutex);
         //adding task to reset port state
         using namespace std::placeholders;
-        const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
+        const quint64 timerID = commonModule()->timerManager()->addTimer(
             std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, !active, 0),
             std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);

@@ -464,7 +464,7 @@ void QnFlirEIPResource::startInputPortStatesMonitoring()
         Qt::DirectConnection);
 
     m_inputPortMonitored = true;
-    m_checkInputPortStatusTimerId = nx::utils::TimerManager::instance()->addTimer(
+    m_checkInputPortStatusTimerId = commonModule()->timerManager()->addTimer(
         std::bind(&QnFlirEIPResource::checkInputPortStatus, this),
         kIOCheckTimeout );
 
@@ -484,7 +484,7 @@ bool QnFlirEIPResource::startAlarmMonitoringAsync()
         this, &QnFlirEIPResource::routeAlarmMonitoringFlow,
         Qt::DirectConnection);
 
-    m_checkAlarmStatusTimerId = nx::utils::TimerManager::instance()->addTimer(
+    m_checkAlarmStatusTimerId = commonModule()->timerManager()->addTimer(
         std::bind(&QnFlirEIPResource::checkAlarmStatus, this),
         kAlarmCheckTimeout );
 
@@ -601,7 +601,7 @@ bool QnFlirEIPResource::setOutputPortState(const QString &outputID, bool activat
             auto portTimerEntry = it->second;
             if (it->second.portId == outputID)
             {
-                nx::utils::TimerManager::instance()->deleteTimer(timerId);
+                commonModule()->timerManager()->deleteTimer(timerId);
                 it = m_autoResetTimers.erase(it);
                 break;
             }
@@ -610,7 +610,7 @@ bool QnFlirEIPResource::setOutputPortState(const QString &outputID, bool activat
 
     if (activate && autoResetTimeoutMS)
     {
-        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
+        auto autoResetTimer = commonModule()->timerManager()->addTimer(
             [this](quint64  timerId)
             {
                 boost::optional<PortTimerEntry> timerEntry(boost::none);
@@ -661,7 +661,7 @@ void QnFlirEIPResource::checkInputPortStatus()
 
     if(!m_eipAsyncClient->doServiceRequestAsync(request))
     {
-        m_checkInputPortStatusTimerId = nx::utils::TimerManager::instance()->addTimer(
+        m_checkInputPortStatusTimerId = commonModule()->timerManager()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this),
             kIOCheckTimeout );
     }
@@ -691,7 +691,7 @@ void QnFlirEIPResource::checkInputPortStatusDone()
 
     if (m_currentCheckingPortNumber == 0)
     {
-        m_checkInputPortStatusTimerId = nx::utils::TimerManager::instance()->addTimer(
+        m_checkInputPortStatusTimerId = commonModule()->timerManager()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this),
             kIOCheckTimeout );
     }
@@ -715,7 +715,7 @@ void QnFlirEIPResource::routeAlarmMonitoringFlow()
 void QnFlirEIPResource::scheduleNextAlarmCheck()
 {
     m_currentAlarmMonitoringState = FlirAlarmMonitoringState::ReadyToCheckAlarm;
-    m_checkAlarmStatusTimerId = nx::utils::TimerManager::instance()->addTimer(
+    m_checkAlarmStatusTimerId = commonModule()->timerManager()->addTimer(
         std::bind(&QnFlirEIPResource::checkAlarmStatus, this),
         kAlarmCheckTimeout );
 }

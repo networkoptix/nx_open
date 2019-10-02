@@ -88,7 +88,7 @@ QnActiResource::~QnActiResource()
         const quint64 taskID = it->first;
         m_triggerOutputTasks.erase( it++ );
         lk.unlock();
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer( taskID );
+        commonModule()->timerManager()->joinAndDeleteTimer( taskID );
         lk.relock();
     }
 }
@@ -1001,7 +1001,7 @@ bool QnActiResource::setOutputPortState(
     if( outputNumber < MIN_DIO_PORT_NUMBER || outputNumber > m_outputCount )
         return false;
 
-    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
+    const quint64 timerID = commonModule()->timerManager()->addTimer(
         this,
         std::chrono::milliseconds::zero());
     m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputNumber, activate, autoResetTimeoutMS ) ) );
@@ -1033,7 +1033,7 @@ void QnActiResource::onTimer( const quint64& timerID )
 
     if (triggerOutputTask.autoResetTimeoutMS > 0)
         m_triggerOutputTasks.insert( std::make_pair(
-            nx::utils::TimerManager::instance()->addTimer(
+            commonModule()->timerManager()->addTimer(
                 this, std::chrono::milliseconds(triggerOutputTask.autoResetTimeoutMS)),
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }

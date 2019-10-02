@@ -33,6 +33,7 @@ const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
     nx::utils::AppInfo::organizationName() + "Server";
 
 DeviceSearcher::DeviceSearcher(
+    nx::utils::TimerManager* timerManager,
     std::unique_ptr<AbstractDeviceSearcherSettings> settings,
     unsigned int discoverTryTimeoutMS)
     :
@@ -40,12 +41,13 @@ DeviceSearcher::DeviceSearcher(
     m_discoverTryTimeoutMS(discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS),
     m_timerID(0),
     m_terminated(false),
-    m_needToUpdateReceiveSocket(false)
+    m_needToUpdateReceiveSocket(false),
+    m_timerManager(timerManager)
 {
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
     {
         QnMutexLocker lk(&m_mutex);
-        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+        m_timerID = m_timerManager->addTimer(
             this,
             std::chrono::milliseconds(m_discoverTryTimeoutMS));
     }
@@ -66,7 +68,10 @@ void DeviceSearcher::pleaseStop()
     }
     //m_timerID cannot be changed after m_terminated set to true
     if (m_timerID)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_timerID);
+    {
+        m_timerManager->joinAndDeleteTimer(m_timerID);
+        m_timerID = 0;
+    }
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
     for (std::map<QString, SocketReadCtx>::const_iterator
@@ -84,7 +89,7 @@ void DeviceSearcher::pleaseStop()
     if (socket)
         socket->pleaseStopSync();
 
-    //cancelling ongoing http requests
+    //canceling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
     for (auto it = m_httpClients.begin();
         it != m_httpClients.end();
@@ -207,7 +212,7 @@ void DeviceSearcher::onTimer(const quint64& /*timerID*/)
     QnMutexLocker lk(&m_mutex);
     if (!m_terminated)
     {
-        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+        m_timerID = m_timerManager->addTimer(
             this, std::chrono::milliseconds(m_discoverTryTimeoutMS));
     }
 }

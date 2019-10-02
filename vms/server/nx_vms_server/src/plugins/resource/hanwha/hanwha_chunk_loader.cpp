@@ -12,6 +12,8 @@
 #include "hanwha_request_helper.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_utils.h"
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace vms::server {
@@ -70,11 +72,18 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
         m_terminated = true;
     }
 
-    if (m_nextRequestTimerId)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_nextRequestTimerId);
+    nx::utils::promise<void> promise;
+    m_timer.post(
+        [this, &promise]()
+        {
+            m_timer.pleaseStopSync();
+            if (m_httpClient)
+                m_httpClient->pleaseStopSync();
 
-    if (m_httpClient)
-        m_httpClient->pleaseStopSync();
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 }
 
 void HanwhaChunkLoader::start(const HanwhaInformation& information)
@@ -673,16 +682,14 @@ void HanwhaChunkLoader::scheduleNextRequest(const std::chrono::milliseconds& del
     if (!m_started)
         return;
 
-    m_nextRequestTimerId = nx::utils::TimerManager::instance()->addTimer(
-        [this](nx::utils::TimerId timerId)
+    //m_nextRequestTimerId = timerManager->addTimer(
+    m_timer.start(
+        delay,
+        [this]()
         {
-            if (timerId != m_nextRequestTimerId)
-                return;
-
             QnMutexLocker lock(&m_mutex);
             sendRequest();
-        },
-        delay);
+        });
 }
 
 qint64 HanwhaChunkLoader::latestChunkTimeMs() const

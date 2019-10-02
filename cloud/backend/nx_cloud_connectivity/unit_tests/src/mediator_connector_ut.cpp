@@ -42,6 +42,7 @@ public:
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(
                 [this](
+                    nx::utils::TimerManager* timerManager,
                     const std::optional<nx::utils::Url>& /*cdbUrl*/,
                     const std::string& /*user*/,
                     const std::string& /*password*/,
@@ -229,6 +230,7 @@ private:
     std::unique_ptr<nx::network::cloud::CloudServerSocket> m_cloudServerSocket;
     CloudModuleListGenerator m_cloudModuleListGenerator;
     std::vector<std::string> m_mediatorArgs;
+    nx::utils::TimerManager timerManager;
 
     virtual void SetUp() override
     {

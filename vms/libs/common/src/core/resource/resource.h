@@ -305,6 +305,7 @@ private:
     std::atomic<bool> m_interruptInitialization{false};
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
+    std::atomic<int> cTestStatus{0};
 };
 
 template<class Resource>

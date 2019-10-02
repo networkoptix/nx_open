@@ -1,21 +1,22 @@
 #include "helpers.h"
 
-#include <nx/utils/timer_manager.h>
-
 namespace nx::vms::server::metrics {
 
 class Timer
 {
 public:
-    Timer(std::chrono::milliseconds timeout, utils::metrics::OnChange change):
+    Timer(
+        nx::utils::TimerManager* timerManager,
+        std::chrono::milliseconds timeout, utils::metrics::OnChange change):
         m_timeout(timeout),
-        m_change(std::move(change))
+        m_change(std::move(change)),
+        m_timerManager(timerManager)
     {
     }
 
     void start()
     {
-        m_guard = nx::utils::TimerManager::instance()->addTimerEx(
+        m_guard = m_timerManager->addTimerEx(
             [this](auto /*timeId*/)
             {
                 m_change();
@@ -36,13 +37,26 @@ private:
     const utils::metrics::OnChange m_change;
     nx::utils::StandaloneTimerManager::TimerGuard m_guard;
     std::atomic<bool> m_isStopped{false};
+    nx::utils::TimerManager* m_timerManager = nullptr;
 };
 
+// Used for tests to speedup all timers
+static double m_multiplier = 1.0;
+
+void setTimerMultiplier(int speedRate)
+{
+    m_multiplier = (double) speedRate;
+}
+
 nx::utils::SharedGuardPtr makeTimer(
+    nx::utils::TimerManager* timerManager,
     std::chrono::milliseconds timeout,
     utils::metrics::OnChange change)
 {
-    auto timer = std::make_unique<Timer>(timeout, std::move(change));
+    if (timeout.count() > 0)
+        timeout = std::chrono::milliseconds(std::max(1, (int)(timeout.count() / m_multiplier)));
+
+    auto timer = std::make_unique<Timer>(timerManager, timeout, std::move(change));
     timer->start();
     return nx::utils::makeSharedGuard([timer = std::move(timer)] { timer->stop(); });
 }

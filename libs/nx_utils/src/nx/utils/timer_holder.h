@@ -21,7 +21,7 @@ public:
     using TimerOwnerId = QString;
 
 public:
-    TimerHolder() = default;
+    TimerHolder(nx::utils::TimerManager* timerManager);
     ~TimerHolder();
 
     // Cancels previous timer for specified object and sets up a new one.
@@ -48,6 +48,7 @@ private:
     mutable QnWaitCondition m_wait;
     std::map<TimerOwnerId, std::shared_ptr<TimerContext>> m_timers;
     std::atomic<bool> m_terminated{false};
+    nx::utils::TimerManager* m_timerManager = nullptr;
 };
 
 } // namespace utils

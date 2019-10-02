@@ -91,7 +91,7 @@ public:
     /**
      * Launches internal thread.
      */
-    StandaloneTimerManager(const char* threadName = nullptr);
+    StandaloneTimerManager(const char* threadName = nullptr, QObject* parent = nullptr);
     virtual ~StandaloneTimerManager();
 
     /**
@@ -186,11 +186,13 @@ private:
 };
 
 class NX_UTILS_API TimerManager:
-    public StandaloneTimerManager,
-    public Singleton<TimerManager>
+    public StandaloneTimerManager
 {
 public:
-    TimerManager(const char* threadName = nullptr) : StandaloneTimerManager(threadName) {}
+    TimerManager(const char* threadName = nullptr, QObject* parent = nullptr):
+        StandaloneTimerManager(threadName, parent)
+    {
+    }
 };
 
 /**

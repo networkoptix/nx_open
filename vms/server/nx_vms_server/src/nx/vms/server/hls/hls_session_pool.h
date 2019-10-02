@@ -124,6 +124,7 @@ public:
         const QString m_id;
     };
 
+    SessionPool(nx::utils::TimerManager* timerManager);
     virtual ~SessionPool();
 
     /**
@@ -139,7 +140,7 @@ public:
      * NOTE: Re-launches session deletion timer for keepAliveTimeoutSec.
      */
     Session* find(const QString& id) const;
-    
+
     /** Removes session. Deallocates Session object. */
     void remove(const QString& id);
 
@@ -171,6 +172,7 @@ private:
     std::set<QString> m_lockedIDs;
     std::map<QString, SessionContext> m_sessionById;
     std::map<quint64, QString> m_taskToSessionId;
+    nx::utils::TimerManager* m_timerManager = nullptr;
 
     /** Implementation of TimerEventHandler::onTimer. */
     virtual void onTimer(const quint64& timerId);

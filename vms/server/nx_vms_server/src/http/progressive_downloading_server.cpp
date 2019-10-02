@@ -422,7 +422,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
     const int sessionLiveTimeoutSec =
         d->serverModule->settings().progressiveDownloadSessionLiveTimeSec();
     if( sessionLiveTimeoutSec > 0 )
-        d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
+        d->killTimerID = commonModule()->timerManager()->addTimer(
             this,
             std::chrono::milliseconds(sessionLiveTimeoutSec*MS_PER_SEC));
 
@@ -444,7 +444,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
         d->killTimerID = 0;
     }
     if( killTimerID )
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer( killTimerID );
+        commonModule()->timerManager()->joinAndDeleteTimer( killTimerID );
 
     stop();
 }

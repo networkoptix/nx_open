@@ -186,14 +186,14 @@ bool QnAdamResource::setOutputPortState(
     if (timerIt != m_autoResetTimers.end())
     {
         NX_VERBOSE(this, "Cancelling scheduled IO port [%1] change", outputId);
-        nx::utils::TimerManager::instance()->deleteTimer(timerIt->first);
+        commonModule()->timerManager()->deleteTimer(timerIt->first);
         m_autoResetTimers.erase(timerIt);
     }
 
     if (autoResetTimeoutMs &&
         newState != nx_io_managment::isActiveIOPortState(m_ioManager->getPortDefaultState(outputId)))
     {
-        auto autoResetTimerId = nx::utils::TimerManager::instance()->addTimer(
+        auto autoResetTimerId = commonModule()->timerManager()->addTimer(
             [this, outputId, newState](quint64  timerId)
             {
                 QnMutexLocker lock(&m_mutex);

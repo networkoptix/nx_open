@@ -12,6 +12,7 @@ namespace hpm {
 static AbstractCloudDataProviderFactory::FactoryFunc cloudDataProviderFactoryFunc;
 
 std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::create(
+    nx::utils::TimerManager* timerManager,
     const std::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
@@ -21,6 +22,7 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     if (cloudDataProviderFactoryFunc)
     {
         return cloudDataProviderFactoryFunc(
+            timerManager,
             cdbUrl,
             user,
             password,
@@ -30,6 +32,7 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     else
     {
         return std::make_unique<CloudDataProvider>(
+            timerManager,
             cdbUrl,
             user,
             password,
@@ -93,6 +96,7 @@ static nx::cloud::db::api::ConnectionFactory* makeConnectionFactory(
 }
 
 CloudDataProvider::CloudDataProvider(
+    nx::utils::TimerManager* timerManager,
     const std::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
@@ -104,7 +108,8 @@ CloudDataProvider::CloudDataProvider(
     m_startTimeout(startTimeout),
     m_isTerminated(false),
     m_connectionFactory(makeConnectionFactory(cdbUrl)),
-    m_connection(m_connectionFactory->createConnection())
+    m_connection(m_connectionFactory->createConnection()),
+    m_timerManager(timerManager)
 {
     m_connection->setCredentials(user, password);
     updateSystemsAsync();
@@ -165,7 +170,7 @@ void CloudDataProvider::updateSystemsAsync()
             if (!m_isTerminated)
             {
                 m_timerGuard =
-                    nx::utils::TimerManager::instance()->addTimerEx(
+                    m_timerManager->addTimerEx(
                         [this](quint64) { updateSystemsAsync(); }, m_updateInterval);
             }
         });

@@ -19,6 +19,11 @@ SearchAutoHandler::~SearchAutoHandler()
     m_deviceSearcher->unregisterHandler(this);
 }
 
+nx::network::upnp::DeviceSearcher* SearchAutoHandler::deviceSearcher() const
+{
+    return m_deviceSearcher;
+}
+
 } // namespace nx
 } // namespace network
 } // namespace upnp

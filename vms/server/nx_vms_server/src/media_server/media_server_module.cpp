@@ -305,13 +305,15 @@ QnMediaServerModule::QnMediaServerModule(
     auto settingsToDeviceSearcherSettingsAdaptor =
         std::make_unique<GlobalSettingsToDeviceSearcherSettingsAdapter>(commonModule()->resourceDiscoveryManager());
     m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
+        timerManager(),
         std::move(settingsToDeviceSearcherSettingsAdaptor));
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
     m_sdkObjectFactory = store(new nx::vms::server::analytics::SdkObjectFactory(this));
 
-    m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool());
+    m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool(
+        commonModule()->timerManager()));
     m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
     // Translations must be installed from the main application thread.
@@ -672,6 +674,11 @@ QnResourceStatusWatcher* QnMediaServerModule::statusWatcher() const
 QnMdnsListener* QnMediaServerModule::mdnsListener() const
 {
     return m_mdnsListener.get();
+}
+
+nx::utils::TimerManager* QnMediaServerModule::timerManager() const
+{
+    return m_commonModule->timerManager();
 }
 
 nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() const

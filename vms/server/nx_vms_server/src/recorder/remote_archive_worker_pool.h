@@ -19,6 +19,7 @@ using LockableTaskMap = nx::utils::Lockable<TaskMap>;
 class RemoteArchiveWorkerPool
 {
 public:
+    RemoteArchiveWorkerPool(nx::utils::TimerManager* timerManager);
     virtual ~RemoteArchiveWorkerPool();
 
     void start();
@@ -46,6 +47,7 @@ private:
     std::map<QnUuid, std::unique_ptr<RemoteArchiveWorker>> m_workers;
     std::list<RemoteArchiveTaskPtr> m_taskQueue;
     nx::utils::MoveOnlyFunc<LockableTaskMap*()> m_taskMapAccessor;
+    nx::utils::TimerManager* m_timerManager = nullptr;
 };
 
 } // namespace recorder

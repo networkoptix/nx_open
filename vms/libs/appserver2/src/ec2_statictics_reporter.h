@@ -16,7 +16,9 @@ namespace ec2
     {
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
-        Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection);
+        Ec2StaticticsReporter(
+            nx::utils::TimerManager* timerManager,
+            ec2::AbstractECConnection* ec2Connection);
 
         ~Ec2StaticticsReporter();
 
@@ -57,5 +59,6 @@ namespace ec2
         QnMutex m_mutex;
         bool m_timerDisabled;
         boost::optional<qint64> m_timerId;
+        nx::utils::TimerManager* m_timerManager = nullptr;
     };
 }

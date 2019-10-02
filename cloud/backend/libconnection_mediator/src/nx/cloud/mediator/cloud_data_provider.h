@@ -48,6 +48,7 @@ class AbstractCloudDataProviderFactory
 public:
     typedef std::function<
         std::unique_ptr<AbstractCloudDataProvider>(
+            nx::utils::TimerManager* timerManager,
             const std::optional<nx::utils::Url>& cdbUrl,
             const std::string& user,
             const std::string& password,
@@ -57,6 +58,7 @@ public:
     virtual ~AbstractCloudDataProviderFactory() {}
 
     static std::unique_ptr<AbstractCloudDataProvider> create(
+        nx::utils::TimerManager* timerManager,
         const std::optional<nx::utils::Url>& cdbUrl,
         const std::string& user,
         const std::string& password,
@@ -79,6 +81,7 @@ public:
     static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
 
     CloudDataProvider(
+        nx::utils::TimerManager* timerManager,
         const std::optional<nx::utils::Url>& cdbUrl,
         const std::string& user,
         const std::string& password,
@@ -103,6 +106,7 @@ private:
 
     std::unique_ptr< nx::cloud::db::api::ConnectionFactory > m_connectionFactory;
     std::unique_ptr< nx::cloud::db::api::Connection > m_connection;
+    nx::utils::TimerManager* m_timerManager = nullptr;
 };
 
 } // namespace hpm

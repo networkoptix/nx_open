@@ -94,7 +94,8 @@ bool StandaloneTimerManager::TimerGuard::operator!=(
 
 //-------------------------------------------------------------------------------------------------
 
-StandaloneTimerManager::StandaloneTimerManager(const char* threadName):
+StandaloneTimerManager::StandaloneTimerManager(const char* threadName, QObject* parent):
+    QThread(parent),
     m_terminated(false),
     m_runningTaskID(0)
 {

@@ -17,7 +17,7 @@ namespace conf { class Settings; }
 class Controller
 {
 public:
-    Controller(const conf::Settings& settings);
+    Controller(nx::utils::TimerManager* timerManager, const conf::Settings& settings);
 
     MediaserverEndpointTester& mediaserverEndpointTester();
 

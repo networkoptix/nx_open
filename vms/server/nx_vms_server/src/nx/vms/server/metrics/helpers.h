@@ -2,6 +2,7 @@
 
 #include <core/resource/resource.h>
 #include <nx/vms/utils/metrics/resource_provider.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx::vms::server::metrics {
 
@@ -50,16 +51,22 @@ utils::metrics::Watch<ResourceType> propertyWatch(const QString& property)
 }
 
 nx::utils::SharedGuardPtr makeTimer(
+    nx::utils::TimerManager* timerManager,
     std::chrono::milliseconds timeout,
     utils::metrics::OnChange change);
+
+/*
+ * @param speedRate speedup all timers in N times. Used for UT only.
+ */
+void setTimerMultiplier(int speedRate);
 
 template<typename ResourceType>
 utils::metrics::Watch<ResourceType> timerWatch(std::chrono::milliseconds timeout)
 {
     return
-        [timeout](const ResourceType& /*resource*/, utils::metrics::OnChange change)
+        [timeout](const ResourceType& resource, utils::metrics::OnChange change)
         {
-            return makeTimer(timeout, std::move(change));
+            return makeTimer(resource->commonModule()->timerManager(), timeout, std::move(change));
         };
 }
 

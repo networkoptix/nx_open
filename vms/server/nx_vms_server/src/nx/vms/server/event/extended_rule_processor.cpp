@@ -246,7 +246,7 @@ void ExtendedRuleProcessor::stop()
     }
 
     for (const auto& timerId : timersToRemove)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
+        serverModule()->commonModule()->timerManager()->joinAndDeleteTimer(timerId);
 }
 
 void ExtendedRuleProcessor::onRemoveResource(const QnResourcePtr& resource)
@@ -796,7 +796,8 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
     }
     if (!aggregatedData.periodicTaskID)
     {
-        aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
+        auto timerManager = serverModule()->commonModule()->timerManager();
+        aggregatedData.periodicTaskID = timerManager->addTimer(
             std::bind(&ExtendedRuleProcessor::sendAggregationEmail, this, action->getRuleId()),
             aggregationPeriod);
     }

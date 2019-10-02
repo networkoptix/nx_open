@@ -285,7 +285,7 @@ bool QnPlAreconVisionResource::setOutputPortState(
     url.setPassword(auth.password());
 
     const auto activateWithAutoResetDoneHandler =
-        [autoResetTimeoutMS, url](
+        [this, autoResetTimeoutMS, url](
             SystemError::ErrorCode errorCode,
             int statusCode,
             nx::network::http::BufferType,
@@ -298,7 +298,7 @@ bool QnPlAreconVisionResource::setOutputPortState(
             }
 
             //scheduling auto-reset
-            nx::utils::TimerManager::instance()->addTimer(
+            commonModule()->timerManager()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
                     resetOutputUrl.setPath(lit("/set"));

@@ -145,6 +145,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
 
+    m_timerManager = new nx::utils::TimerManager("StandaloneTimerManager");
+
     m_storagePluginFactory = new QnStoragePluginFactory(this);
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
@@ -251,6 +253,7 @@ QnCommonModule::~QnCommonModule()
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
     setResourceDiscoveryManager(nullptr);
+    delete m_timerManager;
 }
 
 void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)

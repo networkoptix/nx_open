@@ -11,6 +11,7 @@
 #include <recording/time_period_list.h>
 
 #include <plugins/resource/hanwha/hanwha_information.h>
+#include <common/common_module_aware.h>
 
 extern "C" {
 
@@ -151,7 +152,6 @@ private:
 
     OverlappedChunks m_chunks;
     OverlappedChunks m_newChunks;
-    nx::utils::TimerId m_nextRequestTimerId = 0;
 
     qint64 m_startTimeUs = AV_NOPTS_VALUE;
     qint64 m_endTimeUs = AV_NOPTS_VALUE;
@@ -181,6 +181,7 @@ private:
     std::chrono::milliseconds m_lastTimelineUpdate{0};
 
     HanwhaChunkLoaderSettings m_settings;
+    nx::network::aio::Timer m_timer;
 };
 
 } // namespace plugins

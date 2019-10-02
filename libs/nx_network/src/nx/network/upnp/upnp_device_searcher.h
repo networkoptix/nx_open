@@ -69,6 +69,7 @@ public:
      * @param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch.
      */
     explicit DeviceSearcher(
+        nx::utils::TimerManager* timerManager,
         std::unique_ptr<AbstractDeviceSearcherSettings> settings,
         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS);
     virtual ~DeviceSearcher();
@@ -101,7 +102,7 @@ public:
      */
     void processDiscoveredDevices(SearchHandler* handlerToUse = NULL);
     int cacheTimeout() const;
-
+    nx::utils::TimerManager* timerManager() const { return m_timerManager; }
 private:
     class DiscoveredDeviceInfo
     {
@@ -159,6 +160,7 @@ private:
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
     bool m_needToUpdateReceiveSocket;
+    nx::utils::TimerManager* m_timerManager;
 
     virtual void onTimer(const quint64& timerID) override;
     void onSomeBytesRead(

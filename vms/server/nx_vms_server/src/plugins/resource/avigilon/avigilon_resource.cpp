@@ -75,7 +75,7 @@ void QnAvigilonResource::startInputPortStatesMonitoring()
     NX_ASSERT( !m_inputMonitored );
     m_inputMonitored = true;
 
-    m_checkInputPortStatusTimerID = nx::utils::TimerManager::instance()->addTimer(
+    m_checkInputPortStatusTimerID = commonModule()->timerManager()->addTimer(
         std::bind(&QnAvigilonResource::checkInputPortState, this, std::placeholders::_1),
         std::chrono::milliseconds(INPUT_PORT_CHECK_PERIOD_MS));
 }
@@ -91,7 +91,7 @@ void QnAvigilonResource::stopInputPortStatesMonitoring()
     }
 
     if( checkInputPortStatusTimerID > 0 )
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(checkInputPortStatusTimerID);
+        commonModule()->timerManager()->joinAndDeleteTimer(checkInputPortStatusTimerID);
 
     m_checkInputPortsRequest.reset();
 }
@@ -148,7 +148,7 @@ void QnAvigilonResource::onCheckPortRequestDone( nx::network::http::AsyncHttpCli
         }
     }
 
-    m_checkInputPortStatusTimerID = nx::utils::TimerManager::instance()->addTimer(
+    m_checkInputPortStatusTimerID = commonModule()->timerManager()->addTimer(
         std::bind(&QnAvigilonResource::checkInputPortState, this, std::placeholders::_1),
         std::chrono::milliseconds(INPUT_PORT_CHECK_PERIOD_MS));
 }

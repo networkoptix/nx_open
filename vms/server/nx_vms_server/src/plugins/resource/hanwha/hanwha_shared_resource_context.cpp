@@ -120,7 +120,10 @@ void HanwhaSharedResourceContext::startServices()
     {
         QnMutexLocker lock(&m_servicesMutex);
         if (!m_chunkLoader)
-            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this, m_chunkLoaderSettings);
+        {
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(
+                this, m_chunkLoaderSettings);
+        }
     }
 
     NX_VERBOSE(this, "Starting services (is NVR: %1)...",

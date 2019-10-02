@@ -43,7 +43,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(
     :
     nx::vms::server::ServerModuleAware(serverModule),
     m_flags(flags),
-    m_dataSourceCache(nx::utils::TimerManager::instance())
+    m_dataSourceCache(serverModule->timerManager())
 {
     m_transcodeThreads.resize(TRANSCODE_THREAD_COUNT);
     for (size_t i = 0; i < m_transcodeThreads.size(); ++i)
@@ -77,7 +77,7 @@ void StreamingChunkTranscoder::stop()
     }
 
     for (auto val: m_taskIDToTranscode)
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer(val.first);
+        serverModule()->commonModule()->timerManager()->joinAndDeleteTimer(val.first);
 
     std::for_each(
         m_transcodeThreads.begin(),
@@ -406,7 +406,7 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
     const int transcodeID,
     int delayMSec)
 {
-    const quint64 taskID = nx::utils::TimerManager::instance()->addTimer(
+    const quint64 taskID = serverModule()->commonModule()->timerManager()->addTimer(
         this,
         std::chrono::milliseconds(delayMSec));
 

@@ -53,12 +53,16 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD =
         "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd";
 
-    Ec2StaticticsReporter::Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection):
+    Ec2StaticticsReporter::Ec2StaticticsReporter(
+        nx::utils::TimerManager* timerManager,
+        ec2::AbstractECConnection* ec2Connection)
+        :
         m_ec2Connection(ec2Connection),
         m_firstTime(true),
         m_timerCycle(kInitialTimerCycle),
         m_timerDisabled(false),
-        m_timerId(boost::none)
+        m_timerId(boost::none),
+        m_timerManager(timerManager)
     {
         NX_CRITICAL(kMaxdelayRation <= 100);
         setupTimer();
@@ -153,7 +157,7 @@ namespace ec2
         QnMutexLocker lk(&m_mutex);
         if (!m_timerDisabled)
         {
-            m_timerId = nx::utils::TimerManager::instance()->addTimer(
+            m_timerId = m_timerManager->addTimer(
                 std::bind(&Ec2StaticticsReporter::timerEvent, this),
                 std::chrono::milliseconds(m_timerCycle));
 
@@ -171,7 +175,7 @@ namespace ec2
         }
 
         if (timerId)
-            nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
+            m_timerManager->joinAndDeleteTimer(*timerId);
 
         if (auto client = m_httpClient)
             client->pleaseStopSync();

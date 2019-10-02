@@ -3,6 +3,11 @@
 namespace nx {
 namespace utils {
 
+TimerHolder::TimerHolder(nx::utils::TimerManager* timerManager):
+    m_timerManager(timerManager)
+{
+}
+
 TimerHolder::~TimerHolder()
 {
     terminate();
@@ -29,9 +34,9 @@ void TimerHolder::addTimer(
                 return;
 
             if (timerContext->timerId)
-                TimerManager::instance()->deleteTimer(timerContext->timerId);
+                m_timerManager->deleteTimer(timerContext->timerId);
 
-            timerContext->timerId = TimerManager::instance()->addTimer(
+            timerContext->timerId = m_timerManager->addTimer(
                 [timerContext, callback](TimerId timerId)
                 {
                     QnMutexLocker lock(&timerContext->lock);
@@ -43,7 +48,7 @@ void TimerHolder::addTimer(
                 delay);
         };
 
-    if (TimerManager::instance() == QThread::currentThread())
+    if (m_timerManager == QThread::currentThread())
         return setTimer();
 
     QnMutexLocker lock(&timerContext->lock);
@@ -62,7 +67,7 @@ void TimerHolder::cancelTimerSync(const TimerOwnerId& timerOwnerId)
     if (!timerContext->timerId)
         return;
 
-    TimerManager::instance()->deleteTimer(timerContext->timerId);
+    m_timerManager->deleteTimer(timerContext->timerId);
     timerContext->timerId = 0;
 }
 

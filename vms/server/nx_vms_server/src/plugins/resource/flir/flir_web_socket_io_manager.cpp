@@ -231,7 +231,7 @@ void WebSocketIoManager::terminate()
     }
 
     if (timerId)
-        TimerManager::instance()->joinAndDeleteTimer(timerId);
+        m_resource->commonModule()->timerManager()->joinAndDeleteTimer(timerId);
 }
 
 //------------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ void WebSocketIoManager::connectWebsocketUnsafe(
             proxy->open(url);
         };
 
-    m_timerId = TimerManager::instance()->addTimer(
+    m_timerId = m_resource->commonModule()->timerManager()->addTimer(
         doConnect,
         delay);
 }
@@ -555,7 +555,7 @@ void WebSocketIoManager::sendKeepAliveUnsafe()
             sendKeepAliveUnsafe();
         };
 
-    m_keepAliveTimerId = TimerManager::instance()->addTimer(
+    m_keepAliveTimerId = m_resource->commonModule()->timerManager()->addTimer(
         sendKeepAliveWrapper,
         kKeepAliveTimeout);
 }
@@ -568,7 +568,7 @@ void WebSocketIoManager::handleServerWhoAmIResponseUnsafe(const CommandResponse&
 
     if (m_initializationState == InitState::controlSocketConnected)
     {
-        m_keepAliveTimerId = TimerManager::instance()->addTimer(
+        m_keepAliveTimerId = m_resource->commonModule()->timerManager()->addTimer(
             [this](TimerId timerId)
             {
                 QnMutexLocker lock(&m_mutex);
@@ -715,7 +715,7 @@ void WebSocketIoManager::reinitMonitoringUnsafe()
     createWebSocketProxy();
 
     if (m_keepAliveTimerId)
-        TimerManager::instance()->joinAndDeleteTimer(m_keepAliveTimerId);
+        m_resource->commonModule()->timerManager()->joinAndDeleteTimer(m_keepAliveTimerId);
 
     routeIOMonitoringInitializationUnsafe(InitState::initial);
 }

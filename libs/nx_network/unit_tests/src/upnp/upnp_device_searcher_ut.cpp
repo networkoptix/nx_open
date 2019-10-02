@@ -52,7 +52,8 @@ public:
 TEST(UpnpDeviceSearcher, DISABLED_General)
 {
     nx::utils::TimerManager timerManager;
-    DeviceSearcher deviceSearcher(std::make_unique<DeviceSearcherDefaultSettings>());
+    DeviceSearcher deviceSearcher(
+        &timerManager, std::make_unique<DeviceSearcherDefaultSettings>());
     TestSearchHandler testSearcher(&deviceSearcher);
     QThread::sleep(5);
 }

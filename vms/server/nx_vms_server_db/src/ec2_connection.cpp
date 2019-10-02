@@ -26,7 +26,8 @@ Ec2DirectConnection::Ec2DirectConnection(
     // NOTE: Ec2StaticticsReporter can only be created after connection is established
     if (m_isInitialized)
     {
-        m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(this);
+        m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(
+            commonModule()->timerManager(), this);
     }
 
     m_orphanCameraWatcher = std::make_unique<nx::appserver::OrphanCameraWatcher>(commonModule());

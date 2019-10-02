@@ -76,7 +76,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initializating controller"));
 
-    Controller controller(settings);
+    Controller controller(&timerManager, settings);
     m_controller = &controller;
 
     NX_INFO(this, lm("Initializating view"));

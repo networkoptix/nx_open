@@ -10,7 +10,7 @@
 #include <utils/common/synctime.h>
 
 #include "remote_archive_worker_pool.h"
-
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace vms::server {
@@ -18,7 +18,8 @@ namespace recorder {
 
 WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),
-    m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
+    m_workerPool(std::make_unique<RemoteArchiveWorkerPool>(
+        serverModule->timerManager()))
 {
     m_workerPool->setMaxTaskCount(maxSynchronizationThreads());
     m_workerPool->start();

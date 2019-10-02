@@ -44,6 +44,7 @@ namespace nx { namespace metrics { struct Storage; } }
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
 namespace nx::network::http { class ClientPool; }
+namespace nx::utils { class TimerManager; }
 
 namespace nx::analytics {
 
@@ -214,6 +215,8 @@ public:
         return m_analyticsObjectTypeDescriptorManager;
     }
 
+    nx::utils::TimerManager* timerManager() const { return m_timerManager; }
+
     void setNeedToStop(bool value) { m_needToStop = value; }
     bool isNeedToStop() const { return m_needToStop; }
 
@@ -337,6 +340,7 @@ private:
     void updateModuleInformationUnsafe();
 
 private:
+    nx::utils::TimerManager* m_timerManager = nullptr;
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
     QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;
