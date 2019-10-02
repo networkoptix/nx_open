@@ -121,7 +121,11 @@ bool CameraThumbnailProvider::tryLoad()
     NX_VERBOSE(this, "doLoadAsync(%1) - got image from the cache, error is %2 us",
         m_request.camera->getName(), requiredTime - actualTime);
 
-    m_image = image;
+    const int rotation = m_request.rotation < 0
+        ? int(m_request.camera->defaultRotation())
+        : m_request.rotation;
+
+    m_image = image.transformed(QMatrix().rotate(rotation));
     m_timestampUs = actualTime.count();
 
     emit imageChanged(m_image);
