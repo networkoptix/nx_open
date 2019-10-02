@@ -169,7 +169,6 @@ public:
     void updateArea(const QnUuid& areaId);
     void updateAreas();
     void ensureRotation();
-    QRectF rotatedRectangle(const QRectF& source) const;
 
 public:
     QHash<QnUuid, Area> areaById;
@@ -279,26 +278,6 @@ void AreaHighlightOverlayWidget::Private::ensureRotation()
 
     connect(rotation.data(), &QGraphicsRotation::angleChanged, this, updateAngle);
     updateAngle();
-}
-
-QRectF AreaHighlightOverlayWidget::Private::rotatedRectangle(const QRectF& source) const
-{
-    switch (angle)
-    {
-        case 90:
-            return QRectF(source.top(), 1.0 - source.right(), source.height(), source.width());
-
-        case 180:
-            return QRectF(
-                1.0 - source.right(), 1.0 - source.bottom(), source.width(), source.height());
-
-        case 270:
-            return QRectF(1.0 - source.bottom(), source.left(), source.height(), source.width());
-
-        default:
-            NX_ASSERT(angle == 0);
-            return source;
-    }
 }
 
 AreaHighlightOverlayWidget::AreaHighlightOverlayWidget(QGraphicsWidget* parent):
