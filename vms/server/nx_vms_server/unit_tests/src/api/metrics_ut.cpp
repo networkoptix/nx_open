@@ -12,6 +12,12 @@ namespace nx::test {
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
+static const QString kCameraName("Camera1");
+static const QString kCameraHostAddress("192.168.0.2");
+static const QString kCameraFirmware("1.2.3.4");
+static const QString kCameraModel("model1");
+static const QString kCameraVendor("vendor1");
+
 class DataProviderStub: public QnAbstractStreamDataProvider
 {
 public:
@@ -21,35 +27,9 @@ public:
 class MetricsApi: public ::testing::Test
 {
 public:
-    std::unique_ptr<DataProviderStub> m_dataProviderStub;
-    QnSharedResourcePointer<resource::test::CameraMock> m_camera;
-
     MetricsApi()
     {
         EXPECT_TRUE(launcher.start());
-
-        m_camera.reset(
-            new resource::test::CameraMock(launcher.serverModule()));
-        m_camera->setPhysicalId("testCamera 1");
-        m_camera->setParentId(launcher.commonModule()->moduleGUID());
-        launcher.commonModule()->resourcePool()->addResource(m_camera);
-        m_dataProviderStub.reset(new DataProviderStub(m_camera));
-
-        DeviceFileCatalog catalog(
-            launcher.serverModule(),
-            m_camera->getUniqueId(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
-
-        nx::vms::server::Chunk chunk1;
-        chunk1.startTimeMs = 1400000000LL * 1000;
-        chunk1.durationMs = 45 * 1000;
-        chunk1.setFileSize(100);
-        catalog.addRecord(chunk1);
-
-        nx::vms::server::Chunk chunk2;
-        chunk2.startTimeMs = 1400000000LL * 1000;
-        chunk2.durationMs = 45 * 1000;
-        chunk2.setFileSize(200);
-        catalog.addRecord(chunk2);
     }
 
     template<typename T>
@@ -103,40 +83,6 @@ TEST_F(MetricsApi, Api)
 
     const auto systemAlarms = get<Alarms>("/ec2/metrics/alarms");
     EXPECT_EQ(systemAlarms.size(), 0);
-}
-
-TEST_F(MetricsApi, offlineEvents)
-{
-    {
-        auto systemValues = get<SystemValues>("/ec2/metrics/values");
-        auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-        ASSERT_EQ(5, cameraData.size());
-        int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
-        ASSERT_EQ(1, offlineEvents);
-    }
-
-    const int kOfflineIterations = 4;
-    for (int i = 0; i < kOfflineIterations; ++i)
-    {
-        m_camera->setStatus(Qn::Online);
-        m_camera->setStatus(Qn::Offline);
-    }
-
-    {
-        auto systemValues = get<SystemValues>("/ec2/metrics/values");
-        auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-        int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
-        ASSERT_EQ(1 + kOfflineIterations, offlineEvents);
-    }
-
-    auto systemAlarms = get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_EQ(2, systemAlarms.size());
-    ASSERT_EQ("availability.offlineEvents", systemAlarms[0].parameter);
-    ASSERT_EQ("availability.status", systemAlarms[1].parameter);
-
-    m_camera->setStatus(Qn::Online);
-    systemAlarms = get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_EQ(1, systemAlarms.size());
 }
 
 } // nx::test
