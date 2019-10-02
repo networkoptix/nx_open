@@ -42,7 +42,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
                 return;
 
             /* We may get globalPermissionsChanged when user is removed. */
-            if (m_user->resourcePool())
+            if (resourcePool()->getResourceById(m_user->getId()))
                 reconnect();
         });
 }
