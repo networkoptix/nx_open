@@ -75,22 +75,21 @@ private:
 public:
     void setBootedFromSdCard(bool value) { m_isBootedFromSdCard = value; }
 
-    // TODO: #lbusygin: Check int options for convertion to bool.
+    // TODO: #lbusygin: Check int options for conversion to bool.
     Option<int> port{this, "port",
         7001,
-        "Port, server listen on. All requests (ec2 API, mediaserver API, rtsp) are accepted on "
-        "this port, so name \a rtspPort does not reflects its purpose"
+        "Port the Server listens for all requests (/ec2, /api, rtsp)."
     };
     Option<int> appserverPort{this, "appserverPort", 7001, ""};
     Option<QString> appserverHost{this, "appserverHost", "",
-        "Application server IP address. Usually it's built in to a media server. So, value is "
-        "empty or has value 'localhost'. But it's allowed to redirect media server to a remote "
-        "database placed at another media server."
+        "Application Server IP address. Usually it's built in into the Server. So, the value is "
+        "empty or equals 'localhost'. But it's allowed to redirect the Server to a remote "
+        "database located at another Server."
     };
     Option<QString> appserverPassword{this, "appserverPassword","",
-        "Password to authenticate on EC database. If server use local database, this password is "
-        "writen to a database as an admin password then it's removed from config for security "
-        "reasons."
+        "Password to authenticate on EC database. If the Server uses the local database, this "
+        "password is written to a database as an admin password, and then it's removed from the "
+        "config for security reasons."
     };
     Option<QString> appserverLogin{this, "appserverLogin",helpers::kFactorySystemUser, ""};
     Option<qint64> minStorageSpace{this, "minStorageSpace",kDefaultMinStorageSpace, ""};
@@ -106,17 +105,17 @@ public:
     Option<unsigned int> hlsChunkCacheSizeSec{this, "hlsChunkCacheSizeSec", 60, ""};
     Option<int> hlsRemovedChunksToKeep{this, "hlsRemovedChunksToKeep",
         kDefaultHlsRemovedLiveChunksToKeep,
-        "By hls specification, chunk, removed from playlist, SHOULD be available for period equal "
-        "to chunk duration plus playlist duration.\n"
-        "This results in 7-8 chunks (3-4 of them are already removed from playlist) are always in "
-        "memory what can be too much for edge server.\n"
+        "By HLS specification, a chunk removed from the playlist should be available for the "
+        "period equal to the chunk duration plus the playlist duration.\n"
+        "This results in 7-8 chunks (3-4 of them are already removed from the playlist) being "
+        "always in memory, which can be too much for an Edge Server.\n"
         "This setting allows to override that behavior and keep different removed chunks number "
         "in memory.\n"
-        "-1 means spec-defined behavior is used (default), otherwise this is number of chunks "
-        "removed from playlist which are still available for downloading\n"
-        "\\warning Value of 0 is unreliable and can lead to improper playback (chunked removed "
-        "after client has received playlist but before chunk has been downloaded), so 1 minimum "
-        "is recommended"
+        "-1 means the spec-defined behavior is used (default), otherwise this is the number of "
+        "chunks removed from the playlist which are still available for downloading.\n"
+        "WARNING: The value of 0 is unreliable and can lead to improper playback (a chunk is "
+        "removed after the Client has received playlist but before the chunk has been downloaded), so 1 minimum "
+        "is recommended."
     };
     Option<int> hlsPlaylistPreFillChunks{this, "hlsPlaylistPreFillChunks",
         kDefaultHlsPlaylistPreFillChunks,
@@ -125,7 +124,7 @@ public:
     Option<unsigned int> hlsMaxChunkBufferSize{this, "hlsMaxChunkBufferSize",
         kDefaultHlsMaxChunkBufferSize,
         "Chunk can be fully cached in memory only it size is not greater then this value. "
-        "Otherwise, only last \a hlsMaxChunkBufferSize bytes can be stored in memory"
+        "Otherwise, only the last hlsMaxChunkBufferSize bytes can be stored in memory."
     };
     Option<int> ioBlockSize{this, "ioBlockSize",
         4 * 1024 * 1024,
@@ -135,18 +134,18 @@ public:
     Option<int> ffmpegBufferSize{this, "ffmpegBufferSize",
         4 * 1024 * 1024,
         "Size of data to keep in memory after each write. This is required to minimize seeks on "
-        "disk, since ffmpeg sometimes seeks to the left from current file position to fill in some"
-        " media file structure size. Minimal value for adaptive buffer."
+        "disk, since FFmpeg sometimes seeks to the left from current file position to fill in some "
+        "media file structure size. Minimal value for adaptive buffer."
     };
     Option<int> maxFfmpegBufferSize{this, "maxFfmpegBufferSize", 4 * 1024 * 1024,
         "Size of data to keep in memory after each write. This is required to minimize seeks on "
-        "disk, since ffmpeg sometimes seeks to the left from current file position to fill in some"
-        " media file structure size. Minimal value for adaptive buffer."
+        "disk, since FFmpeg sometimes seeks to the left from current file position to fill in some "
+        "media file structure size. Minimal value for adaptive buffer."
     };
     Option<int> mediaFileDuration{this, "mediaFileDuration", 60, ""};
     Option<int> hlsInactivityPeriod{this, "hlsInactivityPeriod", 10,
         "If no one uses HLS for thid time period (in seconds), than live media cache is stopped "
-        "and cleaned. It will be restarted with next HLS request"
+        "and cleaned. It will be restarted with next HLS request."
     };
     Option<int> resourceInitThreadsCount{this, "resourceInitThreadsCount", 32, ""};
     Option<QString> allowedSslVersions{this, "allowedSslVersions", "",
@@ -161,10 +160,10 @@ public:
         "0 means no limit"
     };
     Option<bool> allowSslConnections{this, "allowSslConnections", true,
-        "Recommended TCP transport to the media server. Default value is true."
-        "If change this parameter to the false, other media servers use HTTP "
-        "instead of HTTPS when open connection to the this server. "
-        "It allows to save CPU for the very slow ARM devices."
+        "Recommended TCP transport for the Server. Default value is true."
+        "If this parameter is changed to false, other Servers will use HTTP "
+        "instead of HTTPS when opening connections to this Server. "
+        "It allows to save CPU for slow ARM devices."
     };
     Option<bool> createFullCrashDump{this, "createFullCrashDump", false,
         "Configures the size of crash dumps:\n"
@@ -182,7 +181,7 @@ public:
     };
     Option<bool> ecDbReadOnly{this, "ecDbReadOnly",
         false,
-        "If set to \a true, EC DB is opened in read-only mode. So, any "
+        "If set to true, EC DB is opened in read-only mode. So, any "
         "data modification operation except license activation will fail",
         [this](bool value)
         {
@@ -213,16 +212,15 @@ public:
     };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",
         "http://updates.vmsproxy.com/updates.json",
-        "Url used by mediaserver as a root update information source. Default = "
-        "http://updates.vmsproxy.com.\n"
-        "See: https://networkoptix.atlassian.net/wiki/spaces/PM/pages/197394433/Updates"
+        "Url used by the Server as a root update information source. Default: "
+        "http://updates.vmsproxy.com."
     };
     Option<bool> secureAppserverConnection{this, "secureAppserverConnection", false, ""};
     Option<bool> lowPriorityPassword{this, "lowPriorityPassword", false, ""};
     Option<QString> pendingSwitchToClusterMode{this, "pendingSwitchToClusterMode", "",
-        "Temporary flag. Used on upgrading machine with mediaserver only. If set to true "
-        "mediaserver connects to remote system, sets correct system name, removes this flag and "
-        "restarts."
+        "Temporary flag. Used on upgrading machine with the Server only. If set to true, "
+        "the Server connects to the remote system, sets correct system name, removes this flag, "
+        "and restarts."
     };
     Option<bool> ffmpegRealTimeOptimization{this, "ffmpegRealTimeOptimization", true, ""};
     Option<int> redundancyTimeout{this, "redundancyTimeout", 3, ""};
@@ -266,17 +264,17 @@ public:
     Option<int> systemIdFromSystemName{this, "systemIdFromSystemName", 0, ""};
     Option<bool> noMonitorStatistics{this, "noMonitorStatistics",
         false,
-        "disable CPU/network usage stats"
+        "Disable CPU/network usage stats."
     };
     Option<QString> guidIsHWID{this, "guidIsHWID", "",
-        "yes If current servers's hardware id is used as server id, no if not used. Initially this"
-        " value is empty. On first start server checks if it can use hardwareid as its id and sets"
-        " this flag to yes or no accordingly."
+        "\"yes\" if the current Server's hardware id is used as the Server id, \"no\" otherwise. "
+        "Initially this value is empty. On the first start, the Server checks if it can use the "
+        "hardware id as its id, and sets this flag to \"yes\" or \"no\" accordingly."
     };
     Option<QString> serverGuid{this, "serverGuid", "", ""};
     Option<QString> serverGuid2{this, "serverGuid2", "",
-        "Server Guid used by v < 2.3 to connect to another server (workaround for DW's issue with "
-        "cloning)."
+        // Workaround for the old issue with cloning.
+        "Deprecated. Server Guid used by v < 2.3 to connect to another Server."
     };
     Option<QString> obsoleteServerGuid{this, "obsoleteServerGuid", "",
         "Temporary variable. Set when changing serverGuid to hardware id."
@@ -289,8 +287,8 @@ public:
     Option<QByteArray> authKey{this, "authKey", "", ""};
     Option<qint64> forceStopRecordingTime{this, "forceStopRecordingTime",
         60 * 60 * 24 * 30,
-        "Stop camera recording timeout if not enough license. Value in seconds. By default it's 30"
-        " days.",
+        "Stop camera recording timeout if not enough licenses. Value in seconds. "
+        "Default: 30 days.",
         [this](const qint64& value)
         {
             return qMin(value, forceStopRecordingTime.defaultValue());
@@ -306,18 +304,18 @@ public:
     Option<QString> rtspTransport{this, "rtspTransport", "automatic", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
-        "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
-        "media data absolute timestamps"
+        "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will correspond to "
+        "media data absolute timestamps."
     };
     Option<MultiThreadDecodePolicy> multiThreadDecodePolicy{this, "multiThreadDecodePolicy",
         MultiThreadDecodePolicy::autoDetect,
         "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
-        "transcoding and motion estimation"
+        "transcoding and motion estimation."
     };
 
     Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
-        "Ignore root tool executable presense (if set to true, media server will try to execute all "
-        "commands that require root access directly)"};
+        "Ignore root tool executable presence (if set to true, the Server will try to execute all "
+        "commands that require root access directly)."};
 
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",
@@ -339,9 +337,8 @@ public:
     };
     Option<QString> dataDir{this, "dataDir",
         "",
-        "/var (on linux). "
-        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\ on "
-        "MSWin",
+        "/var (on Linux), "
+        "C:\\Users\\{username}\\AppData\\Local\\{vendor}}\\{product}\\ (on Windows).",
         [this](const QString& value)
         {
             if (!value.isEmpty())
@@ -352,9 +349,8 @@ public:
     };
     Option<QString> backupDir{this, "backupDir",
         "",
-        "/opt/{CustomizationName}/mediaserver/var/backup (on linux). "
-        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\backup "
-        "on MSWin",
+        "/opt/{vendor}/mediaserver/var/backup (on Linux), "
+        "C:\\Users\\{username}\\AppData\\Local\\{vendor}}\\{server-product}\\backup (on Windows).",
         [this](const QString& value)
         {
             if (!value.isEmpty())
@@ -365,8 +361,8 @@ public:
     };
     Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriodMS",
         kDbBackupPeriodHrs,
-        "Backup EC database period. If server version is updated, this setting is neglected and "
-        "backup is created after the updated server starts.",
+        "Backup EC database period. If Server version is updated, this setting is neglected and "
+        "backup is created after the updated Server starts.",
         [](const std::chrono::milliseconds& value)
         {
             if (value.count() == 0)

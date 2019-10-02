@@ -2382,7 +2382,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/logLevel", new QnLogLevelRestHandler());
 
     /**%apidoc[proprietary] GET /api/execute
-     * Execute any script from subfolder "scripts" of media server. Script name provides directly
+     * Execute any script from subfolder "scripts" of the Server. Script name provides directly
      * in a URL path like "/api/execute/script1.sh". All URL parameters are passed directly to
      * a script as an parameters.
      * %permissions Owner.
@@ -2577,7 +2577,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/updateInformation
      * Retrieves a currently present or specified via a parameter update information manifest.
-     * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
+     * %param[opt]:string version If present, The Server makes an attempt to retrieve an update
      *      manifest for the specified version id from the dedicated updates server and return it
      *      as a result.
      * %return:object JSON with the update manifest.
@@ -4677,7 +4677,7 @@ void MediaServerProcess::run()
 
     if (!serverModule->serverDb()->open())
     {
-        NX_ERROR(this, "Stopping media server because can't open database");
+        NX_ERROR(this, "Stopping the Server because can't open the database");
         return;
     }
 

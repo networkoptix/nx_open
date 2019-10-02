@@ -358,7 +358,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
 
     /**%apidoc GET /ec2/getMediaServerUserAttributesList
-    * Read additional media server attributes.
+    * Read additional Server attributes.
     * %param[default] format
     * %param[opt] id Server unique id. If omitted, return data for all servers.
     * %return List of objects with additional server attributes for all servers, in the requested
