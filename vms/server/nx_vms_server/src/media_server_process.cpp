@@ -4383,7 +4383,6 @@ void MediaServerProcess::startObjects()
     serverModule()->recordingManager()->start();
     if (!isDiscoveryDisabled)
         m_mserverResourceSearcher->start();
-    m_universalTcpListener->start();
     serverModule()->serverConnector()->start();
     serverModule()->backupStorageManager()->scheduleSync()->start();
     serverModule()->unusedWallpapersWatcher()->start();
@@ -4391,6 +4390,7 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
+    m_universalTcpListener->start();
 
     // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
     m_serverStartedTimer->setSingleShot(true);
