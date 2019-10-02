@@ -179,7 +179,7 @@ public:
     ThreadContextGuard(const ThreadContextGuard&) = delete;
     ThreadContextGuard& operator=(const ThreadContextGuard&) = delete;
     ThreadContextGuard(ThreadContextGuard&&) = default;
-    ThreadContextGuard& operator=(ThreadContextGuard&&) = default;
+//    ThreadContextGuard& operator=(ThreadContextGuard&&) = default;
 
     ThreadContext* operator->();
     const ThreadContext* operator->() const;

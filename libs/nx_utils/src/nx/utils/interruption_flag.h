@@ -66,7 +66,7 @@ public:
         Watcher(const Watcher&) = delete;
         Watcher& operator=(const Watcher&) = delete;
         Watcher(Watcher&&) = default;
-        Watcher& operator=(Watcher&&) = default;
+//        Watcher& operator=(Watcher&&) = default;
 
         bool interrupted() const;
 
