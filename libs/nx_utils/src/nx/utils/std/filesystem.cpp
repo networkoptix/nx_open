@@ -42,16 +42,6 @@ std::string path::string() const
     return m_pathStr;
 }
 
-bool path::operator==(const path& other) const
-{
-    return m_pathStr == other.m_pathStr;
-}
-
-bool path::operator!=(const path& other) const
-{
-    return m_pathStr != other.m_pathStr;
-}
-
 } // namespace nx::utils::filesystem
 
 #endif
