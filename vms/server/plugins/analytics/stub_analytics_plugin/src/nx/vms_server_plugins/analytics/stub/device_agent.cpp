@@ -483,7 +483,7 @@ void DeviceAgent::addBlinkingObjectIfNeeded(
     std::vector<IMetadataPacket*>* metadataPackets,
     Ptr<ObjectMetadataPacket> objectMetadataPacket)
 {
-    auto blinkingObjectMetadata = cookBlinkingObjectIfNeeded(metadataTimestampUs);
+    const auto blinkingObjectMetadata = cookBlinkingObjectIfNeeded(metadataTimestampUs);
     if (!blinkingObjectMetadata)
         return;
 
@@ -496,12 +496,12 @@ void DeviceAgent::addBlinkingObjectIfNeeded(
         dedicatedMetadataPacket->setTimestampUs(metadataTimestampUs);
         dedicatedMetadataPacket->setDurationUs(0);
 
-        dedicatedMetadataPacket->addItem(blinkingObjectMetadata.releasePtr());
+        dedicatedMetadataPacket->addItem(blinkingObjectMetadata.get());
         metadataPackets->push_back(dedicatedMetadataPacket.releasePtr());
     }
     else
     {
-        objectMetadataPacket->addItem(blinkingObjectMetadata.releasePtr());
+        objectMetadataPacket->addItem(blinkingObjectMetadata.get());
     }
 }
 
@@ -569,8 +569,8 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
             context.isPreviewGenerated = true;
         }
 
-        auto objectMetadata = makeObjectMetadata(object.get());
-        objectMetadataPacket->addItem(objectMetadata.releasePtr());
+        const auto objectMetadata = makeObjectMetadata(object.get());
+        objectMetadataPacket->addItem(objectMetadata.get());
     }
 
     result.push_back(objectMetadataPacket.releasePtr());
