@@ -16,9 +16,9 @@ const char* toString(ParserState state)
             return "done";
         case ParserState::failed:
             return "failed";
-        default:
-            return "unknown";
     }
+
+    return "unknown";
 }
 
 } // namespace nx::network::server
