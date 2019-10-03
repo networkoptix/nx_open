@@ -54,7 +54,7 @@ void StorageController::start()
 Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
 {
     const auto bytes = resource->getAndResetMetric(metric);
-    return StorageController::Value(bytes / kIoRateUpdateInterval.count());
+    return api::metrics::Value(double(bytes) / double(kIoRateUpdateInterval.count()));
 }
 
 auto transactionsPerSecond(const Resource& storage)

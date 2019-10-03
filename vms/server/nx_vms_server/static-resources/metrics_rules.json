@@ -210,14 +210,14 @@
                 "decodingSpeed3s": {
                     "name": "Decoding speed",
                     "display": "panel",
-                    "format": "Mp/s",
+                    "format": "MPix/s",
                     "calculate": "average %decodedPixels 3s",
                     "insert": "decodedPixels"
                 },
                 "encodingSpeed3s": {
                     "name": "Encoding speed",
                     "display": "panel",
-                    "format": "Mp/s",
+                    "format": "MPix/s",
                     "calculate": "average %encodedPixels 3s",
                     "insert": "encodedPixels"
                 },
