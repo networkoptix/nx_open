@@ -7,6 +7,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/timer_manager.h>
 
 namespace nx::vms::server::metrics {
@@ -84,13 +85,17 @@ static QString forLog(const api::metrics::Alarms& alarms)
     return nx::utils::log::makeMessage("%1 alarms", alarms.size());
 }
 
+static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
+
 template<typename Values>
 JsonRestResponse queryAndMerge(Values values, const QString& api, const QString& query, QnMediaServerModule* module)
 {
-    static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
+    nx::utils::Mutex valuesMutex;
+    std::vector<std::unique_ptr<nx::network::http::AsyncClient>> clients; // < TODO: Use client pool?
+    auto waiter = std::make_unique<nx::utils::BarrierWaiter>();
     for (const auto& server: module->commonModule()->resourcePool()->getResources<QnMediaServerResource>())
     {
-        if (server->getId() == module->commonModule()->moduleGUID())
+        if (server->getId() == module->commonModule()->moduleGUID() || server->getStatus() == Qn::Offline)
             continue;
 
         const auto route = module->commonModule()->router()->routeTo(server->getId());
@@ -104,32 +109,42 @@ JsonRestResponse queryAndMerge(Values values, const QString& api, const QString&
             .setScheme(nx::network::http::kSecureUrlSchemeName).setEndpoint(route.addr)
             .setPath("/api/metrics" + api).setQuery(query);
 
-        // TODO: Use http::AsyncClient to run these requests in parallel.
-        nx::network::http::HttpClient client;
-        client.addAdditionalHeader(Qn::EC2_SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-        client.setUserName(server->getId().toString());
-        client.setUserPassword(server->getAuthKey());
-        if (!client.doGet(url) || !client.response())
-        {
-            NX_DEBUG(kTag, "Connect to %1 (%2) has failed", server, url);
-            continue;
-        }
+        clients.push_back(std::make_unique<nx::network::http::AsyncClient>());
 
-        const auto message = client.fetchMessageBodyBuffer();
-        const auto httpCode = client.response()->statusLine.statusCode;
-        const auto result = QJson::deserialized<QnJsonRestResult>(message);
-        if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
-            || result.error != QnJsonRestResult::NoError)
-        {
-            NX_DEBUG(kTag, "Request to %1 (%2) has failed %3 (%4)", server, url, httpCode, result.errorString);
-            continue;
-        }
+        const auto client = clients.back().get();
+        client->addAdditionalHeader(Qn::EC2_SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+        client->setUserName(server->getId().toString());
+        client->setUserPassword(server->getAuthKey());
+        client->doGet(
+            url,
+            [client, server, url, onDone = waiter->fork(), &values, &valuesMutex]()
+            {
+                const auto onDoneGuard = nx::utils::makeScopeGuard(onDone);
+                if (!client->response())
+                {
+                    NX_DEBUG(kTag, "Connect to %1 (%2) has failed", server, url);
+                    return;
+                }
 
-        auto serverValues = result.deserialized<Values>();
-        NX_DEBUG(kTag, "%1 (%2) returned %3", server, url, forLog(serverValues));
-        api::metrics::merge(&values, &serverValues);
+                const auto httpCode = client->response()->statusLine.statusCode;
+                const auto message = client->fetchMessageBodyBuffer();
+                const auto result = QJson::deserialized<QnJsonRestResult>(message);
+                if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
+                    || result.error != QnJsonRestResult::NoError)
+                {
+                    NX_DEBUG(kTag, "Request to %1 (%2) has failed %3 (%4)", server, url, httpCode, result.errorString);
+                    return;
+                }
+
+                auto serverValues = result.deserialized<Values>();
+                NX_DEBUG(kTag, "%1 (%2) returned %3", server, url, forLog(serverValues));
+
+                NX_MUTEX_LOCKER lock(&valuesMutex);
+                api::metrics::merge(&values, &serverValues);
+            });
     }
 
+    waiter.reset();
     return JsonRestResponse(values);
 }
 
