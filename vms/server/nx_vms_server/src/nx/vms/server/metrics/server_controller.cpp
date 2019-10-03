@@ -167,7 +167,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "osTime",
-                [](const auto& r)
+                [](const auto&)
                 {
                     return Value(dateTimeToString(QDateTime::currentDateTime()));
                 }
@@ -201,6 +201,10 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "serverLoad",
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "logLevel",
+                [](const auto&) { return Value(toString(nx::utils::log::mainLogger()->maxLevel())); }
+            ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "cpuUsageP", [platform](const auto&) { return Value(platform->totalCpuUsage()); },
                 nx::vms::server::metrics::timerWatch<Resource>(kUpdateInterval)
@@ -278,7 +282,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "apiCalls", [this](const auto&) { return Value(getMetric(Metrics::apiCalls)); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "primaryStreams",

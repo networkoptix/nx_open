@@ -121,6 +121,22 @@
         },
         "serverLoad": {
             "values": {
+                "logLevel": {
+                    "name": "Logging level",
+                    "display": "panel",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "equal %logLevel error",
+                            "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
+                        },
+                        {
+                            "level": "warning",
+                            "condition": "equal %logLevel warning",
+                            "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
+                        }
+                    ]
+                },
                 "cpuUsageP": {
                     "name": "CPU %",
                     "format": "%",
