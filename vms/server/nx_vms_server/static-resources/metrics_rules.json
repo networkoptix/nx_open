@@ -127,12 +127,12 @@
                     "alarms": [
                         {
                             "level": "warning",
-                            "condition": "equal %logLevel error",
+                            "condition": "equal %logLevel debug",
                             "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
                         },
                         {
                             "level": "warning",
-                            "condition": "equal %logLevel warning",
+                            "condition": "equal %logLevel verbose",
                             "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
                         }
                     ]
