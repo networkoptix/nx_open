@@ -18,6 +18,7 @@ namespace nxcip
         AV_CODEC_ID_THEORA,
         AV_CODEC_ID_PNG,
         AV_CODEC_ID_GIF,
+        AV_CODEC_ID_H265,
 
         AV_CODEC_ID_MP2 = 0x15000,
         AV_CODEC_ID_MP3,
