@@ -1763,15 +1763,20 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timeZoneOffset Time zone offset, in milliseconds.
      *         %param:string reply.timeZoneId Identification of the time zone in the text form.
      *         %param:string reply.osTime Local OS time on the Server, in milliseconds since epoch.
-     *         %param:string reply.vmsTime Synchronized time, in milliseconds since epoch.
+     *         %param:string reply.vmsTime Synchronized time of the VMS System, in milliseconds
+     *             since epoch.
      */
     reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
 
     reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
 
     /**%apidoc GET /api/gettime
-     * Get the Server time, time zone and authentication realm (realm is added for convenience).
-     * %// TODO: The name of this method and its timezoneId parameter use wrong case.
+     * [DEPRECATED in favor of /api/getTime] Get the Server time, time zone and authentication
+     * realm (the realm is added for convenience).
+     * %// NOTE: The name of this method and its timezoneId parameter use wrong case.
+     * %param[proprietary]:boolean local If specified, the returned utcTime will contain the local
+     *     OS time on the Server, otherwise, it will contain the synchronized time of the VMS
+     *     System. All values are in milliseconds since epoch.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
@@ -2457,7 +2462,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
-     *     %value periods Internal comperssed binary format.
+     *     %value periods Internal compressed binary format.
      * %param[opt]:integer detail Chunk detail level, in milliseconds. Time periods that are
      *     shorter than the detail level are discarded. You can treat the detail level as the
      *     amount of microseconds per screen pixel.
@@ -2468,8 +2473,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
-     * %param[opt]:option flat If specified, do not group chunk lists by server. This parameter is
-     *     deprecated. Please use parameter "groupBy" instead.
+     * %param[opt]:option flat [DEPRECATED in favor of "groupBy"] If specified, do not group chunk
+     *     lists by Server.
      * %param[opt]:enum groupBy group type. Default value is "serverId".
      *     %value serverId group data by serverId. Result field 'guid' has server Guid value.
      *     %value cameraId group data by cameraId. Result field 'guid' has camera Guid value.
@@ -2640,20 +2645,21 @@ void MediaServerProcess::registerRestHandlers(
      *     -1 (the default value) which implies the original frame size, and in this case the width
      *     should also be omitted or set to -1.
      * %param[opt]:integer width Desired image width. Should be not less than 128, or equal to -1
-     *     (the default value) which implies autosizing: if the height is specified, the width will
-     *     be calculated based on the aspect ratio, otherwise, the original frame size will be
+     *     (the default value) which implies auto-sizing: if the height is specified, the width
+     *     will be calculated based on the aspect ratio, otherwise, the original frame size will be
      *     used.
      * %param[opt]:enum imageFormat Format of the requested image. Default value is "JpgFormat".
      *     %value png PNG
      *     %value jpg JPEG
      *     %value tif TIFF
      *     %value raw Raw video frame. Makes the request much more lightweight for Edge servers.
-     * %param[opt]:enum roundMethod Getting a thumbnail at the exact timestamp is costly, so, it
-     *     can be rounded to the nearest keyframe, thus, the default value is
-     *     "KeyFrameAfterMethod".
+     * %param[opt]:enum method Getting a thumbnail at the exact timestamp is costly, so, it
+     *     can be rounded to the nearest keyframe, thus, the default value is "after".
      *     %value before Get the thumbnail from the nearest keyframe before the given time.
      *     %value precise Get the thumbnail as near to given time as possible.
      *     %value after Get the thumbnail from the nearest keyframe after the given time.
+     *     %// TODO: Rename this param to "rounding", and values to "iFrameBefore", "precise" and
+     *         "iFrameAfter", deprecating the old method name and param names.
      * %param[opt]:enum streamSelectionMode Policy for stream selection. Default value is "auto".
      *     %value auto Chooses the most suitable stream automatically.
      *     %value forcedPrimary Primary stream is forced. Secondary stream will be used if the
