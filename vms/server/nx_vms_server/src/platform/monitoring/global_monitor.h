@@ -54,7 +54,7 @@ public:
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
 
 private:
-    nx::vms::server::PlatformMonitor* m_monitorBase;
+    nx::vms::server::PlatformMonitor* m_monitorBase = nullptr;
     mutable QnMutex m_mutex;
     nx::utils::ElapsedTimer m_uptimeTimer;
 

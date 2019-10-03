@@ -15,6 +15,8 @@
 #include <iostream>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
+#include <nx/utils/scope_guard.h>
 #include <nx_vms_server_ini.h>
 #include <utils/common/delete_later.h>
 #include <platform/hardware_information.h>
@@ -41,96 +43,97 @@ public:
 };
 
 #if defined (__linux__)
-void logMallocStatistics()
-{
-    FILE* stream;
-    char* buffer;
-    size_t len;
+    void logMallocStatistics()
+    {
+        char* buffer = nullptr;
+        const auto bufferGuard = nx::utils::makeScopeGuard([buffer] { if (buffer) free(buffer); });
+        size_t len;
 
-    stream = open_memstream(&buffer, &len);
-    if (stream == NULL)
-        NX_INFO(typeid(GlobalMonitor), "Error with open_memstream: %1", strerror(errno));
+        auto stream = nx::utils::wrapUnique(open_memstream(&buffer, &len), &fclose);
+        if (stream == nullptr)
+        {
+            NX_WARNING(typeid(GlobalMonitor), "Error with open_memstream: %1", strerror(errno));
+            return;
+        }
 
-    malloc_info(0, stream);
-    fclose(stream);
-    NX_INFO(typeid(GlobalMonitor), "malloc statistics: \n%1", buffer);
-    free(buffer);
-}
+        malloc_info(0, stream.get());
+        NX_INFO(typeid(GlobalMonitor), "malloc statistics: \n%1", buffer);
+    }
 #else
-void logMallocStatistics()
-{
-    // Not implemented
-    return;
-}
+    void logMallocStatistics()
+    {
+        // Not implemented
+        return;
+    }
 #endif
 
 // TODO: Should be implemented like other statistics
 #if defined (__linux__)
-void logOpenedHandleCount()
-{
-    int fdCount = 0;
-    char buf[64];
-    struct dirent *dp;
-
-    snprintf(buf, 64, "/proc/%i/fd/", getpid());
-
-    DIR *dir = opendir(buf);
-    if (dir == nullptr)
+    void logOpenedHandleCount()
     {
-        NX_INFO(typeid(GlobalMonitor), "Failed to open a directory %1: %2", buf, strerror(errno));
-        return;
-    }
+        int fdCount = 0;
+        char buf[64];
+        struct dirent *dp;
 
-    while ((dp = readdir(dir)) != NULL)
-        fdCount++;
+        snprintf(buf, 64, "/proc/%i/fd/", getpid());
 
-    closedir(dir);
-    NX_INFO(typeid(GlobalMonitor), lm("Opened: %1").args(fdCount));
-}
-#elif defined (Q_OS_WIN)
-void logOpenedHandleCount()
-{
-    DWORD typeChar = 0;
-    DWORD typeDisk = 0;
-    DWORD typePipe = 0;
-    DWORD typeRemote = 0;
-    DWORD typeUnknown = 0;
-    DWORD handlesCount = 0;
-
-    GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
-    handlesCount *= 4;
-    for (std::ptrdiff_t handle = 0x4; handle < handlesCount; handle += 4)
-    {
-        switch (GetFileType((HANDLE)handle))
+        auto dir = nx::utils::wrapUnique(opendir(buf), &closedir);
+        if (dir == nullptr)
         {
-            case FILE_TYPE_CHAR:
-                typeChar++;
-                break;
-            case FILE_TYPE_DISK:
-                typeDisk++;
-                break;
-            case FILE_TYPE_PIPE:
-                typePipe++;
-                break;
-            case FILE_TYPE_REMOTE:
-                typeRemote++;
-                break;
-            case FILE_TYPE_UNKNOWN:
-                if (GetLastError() == NO_ERROR) typeUnknown++;
-                break;
+            NX_WARNING(typeid(GlobalMonitor), "Failed to open a directory %1: %2",
+                buf, strerror(errno));
+            return;
         }
-    }
 
-    NX_INFO(typeid(GlobalMonitor), lit("Disk files: %1").arg(typeDisk));
-    NX_INFO(typeid(GlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
-    NX_INFO(typeid(GlobalMonitor), lit("Character devices: %1").arg(typeChar));
-    NX_INFO(typeid(GlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
-}
+        while ((dp = readdir(dir.get())) != NULL)
+            fdCount++;
+
+        NX_INFO(typeid(GlobalMonitor), "Opened FDs: %1", fdCount);
+    }
+#elif defined (Q_OS_WIN)
+    void logOpenedHandleCount()
+    {
+        DWORD typeChar = 0;
+        DWORD typeDisk = 0;
+        DWORD typePipe = 0;
+        DWORD typeRemote = 0;
+        DWORD typeUnknown = 0;
+        DWORD handlesCount = 0;
+
+        GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
+        handlesCount *= 4;
+        for (std::ptrdiff_t handle = 0x4; handle < handlesCount; handle += 4)
+        {
+            switch (GetFileType((HANDLE)handle))
+            {
+                case FILE_TYPE_CHAR:
+                    typeChar++;
+                    break;
+                case FILE_TYPE_DISK:
+                    typeDisk++;
+                    break;
+                case FILE_TYPE_PIPE:
+                    typePipe++;
+                    break;
+                case FILE_TYPE_REMOTE:
+                    typeRemote++;
+                    break;
+                case FILE_TYPE_UNKNOWN:
+                    if (GetLastError() == NO_ERROR) typeUnknown++;
+                    break;
+            }
+        }
+
+        NX_INFO(typeid(GlobalMonitor), "Disk files: %1", typeDisk);
+        NX_INFO(typeid(GlobalMonitor), "Sockets, pipes: %1", typePipe);
+        NX_INFO(typeid(GlobalMonitor), "Character devices: %1", typeChar);
+        NX_INFO(typeid(GlobalMonitor), "Unknown: %1", typeUnknown);
+    }
 #else
-void logOpenedHandleCount()
-{
-    NX_WARNING(typeid(GlobalMonitor), lit("Not implemented for this platform"));
-}
+    void logOpenedHandleCount()
+    {
+        NX_WARNING(typeid(GlobalMonitor), "Not implemented for this platform");
+    }
 #endif
 
 } // namespace

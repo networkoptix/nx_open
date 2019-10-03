@@ -886,7 +886,7 @@ void MediaServerProcess::saveStorages(
     }
 }
 
-static const std::chrono::milliseconds kSystemUsageDumpTimeout = std::chrono::minutes(30);
+static const std::chrono::minutes kSystemUsageDumpTimeout(30);
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
