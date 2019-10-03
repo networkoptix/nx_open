@@ -30,7 +30,6 @@ public:
 class MetricsCameraApi: public ::testing::Test
 {
 public:
-    static std::unique_ptr<DataProviderStub> m_dataProviderStub;
     static QnSharedResourcePointer<resource::test::CameraMock> m_camera;
     static std::unique_ptr<MediaServerLauncher> launcher;
 
@@ -53,7 +52,6 @@ public:
         m_camera->setMAC(nx::utils::MacAddress(QLatin1String("12:12:12:12:12:12")));
 
         launcher->commonModule()->resourcePool()->addResource(m_camera);
-        m_dataProviderStub.reset(new DataProviderStub(m_camera));
 
         DeviceFileCatalog catalog(
             launcher->serverModule(),
@@ -74,6 +72,7 @@ public:
 
     static void TearDownTestCase()
     {
+        m_camera.reset();
         launcher.reset();
     }
 
@@ -91,7 +90,6 @@ public:
     }
 };
 
-std::unique_ptr<DataProviderStub> MetricsCameraApi::m_dataProviderStub;
 QnSharedResourcePointer<resource::test::CameraMock> MetricsCameraApi::m_camera;
 std::unique_ptr<MediaServerLauncher> MetricsCameraApi::launcher;
 
