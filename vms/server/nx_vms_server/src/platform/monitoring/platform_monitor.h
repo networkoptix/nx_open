@@ -40,8 +40,8 @@ public:
          * suitable to be shown to the user. */
         QString partitions;
 
-        friend uint qHash(const Hdd &hdd) {
-            return qHash(hdd.id) ^ qHash(hdd.name) ^ qHash(hdd.partitions);
+        friend uint qHash(const Hdd& hdd) {
+            return ::qHash(hdd.id) ^ qHash(hdd.name) ^ qHash(hdd.partitions);
         }
     };
 
