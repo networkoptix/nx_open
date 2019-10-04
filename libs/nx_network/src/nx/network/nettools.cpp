@@ -233,27 +233,6 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
     return result;
 }
 
-QList<QHostAddress> allLocalIpV4Addresses()
-{
-    QList<QHostAddress> rez;
-
-    // if nothing else works use first enabled hostaddr
-    for (const QnInterfaceAndAddr& iface : getAllIPv4Interfaces())
-    {
-        if (!(iface.netIf.flags() & QNetworkInterface::IsUp))
-            continue;
-        //if (!QUdpSocket().bind(iface.address, 0))
-        //    continue;
-
-        rez << iface.address;
-    }
-
-    if (rez.isEmpty())
-        rez << QHostAddress(QLatin1String("127.0.0.1"));
-
-    return rez;
-}
-
 QString getIfaceIPv4Addr(const QNetworkInterface& iface)
 {
     for (const auto& addr: iface.addressEntries())

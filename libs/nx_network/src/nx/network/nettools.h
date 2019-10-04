@@ -11,10 +11,6 @@
 
 namespace nx::network {
 
-struct CLSubNetState;
-
-using CLIPList = QList<quint32>;
-
 struct NX_NETWORK_API QnInterfaceAndAddr
 {
     QnInterfaceAndAddr(
@@ -72,11 +68,6 @@ using QnInterfaceAndAddrList = QList<QnInterfaceAndAddr>;
 NX_NETWORK_API QList<QnInterfaceAndAddr> getAllIPv4Interfaces(
     InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface,
     bool ignoreLoopback = true);
-
-/**
- * @return List of IPv4 addresses of current machine. Skips 127.0.0.1 and addresses we can't bind to.
- */
-NX_NETWORK_API QList<QHostAddress> allLocalIpV4Addresses();
 
 /** Filter mask for allLocalAddresses()*/
 enum AddressFilter

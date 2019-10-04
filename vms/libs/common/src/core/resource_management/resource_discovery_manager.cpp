@@ -295,7 +295,12 @@ QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 {
-    QList<QHostAddress> localAddresses = nx::network::allLocalIpV4Addresses();
+    const nx::network::AddressFilters addressMask =
+        nx::network::AddressFilter::ipV4
+        | nx::network::AddressFilter::ipV6
+        | nx::network::AddressFilter::noLocal
+        | nx::network::AddressFilter::noLoopback;
+    auto localAddresses = nx::network::allLocalAddresses(addressMask);
     if (localAddresses != m_allLocalAddresses)
     {
         // Skip first time.

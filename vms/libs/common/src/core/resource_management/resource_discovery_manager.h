@@ -174,7 +174,7 @@ protected:
     bool m_server;
     std::atomic<bool> m_ready;
 
-    QList<QHostAddress> m_allLocalAddresses;
+    QList<nx::network::HostAddress> m_allLocalAddresses;
 
     QScopedPointer<QTimer> m_timer;
     State m_state;
