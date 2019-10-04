@@ -849,25 +849,39 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
     {
         QnMutexLocker lock(&m_mutexCatalog);
-        auto itr = m_devFileCatalog->find(camera->getPhysicalId());
-        if (itr != m_devFileCatalog->end())
+        auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog[i].end())
             result += itr.value()->occupiedDuration();
     }
     return result;
 }
 
-double QnStorageManager::recordingBitrateKBps(
+std::chrono::milliseconds QnStorageManager::calendarDuration(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    std::chrono::milliseconds result{};
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog[i].end())
+            result = std::max(result, itr.value()->calendarDuration());
+    }
+    return result;
+}
+
+double QnStorageManager::recordingBitrateBps(
     const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const
 {
     qint64 bytesPerSecond = 0;
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
     {
         QnMutexLocker lock(&m_mutexCatalog);
-        auto itr = m_devFileCatalog->find(camera->getPhysicalId());
-        if (itr != m_devFileCatalog->end())
+        auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog[i].end())
             bytesPerSecond += itr.value()->getStatistics(bitratePeriod.count()).averageBitrate;
     }
-    return bytesPerSecond / 1000.0;
+    return bytesPerSecond;
 }
 
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)

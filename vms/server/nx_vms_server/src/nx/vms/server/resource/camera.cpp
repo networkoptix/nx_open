@@ -868,11 +868,20 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
         serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
 }
 
-double Camera::recordingBitrateKBps(std::chrono::milliseconds bitratePeriod) const
+std::chrono::milliseconds Camera::calendarDuration() const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();
-    return serverModule()->normalStorageManager()->recordingBitrateKBps(ptr, bitratePeriod) +
-        serverModule()->backupStorageManager()->recordingBitrateKBps(ptr, bitratePeriod);
+    return std::chrono::milliseconds(std::max(
+        serverModule()->normalStorageManager()->calendarDuration(ptr).count(),
+        serverModule()->backupStorageManager()->calendarDuration(ptr).count()));
+}
+
+double Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    auto result = serverModule()->normalStorageManager()->recordingBitrateBps(ptr, bitratePeriod) +
+        serverModule()->backupStorageManager()->recordingBitrateBps(ptr, bitratePeriod);
+    return result;
 }
 
 } // namespace resource

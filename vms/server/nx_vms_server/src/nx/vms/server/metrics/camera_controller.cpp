@@ -245,7 +245,7 @@ auto makeAnalyticsGroupProvider()
                 "archiveLengthS",
                 [](const auto& r)
                 {
-                    const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
+                    const auto value = duration_cast<seconds>(r->calendarDuration());
                     return value.count() > 0 ? Value((double) value.count()) : Value();
                 }
             ),
@@ -260,7 +260,11 @@ auto makeAnalyticsGroupProvider()
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "recordingBitrateBps",
-                [](const auto& r) { return Value(r->recordingBitrateKBps(kBitratePeriod) * 1024); }
+                [](const auto& r)
+                {
+                    const auto result = r->recordingBitrateBps(kBitratePeriod);
+                    return result > 0 ? Value(result) : Value();
+                }
             )
         );
 }

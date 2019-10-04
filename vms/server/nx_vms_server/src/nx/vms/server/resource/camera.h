@@ -212,7 +212,8 @@ public:
     void atIpConflict();
     qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
     std::chrono::milliseconds nxOccupiedDuration() const;
-    double recordingBitrateKBps(std::chrono::milliseconds bitratePeriod) const;
+    std::chrono::milliseconds calendarDuration() const;
+    double recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(

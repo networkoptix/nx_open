@@ -8,6 +8,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/metrics/helpers.h>
+#include <utils/common/synctime.h>
+#include <recorder/storage_manager.h>
 
 namespace nx::test {
 
@@ -20,12 +22,7 @@ static const QString kCameraHostAddress("192.168.0.2");
 static const QString kCameraFirmware("1.2.3.4");
 static const QString kCameraModel("model1");
 static const QString kCameraVendor("vendor1");
-
-class DataProviderStub: public QnAbstractStreamDataProvider
-{
-public:
-    using QnAbstractStreamDataProvider::QnAbstractStreamDataProvider;
-};
+static const int kMinDays = 5;
 
 class MetricsCameraApi: public ::testing::Test
 {
@@ -50,24 +47,35 @@ public:
         m_camera->setHostAddress(kCameraHostAddress);
         m_camera->setFirmware(kCameraFirmware);
         m_camera->setMAC(nx::utils::MacAddress(QLatin1String("12:12:12:12:12:12")));
+        m_camera->setMinDays(kMinDays);
 
         launcher->commonModule()->resourcePool()->addResource(m_camera);
 
-        DeviceFileCatalog catalog(
-            launcher->serverModule(),
-            m_camera->getUniqueId(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
+        auto catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+            m_camera->getUniqueId(), QnServer::HiQualityCatalog);
 
+        const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+
+        static const qint64 kMsInMinute = 1000 * 60;
+        static const qint64 kMsInHour = kMsInMinute * 60;
+        static const qint64 kMsInDay = kMsInHour * 24;
         nx::vms::server::Chunk chunk1;
-        chunk1.startTimeMs = 1400000000LL * 1000;
+        chunk1.startTimeMs = currentTimeMs - kMsInDay * 2;
         chunk1.durationMs = 45 * 1000;
-        chunk1.setFileSize(100);
-        catalog.addRecord(chunk1);
+        chunk1.setFileSize(1000 * 1000);
+        catalog->addRecord(chunk1);
 
-        nx::vms::server::Chunk chunk2;
-        chunk2.startTimeMs = 1400000000LL * 1000;
-        chunk2.durationMs = 45 * 1000;
-        chunk2.setFileSize(200);
-        catalog.addRecord(chunk2);
+        // Fill last 24 hours with 50% archive density.
+        auto timeMs = currentTimeMs - kMsInDay + kMsInMinute;
+        while (timeMs < currentTimeMs)
+        {
+            nx::vms::server::Chunk chunk;
+            chunk.startTimeMs = timeMs;
+            chunk.durationMs = kMsInMinute;
+            chunk.setFileSize(1000 * 1000 * 60); //< Bitrate 8 Mbit.
+            catalog->addRecord(chunk);
+            timeMs += kMsInMinute * 2;
+        }
     }
 
     static void TearDownTestCase()
@@ -115,6 +123,7 @@ TEST_F(MetricsCameraApi, infoGroup)
     cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
     infoData = cameraData["info"];
     ASSERT_EQ("Scheduled", infoData["recording"].toString());
+    m_camera->setLicenseUsed(false);
 }
 
 TEST_F(MetricsCameraApi, availabilityGroup)
@@ -162,6 +171,29 @@ TEST_F(MetricsCameraApi, availabilityGroup)
 
     ASSERT_EQ(2, systemAlarms.size());
     ASSERT_EQ("availability.ipConflicts3min", systemAlarms[0].parameter);
+}
+
+class DataProviderStub : public QnAbstractStreamDataProvider
+{
+public:
+    using QnAbstractStreamDataProvider::QnAbstractStreamDataProvider;
+};
+
+TEST_F(MetricsCameraApi, analyticsGroup)
+{
+    m_camera->setLicenseUsed(true);
+
+    auto systemValues = get<SystemValues>("/ec2/metrics/values");
+    auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    auto analyticsData = cameraData["analytics"];
+    ASSERT_EQ(1000000, analyticsData["recordingBitrateBps"].toInt());
+    ASSERT_EQ(24 * 3600 * 2, analyticsData["archiveLengthS"].toInt());
+    ASSERT_EQ(24 * 3600 * kMinDays, analyticsData["minArchiveLengthS"].toInt());
+
+    auto systemAlarms = get<Alarms>("/ec2/metrics/alarms");
+    ASSERT_EQ("analytics.minArchiveLengthS", systemAlarms[0].parameter);
+
+    m_camera->setLicenseUsed(false);
 }
 
 } // nx::test

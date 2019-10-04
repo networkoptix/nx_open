@@ -259,6 +259,14 @@ milliseconds DeviceFileCatalog::occupiedDuration(int storageIndex) const
     return m_chunks.occupiedDuration(storageIndex);
 }
 
+milliseconds DeviceFileCatalog::calendarDuration(int storageIndex) const
+{
+    QnMutexLocker lk(&m_mutex);
+    if (m_chunks.empty())
+        return milliseconds(0);
+    return milliseconds(m_chunks.rbegin()->endTimeMs() - m_chunks.begin()->startTimeMs);
+}
+
 void DeviceFileCatalog::addChunks(nx::vms::server::ChunksDeque chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
