@@ -15,6 +15,7 @@ static const QByteArray kRules(R"json({
             "values": {
                 "i": {
                     "name": "int parameter",
+                    "description": "integer parameter",
                     "display": "panel|table",
                     "format": "KB"
                 },
@@ -47,6 +48,7 @@ static const QByteArray kRules(R"json({
             "values": {
                 "i": {
                     "name": "int parameter",
+                    "description": "integer parameter",
                     "display": "table",
                     "alarms": [{
                         "level": "warning",
@@ -120,6 +122,7 @@ public:
 
         EXPECT_EQ(group1.values[b + 0].id, "i");
         EXPECT_EQ(group1.values[b + 0].name, includeRules ? "int parameter" : "I");
+        EXPECT_EQ(group1.values[b + 0].description, includeRules ? "integer parameter" : "");
         EXPECT_EQ(group1.values[b + 0].display, includeRules ? displayBoth : displayNone);
         EXPECT_EQ(group1.values[b + 1].id, "t");
         EXPECT_EQ(group1.values[b + 1].name, includeRules ? "text parameter" : "T");
@@ -132,6 +135,7 @@ public:
 
         EXPECT_EQ(group2.values[0].id, "i");
         EXPECT_EQ(group2.values[0].name, includeRules ? "int parameter" : "I");
+        EXPECT_EQ(group2.values[0].description, includeRules ? "integer parameter" : "");
         EXPECT_EQ(group2.values[0].display, includeRules ? displayTable : displayNone);
         EXPECT_EQ(group2.values[1].id, "t");
         EXPECT_EQ(group2.values[1].name, "T");
@@ -290,6 +294,7 @@ public:
         #define EXPECT_ALARM(ALARM, RESOURCE, PARAMETER, LEVEL, TEXT) \
         { \
             const auto& alarm = ALARM; \
+            EXPECT_EQ(alarm.label, "tests"); \
             EXPECT_EQ(alarm.resource, RESOURCE); \
             EXPECT_EQ(alarm.parameter, PARAMETER); \
             EXPECT_EQ(alarm.level, api::metrics::AlarmLevel::LEVEL); \

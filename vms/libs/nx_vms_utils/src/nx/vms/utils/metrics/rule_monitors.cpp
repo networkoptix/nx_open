@@ -364,7 +364,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     if (!m_condition().toBool())
         return std::nullopt;
 
-    return api::metrics::Alarm{"UNKNOWN", m_parameter, m_level, m_text()};
+    return api::metrics::Alarm{"UNKNOWN", "UNKNOWN", m_parameter, m_level, m_text()};
 }
 
 } // namespace nx::vms::utils::metrics

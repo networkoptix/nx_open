@@ -26,6 +26,7 @@ std::vector<api::metrics::Alarm> ResourceController::alarms(Scope requestScope) 
         auto alarms = monitor->alarms(requestScope);
         for (auto& alarm: alarms)
         {
+            alarm.label = m_label;
             alarm.resource = id;
             allAlarms.push_back(std::move(alarm));
         }

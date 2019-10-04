@@ -34,6 +34,7 @@ struct NX_VMS_API Label
 {
     QString id;
     QString name;
+    QString description;
 
     Label(QString id = {}, QString name = {});
 };
@@ -54,7 +55,7 @@ struct NX_VMS_API ValueManifest: Label
 
     ValueManifest(Label label = {}, Displays display = Display::none, QString format = {});
 };
-#define ValueManifest_Fields (id)(name)(format)(display)
+#define ValueManifest_Fields (id)(name)(description)(format)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
 
 struct NX_VMS_API ValueGroupManifest: Label
@@ -63,7 +64,7 @@ struct NX_VMS_API ValueGroupManifest: Label
 
     ValueGroupManifest(Label label = {});
 };
-#define ValueGroupManifest_Fields (id)(name)(values)
+#define ValueGroupManifest_Fields (id)(name)(description)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
 
 using ResourceManifest
@@ -112,12 +113,13 @@ using SystemRules
 
 struct NX_VMS_API Alarm
 {
+    QString label;
     QString resource;
     QString parameter;
     AlarmLevel level;
     QString text;
 };
-#define Alarm_Fields (resource)(parameter)(level)(text)
+#define Alarm_Fields (label)(resource)(parameter)(level)(text)
 QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
 
 using Alarms = std::vector<Alarm>;

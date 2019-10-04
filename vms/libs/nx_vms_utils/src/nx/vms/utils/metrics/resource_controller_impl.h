@@ -62,6 +62,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
                 // Override existing value manifest.
                 if (!valueRule.name.isEmpty())
                     existing->name = valueRule.name;
+                existing->description = valueRule.description;
                 existing->display = valueRule.display;
                 existing->format = valueRule.format;
                 continue;
