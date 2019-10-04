@@ -52,7 +52,8 @@
 
 namespace {
 
-static QList<QHostAddress> allowedInterfaces;
+// NOTE: It is unknown if this legacy is used by somebody. Better to remove it some day if possible.
+static QList<QHostAddress> allowedAddresses;
 
 struct nettoolsFunctionsTag {};
 static const nx::utils::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
@@ -66,7 +67,7 @@ static constexpr int kPingTimeoutMillis = 300;
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
-    allowedInterfaces = ifList;
+    allowedAddresses = ifList;
 }
 
 QHostAddress QnInterfaceAndAddr::broadcastAddress() const
@@ -141,7 +142,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
             if (address.ip().protocol() != QAbstractSocket::IPv4Protocol)
                 continue;
 
-            if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
+            if (allowedAddresses.isEmpty() || allowedAddresses.contains(address.ip()))
             {
                 result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                 addInterfaceAnyway = false;
@@ -192,6 +193,8 @@ static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
 
 QList<HostAddress> allLocalAddresses(AddressFilters filter)
 {
+    // TODO: Add cache like in getAllIPv4Interfaces.
+
     QList<HostAddress> result;
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface : interfaces)
@@ -216,6 +219,9 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
             if (isLocalHost && (filter.testFlag(AddressFilter::noLocal)))
                 continue;
 
+            if (!allowedAddresses.contains(address.ip()))
+                continue;
+
             if (isIpV4 && (filter.testFlag(AddressFilter::ipV4)))
                 result << HostAddress(address.ip().toString());
 
@@ -227,6 +233,9 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
                     iface.index());
                 result << HostAddress(addrString);
             }
+
+            if (filter.testFlag(AddressFilter::onePerDevice))
+                break;
         }
     }
 
