@@ -332,7 +332,12 @@ def main(conf_file, ini_file):
     if vmses and len(vmses) > 0:
         print(f"Detected VMS installation(s):")
         for vms in vmses:
-            print(f"    {vms.customization} in {vms.dir} (port {vms.port}, PID {vms.pid if vms.pid else '-'})")
+            print(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
+            print(f" PID {vms.pid if vms.pid else '-'})", end='')
+            vms_uid = vms.uid()
+            if vms_uid:
+                print(f" UID {vms_uid})", end='')
+            print('')
     else:
         print("No VMS installations found on the box.")
         print("Nothing to do.")
@@ -345,6 +350,16 @@ def main(conf_file, ini_file):
 
     if not vms.is_up():
         raise exceptions.BoxStateError("VMS is not running currently.")
+
+    if not vms.override_ini_config(
+        {
+            'nx_streaming': {
+                'enableTimeCorrection': 0,
+                'unloopCameraPtsWithModulus': ini['testFileHighDurationMs']*1000 + 33333,
+            },
+        }
+    ):
+        print("Unable to override VMS internal configs.")
 
     print('Restarting Server...')
     vms.restart(exc=True)
@@ -373,10 +388,12 @@ def main(conf_file, ini_file):
         raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
 
     vms = vmses[0]
+
+    print('Server restarted successfully.')
+
     ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
         ram_free_bytes = box_platform.ram_free_bytes()
-    print('Server restarted successfully.')
     print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
@@ -515,18 +532,21 @@ def main(conf_file, ini_file):
                 vms_port=vms.port,
             )
             with stream_reader_context_manager as stream_reader_context:
+                stream_reader_process = stream_reader_context[0]
+                streams = stream_reader_context[1]
+
                 started = False
                 stream_opening_started_at = time.time()
 
                 cameras_started_flags = dict((camera.id, False) for camera in cameras)
 
                 while time.time() - stream_opening_started_at < 25:
-                    if stream_reader_context.poll() is not None:
+                    if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
-                    line = stream_reader_context.stdout.readline().decode('UTF-8')
+                    line = stream_reader_process.stdout.readline().decode('UTF-8')
                     import re
-                    match = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
+                    match = re.match(r'.*\/([a-z0-9-]+)\?.* timestamp (\d+) us$', line.strip())
                     if not match:
                         continue
 
@@ -601,8 +621,8 @@ def main(conf_file, ini_file):
 
                 try:
                     while time.time() - streaming_started_at < streaming_duration_mins*60:
-                        if stream_reader_context.poll() is not None:
-                            raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
+                        if stream_reader_process.poll() is not None:
+                            raise exceptions.RtspPerfError("Streaming unxpectedly ended.")
 
                         if not box_poller_thread.is_alive():
                             if (
@@ -625,13 +645,20 @@ def main(conf_file, ini_file):
                             streaming_ended_expected = True
                             break
 
-                        line = stream_reader_context.stdout.readline().decode('UTF-8')
+                        line = stream_reader_process.stdout.readline().decode('UTF-8')
 
-                        match_res = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
+                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
                         if not match_res:
                             continue
 
-                        pts = int(match_res.group(2))/1000
+                        rtsp_url_params = dict(
+                            [param_pair[0], param_pair[1] if len(param_pair) > 1 else None]
+                            for param_pair in [
+                                param_pair_str.split('=')
+                                for param_pair_str in match_res.group(2).split('&')
+                            ]
+                        )
+                        pts = int(match_res.group(3))
 
                         pts_camera_id = match_res.group(1)
 
@@ -648,9 +675,9 @@ def main(conf_file, ini_file):
                         ts = time.time()
 
                         pts_diff_deviation_factor_max = 0.01
-                        pts_diff_expected = 1000.0/float(ini['testFileFps'])
+                        pts_diff_expected = 1000000./float(ini['testFileFps'])
                         pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
-                        pts_diff_max = (1000./float(ini['testFileFps']))*1.05
+                        pts_diff_max = (1000000./float(ini['testFileFps']))*1.05
 
                         # The value is negative because the first PTS of new loop is less than last PTS of the previous
                         # loop.
