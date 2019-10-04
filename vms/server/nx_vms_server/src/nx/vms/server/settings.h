@@ -431,7 +431,7 @@ public:
 #endif // defined(__arm__)
     static constexpr unsigned int kDefaultHlsPlaylistPreFillChunks = 2;
     static constexpr std::chrono::milliseconds kDefaultHlsTargetDurationMs{5 * 1000};
-    static constexpr std::chrono::hours kDbBackupPeriodHrs{24 * 30};
+    static constexpr std::chrono::hours kDbBackupPeriodHrs{24 * 7};
     static constexpr int kDefaultHlsRemovedLiveChunksToKeep = -1;
     static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
 };
