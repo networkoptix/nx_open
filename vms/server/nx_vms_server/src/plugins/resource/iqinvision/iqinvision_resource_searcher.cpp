@@ -285,10 +285,11 @@ QnResourceList QnPlIqResourceSearcher::findResources()
     if (!receiveSock->bind(nx::network::SocketAddress( nx::network::HostAddress::anyHost, kNativeDiscoveryResponsePort)))
         return result;
 
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    using namespace nx::network;
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
         std::unique_ptr<nx::network::AbstractDatagramSocket> sendSock(nx::network::SocketFactory::createDatagramSocket());
-        if (!sendSock->bind(iface.address.toString(), kNativeDiscoveryRequestPort))
+        if (!sendSock->bind(address.toString(), kNativeDiscoveryRequestPort))
             continue;
 
         for (size_t i = 0; i < sizeof(requests) / sizeof(char*); ++i)

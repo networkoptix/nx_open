@@ -72,7 +72,8 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 #endif
         return QnResourceList();
 
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    for (const auto& address:
+        nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
     {
 
         if (shouldStop())
@@ -82,7 +83,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             nx::network::SocketFactory::createDatagramSocket());
         sock->setReuseAddrFlag(true);
 
-        if (!sock->bind(iface.address.toString(), recvSocket->getLocalAddress().port))
+        if (!sock->bind(address.toString(), recvSocket->getLocalAddress().port))
             continue;
 
         // Sending broadcast.

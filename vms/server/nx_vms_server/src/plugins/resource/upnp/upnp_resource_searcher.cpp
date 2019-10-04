@@ -99,27 +99,28 @@ QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
     delete m_receiveSocket;
 }
 
-nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx::network::QnInterfaceAndAddr& iface)
+nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(
+    const nx::network::HostAddress& address)
 {
     if (m_receiveSocket == 0)
     {
         UDPSocket* udpSock = new UDPSocket(AF_INET);
         udpSock->setReuseAddrFlag(true);
         udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
-        udpSock->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, GROUP_PORT ) );
-        for(const auto& iface: nx::network::getAllIPv4Interfaces())
-            udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
+        udpSock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, GROUP_PORT));
+        for (const auto& address: nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
+            udpSock->joinGroup(groupAddress.toString(), address.toString());
         m_receiveSocket = udpSock;
     }
 
-    QMap<QString, nx::network::AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
+    QMap<QString, nx::network::AbstractDatagramSocket*>::iterator it = m_socketList.find(address.toString());
     if (it == m_socketList.end())
     {
         std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
-        QString localAddress = iface.address.toString();
+        QString localAddress = address.toString();
 
         //if (!sock->bindToInterface(iface))
-        if( !sock->bind( nx::network::SocketAddress( iface.address.toString() ) ) ||
+        if( !sock->bind( nx::network::SocketAddress( address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
             !sock->setRecvBufferSize( RECV_BUFFER_SIZE ) )
         {
@@ -127,14 +128,14 @@ nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx
         }
 
         /*
-        if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
+        if (!sock->joinGroup(groupAddress.toString(), address.toString()))
         {
             delete sock;
             return 0;
         }
         */
 
-        m_socketList.insert(iface.address.toString(), sock.get());
+        m_socketList.insert(address.toString(), sock.get());
 
         return sock.release();
     }
@@ -260,9 +261,9 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    for (const auto& address: nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
     {
-        nx::network::AbstractDatagramSocket* sock = sockByName(iface);
+        nx::network::AbstractDatagramSocket* sock = sockByName(address);
         if (!sock)
             continue;
 

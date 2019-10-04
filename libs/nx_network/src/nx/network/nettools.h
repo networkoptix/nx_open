@@ -76,7 +76,8 @@ enum AddressFilter
     ipV6 = 1 << 1,
     noLocal = 1 << 2,
     noLoopback = 1 << 3,
-    onePerDevice = 1 << 4
+    onePerDevice = 1 << 4,
+    onlyFirstIpV4 = ipV4 | onePerDevice | noLocal | noLoopback
 };
 Q_DECLARE_FLAGS(AddressFilters, AddressFilter)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AddressFilters)

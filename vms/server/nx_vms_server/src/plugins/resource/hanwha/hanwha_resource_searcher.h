@@ -111,7 +111,7 @@ private:
     const std::vector<std::vector<quint8>> m_sunapiProbePackets;
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
-    QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
+    QList<nx::network::HostAddress> m_lastAddressList;
     QMap<nx::utils::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 

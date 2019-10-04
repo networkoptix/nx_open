@@ -108,14 +108,15 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    for (const auto& address:
+        nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
     {
         if (shouldStop())
             return QnResourceList();
 
         std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
 
-        if (!sock->bind(iface.address.toString(), 0))
+        if (!sock->bind(address.toString(), 0))
             continue;
 
         // sending broadcast

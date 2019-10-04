@@ -294,9 +294,9 @@ void DeviceSearcher::onSomeBytesRead(
 
 void DeviceSearcher::dispatchDiscoverPackets()
 {
-    for (const QnInterfaceAndAddr& iface : getAllIPv4Interfaces())
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
+        const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(address);
         if (!sock)
             continue;
 
@@ -348,15 +348,16 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     m_receiveSocket->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
     m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, GROUP_PORT));
 
-    for (const auto iface : getAllIPv4Interfaces())
-        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+        m_receiveSocket->joinGroup(groupAddress.toString(), address.toString());
 
     m_needToUpdateReceiveSocket = false;
 
     return oldSock;
 }
 
-std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(const QnInterfaceAndAddr& iface)
+std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
+    const nx::network::HostAddress& address)
 {
 
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
@@ -383,7 +384,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(const QnIn
             });
     }
 
-    const QString& localAddress = iface.address.toString();
+    const QString& localAddress = address.toString();
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
     {
@@ -500,9 +501,9 @@ void DeviceSearcher::processDeviceXml(
 QHostAddress DeviceSearcher::findBestIface(const HostAddress& host)
 {
     QHostAddress oldAddress;
-    for (const QnInterfaceAndAddr& iface : getAllIPv4Interfaces())
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        const QHostAddress& newAddress = iface.address;
+        QHostAddress newAddress(address.toString());
         if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
             oldAddress = newAddress;
     }

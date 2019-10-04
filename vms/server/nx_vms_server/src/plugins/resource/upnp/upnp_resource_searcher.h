@@ -55,7 +55,7 @@ protected:
 
 private:
     QMap<QString, nx::network::AbstractDatagramSocket*> m_socketList;
-    nx::network::AbstractDatagramSocket* sockByName(const nx::network::QnInterfaceAndAddr& iface);
+    nx::network::AbstractDatagramSocket* sockByName(const nx::network::HostAddress& address);
 
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QElapsedTimer m_cacheLivetime;

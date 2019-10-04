@@ -176,17 +176,18 @@ void HanwhaResourceSearcher::updateSocketList()
         }
     }
 
-    const auto interfaceList = nx::network::getAllIPv4Interfaces();
-    if (m_lastInterfaceList == interfaceList)
+    const auto addressList =
+        nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4);
+    if (m_lastAddressList == addressList)
         return;
 
-    m_lastInterfaceList = interfaceList;
+    m_lastAddressList = addressList;
     m_sunApiSocketList.clear();
-    for (const nx::network::QnInterfaceAndAddr& iface: interfaceList)
+    for (const auto& address: addressList)
     {
         auto socket(nx::network::SocketFactory::createDatagramSocket());
         if (!socket->setReuseAddrFlag(true) ||
-            !socket->bind(iface.address.toString(), kSunApiProbeSrcPort) ||
+            !socket->bind(address.toString(), kSunApiProbeSrcPort) ||
             !socket->setSendTimeout(kSunapiSocketSendTimeout))
         {
             continue;

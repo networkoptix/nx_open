@@ -420,11 +420,10 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest(
     }
 
     // Adding local interfaces IP.
-    const auto localInterfaceList = getAllIPv4Interfaces();
-    for (const auto& addr: localInterfaceList)
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
         connectRequest.udpEndpointList.push_back(
-            SocketAddress(addr.address.toString(), udpHolePunchingLocalEndpoint.port));
+            SocketAddress(address.toString(), udpHolePunchingLocalEndpoint.port));
     }
 
     return connectRequest;

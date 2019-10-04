@@ -172,7 +172,7 @@ private:
     void dispatchDiscoverPackets();
     bool needToUpdateReceiveSocket() const;
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
-    std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const QnInterfaceAndAddr& iface);
+    std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const HostAddress& address);
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
         const nx::utils::Url& descriptionUrl,

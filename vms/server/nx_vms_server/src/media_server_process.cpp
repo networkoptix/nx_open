@@ -422,22 +422,15 @@ QString defaultLocalAddress(const QHostAddress& target)
             return result;
     }
 
+    // if nothing else works use first enabled hostaddr
+    for (const auto& address: allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
     {
-        // if nothing else works use first enabled hostaddr
-        QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
-
-        for (int i = 0; i < interfaces.size();++i)
-        {
-            QUdpSocket socket;
-            if (!socket.bind(interfaces.at(i).address, 0))
-                continue;
-
-            QString result = socket.localAddress().toString();
-
-            NX_ASSERT(result.length() > 0);
-
-            return result;
-        }
+        QUdpSocket socket;
+        if (!socket.bind(QHostAddress(address.toString()), 0))
+            continue;
+        const QString result = socket.localAddress().toString();
+        NX_ASSERT(result.length() > 0);
+        return result;
     }
 
     return "127.0.0.1";

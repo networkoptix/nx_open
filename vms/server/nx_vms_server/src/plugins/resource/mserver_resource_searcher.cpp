@@ -34,9 +34,10 @@ QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
     QByteArray result = host.toUtf8();
     if (nx::vms::server::Utils::isLocalAppServer(result))
     {
-        QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
+        const auto interfaces =
+            nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4);
         if (!interfaces.isEmpty())
-            result = interfaces[0].address.toString().toUtf8();
+            result = interfaces[0].toString().toUtf8();
     }
     return result;
 }
@@ -184,12 +185,12 @@ void QnMServerResourceSearcher::run()
 void QnMServerResourceSearcher::updateSocketList()
 {
     deleteSocketList();
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    using namespace nx::network;
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
         UDPSocket* socket = new UDPSocket(AF_INET);
-        QString localAddress = iface.address.toString();
-        //if (socket->bindToInterface(iface))
-        if (socket->bind(nx::network::SocketAddress(iface.address.toString())))
+        QString localAddress = address.toString();
+        if (socket->bind(nx::network::SocketAddress(address.toString())))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;

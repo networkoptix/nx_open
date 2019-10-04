@@ -28,8 +28,9 @@ GenericMulticastIoDevice::GenericMulticastIoDevice(const QUrl& url):
 
 GenericMulticastIoDevice::~GenericMulticastIoDevice()
 {
-    for (const auto iface : nx::network::getAllIPv4Interfaces())
-        m_socket->leaveGroup(m_url.host(), iface.address.toString());
+    using namespace nx::network;
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+        m_socket->leaveGroup(m_url.host(), address.toString());
 }
 
 bool GenericMulticastIoDevice::open(QIODevice::OpenMode openMode)
@@ -80,8 +81,9 @@ bool GenericMulticastIoDevice::initSocket(const QUrl& url)
     if (!result)
         return false;
 
-    for (const auto iface : nx::network::getAllIPv4Interfaces())
-        result &= m_socket->joinGroup(url.host(), iface.address.toString());
+    using namespace nx::network;
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+        result &= m_socket->joinGroup(url.host(), address.toString());
 
     return result;
 }

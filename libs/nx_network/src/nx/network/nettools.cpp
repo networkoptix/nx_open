@@ -57,6 +57,7 @@ static QList<QHostAddress> allowedAddresses;
 
 struct nettoolsFunctionsTag {};
 static const nx::utils::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
+static const std::chrono::milliseconds kCacheTimeout(5000);
 
 } // namespace
 
@@ -113,8 +114,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
     {
         // speed optimization
         QnMutexLocker lock(&cache.guard);
-        enum { kCacheTimeout = 5000 };
-        if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout))
+        if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout.count()))
             return cache.value;
     }
 
@@ -193,8 +193,6 @@ static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
 
 QList<HostAddress> allLocalAddresses(AddressFilters filter)
 {
-    // TODO: Add cache like in getAllIPv4Interfaces.
-
     QList<HostAddress> result;
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface : interfaces)
@@ -254,6 +252,7 @@ QString getIfaceIPv4Addr(const QNetworkInterface& iface)
     return QString();
 }
 
+// TODO: It is the same as allLocalAddresses(). Should be removed.
 QSet<QString> getLocalIpV4AddressList()
 {
     QSet<QString> result;

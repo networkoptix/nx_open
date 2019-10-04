@@ -33,15 +33,17 @@ void QnFlexWatchResourceSearcher::clearSocketList()
 
 bool QnFlexWatchResourceSearcher::updateSocketList()
 {
+    using namespace nx::network;
+
     qint64 curretTime = getUsecTimer();
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        for (nx::network::QnInterfaceAndAddr iface: nx::network::getAllIPv4Interfaces())
+
+        for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
         {
             auto sock = nx::network::SocketFactory::createDatagramSocket();
-            //if (!bindToInterface(*sock, iface, 51001)) {
-            if (!sock->bind(iface.address.toString(), 51001)) {
+            if (!sock->bind(address.toString(), 51001)) {
                 continue;
             }
             m_sockList << sock.release();

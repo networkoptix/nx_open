@@ -142,12 +142,12 @@ void QnMdnsListener::readSocketInternal(nx::network::AbstractDatagramSocket* soc
 void QnMdnsListener::updateSocketList()
 {
     deleteSocketList();
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+    using namespace nx::network;
+    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        std::unique_ptr<UDPSocket> sock( new UDPSocket(AF_INET) );
-        QString localAddress = iface.address.toString();
-        //if (socket->bindToInterface(iface))
-        if( sock->bind( nx::network::SocketAddress( iface.address.toString() ) ) )
+        std::unique_ptr<UDPSocket> sock(new UDPSocket(AF_INET));
+        QString localAddress = address.toString();
+        if( sock->bind( nx::network::SocketAddress(address.toString())))
         {
             sock->setMulticastIF(localAddress);
             m_socketList << sock.release();

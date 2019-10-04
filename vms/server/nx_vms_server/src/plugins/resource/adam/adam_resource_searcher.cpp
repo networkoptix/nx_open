@@ -186,10 +186,10 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
 QnResourceList QnAdamResourceSearcher::findResources()
 {
     QnResourceList result;
-    auto interfaces = nx::network::getAllIPv4Interfaces();
 
     // TODO: Send in parallel and then sleep only once.
-    for (const auto& iface: interfaces)
+    for (const auto& address:
+        nx::network::allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4))
     {
         if (shouldStop())
             return result;
@@ -197,7 +197,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
         auto socket = std::make_shared<nx::network::UDPSocket>(AF_INET);
         socket->setReuseAddrFlag(true);
 
-        nx::network::SocketAddress localAddress(iface.address.toString(), 0);
+        nx::network::SocketAddress localAddress(address.toString(), 0);
         if (!socket->bind(localAddress))
         {
             NX_DEBUG(this, "Unable to bind socket to local address %1", localAddress);

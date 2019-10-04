@@ -61,9 +61,9 @@ void TunnelAcceptor::accept(AcceptHandler handler)
             ackRequest.connectionMethods = hpm::api::ConnectionMethod::udpHolePunching;
 
             const auto port = m_udpMediatorConnection->localAddress().port;
-            for (const auto ifInfo: getAllIPv4Interfaces())
+            for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
             {
-                SocketAddress boundAddress(ifInfo.address.toString(), port);
+                SocketAddress boundAddress(address.toString(), port);
                 ackRequest.udpEndpointList.push_back(std::move(boundAddress));
             }
 
