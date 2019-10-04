@@ -34,8 +34,8 @@ protected:
     }
 
 private:
-    nx::sdk::Ptr<sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
-    nx::sdk::Ptr<sdk::analytics::IMetadataPacket> generateObjectMetadataPacket();
+    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
+    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateObjectMetadataPacket();
 
 private:
     const std::string kHelloWorldObjectType = "nx.sample.helloWorld";
