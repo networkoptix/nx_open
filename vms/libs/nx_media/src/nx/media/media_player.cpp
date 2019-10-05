@@ -1389,7 +1389,7 @@ PlayerStatistics Player::currentStatistics() const
     {
         const auto statistics = d->archiveReader->getStatistics(i);
         result.framerate = qMax(result.framerate, static_cast<qreal>(statistics->getFrameRate()));
-        result.bitrate += statistics->getBitrateMbps();
+        result.bitrate += statistics->getBitrateBps() / 1024.0 / 1024.0;
     }
 
     if (const auto codecContext = d->archiveReader->getCodecContext())

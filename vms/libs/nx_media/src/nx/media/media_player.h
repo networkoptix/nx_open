@@ -33,7 +33,7 @@ private:
     Q_PROPERTY(bool isHwAccelerated MEMBER isHwAccelerated CONSTANT)
 public:
     qreal framerate = 0.0;
-    qreal bitrate = 0.0;
+    qreal bitrate = 0.0; //< MBps
     QString codec;
     bool isHwAccelerated = false;
 };
