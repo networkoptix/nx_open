@@ -20,6 +20,8 @@ StreamMetricHelper::~StreamMetricHelper()
 
 void StreamMetricHelper::setStream(StreamIndex stream)
 {
+    if (m_stream == stream)
+        return;
     if (auto metric = getMetric(m_stream))
         metric->fetch_sub(1);
     if (auto metric = getMetric(stream))
