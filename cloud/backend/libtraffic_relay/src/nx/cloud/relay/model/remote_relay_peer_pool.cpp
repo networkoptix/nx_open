@@ -100,12 +100,12 @@ void RemoteRelayPeerPool::findRelayByDomain(
     m_map->database().dataManager().getRangeWithPrefix(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](
-            ResultCode result, std::map<std::string, std::string> peerToRelayDomain)
+            auto result, auto peerToRelayDomain)
         {
-            if (result != ResultCode::ok)
+            if (!result.ok())
             {
-                NX_VERBOSE(this, "getRangeWithPrefix returned error: %1 for key: %2",
-                    toString(result), domainName);
+                NX_VERBOSE(this, "getRangeWithPrefix returned error: {%1} for key: %2",
+                    result, domainName);
                 return handler(std::string());
             }
 
@@ -139,14 +139,14 @@ void RemoteRelayPeerPool::addPeer(
     m_map->database().dataManager().insertOrUpdate(
         toInternalStorageFormat(domainName),
         m_domainName,
-        [this, domainName, handler = std::move(handler)](ResultCode result)
+        [this, domainName, handler = std::move(handler)](auto result)
         {
-            if (result != ResultCode::ok)
+            if (!result.ok())
             {
-                NX_WARNING(this, "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
-                    toString(result), domainName, m_domainName);
+                NX_WARNING(this, "insertOrUpdate returned error: {%1} for args: key: %2, value: %3",
+                    result, domainName, m_domainName);
             }
-            handler(result == ResultCode::ok);
+            handler(result.ok());
         });
 }
 
@@ -161,15 +161,15 @@ void RemoteRelayPeerPool::removePeer(
 
     m_map->database().dataManager().remove(
         toInternalStorageFormat(domainName),
-        [this, domainName, handler = std::move(handler)](ResultCode result)
+        [this, domainName, handler = std::move(handler)](auto result)
         {
-            if (result != ResultCode::ok)
+            if (!result.ok())
             {
                 NX_VERBOSE(this,
                     "remove returned error: %1, for args: key: %2, value: %3",
-                    toString(result), domainName, m_domainName);
+                    result, domainName, m_domainName);
             }
-            handler(result == ResultCode::ok);
+            handler(result.ok());
         });
 }
 
