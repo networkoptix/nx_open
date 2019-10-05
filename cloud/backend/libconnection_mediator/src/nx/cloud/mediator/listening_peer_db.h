@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nx/clusterdb/map/embedded_database.h>
-#include <nx/fusion/model_functions_fwd.h>
 
 #include "mediator_endpoint.h"
 #include "mediator_selector.h"

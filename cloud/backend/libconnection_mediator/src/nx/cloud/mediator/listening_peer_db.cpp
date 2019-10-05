@@ -151,15 +151,14 @@ void ListeningPeerDb::addPeer(
         toInternalStorageFormat(peerDomainName),
         m_mediatorEndpointString,
         [this, peerDomainName, handler = std::move(handler)](
-            nx::clusterdb::map::ResultCode result)
+            auto result)
         {
-            if (result != nx::clusterdb::map::ResultCode::ok)
+            if (!result.ok())
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "insertOrUpdate peerDomainName(key): %1, mediatorDomainName(value): %2, "
-                        "failed with error: %3",
-                    peerDomainName, m_mediatorEndpointString, nx::clusterdb::map::toString(result));
+                        "failed with error: {%3}",
+                    peerDomainName, m_mediatorEndpointString, result);
                 return handler(false);
             }
 
@@ -176,15 +175,13 @@ void ListeningPeerDb::removePeer(
 
     m_map->database().dataManager().remove(
         toInternalStorageFormat(peerDomainName),
-        [this, peerDomainName, handler = std::move(handler)](
-            nx::clusterdb::map::ResultCode result)
+        [this, peerDomainName, handler = std::move(handler)](auto result)
         {
-            if (result != nx::clusterdb::map::ResultCode::ok)
+            if (!result.ok())
             {
-                NX_WARNING(
-                    this,
-                    "removing peerDomainName: %1 failed with error: %3",
-                    peerDomainName, nx::clusterdb::map::toString(result));
+                NX_WARNING(this,
+                    "removing peerDomainName: %1 failed with error: {%3}",
+                    peerDomainName, result);
                 return handler(false);
             }
 
@@ -201,20 +198,19 @@ void ListeningPeerDb::findMediatorByPeerDomain(
 
     m_map->database().dataManager().getRangeWithPrefix(
         toLowerReversed(peerDomainName),
-        [this, peerDomainName, handler = std::move(handler)](
-            nx::clusterdb::map::ResultCode result, std::map<std::string, std::string> map)
+        [this, peerDomainName, handler = std::move(handler)](auto result, auto map)
         {
-            if (result != nx::clusterdb::map::ResultCode::ok)
+            if (!result.ok())
             {
                 NX_VERBOSE(this,
-                    "getRangeWithPrefix returned ResultCode: %1 for peerDomainName: %2",
-                    nx::clusterdb::map::toString(result), peerDomainName);
+                    "getRangeWithPrefix returned Result: {%1} for peerDomainName: %2",
+                    result, peerDomainName);
                 return handler(MediatorEndpoint());
             }
 
             NX_VERBOSE(this,
-                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerDomainName: %3",
-                nx::clusterdb::map::toString(result), containerString(map), peerDomainName);
+                "getRangeWithPrefix returned ResultCode: {%1} and result set: %2 for peerDomainName: %3",
+                result, containerString(map), peerDomainName);
 
             if (map.empty())
                 return handler(MediatorEndpoint());
