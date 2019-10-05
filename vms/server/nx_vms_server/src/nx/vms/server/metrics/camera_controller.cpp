@@ -175,7 +175,7 @@ auto makePrimaryStreamGroupProvider()
                 {
                     auto params = r->actualParams(StreamIndex::primary);
                     if (params && params->bitrateKbps > 0)
-                        return Value(params->bitrateKbps * 1024);
+                        return Value(params->bitrateKbps * 1024 / 8);
                     return Value();
                 }
             )
@@ -224,7 +224,7 @@ auto makeSecondaryStreamGroupProvider()
                 {
                     auto params = r->actualParams(StreamIndex::secondary);
                     if (params && params->bitrateKbps > 0)
-                        return Value(params->bitrateKbps * 1024);
+                        return Value(params->bitrateKbps * 1024 / 8);
                     return Value();
                 }
             ),

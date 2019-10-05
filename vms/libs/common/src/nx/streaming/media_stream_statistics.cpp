@@ -38,14 +38,14 @@ void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)
     return onData(timestamp, media->dataSize(), isKeyFrame);
 }
 
-qint64 QnMediaStreamStatistics::getBitrateBps() const
+qint64 QnMediaStreamStatistics::bitrateBitsPerSecond() const
 {
     QnMutexLocker locker(&m_mutex);
     if (m_data.empty())
         return 0;
 
     const auto interval = (m_data.rbegin()->timestamp - m_data.begin()->timestamp).count();
-    return ((m_totalSizeBytes - m_data.rbegin()->size) * 1000000) / interval;
+    return ((m_totalSizeBytes - m_data.rbegin()->size) * 8000000) / interval;
 }
 
 bool QnMediaStreamStatistics::hasMediaData() const

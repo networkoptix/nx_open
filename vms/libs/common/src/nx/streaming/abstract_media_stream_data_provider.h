@@ -22,7 +22,7 @@ public:
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;
     int getNumberOfChannels() const;
-    qint64 getBitrateBps() const;
+    qint64 bitrateBitsPerSecond() const;
     float getFrameRate() const;
     float getAverageGopSize() const;
 

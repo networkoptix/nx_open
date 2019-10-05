@@ -109,11 +109,11 @@ int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
     return m_numberOfchannels ? m_numberOfchannels : 1;
 }
 
-qint64 QnAbstractMediaStreamDataProvider::getBitrateBps() const
+qint64 QnAbstractMediaStreamDataProvider::bitrateBitsPerSecond() const
 {
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
-        rez += m_stat[i].getBitrateBps();
+        rez += m_stat[i].bitrateBitsPerSecond();
     return rez;
 }
 

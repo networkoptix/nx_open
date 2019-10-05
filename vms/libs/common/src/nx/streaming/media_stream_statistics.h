@@ -19,7 +19,7 @@ public:
 
     void reset();
     void onData(const QnAbstractMediaDataPtr& media);
-    qint64 getBitrateBps() const;
+    qint64 bitrateBitsPerSecond() const;
     float getFrameRate() const;// returns instant framerate
     float getAverageGopSize() const; // returns total frames count devided by key frames count
     bool hasMediaData() const;

@@ -530,7 +530,7 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
 {
     QnLiveStreamParams result;
-    result.bitrateKbps = getBitrateBps() / 1024.0;
+    result.bitrateKbps = bitrateBitsPerSecond() / 1024.0;
     result.fps = getFrameRate();
     const auto streamInfo = m_cameraRes->streamInfo(encoderIndex());
     const auto sizeParts = streamInfo.resolution.split('x');
@@ -685,7 +685,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
         liveParams.quality, liveParams.resolution, liveParams.fps, liveParams.codec) / 1024;
     info.suggestedBitrate = m_cameraRes->suggestBitrateKbps(liveParams, getRole()) / 1024;
-    info.actualBitrate = getBitrateBps() / 1024.0 / 1024.0 / getNumberOfChannels();
+    info.actualBitrate = bitrateBitsPerSecond() / 1024.0 / 1024.0 / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->useBitratePerGop();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when available [2.6]
