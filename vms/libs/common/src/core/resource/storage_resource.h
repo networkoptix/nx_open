@@ -51,7 +51,7 @@ public:
     bool isExternal() const;
     virtual bool isSystem() const { return false; }
 #ifdef ENABLE_DATA_PROVIDERS
-    virtual float bitrate() const;
+    virtual qint64 bitrateBps() const;
     virtual float getStorageBitrateCoeff() const { return m_storageBitrateCoeff; }
 
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);

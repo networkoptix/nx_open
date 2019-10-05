@@ -151,7 +151,8 @@ auto makePrimaryStreamGroupProvider()
                 "actualFps",
                 [](const auto& r)
                 {
-                    if (auto params = r->actualParams(StreamIndex::primary))
+                    auto params = r->actualParams(StreamIndex::primary);
+                    if (params && params->fps > 0)
                         return Value(params->fps);
                     return Value();
                 }
@@ -162,7 +163,7 @@ auto makePrimaryStreamGroupProvider()
                 {
                     const auto targetParams = r->targetParams(StreamIndex::primary);
                     const auto actualParams = r->actualParams(StreamIndex::primary);
-                    if (targetParams && actualParams)
+                    if (targetParams && actualParams && actualParams->fps > 0)
                         return Value(targetParams->fps - actualParams->fps);
                     return Value();
                 },
@@ -172,7 +173,8 @@ auto makePrimaryStreamGroupProvider()
                 "actualBitrateBps",
                 [](const auto& r)
                 {
-                    if (auto params = r->actualParams(StreamIndex::primary))
+                    auto params = r->actualParams(StreamIndex::primary);
+                    if (params && params->bitrateKbps > 0)
                         return Value(params->bitrateKbps * 1024);
                     return Value();
                 }
@@ -207,8 +209,12 @@ auto makeSecondaryStreamGroupProvider()
                 "actualFps",
                 [](const auto& r)
                 {
-                    if (auto params = r->actualParams(StreamIndex::secondary))
+                    auto params = r->actualParams(StreamIndex::secondary);
+                    if (params && params->fps > 0)
+                    {
+                        params = r->actualParams(StreamIndex::secondary);
                         return Value(params->fps);
+                    }
                     return Value();
                 }
             ),
@@ -216,7 +222,8 @@ auto makeSecondaryStreamGroupProvider()
                 "actualBitrateBps",
                 [](const auto& r)
                 {
-                    if (auto params = r->actualParams(StreamIndex::secondary))
+                    auto params = r->actualParams(StreamIndex::secondary);
+                    if (params && params->bitrateKbps > 0)
                         return Value(params->bitrateKbps * 1024);
                     return Value();
                 }
@@ -227,7 +234,7 @@ auto makeSecondaryStreamGroupProvider()
                 {
                     const auto targetParams = r->targetParams(StreamIndex::secondary);
                     const auto actualParams = r->actualParams(StreamIndex::secondary);
-                    if (targetParams && actualParams)
+                    if (targetParams && actualParams && actualParams->fps > 0)
                         return Value(targetParams->fps - actualParams->fps);
                     return Value();
                 },

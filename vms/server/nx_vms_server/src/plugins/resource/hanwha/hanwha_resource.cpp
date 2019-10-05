@@ -2618,7 +2618,7 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = suggestBitrateKbps(streamParams, role);
+        bitrateKbps = (int) suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()

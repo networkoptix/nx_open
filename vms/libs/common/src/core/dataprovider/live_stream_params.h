@@ -12,7 +12,7 @@ struct QnLiveStreamParams
 
     Qn::StreamQuality quality = Qn::StreamQuality::undefined;
     float fps = kFpsNotInitialized;
-    int bitrateKbps = 0;
+    float bitrateKbps = 0;
     QSize resolution;
     QString codec;
 

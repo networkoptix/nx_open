@@ -70,7 +70,7 @@ public:
         \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
     */
-    bool init();
+    virtual bool init();
 
     /**
      * Initialize camera sync. This function can omit initialization if recently call was failed.

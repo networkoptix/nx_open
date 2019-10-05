@@ -204,7 +204,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
                 m_thirdPartyRes->getSelectedResolutionForEncoder(encoderIndex);
             // TODO: Advanced params control is not implemented for this driver yet.
             params.resolution = QSize(resolution.width, resolution.height);
-            const int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps(params, getRole());
+            const int bitrateKbps = (int) m_thirdPartyRes->suggestBitrateKbps(params, getRole());
 
             nxcip::LiveStreamConfig config;
             memset(&config, 0, sizeof(nxcip::LiveStreamConfig));
@@ -262,9 +262,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
             int selectedBitrateKbps = 0;
             // TODO: advanced params control is not implemented for this driver yet
             params.resolution = QSize(resolution.width, resolution.height);
-            if( cameraEncoder.setBitrate(
-                m_thirdPartyRes->suggestBitrateKbps(params, getRole()),
-                    &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
+            int bitrate = (int) m_thirdPartyRes->suggestBitrateKbps(params, getRole());
+            if( cameraEncoder.setBitrate(bitrate, &selectedBitrateKbps ) != nxcip::NX_NO_ERROR)
             {
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
             }

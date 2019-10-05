@@ -10,10 +10,21 @@ MediaServerVideoCameraMock::MediaServerVideoCameraMock():
 }
 
 QnLiveStreamProviderPtr MediaServerVideoCameraMock::getLiveReader(
-    QnServer::ChunksCatalog /*catalog*/,
+    QnServer::ChunksCatalog catalog,
     bool /*ensureInitialized*/, bool /*createIfNotExist*/)
 {
-    return QnLiveStreamProviderPtr();
+    return catalog == QnServer::ChunksCatalog::HiQualityCatalog
+        ? m_primaryReader : m_secondaryReader;
+}
+
+void MediaServerVideoCameraMock::setPrimaryReader(QnLiveStreamProviderPtr reader)
+{
+    m_primaryReader = reader;
+}
+
+void MediaServerVideoCameraMock::setSecondaryReader(QnLiveStreamProviderPtr reader)
+{
+    m_secondaryReader = reader;
 }
 
 int MediaServerVideoCameraMock::copyLastGop(

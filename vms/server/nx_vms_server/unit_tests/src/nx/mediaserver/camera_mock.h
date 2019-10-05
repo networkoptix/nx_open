@@ -15,6 +15,7 @@ namespace test {
 
 class CameraMock: public Camera
 {
+    using base_type = Camera;
 public:
     CameraMock(QnMediaServerModule* serverModule);
     using Camera::initInternal;
@@ -51,7 +52,7 @@ public:
         PropertyOptions options) override;
 
     virtual bool saveProperties() override;
-
+    virtual bool init() override;
 protected:
     virtual QString getDriverName() const override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

@@ -974,21 +974,21 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeAdvancedParameters(
     return CameraDiagnostics::NoErrorResult();
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(
+float QnPlOnvifResource::suggestBitrateKbps(
     const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     return strictBitrate(
         nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role), role);
 }
 
-int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
+float QnPlOnvifResource::strictBitrate(float bitrate, Qn::ConnectionRole role) const
 {
     auto resData = resourceData();
 
     QString availableBitratesParamName;
     QString bitrateBoundsParamName;
 
-    quint64 bestBitrate = bitrate;
+    float bestBitrate = bitrate;
 
     if (role == Qn::CR_LiveVideo)
     {

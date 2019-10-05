@@ -1,145 +1,90 @@
 #include "media_stream_statistics.h"
 #include <utils/common/synctime.h>
+#include <nx/streaming/media_data_packet.h>
 
-namespace {
-
-    static const int kMaxErrorsToReportIssue = 2;
-
-} // namespace
+static const int kMaxErrorsToReportIssue = 2;
+static const std::chrono::microseconds kWindowSize = std::chrono::seconds(2);
 
 QnMediaStreamStatistics::QnMediaStreamStatistics()
 {
-    resetStatistics();
 }
 
-void QnMediaStreamStatistics::resetStatistics()
+void QnMediaStreamStatistics::reset()
 {
-    QnMutexLocker locker( &m_mutex );
-    m_startTime = QDateTime::currentDateTime();
-    m_frames = 0;
-    m_dataTotal = 0;
+    QnMutexLocker locker(&m_mutex);
+    m_data.clear();
     m_numberOfErrors = 0;
-
-    for (int i = 0; i < CL_STATS_NUM; ++i)
-    {
-        m_stat[i].frames = 0;
-        m_stat[i].total_data = 0;
-    }
-
-    m_current_stat = 0;
-
-    m_bitrateMbps = 0;
-    m_framerate = 0;
-
-    m_runing = true;
-
-    m_first_ondata_call = true;
 }
 
-void QnMediaStreamStatistics::stop()
+void QnMediaStreamStatistics::onData(
+    std::chrono::microseconds timestamp, size_t dataSize, std::optional<bool> isKeyFrame)
 {
-    if (!m_runing) return;
-    QnMutexLocker locker( &m_mutex );
-    m_stopTime = QDateTime::currentDateTime();
-    m_runing = false;
+    QnMutexLocker locker(&m_mutex);
+    auto itr = std::lower_bound(m_data.begin(), m_data.end(), timestamp);
+    m_data.insert(itr, Data{ timestamp, dataSize, std::optional<bool>(isKeyFrame) });
+    m_totalSizeBytes += dataSize;
+
+    auto timeThreshold = m_data.rbegin()->timestamp - kWindowSize;
+    auto rightItr = std::lower_bound(m_data.begin(), m_data.end(), timeThreshold);
+    for (auto itr = m_data.begin(); itr < rightItr; ++itr)
+        m_totalSizeBytes -= itr->size;
+    m_data.erase(m_data.begin(), rightItr);
 }
 
-void QnMediaStreamStatistics::onData(unsigned int datalen, bool isKeyFrame)
+void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)
 {
-    if (!m_runing) return;
-    QnMutexLocker locker( &m_mutex );
-
-    if (datalen)
-    {
-        ++m_frames;
-        if (isKeyFrame)
-            ++m_keyFrames;
-
-        m_dataTotal += datalen;
-        updateStatisticsUnsafe(CameraDiagnostics::NoErrorResult());
-    }
-
-    if (m_first_ondata_call)
-    {
-        m_statTime.start();
-        m_first_ondata_call = false;
-    }
-
-    int ms = m_statTime.elapsed();
-    int ststat_num = ms/CL_STATISTICS_UPDATE_PERIOD_MS;
-
-    if (ststat_num) // if we need to use next cell
-    {
-        m_statTime = m_statTime.addMSecs(ststat_num*CL_STATISTICS_UPDATE_PERIOD_MS);
-
-        for (int i = 0; i < ststat_num;++i)
-        {
-            int index  = (m_current_stat + i + 1)%CL_STATS_NUM;
-            m_stat[index].frames = 0;
-            m_stat[index].total_data = 0;
-        }
-
-        m_current_stat = (m_current_stat + ststat_num)%CL_STATS_NUM;
-
-        // need to recalculate new bitrate&framerate
-
-        int total_frames = 0;
-        int total_bytes = 0;
-        for(int i = 0; i < CL_STATS_NUM; ++i)
-        {
-            if (i!=m_current_stat)
-            {
-                total_bytes += m_stat[i].total_data;
-                total_frames += m_stat[i].frames;
-            }
-        }
-
-        int time = (CL_STATS_NUM-1)*CL_STATISTICS_UPDATE_PERIOD_MS;
-
-        m_bitrateMbps = total_bytes*8*1000.0/time/(1024*1024);
-        m_framerate = total_frames*1000.0/time;
-    }
-
-    if (datalen)
-    {
-        m_stat[m_current_stat].frames++;
-        m_stat[m_current_stat].total_data += datalen;
-    }
-
+    const auto isKeyFrame = media->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+    const auto timestamp = std::chrono::microseconds(media->timestamp);
+    return onData(timestamp, media->dataSize(), isKeyFrame);
 }
 
-float QnMediaStreamStatistics::getBitrateMbps() const
+qint64 QnMediaStreamStatistics::getBitrateBps() const
 {
-    QnMutexLocker locker( &m_mutex );
-    return m_bitrateMbps;
+    QnMutexLocker locker(&m_mutex);
+    if (m_data.empty())
+        return 0;
+
+    const auto interval = (m_data.rbegin()->timestamp - m_data.begin()->timestamp).count();
+    return ((m_totalSizeBytes - m_data.rbegin()->size) * 1000000) / interval;
+}
+
+bool QnMediaStreamStatistics::hasMediaData() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_totalSizeBytes > 0;
 }
 
 float QnMediaStreamStatistics::getFrameRate() const
 {
     QnMutexLocker locker( &m_mutex );
-    return m_framerate;
-}
-
-int QnMediaStreamStatistics::getFrameSize() const
-{
-    return getBitrateMbps()/8*1024 / getFrameRate();
+    if (m_data.empty())
+        return 0;
+    return (m_data.size()-1) * 1000000.0 /
+        (m_data.rbegin()->timestamp - m_data.begin()->timestamp).count();
 }
 
 float QnMediaStreamStatistics::getAverageGopSize() const
 {
-    QnMutexLocker locker( &m_mutex );
-    if ( m_keyFrames == 0 )
-        return 0; // didn't have any frames yet
-
-    return static_cast<float>( m_frames ) / static_cast<float>( m_keyFrames );
+    QnMutexLocker locker(&m_mutex);
+    int totalFrames = 0;
+    int keyFrames = 0;
+    for (const auto& value: m_data)
+    {
+        if (value.isKeyFrame.has_value())
+        {
+            ++totalFrames;
+            if (*value.isKeyFrame)
+                ++keyFrames;
+        }
+    }
+    return keyFrames > 0 ? totalFrames / (float) keyFrames : 0;
 }
 
-void QnMediaStreamStatistics::onEvent(CameraDiagnostics::Result event)
+void QnMediaStreamStatistics::onEvent(
+    std::chrono::microseconds timestamp,
+    CameraDiagnostics::Result event)
 {
-    if (!m_runing)
-        return;
-
-    onData(0, /*isKeyFrame*/ false);
+    onData(timestamp, /*size*/ 0);
 
     QnMutexLocker locker(&m_mutex);
     updateStatisticsUnsafe(event);
@@ -164,43 +109,4 @@ void QnMediaStreamStatistics::updateStatisticsUnsafe(CameraDiagnostics::Result e
 bool QnMediaStreamStatistics::isConnectionLost() const
 {
     return m_numberOfErrors >= kMaxErrorsToReportIssue;
-}
-
-float QnMediaStreamStatistics::getavBitrate() const
-{
-    QnMutexLocker locker( &m_mutex );
-    QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    unsigned long seconds = m_startTime.secsTo(current);
-
-    if (seconds==0)
-        seconds = 1; // // to avoid devision by zero
-
-    return (m_dataTotal*8.0)/(1024*1024)/seconds;
-
-}
-
-float QnMediaStreamStatistics::getavFrameRate() const
-{
-    QnMutexLocker locker( &m_mutex );
-    QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    unsigned long seconds = m_startTime.secsTo(current);
-
-    if (seconds==0)
-        seconds = 1; // // to avoid devision by zero
-
-    return (static_cast<float>(m_frames))/seconds;
-
-}
-
-unsigned long QnMediaStreamStatistics::totalSecs() const
-{
-    QnMutexLocker locker( &m_mutex );
-    QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    return m_startTime.secsTo(current);
-
-}
-
-qint64 QnMediaStreamStatistics::getTotalData() const
-{
-    return m_dataTotal;
 }

@@ -14,6 +14,7 @@
 #include <nx_vms_server_ini.h>
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
+#include <utils/common/synctime.h>
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
@@ -123,7 +124,11 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
         setNeedKeyData();
         if (isInitialized)
-            m_stat[0].onEvent(m_openStreamResult);
+        {
+            m_stat[0].onEvent(
+                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                m_openStreamResult);
+        }
     }
 
     return m_openStreamResult;
@@ -137,9 +142,7 @@ void CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& dat
     QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
     if (videoData)
     {
-        m_stat[videoData->channelNumber].onData(
-            static_cast<unsigned int>(data->dataSize()),
-            videoData->flags & AV_PKT_FLAG_KEY);
+        m_stat[videoData->channelNumber].onData(data);
 
         if (lp)
             lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
@@ -197,7 +200,9 @@ void CLServerPushStreamReader::run()
         {
             setNeedKeyData();
             m_openStreamResult = CameraDiagnostics::BadMediaStreamResult();
-            m_stat[0].onEvent(m_openStreamResult);
+            m_stat[0].onEvent(
+                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                m_openStreamResult);
             QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage
             continue;
         }

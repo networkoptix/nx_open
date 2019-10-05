@@ -89,12 +89,12 @@ QString QnStorageResource::getUniqueId() const
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-float QnStorageResource::bitrate() const
+qint64 QnStorageResource::bitrateBps() const
 {
     float rez = 0;
     QnMutexLocker lock(&m_bitrateMtx);
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
-        rez += provider->getBitrateMbps();
+        rez += provider->getBitrateBps();
     return rez;
 }
 

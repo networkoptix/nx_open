@@ -9,6 +9,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <core/resource/camera_resource.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -64,7 +65,9 @@ void QnClientPullMediaStreamProvider::run()
         if (data == nullptr)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
+            m_stat[0].onEvent(
+                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                CameraDiagnostics::BadMediaStreamResult());
             QnSleep::msleep(kErrorDelayTimeoutMs);
             continue;
         }
@@ -103,9 +106,7 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(
-                static_cast<unsigned int>(videoData->dataSize()),
-                videoData->flags & AV_PKT_FLAG_KEY);
+            m_stat[videoData->channelNumber].onData(videoData);
 
             if (lp)
                 lp->onGotVideoFrame(videoData, getLiveParams(), isCameraControlRequired());

@@ -57,6 +57,11 @@ public:
 
     virtual void beforeDestroy() override {}
 
+
+    void setPrimaryReader(QnLiveStreamProviderPtr reader);
+    void setSecondaryReader(QnLiveStreamProviderPtr reader);
 private:
     std::atomic<int> m_usageCounter;
+    QnLiveStreamProviderPtr m_primaryReader;
+    QnLiveStreamProviderPtr m_secondaryReader;
 };

@@ -9,6 +9,7 @@
 #include "utils/common/sleep.h"
 #include <nx/streaming/video_data_packet.h>
 #include "abstract_archive_integrity_watcher.h"
+#include <utils/common/synctime.h>
 
 // TODO: #rvasilenko filters are moved to mediaserver core
 //#include <core/dataprovider/abstract_media_data_filter.h>
@@ -127,7 +128,9 @@ void QnAbstractArchiveStreamReader::run()
                 m_noDataHandler();
 
             setNeedKeyData();
-            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
+            m_stat[0].onEvent(
+                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                CameraDiagnostics::BadMediaStreamResult());
 
             QnSleep::msleep(30);
             continue;
@@ -158,14 +161,11 @@ void QnAbstractArchiveStreamReader::run()
         if (mediaRes && !mediaRes->hasVideo(this))
         {
             if (data)
-                m_stat[data->channelNumber].onData(
-                    static_cast<unsigned int>(data->dataSize()), false);
+                m_stat[data->channelNumber].onData(data);
         }
         else {
             if (videoData)
-                m_stat[data->channelNumber].onData(
-                    static_cast<unsigned int>(data->dataSize()),
-                    videoData->flags & AV_PKT_FLAG_KEY);
+                m_stat[data->channelNumber].onData(data);
         }
 
 

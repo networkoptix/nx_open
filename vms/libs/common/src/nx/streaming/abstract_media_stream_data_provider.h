@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QtCore/QSharedPointer>
-#include <nx/streaming/media_stream_statistics.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/media_stream_statistics.h>
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -22,7 +22,7 @@ public:
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;
     int getNumberOfChannels() const;
-    float getBitrateMbps() const;
+    qint64 getBitrateBps() const;
     float getFrameRate() const;
     float getAverageGopSize() const;
 

@@ -328,7 +328,7 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
-    virtual int suggestBitrateKbps(
+    virtual float suggestBitrateKbps(
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     static float rawSuggestBitrateKbps(
         Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec);

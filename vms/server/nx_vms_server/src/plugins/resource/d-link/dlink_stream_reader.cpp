@@ -318,8 +318,9 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         if (useCBR)
         {
             // just CBR fo mpeg so far
+            int bitrate = (int) m_dlinkRes->suggestBitrateKbps(params, getRole());
             t << "qualitymode=CBR" << "&";
-            t << "bitrate=" <<  info.bitrateCloseTo(m_dlinkRes->suggestBitrateKbps(params, getRole()));
+            t << "bitrate=" <<  info.bitrateCloseTo(bitrate);
         }
         else
         {

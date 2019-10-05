@@ -25,7 +25,10 @@ utils::metrics::Watch<ResourceType> qtSignalWatch(Signal signal)
         {
             const auto connection = QObject::connect(
                 resource, signal,
-                [change = std::move(change)](const auto& /*resource*/) { change(); });
+                [change = std::move(change)](const auto& /*resource*/)
+                {
+                    change();
+                });
 
             return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
         };

@@ -100,7 +100,7 @@ void ErrorProcessor::processStreamError(
     if (!gotVideoFrameRecently
         && error.errorCode != CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
     {
-        if (streamReader->getStatistics(0)->getTotalData() > 0)
+        if (streamReader->getStatistics(0)->hasMediaData())
             ownerResource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
         else
             ownerResource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());

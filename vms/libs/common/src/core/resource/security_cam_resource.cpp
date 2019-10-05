@@ -1540,14 +1540,18 @@ void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capa
     setProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
 }
 
-int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
+float QnSecurityCamResource::suggestBitrateKbps(
+    const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)
     {
         auto result = streamParams.bitrateKbps;
         auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
         if (streamCapability.maxBitrateKbps > 0)
-            result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
+        {
+            result = qBound((float) streamCapability.minBitrateKbps,
+                result, (float) streamCapability.maxBitrateKbps);
+        }
         return result;
     }
     return suggestBitrateForQualityKbps(

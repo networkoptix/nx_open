@@ -91,7 +91,7 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
-        m_stat[i].resetStatistics();
+        m_stat[i].reset();
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -109,11 +109,11 @@ int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
     return m_numberOfchannels ? m_numberOfchannels : 1;
 }
 
-float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
+qint64 QnAbstractMediaStreamDataProvider::getBitrateBps() const
 {
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
-        rez += m_stat[i].getBitrateMbps();
+        rez += m_stat[i].getBitrateBps();
     return rez;
 }
 

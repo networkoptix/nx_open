@@ -39,7 +39,8 @@ QString QnISDStreamReader::serializeStreamParams(
     QTextStream t(&result);
 
     static const int kMinBitrate = 256; //< kbps
-    const int desiredBitrateKbps = std::max(kMinBitrate, m_isdCam->suggestBitrateKbps(params, getRole()));
+    const int desiredBitrateKbps = std::max(kMinBitrate,
+        (int) m_isdCam->suggestBitrateKbps(params, getRole()));
 
     t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << params.resolution.width()
       << "x" << params.resolution.height() << "\r\n";

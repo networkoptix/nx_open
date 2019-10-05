@@ -9,7 +9,7 @@
 
 #include "core/resource/avi/avi_archive_delegate.h"
 #include "core/resource/avi/thumbnails_archive_delegate.h"
-
+#include <utils/common/synctime.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
@@ -93,7 +93,8 @@ void QnThumbnailsStreamReader::run()
         if (data==0 && !m_needStop)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
+            m_stat[0].onEvent(std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                CameraDiagnostics::BadMediaStreamResult());
             msleep(30);
             continue;
         }
@@ -120,8 +121,7 @@ void QnThumbnailsStreamReader::run()
         }
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(
-                (unsigned int) videoData->dataSize(), videoData->flags & AV_PKT_FLAG_KEY);
+            m_stat[videoData->channelNumber].onData(videoData);
 
         putData(data);
     }

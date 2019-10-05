@@ -347,7 +347,7 @@ public:
         StreamIndex streamIndex,
         const QnLiveStreamParams& params);
 
-    virtual int suggestBitrateKbps(
+    virtual float suggestBitrateKbps(
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
@@ -383,7 +383,7 @@ signals:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
+    float strictBitrate(float bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODEC c);
 
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
