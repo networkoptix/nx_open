@@ -12,20 +12,21 @@ namespace nx::clusterdb::map {
 
 namespace {
 
-ResultCode toResultCode(nx::sql::DBResult dbResult)
+Result toResult(nx::sql::DBResult dbResult)
 {
-    using namespace nx::sql;
+    ResultCode code = ResultCode::unknownError;
     switch (dbResult)
     {
-        case DBResult::ok:
-            return ResultCode::ok;
-        case DBResult::notFound:
-            return ResultCode::notFound;
-        case DBResult::logicError:
-            return ResultCode::logicError;
+        case nx::sql::DBResult::ok:
+            code = ResultCode::ok;
+            break;
+        case nx::sql::DBResult::notFound:
+            code = ResultCode::notFound;
+            break;
         default:
-            return ResultCode::unknownError;
+            code = ResultCode::dbError;
     }
+    return Result(code, nx::sql::toString(dbResult));
 }
 
 template<typename OptionalType>
@@ -59,22 +60,6 @@ std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 }
 
 } // namespace
-
-const char * toString(ResultCode result)
-{
-    switch (result)
-    {
-        case ok:
-            return "ok";
-        case notFound:
-            return "not found";
-        case logicError:
-            return "logic error";
-        case unknownError:
-        default:
-            return "unknown error";
-    }
-}
 
 //-------------------------------------------------------------------------------------------------
 // DataManager
@@ -122,7 +107,7 @@ void DataManager::insertOrUpdate(
     UpdateCompletionHandler completionHandler)
 {
     if (key.empty())
-        return completionHandler(ResultCode::logicError);
+        return completionHandler(Result(ResultCode::logicError, "Empty key"));
 
     m_syncEngine->transactionLog().startDbTransaction(
         m_clusterId,
@@ -134,7 +119,7 @@ void DataManager::insertOrUpdate(
         [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult));
+            completionHandler(toResult(dbResult));
         });
 }
 
@@ -143,7 +128,7 @@ void DataManager::remove(
     UpdateCompletionHandler completionHandler)
 {
     if (key.empty())
-        return completionHandler(ResultCode::logicError);
+        return completionHandler(Result(ResultCode::logicError, "Empty key"));
 
     m_syncEngine->transactionLog().startDbTransaction(
         m_clusterId,
@@ -155,7 +140,7 @@ void DataManager::remove(
         [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult));
+            completionHandler(toResult(dbResult));
         });
 }
 
@@ -164,7 +149,7 @@ void DataManager::get(
     LookupCompletionHandler completionHandler)
 {
     if (key.empty())
-        return completionHandler(ResultCode::logicError, std::string());
+        return completionHandler(Result(ResultCode::logicError, "Empty key"), std::string());
 
     auto sharedValue = std::make_shared<std::optional<std::string>>();
 
@@ -178,7 +163,7 @@ void DataManager::get(
             nx::sql::DBResult dbResult) mutable
         {
             completionHandler(
-                toResultCode(filterDbResult(*sharedValue, dbResult)),
+                toResult(filterDbResult(*sharedValue, dbResult)),
                 getValue(*sharedValue));
         }
     );
@@ -187,7 +172,7 @@ void DataManager::get(
 void DataManager::lowerBound(const std::string& key, LookupCompletionHandler completionHandler)
 {
     if (key.empty())
-        return completionHandler(ResultCode::logicError, std::string());
+        return completionHandler(Result(ResultCode::logicError, "Empty key"), std::string());
 
     auto sharedKey = std::make_shared<std::optional<std::string>>();
 
@@ -201,7 +186,7 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
             nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(filterDbResult(*sharedKey, dbResult)),
+                toResult(filterDbResult(*sharedKey, dbResult)),
                 getValue(*sharedKey));
         });
 }
@@ -209,7 +194,7 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
 void DataManager::upperBound(const std::string& key, LookupCompletionHandler completionHandler)
 {
     if (key.empty())
-        return completionHandler(ResultCode::logicError, std::string());
+        return completionHandler(Result(ResultCode::logicError, "Empty key"), std::string());
 
     auto sharedKey = std::make_shared<std::optional<std::string>>();
 
@@ -223,7 +208,7 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
                 nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(filterDbResult(*sharedKey, dbResult)),
+                toResult(filterDbResult(*sharedKey, dbResult)),
                 getValue(*sharedKey));
         });
 }
@@ -233,8 +218,19 @@ void DataManager::getRange(
     const std::string& keyUpperBound,
     GetRangeCompletionHandler completionHandler)
 {
-    if (keyLowerBound > keyUpperBound || keyLowerBound.empty() || keyUpperBound.empty())
-        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+    if (keyLowerBound.empty() || keyUpperBound.empty())
+    {
+        return completionHandler(
+            Result(ResultCode::logicError, "Empty keyLowerBound or keyUpperBound"),
+            std::map<std::string, std::string>());
+    }
+
+    if (keyLowerBound > keyUpperBound)
+    {
+        return completionHandler(
+            Result(ResultCode::logicError, "keyLowerBound > keyUpperBound"),
+            std::map<std::string, std::string>());
+    }
 
     auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
 
@@ -249,7 +245,7 @@ void DataManager::getRange(
             nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                toResult(filterDbResult(*sharedPairs, dbResult)),
                 getValue(*sharedPairs));
         });
 }
@@ -259,7 +255,11 @@ void DataManager::getRange(
     GetRangeCompletionHandler completionHandler)
 {
     if (keyLowerBound.empty())
-        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+    {
+        return completionHandler(
+            Result(ResultCode::logicError, "Empty key"),
+            std::map<std::string, std::string>());
+    }
 
     auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
 
@@ -274,7 +274,7 @@ void DataManager::getRange(
                 nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                toResult(filterDbResult(*sharedPairs, dbResult)),
                 getValue(*sharedPairs));
         });
 }
@@ -284,7 +284,11 @@ void DataManager::getRangeWithPrefix(
     GetRangeCompletionHandler completionHandler)
 {
     if (keyPrefix.empty())
-        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+    {
+        return completionHandler(
+            Result(ResultCode::logicError, "Empty key"),
+            std::map<std::string, std::string>());
+    }
 
     auto keyPrefixUpperBound = calculateUpperBound(keyPrefix);
 
@@ -336,7 +340,7 @@ std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     const std::string& keyUpperBound)
 {
     auto range = m_keyValueDao.getRange(queryContext, keyLowerBound, keyUpperBound);
-    return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
+    return range.empty() ? std::nullopt : std::optional<decltype(range)>(std::move(range));
 }
 
 std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
@@ -344,7 +348,7 @@ std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     const std::string& keyLowerBound)
 {
     auto range = m_keyValueDao.getRange(queryContext, keyLowerBound);
-    return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
+    return range.empty() ? std::nullopt : std::optional<decltype(range)>(std::move(range));
 }
 
 void DataManager::removeFromDb(

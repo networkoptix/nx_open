@@ -6,13 +6,14 @@
 
 #include "dao/key_value_dao.h"
 #include "key_value_pair.h"
+#include "result.h"
 
 namespace nx::sql {
 
 class QueryContext;
 class AsyncSqlQueryExecutor;
 
-}
+} // namespace sql
 
 namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
@@ -20,26 +21,16 @@ namespace nx::clusterdb::map {
 
 class EventProvider;
 
-enum ResultCode
-{
-    ok = 0,
-    notFound,
-    logicError,
-    unknownError
-};
-
-NX_KEY_VALUE_DB_API const char * toString(ResultCode result);
-
-using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
+using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(Result)>;
 
 /**
- * value is defined only when ResultCode::ok is reported.
+ * value is defined only when Result::ok is reported.
  */
 using LookupCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::string /*value*/)>;
+    nx::utils::MoveOnlyFunc<void(Result, std::string /*value*/)>;
 
 using GetRangeCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::map<std::string/*key*/, std::string /*value*/>)>;
+    nx::utils::MoveOnlyFunc<void(Result, std::map<std::string/*key*/, std::string /*value*/>)>;
 
 class NX_KEY_VALUE_DB_API DataManager
 {
@@ -77,8 +68,8 @@ public:
      * Retrieves the first key that does not compare lexicographically lower than the given key
      * (either it is equivalent or goes after the key).
      *
-     * ResultCode will returned through completionHandler will be ResultCode::notfound
-     * if no lowerbound is determined, ResultCode::ok otherwise.
+     * Result will returned through completionHandler will be Result::notfound
+     * if no lowerbound is determined, Result::ok otherwise.
      */
     void lowerBound(
         const std::string& key,
@@ -87,8 +78,8 @@ public:
     /**
      * Retrieves the first key that compares lexicographically higher than the given key.
      *
-     * ResultCode will returned through completionHandler will be ResultCode::notfound
-     * if no upperbound is determined, ResultCode::ok otherwise.
+     * Result will returned through completionHandler will be Result::notfound
+     * if no upperbound is determined, Result::ok otherwise.
      */
     void upperBound(
         const std::string& key,
@@ -130,8 +121,8 @@ private:
      * Retrieves the first key that does not compare lexicographically lower than the given key
      * (either it is equivalent or goes lexicographically after the key).
      *
-     * ResultCode will returned through completionHandler will be ResultCode::notfound
-     * if no lowerbound is determined, ResultCode::ok otherwise.
+     * Result will returned through completionHandler will be Result::notfound
+     * if no lowerbound is determined, Result::ok otherwise.
      */
     std::optional<std::string> getLowerBoundFromDb(
         nx::sql::QueryContext* queryContext,
@@ -140,8 +131,8 @@ private:
     /**
      * Retrieves the first key that does compares lexicographically higher than the given key.
      *
-     * ResultCode will returned through completionHandler will be ResultCode::notfound
-     * if no upperbound is determined, ResultCode::ok otherwise.
+     * Result will returned through completionHandler will be Result::notfound
+     * if no upperbound is determined, Result::ok otherwise.
      */
     std::optional<std::string> getUpperBoundFromDb(
         nx::sql::QueryContext* queryContext,

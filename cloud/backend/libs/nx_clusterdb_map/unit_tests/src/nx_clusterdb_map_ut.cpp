@@ -194,7 +194,7 @@ protected:
         db(dbIndex).dataManager().insertOrUpdate(
             keyValuePair(keyValuePairIndex)->key,
             keyValuePair(keyValuePairIndex)->value,
-            [this](map::ResultCode result)
+            [this](map::Result result)
             {
                 m_result = result;
                 callbackFired();
@@ -212,7 +212,7 @@ protected:
     {
         db(dbIndex).dataManager().get(
             keyValuePair(keyValuePairIndex)->key,
-            [this](map::ResultCode result, std::string value)
+            [this](map::Result result, std::string value)
             {
                 m_result = result;
                 m_fetchedValue = std::move(value);
@@ -225,7 +225,7 @@ protected:
     void whenRemoveKey()
     {
         db().dataManager().remove(keyValuePair()->key,
-            [this](map::ResultCode result)
+            [this](map::Result result)
             {
                 m_result = result;
                 callbackFired();
@@ -353,13 +353,13 @@ protected:
 
     void thenOperationSucceeded()
     {
-        ASSERT_EQ(map::ResultCode::ok, m_result);
+        ASSERT_EQ(map::ResultCode::ok, m_result.code);
         m_result = map::ResultCode::unknownError;
     }
 
     void thenOperationFailed(map::ResultCode result)
     {
-        ASSERT_EQ(result, m_result);
+        ASSERT_EQ(result, m_result.code);
         m_result = map::ResultCode::unknownError;
     }
 
@@ -596,7 +596,7 @@ private:
     {
         db().dataManager().lowerBound(
             lowerBoundKey,
-            [this](map::ResultCode result, std::string key)
+            [this](map::Result result, std::string key)
             {
                 m_result = result;
                 m_fetchedLowerBound = std::move(key);
@@ -615,7 +615,7 @@ private:
     {
         db().dataManager().upperBound(
             upperBoundKey,
-            [this](map::ResultCode result, std::string key)
+            [this](map::Result result, std::string key)
             {
                 m_result = result;
                 m_upperBound = std::move(key);
@@ -643,7 +643,7 @@ private:
         db().dataManager().getRange(
             lowerBoundKey,
             upperBoundKey,
-            [this](ResultCode result, std::map<std::string, std::string> keyValuePairs)
+            [this](Result result, std::map<std::string, std::string> keyValuePairs)
             {
                 m_result = result;
                 m_fetchedRange = std::move(keyValuePairs);
@@ -667,7 +667,7 @@ private:
 
         db().dataManager().getRangeWithPrefix(
             prefix,
-            [this](map::ResultCode result, std::map<std::string, std::string> fetchedRange)
+            [this](map::Result result, std::map<std::string, std::string> fetchedRange)
             {
                 m_result = result;
                 m_fetchedRange = std::move(fetchedRange);
@@ -699,7 +699,7 @@ private:
     std::vector<std::unique_ptr<NodeLauncher>> m_nodes;
 
     std::vector<KeyValuePair> m_keyValuePairs;
-    map::ResultCode m_result;
+    map::Result m_result;
     std::string m_fetchedValue;
 
     std::map<std::string, std::string> m_expectedRange;
