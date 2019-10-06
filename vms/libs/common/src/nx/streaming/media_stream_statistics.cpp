@@ -1,5 +1,4 @@
 #include "media_stream_statistics.h"
-#include <utils/common/synctime.h>
 #include <nx/streaming/media_data_packet.h>
 
 static const int kMaxErrorsToReportIssue = 2;
@@ -14,6 +13,7 @@ void QnMediaStreamStatistics::reset()
     QnMutexLocker locker(&m_mutex);
     m_data.clear();
     m_numberOfErrors = 0;
+    m_totalSizeBytes = 0;
 }
 
 void QnMediaStreamStatistics::onData(
