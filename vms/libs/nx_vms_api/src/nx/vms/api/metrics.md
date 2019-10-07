@@ -17,39 +17,29 @@ Format:
   "<resourceTypeGroup>": [ // e.g. systems / servers/ cameras / etc.
     {
       "<groupId>": {
-        "<parameterId>": {
-          "name": "<parameter_name>", //< Optional: overrides parameter name.
-          "display": "<display>", //< Optional: overrides parameter display.
-          "calculate": "<function> <arguments>...", //< Required for new parameters: calculates value.
-          "insert": "<relation> <parameterId>", //< Optional for new parameters: specifies value.
-          "alarms": [ // Optional: specifies alarm conditions for this parameter.
-            {
-              "level": "warning|danger",
-              "condition": "<comparator> <arguments>...",
-              "text": "<template>", //< Optional, by default `<parameter.name> is <parameter.value>`.
-            }
-          ]
+        "name": "<groupName>",
+        "values": {
+          "<parameterId>": {
+            "name": "<parameterName>", //< Optional: overrides parameter name.
+            "description": "<parameterDescription>", // Optional: overrides description.
+            "display": "<display>", //< Optional: overrides parameter display.
+            "calculate": "<function> <arguments>...", //< Required for new parameters: calculates value.
+            "insert": "<relation> <parameterId>", //< Optional for new parameters: specifies value.
+            "alarms": [ // Optional: specifies alarm conditions for this parameter.
+              {
+                "level": "warning|danger",
+                "condition": "<comparator> <arguments>...",
+                "text": "<template>", //< Optional, by default `<parameter.name> is <parameter.value>`.
+              }
+            ]
+          }
         }
       }
     }
   ],
 }
 ```
-- Supported `<function>` variants:
-  - `const <value>` - hard coded constant;
-  - `add <parameter1> <parameter2>` - parameter1 + parameter2;
-  - `sub <parameter1> <parameter2>` - parameter1 + parameter2;
-  - `count <parameter> [interval]` - counts parameter changes;
-  - `sum <parameter> [interval]` - sums all values`;
-  - `avg <parameter> <interval>` - average in interval.
-- Supported `<comparator>` variants:
-  - `eq <parameter1> <parameter2>` - triggers if parameter1 == parameter2;
-  - `ne <parameter1> <parameter2>` - triggers if parameter1 != parameter2;
-  - `gt <parameter1> <parameter2>` - triggers if parameter1 > parameter2;
-  - `ge <parameter1> <parameter2>` - triggers if parameter1 >= parameter2;
-  - `lt <parameter1> <parameter2>` - triggers if parameter1 < parameter2;
-  - `le <parameter1> <parameter2>` - triggers if parameter1 <= parameter2.
-- `<template>` is a string with keys like `{parameter}` to be substituted by parameter values.
+This data is for internal use only, detailed documentation can only be found in server source code.
 
 Example:
 ```json
@@ -59,13 +49,13 @@ Example:
       "recommendedServers": { "calculate": "const 100" },
       "servers": { "alarms": [{
         "level": "warning",
-        "condition": "gt %servers %recommendedServers",
+        "condition": "greaterThen %servers %recommendedServers",
         "text": "The maximum number of %recommendedServers servers per system is reached. Create another system to use more servers"
       }]},
       "recommendedCameraChannels": { "calculate": "const 1000" },
       "cameraChannels": { "alarms": [{
         "level": "warning",
-        "condition": "gt %cameraChannels %recommendedCameraChannels",
+        "condition": "greaterThen %cameraChannels %recommendedCameraChannels",
         "text": "The maximum number of %recommendedCameraChannels cameras per system is reached. Create another system to use more cameras"
       }]}
     },
@@ -73,11 +63,11 @@ Example:
       "professional": { "alarms": [
         {
           "level": "danger",
-          "condition": "gt %requiredProfessional 0",
+          "condition": "greaterThen %requiredProfessional 0",
           "text": "%requiredProfessional Professional License Channels are required"
         }, {
           "level": "warning",
-          "condition": "gt %expiringProfessional 0",
+          "condition": "greaterThen %expiringProfessional 0",
           "text": "expiringProfessional Professional License Channels expiring within 30 days"
         }
       ]},
@@ -86,14 +76,14 @@ Example:
   },
   "servers": {
     "availability": {
-      "status": { "alarms": [{ "level": "danger", "condition": "ne %status Online" }]},
-      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt %offlineEvents 0" }]},
+      "status": { "alarms": [{ "level": "danger", "condition": "notEqual %status Online" }]},
+      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThen %offlineEvents 0" }]},
     },
     "load": {
       "recommendedCpuUsageP": { "calculate": "const 95" },
       "totalCpuUsageP": { "alarms": [{
         "level": "warning",
-        "condition": "gt %totalCpuUsageP %recommendedCpuUsageP",
+        "condition": "greaterThen %totalCpuUsageP %recommendedCpuUsageP",
         "text": "CPU usage is %totalCpuUsageP"
       }]},
       ...
@@ -103,18 +93,18 @@ Example:
   "cameras": {
     "info": {
       "status": { "alarms": [
-        { "level": "warning", "condition": "eq status 'Unauthorized'" },
-        { "level": "danger", "condition": "eq status 'Offline'" }
+        { "level": "warning", "condition": "equal status 'Unauthorized'" },
+        { "level": "danger", "condition": "equal status 'Offline'" }
       ]}
     },
     "issues": { "group": {
-      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }] },
-      "streamIssues": { "alarms": [{ "level": "warning", "condition": "gt streamIssues 0" }] },
-      "ipConflicts": { "alarms": [{ "level": "warning", "condition": "gt ipConflicts 0" }] }
+      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThen offlineEvents 0" }] },
+      "streamIssues": { "alarms": [{ "level": "warning", "condition": "greaterThen streamIssues 0" }] },
+      "ipConflicts": { "alarms": [{ "level": "warning", "condition": "greaterThen ipConflicts 0" }] }
     }},
     "primaryStream": { "group": {
-      "bitrate": { "alarms": [{ "level": "error", "condition": "eq bitrate 0" }] },
-      "actualFps": { "alarms": [{ "level": "warning", "condition": "gt fpsDrops 0" }] }
+      "bitrate": { "alarms": [{ "level": "error", "condition": "equal bitrate 0" }] },
+      "actualFps": { "alarms": [{ "level": "warning", "condition": "greaterThen fpsDrops 0" }] }
     }},
     ...
   },
@@ -124,9 +114,7 @@ Example:
 
 ## GET /ec2/metrics/manifest
 
-The manifest for `/ec2/metrics/value` visualization. Parameters:
-- noRules (optional) - do not include parameters from rules if present;
-- compact (optional) - do not include parameters with display none.
+The manifest for `/ec2/metrics/value` visualization.
 
 Format:
 ```json
@@ -139,6 +127,7 @@ Format:
         {
           "id": "<parameterId>",
           "name": "<parameterName>",
+          "description": "<parameterDescription>", //< Optional, should be shown in table instead of name if specified.
           "format": "<format>", //< Optional, should be bound to parameter name when shown to the user.
           "display": "<display>", //< Optional, specifies where this values should be shown to the user.
         }
@@ -152,6 +141,8 @@ Format:
   - `table` - parameter is visible in the table only;
   - `panel` - parameter is visible in the right panel only;
   - `table&panel` - parameter is visible in both the table and the panel.
+- Supported `<format>` rules are automatically applied in alarms only, the rules can be found in:
+  `vms/libs/nx_vms_api/src/nx/vms/api/metrics.cpp` function `makeFormatter`.
 
 Example:
 ```json
@@ -221,7 +212,7 @@ Example:
       "name": "Issues",
       "values": [
         { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
-        { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table|panel" },
+        { "id": "streamIssues", "name": "Issues (1h)", "description": "Stream Issues (1h)", "display": "table|panel" },
         { "id": "ipConflicts", "name": "IP conflicts (3m)", "display": "panel" }
         ...
       ]
@@ -242,16 +233,14 @@ Example:
 
 ## GET /ec2/metrics/values
 
-Current state of the values (including values calculated by server). Initially returns JSON values, in
-future will support WebSocket for push notifications and time period queries. Parameters:
-- noRules (optional) - do not include values from rules if present;
-- compact (optional) - do not include parameters with display none.
+Current state of the values (including values calculated by server). Optional parameters:
+- `?formatted` - apply format (like in alarms). Should be used for debug only.
 
 Format:
 ```json
 {
-  "<resource_type_section>": {
-    "<resource_uuid>": {
+  "<resourceTypeSection>": {
+    "<resourceId>": {
       "<groupId>": {
         "<parameterId>": "<parameterValue>"
       }
@@ -343,6 +332,7 @@ Format:
 ```json
 [
   {
+    "label": "<resourceTypeSection>",
     "resource": "<resourceId>",
     "parameter": "<groupId>.<parameterId>",
     "level": "warning|danger",
@@ -355,41 +345,49 @@ Example:
 ```json
 [
   {
+    "label": "systems",
     "resource": "SYSTEM_UUID_1",
     "parameter": "servers",
     "level": "warning",
     "text": "The maximum number of 100 servers per system is reached. Create another system to use more servers"
   }, {
+    "label": "systems",
     "resource": "SYSTEM_UUID_1",
     "parameter": "licenses.professional",
     "level": "danger",
     "text": "5 Professional License Channels are required"
   }, {
+    "label": "systems",
     "resource": "SYSTEM_UUID_1",
     "parameter": "licenses.professional",
     "level": "danger",
     "text": "10 Professional License Channels expiring within ??? days"
   }, {
+    "label": "servers",
     "resource": "SERVER_UUID_1",
     "parameter": "load.totalCpuUsageP",
     "level": "warning",
     "text": "CPU Usage is 95%"
   }, {
+    "label": "servers",
     "resource": "SERVER_UUID_2",
     "parameter": "availability.status",
     "level": "warning",
     "text": "Status is Offline"
   }, {
+    "label": "cameras",
     "resource": "CAMERA_UUID_1",
     "parameter": "primaryStream.targetFps",
     "level": "warning",
     "text": "Actual FPS is 30"
   }, {
+    "label": "cameras",
     "resource": "CAMERA_UUID_2",
     "parameter": "status",
     "level": "warning",
     "text": "Status is Unauthorized"
   }, {
+    "label": "cameras",
     "resource": "CAMERA_UUID_3",
     "parameter": "issues.offlineEvents",
     "level": "warning",
@@ -399,7 +397,7 @@ Example:
 ]
 ```
 
-## GET /ec2/metrics/report
+## GET /ec2/metrics/report (TODO)
 
 All information in a single request. Params:
 - rules = yes|no (optional), default yes;
@@ -418,13 +416,10 @@ All information in a single request. Params:
 
 # Internal APIs
 
-## GET /api/metrics/{rules|manifest}
-
-Return the same result as `/ec2/metrics/{rules|manifest}`, because rules and manifest are system
-wide.
-
 ## GET /api/metrics/{values|alarms}
 
-Return the same result as `/ec2/metrics/{values|alarms}` but includes only resources from target
-server only. Used internally to implement ec2 versions.
+Return the same result as `/ec2/metrics/{values|alarms}` but includes only resources and values from target
+server only. Used internally to implement ec2 versions. Optional parameters:
+- `?formatted` - apply format (like in alarms). Should be used for debug only;
+- `&system` - also show all of the data known to this server (system values for system resources).
 
