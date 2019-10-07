@@ -29,7 +29,7 @@ public:
     void onEvent(std::chrono::microseconds timestamp, CameraDiagnostics::Result event);
 private:
     void updateStatisticsUnsafe(CameraDiagnostics::Result event);
-    void QnMediaStreamStatistics::onData(
+    void onData(
         std::chrono::microseconds timestamp, size_t dataSize,
         std::optional<bool> isKeyFrame = std::nullopt);
 
