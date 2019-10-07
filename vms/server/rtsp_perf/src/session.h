@@ -24,10 +24,11 @@ public:
     std::thread worker;
 
 private:
-    bool processPacket(const Config& config, const uint8_t* data, int64_t size, const char* url);
+    bool processPacket(const uint8_t* data, int64_t size, const char* url);
     int64_t parsePacketTimestamp(const uint8_t* data, int64_t size);
 
 private:
+    Config m_config;
     bool m_newPacket = true;
     std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime;
 };

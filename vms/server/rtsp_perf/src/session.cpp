@@ -12,7 +12,7 @@
 
 void Session::run(const QString& url, const Config& config, bool live)
 {
-    static const int kInterleavedRtpOverTcpPrefixLength = 4;
+    static const int kTcpPrefixLength = 4;
     int64_t position = DATETIME_NOW;
     if (!live)
     {
@@ -25,6 +25,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
 
+    m_config = config;
     QAuthenticator auth;
     auth.setUser(config.user);
     auth.setPassword(config.password);
@@ -44,27 +45,26 @@ void Session::run(const QString& url, const Config& config, bool live)
         return;
     }
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
-    int rtpChannelNum = -1;
+    int channel = -1;
     std::vector<QnByteArray*> dataArrays;
     m_lastFrameTime = std::chrono::system_clock::now();
     while (true)
     {
-        int bytesRead = rtspClient.readBinaryResponce(dataArrays, rtpChannelNum);
-        if (rtpChannelNum >= 0 && (int)dataArrays.size() > rtpChannelNum && dataArrays[rtpChannelNum])
+        int bytesRead = rtspClient.readBinaryResponce(dataArrays, channel);
+        if (channel >= 0 && (int)dataArrays.size() > channel && dataArrays[channel])
         {
             if (bytesRead > 0)
             {
-                uint8_t* data =
-                    (uint8_t*)dataArrays[rtpChannelNum]->data() + kInterleavedRtpOverTcpPrefixLength;
-                int64_t size = dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength;
-                if (!processPacket(config, data, size, url.toUtf8().data()))
+                uint8_t* data = (uint8_t*)dataArrays[channel]->data() + kTcpPrefixLength;
+                int64_t size = dataArrays[channel]->size() - kTcpPrefixLength;
+                if (!processPacket(data, size, url.toUtf8().data()))
                 {
                     failed = true;
                     ++failedCount;
                     break;
                 }
             }
-            dataArrays[rtpChannelNum]->clear();
+            dataArrays[channel]->clear();
         }
         if (bytesRead <= 0)
         {
@@ -79,15 +79,14 @@ void Session::run(const QString& url, const Config& config, bool live)
         delete data;
 }
 
-bool Session::processPacket(
-    const Config& config, const uint8_t* data, int64_t size, const char* url)
+bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
     int64_t timestamp = parsePacketTimestamp(data, size);
 
     auto nowTime = std::chrono::system_clock::now();
     if (timestamp != -1)
     {
-        if (config.printTimestamps)
+        if (m_config.printTimestamps)
         {
             printf("Camera %s timestamp %lld us\n", url,
                 (long long int) timestamp);
@@ -97,7 +96,7 @@ bool Session::processPacket(
     else
     {
         std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
-        if (timeFromLastFrame > config.timeout)
+        if (timeFromLastFrame > m_config.timeout)
         {
             printf("WARNING: camera %s, video frame was not received for %lfsec\n",
                 url, timeFromLastFrame.count());
