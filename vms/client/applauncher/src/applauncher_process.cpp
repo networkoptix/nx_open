@@ -50,7 +50,7 @@ ApplauncherProcess::ApplauncherProcess(
     m_settings(settings),
     m_installationManager(installationManager),
     m_startupParameters(startupParameters),
-    m_timerManager(new nx::utils::TimerManager())
+    m_timerManager("ApplauncherProcess timer manager")
 {
 }
 
@@ -67,7 +67,7 @@ void ApplauncherProcess::pleaseStop()
         m_killProcessTasks.end(),
         [this](const std::pair<qint64, KillProcessTask>& val)
         {
-            m_timerManager->joinAndDeleteTimer(val.first);
+            m_timerManager.joinAndDeleteTimer(val.first);
         });
     m_killProcessTasks.clear();
 }
@@ -449,7 +449,7 @@ bool ApplauncherProcess::addProcessKillTimer(
             return true;
         }
 
-        m_killProcessTasks[m_timerManager->addTimer(
+        m_killProcessTasks[m_timerManager.addTimer(
             this,
             std::chrono::milliseconds(request.timeoutMillis))] = task;
     }

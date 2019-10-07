@@ -145,7 +145,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
 
-    m_timerManager = new nx::utils::TimerManager("StandaloneTimerManager");
+    m_timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
 
     m_storagePluginFactory = new QnStoragePluginFactory(this);
 
@@ -253,7 +253,6 @@ QnCommonModule::~QnCommonModule()
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
     setResourceDiscoveryManager(nullptr);
-    delete m_timerManager;
 }
 
 void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)

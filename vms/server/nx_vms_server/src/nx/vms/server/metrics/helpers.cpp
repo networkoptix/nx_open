@@ -35,7 +35,7 @@ public:
 private:
     const std::chrono::milliseconds m_timeout;
     const utils::metrics::OnChange m_change;
-    nx::utils::StandaloneTimerManager::TimerGuard m_guard;
+    nx::utils::TimerManager::TimerGuard m_guard;
     std::atomic<bool> m_isStopped{false};
     nx::utils::TimerManager* m_timerManager = nullptr;
 };

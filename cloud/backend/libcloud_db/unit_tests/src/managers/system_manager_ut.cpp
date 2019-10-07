@@ -133,7 +133,7 @@ protected:
 
 private:
     conf::Settings m_settings;
-    nx::utils::StandaloneTimerManager m_timerManager;
+    nx::utils::TimerManager m_timerManager;
     StreeManager m_streeManager;
     AccountManagerStub m_accountManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;

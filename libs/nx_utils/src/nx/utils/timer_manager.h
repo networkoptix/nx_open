@@ -41,14 +41,14 @@ public:
  *   but it delivers timer events to internal thread,
  *   so additional synchronization in timer event handler may be required.
  */
-class NX_UTILS_API StandaloneTimerManager:
+class NX_UTILS_API TimerManager:
     public QThread
 {
 public:
     /**
      * Simplifies timer id usage.
      * NOTE: Not thread-safe.
-     * WARNING: This class calls StandaloneTimerManager::joinAndDeleteTimer, so watch out for deadlock!
+     * WARNING: This class calls TimerManager::joinAndDeleteTimer, so watch out for deadlock!
      */
     class NX_UTILS_API TimerGuard
     {
@@ -57,7 +57,7 @@ public:
 
     public:
         TimerGuard();
-        TimerGuard(StandaloneTimerManager* const StandaloneTimerManager, TimerId timerId);
+        TimerGuard(TimerManager* const timerManager, TimerId timerId);
         TimerGuard(TimerGuard&& right);
         /**
          * Calls TimerGuard::reset().
@@ -81,7 +81,7 @@ public:
         bool operator!=(const TimerGuard& right) const;
 
     private:
-        StandaloneTimerManager* m_standaloneTimerManager;
+        TimerManager* m_timerManager;
         TimerId m_timerID;
 
         TimerGuard(const TimerGuard& right);
@@ -91,8 +91,8 @@ public:
     /**
      * Launches internal thread.
      */
-    StandaloneTimerManager(const char* threadName = nullptr, QObject* parent = nullptr);
-    virtual ~StandaloneTimerManager();
+    TimerManager(const char* threadName = nullptr, QObject* parent = nullptr);
+    virtual ~TimerManager();
 
     /**
      * Adds timer that is executed once after delay expiration.
@@ -183,16 +183,6 @@ private:
         const QnMutexLockerBase& lk,
         const TimerId timerId);
     uint64_t generateNextTimerId();
-};
-
-class NX_UTILS_API TimerManager:
-    public StandaloneTimerManager
-{
-public:
-    TimerManager(const char* threadName = nullptr, QObject* parent = nullptr):
-        StandaloneTimerManager(threadName, parent)
-    {
-    }
 };
 
 /**

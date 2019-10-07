@@ -14,87 +14,87 @@ namespace utils {
 
 using namespace std;
 
-StandaloneTimerManager::TimerGuard::TimerGuard():
-    m_standaloneTimerManager(nullptr),
+TimerManager::TimerGuard::TimerGuard():
+    m_timerManager(nullptr),
     m_timerID(0)
 {
 }
 
-StandaloneTimerManager::TimerGuard::TimerGuard(
-    StandaloneTimerManager* const StandaloneTimerManager,
+TimerManager::TimerGuard::TimerGuard(
+    TimerManager* const TimerManager,
     TimerId timerId)
 :
-    m_standaloneTimerManager(StandaloneTimerManager),
+    m_timerManager(TimerManager),
     m_timerID(timerId)
 {
 }
 
-StandaloneTimerManager::TimerGuard::TimerGuard(TimerGuard&& right):
-    m_standaloneTimerManager(right.m_standaloneTimerManager),
+TimerManager::TimerGuard::TimerGuard(TimerGuard&& right):
+    m_timerManager(right.m_timerManager),
     m_timerID(right.m_timerID)
 {
     right.m_timerID = 0;
 }
 
-StandaloneTimerManager::TimerGuard::~TimerGuard()
+TimerManager::TimerGuard::~TimerGuard()
 {
     reset();
 }
 
-StandaloneTimerManager::TimerGuard& StandaloneTimerManager::TimerGuard::operator=(
-    StandaloneTimerManager::TimerGuard&& right)
+TimerManager::TimerGuard& TimerManager::TimerGuard::operator=(
+    TimerManager::TimerGuard&& right)
 {
     if (&right == this)
         return *this;
 
     reset();
 
-    m_standaloneTimerManager = right.m_standaloneTimerManager;
+    m_timerManager = right.m_timerManager;
     m_timerID = right.m_timerID;
     right.m_timerID = 0;
     return *this;
 }
 
-void StandaloneTimerManager::TimerGuard::reset()
+void TimerManager::TimerGuard::reset()
 {
     if (!m_timerID)
         return;
-    m_standaloneTimerManager->joinAndDeleteTimer(m_timerID);
+    m_timerManager->joinAndDeleteTimer(m_timerID);
     m_timerID = 0;
 }
 
-TimerId StandaloneTimerManager::TimerGuard::get() const
+TimerId TimerManager::TimerGuard::get() const
 {
     return m_timerID;
 }
 
-TimerId StandaloneTimerManager::TimerGuard::release()
+TimerId TimerManager::TimerGuard::release()
 {
     const auto result = m_timerID;
     m_timerID = 0;
     return result;
 }
 
-StandaloneTimerManager::TimerGuard::operator bool_type() const
+TimerManager::TimerGuard::operator bool_type() const
 {
     return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator==(
-    const StandaloneTimerManager::TimerGuard& right) const
+bool TimerManager::TimerGuard::operator==(
+    const TimerManager::TimerGuard& right) const
 {
     return m_timerID == right.m_timerID;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator!=(
-    const StandaloneTimerManager::TimerGuard& right) const
+bool TimerManager::TimerGuard::operator!=(
+    const TimerManager::TimerGuard& right) const
 {
     return m_timerID != right.m_timerID;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-StandaloneTimerManager::StandaloneTimerManager(const char* threadName, QObject* parent):
+TimerManager::TimerManager(const char* threadName, QObject* parent):
     QThread(parent),
     m_terminated(false),
     m_runningTaskID(0)
@@ -106,12 +106,12 @@ StandaloneTimerManager::StandaloneTimerManager(const char* threadName, QObject* 
     start();
 }
 
-StandaloneTimerManager::~StandaloneTimerManager()
+TimerManager::~TimerManager()
 {
     stop();
 }
 
-void StandaloneTimerManager::stop()
+void TimerManager::stop()
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -122,7 +122,7 @@ void StandaloneTimerManager::stop()
     wait();
 }
 
-TimerId StandaloneTimerManager::addTimer(
+TimerId TimerManager::addTimer(
     TimerEventHandler* const taskManager,
     std::chrono::milliseconds delay)
 {
@@ -130,7 +130,7 @@ TimerId StandaloneTimerManager::addTimer(
     return addTimer(std::bind(&TimerEventHandler::onTimer, taskManager, _1), delay);
 }
 
-TimerId StandaloneTimerManager::addTimer(
+TimerId TimerManager::addTimer(
     MoveOnlyFunc<void(TimerId)> func,
     std::chrono::milliseconds delay)
 {
@@ -146,7 +146,7 @@ TimerId StandaloneTimerManager::addTimer(
     return timerId;
 }
 
-StandaloneTimerManager::TimerGuard StandaloneTimerManager::addTimerEx(
+TimerManager::TimerGuard TimerManager::addTimerEx(
     MoveOnlyFunc<void(TimerId)> taskHandler,
     std::chrono::milliseconds delay)
 {
@@ -154,7 +154,7 @@ StandaloneTimerManager::TimerGuard StandaloneTimerManager::addTimerEx(
     return TimerGuard(this, timerId);
 }
 
-TimerId StandaloneTimerManager::addNonStopTimer(
+TimerId TimerManager::addNonStopTimer(
     MoveOnlyFunc<void(TimerId)> func,
     std::chrono::milliseconds repeatPeriod,
     std::chrono::milliseconds firstShotDelay)
@@ -172,7 +172,7 @@ TimerId StandaloneTimerManager::addNonStopTimer(
     return timerId;
 }
 
-bool StandaloneTimerManager::modifyTimerDelay(
+bool TimerManager::modifyTimerDelay(
     TimerId timerId,
     std::chrono::milliseconds newDelay)
 {
@@ -208,13 +208,13 @@ bool StandaloneTimerManager::modifyTimerDelay(
     return true;
 }
 
-bool StandaloneTimerManager::hasPendingTasks() const
+bool TimerManager::hasPendingTasks() const
 {
     QnMutexLocker lk(&m_mutex);
     return !m_timeToTask.empty() || m_runningTaskID != 0;
 }
 
-void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
+void TimerManager::deleteTimer(const TimerId& timerId)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -223,7 +223,7 @@ void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
     deleteTaskNonSafe(lk, timerId);
 }
 
-void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
+void TimerManager::joinAndDeleteTimer(const TimerId& timerId)
 {
     NX_ASSERT(timerId, lm("Timer id should be a positive number, 0 given."));
     if (timerId == 0)
@@ -241,7 +241,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
     }
     else
     {
-        //method called from scheduler thread (there is StandaloneTimerManagerImpl::run upper in stack).
+        //method called from scheduler thread (there is TimerManagerImpl::run upper in stack).
         //    There is no sense to wait task completion
     }
 
@@ -253,7 +253,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
 constexpr static std::chrono::milliseconds kErrorSkipTimeout =
     std::chrono::milliseconds(3000);
 
-void StandaloneTimerManager::run()
+void TimerManager::run()
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -345,7 +345,7 @@ void StandaloneTimerManager::run()
     NX_DEBUG(this, lm("stopped"));
 }
 
-void StandaloneTimerManager::addTaskNonSafe(
+void TimerManager::addTaskNonSafe(
     const QnMutexLockerBase& /*lk*/,
     const TimerId timerId,
     TaskContext taskContext,
@@ -367,7 +367,7 @@ void StandaloneTimerManager::addTaskNonSafe(
     m_cond.wakeOne();
 }
 
-void StandaloneTimerManager::deleteTaskNonSafe(
+void TimerManager::deleteTaskNonSafe(
     const QnMutexLockerBase& /*lk*/,
     const TimerId timerId)
 {
@@ -379,7 +379,7 @@ void StandaloneTimerManager::deleteTaskNonSafe(
     m_taskToTime.erase(it);
 }
 
-uint64_t StandaloneTimerManager::generateNextTimerId()
+uint64_t TimerManager::generateNextTimerId()
 {
     static QAtomicInt lastTaskID = 0;
 
@@ -391,14 +391,14 @@ uint64_t StandaloneTimerManager::generateNextTimerId()
 
 //-------------------------------------------------------------------------------------------------
 
-StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func):
+TimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func):
     func(std::move(_func)),
     singleShot(true)
 {
     NX_CRITICAL(func);
 }
 
-StandaloneTimerManager::TaskContext::TaskContext(
+TimerManager::TaskContext::TaskContext(
     MoveOnlyFunc<void(TimerId)> _func,
     std::chrono::milliseconds _repeatPeriod)
 :

@@ -7,7 +7,7 @@
 
 const unsigned int DataSourceCache::DEFAULT_LIVE_TIME_MS;
 
-DataSourceCache::DataSourceCache(nx::utils::StandaloneTimerManager* timerManager):
+DataSourceCache::DataSourceCache(nx::utils::TimerManager* timerManager):
     m_timerManager(timerManager),
     m_terminated(false)
 {

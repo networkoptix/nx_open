@@ -139,7 +139,7 @@ private:
     };
 
     InstallationProcess m_process;
-    std::unique_ptr<nx::utils::TimerManager> m_timerManager;
+    nx::utils::TimerManager m_timerManager;
 };
 
 } // namespace nx::vms::applauncher

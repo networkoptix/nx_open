@@ -114,7 +114,7 @@ protected:
     }
 
 private:
-    nx::utils::StandaloneTimerManager m_timerManager;
+    nx::utils::TimerManager m_timerManager;
     ::DataSourceCache m_cache;
     StreamingChunkCacheKey m_prevGeneratedCacheKey;
     DataSourceContextPtr m_prevCacheResult;

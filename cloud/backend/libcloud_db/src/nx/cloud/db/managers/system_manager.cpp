@@ -42,7 +42,7 @@ static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
 
 SystemManager::SystemManager(
     const conf::Settings& settings,
-    nx::utils::StandaloneTimerManager* const timerManager,
+    nx::utils::TimerManager* const timerManager,
     AbstractAccountManager* const accountManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     nx::sql::AsyncSqlQueryExecutor* const dbManager,

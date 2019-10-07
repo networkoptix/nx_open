@@ -237,7 +237,7 @@ void PersistentScheduler::start()
 {
     {
         QnMutexLocker lock(&m_timerManagerMutex);
-        m_timerManager.reset(new nx::utils::StandaloneTimerManager);
+        m_timerManager.reset(new nx::utils::TimerManager);
     }
 
     for (const auto& functorToTask: m_scheduleData.functorToTasks)

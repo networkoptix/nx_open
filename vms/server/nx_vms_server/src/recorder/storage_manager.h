@@ -361,6 +361,6 @@ private:
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 
-    nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    nx::utils::TimerManager m_auxTasksTimerManager;
     std::optional<bool> m_hasWritableStorages;
 };

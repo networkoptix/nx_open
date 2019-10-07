@@ -80,7 +80,7 @@ private:
     FunctorToReceiverMap m_functorToReceiver;
     QnMutex m_mutex;
     ScheduleData m_scheduleData;
-    std::unique_ptr<nx::utils::StandaloneTimerManager> m_timerManager;
+    std::unique_ptr<nx::utils::TimerManager> m_timerManager;
     QnMutex m_timerManagerMutex;
     std::unordered_map<QnUuid, nx::utils::TimerId> m_taskToTimer;
     std::unordered_map<QnUuid, std::unordered_map<QnUuid, ScheduleParams>> m_functorToTaskToParams;

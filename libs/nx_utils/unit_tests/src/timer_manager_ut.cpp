@@ -147,7 +147,7 @@ TEST(parseTimerDuration, incorrect_input)
 
 TEST_F(TimerManager, deleteFromCallBack)
 {
-    utils::StandaloneTimerManager mgr;
+    utils::TimerManager mgr;
     int fireCount = 0;
     const std::chrono::milliseconds kTimeout(10);
 

@@ -215,7 +215,7 @@ public:
         return m_analyticsObjectTypeDescriptorManager;
     }
 
-    nx::utils::TimerManager* timerManager() const { return m_timerManager; }
+    nx::utils::TimerManager* timerManager() const { return m_timerManager.get(); }
 
     void setNeedToStop(bool value) { m_needToStop = value; }
     bool isNeedToStop() const { return m_needToStop; }
@@ -340,7 +340,7 @@ private:
     void updateModuleInformationUnsafe();
 
 private:
-    nx::utils::TimerManager* m_timerManager = nullptr;
+    std::unique_ptr<nx::utils::TimerManager> m_timerManager;
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
     QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;

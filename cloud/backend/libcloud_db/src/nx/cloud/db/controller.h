@@ -81,7 +81,7 @@ private:
     clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
-    nx::utils::StandaloneTimerManager m_timerManager;
+    nx::utils::TimerManager m_timerManager;
     SystemManager m_systemManager;
     SystemCapabilitiesProvider m_systemCapabilitiesProvider;
     VmsGateway m_vmsGateway;

@@ -68,7 +68,7 @@ private:
     QString m_dbFileName;
     UuidToHash m_uuidToHash;
     std::chrono::seconds m_vacuumInterval;
-    nx::utils::StandaloneTimerManager m_vacuumTimer;
+    nx::utils::TimerManager m_vacuumTimer;
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
