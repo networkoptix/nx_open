@@ -14,8 +14,8 @@ class RtspPerf
 public:
     struct Config
     {
-        QString server = "127.0.0.1:7001";
-        QString user = "admin";
+        QString server;
+        QString user;
         QString password;
         QStringList urls;
         int count = 1;
@@ -43,12 +43,12 @@ private:
         std::atomic<bool> failed = true;
         std::thread worker;
     private:
-        void parsePacketTimestamp(
-            const uint8_t* data,
-            int64_t size,
-            const QString& cameraId,
-            std::chrono::milliseconds timeout);
-        bool newPacket = true;
+        bool processPacket(
+            const Config& config, const uint8_t* data, int64_t size, const char* url);
+        int64_t parsePacketTimestamp(const uint8_t* data, int64_t size);
+
+    private:
+        bool m_newPacket = true;
         std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime;
     };
 
