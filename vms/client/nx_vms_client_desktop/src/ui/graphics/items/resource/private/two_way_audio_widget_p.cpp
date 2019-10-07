@@ -275,7 +275,7 @@ void QnTwoWayAudioWidget::Private::updateCamera(const QnVirtualCameraResourcePtr
     if (camera)
         connect(camera.get(), &QnResource::statusChanged, this, &Private::updateState);
 
-    m_controller.setResourceId(m_camera->getId().toString());
+    m_controller.setResourceId(m_camera->getId());
     updateState();
 }
 
