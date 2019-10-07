@@ -125,7 +125,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
         setNeedKeyData();
         if (isInitialized)
         {
-            m_stat[0].onEvent(
+            onEvent(
                 std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
                 m_openStreamResult);
         }
@@ -200,7 +200,7 @@ void CLServerPushStreamReader::run()
         {
             setNeedKeyData();
             m_openStreamResult = CameraDiagnostics::BadMediaStreamResult();
-            m_stat[0].onEvent(
+            onEvent(
                 std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
                 m_openStreamResult);
             QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage

@@ -128,7 +128,7 @@ void QnAbstractArchiveStreamReader::run()
                 m_noDataHandler();
 
             setNeedKeyData();
-            m_stat[0].onEvent(
+            onEvent(
                 std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
                 CameraDiagnostics::BadMediaStreamResult());
 
@@ -155,7 +155,14 @@ void QnAbstractArchiveStreamReader::run()
         }
 
         if(data)
+        {
             data->dataProvider = this;
+            if (data->flags &
+                (QnAbstractMediaData::MediaFlags_AfterEOF | QnAbstractMediaData::MediaFlags_BOF))
+            {
+                m_stat[data->channelNumber].reset();
+            }
+        }
 
         auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
         if (mediaRes && !mediaRes->hasVideo(this))

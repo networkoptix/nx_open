@@ -14,6 +14,32 @@
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 static const qint64 kMinAudioFrameDurationUsec = 1000;
+static const int kMaxErrorsToReportIssue = 2;
+
+bool QnAbstractMediaStreamDataProvider::isConnectionLost() const
+{
+    return m_numberOfErrors >= kMaxErrorsToReportIssue;
+}
+
+void QnAbstractMediaStreamDataProvider::onEvent(
+    std::chrono::microseconds /*timestamp*/,
+    CameraDiagnostics::Result event)
+{
+    if (event.errorCode == CameraDiagnostics::ErrorCode::noError)
+    {
+        if (m_numberOfErrors > 0)
+        {
+            m_numberOfErrors = 0;
+            emit streamEvent(this, event); //< Report no error.
+        }
+    }
+    else
+    {
+        ++m_numberOfErrors;
+        if (m_numberOfErrors % kMaxErrorsToReportIssue == 0)
+            emit streamEvent(this, event);
+    }
+}
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
     :
@@ -25,13 +51,6 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
     NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
     m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
-
-    connect(
-        &m_stat[0], &QnMediaStreamStatistics::streamEvent,
-        this, [this](CameraDiagnostics::Result result)
-        {
-            emit streamEvent(this, result);
-        }, Qt::DirectConnection);
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
@@ -86,12 +105,12 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     return false;
 }
 
-
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
         m_stat[i].reset();
+    m_numberOfErrors = 0;
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()

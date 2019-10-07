@@ -65,7 +65,7 @@ void QnClientPullMediaStreamProvider::run()
         if (data == nullptr)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(
+            onEvent(
                 std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
                 CameraDiagnostics::BadMediaStreamResult());
             QnSleep::msleep(kErrorDelayTimeoutMs);

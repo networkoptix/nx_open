@@ -529,6 +529,8 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 
 QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
 {
+    if (isConnectionLost())
+        return QnLiveStreamParams();
     QnLiveStreamParams result;
     result.bitrateKbps = bitrateBitsPerSecond() / 1024.0;
     result.fps = getFrameRate();

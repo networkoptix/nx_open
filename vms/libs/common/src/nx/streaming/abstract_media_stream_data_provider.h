@@ -41,6 +41,7 @@ public:
 
     virtual bool hasThread() const { return true; }
     virtual bool reinitResourceOnStreamError() const { return true; }
+    bool isConnectionLost() const;
 signals:
     void streamEvent(QnAbstractMediaStreamDataProvider* streamReader, CameraDiagnostics::Result result);
 protected:
@@ -54,6 +55,7 @@ protected:
     void checkTime(const QnAbstractMediaDataPtr& data);
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
+    void onEvent(std::chrono::microseconds timestamp, CameraDiagnostics::Result event);
 private:
     void loadNumberOfChannelsIfUndetected() const;
 protected:
@@ -67,6 +69,7 @@ private:
     qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
     bool m_isCamera;
     qint64 m_unloopingPeriodStartUs = 0;
+    std::atomic<int> m_numberOfErrors{};
 };
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
