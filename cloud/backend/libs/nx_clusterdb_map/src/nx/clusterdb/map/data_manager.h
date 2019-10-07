@@ -112,7 +112,7 @@ private:
      * Inserts/updates key/value within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
      */
-    void insertToOrUpdateDb(
+    nx::sql::DBResult insertToOrUpdateDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key,
         const std::string& value);
@@ -165,7 +165,7 @@ private:
      * Removes elements within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
      */
-    void removeFromDb(
+    nx::sql::DBResult removeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 

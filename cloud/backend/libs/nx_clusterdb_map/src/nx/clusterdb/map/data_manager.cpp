@@ -113,8 +113,7 @@ void DataManager::insertOrUpdate(
         m_clusterId,
         [this, key, value](nx::sql::QueryContext* queryContext)
         {
-            insertToOrUpdateDb(queryContext, key, value);
-            return nx::sql::DBResult::ok;
+            return insertToOrUpdateDb(queryContext, key, value);
         },
         [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
@@ -134,8 +133,7 @@ void DataManager::remove(
         m_clusterId,
         [this, key](nx::sql::QueryContext* queryContext)
         {
-            removeFromDb(queryContext, key);
-            return nx::sql::DBResult::ok;
+            return removeFromDb(queryContext, key);
         },
         [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
@@ -298,7 +296,7 @@ void DataManager::getRangeWithPrefix(
         getRange(keyPrefix, std::move(completionHandler));
 }
 
-void DataManager::insertToOrUpdateDb(
+nx::sql::DBResult DataManager::insertToOrUpdateDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key,
     const std::string& value)
@@ -306,7 +304,7 @@ void DataManager::insertToOrUpdateDb(
     m_keyValueDao.insertOrUpdate(queryContext, key, value);
     m_eventProvider->notifyRecordInserted(queryContext, key, value);
 
-    m_syncEngine->transactionLog()
+    return m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveKeyValuePair>(
             queryContext, m_clusterId, KeyValuePair{key, value});
 }
@@ -351,14 +349,14 @@ std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     return range.empty() ? std::nullopt : std::optional<decltype(range)>(std::move(range));
 }
 
-void DataManager::removeFromDb(
+nx::sql::DBResult DataManager::removeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
     m_keyValueDao.remove(queryContext, key);
     m_eventProvider->notifyRecordRemoved(queryContext, key);
 
-    m_syncEngine->transactionLog()
+    return m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
             queryContext, m_clusterId, Key{key});
 }
