@@ -50,5 +50,14 @@
         "brand_d7":     "#909090",
 
         "brand_contrast":"#181818"
+    },
+
+    "QComboBox": {
+        "palette": {
+            "default": {
+                "highlight":        "brand_d1",
+                "highlightedText":  "brand_contrast"
+            }
+        }
     }
 }
