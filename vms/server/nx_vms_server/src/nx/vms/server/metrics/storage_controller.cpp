@@ -51,13 +51,13 @@ void StorageController::start()
         });
 }
 
-Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
+static Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
 {
     const auto bytes = resource->getAndResetMetric(metric);
     return api::metrics::Value(double(bytes) / double(kIoRateUpdateInterval.count()));
 }
 
-auto transactionsPerSecond(const Resource& storage)
+static auto transactionsPerSecond(const Resource& storage)
 {
     const auto resourcePool = storage->commonModule()->resourcePool();
     const auto ownMediaServer = resourcePool->getOwnMediaServer();
@@ -70,7 +70,7 @@ auto transactionsPerSecond(const Resource& storage)
         / (double)duration_cast<seconds>(statistics->statisticalPeriod).count());
 }
 
-auto infoGroupProvider()
+static auto infoGroupProvider()
 {
     return
         utils::metrics::makeValueGroupProvider<Resource>(
@@ -87,7 +87,7 @@ auto infoGroupProvider()
         );
 }
 
-auto stateGroupProvider()
+static auto stateGroupProvider()
 {
     return
         utils::metrics::makeValueGroupProvider<Resource>(
@@ -108,7 +108,7 @@ auto stateGroupProvider()
         );
 }
 
-auto activityGroupProvider()
+static auto activityGroupProvider()
 {
     return
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
@@ -132,7 +132,7 @@ auto activityGroupProvider()
         );
 }
 
-auto spaceGroupProvider()
+static auto spaceGroupProvider()
 {
     return
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
