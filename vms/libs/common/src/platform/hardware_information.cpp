@@ -1,6 +1,6 @@
 #include "hardware_information.h"
 
-#if !defined(__arm__)
+#if !defined(__arm__) && !defined(__aarch64__)
     #if defined(_MSC_VER)
         #include <intrin.h>
     #else
@@ -81,7 +81,7 @@ const QString& compileCpuArchicture()
         logicalCores = std::thread::hardware_concurrency();
         physicalCores = logicalCores;
 
-        #if !defined(__arm__)
+        #if !defined(__arm__) && !defined(__aarch64__)
             int cpuinfo[4];
             #if defined(_MSC_VER)
                 __cpuid(cpuinfo, 1);
