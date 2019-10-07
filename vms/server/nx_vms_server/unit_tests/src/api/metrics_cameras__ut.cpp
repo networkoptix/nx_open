@@ -286,7 +286,7 @@ TEST_F(MetricsCameraApi, availabilityGroup)
     do
     {
         systemAlarms = get<Alarms>("/ec2/metrics/alarms");
-    } while (systemAlarms.size() != 2 && !timer.hasExpired(15s));
+    } while (!hasAlarm(systemAlarms, "availability.ipConflicts3min") && !timer.hasExpired(15s));
     ASSERT_TRUE(hasAlarm(systemAlarms, "availability.ipConflicts3min"));
 }
 
