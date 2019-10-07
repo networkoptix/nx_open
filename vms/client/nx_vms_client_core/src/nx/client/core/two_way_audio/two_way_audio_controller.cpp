@@ -129,14 +129,13 @@ void TwoWayAudioController::setSourceId(const QString& value)
     d->sourceId = value;
 }
 
-QString TwoWayAudioController::resourceId() const
+QnUuid TwoWayAudioController::resourceId() const
 {
-    return d->camera ? d->camera->getId().toString() : QString();
+    return d->camera ? d->camera->getId() : QnUuid();
 }
 
-void TwoWayAudioController::setResourceId(const QString& value)
+void TwoWayAudioController::setResourceId(const QnUuid& id)
 {
-    const auto id = QnUuid::fromStringSafe(value);
     if (d->camera && d->camera->getId() == id)
         return;
 

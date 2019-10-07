@@ -7,6 +7,7 @@
 #include <client_core/connection_context_aware.h>
 #include <utils/common/connective.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
 class QnSingleCamLicenseStatusHelper;
 
@@ -22,7 +23,7 @@ class TwoWayAudioController: public Connective<QObject>, public QnConnectionCont
 
     Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
     Q_PROPERTY(bool started READ started NOTIFY startedChanged)
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
     TwoWayAudioController(QObject* parent = nullptr);
@@ -42,8 +43,8 @@ public:
 
     bool available() const;
 
-    QString resourceId() const;
-    void setResourceId(const QString& value);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& value);
 
 signals:
     void startedChanged();
