@@ -31,7 +31,7 @@ bool Result::ok() const
     return code == ResultCode::ok;
 }
 
-std::string nx::clusterdb::map::Result::toString() const
+std::string Result::toString() const
 {
     return map::toString(code) + (!text.empty() ? (": " + text) : std::string());
 }
