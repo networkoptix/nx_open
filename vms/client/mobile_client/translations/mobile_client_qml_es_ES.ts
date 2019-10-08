@@ -553,12 +553,12 @@
       <translation>INALCANZABLE</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Este servidor tiene una versión demasiado antigua. Por favor actualice a la última versión.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Conéctese a este servidor desde el navegador web o a través del cliente para configurarlo</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>El servidor tiene una versión demasiado antigua. Por favor, actualizalo a la última</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Sistemas no encontrados</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>No se puede conectar al servidor</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Compruebe su conexión de red o póngase en contacto con un administrador del sistema</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>No hubo resultado</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>No se puede conectar al servidor</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Guardar</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Usar hora del servidor</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>No hay transmisión en vivo</translation>
     </message>
   </context>
   <context>

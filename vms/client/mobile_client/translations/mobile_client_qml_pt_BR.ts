@@ -553,12 +553,12 @@
       <translation>INACESSÍVEL</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Este servidor tem uma versão muito antiga. Por favor, atualize-o para a versão mais recente.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Conecte-se a este servidor pelo navegador da Web ou pelo cliente de desktop para configurá-lo</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Nenhum sistema encontrado</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Não foi possível ligar ao Servidor</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Verifique sua conexão de rede ou entre em contacto com um administrador do sistema</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Nada encontrado</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Não foi possível ligar ao servidor</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Manter</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Sem transmissão ao vivo</translation>
     </message>
   </context>
   <context>

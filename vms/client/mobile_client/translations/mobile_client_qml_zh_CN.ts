@@ -553,12 +553,12 @@
       <translation>不可到达</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>此服务器已太老版本。请更新到最新版本。</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>从Web浏览器或桌面客户端连接到此服务器进行设置</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>服务器版本太旧。请更新到最新版本</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>未发现系统</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>无法连接到服务器</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>请检查您的网络连接或与系统管理员联系</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>未找到内容</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>无法连接到服务器</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>保留</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>請以服務器時間為準</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>没有实时流</translation>
     </message>
   </context>
   <context>

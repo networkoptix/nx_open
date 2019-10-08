@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar o stream de saída para gravação.</translation>
+      <translation>Não foi possível alocar o stream para gravação.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

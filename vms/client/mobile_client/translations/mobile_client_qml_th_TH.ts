@@ -140,7 +140,7 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
+      <translation>เชื่อมต่อกับกล้องไม่ได้%1</translation>
     </message>
   </context>
   <context>
@@ -553,12 +553,12 @@
       <translation>ไม่สามารถเข้าถึงได้</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>เซิร์ฟเวอร์นี้มีรุ่นที่เก่าเกินไป กรุณาปรับปรุงให้รุ่นล่าสุด</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>เชื่อมต่อกับเซิร์ฟเวอร์นี้จากเว็บเบราเซอร์หรือผ่านทางไคลเอ็นต์เดสก์ท็อปเพื่อตั้งค่า</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>ไม่พบระบบ</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณหรือติดต่อผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>ไม่พบสิ่งใด</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>ไม่สามารถเชื่อมต่อ server ได้</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>เก็บไว้</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>ไม่มีสตรีมภาพปัจจุบัน</translation>
     </message>
   </context>
   <context>
@@ -864,7 +864,7 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
+      <translation>เชื่อมต่อกับกล้องไม่ได้%1</translation>
     </message>
   </context>
 </TS>

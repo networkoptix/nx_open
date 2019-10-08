@@ -553,12 +553,12 @@
       <translation>ONÅBAR</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Den här servern har för gammal version. Vänligen uppdatera den till den senaste versionen.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Anslut till den här servern från webbläsaren eller via skrivbordsklienten för att ställa in den</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>Servern har för gammal version. Uppdatera den till den senaste</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Inga system hittades</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Kan inte ansluta till servern</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Kontrollera din nätverksanslutning eller kontakta en systemadministratör</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting hittades</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Kan inte ansluta till servern</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Behåll</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Använd servertid</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Ingen liveström</translation>
     </message>
   </context>
   <context>

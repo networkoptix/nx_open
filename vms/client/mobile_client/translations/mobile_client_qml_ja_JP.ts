@@ -553,12 +553,12 @@
       <translation>到達不可</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>このサーバーは古いバージョンです　最新バージョンに更新してください</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Webブラウザまたはデスクトップクライアントからサーバに接続して設定する</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>システムが見つかりませんでした</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>サーバーに接続できません</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>ネットワーク接続を確認するかシステム管理者に問い合わせてください</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>何も見つかりませんでした</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>サーバーに接続できません</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>維持</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>ライブストリームなし</translation>
     </message>
   </context>
   <context>

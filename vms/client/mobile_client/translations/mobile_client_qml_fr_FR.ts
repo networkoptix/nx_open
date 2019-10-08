@@ -553,12 +553,12 @@
       <translation>INACCESSIBLE</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Ce serveur a une version trop vielle. S’il vous plaît mettre à jour à la dernière version.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Connecter à ce serveur à partir du navigateur Web ou client PC pour le configurer</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Aucun système trouvé</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Impossible de se connecter au serveur</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Vérifiez votre connexion réseau ou contactez un administrateur système</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Rien trouvé</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Impossible de se connecter au serveur</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Garder</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>

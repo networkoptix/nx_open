@@ -553,12 +553,12 @@
       <translation>НЕДОСТУПНА</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Версія цього сервера застаріла. Будь ласка, оновіть його до останньої версії.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Підключіться до цього сервера через веб-браузер або через настільний клієнт, щоб налаштувати його</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>Версія цього сервера застаріла. Будь ласка, оновіть його до останньої версії</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Системи не знайдені</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Неможливо з'єднатися з сервером</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Перевірте підключення до мережі або зверніться до системного адміністратора</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Нічого не знайдено</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Неможливо з'єднатися з сервером</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Залишити</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Використовуйте час сервера</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Немає онлайн потоку</translation>
     </message>
   </context>
   <context>

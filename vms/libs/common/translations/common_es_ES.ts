@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Modulos E/S</translation>
+      <translation>Módulo E/S</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>No se pudo asignar secuencia de salida para la grabación.</translation>
+      <translation>No se pudo asignar el flujo de salida para la grabación.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

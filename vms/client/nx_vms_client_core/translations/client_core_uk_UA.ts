@@ -76,7 +76,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>ТБ</translation>
+      <translation>Тб</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -91,7 +91,7 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>ПБ</translation>
+      <translation>Пб</translation>
     </message>
   </context>
   <context>
@@ -148,7 +148,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation>Ваша Система</translation>
+      <translation>Ваша система</translation>
     </message>
   </context>
   <context>
@@ -191,7 +191,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation>Ваша Система</translation>
+      <translation>Ваша система</translation>
     </message>
   </context>
   <context>
@@ -209,12 +209,12 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>хв</translation>
+      <translation>м</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>год</translation>
+      <translation>ч</translation>
     </message>
     <message>
       <source>d</source>

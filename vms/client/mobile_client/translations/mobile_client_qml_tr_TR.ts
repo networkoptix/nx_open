@@ -553,12 +553,12 @@
       <translation>ULAŞILAMAZ</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Kurmak için web tarayıcısından veya masaüstü istemcisinden bu sunucuya bağlanın</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Hiçbir sistem bulundu</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Sunucuya bağlanılamıyor</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Bağlanıtınızı kontrol edin veya sistem yöneticinize başvurun</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Hiçbir şey bulunamadı</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Sunucuya bağlanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Tut</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Sunucu saatini kullan</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Canlı yayın yok</translation>
     </message>
   </context>
   <context>

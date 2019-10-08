@@ -553,12 +553,12 @@
       <translation>NEDOSTUPNÝ</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Tento server má příliš starou verzi. Aktualizujte ho na nejnovější verzi.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Připojte se k tomuto serveru z webového prohlížeče nebo pomocí stolního klienta a nastavte jej</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Nebyly nalezeny žádné systémy</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Nelze se připojit k serveru</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Zkontrolujte síťové připojení nebo se obraťte na správce systému</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Nic nenalezeno</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Nelze se připojit k serveru</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Ponechat</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>

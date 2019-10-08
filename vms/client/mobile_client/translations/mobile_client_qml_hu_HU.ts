@@ -553,12 +553,12 @@
       <translation>NEM ELÉRHETŐ</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Szerver verzió túl régi. Frissítsen a legújabb verzióra.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>A beállítások eléréséhez csatlakozzon a szerverhez webböngésző vagy asztali kliens használatával</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Nem találhatók rendszerek</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Nem lehet kapcsolódni a szerverhez</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Ellenőrizze a hálózati kapcsolatot, vagy lépjen kapcsolatba egy rendszer adminisztrátorral</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Nincs találat</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Nem lehet kapcsolódni a szerverhez</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Megtart</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -758,7 +758,7 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>Nincs elég licensz</translation>
+      <translation>Nincs elegendő licensz</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Nincs élő stream</translation>
     </message>
   </context>
   <context>

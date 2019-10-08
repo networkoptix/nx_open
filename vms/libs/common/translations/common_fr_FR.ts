@@ -866,7 +866,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Inconnu</translation>
+      <translation>Inconnue</translation>
     </message>
     <message>
       <source>FREE License</source>

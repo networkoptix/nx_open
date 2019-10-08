@@ -109,7 +109,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+      <translation>オーディオエンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

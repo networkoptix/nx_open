@@ -553,12 +553,12 @@
       <translation>ONBEREIKBAAR</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Deze server heeft te oude versie. Update het bij de nieuwste versie.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Verbinding maken met deze server vanuit een webbrowser of via een desktopclient om het in te stellen</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>Server heeft een te oude versie. Werk het bij naar de nieuwste versie</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Geen systemen gevonden</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Kan geen verbinding maken met de server</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Controleer uw netwerkverbinding of neem contact op met een systeembeheerder</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Bewaar</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Gebruik servertijd</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Geen live stream</translation>
     </message>
   </context>
   <context>

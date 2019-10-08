@@ -113,7 +113,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>Гаразд</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -869,7 +869,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Модуль вводу/виводу</translation>
+      <translation>Модуль вводу-виводу</translation>
     </message>
     <message>
       <source>I/O module</source>

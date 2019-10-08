@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Frissítse a firmware-t. A minimálisan támogatott verzió %1. A jelenlegi verzió %2</translation>
+      <translation>Frissítse a firmware-t. A minimális támogatott verzió %1. A jelenlegi verzió %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -406,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder a %1 codec-hez.</translation>
+      <translation>Nem található enkóder %1 kodekhez.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

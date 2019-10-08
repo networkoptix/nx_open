@@ -553,12 +553,12 @@
       <translation>연결할 수 없는</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>이 서버는 오래 된 버전입니다. 최신 버전으로 업데이트 하십시오.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>웹 브라우저 또는 데스크톱 클라이언트를 통해 이 서버에 연결하여 설정하십시오.</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>이 서버는 오래 된 버전입니다. 최신 버전으로 업데이트 하십시오.</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>발견된 시스템 없음.</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>서버에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>네트워크 연결을 확인 하거나 시스템 관리자에 게 문의</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>결과 없음</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>서버에 연결할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>유지</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>서버 시간 사용</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>라이브 스트림 없음</translation>
     </message>
   </context>
   <context>

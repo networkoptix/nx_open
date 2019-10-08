@@ -1131,7 +1131,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Bu nedir&apos;</translation>
+      <translation>Bu nedir&apos;?</translation>
     </message>
   </context>
   <context>
@@ -1142,7 +1142,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>&amp;Yenile</translation>
+      <translation>&amp;Tekrarla</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>

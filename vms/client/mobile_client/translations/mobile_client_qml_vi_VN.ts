@@ -553,12 +553,12 @@
       <translation>Không thể sử dụng được</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Máy chủ này có phiên bản quá cũ. Vui lòng cập nhật lên phiên bản mới nhất.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Kết nối với máy chủ này từ trình duyệt web hoặc máy tính để bàn để cài đặt</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Không tìm thấy Hệ thống</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Không thể kết nối tới máy chủ</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Kiểm tra kết nối mạng của bạn hoặc liên hệ với quản trị viên hệ thống</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Không thể kết nối tới máy chủ</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Giữ</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Không có luồng trực tiếp</translation>
     </message>
   </context>
   <context>

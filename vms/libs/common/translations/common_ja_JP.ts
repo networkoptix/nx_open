@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます。</translation>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ統合できます. システム名とパスワードは %1 システムから取得されます.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -93,12 +93,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません。このサーバーを削除してやり直してください。</translation>
+      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません. このサーバーを削除してやり直してください.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません</translation>
+      <translation>クラウドシステムのオーナーが異なります. 統合は許可されていません.</translation>
     </message>
   </context>
   <context>
@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -832,7 +832,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>不明</translation>
+      <translation>未知の値</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -983,7 +983,7 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>Zip ファイルが壊れています</translation>
+      <translation>Zipファイルが壊れています.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
@@ -1003,11 +1003,11 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation>抽出は取り消されました</translation>
+      <translation>抽出はキャンセルされました.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation>抽出が忙しい</translation>
+      <translation>抽出はビジーです.</translation>
     </message>
   </context>
   <context>

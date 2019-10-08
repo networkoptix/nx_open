@@ -406,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Koodekin %1 kooderia ei löytynyt.</translation>
+      <translation>Koodekin %1 dekooderia ei löytynyt.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Ulostulon streamia ei voinut varata tallentamiseen.</translation>
+      <translation>Output streamia ei voinut varata tallentamiseen.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

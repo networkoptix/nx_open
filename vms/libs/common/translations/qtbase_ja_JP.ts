@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>すべてを選択</translation>
+      <translation>すべて選択</translation>
     </message>
   </context>
 </TS>

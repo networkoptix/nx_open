@@ -553,12 +553,12 @@
       <translation>NIEOSIĄGALNY</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Ten serwer ma zbyt starą wersję. Zaktualizuj go do najnowszej wersji.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>W celu konfiguracji połącz się z tym serwerem z poziomu przeglądarki internetowej lub za pośrednictwem aplikacji klienta</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation>Serwer ma zbyt starą wersję. Proszę go zaktualizować do najnowszej wersji.</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Nie znaleziono systemów</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Nie można połączyć się z serwerem</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Sprawdź połączenie sieciowe lub skontaktuj się z administratorem systemu</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Nic nie znaleziono</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Nie można połączyć się z serwerem</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Zachowaj</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Użyj czasu serwera</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Brak strumienia na żywo</translation>
     </message>
   </context>
   <context>

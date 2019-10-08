@@ -553,12 +553,12 @@
       <translation type="unfinished">UNREACHABLE</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation type="unfinished">No Systems found</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation type="unfinished">Cannot connect to server</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>

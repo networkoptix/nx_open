@@ -553,12 +553,12 @@
       <translation>UTILGJENGELIG</translation>
     </message>
     <message>
-      <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Denne serveren har for gammel versjon. Vennligst oppdatere den til den nyeste versjonen.</translation>
-    </message>
-    <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
       <translation>Koble til denne serveren fra nettleseren eller via stasjonær klient for å konfigurere den</translation>
+    </message>
+    <message>
+      <source>Server has too old version. Please update it to the latest one</source>
+      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
     </message>
   </context>
   <context>
@@ -574,14 +574,6 @@
     <message>
       <source>No Systems found</source>
       <translation>Ingen systemer funnet</translation>
-    </message>
-    <message>
-      <source>Cannot connect to Server</source>
-      <translation>Kan ikke koble til serveren</translation>
-    </message>
-    <message>
-      <source>Check your network connection or contact a system administrator</source>
-      <translation>Sjekk nettverksforbindelsen din eller kontakt en systemadministrator</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -601,6 +593,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
+    </message>
+    <message>
+      <source>Cannot connect to server</source>
+      <translation>Kan ikke koble til serveren</translation>
     </message>
   </context>
   <context>
@@ -628,6 +624,10 @@
     <message>
       <source>Keep</source>
       <translation>Behold</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation type="unfinished">Use server time</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Ingen live stream</translation>
     </message>
   </context>
   <context>

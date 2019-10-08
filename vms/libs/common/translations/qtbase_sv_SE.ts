@@ -709,7 +709,7 @@ Vill du ta bort det ändå?</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Min Dator</translation>
+      <translation>Den här datorn</translation>
     </message>
     <message>
       <source>Computer</source>
