@@ -1,20 +1,8 @@
 #pragma once
 
-#if defined(_WIN32)
-#include <filesystem>
-
-#if (_MSC_VER < 1923)
-namespace std { namespace filesystem { using namespace std::experimental::filesystem; } }
-#endif
-
-#else
-
-#define NX_STD_FILESYSTEM_IMPLEMENTATION
-
 #include <string>
 
-namespace std {
-namespace filesystem {
+namespace nx::utils::filesystem {
 
 class NX_UTILS_API path
 {
@@ -35,7 +23,4 @@ private:
     std::string m_pathStr;
 };
 
-} // namespace filesystem
-} // namespace std
-
-#endif
+} // namespace nx::utils::filesystem

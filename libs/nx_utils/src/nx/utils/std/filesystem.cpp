@@ -1,9 +1,6 @@
 #include "filesystem.h"
 
-#if defined(NX_STD_FILESYSTEM_IMPLEMENTATION)
-
-namespace std {
-namespace filesystem {
+namespace nx::utils::filesystem {
 
 path::path(const std::string& str):
     m_pathStr(str)
@@ -53,7 +50,4 @@ bool path::operator!=(const path& other) const
     return m_pathStr != other.m_pathStr;
 }
 
-} // namespace filesystem
-} // namespace std
-
-#endif
+} // namespace namespace nx::utils::filesystem

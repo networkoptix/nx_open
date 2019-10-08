@@ -23,7 +23,7 @@ void LoggerSettings::parse(const QString& str)
     {
         if (param.first == "file")
         {
-            const auto filePath = std::filesystem::path(param.second.toStdString());
+            const auto filePath = nx::utils::filesystem::path(param.second.toStdString());
 
             logBaseName = QString::fromStdString(filePath.filename().string());
             if (filePath.has_parent_path())
