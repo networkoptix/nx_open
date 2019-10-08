@@ -2,9 +2,7 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace nx::network::upnp {
 
 //Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
 QString NX_NETWORK_API toUpnpUrn(const QString& id, const QString& suffix, int version = 1);
@@ -68,6 +66,4 @@ private:
     DeviceInfo::Service* m_lastService;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

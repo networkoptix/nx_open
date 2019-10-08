@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QWaitCondition>
 
 #include <nx/utils/scope_guard.h>
@@ -8,9 +10,7 @@
 #include "upnp_async_client.h"
 #include "upnp_search_handler.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace nx::network::upnp {
 
 class NX_NETWORK_API PortMapper:
     SearchAutoHandler,
@@ -20,9 +20,9 @@ public:
     PortMapper(
         nx::network::upnp::DeviceSearcher* deviceSearcher,
         bool isEnabled = true,
-        quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        std::chrono::milliseconds checkMappingsInterval = kDefaultCheckMappingsInterval,
         const QString& description = QString(),
-        const QString& device = AsyncClient::INTERNAL_GATEWAY);
+        const QString& device = AsyncClient::kInternalGateway);
     ~PortMapper();
 
     PortMapper(const PortMapper&) = delete;
@@ -30,14 +30,15 @@ public:
     PortMapper& operator = (const PortMapper&) = delete;
     PortMapper& operator = (PortMapper&&) = delete;
 
-    static const quint64 DEFAULT_CHECK_MAPPINGS_INTERVAL;
+    static constexpr std::chrono::minutes kDefaultCheckMappingsInterval{1};
+
     typedef AsyncClient::Protocol Protocol;
 
     /**
      * Asks to forward the @param port to some external port
      *
      *  @returns false if @param port has already been mapped
-     *  @param callback is called only if smth changes: some port have been mapped,
+     *  @param callback is called only if something changes: some port have been mapped,
      *         remapped or mapping is not valid any more)
      */
     bool enableMapping(
@@ -48,7 +49,7 @@ public:
     /**
      * Asks to cancel @param port forwarding
      *
-     *  @return false if @param port hasnt been mapped
+     *  @return false if @param port hasn't been mapped
      */
     bool disableMapping(quint16 port, Protocol protocol);
 
@@ -56,7 +57,7 @@ public:
      * Enables/disables actual mapping on devices.
      * When mapper goes disabled no new mappings will be made as well as no old
      *  one will be sustained.
-     * When mapper goes enabled all mappings will be resored by timer (including
+     * When mapper goes enabled all mappings will be resorted by timer (including
      *  added during disabled period).
      */
     void setIsEnabled(bool isEnabled);
@@ -81,7 +82,7 @@ protected: // for testing only
         Protocol protocol;
 
         PortId(quint16 port_, Protocol protocol_);
-        bool operator < (const PortId& rhs) const;
+        bool operator< (const PortId& rhs) const;
     };
 
     struct Device
@@ -91,13 +92,13 @@ protected: // for testing only
         HostAddress externalIp;
 
         FailCounter failCounter;
-        std::map< PortId, quint16 > mapped; //!< internal port -> external port
-        std::set< PortId > engagedPorts;    //!< external ports
+        std::map<PortId, quint16> mapped; //!< internal port -> external port
+        std::set<PortId> engagedPorts;    //!< external ports
     };
 
     virtual bool processPacket(
         const QHostAddress& localAddress, const SocketAddress& devAddress,
-        const DeviceInfo& devInfo, const QByteArray& xmlDevInfo) override;
+        const DeviceInfo& devInfo, const QByteArray& /*xmlDevInfo*/) override;
 
     bool searchForMappers(const HostAddress& localAddress,
         const SocketAddress& devAddress,
@@ -105,6 +106,7 @@ protected: // for testing only
 
     virtual void onTimer(const quint64& timerID) override;
     virtual bool isEnabled() const override;
+
 private:
     void addNewDevice(
         const HostAddress& localAddress,
@@ -122,12 +124,10 @@ protected: // for testing only
     std::unique_ptr<AsyncClient> m_upnpClient;
     quint64 m_timerId;
     const QString m_description;
-    const quint64 m_checkMappingsInterval;
+    const std::chrono::milliseconds m_checkMappingsInterval;
 
-    std::map< PortId, std::function< void(SocketAddress) > > m_mapRequests;
-    std::map< QString, Device > m_devices;
+    std::map<PortId, std::function<void(SocketAddress)>> m_mapRequests;
+    std::map<QString, Device> m_devices;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

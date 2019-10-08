@@ -7,9 +7,7 @@
 
 #include "upnp_device_description.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace nx::network::upnp {
 
 class DeviceSearcher;
 
@@ -50,6 +48,4 @@ private:
     nx::network::upnp::DeviceSearcher* m_deviceSearcher = nullptr;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

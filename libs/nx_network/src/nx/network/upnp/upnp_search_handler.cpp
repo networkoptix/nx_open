@@ -1,9 +1,7 @@
 #include "upnp_search_handler.h"
 #include "upnp_device_searcher.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace nx::network::upnp {
 
 SearchAutoHandler::SearchAutoHandler(
     nx::network::upnp::DeviceSearcher* deviceSearcher,
@@ -24,6 +22,4 @@ nx::network::upnp::DeviceSearcher* SearchAutoHandler::deviceSearcher() const
     return m_deviceSearcher;
 }
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

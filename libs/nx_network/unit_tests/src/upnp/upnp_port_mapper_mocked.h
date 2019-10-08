@@ -71,7 +71,7 @@ public:
     PortMapperMocked(
         DeviceSearcher* deviceSearcher,
         const HostAddress& internalIp,
-        quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL);
+        std::chrono::milliseconds checkMappingsInterval = kDefaultCheckMappingsInterval);
     AsyncClientMock& clientMock();
 };
 

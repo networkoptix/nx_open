@@ -24,9 +24,7 @@
 
 #include "upnp_search_handler.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace nx::network::upnp {
 
 class NX_NETWORK_API AbstractDeviceSearcherSettings
 {
@@ -61,17 +59,17 @@ class NX_NETWORK_API DeviceSearcher:
     Q_OBJECT
 
 public:
-    static const unsigned int DEFAULT_DISCOVER_TRY_TIMEOUT_MS = 3000;
-    static const QString DEFAULT_DEVICE_TYPE;
+    static const unsigned int kDefaultDiscoverTryTimeoutMs = 3000;
+    static const QString kDefaultDeviceType;
 
     /**
-     * @param globalSettings Controlls if multicasts should be enabled, always enabled if nullptr.
+     * @param globalSettings Controls if multicasts should be enabled, always enabled if nullptr.
      * @param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch.
      */
     explicit DeviceSearcher(
         nx::utils::TimerManager* timerManager,
         std::unique_ptr<AbstractDeviceSearcherSettings> settings,
-        unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS);
+        unsigned int discoverTryTimeoutMS = kDefaultDiscoverTryTimeoutMs);
     virtual ~DeviceSearcher();
 
     virtual void pleaseStop() override;
@@ -91,14 +89,16 @@ public:
     void unregisterHandler(SearchHandler* handler, const QString& deviceType = QString());
 
     /**
-     * Makes internal copy of discovered but not processed devices. processDiscoveredDevices uses this copy.
+     * Makes internal copy of discovered but not processed devices. processDiscoveredDevices uses
+     * this copy.
      */
     void saveDiscoveredDevicesSnapshot();
     /**
      * Passes discovered devices info snapshot to registered handlers.
      * If some handlers processes packet (UPNPSearchHandler::processPacket returns true),
      *   then packet is removed and not passed to other handlers.
-     * @param handlerToUse If NULL, all handlers are used, otherwise packets are passed to handlerToUse only.
+     * @param handlerToUse If NULL, all handlers are used, otherwise packets are passed to
+     *   handlerToUse only.
      */
     void processDiscoveredDevices(SearchHandler* handlerToUse = NULL);
     int cacheTimeout() const;
@@ -177,7 +177,8 @@ private:
         const QByteArray& uuidStr,
         const nx::utils::Url& descriptionUrl,
         const HostAddress& sender);
-    void processDeviceXml(const DiscoveredDeviceInfo& devInfo, const QByteArray& foundDeviceDescription);
+    void processDeviceXml(const DiscoveredDeviceInfo& devInfo,
+        const QByteArray& foundDeviceDescription);
     QHostAddress findBestIface(const HostAddress& host);
     /**
      * NOTE: MUST be called with m_mutex locked. Also, returned item MUST be used under same lock
@@ -194,6 +195,4 @@ private slots:
     void onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient);
 };
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

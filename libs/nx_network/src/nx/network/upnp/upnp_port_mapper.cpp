@@ -7,22 +7,25 @@
 #include <nx/utils/log/log.h>
 #include "upnp_device_searcher.h"
 
-static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
-static const size_t BREAK_TIME_PER_FAULT = 1 * 60; // wait 1 minute per fault in a row
+namespace nx::network::upnp {
 
-static const quint16 PORT_SAFE_RANGE_BEGIN = 4096; // begining of range to peak rnd port
-static const quint16 PORT_SAFE_RANGE_END = 49151;
+namespace {
 
-static const quint16 MAPPING_TIME_RATIO = 10; // 10 times longer then we check
+static constexpr size_t kBreakFaultsCount = 5; //< Faults in a row.
+static constexpr size_t kBreakTimePerFaultSec = 1 * 60; //< Wait 1 minute per fault in a row.
 
-namespace nx {
-namespace network {
-namespace upnp {
+// The range to peak random port.
+static constexpr quint16 kPortSafeRangeBegin = 4096;
+static constexpr quint16 kPortSafeRangeEnd = 49151; //< The end is included.
+
+static constexpr int kMappingTimeRatio = 10; //< 10 times longer then we check.
+
+} // namespace
 
 PortMapper::PortMapper(
     nx::network::upnp::DeviceSearcher* deviceSearcher,
     bool isEnabled,
-    quint64 checkMappingsInterval,
+    std::chrono::milliseconds checkMappingsInterval,
     const QString& description,
     const QString& device)
     :
@@ -33,8 +36,7 @@ PortMapper::PortMapper(
     m_checkMappingsInterval(checkMappingsInterval)
 {
     m_timerId = deviceSearcher->timerManager()->addTimer(
-        this,
-        std::chrono::milliseconds(m_checkMappingsInterval));
+        this, std::chrono::milliseconds(m_checkMappingsInterval));
 }
 
 PortMapper::~PortMapper()
@@ -50,8 +52,6 @@ PortMapper::~PortMapper()
     m_upnpClient.reset();
 }
 
-const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 1 * 60 * 1000; // 10 min
-
 bool PortMapper::enableMapping(
     quint16 port,
     Protocol protocol,
@@ -61,12 +61,12 @@ bool PortMapper::enableMapping(
 
     QnMutexLocker lock(&m_mutex);
     if (!m_mapRequests.emplace(std::move(portId), std::move(callback)).second)
-        return false; // port already mapped
+        return false; //< port already mapped
 
     if (m_isEnabled)
     {
-        // ask to map this port on all known devices
-        for (auto& device : m_devices)
+        // Ask to map this port on all known devices.
+        for (auto& device: m_devices)
             ensureMapping(device.second, port, protocol);
     }
 
@@ -115,11 +115,11 @@ void PortMapper::FailCounter::failure()
 
 bool PortMapper::FailCounter::isOk()
 {
-    if (m_failsInARow < BREAK_FAULTS_COUNT)
+    if (m_failsInARow < kBreakFaultsCount)
         return true;
 
-    const auto breakTime = m_lastFail + BREAK_TIME_PER_FAULT * m_failsInARow;
-    return QDateTime::currentDateTime().toTime_t() > breakTime;
+    const size_t breakTimeSec = m_lastFail + kBreakTimePerFaultSec * m_failsInARow;
+    return QDateTime::currentDateTime().toTime_t() > breakTimeSec;
 }
 
 PortMapper::PortId::PortId(quint16 port_, Protocol protocol_)
@@ -127,7 +127,7 @@ PortMapper::PortId::PortId(quint16 port_, Protocol protocol_)
 {
 }
 
-bool PortMapper::PortId::operator < (const PortId& rhs) const
+bool PortMapper::PortId::operator< (const PortId& rhs) const
 {
     if (port < rhs.port) return true;
     if (port == rhs.port && protocol < rhs.protocol) return true;
@@ -136,9 +136,8 @@ bool PortMapper::PortId::operator < (const PortId& rhs) const
 
 bool PortMapper::processPacket(
     const QHostAddress& localAddress, const SocketAddress& devAddress,
-    const DeviceInfo& devInfo, const QByteArray& xmlDevInfo)
+    const DeviceInfo& devInfo, const QByteArray& /*xmlDevInfo*/)
 {
-    static_cast< void >(xmlDevInfo);
     return searchForMappers(HostAddress(localAddress.toString()), devAddress, devInfo);
 }
 
@@ -150,7 +149,7 @@ bool PortMapper::searchForMappers(
     bool atLeastOneFound = false;
     for (const auto& service: devInfo.serviceList)
     {
-        if (service.serviceType != AsyncClient::WAN_IP)
+        if (service.serviceType != AsyncClient::kWanIp)
             continue; // uninteresting
 
         nx::utils::Url url;
@@ -173,7 +172,7 @@ void PortMapper::onTimer(const quint64& /*timerID*/)
     QnMutexLocker lock(&m_mutex);
     if (m_isEnabled)
     {
-        for (auto& device : m_devices)
+        for (auto& device: m_devices)
         {
             updateExternalIp(device.second);
             for (const auto& request : m_mapRequests)
@@ -345,7 +344,7 @@ void PortMapper::checkMapping(
     });
 }
 
-// TODO: reduse the size of method
+// TODO: reduce the size of method
 void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol)
 {
     if (!device.failCounter.isOk())
@@ -372,10 +371,10 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
 
         const auto callback = request->second;
         for (const auto mapping : list)
-            if (mapping.internalIp == device.internalIp &&
-                mapping.internalPort == inPort &&
-                mapping.protocol == protocol &&
-                (mapping.duration == 0 || mapping.duration > m_checkMappingsInterval))
+            if (mapping.internalIp == device.internalIp && mapping.internalPort == inPort
+                && mapping.protocol == protocol
+                && (mapping.duration == std::chrono::milliseconds::zero()
+                || mapping.duration > m_checkMappingsInterval))
             {
                 NX_DEBUG(this, lm("Already mapped %1").arg(mapping.toString()));
 
@@ -414,9 +413,9 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
 static std::default_random_engine randomEngine(
     std::chrono::system_clock::now().time_since_epoch().count());
 static std::uniform_int_distribution<quint16> portDistribution(
-    PORT_SAFE_RANGE_BEGIN, PORT_SAFE_RANGE_END);
+    kPortSafeRangeBegin, kPortSafeRangeEnd);
 
-// TODO: reduse the size of method
+// TODO: reduce the size of method
 void PortMapper::makeMapping(
     Device& device,
     quint16 inPort,
@@ -433,7 +432,7 @@ void PortMapper::makeMapping(
 
     m_upnpClient->addMapping(
         device.url, device.internalIp, inPort, desiredPort, protocol, m_description,
-        m_checkMappingsInterval * MAPPING_TIME_RATIO,
+        std::chrono::milliseconds(m_checkMappingsInterval).count() * kMappingTimeRatio,
         [this, &device, inPort, desiredPort, protocol, retries](bool success)
     {
         QnMutexLocker lk(&m_mutex);
@@ -447,7 +446,7 @@ void PortMapper::makeMapping(
             }
             else
             {
-                NX_ERROR(this, lm("Cound not forward any port on %1")
+                NX_ERROR(this, lm("Could not forward any port on %1")
                     .arg(device.url.toString(QUrl::RemovePassword)));
             }
 
@@ -475,6 +474,4 @@ void PortMapper::makeMapping(
     });
 }
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

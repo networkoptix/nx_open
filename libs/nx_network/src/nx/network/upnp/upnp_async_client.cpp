@@ -5,14 +5,13 @@
 
 #include "upnp_device_description.h"
 
-namespace nx {
-namespace network {
-namespace upnp {
-namespace /* noname */ {
+namespace nx::network::upnp {
 
-static const auto MESSAGE_BODY_READ_TIMEOUT_MS = 20 * 1000; // 20 sec
+namespace {
 
-static const QString SOAP_REQUEST = QLatin1String(
+static constexpr std::chrono::seconds kMessageBodyReadTimeout(20);
+
+static const QString kSoapRequest(
     "<?xml version=\"1.0\" ?>"
     "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
     " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
@@ -23,6 +22,25 @@ static const QString SOAP_REQUEST = QLatin1String(
     "</s:Body>"
     "</s:Envelope>"
 );
+
+static const QString kNone; //< Just an empty string.
+
+// UPNP parameters.
+static const QString kGetExternalIPAddress("GetExternalIPAddress");
+static const QString kAddPortMapping("AddPortMapping");
+static const QString kDeletePortMapping("DeletePortMapping");
+static const QString kGetGenericPortMappingEntry("GetGenericPortMappingEntry");
+static const QString kGetSpecificPortMappingEntry("GetSpecificPortMappingEntry");
+
+static const QString kNewPortMappingIndex("NewPortMappingIndex");
+static const QString kNewExternalIPAddress("NewExternalIPAddress");
+static const QString kNewExternalPort("NewExternalPort");
+static const QString kNewProtocol("NewProtocol");
+static const QString kNewInternalPort("NewInternalPort");
+static const QString kNewInternalClient("NewInternalClient");
+static const QString kNewEnabled("NewEnabled");
+static const QString kNewPortMappingDescription("NewPortMappingDescription");
+static const QString kNewLeaseDuration("NewLeaseDuration");
 
 // TODO: move parsers to separate file
 class UpnpMessageHandler:
@@ -122,181 +140,47 @@ public:
     }
 };
 
-} // namespace noname
-
-AsyncClient::~AsyncClient()
+void fetchMappingsRecursive(
+    AsyncClient* client, const nx::utils::Url& url,
+    const std::function<void(AsyncClient::MappingList)>& callback,
+    std::shared_ptr<AsyncClient::MappingList> collected,
+    AsyncClient::MappingInfo newMap)
 {
-    std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
+    if (!newMap.isValid())
     {
-        QnMutexLocker lk(&m_mutex);
-        m_isTerminating = true;
-        std::swap(httpClients, m_httpClients);
+        callback(std::move(*collected));
+        return;
     }
 
-    for (const auto& client : httpClients)
-        client->pleaseStopSync();
+    collected->push_back(std::move(newMap));
+    client->getMapping(url, collected->size(),
+        [client, url, callback, collected](AsyncClient::MappingInfo nextMap)
+    {
+        fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
+    });
 }
+
+} // namespace
 
 bool AsyncClient::Message::isOk() const
 {
     return !action.isEmpty() && !service.isEmpty();
 }
 
-static const QString none;
 const QString& AsyncClient::Message::getParam(const QString& key) const
 {
     const auto it = params.find(key);
-    return (it == params.end()) ? none : it->second;
+    return (it == params.end()) ? kNone : it->second;
 }
 
 QString AsyncClient::Message::toString() const
 {
     QStringList paramList;
-    for (const auto& param : params)
+    for (const auto& param: params)
         paramList << lm("%1='%2'").args(param.first, param.second);
 
     return lm("%1:%2(%3)").args(service, action, paramList.join(", "));
 }
-
-void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
-    std::function< void(const Message&)> callback)
-{
-    const auto service = toUpnpUrn(message.service, "service");
-    const auto action = QString("\"%1#%2\"").arg(service).arg(message.action);
-
-    QStringList params;
-    for (const auto& p : message.params)
-        params.push_back(QString("<%1>%2</%1>").arg(p.first).arg(p.second));
-
-    const auto request = SOAP_REQUEST.arg(message.action).arg(service)
-        .arg(params.join(""));
-
-    auto complete = [this, url, callback](const nx::network::http::AsyncHttpClientPtr& ptr)
-    {
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_httpClients.erase(ptr);
-        }
-
-        if (auto resp = ptr->response())
-        {
-            const auto status = resp->statusLine.statusCode;
-            const bool success = (status >= 200 && status < 300);
-
-            std::unique_ptr<UpnpMessageHandler> xmlHandler;
-            if (success)   xmlHandler.reset(new UpnpSuccessHandler);
-            else            xmlHandler.reset(new UpnpFailureHandler);
-
-            QXmlSimpleReader xmlReader;
-            xmlReader.setContentHandler(xmlHandler.get());
-            xmlReader.setErrorHandler(xmlHandler.get());
-
-            QXmlInputSource input;
-            input.setData(ptr->fetchMessageBodyBuffer());
-            if (xmlReader.parse(&input))
-            {
-                callback(xmlHandler->message());
-                return;
-            }
-        }
-
-        NX_ERROR(this, lm("Could not parse message from %1").arg(
-            url.toString(QUrl::RemovePassword)));
-
-        callback(Message());
-    };
-
-    QnMutexLocker lk(&m_mutex);
-    if (m_isTerminating)
-        return;
-
-    const auto httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->addAdditionalHeader("SOAPAction", action.toUtf8());
-    httpClient->setMessageBodyReadTimeoutMs(MESSAGE_BODY_READ_TIMEOUT_MS);
-    QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        httpClient.get(), std::move(complete), Qt::DirectConnection);
-
-    m_httpClients.insert(httpClient);
-    httpClient->doPost(url, "text/xml", request.toUtf8());
-}
-
-const QString AsyncClient::CLIENT_ID = "NX UpnpAsyncClient";
-const QString AsyncClient::INTERNAL_GATEWAY = "InternetGatewayDevice";
-const QString AsyncClient::WAN_IP = "WANIPConnection";
-
-static const QString GET_EXTERNAL_IP = "GetExternalIPAddress";
-static const QString ADD_PORT_MAPPING = "AddPortMapping";
-static const QString DELETE_PORT_MAPPING = "DeletePortMapping";
-static const QString GET_GEN_PORT_MAPPING = "GetGenericPortMappingEntry";
-static const QString GET_SPEC_PORT_MAPPING = "GetSpecificPortMappingEntry";
-
-static const QString MAP_INDEX = "NewPortMappingIndex";
-static const QString EXTERNAL_IP = "NewExternalIPAddress";
-static const QString EXTERNAL_PORT = "NewExternalPort";
-static const QString PROTOCOL = "NewProtocol";
-static const QString INTERNAL_PORT = "NewInternalPort";
-static const QString INTERNAL_IP = "NewInternalClient";
-static const QString ENABLED = "NewEnabled";
-static const QString DESCRIPTION = "NewPortMappingDescription";
-static const QString DURATION = "NewLeaseDuration";
-
-void AsyncClient::externalIp(
-    const nx::utils::Url& url, std::function< void(const HostAddress&) > callback)
-{
-    AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP,{} };
-    doUpnp(
-        url,
-        request,
-        [callback](const Message& response)
-        {
-            callback(response.getParam(EXTERNAL_IP));
-        });
-}
-
-void AsyncClient::addMapping(
-    const nx::utils::Url& url, const HostAddress& internalIp, quint16 internalPort,
-    quint16 externalPort, Protocol protocol, const QString& description,
-    quint64 duration, std::function< void(bool) > callback)
-{
-    AsyncClient::Message request;
-    request.action = ADD_PORT_MAPPING;
-    request.service = WAN_IP;
-
-    request.params[EXTERNAL_PORT] = QString::number(externalPort);
-    request.params[PROTOCOL] = QnLexical::serialized(protocol);
-    request.params[INTERNAL_PORT] = QString::number(internalPort);
-    request.params[INTERNAL_IP] = internalIp.toString();
-    request.params[ENABLED] = QString::number(1);
-    request.params[DESCRIPTION] = description.isEmpty() ? CLIENT_ID : description;
-    request.params[DURATION] = QString::number(duration);
-
-    doUpnp(
-        url,
-        request,
-        [callback](const Message& response)
-        {
-            callback(response.isOk());
-        });
-}
-
-void AsyncClient::deleteMapping(
-    const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
-    std::function< void(bool) > callback)
-{
-    AsyncClient::Message request;
-    request.action = DELETE_PORT_MAPPING;
-    request.service = WAN_IP;
-    request.params[EXTERNAL_PORT] = QString::number(externalPort);
-    request.params[PROTOCOL] = QnLexical::serialized(protocol);
-
-    doUpnp(
-        url,
-        request,
-        [callback](const Message& response)
-        {
-            callback(response.isOk());
-        });
-    }
 
 AsyncClient::MappingInfo::MappingInfo(
     const HostAddress& inIp,
@@ -325,17 +209,145 @@ QString AsyncClient::MappingInfo::toString() const
     return lm("MappingInfo( %1:%2 -> %3 %4 : %5 for %6 )")
         .arg(internalIp.toString()).arg(internalPort)
         .arg(externalPort).arg(QnLexical::serialized(protocol))
-        .arg(description).arg(duration);
+        .arg(description).arg(std::chrono::milliseconds(duration).count());
 }
+
+AsyncClient::~AsyncClient()
+{
+    std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_isTerminating = true;
+        std::swap(httpClients, m_httpClients);
+    }
+
+    for (const auto& client : httpClients)
+        client->pleaseStopSync();
+}
+
+void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
+    std::function<void(const Message&)> callback)
+{
+    const auto service = toUpnpUrn(message.service, "service");
+    const auto action = QString("\"%1#%2\"").arg(service, message.action);
+
+    QStringList params;
+    for (const auto& p : message.params)
+        params.push_back(QString("<%1>%2</%1>").arg(p.first, p.second));
+
+    const auto request = kSoapRequest.arg(message.action, service, params.join(""));
+
+    auto complete = [this, url, callback](const nx::network::http::AsyncHttpClientPtr& ptr)
+    {
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_httpClients.erase(ptr);
+        }
+
+        if (auto resp = ptr->response())
+        {
+            const auto status = resp->statusLine.statusCode;
+            const bool success = (status >= 200 && status < 300);
+
+            std::unique_ptr<UpnpMessageHandler> xmlHandler;
+            if (success)
+                xmlHandler.reset(new UpnpSuccessHandler);
+            else
+                xmlHandler.reset(new UpnpFailureHandler);
+
+            QXmlSimpleReader xmlReader;
+            xmlReader.setContentHandler(xmlHandler.get());
+            xmlReader.setErrorHandler(xmlHandler.get());
+
+            QXmlInputSource input;
+            input.setData(ptr->fetchMessageBodyBuffer());
+            if (xmlReader.parse(&input))
+            {
+                callback(xmlHandler->message());
+                return;
+            }
+        }
+
+        NX_ERROR(this, lm("Could not parse message from %1").arg(
+            url.toString(QUrl::RemovePassword)));
+
+        callback(Message());
+    };
+
+    QnMutexLocker lk(&m_mutex);
+    if (m_isTerminating)
+        return;
+
+    const auto httpClient = nx::network::http::AsyncHttpClient::create();
+    httpClient->addAdditionalHeader("SOAPAction", action.toUtf8());
+    httpClient->setMessageBodyReadTimeoutMs(
+        std::chrono::milliseconds(kMessageBodyReadTimeout).count());
+    QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
+        httpClient.get(), std::move(complete), Qt::DirectConnection);
+
+    m_httpClients.insert(httpClient);
+    httpClient->doPost(url, "text/xml", request.toUtf8());
+}
+
+void AsyncClient::externalIp(
+    const nx::utils::Url& url, std::function<void(const HostAddress&)> callback)
+{
+    AsyncClient::Message request(kGetExternalIPAddress, kWanIp);
+    doUpnp(
+        url,
+        request,
+        [callback](const Message& response)
+        {
+            callback(response.getParam(kNewExternalIPAddress));
+        });
+}
+
+void AsyncClient::addMapping(
+    const nx::utils::Url& url, const HostAddress& internalIp, quint16 internalPort,
+    quint16 externalPort, Protocol protocol, const QString& description,
+    quint64 duration, std::function<void(bool)> callback)
+{
+    AsyncClient::Message request(kAddPortMapping, kWanIp);
+    request.params[kNewExternalPort] = QString::number(externalPort);
+    request.params[kNewProtocol] = QnLexical::serialized(protocol);
+    request.params[kNewInternalPort] = QString::number(internalPort);
+    request.params[kNewInternalClient] = internalIp.toString();
+    request.params[kNewEnabled] = QString::number(1);
+    request.params[kNewPortMappingDescription] = description.isEmpty() ? kClientId : description;
+    request.params[kNewLeaseDuration] = QString::number(duration);
+
+    doUpnp(
+        url,
+        request,
+        [callback](const Message& response)
+        {
+            callback(response.isOk());
+        });
+}
+
+void AsyncClient::deleteMapping(
+    const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
+    std::function<void(bool)> callback)
+{
+    AsyncClient::Message request(kDeletePortMapping, kWanIp);
+    request.params[kNewExternalPort] = QString::number(externalPort);
+    request.params[kNewProtocol] = QnLexical::serialized(protocol);
+
+    doUpnp(
+        url,
+        request,
+        [callback](const Message& response)
+        {
+            callback(response.isOk());
+        });
+    }
 
 void AsyncClient::getMapping(
     const nx::utils::Url& url, quint32 index,
-    std::function< void(MappingInfo) > callback)
+    std::function<void(MappingInfo)> callback)
 {
-    AsyncClient::Message request;
-    request.action = GET_GEN_PORT_MAPPING;
-    request.service = WAN_IP;
-    request.params[MAP_INDEX] = QString::number(index);
+    AsyncClient::Message request(kGetGenericPortMappingEntry, kWanIp);
+    request.params[kNewPortMappingIndex] = QString::number(index);
 
     return doUpnp(
         url,
@@ -344,11 +356,11 @@ void AsyncClient::getMapping(
         {
             if (response.isOk())
                 callback(MappingInfo(
-                    response.getParam(INTERNAL_IP),
-                    response.getParam(INTERNAL_PORT).toUShort(),
-                    response.getParam(EXTERNAL_PORT).toUShort(),
-                    QnLexical::deserialized< Protocol >(response.getParam(PROTOCOL)),
-                    response.getParam(DESCRIPTION)));
+                    response.getParam(kNewInternalClient),
+                    response.getParam(kNewInternalPort).toUShort(),
+                    response.getParam(kNewExternalPort).toUShort(),
+                    QnLexical::deserialized<Protocol>(response.getParam(kNewProtocol)),
+                    response.getParam(kNewPortMappingDescription)));
             else
                 callback(MappingInfo());
         });
@@ -356,13 +368,11 @@ void AsyncClient::getMapping(
 
 void AsyncClient::getMapping(
     const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
-    std::function< void(MappingInfo) > callback)
+    std::function<void(MappingInfo)> callback)
 {
-    AsyncClient::Message request;
-    request.action = GET_SPEC_PORT_MAPPING;
-    request.service = WAN_IP;
-    request.params[EXTERNAL_PORT] = QString::number(externalPort);
-    request.params[PROTOCOL] = QnLexical::serialized(protocol);
+    AsyncClient::Message request(kGetSpecificPortMappingEntry, kWanIp);
+    request.params[kNewExternalPort] = QString::number(externalPort);
+    request.params[kNewProtocol] = QnLexical::serialized(protocol);
 
     return doUpnp(url, request,
         [callback, externalPort, protocol](const Message& response)
@@ -370,11 +380,11 @@ void AsyncClient::getMapping(
             if (response.isOk())
             {
                 callback(MappingInfo(
-                    response.getParam(INTERNAL_IP),
-                    response.getParam(INTERNAL_PORT).toUShort(),
+                    response.getParam(kNewInternalClient),
+                    response.getParam(kNewInternalPort).toUShort(),
                     externalPort, protocol,
-                    response.getParam(DESCRIPTION),
-                    response.getParam(DURATION).toULongLong()));
+                    response.getParam(kNewPortMappingDescription),
+                    response.getParam(kNewLeaseDuration).toULongLong()));
             }
             else
             {
@@ -383,30 +393,10 @@ void AsyncClient::getMapping(
         });
 }
 
-void fetchMappingsRecursive(
-    AsyncClient* client, const nx::utils::Url& url,
-    const std::function< void(AsyncClient::MappingList) >& callback,
-    std::shared_ptr< AsyncClient::MappingList > collected,
-    AsyncClient::MappingInfo newMap)
-{
-    if (!newMap.isValid())
-    {
-        callback(std::move(*collected));
-        return;
-    }
-
-    collected->push_back(std::move(newMap));
-    client->getMapping(url, collected->size(),
-        [client, url, callback, collected](AsyncClient::MappingInfo nextMap)
-        {
-            fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
-        });
-}
-
 void AsyncClient::getAllMappings(
-    const nx::utils::Url& url, std::function< void(MappingList) > callback)
+    const nx::utils::Url& url, std::function<void(MappingList)> callback)
 {
-    auto mappings = std::make_shared< std::vector< MappingInfo > >();
+    auto mappings = std::make_shared<std::vector<MappingInfo>>();
     return getMapping(url, 0,
         [this, url, callback, mappings](MappingInfo newMap)
         {
@@ -414,9 +404,7 @@ void AsyncClient::getAllMappings(
         });
 }
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::upnp::AsyncClient, Protocol,
     (nx::network::upnp::AsyncClient::Protocol::TCP, "tcp")

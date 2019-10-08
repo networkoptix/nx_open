@@ -10,12 +10,14 @@ namespace network {
 namespace upnp {
 namespace test {
 
+using namespace std::literals::chrono_literals;
+
 class UpnpPortMapper: public ::testing::Test
 {
 public:
     UpnpPortMapper():
         deviceSearcher(&timerManager, std::make_unique<DeviceSearcherDefaultSettings>()),
-        portMapper(&deviceSearcher, lit("192.168.0.10"), 100)
+        portMapper(&deviceSearcher, lit("192.168.0.10"), 100ms)
     {
         portMapper.clientMock().changeExternalIp(lit("12.34.56.78"));
     }
@@ -130,7 +132,7 @@ TEST_F(UpnpPortMapper, DISABLED_RealRouter)
     nx::network::upnp::DeviceSearcher deviceSearcher(
         &timerManager,
         std::make_unique<DeviceSearcherDefaultSettings>());
-    PortMapper portMapper(&deviceSearcher, true, 10000);
+    PortMapper portMapper(&deviceSearcher, true, 10000ms);
     EXPECT_TRUE(portMapper.enableMapping(7001, PortMapper::Protocol::TCP, [&](SocketAddress) {}));
     QThread::sleep(60 * 60);
 }

@@ -126,7 +126,6 @@ bool AsyncClientMock::mkMapping(const Mappings::value_type& value)
     return m_mappings.insert(value).second;
 }
 
-
 bool AsyncClientMock::rmMapping(quint16 port, Protocol protocol)
 {
     QnMutexLocker lock(&m_mutex);
@@ -136,14 +135,14 @@ bool AsyncClientMock::rmMapping(quint16 port, Protocol protocol)
 PortMapperMocked::PortMapperMocked(
     DeviceSearcher* deviceSearcher,
     const HostAddress& internalIp,
-    quint64 checkMappingsInterval)
+    std::chrono::milliseconds checkMappingsInterval)
     :
     PortMapper(deviceSearcher, true, checkMappingsInterval, lit("UpnpPortMapperMocked"), QString())
 {
     m_upnpClient.reset(new AsyncClientMock);
 
     DeviceInfo::Service service;
-    service.serviceType = AsyncClient::WAN_IP;
+    service.serviceType = AsyncClient::kWanIp;
     service.controlUrl = lit("/someUrl");
 
     DeviceInfo devInfo;

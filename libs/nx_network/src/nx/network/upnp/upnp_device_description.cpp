@@ -1,14 +1,16 @@
 #include "upnp_device_description.h"
 
-static const QString urnTemplate = "urn:schemas-upnp-org:%1:%2:%3";
+namespace nx::network::upnp {
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace {
+
+static const QString kUrnTemplate = "urn:schemas-upnp-org:%1:%2:%3";
+
+} // namespace
 
 QString toUpnpUrn(const QString& id, const QString& suffix, int version)
 {
-    return urnTemplate.arg(suffix).arg(id).arg(version);
+    return kUrnTemplate.arg(suffix, id, QString::number(version));
 }
 
 QString fromUpnpUrn(const QString& urn, const QString& suffix, int version)
@@ -86,7 +88,7 @@ bool DeviceDescriptionHandler::characters(const QString& ch)
     if (!m_deviceStack.empty() && charactersInDevice(ch))
         return true;
 
-    return true; // Something not interesting for us
+    return true; //< Something not interesting for us.
 }
 
 bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
@@ -110,7 +112,7 @@ bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
     else if (m_paramElement == "presentationURL")
         lastDev.presentationUrl = ch.endsWith("/") ? ch.left(ch.length() - 1) : ch;
     else
-        return false; // was not useful
+        return false; //< Was not useful.
 
     return true;
 }
@@ -128,11 +130,9 @@ bool DeviceDescriptionHandler::charactersInService(const QString& ch)
     else if (m_paramElement == QLatin1String("SCPDURL"))
         m_lastService->scpdUrl = ch;
     else
-        return false; // was not useful
+        return false; //< Was not useful.
 
     return true;
 }
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp

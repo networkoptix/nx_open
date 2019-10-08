@@ -3114,7 +3114,7 @@ void MediaServerProcess::initializeUpnpPortMapper()
     m_upnpPortMapper = std::make_unique<nx::network::upnp::PortMapper>(
         serverModule()->upnpDeviceSearcher(),
         /*isEnabled*/ false,
-        nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        nx::network::upnp::PortMapper::kDefaultCheckMappingsInterval,
         QnAppInfo::organizationName());
     auto updateEnabled =
         [this]()

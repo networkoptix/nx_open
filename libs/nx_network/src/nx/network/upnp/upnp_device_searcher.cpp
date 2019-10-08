@@ -14,22 +14,24 @@
 using namespace std;
 using namespace nx::network;
 
-static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
-static const int GROUP_PORT = 1900;
-static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512 * 1024;
-static const int XML_DESCRIPTION_LIVE_TIME_MS = 5 * 60 * 1000;
-static const unsigned int READ_BUF_CAPACITY = 64 * 1024 + 1;    //max UDP packet size
+namespace nx::network::upnp {
 
-namespace nx {
-namespace network {
-namespace upnp {
+namespace {
+
+static const QHostAddress groupAddress(QString("239.255.255.250"));
+static const int kGroupPort = 1900;
+static const unsigned int kMaxUpnpResponsePacketSize = 512 * 1024;
+static const int kXmlDescriptionLiveTimeMs = 5 * 60 * 1000;
+static const unsigned int kReadBufferCapacity = 64 * 1024 + 1; //< max UDP packet size
+
+} // namespace
 
 int DeviceSearcherDefaultSettings::cacheTimeout() const
 {
-    return XML_DESCRIPTION_LIVE_TIME_MS;
+    return kXmlDescriptionLiveTimeMs;
 }
 
-const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
+const QString DeviceSearcher::kDefaultDeviceType =
     nx::utils::AppInfo::organizationName() + "Server";
 
 DeviceSearcher::DeviceSearcher(
@@ -38,13 +40,14 @@ DeviceSearcher::DeviceSearcher(
     unsigned int discoverTryTimeoutMS)
     :
     m_settings(std::move(settings)),
-    m_discoverTryTimeoutMS(discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS),
+    m_discoverTryTimeoutMS(
+        discoverTryTimeoutMS == 0 ? kDefaultDiscoverTryTimeoutMs : discoverTryTimeoutMS),
     m_timerID(0),
     m_terminated(false),
     m_needToUpdateReceiveSocket(false),
     m_timerManager(timerManager)
 {
-    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
+    m_receiveBuffer.reserve(kReadBufferCapacity);
     {
         QnMutexLocker lk(&m_mutex);
         m_timerID = m_timerManager->addTimer(
@@ -89,8 +92,9 @@ void DeviceSearcher::pleaseStop()
     if (socket)
         socket->pleaseStopSync();
 
-    //canceling ongoing http requests
-    //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
+    // Canceling ongoing http requests.
+    // NOTE: m_httpClients cannot be modified by other threads, since UDP socket processing is
+    // over and m_terminated == true
     for (auto it = m_httpClients.begin();
         it != m_httpClients.end();
         ++it)
@@ -312,7 +316,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
             {
                 // undefined device type will trigger default discovery
                 const auto& deviceType = !handler.first.isEmpty() ?
-                        handler.first : DEFAULT_DEVICE_TYPE;
+                        handler.first : kDefaultDeviceType;
 
                 QByteArray data;
                 data.append("M-SEARCH * HTTP/1.1\r\n");
@@ -320,7 +324,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
                 data.append("ST:" + toUpnpUrn(deviceType, "device") + "\r\n");
                 data.append("Man:\"sdp:discover\"\r\n");
                 data.append("MX:3\r\n\r\n" );
-                sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+                sock->sendTo(data.data(), data.size(), groupAddress.toString(), kGroupPort);
             }
         }
     }
@@ -345,8 +349,8 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
 
     m_receiveSocket->setNonBlockingMode(true);
     m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
-    m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, GROUP_PORT));
+    m_receiveSocket->setRecvBufferSize(kMaxUpnpResponsePacketSize);
+    m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, kGroupPort));
 
     for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
         m_receiveSocket->joinGroup(groupAddress.toString(), address.toString());
@@ -400,12 +404,12 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
     using namespace std::placeholders;
 
     p.first->second.sock = sock;
-    p.first->second.buf.reserve(READ_BUF_CAPACITY);
+    p.first->second.buf.reserve(kReadBufferCapacity);
     if (!sock->setNonBlockingMode(true) ||
         !sock->setReuseAddrFlag(true) ||
         !sock->bind(SocketAddress(localAddress)) ||
         !sock->setMulticastIF(localAddress) ||
-        !sock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE))
+        !sock->setRecvBufferSize(kMaxUpnpResponsePacketSize))
     {
         sock->post(
             std::bind(
@@ -594,6 +598,4 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncH
     m_httpClients.erase(httpClient);
 }
 
-} // namespace nx
-} // namespace network
-} // namespace upnp
+} // namespace nx::network::upnp
