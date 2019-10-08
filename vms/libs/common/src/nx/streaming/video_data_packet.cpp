@@ -1,7 +1,5 @@
 #include "video_data_packet.h"
 
-#include <nx/utils/memory/cyclic_allocator.h>
-
 namespace {
 
 constexpr unsigned int MAX_VALID_CAPACITY = 256 * 1024 * 1024;
@@ -30,15 +28,13 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
     pts = other->pts;
 }
 
-//static CyclicAllocator videoPacketCyclicAllocator;
-
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     unsigned int alignment,
     unsigned int capacity,
     QnConstMediaContextPtr ctx )
 :   //TODO #ak delegate constructor (requires msvc2013)
     QnCompressedVideoData( ctx ),
-    m_data(/*&videoPacketCyclicAllocator,*/ alignment, capacity)
+    m_data(alignment, capacity)
 {
     NX_ASSERT(capacity <= MAX_VALID_CAPACITY);
 }

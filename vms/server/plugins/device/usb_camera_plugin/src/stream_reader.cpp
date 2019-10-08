@@ -154,7 +154,6 @@ void StreamReader::setBitrate(int bitrate)
 std::unique_ptr<ILPMediaPacket> StreamReader::toNxPacket(const ffmpeg::Packet *packet)
 {
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
-        &m_allocator,
         packet->mediaType() == AVMEDIA_TYPE_VIDEO ? 0 : 1,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecId()),

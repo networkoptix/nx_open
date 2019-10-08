@@ -6,19 +6,16 @@
 #include <functional>
 
 #include <nx/kit/utils.h>
-#include <nx/utils/memory/cyclic_allocator.h>
 
 namespace nx::vms_server_plugins::mjpeg_link {
 
 ILPVideoPacket::ILPVideoPacket(
-    CyclicAllocator* const allocator,
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
     unsigned int flags,
     unsigned int cSeq )
 :
     m_refManager( this ),
-    m_allocator( allocator ),
     m_channelNumber( channelNumber ),
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
@@ -32,8 +29,8 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        using namespace std::placeholders;
-        nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned(m_buffer);
+
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -132,17 +129,15 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
         return;
     }
 
-    using namespace std::placeholders;
     void* newBuffer = nx::kit::utils::mallocAligned(
         bufSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
-        nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
-        std::bind( &CyclicAllocator::alloc, m_allocator, _1 ) );
+        nxcip::MEDIA_DATA_BUFFER_ALIGNMENT);
 
     if( m_bufSize > 0 )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned(m_buffer);
         m_buffer = NULL;
         m_bufSize = 0;
     }
