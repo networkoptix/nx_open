@@ -870,7 +870,7 @@ std::chrono::milliseconds QnStorageManager::calendarDuration(
     return result;
 }
 
-double QnStorageManager::recordingBitrateBps(
+qint64 QnStorageManager::recordingBitrateBps(
     const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const
 {
     qint64 bytesPerSecond = 0;

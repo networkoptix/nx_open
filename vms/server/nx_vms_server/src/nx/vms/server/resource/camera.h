@@ -213,7 +213,7 @@ public:
     qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
     std::chrono::milliseconds nxOccupiedDuration() const;
     std::chrono::milliseconds calendarDuration() const;
-    double recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
+    qint64 recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
