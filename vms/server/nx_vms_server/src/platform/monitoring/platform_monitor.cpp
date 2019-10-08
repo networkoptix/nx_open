@@ -5,7 +5,8 @@
 
 namespace nx::vms::server {
 
-QList<PlatformMonitor::NetworkLoad> PlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types) {
+QList<PlatformMonitor::NetworkLoad> PlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types)
+{
     QList<NetworkLoad> result;
     for(const NetworkLoad &load: totalNetworkLoad())
         if(load.type & types)
@@ -13,7 +14,8 @@ QList<PlatformMonitor::NetworkLoad> PlatformMonitor::totalNetworkLoad(NetworkInt
     return result;
 }
 
-QList<PlatformMonitor::PartitionSpace> PlatformMonitor::totalPartitionSpaceInfo(PartitionTypes types) {
+QList<PlatformMonitor::PartitionSpace> PlatformMonitor::totalPartitionSpaceInfo(PartitionTypes types)
+{
     QList<PartitionSpace> result;
     for(const PartitionSpace &partition: totalPartitionSpaceInfo())
         if(partition.type & types)
