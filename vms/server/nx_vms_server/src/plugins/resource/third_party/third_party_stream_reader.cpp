@@ -598,6 +598,8 @@ AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compre
             return AV_CODEC_ID_MPEG4;
         case nxcip::AV_CODEC_ID_H264:
             return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_H265:
+            return AV_CODEC_ID_H265;
         case nxcip::AV_CODEC_ID_THEORA:
             return AV_CODEC_ID_THEORA;
         case nxcip::AV_CODEC_ID_PNG:

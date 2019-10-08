@@ -9,6 +9,7 @@
 
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
+#include "svg_icon_colorer.h"
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -26,8 +27,6 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Pressed,  "pressed"},
     {QnIcon::Error,    "error"}
 });
-
-static const QString kSvgExtension(".svg");
 
 static constexpr QSize kBaseIconSize(20, 20);
 
@@ -159,84 +158,6 @@ void loadCustomIcons(
         }
     }
 }
-
-class SvgIconColorer
-{
-public:
-    SvgIconColorer(const QByteArray& sourceIconData, const QString& iconName):
-        m_sourceIconData(sourceIconData),
-        m_iconName(iconName)
-    {
-        initializeDump();
-        dumpIconIfNeeded(sourceIconData);
-    }
-
-    QByteArray makeNormalIcon() const { return makeIcon("light10", "light4", ""); }
-    QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", "_disabled"); }
-    QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "_selected"); }
-    QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "_active"); }
-    QByteArray makeErrorIcon() const { return makeIcon("red_l2", "red_l3", "_error"); }
-
-private:
-    void initializeDump()
-    {
-        const QString directoryPath(ini().dumpGeneratedIconsTo);
-        if (directoryPath.isEmpty())
-            return;
-
-        const QFileInfo basePath = QDir(directoryPath).absoluteFilePath(m_iconName);
-
-        m_dumpDirectory = basePath.absoluteDir();
-        m_iconName = basePath.baseName();
-        m_dump = m_dumpDirectory.mkpath(m_dumpDirectory.path());
-    }
-
-    void dumpIconIfNeeded(const QByteArray& data, const QString& suffix = QString()) const
-    {
-        if (!m_dump)
-            return;
-
-        QString filename = m_dumpDirectory.absoluteFilePath(m_iconName + suffix + kSvgExtension);
-        QFile f(filename);
-		if (!f.open(QIODevice::WriteOnly))
-            return;
-
-        f.write(data);
-		f.close();
-    }
-
-    QString colorName(const QString& name) const
-    {
-        return colorTheme()->color(name).name();
-    };
-
-    QByteArray colorized(const QString& primary, const QString& secondary) const
-    {
-        static const QString primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
-        static const QString secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
-
-        return nx::utils::replaceStrings(m_sourceIconData,
-            {
-                {primaryColor, colorName(primary)},
-                {secondaryColor, colorName(secondary)},
-            }).toLatin1();
-    };
-
-    QByteArray makeIcon(const QString& primary, const QString& secondary, const QString& suffix) const
-    {
-        auto result = colorized(primary, secondary);
-        dumpIconIfNeeded(result, suffix);
-        return result;
-    }
-
-private:
-    bool m_dump = false;
-    QDir m_dumpDirectory;
-    QByteArray m_sourceIconData;
-    QString m_iconName;
-};
-
-
 
 } //namespace
 

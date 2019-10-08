@@ -358,7 +358,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
 
     /**%apidoc GET /ec2/getMediaServerUserAttributesList
-    * Read additional media server attributes.
+    * Read additional Server attributes.
     * %param[default] format
     * %param[opt] id Server unique id. If omitted, return data for all servers.
     * %return List of objects with additional server attributes for all servers, in the requested
@@ -462,7 +462,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *     %value false
      *     %value true
-     * %param licenseUsed Whether the license is used for the camera.
+     * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
      * %param motionType Type of motion detection method.
@@ -559,7 +559,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *     %value false
      *     %value true
-     * %param licenseUsed Whether the license is used for the camera.
+     * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
      * %param motionType Type of motion detection method.
@@ -747,7 +747,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * This information is used for archive playback if camera has been moved from
      * one server to another.
      * There is no detail information about archive time periods.
-     * To obtain detail information please use method ec2/recordedTimePeriods.
+     * To obtain detail information please use method /ec2/recordedTimePeriods.
      * %param[default] format
      * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
@@ -1201,8 +1201,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[proprietary] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
      * %param[opt] password User's password
-     * %param[proprietary] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
-     *     /api/gettime.
+     * %param[proprietary] realm HTTP authorization realm as defined in RFC 2617, can be obtained
+     *     via /api/getTime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
      *     %value true
@@ -1261,7 +1261,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
     *     when creating, keep the value when modifying.
     * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
-    *     /api/gettime.
+    *     /api/getTime.
     * %param[opt] isLdap Whether the user was imported from LDAP.
     *     %value false
     *     %value true

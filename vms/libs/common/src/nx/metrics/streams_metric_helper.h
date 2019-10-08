@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/api/types_fwd.h>
+#include <nx/vms/api/types/motion_types.h>
 
 namespace nx::metrics { struct Storage; }
 

@@ -92,8 +92,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(metadata_sdk_distribution_name
         "${prefix}-metadata_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
-    set(camera_sdk_distribution_name
-        "${prefix}-camera_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(video_source_sdk_distribution_name
+        "${prefix}-video_source_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(storage_sdk_distribution_name
         "${prefix}-storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(vms_benchmark_distribution_name

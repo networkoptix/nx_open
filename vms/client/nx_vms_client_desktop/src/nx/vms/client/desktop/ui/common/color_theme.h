@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop {
 
-class ColorTheme: public QObject, public Singleton<ColorTheme>
+class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject, public Singleton<ColorTheme>
 {
     Q_OBJECT
 
@@ -19,6 +19,12 @@ public:
     virtual ~ColorTheme() override;
 
     QVariantMap colors() const;
+
+    /*!
+    Returns color value pairs of basic and current skins.
+    \return Pairs of basic and current skin color values.
+    */
+    QMap<QString, QString> getColorSubstitutions() const;
 
     QColor color(const char* name) const;
     QColor color(const QString& name) const;

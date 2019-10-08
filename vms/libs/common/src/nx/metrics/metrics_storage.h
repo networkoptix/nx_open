@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
+
 #include <QtCore/QMap>
 #include <QtCore/QJsonObject>
 #include <QtCore/QString>
+#include <QtCore/QVariant>
 
 namespace nx {
 namespace metrics {

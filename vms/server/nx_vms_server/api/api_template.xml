@@ -265,12 +265,12 @@
             <groupName>WebSocket API</groupName>
             <urlPrefix>/ec2</urlPrefix>
             <groupDescription>
-                This group contains information about an access to the Nx Media Server transaction bus via WebSocket connection endpoint.
+                This group contains information about an access to the Server transaction bus via WebSocket connection endpoint.
             </groupDescription>
             <functions>
                 <function>
                     <name>transactionBus</name>
-                    <description>Allows third-party systems to get an access to the Nx Media Server transaction bus.
+                    <description>Allows third-party systems to get an access to the Server transaction bus.
                         A third-party peer should undergo usual (the same as when accessing Server API or System API) authentication process before using WebSocket connection.
                         Transactions are transferred in JSON format by default.
                         <br/>

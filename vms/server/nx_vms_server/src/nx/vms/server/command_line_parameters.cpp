@@ -47,55 +47,65 @@ CmdLineArguments::CmdLineArguments(int argc, char* argv[])
 void CmdLineArguments::init(const QStringList& arguments)
 {
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&logLevel, "--log-level", NULL,
-        lit("Supported values: none (no logging), always, error, warning, info, debug, verbose. Default: ")
-        + toString(nx::utils::log::kDefaultLevel));
+    commandLineParser.addParameter(&logLevel, "--log-level", nullptr,
+        "Supported values: none (no logging), always, error, warning, info, debug, verbose. "
+        "Default: " + toString(nx::utils::log::kDefaultLevel));
 
-    commandLineParser.addParameter(&httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
-    commandLineParser.addParameter(&systemLogLevel, "--system-log-level", NULL, "Log value for hw_log.log.");
-    commandLineParser.addParameter(&ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
-    commandLineParser.addParameter(&permissionsLogLevel, "--permissions-log-level", NULL, "Log value for permissions.log.");
+    commandLineParser.addParameter(&httpLogLevel, "--http-log-level", nullptr,
+        "Log value for http_log.log.");
+    commandLineParser.addParameter(&systemLogLevel, "--system-log-level", nullptr,
+        "Log value for hw_log.log.");
+    commandLineParser.addParameter(&ec2TranLogLevel, "--ec2-tran-log-level", nullptr,
+        "Log value for ec2_tran.log.");
+    commandLineParser.addParameter(&permissionsLogLevel, "--permissions-log-level", nullptr,
+        "Log value for permissions.log.");
 
-    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL,
-        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
-    commandLineParser.addParameter(&allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
-    commandLineParser.addParameter(&ifListFilter, "--if", NULL,
-        "Strict media server network interface list (comma delimited list)");
-    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL,
-        "Path to config file. By default " + defaultROSettingsFilePath());
-    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL,
-        "Path to config file which is used to save some. By default " + defaultRunTimeSettingsFilePath());
-    commandLineParser.addParameter(&showVersion, "--version", NULL,
-        lit("Print version info and exit"), true);
-    commandLineParser.addParameter(&showHelp, "--help", NULL,
-        lit("This help message"), true);
-    commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
-        lit("Force the other engine version"), QString());
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", nullptr,
+        "Rebuild archive index. Supported values: "
+        "all (high & low quality), hq (only high), lq (only low),",
+        "all");
+    commandLineParser.addParameter(&allowedDiscoveryPeers, "--allowed-peers", nullptr, "");
+    commandLineParser.addParameter(&ifListFilter, "--if", nullptr,
+        "Strict Server network interfaces (a comma-delimited list).");
+    commandLineParser.addParameter(&configFilePath, "--conf-file", nullptr,
+        "Path to config file. Default: " + defaultROSettingsFilePath());
+    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", nullptr,
+        "Path to config file which is used to save some. Default: "
+        + defaultRunTimeSettingsFilePath());
+    commandLineParser.addParameter(&showVersion, "--version", nullptr,
+        "Print version info and exit.", true);
+    commandLineParser.addParameter(&showHelp, "--help", nullptr,
+        "Show this help message.", true);
+    commandLineParser.addParameter(&engineVersion, "--override-version", nullptr,
+        "Force the other engine version.", "");
     commandLineParser.addParameter(&vmsProtocolVersion, "--override-protocol-version", nullptr,
-        "Force VMS protocol version", QString());
-    commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
-        lit("Enforces stream socket type (TCP, UDT)"), QString());
-    commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
-        lit("Enforces mediator address"), QString());
-    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
-        lit("Force ip version"), QString());
-    commandLineParser.addParameter(&createFakeData, "--create-fake-data", NULL,
-        lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
-    commandLineParser.addParameter(&crashDirectory, "--crash-directory", NULL,
-        lit("Directory to save and send crash reports."), QString());
-    commandLineParser.addParameter(&cleanupDb, "--cleanup-db", NULL,
-        lit("Deletes resources with NULL ids, "
-            "cleans dangling cameras' and servers' user attributes, "
-            "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
+        "Force VMS protocol version.", "");
+    commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", nullptr,
+        "Enforce stream socket type: TCP, UDT.", "");
+    commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", nullptr,
+        "Enforce mediator address.", "");
+    commandLineParser.addParameter(&ipVersion, "--ip-version", nullptr,
+        "Force ip version.", "");
+    commandLineParser.addParameter(&createFakeData, "--create-fake-data", nullptr,
+        "Create fake data: users, cameras, propertiesPerCamera, camerasPerLayout, storageCount.",
+        "");
+    commandLineParser.addParameter(&crashDirectory, "--crash-directory", nullptr,
+        "Directory to save and send crash reports.", "");
+    commandLineParser.addParameter(&cleanupDb, "--cleanup-db", nullptr,
+        "Deletes resources with nullptr ids, "
+        "cleans dangling cameras' and Servers' user attributes, "
+        "kvpairs and resourceStatuses, also cleans and rebuilds transaction log",
+        true);
 
-    commandLineParser.addParameter(&moveHandlingCameras, "--move-handling-cameras", NULL,
-        lit("Move handling cameras to itself, "
-            "In some rare scenarios cameras can be assigned to removed server, "
-            "This startup parameter force server to move these cameras to itself"), true);
+    commandLineParser.addParameter(&moveHandlingCameras, "--move-handling-cameras", nullptr,
+        "Move handling cameras to this Server. "
+        "In some rare scenarios cameras can be assigned to a removed Server. "
+        "This startup parameter forces the Server to move these cameras to itself.",
+        true);
 
-    commandLineParser.addParameter(&auxLoggers, "--log/logger", NULL,
-        lit("Additional logger configuration. "
-            "E.g., to log every message <= WARING to stdout: file=-;level=WARNING"));
+    commandLineParser.addParameter(&auxLoggers, "--log/logger", nullptr,
+        "Additional logger configuration. "
+        "E.g., to log every message <= WARNING to stdout: file=-;level=WARNING");
 
     commandLineParser.parse(arguments, stderr);
     if (showHelp)

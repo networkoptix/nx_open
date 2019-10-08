@@ -8,8 +8,9 @@
 #include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <nx/client/core/utils/geometry.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include "area_rect_item.h"
@@ -168,7 +169,6 @@ public:
     void updateArea(const QnUuid& areaId);
     void updateAreas();
     void ensureRotation();
-    QRectF rotatedRectangle(const QRectF& source) const;
 
 public:
     QHash<QnUuid, Area> areaById;
@@ -204,7 +204,8 @@ void AreaHighlightOverlayWidget::Private::updateArea(
     if (!area.rectItem || !area.tooltipItem)
         return;
 
-    area.rotatedRectangle = rotatedRectangle(area.info.rectangle);
+    area.rotatedRectangle = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
+        area.info.rectangle, angle / 90);
 
     const bool highlighted = highlightedAreaId == area.info.id;
 
@@ -277,26 +278,6 @@ void AreaHighlightOverlayWidget::Private::ensureRotation()
 
     connect(rotation.data(), &QGraphicsRotation::angleChanged, this, updateAngle);
     updateAngle();
-}
-
-QRectF AreaHighlightOverlayWidget::Private::rotatedRectangle(const QRectF& source) const
-{
-    switch (angle)
-    {
-        case 90:
-            return QRectF(source.top(), 1.0 - source.right(), source.height(), source.width());
-
-        case 180:
-            return QRectF(
-                1.0 - source.right(), 1.0 - source.bottom(), source.width(), source.height());
-
-        case 270:
-            return QRectF(1.0 - source.bottom(), source.left(), source.height(), source.width());
-
-        default:
-            NX_ASSERT(angle == 0);
-            return source;
-    }
 }
 
 AreaHighlightOverlayWidget::AreaHighlightOverlayWidget(QGraphicsWidget* parent):

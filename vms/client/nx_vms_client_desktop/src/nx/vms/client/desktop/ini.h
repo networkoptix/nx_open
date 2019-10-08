@@ -30,7 +30,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, allowCustomArZoomWindows,
         "Allows zoom windows to have custom aspect ratio.\n"
         "\n"
-        "When disabled, the acpect ratio of the zoom window is the same as the aspect ratio of\n"
+        "When disabled, the aspect ratio of the zoom window is the same as the aspect ratio of\n"
         "the main camera window. If enabled, allows the user to specify the aspect ratio of the\n"
         "zoom window.");
     NX_INI_INT(500, analyticsVideoBufferLengthMs,
@@ -95,7 +95,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, enableWebKitPlugins,
         "Enables WebKit NPAPI plugins (Flash, Java, etc.).");
     NX_INI_FLAG(1, modalServerSetupWizard,
-        "Whether to show Server's setup wizard dialog in a modal window.");
+        "Whether to show Server's setup wizard dialog in a modal window. Default behavior: modal\n"
+        "window. To be changed for debugging of web-based components only.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor,
         "Allows to show the screenshot above the timeline when mouse pointer hovers over the\n"
         "timeline.\n"
@@ -124,7 +125,7 @@ struct Ini: nx::kit::IniConfig
         "Whether to show Right Panel progress informers during System Update (unfinished\n"
         "functionality).");
     NX_INI_FLAG(0, compatibilityIsMediaPaused,
-        "Enables a check if all sync play items are paused upon every request.");
+        "Switch to the old scheme of a check for paused video.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride,
         "Background updates check will use this changeset instead of \"latest\".");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
@@ -201,6 +202,8 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(1, limitAnalyticsTimePeriodsLoading,
         "Send analytics time period requests only when these periods are visible.");
+    NX_INI_STRING("", updateFeedUrl,
+        "Overrides URL update server. Leave empty value to use built-in path.");
 };
 
 inline Ini& ini()

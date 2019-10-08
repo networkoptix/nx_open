@@ -255,6 +255,7 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
+    void onBackupDbTimer();
     void initMetricsController();
 private:
     int m_argc = 0;
@@ -275,7 +276,7 @@ private:
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
-    std::unique_ptr<QTimer> m_createDbBackupTimer;
+    std::unique_ptr<nx::utils::StandaloneTimerManager> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
     QString m_oldAnalyticsStoragePath;

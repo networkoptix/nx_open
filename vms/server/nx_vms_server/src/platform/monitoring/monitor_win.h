@@ -5,7 +5,8 @@
 
 class QnWindowsMonitorPrivate;
 
-class QnWindowsMonitor: public QnSigarMonitor {
+class QnWindowsMonitor: public QnSigarMonitor
+{
     Q_OBJECT
     typedef QnSigarMonitor base_type;
 
@@ -13,11 +14,11 @@ public:
     QnWindowsMonitor(QObject *parent = NULL);
     virtual ~QnWindowsMonitor();
 
-    //!Implementation of \a nx::vms::server::PlatformMonitor::totalPartitionSpaceInfo
+    /** Implementation of nx::vms::server::PlatformMonitor::totalPartitionSpaceInfo */
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
-    //!Implementation of \a nx::vms::server::PlatformMonitor::totalHddLoad
+    /** Implementation of nx::vms::server::PlatformMonitor::totalHddLoad */
     virtual QList<HddLoad> totalHddLoad() override;
-    //!Implementation of \a nx::vms::server::PlatformMonitor::totalNetworkLoad
+    /** Implementation of nx::vms::server::PlatformMonitor::totalNetworkLoad */
     virtual QList<NetworkLoad> totalNetworkLoad() override;
 
 private:

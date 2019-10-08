@@ -71,20 +71,25 @@ int main(int argc, char** argv)
     QCommandLineOption logLevelOption(QStringList() << "log-level",
         "Log level(NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE)", "level", "");
     parser.addOption(logLevelOption);
+    QCommandLineOption disableRestart(QStringList() << "disable-restart",
+        "Start every RTSP session only once.");
+    parser.addOption(disableRestart);
     parser.process(app);
 
 
     RtspPerf::Config config;
     config.count = parser.value(countOption).toInt();
     config.startInterval = std::chrono::milliseconds(parser.value(intervalOption).toInt());
-    config.timeout = std::chrono::milliseconds(parser.value(timeoutOption).toInt());
     config.livePercent = parser.value(livePercentOption).toInt();
     config.server = parser.value(serverOption);
-    config.user = parser.value(userOption);
-    config.password = parser.value(passwordOption);
     config.useSsl = parser.isSet(sslOption);
-    config.printTimestamps = parser.isSet(timestampsOption);
     config.urls = parser.values(urlOption);
+    config.disableRestart = parser.isSet(disableRestart);
+
+    config.sessionConfig.timeout = std::chrono::milliseconds(parser.value(timeoutOption).toInt());
+    config.sessionConfig.user = parser.value(userOption);
+    config.sessionConfig.password = parser.value(passwordOption);
+    config.sessionConfig.printTimestamps = parser.isSet(timestampsOption);
 
     if (parser.isSet(logLevelOption))
     {

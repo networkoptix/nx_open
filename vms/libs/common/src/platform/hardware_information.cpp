@@ -1,5 +1,7 @@
 #include "hardware_information.h"
 
+#include <thread>
+
 #if !defined(__arm__) && !defined(__aarch64__)
     #if defined(_MSC_VER)
         #include <intrin.h>

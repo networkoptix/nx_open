@@ -84,13 +84,24 @@ if platform.system() == 'Linux':
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
 
-        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
             log_remote_command(command_wrapped)
 
+            opts = {}
+
+            if stdin:
+                opts['input'] = stdin.encode('UTF-8')
+
             try:
-                run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                run = subprocess.run(
+                    [*self.ssh_args, command_wrapped],
+                    timeout=timeout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    **opts
+                )
             except subprocess.TimeoutExpired:
                 message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
                           'check boxHostnameOrIp in vms_benchmark.conf.')
@@ -124,9 +135,9 @@ if platform.system() == 'Linux':
 
             return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=5, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None, stdin=None):
             out = StringIO()
-            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout=timeout)
 
             if res.return_code is None:
                 raise exceptions.BoxCommandError(res.message)
@@ -136,8 +147,8 @@ if platform.system() == 'Linux':
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, su=False, stderr=None, timeout=15):
-            return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=None, stdin=None, timeout=15):
+            return self.eval(f'cat "{path}"', su=su, stderr=stderr, stdin=stdin, timeout=timeout)
 
 elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
     class BoxConnection:
@@ -204,7 +215,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
         _SH_DEFAULT = object()
 
-        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr, stdin=None):
             opts = {
                 'stdin': subprocess.PIPE
             }
@@ -217,6 +228,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             try:
                 proc = subprocess.Popen(self.ssh_command(), **opts)
                 out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
+                if stdin:
+                    proc.stdin.write(str(stdin))
                 proc.stdin.close()
             except subprocess.TimeoutExpired:
                 message = f'Timeout {timeout} seconds expired'
@@ -243,17 +256,17 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
             return self.BoxConnectionResult(proc.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=5, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None, stdin=None):
             out = StringIO()
-            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout=timeout)
 
             if not res:
                 return None
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, su=False, stderr=sys.stderr, timeout=15):
-            return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=sys.stderr, stdin=None, timeout=15):
+            return self.eval(f'cat "{path}"', su=su, stderr=stderr, stdin=stdin, timeout=timeout)
 
 else:
     raise Exception(f"ERROR: OS {platform.system()} is unsupported.")

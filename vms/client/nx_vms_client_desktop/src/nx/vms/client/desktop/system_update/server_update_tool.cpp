@@ -28,6 +28,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 
@@ -1415,6 +1416,19 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
             return contents;
         });
+}
+
+QString ServerUpdateTool::updateFeedUrl()
+{
+    QString value = ini().updateFeedUrl;
+    if (!value.isEmpty())
+        return value;
+    return QnAppInfo::updateFeedUrl();
+}
+
+QString ServerUpdateTool::updateGeneratorUrl()
+{
+    return QnAppInfo::updateGeneratorUrl();
 }
 
 nx::utils::SoftwareVersion getCurrentVersion(

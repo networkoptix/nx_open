@@ -362,7 +362,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 // We should run update check again. This should fix VMS-13037.
                 if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
                 {
-                    QString updateUrl = QnAppInfo::updateFeedUrl();
+                    QString updateUrl = ServerUpdateTool::updateFeedUrl();
                     m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
                 }
             }
@@ -921,7 +921,7 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     m_forceUiStateUpdate = true;
 
     clearUpdateInfo();
-    QString updateUrl = QnAppInfo::updateFeedUrl();
+    QString updateUrl = ServerUpdateTool::updateFeedUrl();
     m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(
         updateUrl,
         dialog.changeset());
@@ -964,7 +964,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        QString updateUrl = QnAppInfo::updateFeedUrl();
+        QString updateUrl = ServerUpdateTool::updateFeedUrl();
         m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
         m_updateReport.compareAndSet(m_updateReport->checking, isChecking());
         // We have changed 'isChecking' here.
@@ -1606,7 +1606,7 @@ void MultiServerUpdatesWidget::processInitialState()
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        QString updateUrl = QnAppInfo::updateFeedUrl();
+        QString updateUrl = ServerUpdateTool::updateFeedUrl();
         m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
     }
 
@@ -2599,8 +2599,8 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
     if (m_showDebugData)
     {
         QStringList debugState = {
-            QString("UpdateFeedUrl=<a href=\"%1\">%1</a>").arg(QnAppInfo::updateFeedUrl()),
-            QString("UpdateGeneratorUrl=<a href=\"%1\">%1</a>").arg(QnAppInfo::updateGeneratorUrl()),
+            QString("UpdateFeedUrl=<a href=\"%1\">%1</a>").arg(ServerUpdateTool::updateFeedUrl()),
+            QString("UpdateGeneratorUrl=<a href=\"%1\">%1</a>").arg(ServerUpdateTool::updateGeneratorUrl()),
             QString("Widget=%1").arg(toString(m_widgetState)),
             QString("Widget source=%1, Update source=%2").arg(toString(m_updateSourceMode), toString(m_updateInfo.sourceType)),
             QString("UploadTool=%1").arg(toString(m_serverUpdateTool->getUploaderState())),

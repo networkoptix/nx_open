@@ -14,9 +14,9 @@ class InvalidConfigOption(exceptions.VmsBenchmarkError):
 
 
 class ConfigOptionValueError(exceptions.VmsBenchmarkError):
-    def __init__(self, config_file, name, value, original_exception=None):
+    def __init__(self, conf_file, name, value, original_exception=None):
         super(ConfigOptionValueError, self).__init__(
-            f"Error in config '{config_file}' processing value '{value}' of option '{name}'."
+            f"Error in config '{conf_file}' processing value '{value}' of option '{name}'."
         )
         self.original_exception = original_exception
 
@@ -62,7 +62,7 @@ class ConfigParser:
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
                 if name not in self.options.keys():
-                    raise ConfigOptionNotFound(f"Mandatory config option '{name}' is not defined in config {filepath}.")
+                    raise ConfigOptionNotFound(f"Mandatory option '{name}' is not defined in {filepath}.")
 
             for name, _ in option_descriptions.items():
                 try:
@@ -84,7 +84,7 @@ class ConfigParser:
 
             for name, value in self.options.items():
                 if name not in option_descriptions.keys():
-                    raise InvalidConfigOption(f"Unexpected option '{name}' in config {filepath}.")
+                    raise InvalidConfigOption(f"Unexpected option '{name}' in {filepath}.")
 
     def __getitem__(self, item):
         return self.options[item]

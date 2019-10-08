@@ -1345,7 +1345,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSD磁盘&quot;%1&quot; 已满。磁盘包含太多不受VMS管理的数据。</translation>
+      <translation>HDD / SSD磁盘&quot;%1&quot; 已满。磁盘包含太多非本软体录影档案之数据。</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>

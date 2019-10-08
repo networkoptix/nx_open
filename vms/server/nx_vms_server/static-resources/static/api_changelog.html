@@ -44,10 +44,10 @@ supported for a while, when noted below.
 <h3>Breaking compatibility</h3>
 <p>
 In case of <strong><code>InvalidParameter</code></strong> or
-<strong><code>MissingParameter</code></strong> error, the return status code has been changed from
+<strong><code>MissingParameter</code></strong> error, the status code has been changed from
 <strong><code><i>200 OK</i></code></strong> to
-<strong><code><b>422 Unprocessable Entity</b></code></strong>; in the case of timeout, the return
-status code has been changed from <strong><code><i>200 OK</i></code></strong> to
+<strong><code><b>422 Unprocessable Entity</b></code></strong>; in case of timeout, the status code
+has been changed from <strong><code><i>200 OK</i></code></strong> to
 <strong><code><b>408 Request Timeout</b></code></strong> in methods:
 <pre>
     /api/getCameraParam
@@ -112,6 +112,20 @@ layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
 
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
+
+<p>
+Method <strong><code>/api/get<i>t</i>ime</code></strong> deprecated in favor of the new
+method <strong><code>/api/get<b>T</b>ime</code></strong> (deprecated method support expires
+after 4.0).
+<br/>
+Result structure of the new method differs from the old one:
+<pre>
+    <strong>timeZoneOffset</strong> - is now in milliseconds instead of seconds
+    <strong>time<i>z</i>oneId</strong> -> <strong>time<b>Z</b>oneId</strong>
+    <strong><i>utc</i>Time</strong> -> <strong><b>vms</b>Time</strong>
+    <strong><b>osTime</b></strong> - new parameter, see documentation for details
+</pre>
+</p>
 <p>
 Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
 <strong><b>POST</b></strong> in method <strong><code>/api/setCameraParam</code></strong>

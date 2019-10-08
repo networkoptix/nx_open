@@ -8,6 +8,8 @@
 #include <utils/web_downloader.h>
 #include <utils/common/delayed.h>
 
+#include <ui/style/svg_icon_colorer.h>
+
 namespace {
 
 const char * stubPage = R"HTML(
@@ -136,11 +138,38 @@ protected:
     }
 };
 
+/**
+ * Get theme-colored SVG icon data suitable for inserting into src property of img tag.
+ */
+QString getSvgIconData(const QString& path)
+{
+    QFile source(path);
+    if (!source.open(QIODevice::ReadOnly))
+    {
+        NX_ERROR(typeid(QnWebPage), "Unable to load icon: %1", path);
+        return QString();
+    }
+
+    SvgIconColorer iconColorer(source.readAll(), QFileInfo(path).completeBaseName());
+
+    const auto coloredIcon = iconColorer.makeNormalIcon();
+
+    return QLatin1String("data:image/svg+xml;base64,") + QLatin1String(coloredIcon.toBase64());
+}
+
 } // namespace
 
-QnWebPage::QnWebPage(QObject* parent): base_type(parent)
+QnWebPage::QnWebPage(QObject* parent):
+    base_type(parent),
+    // Network access manager should not be deallocated before QWebPage destructor,
+    // so we use custom deleter which calls deleteLater.
+    // Unfortunately custom deleter can not be passed to make_shared and we loose
+    // exception safety here.
+    // One way to overcome this is by using allocate_shared with simple allocator,
+    // but it seems like an overkill.
+    m_networkAccessManager(
+        new Http1NetworkAccessManager(), [](QObject* p) { p->deleteLater(); })
 {
-    m_networkAccessManager = std::make_shared<Http1NetworkAccessManager>();
     setNetworkAccessManager(m_networkAccessManager.get());
 
     connect(networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
@@ -153,13 +182,17 @@ QnWebPage::QnWebPage(QObject* parent): base_type(parent)
         });
 
     setForwardUnsupportedContent(true);
-    connect(this, &QWebPage::downloadRequested, this, [this](const QNetworkRequest& request) {
-        download(m_networkAccessManager->get(request));
-    });
+    connect(this, &QWebPage::downloadRequested, this,
+        [this](const QNetworkRequest& request)
+        {
+            download(m_networkAccessManager->get(request));
+        });
 
-    connect(this, &QWebPage::unsupportedContent, this, [this](QNetworkReply* reply) {
-        download(reply);
-    });
+    connect(this, &QWebPage::unsupportedContent, this,
+        [this](QNetworkReply* reply)
+        {
+            download(reply);
+        });
 }
 
 void QnWebPage::download(QNetworkReply* reply)
@@ -202,6 +235,8 @@ bool QnWebPage::extension(Extension extension, const ExtensionOption * option, E
         && errOption->error == kFrameLoadInterruptedByPolicyChange;
     const bool showUrl = requestDownload || unsupportedContentError;
 
+    static const auto svgData = getSvgIconData(":/skin/item_placeholders/downloading.svg");
+
     QString errPage =
         QString(stubPage)
             .replace("{font1-color}",
@@ -212,7 +247,7 @@ bool QnWebPage::extension(Extension extension, const ExtensionOption * option, E
             .replace("{background-color}",
                 nx::vms::client::desktop::colorTheme()->color("dark6").name(QColor::HexRgb))
             .replace("{image-source}",
-                showUrl ? QString("src=\"%1\"").arg("qrc:/skin/item_placeholders/downloading.svg")
+                showUrl ? QString("src=\"%1\"").arg(svgData)
                         : QString("srcset=\"%1.png 1x, %1@2x.png 2x\"")
                               .arg("qrc:/skin/item_placeholders/no_signal"))
             .replace("{label1-text}",

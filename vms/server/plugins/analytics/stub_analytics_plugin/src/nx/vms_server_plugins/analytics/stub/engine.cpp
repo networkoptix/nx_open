@@ -280,6 +280,21 @@ std::string Engine::manifestString() const
                             },
                             {
                                 "type": "SpinBox",
+                                "name": ")json" + kBlinkingObjectPeriodMsSetting + R"json(",
+                                "caption": "Generate 1-frame BlinkingObject every N ms (if not 0)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 100000
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kBlinkingObjectInDedicatedPacketSetting + R"json(",
+                                "caption": "Put BlinkingObject into a dedicated MetadataPacket",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "SpinBox",
                                 "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
                                 "caption": "Number of objects to generate",
                                 "defaultValue": 1,
@@ -336,14 +351,14 @@ std::string Engine::manifestString() const
                     },
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kLeakFrames + R"json(",
-                        "caption": "Force a memory leak when proccessing a video frame",
+                        "name": ")json" + kLeakFramesSetting + R"json(",
+                        "caption": "Force a memory leak when processing a video frame",
                         "defaultValue": false,
                         "value": false
                     },
                     {
                         "type": "SpinBox",
-                        "name": ")json" + kAdditionalFrameProcessingDelayMs + R"json(",
+                        "name": ")json" + kAdditionalFrameProcessingDelayMsSetting + R"json(",
                         "caption": "Additional frame processing delay, ms",
                         "defaultValue": 0,
                         "minValue": 0,
