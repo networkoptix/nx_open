@@ -10,7 +10,11 @@ namespace nx::utils::filesystem {
 
 #if defined(_WIN32)
 
-using namespace std::experimental::filesystem;
+#if (_MSC_VER < 1923)
+    using namespace std::experimental::filesystem;
+#else
+    using namespace std::filesystem;
+#endif
 
 #else
 

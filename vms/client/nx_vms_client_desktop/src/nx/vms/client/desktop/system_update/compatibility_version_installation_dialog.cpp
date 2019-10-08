@@ -7,6 +7,7 @@
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
+#include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
@@ -256,7 +257,7 @@ int CompatibilityVersionInstallationDialog::startUpdate()
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
-    QString updateUrl = QnAppInfo::updateFeedUrl();
+    QString updateUrl = nx::vms::client::desktop::ServerUpdateTool::updateFeedUrl();
     QString build = QString::number(m_versionToInstall.build());
 
     m_private->checkingUpdates = true;

@@ -50,6 +50,8 @@ nxcip::CompressionType fromFfmpegCodecIdToNx(AVCodecID codecId)
     {
         case AV_CODEC_ID_H264:
             return nxcip::CompressionType::AV_CODEC_ID_H264;
+        case AV_CODEC_ID_H265:
+            return nxcip::CompressionType::AV_CODEC_ID_H265;
         case AV_CODEC_ID_MPEG2VIDEO:
             return nxcip::CompressionType::AV_CODEC_ID_MPEG2VIDEO;
         case AV_CODEC_ID_H263:

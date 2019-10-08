@@ -55,7 +55,7 @@ set(old_sdk_static_resources "")
 if(TARGET nx_storage_sdk)
     list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
 endif()
-if(TARGET nx_camera_sdk)
+if(TARGET nx_video_source_sdk)
     list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
 endif()
 
@@ -103,11 +103,26 @@ nx_add_target(nx_vms_server LIBRARY
         nx_speech_synthesizer
 )
 
+# Copy certain files to the distribution dir.
+set(files_to_distribution
+    ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/static-resources/static/api_changelog.html
+)
+set(files_in_distribution "")
+foreach(file_to_distribution ${files_to_distribution})
+    get_filename_component(file_in_distribution_filename ${file_to_distribution} NAME)
+    set(file_in_distribution ${distribution_output_dir}/${file_in_distribution_filename})
+    list(APPEND files_in_distribution ${file_in_distribution})
+    add_custom_command(TARGET nx_vms_server POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${file_to_distribution} ${file_in_distribution}
+    )
+endforeach()
+
 if(TARGET nx_storage_sdk)
     add_dependencies(nx_vms_server nx_storage_sdk)
 endif()
-if(TARGET nx_camera_sdk)
-    add_dependencies(nx_vms_server nx_camera_sdk)
+if(TARGET nx_video_source_sdk)
+    add_dependencies(nx_vms_server nx_video_source_sdk)
 endif()
 
 nx_force_include(nx_vms_server

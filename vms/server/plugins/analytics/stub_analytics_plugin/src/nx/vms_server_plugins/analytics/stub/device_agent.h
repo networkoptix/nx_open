@@ -12,6 +12,7 @@
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
 #include "engine.h"
 #include "objects/random.h"
@@ -50,7 +51,16 @@ protected:
 
 private:
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
+
     std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
+
+    nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadata> cookBlinkingObjectIfNeeded(
+        int64_t metadataTimestampUs);
+
+    void addBlinkingObjectIfNeeded(
+        int64_t metadataTimestampUs,
+        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
     int64_t usSinceEpoch() const;
 
@@ -117,18 +127,20 @@ private:
     int m_frameCounter = 0;
     std::string m_eventTypeId;
 
-    std::deque<int64_t> m_frameTimestampQueue;
+    std::deque<int64_t> m_frameTimestampUsQueue;
     int64_t m_lastVideoFrameTimestampUs = 0;
+    int64_t m_lastBlinkingObjectTimestampUs = 0;
 
     struct DeviceAgentSettings
     {
-        bool needToGenerateObjects()
+        bool needToGenerateObjects() const
         {
             return generateCars
                 || generateTrucks
                 || generatePedestrians
                 || generateHumanFaces
-                || generateBicycles;
+                || generateBicycles
+                || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero();
         }
 
         std::atomic<bool> generateEvents{true};
@@ -139,18 +151,23 @@ private:
         std::atomic<bool> generateHumanFaces{true};
         std::atomic<bool> generateBicycles{true};
 
-        std::atomic<int> generateObjectsEveryNFrames{1};
+        std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<bool> blinkingObjectInDedicatedPacket{false};
+
         std::atomic<int> numberOfObjectsToGenerate{1};
+        std::atomic<int> generateObjectsEveryNFrames{1};
 
         std::atomic<bool> generatePreviews{true};
 
         std::atomic<bool> throwPluginDiagnosticEvents{false};
         std::atomic<bool> leakFrames{false};
 
-        std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
+        std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelayMs{
             std::chrono::milliseconds::zero()};
 
-        std::atomic<std::chrono::milliseconds> overallMetadataDelay{
+        std::atomic<std::chrono::milliseconds> overallMetadataDelayMs{
             std::chrono::milliseconds::zero()};
 
         std::atomic<int> numberOfFramesBeforePreviewGeneration{30};
@@ -204,6 +221,7 @@ const std::string kIntrusionEventType = "nx.stub.intrusion";
 const std::string kGunshotEventType = "nx.stub.gunshot";
 const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
+const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 
 } // namespace stub
 } // namespace analytics

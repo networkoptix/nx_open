@@ -11,8 +11,21 @@ debug = False
 
 
 @contextmanager
-def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip, vms_port):
+def stream_reader_running(
+    camera_ids,
+    streams_per_camera,
+    archive_streams_count,
+    user,
+    password,
+    box_ip,
+    vms_port
+):
     camera_ids = list(camera_ids)
+
+    archive_streams_list = []
+
+    for i in range(archive_streams_count):
+        archive_streams_list.append(camera_ids[i % len(camera_ids)])
 
     args = [
         binary_file,
@@ -25,12 +38,33 @@ def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip
         streams_per_camera
     ]
 
-    for stream_url in (
-        f"rtsp://{box_ip}:{vms_port}/{camera_id}"
-        for camera_id in camera_ids
+    streams = {}
+
+    for camera_id, opts in (
+        [
+            [camera_id, None]
+            for camera_id in camera_ids
+        ] + [
+            [camera_id, {"pos": 0}]
+            for camera_id in archive_streams_list
+        ]
     ):
+        import uuid
+        stream_uuid = str(uuid.uuid4())
+
+        base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
+
+        opts = dict(opts) if isinstance(opts, dict) else {}
+        opts['vms_benchmark_stream_id'] = stream_uuid
+
+        url = base_url + '?' + '&'.join([f"{k}={v}" for k, v in opts.items()])
+
         args.append('--url')
-        args.append(stream_url)
+        args.append(url)
+
+        streams[stream_uuid] = {
+            "camera_id": camera_id
+        }
 
     opts = {
         'stdout': subprocess.PIPE,
@@ -58,6 +92,6 @@ def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip
         raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
 
     try:
-        yield proc
+        yield [proc, streams]
     finally:
         proc.terminate()

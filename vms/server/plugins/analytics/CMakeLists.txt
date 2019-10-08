@@ -20,4 +20,6 @@ if(targetDevice STREQUAL "linux_arm64")
     add_subdirectory(deepstream_analytics_plugin)
 endif()
 
+add_subdirectory(sample_analytics_plugin)
+
 add_subdirectory(stub_analytics_plugin)

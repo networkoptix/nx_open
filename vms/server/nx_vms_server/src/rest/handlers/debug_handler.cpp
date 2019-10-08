@@ -163,5 +163,4 @@ void QnDebugHandler::afterExecute(
         default: //< Other actions require no after-execution steps.
             return;
     }
-    NX_ASSERT(false, lm("Unexpected enum value: %1").arg(static_cast<int>(action)));
 }

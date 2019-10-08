@@ -976,11 +976,11 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
-        if( d->useProprietaryFormat || speedStr.toLower() == "max")
+        if ((d->useProprietaryFormat && speedStr.isEmpty()) || speedStr.toLower() == "max")
         {
             speed = QnRtspDataConsumer::MAX_STREAMING_SPEED;
         }
-        else if( !speedStr.isEmpty() )
+        else if (!speedStr.isEmpty())
         {
             bool ok = false;
             const int tmpSpeed = speedStr.toInt(&ok);

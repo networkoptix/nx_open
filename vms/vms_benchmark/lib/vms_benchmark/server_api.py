@@ -195,6 +195,23 @@ class ServerApi:
 
         return None
 
+    def get_statistics(self):
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/statistics")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = self.get_request(request)
+
+        result = self.Response(response.code)
+
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.body)
+            if int(result.payload['error']) != 0 or 'reply' not in result.payload:
+                return None
+            return result.payload['reply']['statistics']
+
+        return None
+
     def remove_camera(self, camera_id):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/removeResource")
         credentials = f"{self.user}:{self.password}"
