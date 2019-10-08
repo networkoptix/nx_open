@@ -3,7 +3,10 @@
 #if defined(_WIN32)
 #include <filesystem>
 
+#if (_MSC_VER < 1923)
 namespace std { namespace filesystem { using namespace std::experimental::filesystem; } }
+#endif
+
 #else
 
 #define NX_STD_FILESYSTEM_IMPLEMENTATION
