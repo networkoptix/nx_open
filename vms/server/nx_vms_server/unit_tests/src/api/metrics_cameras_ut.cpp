@@ -133,6 +133,7 @@ public:
     {
         m_camera.reset();
         launcher.reset();
+        nx::vms::server::metrics::setTimerMultiplier(1);
     }
 
     MetricsCameraApi()
