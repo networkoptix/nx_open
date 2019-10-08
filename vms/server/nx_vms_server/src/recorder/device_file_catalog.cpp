@@ -980,8 +980,8 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     QnRecordingStatsData result;
     QnMutexLocker lock(&m_mutex);
 
-    NX_VERBOSE(this,
-        "getStatistics for camera %1, analize period %2", m_cameraUniqueId, bitrateAnalyzePeriodMs);
+    NX_VERBOSE(this, "getStatistics for camera %1, analize period %2, catalog size %3",
+        m_cameraUniqueId, bitrateAnalyzePeriodMs, m_chunks.size());
 
     if (m_chunks.empty())
     {
@@ -1005,6 +1005,8 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
 
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
         ? m_chunks.back().chunk().startTimeMs - bitrateAnalyzePeriodMs : 0;
+    NX_VERBOSE(this, "getStatistics for camera %1. averagingStartTime %1", averagingStartTime);
+
 
     qint64 recordedMsForPeriod = 0;
     qint64 recordedBytesForPeriod = 0;
@@ -1019,6 +1021,9 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
             recordedMsForPeriod += chunk.durationMs;
         }
     }
+    NX_VERBOSE(this, 
+        "getStatistics for camera %1. recordedBytesForPeriod %2, recordedMsForPeriod %3",
+        m_cameraUniqueId, recordedBytesForPeriod, recordedMsForPeriod);
 
     if (recordedBytesForPeriod > 0)
     {
