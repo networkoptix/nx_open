@@ -217,7 +217,7 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
             if (isLocalHost && (filter.testFlag(AddressFilter::noLocal)))
                 continue;
 
-            if (!allowedAddresses.contains(address.ip()))
+            if (!allowedAddresses.isEmpty() && !allowedAddresses.contains(address.ip()))
                 continue;
 
             if (isIpV4 && (filter.testFlag(AddressFilter::ipV4)))
