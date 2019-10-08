@@ -12,9 +12,7 @@
 
 class QnMediaServerModule;
 
-namespace nx {
-namespace vms::server {
-namespace plugins {
+namespace nx::vms::server::plugins {
 
 class HanwhaResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
@@ -49,6 +47,7 @@ public:
     virtual bool isEnabled() const override;
 
     static QAuthenticator getDefaultAuth();
+
 private:
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
@@ -59,7 +58,8 @@ private:
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
-    HanwhaResult<HanwhaInformation> cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url);
+    HanwhaResult<HanwhaInformation> cachedDeviceInfo(
+        const QAuthenticator& auth, const nx::utils::Url& url);
     void addResourcesViaSunApi(QnResourceList& upnpResults);
     void sendSunApiProbe();
     void readSunApiResponse(QnResourceList& resultResourceList);
@@ -75,8 +75,9 @@ private:
         QElapsedTimer timer;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
-    bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
+    bool doesHostBelongToValidSubnet(const QHostAddress& address) const;
     static std::vector<std::vector<quint8>> createProbePackets();
+
 private:
     struct SessionKeyData
     {
@@ -115,6 +116,4 @@ private:
     QMap<nx::utils::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 
-} // namespace plugins
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::plugins

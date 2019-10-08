@@ -20,21 +20,18 @@ namespace {
 
 static const QString kUpnpBasicDeviceType("Basic");
 static const QString kHanwhaCameraName("Hanwha_Common");
-static const QString kHanwhaResourceTypeName = lit("Hanwha_Sunapi");
-static const QString kHanwhaDefaultUser = lit("admin");
-static const QString kHanwhaDefaultPassword = lit("4321");
+static const QString kHanwhaResourceTypeName("Hanwha_Sunapi");
+static const QString kHanwhaDefaultUser("admin");
+static const QString kHanwhaDefaultPassword("4321");
 
-static const int kSunApiProbeSrcPort = 7711;
-static const int kSunApiProbeDstPort = 7701;
-static std::chrono::seconds kSunapiSocketSendTimeout(5);
-
-static const int64_t kSunApiDiscoveryTimeoutMs = 10 * 60 * 1000; //< 10 minutes.
+constexpr int kSunApiProbeSrcPort = 7711;
+constexpr int kSunApiProbeDstPort = 7701;
+constexpr std::chrono::seconds kSunapiSocketSendTimeout(5);
+static constexpr std::chrono::minutes kSunApiDiscoveryTimeout(10);
 
 } // namespace
 
-namespace nx {
-namespace vms::server {
-namespace plugins {
+namespace nx::vms::server::plugins {
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
@@ -46,7 +43,8 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule
     ini().reload();
 }
 
-HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
+HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(
+    const QAuthenticator& auth, const nx::utils::Url& url)
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
@@ -196,7 +194,7 @@ void HanwhaResourceSearcher::updateSocketList()
     }
 }
 
-bool HanwhaResourceSearcher::isHostBelongsToValidSubnet(const QHostAddress& address) const
+bool HanwhaResourceSearcher::doesHostBelongToValidSubnet(const QHostAddress& address) const
 {
     using namespace nx::network;
     const auto interfaceList = getAllIPv4Interfaces(
@@ -228,7 +226,7 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
     static const int kUrlOffset = 133;
     const auto urlStr = QLatin1String(data.data() + kUrlOffset);
     QUrl url(urlStr);
-    if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
+    if (!url.isValid() || !doesHostBelongToValidSubnet(QHostAddress(url.host())))
         return false;
     outData->presentationUrl = url.toString(QUrl::RemovePath);
     outData->manufacturer = kHanwhaManufacturerName;
@@ -342,7 +340,7 @@ bool HanwhaResourceSearcher::processPacket(
     if (cameraMac.isNull())
     {
         NX_WARNING(this,
-            "Can't obtain MAC address for hanwha device: [%1] (udn: [%2], serial: [%3])",
+            "Can't obtain MAC address for Hanwha device: [%1] (udn: [%2], serial: [%3])",
             devInfo.modelName, devInfo.udn, devInfo.serialNumber);
         return false;
     }
@@ -352,9 +350,9 @@ bool HanwhaResourceSearcher::processPacket(
 
         // Due to some bugs in UPnP implementation higher priority is given
         // to the native SUNAPI discovery protocol.
-        auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
-        if (itr != m_sunapiDiscoveredDevices.end()
-            && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
+        if (const auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
+            itr != m_sunapiDiscoveredDevices.end()
+            && !itr->timer.hasExpired(std::chrono::milliseconds(kSunApiDiscoveryTimeout).count()))
         {
             NX_DEBUG(this,
                 "Device [%1] (%2) was discovered by SUNAPI, skipping device info found by UPnP",
@@ -482,6 +480,4 @@ QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
     return defaultAuth;
 }
 
-} // namespace plugins
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::plugins
