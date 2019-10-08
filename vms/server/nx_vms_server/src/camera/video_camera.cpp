@@ -12,7 +12,6 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
-#include <nx/utils/memory/cyclic_allocator.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <providers/cpull_media_stream_provider.h>

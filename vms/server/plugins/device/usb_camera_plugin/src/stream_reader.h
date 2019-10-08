@@ -6,7 +6,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern C
 
-#include <nx/utils/memory/cyclic_allocator.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -50,7 +49,6 @@ private:
     std::unique_ptr<TranscodeStreamReader> m_transcodeReader;
     int m_encoderIndex;
     std::shared_ptr<Camera> m_camera;
-    CyclicAllocator m_allocator;
     std::atomic_bool m_interrupted = false;
     bool m_isPrimaryStream = true;
 };

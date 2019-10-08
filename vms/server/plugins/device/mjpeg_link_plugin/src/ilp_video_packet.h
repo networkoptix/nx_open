@@ -4,8 +4,6 @@
 
 #include <plugins/plugin_tools.h>
 
-class CyclicAllocator;
-
 namespace nx::vms_server_plugins::mjpeg_link {
 
 class ILPVideoPacket
@@ -14,7 +12,6 @@ class ILPVideoPacket
 {
 public:
     ILPVideoPacket(
-        CyclicAllocator* const allocator,
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
@@ -56,7 +53,6 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    CyclicAllocator* const m_allocator;
     const int m_channelNumber;
     nxcip::UsecUTCTimestamp m_timestamp;
     void* m_buffer;

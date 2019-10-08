@@ -315,7 +315,6 @@ void StreamReader::gotJpegFrame(const nx::network::http::ConstBufferRefType& jpg
 {
     // Creating video packet.
     m_videoPacket.reset(new ILPVideoPacket(
-        &m_allocator,
         0,
         m_timeProvider->millisSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,

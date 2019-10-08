@@ -7,9 +7,8 @@
 
 #include <nx/kit/utils.h>
 
-GenericMulticastMediaPacket::GenericMulticastMediaPacket(CyclicAllocator* allocator):
-    m_refManager(this),
-    m_allocator(allocator)
+GenericMulticastMediaPacket::GenericMulticastMediaPacket():
+    m_refManager(this)
 {
 
 }
@@ -18,9 +17,7 @@ GenericMulticastMediaPacket::~GenericMulticastMediaPacket()
 {
     if (m_buffer)
     {
-        nx::kit::utils::freeAligned(
-            m_buffer,
-            [this](void* memoryToFree){ m_allocator->release(memoryToFree); });
+        nx::kit::utils::freeAligned(m_buffer);
 
         m_buffer = nullptr;
         m_bufferSize = 0;
@@ -156,8 +153,7 @@ void GenericMulticastMediaPacket::setData(uint8_t* data, int64_t dataSize)
         m_buffer = static_cast<uint8_t*>(
             nx::kit::utils::mallocAligned(
                 dataSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
-                nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
-                [this](size_t size) -> void* { return m_allocator->alloc(size); }));
+                nxcip::MEDIA_DATA_BUFFER_ALIGNMENT));
 
         if (!m_buffer)
         {
@@ -175,15 +171,12 @@ void GenericMulticastMediaPacket::setData(uint8_t* data, int64_t dataSize)
         return;
     }
 
-    nx::kit::utils::freeAligned(
-        m_buffer,
-        [this](void* memoryToFree){ m_allocator->release(memoryToFree); });
+    nx::kit::utils::freeAligned(m_buffer);
 
     m_buffer = static_cast<uint8_t*>(
         nx::kit::utils::mallocAligned(
             dataSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
-            nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
-            [this](size_t size) -> void* { return m_allocator->alloc(size); }));
+            nxcip::MEDIA_DATA_BUFFER_ALIGNMENT));
 
     if (!m_buffer)
     {

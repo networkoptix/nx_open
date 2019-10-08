@@ -3,15 +3,12 @@
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-class CyclicAllocator;
-
 namespace nx {
 namespace usb_cam {
 
 class ILPMediaPacket: public nxcip::VideoDataPacket {
 public:
     ILPMediaPacket(
-        CyclicAllocator* const allocator,
         int channelNumber,
         nxcip::DataPacketType dataType,
         nxcip::CompressionType compressionType,
@@ -39,7 +36,6 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    CyclicAllocator* const m_allocator;
     const int m_channelNumber = 0;
     nxcip::DataPacketType m_dataType = nxcip::DataPacketType::dptEmpty;
     nxcip::CompressionType m_compressionType = nxcip::AV_CODEC_ID_NONE;

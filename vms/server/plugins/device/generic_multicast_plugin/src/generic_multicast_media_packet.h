@@ -5,8 +5,6 @@
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-#include <nx/utils/memory/cyclic_allocator.h>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
@@ -15,7 +13,7 @@ class GenericMulticastMediaPacket: public nxcip::MediaDataPacket2
 {
 
 public:
-    GenericMulticastMediaPacket(CyclicAllocator* allocator);
+    GenericMulticastMediaPacket();
     virtual ~GenericMulticastMediaPacket();
 
     /** Implementation of nxpl::PluginInterface::queryInterface */
@@ -80,7 +78,6 @@ private:
     uint8_t* m_buffer = nullptr;
     int64_t m_dataSize = 0;
     int64_t m_bufferSize = 0;
-    CyclicAllocator* m_allocator = nullptr;
     nxcip::UsecUTCTimestamp m_timestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     nxcip::DataPacketType m_dataPacketType = nxcip::DataPacketType::dptEmpty;
     unsigned int m_channelNumber = 0;

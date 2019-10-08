@@ -9,7 +9,6 @@
 #include <plugins/plugin_tools.h>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/memory/cyclic_allocator.h>
 
 extern "C" {
 
@@ -81,7 +80,6 @@ private:
     nxpt::CommonRefManager m_refManager;
     std::atomic<bool> m_interrupted = {false};
     QUrl m_url;
-    CyclicAllocator m_allocator;
 
     AVFormatContext* m_formatContext = nullptr;
 

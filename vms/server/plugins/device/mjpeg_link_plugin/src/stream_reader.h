@@ -5,7 +5,6 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/utils/memory/cyclic_allocator.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/network/http/http_client.h>
@@ -61,7 +60,6 @@ private:
     };
 
     nxpt::CommonRefManager m_refManager;
-    CyclicAllocator m_allocator;
     QString m_login;
     QString m_password;
     QString m_url;
