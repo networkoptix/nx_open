@@ -50,7 +50,7 @@ void Session::run(const QString& url, const Config& config, bool live)
     m_lastFrameTime = std::chrono::system_clock::now();
     while (true)
     {
-        int bytesRead = rtspClient.readBinaryResponce(dataArrays, channel);
+        int bytesRead = rtspClient.readBinaryResponse(dataArrays, channel);
         if (channel >= 0 && (int)dataArrays.size() > channel && dataArrays[channel])
         {
             if (bytesRead > 0)
