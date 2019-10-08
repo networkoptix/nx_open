@@ -980,8 +980,15 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     QnRecordingStatsData result;
     QnMutexLocker lock(&m_mutex);
 
+    NX_VERBOSE(this,
+        "getStatistics for camera %1, analize period %2", m_cameraUniqueId, bitrateAnalyzePeriodMs);
+
     if (m_chunks.empty())
+    {
+        NX_VERBOSE(this,
+            "getStatistics for camera %1. Device file catalog is empty", m_cameraUniqueId);
         return QnRecordingStatsData();
+    }
 
     result.recordedBytes = occupiedSpace();
     result.recordedSecs = duration_cast<seconds>(occupiedDuration()).count();
