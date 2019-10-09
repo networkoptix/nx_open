@@ -1,12 +1,14 @@
 #include "mediaserver_launcher.h"
 
 #include <api/global_settings.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/p2p/p2p_message_bus.h>
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
 #include <transaction/message_bus_adapter.h>
-#include <nx/p2p/p2p_message_bus.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace {
 
@@ -91,6 +93,17 @@ void MediaServerLauncher::connectTo(MediaServerLauncher* target, bool isSecure)
 
     serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
         peerId, nx::vms::api::PeerType::server, url);
+}
+
+void MediaServerLauncher::connectAndWaitForSync(MediaServerLauncher* target, bool isSecure)
+{
+    connectTo(target, isSecure);
+
+    const auto targetId = target->commonModule()->moduleGUID();
+    commonModule()->globalSettings()->setPrimaryTimeServer(targetId);
+    commonModule()->globalSettings()->synchronizeNow();
+    while (target->commonModule()->globalSettings()->primaryTimeServer() != targetId)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void MediaServerLauncher::addSetting(const std::string& name, const QVariant& value)
@@ -185,7 +198,7 @@ bool MediaServerLauncher::waitForStarted()
     if (result != std::future_status::ready)
         return false;
 
-    while (m_mediaServerProcess->getTcpPort() == 0)
+    while (m_mediaServerProcess->getTcpPort() == 0 || m_mediaServerProcess->thisServer()->getStatus() != Qn::Online)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     return true;

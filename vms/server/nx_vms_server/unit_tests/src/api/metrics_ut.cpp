@@ -38,7 +38,7 @@ public:
     {
         auto newServer = std::make_unique<MediaServerLauncher>();
         EXPECT_TRUE(newServer->start());
-        newServer->connectTo(mainServer.get());
+        newServer->connectAndWaitForSync(mainServer.get());
         return newServer;
     }
 
@@ -71,7 +71,6 @@ TEST_F(MetricsApi, Api)
 
     const auto systemId = mainServer->commonModule()->globalSettings()->localSystemId().toSimpleString();
     const auto mainServerId = mainServer->commonModule()->moduleGUID().toSimpleString();
-    std::this_thread::sleep_for(std::chrono::seconds(1)); // TODO: Find another way to wait for proper start.
     {
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
@@ -95,7 +94,6 @@ TEST_F(MetricsApi, Api)
 
     auto secondServer = addServer();
     const auto secondServerId = secondServer->commonModule()->moduleGUID().toSimpleString();
-    std::this_thread::sleep_for(std::chrono::seconds(5)); // TODO: Find another way to wait for proper start and merge.
     {
         auto secondRules = get<SystemRules>("/ec2/metrics/rules", secondServer);
         EXPECT_EQ(QJson::serialized(rules), QJson::serialized(secondRules));
