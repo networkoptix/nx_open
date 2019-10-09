@@ -12,6 +12,7 @@
 #include "helpers.h"
 #include <utils/common/synctime.h>
 #include <platform/hardware_information.h>
+#include <plugins/plugin_manager.h>
 
 namespace nx::vms::server::metrics {
 
@@ -279,6 +280,16 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "thumbnails",
                 [this](const auto&) { return Value(getMetric(Metrics::thumbnailsRequested)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "plugins",
+                [this](const auto& r)
+                {
+                    QStringList result;
+                    for (const auto& value: serverModule()->pluginManager()->metrics())
+                        result.push_back(value.name);
+                    return result.isEmpty() ? Value() : Value(result.join(L'\n'));
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "apiCalls", [this](const auto&) { return Value(getMetric(Metrics::apiCalls)); },

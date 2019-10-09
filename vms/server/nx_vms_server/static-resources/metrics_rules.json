@@ -251,6 +251,10 @@
                     "calculate": "average %apiCalls 1m",
                     "insert": "apiCalls"
                 },
+                "plugins": {
+                    "name": "Active plugins list",
+                    "display": "panel"
+                },
                 "primaryStreams": {
                     "name": "Primary streams",
                     "display": "panel"
