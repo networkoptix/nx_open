@@ -34,18 +34,16 @@ def stream_reader_running(
         '-p',
         password,
         '--timestamps',
-        '--count',
-        streams_per_camera
     ]
 
     streams = {}
 
     for camera_id, opts in (
         [
-            [camera_id, None]
-            for camera_id in camera_ids
+            [camera_id, {"type": 'live'}]
+            for camera_id in camera_ids*streams_per_camera
         ] + [
-            [camera_id, {"pos": 0}]
+            [camera_id, {"type": 'archive'}]
             for camera_id in archive_streams_list
         ]
     ):
@@ -54,17 +52,25 @@ def stream_reader_running(
 
         base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
 
-        opts = dict(opts) if isinstance(opts, dict) else {}
-        opts['vms_benchmark_stream_id'] = stream_uuid
+        params = {
+            'vms_benchmark_stream_id': stream_uuid,
+        }
 
-        url = base_url + '?' + '&'.join([f"{k}={v}" for k, v in opts.items()])
+        if opts.get('type', 'live') == 'archive':
+            params['pos'] = 0
+
+        url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
         args.append('--url')
         args.append(url)
 
         streams[stream_uuid] = {
-            "camera_id": camera_id
+            "camera_id": camera_id,
+            "type": opts.get('type', 'live')
         }
+
+    args.append('--count')
+    args.append(len(streams.items()))
 
     opts = {
         'stdout': subprocess.PIPE,
