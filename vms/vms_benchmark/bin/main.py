@@ -543,7 +543,7 @@ def main(conf_file, ini_file):
 
                 print(
                     ("    Waiting for virtual cameras discovery and going live " +
-                        f"(timeout is {discovering_timeout_seconds} minutes).")
+                        f"(timeout is {discovering_timeout_seconds} sec).")
                 )
                 res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_seconds, online_duration=3)
                 if not res:
