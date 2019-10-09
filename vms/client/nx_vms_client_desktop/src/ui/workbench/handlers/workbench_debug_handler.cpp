@@ -7,10 +7,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
-#if defined(NX_ENABLE_WEBENGINE)
-    #include <QtWebEngineWidgets/QWebEnginePage>
-    #include <QtWebEngineWidgets/QWebEngineView>
-#endif
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineView>
 
 #include <QtWebKitWidgets/QWebView>
 
@@ -116,47 +114,45 @@ private:
     QLineEdit* const m_urlLineEdit;
 };
 
-#if defined(NX_ENABLE_WEBENGINE)
 
-    class WebEngineViewDialog: public QDialog
+class WebEngineViewDialog: public QDialog
+{
+    using base_type = QDialog;
+
+public:
+    WebEngineViewDialog(QWidget* parent = nullptr) :
+        base_type(parent, Qt::Window),
+        m_page(new QWebEnginePage(this)),
+        m_webView(new QWebEngineView(this)),
+        m_urlLineEdit(new QLineEdit(this))
     {
-        using base_type = QDialog;
+        m_webView->setPage(m_page);
 
-    public:
-        WebEngineViewDialog(QWidget* parent = nullptr) :
-            base_type(parent, Qt::Window),
-            m_page(new QWebEnginePage(this)),
-            m_webView(new QWebEngineView(this)),
-            m_urlLineEdit(new QLineEdit(this))
-        {
-            m_webView->setPage(m_page);
+        auto layout = new QVBoxLayout(this);
+        layout->setContentsMargins(QMargins());
+        layout->addWidget(m_urlLineEdit);
+        layout->addWidget(m_webView, 1);
+        connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
+            [this]
+            {
+                m_webView->load(m_urlLineEdit->text());
+            });
+    }
 
-            auto layout = new QVBoxLayout(this);
-            layout->setContentsMargins(QMargins());
-            layout->addWidget(m_urlLineEdit);
-            layout->addWidget(m_webView, 1);
-            connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
-                [this]
-                {
-                    m_webView->load(m_urlLineEdit->text());
-                });
-        }
+    QString url() const { return m_urlLineEdit->text(); }
 
-        QString url() const { return m_urlLineEdit->text(); }
+    void setUrl(const QString& value)
+    {
+        m_urlLineEdit->setText(value);
+        m_webView->load(QUrl::fromUserInput(value));
+    }
 
-        void setUrl(const QString& value)
-        {
-            m_urlLineEdit->setText(value);
-            m_webView->load(QUrl::fromUserInput(value));
-        }
+private:
+    QWebEnginePage* const m_page;
+    QWebEngineView* const m_webView;
+    QLineEdit* const m_urlLineEdit;
+};
 
-    private:
-        QWebEnginePage* const m_page;
-        QWebEngineView* const m_webView;
-        QLineEdit* const m_urlLineEdit;
-    };
-
-#endif
 
 //-------------------------------------------------------------------------------------------------
 // QnDebugControlDialog
@@ -216,15 +212,13 @@ public:
                 dialog->show();
             });
 
-        #if defined(NX_ENABLE_WEBENGINE)
-            addButton("Web Engine View",
-                [this]
-                {
-                    auto dialog = new WebEngineViewDialog(this);
-                    //dialog->setUrl("http://localhost:7001");
-                    dialog->show();
-                });
-        #endif
+        addButton("Web Engine View",
+            [this]
+            {
+                auto dialog = new WebEngineViewDialog(this);
+                //dialog->setUrl("http://localhost:7001");
+                dialog->show();
+            });
 
 
         addButton("Toggle default password",

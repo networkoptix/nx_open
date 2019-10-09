@@ -1,3 +1,17 @@
+find_package(Qt5
+    COMPONENTS
+        OpenGL
+        Svg
+        QuickWidgets
+        WebKit
+        WebKitWidgets
+        WebEngine
+        WebEngineWidgets)
+
+if(LINUX)
+    find_package(Qt5 COMPONENTS X11Extras)
+endif()
+
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
@@ -42,6 +56,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         Qt5::Svg
+        Qt5::WebEngine
+        Qt5::WebEngineWidgets
         nx_vms_client_core
         nx_speech_synthesizer
         nx_audio
@@ -92,19 +108,4 @@ endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
-endif()
-
-option(enableWebEngine "Enable Qt WebEngine support" OFF)
-mark_as_advanced(enableWebEngine)
-if(enableWebEngine)
-    find_package(Qt5
-        COMPONENTS
-            WebEngine
-            WebEngineWidgets)
-
-    target_compile_definitions(nx_vms_client_desktop
-        PRIVATE NX_ENABLE_WEBENGINE=1
-    )
-
-    target_link_libraries(nx_vms_client_desktop PUBLIC Qt5::WebEngine Qt5::WebEngineWidgets)
 endif()
