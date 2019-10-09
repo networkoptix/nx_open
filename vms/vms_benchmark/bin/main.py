@@ -597,7 +597,7 @@ def main(conf_file, ini_file):
                         for param_pair in [
                             param_pair_str.split('=')
                             for param_pair_str in match_res.group(2).split('&')
-                        ],
+                        ]
                     )
 
                     stream_id = rtsp_url_params['vms_benchmark_stream_id']
@@ -706,7 +706,7 @@ def main(conf_file, ini_file):
                             for param_pair in [
                                 param_pair_str.split('=')
                                 for param_pair_str in match_res.group(2).split('&')
-                            ],
+                            ]
                         )
                         pts = int(match_res.group(3))
 
