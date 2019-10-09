@@ -38,7 +38,7 @@ public:
     {
         auto newServer = std::make_unique<MediaServerLauncher>();
         EXPECT_TRUE(newServer->start());
-        newServer->connectAndWaitForSync(mainServer.get());
+        newServer->connectTo(mainServer.get());
         return newServer;
     }
 
@@ -113,6 +113,9 @@ TEST_F(MetricsApi, Api)
         EXPECT_GT(secondServerValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
 
+        while (get<SystemValues>("/ec2/metrics/values", secondServer)["servers"].size() != 2)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
+
         auto systemValues = get<SystemValues>("/ec2/metrics/values", secondServer);
         EXPECT_EQ(systemValues["systems"].size(), 1);
         EXPECT_EQ(systemValues["systems"][systemId]["info"]["servers"], 2);
@@ -133,6 +136,9 @@ TEST_F(MetricsApi, Api)
         EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+
+        while (get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
 
         auto systemValues = get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);

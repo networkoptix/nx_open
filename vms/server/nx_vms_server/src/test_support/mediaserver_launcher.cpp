@@ -10,11 +10,6 @@
 #include <transaction/message_bus_adapter.h>
 #include <core/resource_management/resource_pool.h>
 
-namespace {
-
-
-} // namespace
-
 MediaServerLauncher::MediaServerLauncher(
     const QString& tmpDir,
     int port,
@@ -93,17 +88,6 @@ void MediaServerLauncher::connectTo(MediaServerLauncher* target, bool isSecure)
 
     serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
         peerId, nx::vms::api::PeerType::server, url);
-}
-
-void MediaServerLauncher::connectAndWaitForSync(MediaServerLauncher* target, bool isSecure)
-{
-    connectTo(target, isSecure);
-
-    const auto targetId = target->commonModule()->moduleGUID();
-    commonModule()->globalSettings()->setPrimaryTimeServer(targetId);
-    commonModule()->globalSettings()->synchronizeNow();
-    while (target->commonModule()->globalSettings()->primaryTimeServer() != targetId)
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void MediaServerLauncher::addSetting(const std::string& name, const QVariant& value)
