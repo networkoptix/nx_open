@@ -57,6 +57,8 @@
 #include <system_log/system_event_log_reader.h>
 #include <nx/vms/utils/metrics/system_controller.h>
 
+#include <nx/utils/timer_manager.h>
+
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
@@ -276,7 +278,7 @@ private:
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
-    std::unique_ptr<nx::utils::StandaloneTimerManager> m_createDbBackupTimer;
+    std::unique_ptr<nx::utils::TimerManager> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
     QString m_oldAnalyticsStoragePath;

@@ -1,5 +1,7 @@
 #include "chunks_deque.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::server {
 
 ChunksDeque::ProxyChunk::ProxyChunk(const ChunksDeque* deque, const Chunk* originalChunkPtr) :

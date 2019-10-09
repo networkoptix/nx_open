@@ -298,7 +298,7 @@ TEST_F(MetricsCameraApi, analyticsGroup)
     auto systemValues = get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
     auto analyticsData = cameraData["analytics"];
-    ASSERT_EQ(1000000, analyticsData["recordingBitrateBps"].toInt());
+    ASSERT_EQ(1000000, analyticsData["recordingBitrateBps"].toDouble());
     ASSERT_EQ(24 * 3600 * 2, analyticsData["archiveLengthS"].toInt());
     ASSERT_EQ(24 * 3600 * kMinDays, analyticsData["minArchiveLengthS"].toInt());
 

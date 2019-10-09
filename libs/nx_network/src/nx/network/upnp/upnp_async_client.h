@@ -70,13 +70,13 @@ public:
         std::function<void(const Message&)> callback);
 
     //! ID string of this client
-    static inline const QString kClientId{"NX UpnpAsyncClient"};
+    static constexpr auto kClientId = "NX UpnpAsyncClient";
 
     //! UPnP Device for @var kWanIp
-    static inline const QString kInternalGateway{"InternetGatewayDevice"};
+    static constexpr auto kInternalGateway = "InternetGatewayDevice";
 
     //! UPnP Service for @fn externalIp, @fn addMapping
-    static inline const QString kWanIp{"WANIPConnection"};
+    static constexpr auto kWanIp = "WANIPConnection";
 
     //! Finds out external IP address
     virtual void externalIp(const nx::utils::Url& url,

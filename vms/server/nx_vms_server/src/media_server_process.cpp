@@ -4376,7 +4376,7 @@ void MediaServerProcess::startObjects()
         }
     }
 
-    m_createDbBackupTimer = std::make_unique<nx::utils::StandaloneTimerManager>();
+    m_createDbBackupTimer = std::make_unique<nx::utils::TimerManager>();
     m_createDbBackupTimer->addTimer(
         [this](auto /*timerId*/) { onBackupDbTimer(); },
         std::chrono::milliseconds(initialBackupDbPeriodMs));

@@ -1,24 +1,8 @@
 #pragma once
 
-#if defined(_WIN32)
-#include <filesystem>
-#endif
-
 #include <string>
 
 namespace nx::utils::filesystem {
-
-#if defined(_WIN32)
-
-#if (_MSC_VER < 1923)
-    using namespace std::experimental::filesystem;
-#else
-    using namespace std::filesystem;
-#endif
-
-#else
-
-#define NX_STD_FILESYSTEM_IMPLEMENTATION
 
 class NX_UTILS_API path
 {
@@ -54,7 +38,5 @@ inline bool operator!=(const path& one, const path& two)
 {
     return one.native() != two.native();
 }
-
-#endif
 
 } // namespace nx::utils::filesystem

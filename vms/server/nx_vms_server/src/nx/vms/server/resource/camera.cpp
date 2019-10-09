@@ -876,7 +876,7 @@ std::chrono::milliseconds Camera::calendarDuration() const
         serverModule()->backupStorageManager()->calendarDuration(ptr).count()));
 }
 
-double Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const
+qint64 Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();
     auto result = serverModule()->normalStorageManager()->recordingBitrateBps(ptr, bitratePeriod) +
