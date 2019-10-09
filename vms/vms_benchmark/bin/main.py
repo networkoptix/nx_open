@@ -253,6 +253,14 @@ def get_writable_storages(api, ini):
     return result
 
 
+def get_cumulative_swap_bytes(box):
+    output = box.eval('cat /proc/vmstat')
+    raw = [line.split() for line in output.splitlines()]
+    data = {k: int(v) for k, v in raw}
+    kilobytes_swapped = data['pgpgin']  # pswpin is the number of pages.
+    return kilobytes_swapped * 1024
+
+
 @click.command()
 @click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
 @click.option('-C', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
@@ -400,6 +408,8 @@ def main(conf_file, ini_file):
         box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
 
     print('Camera archives cleaned.')
+
+    swapped_before = get_cumulative_swap_bytes(box)
 
     vms.start(exc=True)
 
@@ -812,6 +822,12 @@ def main(conf_file, ini_file):
 
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
+
+    swapped_after = get_cumulative_swap_bytes(box)
+    swapping_threshold_mb = 100
+    swapped_during_test = swapped_after - swapped_before
+    if swapped_during_test > swapping_threshold_mb * 1024 * 1024:
+        raise exceptions.BoxStateError(f"More than {swapping_threshold_mb}M was swapped during the tests")
 
     print('\nSUCCESS: All tests finished.')
     return 0
