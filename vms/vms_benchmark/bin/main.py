@@ -362,8 +362,40 @@ def main(conf_file, ini_file):
     ):
         print("Unable to override VMS internal configs.")
 
-    print('Restarting Server...')
-    vms.restart(exc=True)
+    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
+
+    for i in 1, 2, 3:
+        cameras = api.get_test_cameras_all()
+        if cameras is not None:
+            break
+        print(f"Attempt #{i}to get camera list")
+        time.sleep(i)
+
+    if cameras is None:
+        raise exceptions.ServerApiError(message="Unable to get camera list.")
+
+    module_information = api.get_module_information()
+
+    if module_information is None:
+        raise exceptions.ServerApiError(message="Unable to get module information.")
+
+    vms_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
+    vms_id = vms_id_raw[1:-1] if vms_id_raw[0] == '{' and vms_id_raw[-1] == '}' else vms_id_raw
+
+    vms.stop(exc=True)
+
+    print('Server stopped.')
+
+    for camera in cameras:
+        box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
+        box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
+        box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
+
+    print('Camera archives cleaned.')
+
+    vms.start(exc=True)
+
+    print('Server starting...')
 
     def wait_for_server_up(timeout=30):
         started_at = time.time()
@@ -390,7 +422,7 @@ def main(conf_file, ini_file):
 
     vms = vmses[0]
 
-    print('Server restarted successfully.')
+    print('Server started successfully.')
 
     ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
@@ -679,30 +711,35 @@ def main(conf_file, ini_file):
                         elif streams[pts_stream_id]['type'] == 'live':
                             lags[pts_stream_id] = max(
                                 lags.get(pts_stream_id, 0),
-                                time.time() - (first_tses[pts_stream_id] + frames.get(pts_stream_id, 0) * (1.0/float(ini['testFileFps'])))
+                                time.time() - (
+                                    first_tses[pts_stream_id] +
+                                        frames.get(pts_stream_id, 0) * (1.0/float(ini['testFileFps']))
+                                )
                             )
 
                         ts = time.time()
 
-                        if streams[pts_stream_id]['type'] == 'live':
-                            pts_diff_deviation_factor_max = 0.01
-                            pts_diff_expected = 1000000./float(ini['testFileFps'])
-                            pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
-                            pts_diff_max = (1000000./float(ini['testFileFps']))*1.05
+                        pts_diff_deviation_factor_max = 0.03
+                        pts_diff_expected = 1000000./float(ini['testFileFps'])
+                        pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
+                        pts_diff_max = (1000000./float(ini['testFileFps']))*(1.0 + pts_diff_deviation_factor_max)
 
-                            # The value is negative because the first PTS of new loop is less than last PTS of the previous
-                            # loop.
-                            pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
+                        # The value is negative because the first PTS of new loop is less than last PTS of the previous
+                        # loop.
+                        pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
 
-                            if pts_diff is not None:
-                                pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
+                        if pts_diff is not None:
+                            pts_diff_deviation_factor = lambda diff_expected: abs(
+                                (diff_expected - pts_diff) / diff_expected
+                            )
 
-                                if (
-                                        pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
-                                        pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
-                                ):
-                                    frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
-                                    print(f'Detected framedrop from camera {pts_stream_id}: {pts - last_ptses.get(pts_stream_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
+                            if (
+                                pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
+                                pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
+                            ):
+                                frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
+                                print(f'Detected framedrop from camera {streams[pts_stream_id]["camera_id"]}: ', end='')
+                                print(f'{pts_diff} (max={pts_diff_max}) {pts} {time.time()}')
 
                         if time.time() - streaming_started_at > streaming_duration_mins*60:
                             streaming_ended_expected = True

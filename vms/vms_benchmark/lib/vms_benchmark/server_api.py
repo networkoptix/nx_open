@@ -60,6 +60,30 @@ class ServerApi:
 
         return result
 
+    def get_module_information(self):
+        try:
+            request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+            credentials = f"{self.user}:{self.password}"
+            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+            response = self.get_request(request)
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                raise exceptions.ServerApiError(
+                    "API of Server is not working: "
+                    "authentication was not successful, "
+                    "check vmsUser and vmsPassword in vms_benchmark.conf.")
+            raise
+
+        result = self.Response(response.code)
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.body)
+
+            if result.payload.get('error', 1) != '0' or 'reply' not in result.payload:
+                return None
+
+            return result.payload['reply']
+
     def check_authentication(self):
         try:
             request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
