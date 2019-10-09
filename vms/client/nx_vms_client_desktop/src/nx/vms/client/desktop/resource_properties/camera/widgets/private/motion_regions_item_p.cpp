@@ -288,28 +288,22 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geomet
 
 void MotionRegionsItem::Private::invalidateRegionsTexture()
 {
-    m_currentState.texture.reset();
+    m_updateRegionsTexture = true;
 }
 
 void MotionRegionsItem::Private::ensureRegionsTexture()
 {
-    if (m_currentState.texture)
+    if (!m_updateRegionsTexture)
         return;
 
+    m_updateRegionsTexture = false;
     const auto window = q->window();
     if (!window)
         return;
 
     updateRegionsImage();
 
-    const auto textureDeleter =
-        [](QSGTexture* texture)
-        {
-            if (texture)
-                texture->deleteLater();
-        };
-
-    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage), textureDeleter);
+    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage));
     m_currentState.texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setFiltering(QSGTexture::Nearest);
