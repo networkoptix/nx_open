@@ -146,7 +146,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
         }
 
         stream = m_formatContext->streams[packet.stream_index];
-        auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>(&m_allocator);
+        auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>();
         mediaPacket->setCodecType(stream->codecpar->codec_id);
         mediaPacket->setTimestamp(packetTimestamp(packet));
         mediaPacket->setChannelNumber(0);

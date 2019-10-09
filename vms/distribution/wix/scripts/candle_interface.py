@@ -56,7 +56,7 @@ def candle_command(
     for extension in extensions:
         command += ['-ext', '{0}.dll'.format(extension)]
 
-    for key, value in variables.iteritems():
+    for key, value in variables.items():
         command += ['-d{0}={1}'.format(key, value)]
 
     for component in components:

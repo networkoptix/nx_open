@@ -1,7 +1,5 @@
 #include "filesystem.h"
 
-#if defined(NX_STD_FILESYSTEM_IMPLEMENTATION)
-
 namespace nx::utils::filesystem {
 
 path::path(const std::string& str):
@@ -63,6 +61,3 @@ const path::string_type& path::native() const
 }
 
 } // namespace nx::utils::filesystem
-
-#endif
-

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import fnmatch
 import subprocess
 import shutil
@@ -6,7 +7,7 @@ import zipfile
 
 
 def print_command(command):
-    print '>> {0}'.format(subprocess.list2cmdline(command))
+    print('>> {0}'.format(subprocess.list2cmdline(command)))
 
 
 def execute_command(command, verbose=False, working_directory=None):
@@ -22,7 +23,7 @@ def execute_command(command, verbose=False, working_directory=None):
     except Exception as e:
         if not verbose:
             print_command(command)
-        print "Error: {0}".format(e.output)
+        print("Error: {0}".format(e.output))
         raise
 
 
@@ -107,4 +108,3 @@ def zip_files_to(zip, files, rel_path, target_path='.'):
 def zip_rdep_package_to(zip, package_directory):
     bin_directory = os.path.join(package_directory, 'bin')
     zip_files_to(zip, find_all_files(bin_directory), bin_directory)
-
