@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import platform
 import signal
 import sys
@@ -327,6 +328,13 @@ def main(conf_file, ini_file):
         for (point, storage) in
         box_platform.storages_list.items()
     ]
+
+    box_time_output = box.eval('date +%s.%N')
+    box_time = float(box_time_output.strip())
+    host_time = time.time()
+    time_diff_threshold = 3 * 60
+    if abs(box_time - host_time) > time_diff_threshold:
+        raise exceptions.BoxStateError(f"Box time differs from host time by more than {time_diff_threshold} sec")
 
     vmses = VmsScanner.scan(box, linux_distribution)
 
