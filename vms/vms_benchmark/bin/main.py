@@ -98,22 +98,23 @@ def load_configs(conf_file, ini_file):
             "default": "admin",
         },
         "virtualCamerasCount": {
-            "optional": True,
+            "optional": False,
             "type": "integers",
         },
         "streamsPerTestCamera": {
             "optional": True,
             "type": 'integer',
+            "default": 1,
         },
         "streamingTestDurationMinutes": {
             "optional": True,
             "type": 'integer',
-            "default": 1 if os.path.exists('.not_installed') else 4 * 60
+            "default": 1 if os.path.exists('.not_installed') else 4 * 60,
         },
-        "cameraDiscoveryTimeoutMinutes": {
+        "cameraDiscoveryTimeoutSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 3
+            "default": 180,
         },
     }
 
@@ -355,7 +356,7 @@ def main(conf_file, ini_file):
         {
             'nx_streaming': {
                 'enableTimeCorrection': 0,
-                'unloopCameraPtsWithModulus': ini['testFileHighDurationMs']*1000 + 33333,
+                'unloopCameraPtsWithModulus': ini['testFileHighDurationMs']*1000 + 1000000//ini['testStreamFpsHigh'],
             },
         }
     ):
@@ -454,7 +455,7 @@ def main(conf_file, ini_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in conf.get('virtualCamerasCount', [1]):
+    for test_cameras_count in conf['virtualCamerasCount']:
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
@@ -498,13 +499,13 @@ def main(conf_file, ini_file):
                 return False, None
 
             try:
-                discovering_timeout_mins = conf['cameraDiscoveryTimeoutMinutes']
+                discovering_timeout_seconds = conf['cameraDiscoveryTimeoutSeconds']
 
                 print(
                     ("    Waiting for virtual cameras discovery and going live " +
-                        f"(timeout is {discovering_timeout_mins} minutes).")
+                        f"(timeout is {discovering_timeout_seconds} minutes).")
                 )
-                res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_mins*60, online_duration=3)
+                res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_seconds, online_duration=3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
@@ -524,7 +525,7 @@ def main(conf_file, ini_file):
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=(camera.id for camera in cameras),
-                streams_per_camera=conf.get('streamsPerTestCamera', len(cameras)),
+                streams_per_camera=conf['streamsPerTestCamera'],
                 archive_streams_count=1,
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
@@ -538,26 +539,35 @@ def main(conf_file, ini_file):
                 started = False
                 stream_opening_started_at = time.time()
 
-                cameras_started_flags = dict((camera.id, False) for camera in cameras)
+                streams_started_flags = dict((stream_id, False) for stream_id, _ in streams.items())
 
                 while time.time() - stream_opening_started_at < 25:
                     if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
                     line = stream_reader_process.stdout.readline().decode('UTF-8')
+
                     import re
-                    match = re.match(r'.*\/([a-z0-9-]+)\?.* timestamp (\d+) us$', line.strip())
-                    if not match:
+                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
+                    if not match_res:
                         continue
 
-                    camera_id = match.group(1)
+                    rtsp_url_params = dict(
+                        [param_pair[0], param_pair[1] if len(param_pair) > 1 else None]
+                        for param_pair in [
+                            param_pair_str.split('=')
+                            for param_pair_str in match_res.group(2).split('&')
+                        ],
+                    )
 
-                    if camera_id not in cameras_started_flags:
-                        raise exceptions.RtspPerfError(f'Cannot open video streams: unexpected camera id.')
+                    stream_id = rtsp_url_params['vms_benchmark_stream_id']
 
-                    cameras_started_flags[camera_id] = True
+                    if stream_id not in streams_started_flags:
+                        raise exceptions.RtspPerfError(f'Cannot open video streams: unexpected stream id.')
 
-                    if len(list(filter(lambda e: e[1] is False, cameras_started_flags.items()))) == 0:
+                    streams_started_flags[stream_id] = True
+
+                    if len(list(filter(lambda e: e[1] is False, streams_started_flags.items()))) == 0:
                         started = True
                         break
 
@@ -656,49 +666,50 @@ def main(conf_file, ini_file):
                             for param_pair in [
                                 param_pair_str.split('=')
                                 for param_pair_str in match_res.group(2).split('&')
-                            ]
+                            ],
                         )
                         pts = int(match_res.group(3))
 
-                        pts_camera_id = match_res.group(1)
+                        pts_stream_id = rtsp_url_params['vms_benchmark_stream_id']
 
-                        frames[pts_camera_id] = frames.get(pts_camera_id, 0) + 1
+                        frames[pts_stream_id] = frames.get(pts_stream_id, 0) + 1
 
-                        if pts_camera_id not in first_tses:
-                            first_tses[pts_camera_id] = time.time()
-                        else:
-                            lags[pts_camera_id] = max(
-                                lags.get(pts_camera_id, 0),
-                                time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(ini['testFileFps'])))
+                        if pts_stream_id not in first_tses:
+                            first_tses[pts_stream_id] = time.time()
+                        elif streams[pts_stream_id]['type'] == 'live':
+                            lags[pts_stream_id] = max(
+                                lags.get(pts_stream_id, 0),
+                                time.time() - (first_tses[pts_stream_id] + frames.get(pts_stream_id, 0) * (1.0/float(ini['testFileFps'])))
                             )
 
                         ts = time.time()
 
-                        pts_diff_deviation_factor_max = 0.01
-                        pts_diff_expected = 1000000./float(ini['testFileFps'])
-                        pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
-                        pts_diff_max = (1000000./float(ini['testFileFps']))*1.05
+                        if streams[pts_stream_id]['type'] == 'live':
+                            pts_diff_deviation_factor_max = 0.01
+                            pts_diff_expected = 1000000./float(ini['testFileFps'])
+                            pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
+                            pts_diff_max = (1000000./float(ini['testFileFps']))*1.05
 
-                        # The value is negative because the first PTS of new loop is less than last PTS of the previous
-                        # loop.
-                        pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
+                            # The value is negative because the first PTS of new loop is less than last PTS of the previous
+                            # loop.
+                            pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
 
-                        if pts_diff is not None:
-                            pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
+                            if pts_diff is not None:
+                                pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
 
-                            if (
-                                    pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
-                                    pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
-                            ):
-                                frame_drops[pts_camera_id] = frame_drops.get(pts_camera_id, 0) + 1
-                                print(f'Detected framedrop from camera {pts_camera_id}: {pts - last_ptses.get(pts_camera_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
+                                if (
+                                        pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
+                                        pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
+                                ):
+                                    frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
+                                    print(f'Detected framedrop from camera {pts_stream_id}: {pts - last_ptses.get(pts_stream_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
 
                         if time.time() - streaming_started_at > streaming_duration_mins*60:
                             streaming_ended_expected = True
                             print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
                             break
 
-                        last_ptses[pts_camera_id] = pts
+                        last_ptses[pts_stream_id] = pts
                 finally:
                     box_poller_thread_stop_event.set()
 
