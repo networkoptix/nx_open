@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <api/global_settings.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/metrics.h>
 #include <server_for_tests.h>
-#include <core/resource/media_server_resource.h>
 
 namespace nx::vms::server::test {
 
@@ -53,7 +54,8 @@ TEST_F(MetricsServersApi, values)
     // EXPECT_NE(startValues["activity"]["plugins"].toString(), "");
 
     auto startAlarms = get<Alarms>("/ec2/metrics/alarms");
-    EXPECT_TRUE(startAlarms.empty()) << QJson::serialized(startAlarms).data();
+    nx::utils::remove_if(startAlarms, [](const auto& i) { return i.parameter == "load.logLevel"; });
+    ASSERT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
     // TODO: Cause values modification and check for response changes.
 }
