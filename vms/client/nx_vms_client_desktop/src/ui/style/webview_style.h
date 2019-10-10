@@ -3,8 +3,8 @@
 #include <QtCore/QString>
 #include <QtGui/QPalette>
 
-class QWebView;
-class QGraphicsWebView;
+class QGraphicsWidget;
+class QWidget;
 
 namespace NxUi {
 
@@ -16,8 +16,8 @@ enum class WebViewStyle
 };
 
 QPalette createWebViewPalette(WebViewStyle style = WebViewStyle::common);
-void setupWebViewStyle(QWebView* webView, WebViewStyle style = WebViewStyle::common);
-void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style = WebViewStyle::common);
+void setupWebViewStyle(QWidget* webView, WebViewStyle style = WebViewStyle::common);
+void setupWebViewStyle(QGraphicsWidget* webView, WebViewStyle style = WebViewStyle::common);
 
 /** Generates a CSS according to our customization style. */
 QString generateCssStyle();

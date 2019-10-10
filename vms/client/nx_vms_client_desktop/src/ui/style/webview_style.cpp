@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWebKitWidgets/QGraphicsWebView>
+#include <QWidget>
+#include <QGraphicsWidget>
 
 #include <ui/style/nx_style.h>
 
@@ -41,13 +41,13 @@ QPalette createWebViewPalette(WebViewStyle style)
     return result;
 }
 
-void setupWebViewStyle(QWebView* webView, WebViewStyle style)
+void setupWebViewStyle(QWidget* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
 }
 
-void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
+void setupWebViewStyle(QGraphicsWidget* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
@@ -67,23 +67,25 @@ QString generateCssStyle()
     body {
         padding-left: 0px;
         margin: 0px;
+        background-color: %2;
     }
     p {
         padding-left: 0px;
     }
     a {
-        color: %2;
+        color: %3;
         font-size: 13px;
     }
     a:hover {
-        color: %3;
+        color: %4;
     })css");
 
     const auto palette = qApp->palette();
     const auto windowText = palette.color(QPalette::WindowText).name();
+    const auto window = palette.color(QPalette::Window).name();
     const auto highlight = palette.color(QPalette::Highlight).name();
     const auto link = palette.color(QPalette::Link).name();
-    return styleBase.arg(windowText, link, highlight);
+    return styleBase.arg(windowText, window, link, highlight);
 }
 
 } // namespace NxUi
