@@ -16,8 +16,6 @@
 
 #include <iostream>
 
-#include <utils/common/warnings.h>
-
 #include "noptix_style.h"
 #include "noptix_icon_loader.h"
 #include "nx_style.h"

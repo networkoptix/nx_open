@@ -42,6 +42,8 @@ public:
     Q_INVOKABLE static bool isDark(const QColor& color);
     Q_INVOKABLE static bool isLight(const QColor& color);
 
+    static void registerQmlType();
+
 private:
     struct Private;
     QScopedPointer<Private> const d;

@@ -6,8 +6,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QRegularExpression>
 #include <QtGui/QColor>
-
-#include <ui/style/skin.h>
+#include <QtQml/QtQml>
 
 #include <nx/utils/log/log.h>
 
@@ -18,8 +17,8 @@ static uint qHash(const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-static const auto kBaseSkinFileName = "customization_common.json";
-static const auto kCustomSkinFileName = "skin.json";
+static const auto kBaseSkinFileName = ":/skin/customization_common.json";
+static const auto kCustomSkinFileName = ":/skin/skin.json";
 
 struct ColorTheme::Private
 {
@@ -43,7 +42,7 @@ struct ColorTheme::Private
     void loadColors(); //< Initialize color values, color groups and color substitutions.
 
 private:
-    QJsonObject readColorDataFromFile(const QString& filename) const;
+    QJsonObject readColorDataFromFile(const QString& fileName) const;
     QSet<QString> updateColors(const QJsonObject& newColors);
 };
 
@@ -71,11 +70,11 @@ void ColorTheme::Private::loadColors()
     }
 }
 
-QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& filename) const
+QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) const
 {
-    QFile file(qnSkin->path(filename));
+    QFile file(fileName);
     const bool opened = file.open(QFile::ReadOnly);
-    if (NX_ASSERT(opened, "Cannot read skin file %1", filename))
+    if (NX_ASSERT(opened, "Cannot read skin file %1", fileName))
     {
         const auto& jsonData = file.readAll();
 
@@ -235,6 +234,11 @@ Q_INVOKABLE bool ColorTheme::isDark(const QColor& color)
 Q_INVOKABLE bool ColorTheme::isLight(const QColor& color)
 {
     return !isDark(color);
+}
+
+void ColorTheme::registerQmlType()
+{
+    qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
 }
 
 } // namespace nx::vms::client::desktop
