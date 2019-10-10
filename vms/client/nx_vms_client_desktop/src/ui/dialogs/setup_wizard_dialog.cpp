@@ -49,10 +49,10 @@ QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
         [this, urlLineEdit]()
         {
             Q_D(QnSetupWizardDialog);
-            d->webView->load(urlLineEdit->text());
+            d->load(urlLineEdit->text());
         });
 #endif
-    layout->addWidget(d->webView);
+    layout->addWidget(d->webWidget());
     setFixedSize(kSetupWizardSize);
 
     setHelpTopic(this, Qn::Setup_Wizard_Help);
@@ -93,7 +93,7 @@ void QnSetupWizardDialog::loadPage()
 
     NX_DEBUG(this, lm("Opening setup URL: %1").arg(url.toString(QUrl::RemovePassword)));
 
-    d->webView->load(url);
+    d->load(url);
 }
 
 nx::vms::common::Credentials QnSetupWizardDialog::localCredentials() const

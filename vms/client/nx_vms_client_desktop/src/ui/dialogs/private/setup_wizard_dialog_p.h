@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWebKitWidgets/QWebView>
+#include <QQuickWidget>
 
 class QnSetupWizardDialog;
 
@@ -13,6 +14,8 @@ class QnSetupWizardDialogPrivate : public QObject
 public:
     QnSetupWizardDialogPrivate(QnSetupWizardDialog *parent);
 
+    QWidget* webWidget();
+
 public slots:
     void openUrlInBrowser(const QString &urlString);
 
@@ -24,6 +27,9 @@ public slots:
         bool savePassword);
 
     void cancel();
+
+    void load(const QUrl& url);
+
 public:
     struct LoginInfo
     {
@@ -36,7 +42,8 @@ public:
 
 #define LoginInfo_Fields (cloudEmail)(cloudPassword)(localLogin)(localPassword)(savePassword)
 
-    QWebView *webView;
+    QWebView* m_webView;
+    QQuickWidget* m_quickWidget;
     QUrl url;
     LoginInfo loginInfo;
 };

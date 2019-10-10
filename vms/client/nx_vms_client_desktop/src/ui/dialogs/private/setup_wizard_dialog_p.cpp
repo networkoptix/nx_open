@@ -4,12 +4,16 @@
 
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebFrame>
+#include <QQuickItem>
 
+#include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/common/web_page.h>
 
 #include <nx/utils/log/log.h>
 
 #include <nx/fusion/model_functions.h>
+
+#include <nx/vms/client/desktop/ini.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSetupWizardDialogPrivate::LoginInfo, (json), LoginInfo_Fields);
 
@@ -18,23 +22,81 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
     QnSetupWizardDialog *parent)
     : QObject(parent)
     , q_ptr(parent)
-    , webView(new QWebView(parent))
+    , m_webView(nullptr)
+    , m_quickWidget(nullptr)
 {
     Q_Q(QnSetupWizardDialog);
 
-    QnWebPage* page = new QnWebPage(webView);
-    webView->setPage(page);
+    static const QString exportedName("setupDialog");
 
-    QWebFrame *frame = page->mainFrame();
-
-    connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
-        this, [this, frame]()
+    if (nx::vms::client::desktop::ini().useWebEngine)
     {
-        frame->addToJavaScriptWindowObject(lit("setupDialog"), this);
-    }
-    );
+        m_webView = new QWebView(parent);
+        QnWebPage* page = new QnWebPage(m_webView);
+        m_webView->setPage(page);
 
-    connect(page, &QWebPage::windowCloseRequested, q, &QnSetupWizardDialog::accept);
+        QWebFrame *frame = page->mainFrame();
+
+        connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
+            this, [this, frame]()
+            {
+                frame->addToJavaScriptWindowObject(exportedName, this);
+            });
+
+        connect(page, &QWebPage::windowCloseRequested, q, &QnSetupWizardDialog::accept);
+    }
+    else
+    {
+        m_quickWidget = new QQuickWidget(QUrl(), parent);
+        connect(m_quickWidget, &QQuickWidget::statusChanged,
+            this, [this, q](QQuickWidget::Status status){
+                if (status != QQuickWidget::Ready)
+                    return;
+
+                QQuickItem* webView = m_quickWidget->rootObject();
+                if (!webView)
+                    return;
+
+                connect(webView, SIGNAL(windowCloseRequested()), q, SLOT(accept()));
+
+                nx::vms::client::desktop::GraphicsWebEngineView::registerObject(webView, exportedName, this);
+            });
+        m_quickWidget->setSource(nx::vms::client::desktop::GraphicsWebEngineView::kQmlSourceUrl);
+    }
+}
+
+QWidget* QnSetupWizardDialogPrivate::webWidget()
+{
+    if (m_webView)
+        return m_webView;
+
+    return m_quickWidget;
+}
+
+void QnSetupWizardDialogPrivate::load(const QUrl& url)
+{
+    if (m_webView)
+    {
+        m_webView->load(url);
+        return;
+    }
+
+    auto setUrlFunc = [this, url](QQuickWidget::Status status){
+        if (status != QQuickWidget::Ready)
+            return;
+        QQuickItem* webView = m_quickWidget->rootObject();
+        if (!webView)
+            return;
+        webView->setProperty("url", url);
+    };
+
+    if (m_quickWidget->status() != QQuickWidget::Ready)
+    {
+        connect(m_quickWidget, &QQuickWidget::statusChanged, this, setUrlFunc);
+        return;
+    }
+
+    setUrlFunc(m_quickWidget->status());
 }
 
 QString QnSetupWizardDialogPrivate::getCredentials() const
@@ -60,7 +122,10 @@ void QnSetupWizardDialogPrivate::cancel()
     Q_Q(QnSetupWizardDialog);
 
     /* Remove 'accept' connection. */
-    disconnect(webView->page(), nullptr, q, nullptr);
+    if (m_webView)
+        disconnect(m_webView->page(), nullptr, q, nullptr);
+    else if (QQuickItem* webView = m_quickWidget->rootObject())
+        disconnect(webView, nullptr, q, nullptr);
 
     /* Security fix to make sure we will never try to login further. */
     loginInfo = LoginInfo();
