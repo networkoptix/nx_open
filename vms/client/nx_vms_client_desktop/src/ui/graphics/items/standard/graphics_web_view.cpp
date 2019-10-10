@@ -3,7 +3,9 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWebKit/QWebHistory>
+#include <QQuickItem>
 
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 
@@ -31,6 +33,169 @@ namespace
         }
     }
 }
+
+namespace nx::vms::client::desktop {
+
+const QUrl GraphicsWebEngineView::kQmlSourceUrl("qrc:/qml/Nx/Controls/NxWebEngineView.qml");
+
+GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *parent)
+    : GraphicsQmlView(parent)
+    , m_status(kPageLoadFailed)
+    , m_canGoBack(false)
+{
+    setProperty(Qn::NoHandScrollOver, true);
+
+    // TODO: Fix WebEngine styles
+    //NxUi::setupWebViewStyle(this);
+
+    connect(this, &GraphicsQmlView::statusChanged, this, [this, url](QQmlComponent::Status status){
+        if (status != QQmlComponent::Ready)
+            return;
+
+        QQuickItem* webView = rootObject();
+        if (!webView)
+            return;
+
+        if (m_rootReadyCallback)
+        {
+            m_rootReadyCallback();
+            m_rootReadyCallback = nullptr;
+        }
+
+        connect(webView, SIGNAL(urlChanged()), this, SLOT(viewUrlChanged()));
+        connect(webView, SIGNAL(loadingStatusChanged(int)), this, SLOT(setViewStatus(int)));
+
+        webView->setProperty("url", url);
+    });
+
+    setSource(kQmlSourceUrl);
+}
+
+void GraphicsWebEngineView::whenRootReady(RootReadyCallback callback)
+{
+    if (rootObject())
+    {
+        m_rootReadyCallback = nullptr;
+        callback();
+        return;
+    }
+    m_rootReadyCallback = callback;
+}
+
+GraphicsWebEngineView::~GraphicsWebEngineView()
+{
+}
+
+void GraphicsWebEngineView::registerObject(QQuickItem* webView, const QString& name, QObject* object)
+{
+    if (!webView)
+        return;
+    QObject* webChannel = webView->findChild<QObject*>("nxWebChannel");
+    if (!webChannel)
+        return;
+    QVariantMap objects;
+    objects.insert(name,  QVariant::fromValue<QObject*>(object));
+    QMetaObject::invokeMethod(webChannel, "registerObjects", Q_ARG(QVariantMap, objects));
+    webView->setProperty("enableInjections", true);
+}
+
+void GraphicsWebEngineView::addToJavaScriptWindowObject(const QString& name, QObject* object)
+{
+    registerObject(rootObject(), name, object);
+}
+
+void GraphicsWebEngineView::setViewStatus(int status)
+{
+    switch(status)
+    {
+        case 0: // WebEngineView.LoadStartedStatus
+            setStatus(kPageLoading);
+            emit loadStarted();
+            break;
+        case 1: // WebEngineView.LoadStoppedStatus
+            setStatus(kPageLoaded);
+            break;
+        case 2: // WebEngineView.LoadSucceededStatus
+            setStatus(kPageLoaded);
+            break;
+        case 3: // WebEngineView.LoadFailedStatus
+        default:
+            setStatus(kPageLoadFailed);
+    }
+}
+
+void GraphicsWebEngineView::viewUrlChanged()
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return;
+    setCanGoBack(webView->property("canGoBack").toBool());
+}
+
+WebViewPageStatus GraphicsWebEngineView::status() const
+{
+    return m_status;
+}
+
+bool GraphicsWebEngineView::canGoBack() const
+{
+    return m_canGoBack;
+}
+
+void GraphicsWebEngineView::setCanGoBack(bool value)
+{
+    if (m_canGoBack == value)
+        return;
+
+    m_canGoBack = value;
+    emit canGoBackChanged();
+}
+
+void GraphicsWebEngineView::setPageUrl(const QUrl &newUrl)
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return;
+    QMetaObject::invokeMethod(webView, "stop");
+
+    // FIXME: There is no QWebSettings::clearMemoryCaches() for QWebEngine
+    setUrl(newUrl);
+}
+
+void GraphicsWebEngineView::setUrl(const QUrl &url)
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return;
+    webView->setProperty("url", url);
+}
+
+QUrl GraphicsWebEngineView::url() const
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return QUrl();
+    return webView->property("url").toUrl();
+}
+
+void GraphicsWebEngineView::back()
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return;
+    QMetaObject::invokeMethod(webView, "goBack");
+}
+
+void GraphicsWebEngineView::setStatus(WebViewPageStatus value)
+{
+    if (m_status == value)
+        return;
+
+    m_status = value;
+    emit statusChanged();
+}
+
+} // namespace nx::vms::client::desktop
 
 QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
     , QGraphicsItem *item)
