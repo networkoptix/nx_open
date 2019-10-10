@@ -7,6 +7,8 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
+#include <QtWebEngine>
+#include <QWebEngineSettings>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QSurfaceFormat>
 
@@ -252,6 +254,13 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
         isWebKitInitialized = true;
     }
+
+    QtWebEngine::initialize();
+    const auto settings = QWebEngineSettings::defaultSettings();
+    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+    // TODO: Add ini parameters for WebEngine attributes
+    //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
+    //settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
 }
 
 QnClientModule::~QnClientModule()
@@ -352,6 +361,8 @@ void QnClientModule::initSurfaceFormat()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
     format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
+    format.setDepthBufferSize(16);
+    format.setStencilBufferSize(8);
 
     QSurfaceFormat::setDefaultFormat(format);
 }
