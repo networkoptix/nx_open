@@ -83,8 +83,8 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
 
     for (const auto& chunk: m_chunks)
     {
-        if (chunk.chunk().storageIndex == storageIndex)
-            result += chunk.chunk().getFileSize();
+        if (chunk.storageIndex == storageIndex)
+            result += chunk.getFileSize();
     }
 
     return result;
@@ -191,14 +191,10 @@ void DeviceFileCatalog::replaceChunks(
 
     QnMutexLocker lock( &m_mutex );
 
-    nx::vms::server::ChunksDeque filteredData;
-    filteredData.swap( m_chunks );
-    const auto filteredDataEndIter = std::remove_if(
-        filteredData.begin(), filteredData.end(),
-        [storageIndex](const auto& chunk){ return chunk.chunk().storageIndex == storageIndex; } );
+    m_chunks.remove_if(
+        [storageIndex](const auto& chunk){ return chunk.storageIndex == storageIndex; } );
 
-    m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
-    std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
+    m_chunks.set_union(newCatalog.begin(), newCatalog.end());
 }
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
@@ -228,20 +224,20 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     QnMutexLocker lk( &m_mutex );
 
-    if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].chunk().startTimeMs) {
+    if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].startTimeMs) {
         m_chunks.push_back(chunk);
     }
     else {
-        auto itr = std::upper_bound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+        auto itr = std::upper_bound(m_chunks.cbegin(), m_chunks.cend(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
-    if (m_chunks.size() > 1 && m_chunks[m_chunks.size()-1].chunk().startTimeMs == m_chunks[m_chunks.size()-2].chunk().endTimeMs() + 1)
+    if (m_chunks.size() > 1 && m_chunks[m_chunks.size()-1].startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
     {
         // update catalog to fix bug from previous version
-        auto chunkToUpdate = m_chunks[m_chunks.size()-2].chunk();
+        auto chunkToUpdate = m_chunks[m_chunks.size()-2];
         chunkToUpdate.startTimeMs =
-            m_chunks[m_chunks.size()-1].chunk().startTimeMs - chunkToUpdate.startTimeMs;
-        m_chunks[m_chunks.size()-2] = chunkToUpdate;
+            m_chunks[m_chunks.size()-1].startTimeMs - chunkToUpdate.startTimeMs;
+        m_chunks.update(m_chunks.size()-2, chunkToUpdate);
         return true;
     }
     return false;
@@ -267,19 +263,18 @@ milliseconds DeviceFileCatalog::calendarDuration(int storageIndex) const
     return milliseconds(m_chunks.rbegin()->endTimeMs() - m_chunks.begin()->startTimeMs);
 }
 
-void DeviceFileCatalog::addChunks(nx::vms::server::ChunksDeque chunks)
+void DeviceFileCatalog::addChunks(const nx::vms::server::ChunksDeque& chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+    QnMutexLocker lk(&m_mutex);
+    m_chunks.set_union(chunks.begin(), chunks.end());
+}
 
-    QnMutexLocker lk( &m_mutex );
-
-    ChunksDeque existChunks;
-    existChunks.swap( m_chunks );
-    m_chunks.resize(existChunks.size() + chunks.size());
-    auto itr = std::set_union(
-        existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
-    if (!m_chunks.empty())
-        m_chunks.resize(itr - m_chunks.begin());
+void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
+{
+    NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+    QnMutexLocker lk(&m_mutex);
+    m_chunks.set_union(chunks.begin(), chunks.end());
 }
 
 std::deque<Chunk> DeviceFileCatalog::mergeChunks(
@@ -608,19 +603,20 @@ Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
     while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
         --itr;
 
-    if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
-        ChunksDeque::ProxyChunk result = *itr;
+    if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs)
+    {
+        auto result = *itr;
         int idx = itr - m_chunks.begin();
         removeRecord(idx);
-        return result.chunk();
+        return result;
     }
 
     return Chunk();
 }
 
 void DeviceFileCatalog::assignChunksUnsafe(
-    std::deque<nx::vms::server::Chunk>::iterator begin,
-    std::deque<nx::vms::server::Chunk>::iterator end)
+    std::deque<Chunk>::const_iterator begin,
+    std::deque<Chunk>::const_iterator end)
 {
     m_chunks.assign(begin, end);
 }
@@ -628,7 +624,7 @@ void DeviceFileCatalog::assignChunksUnsafe(
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].chunk().startTimeMs;
+    return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
 }
 
 qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
@@ -655,12 +651,12 @@ Chunk DeviceFileCatalog::updateDuration(
     auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), timeToFind);
     if (itr != m_chunks.end() && itr->startTimeMs == timeToFind)
     {
-        Chunk chunk = (*itr).chunk();
+        Chunk chunk = *itr;
         chunk.durationMs = durationMs;
         chunk.setFileSize(fileSize);
         if (indexWithDuration)
             chunk.fileIndex = Chunk::FILE_INDEX_WITH_DURATION;
-        *itr = chunk;
+        m_chunks.update(std::distance(m_chunks.cbegin(), itr), chunk);
         return chunk;
     }
     else
@@ -712,9 +708,9 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
     for (int i = 0; i < m_chunks.size();)
     {
-        if (m_chunks[i].chunk().storageIndex == storageIndex)
+        if (m_chunks[i].storageIndex == storageIndex)
         {
-            if (m_chunks[i].chunk().startTimeMs < timeMs)
+            if (m_chunks[i].startTimeMs < timeMs)
                 removeRecord(i);
             else
                 break;
@@ -747,9 +743,9 @@ Chunk DeviceFileCatalog::deleteFirstRecord()
         }
         else
         {
-            storageIndex = m_chunks[0].chunk().storageIndex;
-            delFileName = fullFileName(m_chunks[0].chunk());
-            deletedChunk = m_chunks[0].chunk();
+            storageIndex = m_chunks[0].storageIndex;
+            delFileName = fullFileName(m_chunks[0]);
+            deletedChunk = m_chunks[0];
             removeRecord(0);
         }
     }
@@ -829,7 +825,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].chunk().startTimeMs;
+        return m_chunks[0].startTimeMs;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
@@ -837,10 +833,10 @@ qint64 DeviceFileCatalog::maxTime() const
     QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
-    else if (m_chunks[m_chunks.size()-1].chunk().durationMs == -1)
+    else if (m_chunks[m_chunks.size()-1].durationMs == -1)
         return DATETIME_NOW;
     else
-        return m_chunks[m_chunks.size()-1].chunk().startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].chunk().durationMs);
+        return m_chunks[m_chunks.size()-1].startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].durationMs);
 }
 
 bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
@@ -880,14 +876,14 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
     if (m_chunks.empty())
         return true;
     else
-        return m_chunks[m_chunks.size()-1].chunk().startTimeMs == startTimeMs;
+        return m_chunks[m_chunks.size()-1].startTimeMs == startTimeMs;
 }
 
 nx::vms::server::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QnMutexLocker lock( &m_mutex );
     if (index >= 0 && (size_t)index < m_chunks.size() )
-        return m_chunks.at(index).chunk();
+        return m_chunks.at(index);
     else
         return Chunk();
 }
@@ -898,7 +894,7 @@ qint64 DeviceFileCatalog::firstTime() const
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].chunk().startTimeMs;
+        return m_chunks[0].startTimeMs;
 }
 
 void DeviceFileCatalog::close()
@@ -1001,10 +997,10 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     result.archiveDurationSecs =
         qMax(
             0ll,
-            (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks.front().chunk().startTimeMs) / 1000);
+            (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks.front().startTimeMs) / 1000);
 
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
-        ? m_chunks.back().chunk().startTimeMs - bitrateAnalyzePeriodMs : 0;
+        ? m_chunks.back().startTimeMs - bitrateAnalyzePeriodMs : 0;
     NX_VERBOSE(this, "getStatistics for camera %1. averagingStartTime %1", averagingStartTime);
 
 
@@ -1014,14 +1010,14 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     for (auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), averagingStartTime);
         itr != m_chunks.end(); ++itr)
     {
-        const auto& chunk = (*itr).chunk();
+        const auto& chunk = *itr;
         if (chunk.durationMs != Chunk::UnknownDuration)
         {
             recordedBytesForPeriod += chunk.getFileSize();
             recordedMsForPeriod += chunk.durationMs;
         }
     }
-    NX_VERBOSE(this, 
+    NX_VERBOSE(this,
         "getStatistics for camera %1. recordedBytesForPeriod %2, recordedMsForPeriod %3",
         m_cameraUniqueId, recordedBytesForPeriod, recordedMsForPeriod);
 
@@ -1029,7 +1025,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
     {
         qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0 // bitrateAnalyzePeriodMs or all archive
             ? bitrateAnalyzePeriodMs
-            : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().chunk().startTimeMs);
+            : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().startTimeMs);
 
         result.averageDensity = recordedBytesForPeriod / (qreal) averagingPeriodMs * 1000; // msec to sec
         if (recordedMsForPeriod > 0)

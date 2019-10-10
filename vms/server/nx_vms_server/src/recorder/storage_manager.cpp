@@ -1207,10 +1207,12 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             NX_ASSERT(std::is_sorted(
                 newCatalog->getChunksUnsafe().cbegin(), newCatalog->getChunksUnsafe().cend()));
 
+            std::deque<Chunk> chunks;
             std::set_difference(
                 c->getChunksUnsafe().begin(), c->getChunksUnsafe().end(),
                 newCatalog->getChunksUnsafe().begin(), newCatalog->getChunksUnsafe().end(),
-                nx::vms::server::ChunksDequeBackInserter(catalogToWrite->getChunksUnsafe()));
+                std::back_inserter(chunks));
+            catalogToWrite->addChunks(chunks);
 
             catalogsToWrite.push_back(catalogToWrite);
         }
@@ -1218,8 +1220,8 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     for (auto const &c : catalogsToWrite)
     {
-        for (auto const &chunk : c->getChunksUnsafe())
-            sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk.chunk());
+        for (auto const &chunk: c->getChunksUnsafe())
+            sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk);
     }
 }
 
@@ -1687,15 +1689,15 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnMutexLocker lock1(&catalogHi->m_mutex);
     QnMutexLocker lock2(&catalogLow->m_mutex);
 
-    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().chunk().startTimeMs,
-        catalogLow->m_chunks.front().chunk().startTimeMs);
+    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().startTimeMs,
+        catalogLow->m_chunks.front().startTimeMs);
 
     qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0
         ? bitrateAnalyzePeriodMs
         : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs);
 
     const auto archiveEndTimeMs = qMax(
-        catalogLow->m_chunks.back().chunk().startTimeMs, catalogHi->m_chunks.back().chunk().startTimeMs);
+        catalogLow->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs);
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
         ? archiveEndTimeMs - bitrateAnalyzePeriodMs
         : 0;
@@ -2690,17 +2692,17 @@ void QnStorageManager::replaceChunks(
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     qint64 newArchiveFirstChunkStartTimeMs = newCatalog->m_chunks.empty()
         ? std::numeric_limits<qint64>::max()
-        : newCatalog->m_chunks.front().chunk().startTimeMs;
+        : newCatalog->m_chunks.front().startTimeMs;
     qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
     for (const auto& chunk : ownCatalog->m_chunks)
     {
-        if (chunk.chunk().storageIndex != storageIndex)
+        if (chunk.storageIndex != storageIndex)
             continue;
 
-        if (chunk.chunk().startTimeMs >= newArchiveBorder)
+        if (chunk.startTimeMs >= newArchiveBorder)
             break;
 
-        newCatalog->addChunk(chunk.chunk());
+        newCatalog->addChunk(chunk);
     }
 
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
@@ -3005,9 +3007,8 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
         QVector<nx::vms::server::Chunk> notMigratedChunks;
         if (catalogFile->fromCSVFile(catalogName))
         {
-            for(const auto& proxyChunk: catalogFile->m_chunks)
+            for(const auto& chunk: catalogFile->m_chunks)
             {
-                const auto chunk = proxyChunk.chunk();
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
                 if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
                     storage.clear();
