@@ -13,18 +13,6 @@ namespace nx::test {
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
-static const QString kCameraName("Camera1");
-static const QString kCameraHostAddress("192.168.0.2");
-static const QString kCameraFirmware("1.2.3.4");
-static const QString kCameraModel("model1");
-static const QString kCameraVendor("vendor1");
-
-class DataProviderStub: public QnAbstractStreamDataProvider
-{
-public:
-    using QnAbstractStreamDataProvider::QnAbstractStreamDataProvider;
-};
-
 class MetricsApi: public ::testing::Test
 {
 public:
@@ -59,13 +47,13 @@ TEST_F(MetricsApi, Api)
 {
     auto rules = get<SystemRules>("/ec2/metrics/rules");
     EXPECT_EQ(rules["systems"].size(), 1);
-    EXPECT_EQ(rules["servers"].size(), 3);
+    EXPECT_EQ(rules["servers"].size(), 5);
     EXPECT_EQ(rules["cameras"].size(), 5);
     EXPECT_EQ(rules["storages"].size(), 4);
 
     auto manifest = get<SystemManifest>("/ec2/metrics/manifest");
     EXPECT_EQ(manifest["systems"].size(), 1);
-    EXPECT_EQ(manifest["servers"].size(), 3);
+    EXPECT_EQ(manifest["servers"].size(), 5);
     EXPECT_EQ(manifest["cameras"].size(), 5);
     EXPECT_EQ(manifest["storages"].size(), 4);
 
@@ -77,7 +65,7 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(serverValues["servers"].size(), 1);
         EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(serverValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(serverValues["cameras"].size(), 0);
         EXPECT_EQ(serverValues["storages"].size(), 0);
 
@@ -87,7 +75,7 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(systemValues["servers"].size(), 1);
         EXPECT_EQ(systemValues["servers"][mainServerId]["availability"]["status"], "Online");
         EXPECT_GT(systemValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(systemValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(systemValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(systemValues["cameras"].size(), 0);
         EXPECT_EQ(systemValues["storages"].size(), 0);
     }
@@ -105,13 +93,13 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(mainServerValues["systems"].size(), 0);
         EXPECT_EQ(mainServerValues["servers"].size(), 1);
         EXPECT_GT(mainServerValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(mainServerValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(mainServerValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
         auto secondServerValues = get<SystemValues>("/api/metrics/values", secondServer);
         EXPECT_EQ(secondServerValues["systems"].size(), 0);
         EXPECT_EQ(secondServerValues["servers"].size(), 1);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(secondServerValues["servers"][secondServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(secondServerValues["servers"][secondServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
         while (get<SystemValues>("/ec2/metrics/values", secondServer)["servers"].size() != 2)
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
@@ -122,10 +110,10 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(systemValues["servers"].size(), 2);
         EXPECT_EQ(systemValues["servers"][mainServerId]["availability"]["status"], "Online");
         EXPECT_GT(systemValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(systemValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(systemValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(systemValues["servers"][secondServerId]["availability"]["status"], "Online");
         EXPECT_GT(systemValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(systemValues["servers"][secondServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(systemValues["servers"][secondServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
     }
 
     secondServer.reset();
@@ -135,7 +123,7 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(serverValues["servers"].size(), 1);
         EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(serverValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
         while (get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
@@ -146,10 +134,10 @@ TEST_F(MetricsApi, Api)
         EXPECT_EQ(systemValues["servers"].size(), 2);
         EXPECT_EQ(systemValues["servers"][mainServerId]["availability"]["status"], "Online");
         EXPECT_GT(systemValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
-        EXPECT_GT(systemValues["servers"][mainServerId]["serverLoad"]["transactionsPerSecond1m"].toDouble(), 0);
+        EXPECT_GT(systemValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(systemValues["servers"][secondServerId]["availability"]["status"], "Offline");
         EXPECT_FALSE(systemValues["servers"][secondServerId]["availability"].count("uptimeS"));
-        EXPECT_FALSE(systemValues["servers"][secondServerId]["serverLoad"].count("transactionsPerSecond1m"));
+        EXPECT_FALSE(systemValues["servers"][secondServerId]["activity"].count("transactionsPerSecond1m"));
     }
 }
 

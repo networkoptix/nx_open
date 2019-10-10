@@ -22,7 +22,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 static QString nameOrCapitalizedId(QString name, const QString& id)
 {
-    if (!name.isEmpty() || id.isEmpty())
+    if (!name.isEmpty() || id.isEmpty() || id == "_")
         return name;
 
     return id.left(1).toUpper() + id.mid(1);
