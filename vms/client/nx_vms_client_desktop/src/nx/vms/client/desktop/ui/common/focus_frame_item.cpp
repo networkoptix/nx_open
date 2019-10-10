@@ -69,8 +69,6 @@ FocusFrameItem::FocusFrameItem(QQuickItem* parent):
 
 FocusFrameItem::~FocusFrameItem()
 {
-    if (d->material->texture())
-        delete d->material->texture();
 }
 
 QColor FocusFrameItem::color() const
@@ -109,6 +107,12 @@ void FocusFrameItem::setFrameWidth(int frameWidth)
 void FocusFrameItem::registerQmlType()
 {
     qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
+}
+
+void FocusFrameItem::releaseResources()
+{
+    if (d->material->texture())
+        delete d->material->texture();
 }
 
 QSGNode* FocusFrameItem::updatePaintNode(

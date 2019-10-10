@@ -32,6 +32,7 @@ protected:
     virtual QSGNode* updatePaintNode(
         QSGNode* node,
         UpdatePaintNodeData* updatePaintNodeData) override;
+    virtual void releaseResources() override;
 
 private:
     class Private;

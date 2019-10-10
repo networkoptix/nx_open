@@ -229,16 +229,6 @@ public:
         animationTimer.start();
     }
 
-    ~QnTimelinePrivate()
-    {
-        if (stripesDarkTexture)
-            delete stripesDarkTexture;
-        if (stripesLightTexture)
-            delete stripesLightTexture;
-        if (textTexture)
-            delete textTexture;
-    }
-
     void updateZoomLevel()
     {
         int index = (prevZoomIndex == -1) ? zoomLevels.size() - 1 : qMax(prevZoomIndex, 0);
@@ -834,6 +824,15 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
     }
 
     emit chunkProviderChanged();
+}
+
+void QnTimeline::releaseResources()
+{
+    for (const auto texture: {stripesDarkTexture, stripesLightTexture, textTexture})
+    {
+        if (texture)
+            delete texture;
+    }
 }
 
 QSGNode* QnTimeline::updatePaintNode(
