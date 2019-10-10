@@ -22,10 +22,13 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
-            "info",
+            "_",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r.name); }
-            ),
+            )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "info",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "server", [this](const auto&) { return Value(m_serverId); }
             ),
@@ -36,10 +39,10 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "rates",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "inBps", [](const auto&) { return Value(666); } // TODO: Implement.
+                "inBps", [](const auto&) { return Value(0); } // TODO: Implement.
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "outBps", [](const auto&) { return Value(777); } // TODO: Implement.
+                "outBps", [](const auto&) { return Value(0); } // TODO: Implement.
             )
         )
     );

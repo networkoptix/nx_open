@@ -228,10 +228,6 @@
                     "calculate": "average %encodedPixels 3s",
                     "insert": "encodedPixels"
                 },
-                "plugins": {
-                    "name": "Active plugins list",
-                    "display": "panel"
-                },
                 "primaryStreams": {
                     "name": "Primary streams",
                     "display": "panel"
@@ -271,6 +267,10 @@
                     "display": "panel",
                     "calculate": "average %thumbnails 1m",
                     "insert": "thumbnails"
+                },
+                "plugins": {
+                    "name": "Active plugins list",
+                    "display": "panel"
                 }
             }
         }
@@ -488,11 +488,15 @@
         }
     },
     "storages": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },
@@ -563,11 +567,15 @@
         }
     },
     "networkInterfaces": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },

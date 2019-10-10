@@ -48,7 +48,6 @@ void ValueGroupMonitor::setRules(
     const std::map<QString, api::metrics::ValueRule>& rules, bool skipOnMissingArgument)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-
     for (auto it = m_valueMonitors.begin(); it != m_valueMonitors.end();)
     {
         if (dynamic_cast<ExtraValueMonitor*>(it->second.get()))
@@ -58,15 +57,17 @@ void ValueGroupMonitor::setRules(
     }
 
     // Prepare monitors for extra values to make sure all of the formulas will find their arguments.
-    for (const auto& [parameterId, rule]: rules)
+    for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            m_valueMonitors.emplace(parameterId, std::make_unique<ExtraValueMonitor>());
+            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>());
+
+        NX_ASSERT(m_valueMonitors.count(id) || skipOnMissingArgument, "Unknown id in rules: %1", id);
     }
-    for (const auto& [parameterId, rule]: rules)
+    for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            updateExtraValue(parameterId, rule, skipOnMissingArgument);
+            updateExtraValue(id, rule, skipOnMissingArgument);
     }
 
     for (const auto& [id, monitor]: m_valueMonitors)
@@ -77,8 +78,8 @@ void ValueGroupMonitor::setRules(
     }
 
     m_alarmMonitors.clear();
-    for (const auto& [parameterId, rule]: rules)
-        updateAlarms(parameterId, rule, skipOnMissingArgument);
+    for (const auto& [id, rule]: rules)
+        updateAlarms(id, rule, skipOnMissingArgument);
 }
 
 void ValueGroupMonitor::updateExtraValue(

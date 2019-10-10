@@ -66,13 +66,13 @@ TEST_F(MetricsServersApi, twoServers)
     EXPECT_EQ(rules["systems"].size(), 1);
     EXPECT_EQ(rules["servers"].size(), 5);
     EXPECT_EQ(rules["cameras"].size(), 6);
-    EXPECT_EQ(rules["storages"].size(), 4);
+    EXPECT_EQ(rules["storages"].size(), 5);
 
     auto manifest = get<SystemManifest>("/ec2/metrics/manifest");
     EXPECT_EQ(manifest["systems"].size(), 1);
     EXPECT_EQ(manifest["servers"].size(), 5);
     EXPECT_EQ(manifest["cameras"].size(), 6);
-    EXPECT_EQ(manifest["storages"].size(), 4);
+    EXPECT_EQ(manifest["storages"].size(), 5);
 
     const auto systemId = commonModule()->globalSettings()->localSystemId().toSimpleString();
     const auto mainServerId = commonModule()->moduleGUID().toSimpleString();
