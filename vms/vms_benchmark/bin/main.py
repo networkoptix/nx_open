@@ -606,7 +606,7 @@ def main(conf_file, ini_file):
                         continue
 
                     rtsp_url_params = dict(
-                        [param_pair[0], param_pair[1] if len(param_pair) > 1 else None]
+                        [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
                         for param_pair in [
                             param_pair_str.split('=')
                             for param_pair_str in match_res.group(2).split('&')
@@ -715,7 +715,7 @@ def main(conf_file, ini_file):
                             continue
 
                         rtsp_url_params = dict(
-                            [param_pair[0], param_pair[1] if len(param_pair) > 1 else None]
+                            [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
                             for param_pair in [
                                 param_pair_str.split('=')
                                 for param_pair_str in match_res.group(2).split('&')
