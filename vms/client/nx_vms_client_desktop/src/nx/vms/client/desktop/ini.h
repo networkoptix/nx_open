@@ -204,6 +204,7 @@ struct Ini: nx::kit::IniConfig
         "Send analytics time period requests only when these periods are visible.");
     NX_INI_STRING("", updateFeedUrl,
         "Overrides URL update server. Leave empty value to use built-in path.");
+    NX_INI_FLAG(0, useWebEngine, "Use Chromium-based web engine.");
 };
 
 inline Ini& ini()
