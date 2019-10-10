@@ -1,49 +1,17 @@
 #include <gtest/gtest.h>
 
 #include <api/global_settings.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/mediaserver/camera_mock.h>
 #include <nx/vms/api/metrics.h>
-#include <rest/server/json_rest_result.h>
+#include <server_for_tests.h>
 
-#include "test_api_requests.h"
-
-namespace nx::test {
+namespace nx::vms::server::test {
 
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
-class MetricsApi: public ::testing::Test
-{
-public:
-    MetricsApi()
-    {
-        mainServer = std::make_unique<MediaServerLauncher>();
-        EXPECT_TRUE(mainServer->start());
-    }
+class MetricsServersMergeApi: public testing::Test, public ServerForTests {};
 
-    std::unique_ptr<MediaServerLauncher> addServer() const
-    {
-        auto newServer = std::make_unique<MediaServerLauncher>();
-        EXPECT_TRUE(newServer->start());
-        newServer->connectTo(mainServer.get());
-        return newServer;
-    }
-
-    template<typename T>
-    T get(const QString& api, const std::unique_ptr<MediaServerLauncher>& targetServer = {})
-    {
-        QnJsonRestResult result;
-        [&](){ NX_TEST_API_GET(targetServer ? targetServer.get() : mainServer.get(), api, &result); }();
-        EXPECT_EQ(result.error, QnJsonRestResult::NoError);
-        return result.deserialized<T>();
-    }
-
-protected:
-    std::unique_ptr<MediaServerLauncher> mainServer;
-};
-
-TEST_F(MetricsApi, Api)
+TEST_F(MetricsServersMergeApi, twoServers)
 {
     auto rules = get<SystemRules>("/ec2/metrics/rules");
     EXPECT_EQ(rules["systems"].size(), 1);
@@ -57,8 +25,8 @@ TEST_F(MetricsApi, Api)
     EXPECT_EQ(manifest["cameras"].size(), 5);
     EXPECT_EQ(manifest["storages"].size(), 4);
 
-    const auto systemId = mainServer->commonModule()->globalSettings()->localSystemId().toSimpleString();
-    const auto mainServerId = mainServer->commonModule()->moduleGUID().toSimpleString();
+    const auto systemId = commonModule()->globalSettings()->localSystemId().toSimpleString();
+    const auto mainServerId = commonModule()->moduleGUID().toSimpleString();
     {
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
@@ -83,28 +51,28 @@ TEST_F(MetricsApi, Api)
     auto secondServer = addServer();
     const auto secondServerId = secondServer->commonModule()->moduleGUID().toSimpleString();
     {
-        auto secondRules = get<SystemRules>("/ec2/metrics/rules", secondServer);
+        auto secondRules = secondServer->get<SystemRules>("/ec2/metrics/rules");
         EXPECT_EQ(QJson::serialized(rules), QJson::serialized(secondRules));
 
-        auto secondManifest = get<SystemManifest>("/ec2/metrics/manifest", secondServer);
+        auto secondManifest = secondServer->get<SystemManifest>("/ec2/metrics/manifest");
         EXPECT_EQ(QJson::serialized(manifest), QJson::serialized(secondManifest));
 
-        auto mainServerValues = get<SystemValues>("/api/metrics/values", mainServer);
+        auto mainServerValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(mainServerValues["systems"].size(), 0);
         EXPECT_EQ(mainServerValues["servers"].size(), 1);
         EXPECT_GT(mainServerValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(mainServerValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        auto secondServerValues = get<SystemValues>("/api/metrics/values", secondServer);
+        auto secondServerValues = secondServer->get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(secondServerValues["systems"].size(), 0);
         EXPECT_EQ(secondServerValues["servers"].size(), 1);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        while (get<SystemValues>("/ec2/metrics/values", secondServer)["servers"].size() != 2)
+        while (secondServer->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
 
-        auto systemValues = get<SystemValues>("/ec2/metrics/values", secondServer);
+        auto systemValues = secondServer->get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);
         EXPECT_EQ(systemValues["systems"][systemId]["info"]["servers"], 2);
         EXPECT_EQ(systemValues["servers"].size(), 2);
@@ -141,4 +109,4 @@ TEST_F(MetricsApi, Api)
     }
 }
 
-} // nx::test
+} // namespace nx::vms::server::test

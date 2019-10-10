@@ -17,7 +17,7 @@ class CameraMock: public Camera
 {
     using base_type = Camera;
 public:
-    CameraMock(QnMediaServerModule* serverModule);
+    CameraMock(QnMediaServerModule* serverModule, std::optional<int> id = {});
     using Camera::initInternal;
 
     template<template<typename> class ApiProvider>
