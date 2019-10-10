@@ -53,7 +53,7 @@ TEST_F(MetricsServersApi, values)
     // EXPECT_NE(startValues["activity"]["plugins"].toString(), "");
 
     auto startAlarms = get<Alarms>("/ec2/metrics/alarms");
-    EXPECT_TRUE(startAlarms.empty());
+    EXPECT_TRUE(startAlarms.empty()) << QJson::serialized(startAlarms).data();
 
     // TODO: Cause values modification and check for response changes.
 }
