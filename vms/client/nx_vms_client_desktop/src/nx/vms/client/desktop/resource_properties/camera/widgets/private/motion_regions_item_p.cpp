@@ -211,6 +211,11 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     return geometryNode;
 }
 
+void MotionRegionsItem::Private::releaseResources()
+{
+    m_currentState.texture.reset();
+}
+
 void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
 {
     auto labelsNode = mainNode->childCount() > 0
@@ -293,7 +298,7 @@ void MotionRegionsItem::Private::invalidateRegionsTexture()
 
 void MotionRegionsItem::Private::ensureRegionsTexture()
 {
-    if (!m_updateRegionsTexture)
+    if (!m_updateRegionsTexture && m_currentState.texture)
         return;
 
     m_updateRegionsTexture = false;

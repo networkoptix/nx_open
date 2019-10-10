@@ -48,6 +48,7 @@ public:
     void setFillOpacity(qreal value);
 
     QSGNode* updatePaintNode(QSGNode* node);
+    void releaseResources();
 
 private:
     void invalidateRegionsTexture();
