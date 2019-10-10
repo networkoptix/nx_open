@@ -3,15 +3,62 @@
 #include <api/global_settings.h>
 #include <nx/vms/api/metrics.h>
 #include <server_for_tests.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx::vms::server::test {
 
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
-class MetricsServersMergeApi: public testing::Test, public ServerForTests {};
+class MetricsServersApi: public testing::Test, public ServerForTests {};
 
-TEST_F(MetricsServersMergeApi, twoServers)
+TEST_F(MetricsServersApi, values)
+{
+    auto startValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    EXPECT_EQ(startValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
+
+    EXPECT_EQ(startValues["availability"]["status"], "Online");
+    EXPECT_EQ(startValues["availability"]["offlineEvents"], 1);
+    EXPECT_GT(startValues["availability"]["uptimeS"].toDouble(), 0);
+
+    // TODO: Mockup platform monitor on check info group.
+    EXPECT_NE(startValues["info"]["publicIp"].toString(), "");
+    EXPECT_NE(startValues["info"]["os"].toString(), "");
+    EXPECT_NE(startValues["info"]["osTime"].toString(), "");
+    EXPECT_NE(startValues["info"]["vmsTime"].toString(), "");
+    EXPECT_EQ(startValues["info"]["vmsTimeChanged24h"], 0);
+    EXPECT_NE(startValues["info"]["cpu"].toString(), "");
+    // EXPECT_GT(startValues["info"]["cpuCores"].toDouble(), 0);
+    // EXPECT_GT(startValues["info"]["ram"].toDouble(), 0);
+
+    // EXPECT_GT(startValues["load"]["cpuUsageP"].toDouble(), 0);
+    // EXPECT_GT(startValues["load"]["serverCpuUsageP"].toDouble(), 0);
+    // EXPECT_GT(startValues["load"]["ramUsageB"].toDouble(), 0);
+    // EXPECT_GT(startValues["load"]["ramUsageP"].toDouble(), 0);
+    // EXPECT_GT(startValues["load"]["serverRamUsage"].toDouble(), 0);
+    // EXPECT_GT(startValues["load"]["serverRamUsageP"].toDouble(), 0);
+    EXPECT_EQ(startValues["load"]["cameras"], 0);
+    EXPECT_EQ(startValues["load"]["decodingSpeed3s"], 0);
+    EXPECT_EQ(startValues["load"]["encodingSpeed3s"], 0);
+    EXPECT_EQ(startValues["load"]["encodingThreads"], 0);
+    EXPECT_EQ(startValues["load"]["primaryStreams"], 0);
+    EXPECT_EQ(startValues["load"]["secondaryStreams"], 0);
+    EXPECT_GT(startValues["load"]["incomingConnections"].toDouble(), 0);
+    EXPECT_NE(startValues["load"]["logLevel"].toString(), "");
+
+    EXPECT_GT(startValues["activity"]["transactionsPerSecond1m"].toDouble(), 0);
+    EXPECT_EQ(startValues["activity"]["actionsTriggered"], 0);
+    EXPECT_EQ(startValues["activity"]["apiCalls1m"], 0);
+    EXPECT_EQ(startValues["activity"]["thumbnails1m"], 0);
+    // EXPECT_NE(startValues["activity"]["plugins"].toString(), "");
+
+    auto startAlarms = get<Alarms>("/ec2/metrics/alarms");
+    EXPECT_TRUE(startAlarms.empty());
+
+    // TODO: Cause values modification and check for response changes.
+}
+
+TEST_F(MetricsServersApi, twoServers)
 {
     auto rules = get<SystemRules>("/ec2/metrics/rules");
     EXPECT_EQ(rules["systems"].size(), 1);
