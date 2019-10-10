@@ -7,9 +7,8 @@
     #include <pthread.h>
 #endif
 
-#if defined(_WIN32) || defined(__linux__)
+#define _GNU_SOURCE
 #include <boost/stacktrace.hpp>
-#endif
 
 #include "log.h"
 
@@ -24,13 +23,9 @@ static std::function<void(const log::Message&)> g_onAssertHandler;
 
 std::string getStackTrace()
 {
-#if defined(_WIN32) || defined(__linux__)
     std::stringstream ss;
     ss << "\n\n" << boost::stacktrace::stacktrace();
     return ss.str();
-#else
-    return std::string();
-#endif
 }
 
 void setOnAssertHandler(std::function<void(const log::Message&)> handler)
