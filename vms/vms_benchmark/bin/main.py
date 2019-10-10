@@ -561,8 +561,6 @@ def main(conf_file, ini_file):
 
                 print("    All virtual cameras discovered and went live.")
 
-                time.sleep(test_cameras_count * 2)
-
                 for camera in cameras:
                     if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
                         print(f"    Recording on camera {camera.id} enabled.")
@@ -572,6 +570,11 @@ def main(conf_file, ini_file):
             except Exception as e:
                 log_exception('Discovering cameras', e)
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
+
+            wait_for_archive_timeout_minutes = 1
+            print(f"Waiting the archives are ready to stream ({wait_for_archive_timeout_minutes} minutes)...")
+            time.sleep(wait_for_archive_timeout_minutes*60)
+            print("Waiting finishedWaiting finished..")
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=(camera.id for camera in cameras),
