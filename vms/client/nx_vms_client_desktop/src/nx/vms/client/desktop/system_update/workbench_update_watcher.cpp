@@ -3,6 +3,8 @@
 #include <QtCore/QTimer>
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebView>
+#include <QWebEngineView>
+#include <QWebEnginePage>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
@@ -36,6 +38,8 @@
 #include <nx/update/update_check.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 #include "server_update_tool.h"
 #include "update_verification.h"
 
@@ -51,6 +55,25 @@ namespace {
 
     const auto kCheckUpdatePeriod = std::chrono::minutes(60);
     const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
+
+class RedirectLinksToDesktopPage: public QWebEnginePage
+{
+    using base_type = QWebEnginePage;
+public:
+    RedirectLinksToDesktopPage(QObject* p): base_type(p) {}
+
+protected:
+    virtual bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override
+    {
+        if (type == QWebEnginePage::NavigationTypeLinkClicked)
+        {
+            QDesktopServices::openUrl(url);
+            return false;
+        }
+        return base_type::acceptNavigationRequest(url, type, isMainFrame);
+    }
+};
+
 } // anonymous namespace
 
 namespace nx::vms::client::desktop {
@@ -299,25 +322,42 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
         </html>
         )").arg(cssStyle, htmlBody);
 
-    auto view = new QWebView(&messageBox);
-    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-    view->setHtml(html);
-    // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
-    view->setFixedWidth(360);
-    if (description.isEmpty())
-        view->setFixedHeight(20);
+    QWidget* webWidget = nullptr;
+    if (ini().useWebEngine)
+    {
+        auto view = new QWebEngineView(&messageBox);
+        webWidget = view;
+        // Setting up a policy for link redirection. We should not open release notes right here.
+        view->setPage(new RedirectLinksToDesktopPage(view));
+        view->page()->setBackgroundColor(Qt::transparent);
+        NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+        view->setHtml(html, QUrl("qrc://"));
+    }
     else
-        view->setFixedHeight(320);
-    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-    // Setting up a policy for link redirection. We should not open release notes right here.
-    auto page = view->page();
-    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(page, &QWebPage::linkClicked, this,
-        [](const QUrl& url)
-        {
-            QDesktopServices::openUrl(url);
-        });
-    messageBox.addCustomWidget(view, QnMessageBox::Layout::AfterMainLabel);
+    {
+        auto view = new QWebView(&messageBox);
+        webWidget = view;
+        NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+        view->setHtml(html);
+        // Setting up a policy for link redirection. We should not open release notes right here.
+        auto page = view->page();
+        page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+        connect(page, &QWebPage::linkClicked, this,
+            [](const QUrl& url)
+            {
+                QDesktopServices::openUrl(url);
+            });
+    }
+
+    // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
+    webWidget->setFixedWidth(360);
+    if (description.isEmpty())
+        webWidget->setFixedHeight(20);
+    else
+        webWidget->setFixedHeight(320);
+    webWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+
+    messageBox.addCustomWidget(webWidget, QnMessageBox::Layout::AfterMainLabel);
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
 
