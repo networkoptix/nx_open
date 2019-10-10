@@ -172,6 +172,8 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     }
 
     setSettingsInternal(settings);
+
+    // TODO: #dmishin: Investigate why this condition is checked here; should it be NX_ASSERT()?
     if (!m_started)
     {
         m_lastNeededMetadataTypes.reset();
