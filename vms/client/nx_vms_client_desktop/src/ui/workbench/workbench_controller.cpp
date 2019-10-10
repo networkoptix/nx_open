@@ -80,6 +80,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 
 #include <ui/help/help_handler.h>
 
@@ -1292,7 +1293,8 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     bool canMoveFocus = !focusItem
         || dynamic_cast<QnResourceWidget*>(focusItem)
-        || dynamic_cast<QnGraphicsWebView*>(focusItem);
+        || dynamic_cast<QnGraphicsWebView*>(focusItem)
+        || dynamic_cast<GraphicsQmlView*>(focusItem);
 
     if (newWidget && canMoveFocus)
         newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */

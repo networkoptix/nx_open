@@ -69,6 +69,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/generic/splash_item.h>
@@ -291,7 +292,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* We should disable all one-key shortcuts while web view is in the focus. */
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
     {
-        bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
+        bool isWebView = scene() && (dynamic_cast<QnGraphicsWebView*>(scene()->focusItem()) || dynamic_cast<GraphicsQmlView*>(scene()->focusItem()));
 
         for (auto actionId : {
             action::NotificationsTabAction, //< N

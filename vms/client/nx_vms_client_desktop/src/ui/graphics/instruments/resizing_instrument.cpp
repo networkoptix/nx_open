@@ -8,6 +8,7 @@
 #include <ui/common/cursor_cache.h>
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <nx/client/core/utils/geometry.h>
 
@@ -33,6 +34,9 @@ bool itemIsResizableWidget(QGraphicsItem* item)
     }
 
     if (auto webView = qobject_cast<QnGraphicsWebView*>(widget))
+        return false;
+
+    if (auto webView = qobject_cast<nx::vms::client::desktop::GraphicsQmlView*>(widget))
         return false;
 
     return true;

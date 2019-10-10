@@ -42,6 +42,7 @@
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -349,6 +350,9 @@ action::ActionScope WorkbenchUi::currentScope() const
 
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<QnGraphicsWebView*>(focusItem))
+        return action::InvalidScope;
+
+    if (dynamic_cast<GraphicsQmlView*>(focusItem))
         return action::InvalidScope;
 
     if (display()->scene()->hasFocus())
