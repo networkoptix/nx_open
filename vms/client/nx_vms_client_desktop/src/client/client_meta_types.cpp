@@ -179,7 +179,7 @@ void QnClientMetaTypes::initialize()
 
 void QnClientMetaTypes::registerQmlTypes()
 {
-    qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
+    ColorTheme::registerQmlType();
     LayoutModel::registerQmlType();
 
     qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
