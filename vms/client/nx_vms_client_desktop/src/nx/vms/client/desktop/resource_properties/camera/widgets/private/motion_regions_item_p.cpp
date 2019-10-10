@@ -214,6 +214,7 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 void MotionRegionsItem::Private::releaseResources()
 {
     m_currentState.texture.reset();
+    m_labelsTexture.reset();
 }
 
 void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
