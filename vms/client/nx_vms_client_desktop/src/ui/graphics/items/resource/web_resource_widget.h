@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 
 class QWebPage;
 class QnGraphicsWebView;
@@ -34,5 +35,6 @@ private:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
 protected:
-    QnGraphicsWebView* const m_webView;
+    QnGraphicsWebView* m_webView;
+    nx::vms::client::desktop::GraphicsWebEngineView* m_webEngineView;
 };
