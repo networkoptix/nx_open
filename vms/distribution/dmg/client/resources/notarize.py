@@ -70,7 +70,7 @@ def stapleApp(dmgFileName):
 def addStandardParserParameters(parser):
     parser.add_argument("--user", metavar = "<Apple Developer ID>", dest = "user", required = True)
     parser.add_argument("--password", metavar = "<Apple Developer Password>", dest = "password", required = True)
-    parser.add_argument("--timeout", metavar = "<Timeout of opeartion in minutes>", dest = "timeout", type = int, default = 20)
+    parser.add_argument("--timeout", metavar = "<Timeout of opeartion in minutes>", dest = "timeout", type = int, default = 60)
  
 def showCriticalErrorAndExit(message):
     sys.stderr.write(message)
