@@ -642,41 +642,47 @@ def main(conf_file, ini_file):
                 streaming_ended_expected = False
                 issues = []
                 cpu_usage_max_collector = [None]
+                cpu_usage_avg_collector = []
 
                 box_poller_thread_stop_event = threading.Event()
                 box_poller_thread_exceptions_collector = []
 
-                def box_poller(stop_event, exception_collector, cpu_usage_max_collector):
-                    while not stop_event.isSet():
-                        try:
-                            statistics = api.get_statistics()
-                            cannot_get_exception = exceptions.ServerApiError(
-                                "Can't get server statistics through the REST API."
-                            )
-                            if not statistics:
-                              raise cannot_get_exception
-                            cpu_usage_search_result = [e['value'] for e in statistics if e['description'] == 'CPU']
-                            if len(cpu_usage_search_result) != 1:
-                                raise cannot_get_exception
-                            cpu_usage = cpu_usage_search_result[0]
+                def box_poller(stop_event, exception_collector, cpu_usage_max_collector, cpu_usage_avg_collector):
+                    try:
+                        while not stop_event.isSet():
+                            loadavg = box.eval('cat /proc/loadavg')
+                            if not loadavg:
+                                # TODO: raise
+                                pass
+                            match = re.match(r'(\d+\.\d+) (\d+\.\d+) (\d+\.\d+) .*', loadavg)
+                            if not match:
+                                # TODO: raise
+                                pass
+                            cpu_usage_last_minute = float(match.group(1))
+                            print(f"{round(time.time() - streaming_started_at)} seconds after the test started. CPU usage={cpu_usage_last_minute}.")
                             if not cpu_usage_max_collector[0] is None:
-                                cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage)
-                            if cpu_usage > ini['cpuUsageThreshold']:
+                                cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
+                            else:
+                                cpu_usage_max_collector[0] = cpu_usage_last_minute
+
+                            cpu_usage_avg_collector.append(cpu_usage_last_minute)
+                            if cpu_usage_last_minute > ini['cpuUsageThreshold']:
                                 raise exceptions.CPUUsageThresholdExceededIssue(
-                                    cpu_usage,
+                                    cpu_usage_last_minute,
                                     ini['cpuUsageThreshold']
                                 )
-                            stop_event.wait(15)
-                        except Exception as e:
-                            exception_collector.append(e)
-                            return
+                            stop_event.wait(60)
+                    except Exception as e:
+                        exception_collector.append(e)
+                        return
 
                 box_poller_thread = threading.Thread(
                     target=box_poller,
                     args=(
                         box_poller_thread_stop_event,
                         box_poller_thread_exceptions_collector,
-                        cpu_usage_max_collector
+                        cpu_usage_max_collector,
+                        cpu_usage_avg_collector,
                     )
                 )
 
@@ -773,6 +779,11 @@ def main(conf_file, ini_file):
 
                 cpu_usage_max = cpu_usage_max_collector[0]
 
+                if cpu_usage_avg_collector is not None:
+                    cpu_usage_avg = sum(cpu_usage_avg_collector)/len(cpu_usage_avg_collector)
+                else:
+                    cpu_usage_avg = None
+
                 if not streaming_ended_expected:
                     raise exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
@@ -800,14 +811,14 @@ def main(conf_file, ini_file):
 
                 print(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
                 if cpu_usage_max is not None:
-                    print(f"    CPU usage: {str(cpu_usage_max) if cpu_usage_max else '-'}")
+                    print(f"    Maximum CPU usage: {str(cpu_usage_max)}")
+                if cpu_usage_avg is not None:
+                    print(f"    Average CPU usage: {str(cpu_usage_avg)}")
                 if ram_free_bytes is not None:
                     print(f"    Free RAM: {to_megabytes(ram_free_bytes)} MB")
 
                 if frame_drops_sum > 0:
-                    issues.append(exceptions.VmsBenchmarkIssue(
-                        f'{frame_drops_sum} frame drops detected.'
-                    ))
+                    issues.append(exceptions.VmsBenchmarkIssue(f'{frame_drops_sum} frame drops detected.'))
 
                 try:
                     report_server_storage_failures(api, round(streaming_started_at*1000))
