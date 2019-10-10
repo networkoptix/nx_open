@@ -276,11 +276,15 @@
         }
     },
     "cameras": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },
@@ -328,6 +332,7 @@
                     "description": "Events count: Camera offline (1h)",
                     "display": "table|panel",
                     "calculate": "countValues %status 24h Offline",
+                    "insert": "streamIssues",
                     "alarms": [
                         {
                             "level": "warning",
@@ -372,22 +377,22 @@
             }
         },
         "primaryStream": {
+            "name": "Primary Stream",
             "values": {
                 "resolution": {
                     "name": "Resolution",
                     "display": "table|panel"
                 },
-                "targetFps": {
-                    "display": "Target fps"
-                },
                 "actualFps": {
-                    "display": "Actual fps"
+                    "name": "Actual fps",
+                    "display": "panel"
                 },
-                "fpsDeltaAvarage": {
+                "fpsDeltaAverage": {
                     "name": "Avg FPS drop (10 min)",
                     "description": "Average FPS drop (10 min)",
                     "display": "panel",
                     "calculate": "average %fpsDelta 10m",
+                    "insert": "fpsDelta",
                     "alarms": [
                     {
                         "level": "warning",
@@ -416,6 +421,7 @@
             }
         },
         "secondaryStream": {
+            "name": "Secondary Stream",
             "values": {
                 "resolution": {
                     "name": "Resolution",
@@ -428,11 +434,16 @@
                         }
                     ]
                 },
-                "targetFps": {
-                    "display": "Target fps"
-                },
                 "actualFps": {
-                    "display": "Actual fps"
+                    "name": "Actual fps",
+                    "display": "panel"
+                },
+                "fpsDeltaAverage": {
+                    "name": "Avg FPS drop (10 min)",
+                    "description": "Average FPS drop (10 min)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m",
+                    "insert": "fpsDelta"
                 },
                 "actualBitrateBps": {
                     "name": "Bitrate",
@@ -445,16 +456,11 @@
                             "text": "Actual bitrate is 0 KBps"
                         }
                     ]
-                },
-                "fpsDeltaAvarage": {
-                    "name": "Avg FPS drop (10 min)",
-                    "description": "Average FPS drop (10 min)",
-                    "display": "panel",
-                    "calculate": "average %fpsDelta 10m"
                 }
             }
         },
-        "analytics": {
+        "storage": {
+            "name": "Storage Analytics",
             "values": {
                 "archiveLengthS": {
                     "name": "Forecast",
@@ -475,7 +481,7 @@
                     "alarms": [{
                         "level": "error",
                         "condition": "greaterThan %minArchiveLengthS %archiveLengthS",
-                        "text": "Actual archive length %archiveLengthS is less than user defined minumal archive length %minArchiveLengthS"
+                        "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
                     }]
                 }
             }

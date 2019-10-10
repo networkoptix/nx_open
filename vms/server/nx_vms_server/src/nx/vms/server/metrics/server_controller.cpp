@@ -87,20 +87,16 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
-            "availability",
-            makeAvailabilityProviders()
+            "availability", makeAvailabilityProviders()
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
-            "load",
-            makeLoadProviders()
+            "load", makeLoadProviders()
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
-            "info",
-            makeInfoProviders()
+            "info", makeInfoProviders()
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
-            "activity",
-            makeActivityProviders()
+            "activity", makeActivityProviders()
         )
     );
 }

@@ -196,24 +196,24 @@ TEST_F(MetricsCamerasApi, infoGroup)
 {
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    ASSERT_EQ(5, cameraData.size());
-    auto infoData = cameraData["info"];
-    const auto commonModule = launcher->commonModule();
+    EXPECT_EQ(6, cameraData.size());
+    EXPECT_EQ(cameraData["_"]["name"], "CMock 2");
 
-    ASSERT_EQ("CMock 2", infoData["name"].toString());
-    ASSERT_EQ(commonModule->moduleGUID().toSimpleString(), infoData["server"].toString());
-    ASSERT_EQ("Camera", infoData["type"].toString());
-    ASSERT_EQ("192.168.0.2", infoData["ip"].toString());
-    ASSERT_EQ("Model_2", infoData["model"].toString());
-    ASSERT_EQ("Vendor_2", infoData["vendor"].toString());
-    ASSERT_EQ("1.0.2", infoData["firmware"].toString());
-    ASSERT_EQ("Off", infoData["recording"].toString());
+    auto infoData = cameraData["info"];
+    EXPECT_EQ(infoData["server"], launcher->commonModule()->moduleGUID().toSimpleString());
+    EXPECT_EQ(infoData["type"], "Camera");
+    EXPECT_EQ(infoData["ip"], "192.168.0.2");
+    EXPECT_EQ(infoData["model"], "Model_2");
+    EXPECT_EQ(infoData["vendor"], "Vendor_2");
+    EXPECT_EQ(infoData["firmware"], "1.0.2");
+    EXPECT_EQ(infoData["recording"], "Off");
 
     m_camera->setLicenseUsed(true);
     systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+
     cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
     infoData = cameraData["info"];
-    ASSERT_EQ("Scheduled", infoData["recording"].toString());
+    EXPECT_EQ(infoData["recording"], "Scheduled");
     m_camera->setLicenseUsed(false);
 }
 
@@ -221,7 +221,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
 {
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    ASSERT_EQ(5, cameraData.size());
+    ASSERT_EQ(6, cameraData.size());
 
     int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
     ASSERT_EQ(1, offlineEvents);
@@ -267,13 +267,13 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
 
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    auto analyticsData = cameraData["analytics"];
-    ASSERT_EQ(1000000, analyticsData["recordingBitrateBps"].toDouble());
-    ASSERT_EQ(24 * 3600 * 2, analyticsData["archiveLengthS"].toInt());
-    ASSERT_EQ(24 * 3600 * kMinDays, analyticsData["minArchiveLengthS"].toInt());
+    auto analyticsData = cameraData["storage"];
+    EXPECT_EQ(analyticsData["recordingBitrateBps"], 1000000);
+    EXPECT_EQ(analyticsData["archiveLengthS"], 24 * 3600 * 2);
+    EXPECT_EQ(analyticsData["minArchiveLengthS"], 24 * 3600 * kMinDays);
 
     auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_TRUE(hasAlarm(systemAlarms, "analytics.minArchiveLengthS"));
+    EXPECT_TRUE(hasAlarm(systemAlarms, "storage.minArchiveLengthS"));
 
     m_camera->setLicenseUsed(false);
 }

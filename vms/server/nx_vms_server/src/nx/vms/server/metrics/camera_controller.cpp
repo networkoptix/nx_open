@@ -62,228 +62,169 @@ void CameraController::start()
         });
 }
 
-auto makeInfoGroupProvider()
+namespace {
+
+auto makeInfoProviders()
 {
-    return
-        utils::metrics::makeValueGroupProvider<Resource>(
-        "info",
-        utils::metrics::makeSystemValueProvider<Resource>(
-            "name", [](const auto& r) { return Value(r->getName()); }
-            ),
+    return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
             "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "type", [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "ip", [](const auto& r) { return Value(r->getHostAddress()); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "vendor", [](const auto& r) { return Value(r->getVendor()); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "model", [](const auto& r) { return Value(r->getModel()); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "firmware", [](const auto& r) { return Value(r->getFirmware()); }
-            ),
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "recording",
-            [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
-            )
-        );
+            "recording", [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
+        )
+    );
 }
 
-auto makeAvailabilityGroupProvider()
+auto makeAvailabilityProviders()
 {
-    return
-        utils::metrics::makeValueGroupProvider<Resource>(
-            "availability",
-                utils::metrics::makeSystemValueProvider<Resource>(
-                "status",
-                [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
-                qtSignalWatch<Resource>(&resource::Camera::statusChanged)
-                ),
-                utils::metrics::makeLocalValueProvider<Resource>(
-                "streamIssues",
-                [](const auto& r)
-                {
-                    return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues));
-                },
-                nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "ipConflicts",
-                [](const auto& r)
-                {
-                    return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts));
-                },
-                nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
-            )
-        );
+    return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "status",
+            [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
+            qtSignalWatch<Resource>(&resource::Camera::statusChanged)
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "streamIssues",
+            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
+            nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "ipConflicts",
+            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
+            nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
+        )
+    );
 }
 
-auto makePrimaryStreamGroupProvider()
+auto makeStreamProviders(StreamIndex streamIndex)
 {
-    return
-        utils::metrics::makeValueGroupProvider<Resource>(
-            "primaryStream",
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "resolution",
-                [](const auto& r)
-                {
-                    if (auto p = r->targetParams(StreamIndex::primary))
-                        return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
-                    return Value();
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "targetFps",
-                [](const auto& r)
-                {
-                    if (auto params = r->targetParams(StreamIndex::primary))
-                        return Value(params->fps);
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "actualFps",
-                [](const auto& r)
-                {
-                    auto params = r->actualParams(StreamIndex::primary);
-                    if (params && params->fps > 0)
-                        return Value(params->fps);
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "fpsDelta",
-                [](const auto& r)
-                {
-                    const auto targetParams = r->targetParams(StreamIndex::primary);
-                    const auto actualParams = r->actualParams(StreamIndex::primary);
-                    if (targetParams && actualParams && actualParams->fps > 0)
-                        return Value(targetParams->fps - actualParams->fps);
-                    return Value();
-                },
-                nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrateBps",
-                [](const auto& r)
-                {
-                    auto params = r->actualParams(StreamIndex::primary);
-                    if (params && params->bitrateKbps > 0)
-                        return Value(params->bitrateKbps * 1024 / 8);
-                    return Value();
-                }
-            )
-        );
+    return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "resolution",
+            [streamIndex](const auto& r)
+            {
+                if (auto p = r->targetParams(streamIndex))
+                    return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
+                return Value();
+            }
+        ),
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "targetFps",
+            [streamIndex](const auto& r)
+            {
+                if (auto params = r->targetParams(streamIndex))
+                    return Value(params->fps);
+                return Value();
+            }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "actualFps",
+            [streamIndex](const auto& r)
+            {
+                auto params = r->actualParams(streamIndex);
+                if (params && params->fps > 0)
+                    return Value(params->fps);
+                return Value();
+            }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "fpsDelta",
+            [streamIndex](const auto& r)
+            {
+                const auto targetParams = r->targetParams(streamIndex);
+                const auto actualParams = r->actualParams(streamIndex);
+                if (targetParams && actualParams && actualParams->fps > 0)
+                    return Value(targetParams->fps - actualParams->fps);
+                return Value();
+            },
+            nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "actualBitrateBps",
+            [streamIndex](const auto& r)
+            {
+                auto params = r->actualParams(streamIndex);
+                if (params && params->bitrateKbps > 0)
+                    return Value(params->bitrateKbps * 1024 / 8);
+                return Value();
+            }
+        )
+    );
 }
 
-auto makeSecondaryStreamGroupProvider()
+auto makeStorageProviders()
 {
-    return
-        utils::metrics::makeValueGroupProvider<Resource>(
-            "secondaryStream",
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "resolution",
-                [](const auto& r)
-                {
-                    if (auto p = r->targetParams(StreamIndex::secondary))
-                        return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
-                    return Value();
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "targetFps",
-                [](const auto& r)
-                {
-                    if (auto params = r->targetParams(StreamIndex::secondary))
-                        return Value(params->fps);
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "actualFps",
-                [](const auto& r)
-                {
-                    auto params = r->actualParams(StreamIndex::secondary);
-                    if (params && params->fps > 0)
-                    {
-                        params = r->actualParams(StreamIndex::secondary);
-                        return Value(params->fps);
-                    }
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrateBps",
-                [](const auto& r)
-                {
-                    auto params = r->actualParams(StreamIndex::secondary);
-                    if (params && params->bitrateKbps > 0)
-                        return Value(params->bitrateKbps * 1024 / 8);
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "fpsDelta",
-                [](const auto& r)
-                {
-                    const auto targetParams = r->targetParams(StreamIndex::secondary);
-                    const auto actualParams = r->actualParams(StreamIndex::secondary);
-                    if (targetParams && actualParams && actualParams->fps > 0)
-                        return Value(targetParams->fps - actualParams->fps);
-                    return Value();
-                },
-                nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
-            )
-        );
+    return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "archiveLengthS",
+            [](const auto& r)
+            {
+                const auto value = duration_cast<seconds>(r->calendarDuration());
+                return value.count() > 0 ? Value((double) value.count()) : Value();
+            }
+        ),
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "minArchiveLengthS",
+            [](const auto& r)
+            {
+                if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
+                    return Value((double) duration_cast<seconds>(hours(days * 24)).count());
+                return Value();
+            }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "recordingBitrateBps",
+            [](const auto& r)
+            {
+                const auto result = r->recordingBitrateBps(kBitratePeriod);
+                return result > 0 ? Value(result) : Value();
+            }
+        )
+    );
 }
 
-auto makeAnalyticsGroupProvider()
-{
-    return
-        utils::metrics::makeValueGroupProvider<Resource>(
-            "analytics",
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "archiveLengthS",
-                [](const auto& r)
-                {
-                    const auto value = duration_cast<seconds>(r->calendarDuration());
-                    return value.count() > 0 ? Value((double) value.count()) : Value();
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "minArchiveLengthS",
-                [](const auto& r)
-                {
-                    if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
-                        return Value((double) duration_cast<seconds>(hours(days * 24)).count());
-                    return Value();
-                }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "recordingBitrateBps",
-                [](const auto& r)
-                {
-                    const auto result = r->recordingBitrateBps(kBitratePeriod);
-                    return result > 0 ? Value(result) : Value();
-                }
-            )
-        );
-}
+} // namespace
 
 utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        makeInfoGroupProvider(),
-        makeAvailabilityGroupProvider(),
-        makePrimaryStreamGroupProvider(),
-        makeSecondaryStreamGroupProvider(),
-        makeAnalyticsGroupProvider()
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "_",
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "name", [](const auto& r) { return Value(r->getName()); }
+            )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "info", makeInfoProviders()
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "availability", makeAvailabilityProviders()
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "primaryStream", makeStreamProviders(StreamIndex::primary)
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "secondaryStream", makeStreamProviders(StreamIndex::secondary)
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "storage", makeStorageProviders()
+        )
     );
 }
 
