@@ -828,7 +828,7 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
 
 void QnTimeline::releaseResources()
 {
-    for (const auto texture: {stripesDarkTexture, stripesLightTexture, textTexture})
+    for (const auto texture: {d->stripesDarkTexture, d->stripesLightTexture, d->textTexture})
     {
         if (texture)
             delete texture;
