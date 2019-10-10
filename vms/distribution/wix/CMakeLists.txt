@@ -24,6 +24,8 @@ else()
    set(installerIcon ${productLogo})
 endif()
 
+include(wix_utils)
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 
 add_subdirectory(custom_actions)
@@ -104,6 +106,11 @@ endif()
 if(withDesktopClient)
     set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml/")
     set(desktop_client_executable "${bin_source_dir}/nx_vms_client_desktop.dll")
+
+    nx_generate_wxs(${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
+        SOURCE_DIR ${qt.dir}/resources
+        TARGET_DIR_ALIAS resources
+        COMPONENT_GROUP webengine_resources)
 
     add_custom_target(collect_qml_dependencies
         DEPENDS

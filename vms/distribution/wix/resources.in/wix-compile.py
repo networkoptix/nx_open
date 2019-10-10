@@ -55,6 +55,7 @@ shared_vms_components = [
 
 client_components = shared_vms_components + [
     'client_libraries',
+    'webengine_resources',
     'Associations',
     'ClientDlg',
     'client/msi_interface',
