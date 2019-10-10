@@ -7,6 +7,8 @@
     #include <pthread.h>
 #endif
 
+#include <boost/stacktrace.hpp>
+
 #include "log.h"
 
 #include <nx/utils/unused.h>
@@ -17,6 +19,13 @@ namespace nx::utils {
 static const size_t kShowTheMostCount(30);
 
 static std::function<void(const log::Message&)> g_onAssertHandler;
+
+std::string getStackTrace()
+{
+    std::stringstream ss;
+    ss << "\n\n" << boost::stacktrace::stacktrace();
+    return ss.str();
+}
 
 void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 {
@@ -50,8 +59,9 @@ bool assertFailure(bool isCritical, const log::Message& message)
 
     const bool isCrashRequired = isCritical || ini().assertCrash;
     const auto& kTag = isCrashRequired ? kCrashTag : kAssertTag;
-    NX_ERROR(kTag, message);
-    std::cerr << std::endl << ">>> " << message.toStdString() << std::endl;
+    const auto stackTrace = ini().printStackTraceOnAssert ? getStackTrace() : std::string();
+    NX_ERROR(kTag, message, stackTrace);
+    std::cerr << std::endl << ">>> " << message.toStdString() << stackTrace << std::endl;
 
     if (g_onAssertHandler)
         g_onAssertHandler(message);

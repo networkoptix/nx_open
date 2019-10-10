@@ -53,6 +53,10 @@ if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
 
+if(LINUX)
+    target_link_libraries(nx_utils PRIVATE dl)
+endif()
+
 if(LINUX AND NOT ANDROID)
     target_link_libraries(nx_utils PRIVATE pthread)
 endif()
