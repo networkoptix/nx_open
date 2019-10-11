@@ -4,6 +4,7 @@ add_library(qtsingleguiapplication STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qtsingleguiapplication.cpp
     ${src_dir}/src/qtlocalpeer.cpp
 )
+set_target_properties(qtsingleguiapplication PROPERTIES FOLDER third_party)
 nx_add_qt_mocables(qtsingleguiapplication
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qtsingleguiapplication.h
     ${src_dir}/src/qtlocalpeer.h

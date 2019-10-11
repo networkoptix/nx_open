@@ -1,6 +1,7 @@
 enable_testing()
 
 add_custom_target(unit_tests)
+set_target_properties(unit_tests PROPERTIES FOLDER tests)
 
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 
@@ -13,7 +14,7 @@ function(nx_add_test target) # [NO_GTEST] ...
     nx_expose_variables_to_parent_scope(${affected_variables})
 
     if(NOT NX_ADD_TEST_NO_GTEST)
-        set(additional_private_libs 
+        set(additional_private_libs
             PRIVATE_LIBS
                 GTest
                 GMock
@@ -25,6 +26,7 @@ function(nx_add_test target) # [NO_GTEST] ...
         NO_RC_FILE
         NO_MOC
         ${additional_private_libs}
+        FOLDER tests
         ${NX_ADD_TEST_UNPARSED_ARGUMENTS}
     )
 

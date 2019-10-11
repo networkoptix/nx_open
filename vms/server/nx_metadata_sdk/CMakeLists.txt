@@ -122,3 +122,4 @@ add_custom_command(OUTPUT ${zip_file}
 )
 
 add_custom_target(nx_metadata_sdk ALL DEPENDS ${zip_file})
+set_target_properties(nx_metadata_sdk PROPERTIES FOLDER sdk)

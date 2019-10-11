@@ -7,6 +7,7 @@ if(WINDOWS)
 endif()
 
 add_custom_target(server_plugins)
+set_target_properties(server_plugins PROPERTIES FOLDER libs)
 
 set(nx_add_plugin_to_distribution_if NOT targetDevice STREQUAL "edge1")
 set_property(GLOBAL PROPERTY nx_server_plugins_list)

@@ -12,6 +12,7 @@ nx_add_target(nov_browser EXECUTABLE
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
+    FOLDER utils
 )
 
 

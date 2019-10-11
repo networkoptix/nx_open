@@ -76,3 +76,4 @@ else()
 endif()
 
 add_custom_target(vms_benchmark ALL DEPENDS ${zip_file})
+set_target_properties(vms_benchmark PROPERTIES FOLDER utils)

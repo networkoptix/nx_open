@@ -1,5 +1,6 @@
 nx_add_target(root_tool EXECUTABLE
-    PUBLIC_LIBS boost nx_system_commands pthread)
+    PUBLIC_LIBS boost nx_system_commands pthread
+    FOLDER utils)
 
 if(LINUX)
     add_definitions(-DNX_USER_NAME=${customization.companyId})

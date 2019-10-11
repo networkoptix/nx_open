@@ -20,4 +20,5 @@ nx_add_target(traytool EXECUTABLE SIGNED
     PRIVATE_LIBS
         Shell32
         AdvApi32
+    FOLDER utils
 )

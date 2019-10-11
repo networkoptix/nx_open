@@ -14,3 +14,8 @@ if(withTests)
     add_dependencies(unit_tests nx_kit_ut)
 endif()
 
+set_target_properties(
+    nx_kit
+    nx_kit_ut
+    disabled_ini_config_ut
+    PROPERTIES FOLDER sdk)

@@ -53,8 +53,8 @@ if (withMediaServer OR withDesktopClient)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(distribution_wix PROPERTIES FOLDER distribution)
 endif()
-
 
 if(withTestCamera)
     add_dependencies(distribution_wix testcamera)
@@ -68,6 +68,7 @@ if(withTestCamera)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(generate_testcamera_package PROPERTIES FOLDER distribution)
 endif()
 
 
@@ -99,6 +100,10 @@ if(withNxTool)
             "--sources-dir" "${CMAKE_CURRENT_BINARY_DIR}"
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        collect_nxtool_qml_dependencies
+        create_nxtool_installer
+        PROPERTIES FOLDER distribution)
 endif()
 
 if(withDesktopClient)
@@ -140,6 +145,13 @@ if(withDesktopClient)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+
+    set_target_properties(
+        collect_qml_dependencies
+        generate_client_update_package
+        create_nxtool_installer
+        generate_client_debug_package
+        PROPERTIES FOLDER distribution)
 endif()
 
 if(withMediaServer)
@@ -161,6 +173,10 @@ if(withMediaServer)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+
+    set_target_properties(
+        generate_server_update_package
+        PROPERTIES FOLDER distribution)
 endif()
 
 
@@ -179,6 +195,10 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        generate_libs_debug_package
+        PROPERTIES FOLDER distribution)
+
     if(TARGET nx_sql)
          add_dependencies(generate_libs_debug_package nx_sql)
      endif()
@@ -211,6 +231,9 @@ if(withMediaServer)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        generate_mediaserver_debug_package
+        PROPERTIES FOLDER distribution)
 endif()
 
 if(withClouds)
@@ -226,6 +249,9 @@ if(withClouds)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        generate_cloud_debug_package
+        PROPERTIES FOLDER distribution)
 endif()
 
 if(addQtPdb)
@@ -236,6 +262,9 @@ if(addQtPdb)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        generate_qt_debug_package
+        PROPERTIES FOLDER distribution)
 endif()
 
 add_custom_target(generate_misc_debug_package ALL
@@ -245,6 +274,9 @@ add_custom_target(generate_misc_debug_package ALL
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
 )
+set_target_properties(
+    generate_misc_debug_package
+    PROPERTIES FOLDER distribution)
 
 if(TARGET applauncher)
     add_dependencies(generate_misc_debug_package applauncher)

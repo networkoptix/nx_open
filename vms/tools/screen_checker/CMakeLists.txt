@@ -5,4 +5,5 @@ nx_add_target(screen_checker EXECUTABLE
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
+    FOLDER utils
 )

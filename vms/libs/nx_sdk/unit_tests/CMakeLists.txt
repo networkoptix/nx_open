@@ -15,3 +15,4 @@ target_link_libraries(nx_sdk_ut
 target_compile_definitions(nx_sdk_ut PRIVATE NX_PLUGIN_API="")
 
 add_test(NAME nx_sdk_ut COMMAND nx_sdk_ut)
+set_target_properties(nx_sdk_ut PROPERTIES FOLDER sdk)
