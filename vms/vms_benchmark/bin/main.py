@@ -185,7 +185,7 @@ def load_configs(conf_file, ini_file):
         "swapThresholdMegabytes": {
             "optional": True,
             "type": 'float',
-            "default": 100,
+            "default": 0,
         },
     }
 
