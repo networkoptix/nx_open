@@ -315,6 +315,7 @@ def main(conf_file, ini_file):
             )
 
     print(f"Box IP: {box.ip}")
+    print(f"Used network device name: {box.eth_name}")
     if box.is_root:
         print(f"Box ssh user is root.")
 

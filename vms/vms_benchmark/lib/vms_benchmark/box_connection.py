@@ -73,17 +73,32 @@ if platform.system() == 'Linux':
             self.ip = None
             self.local_ip = None
             self.is_root = False
+            self.eth_name = None
 
         def obtain_connection_info(self):
-            # Obtain device ip address
-            eval_reply = self.eval('echo $SSH_CONNECTION')
-            ssh_connection_info = eval_reply.strip().split() if eval_reply else None
-            if not eval_reply or len(ssh_connection_info) < 3:
+            ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
+            ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
+            if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
                     'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
+
+            line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
+            eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
+            if not eth_name:
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
+            eth_name_check_result = self.sh(f'test -d "/sys/class/net/{eth_name}"')
+
+            if not eth_name_check_result or eth_name_check_result.return_code != 0:
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
+            self.eth_name = eth_name
 
         @contextmanager
         def sh2(self, command, su=False):
@@ -212,17 +227,32 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             self.ip = None
             self.local_ip = None
             self.is_root = False
+            self.eth_name = None
 
         def obtain_connection_info(self):
-            # Obtain device ip address
-            eval_reply = self.eval('echo $SSH_CONNECTION')
-            ssh_connection_info = eval_reply.strip().split() if eval_reply else None
-            if not eval_reply or len(ssh_connection_info) < 3:
+            ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
+            ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
+            if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
                     'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
+
+            line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
+            eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
+            if not eth_name:
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
+            eth_name_check_result = self.sh(f'test -f "/sys/class/net/{eth_name}"')
+
+            if not eth_name_check_result or eth_name_check_result.return_code != 0:
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+
+            self.eth_name = eth_name
 
         def ssh_command(self):
             res = self._ssh_command.copy()
