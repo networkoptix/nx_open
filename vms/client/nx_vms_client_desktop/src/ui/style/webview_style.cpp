@@ -57,16 +57,22 @@ void setupWebViewStyle(QGraphicsWidget* webView, WebViewStyle style)
 QString generateCssStyle()
 {
     const auto styleBase = QString::fromLatin1(R"css(
+    @font-face {
+        font-family: 'Roboto';
+        src: url('qrc:/fonts/Roboto-Regular.ttf') format('truetype');
+        font-style: normal;
+    }
     * {
         color: %1;
         font-family: 'Roboto-Regular', 'Roboto';
-        font-weight: 400;
+        font-weight: 600;
         font-size: 13px;
         line-height: 16px;
     }
     body {
         padding-left: 0px;
         margin: 0px;
+        overscroll-behavior: none;
         background-color: %2;
     }
     p {
