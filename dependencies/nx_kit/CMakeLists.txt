@@ -17,6 +17,8 @@ endif()
 set_target_properties(nx_kit PROPERTIES FOLDER sdk)
 if(TARGET nx_kit_ut)
     set_target_properties(nx_kit_ut PROPERTIES FOLDER sdk)
+endif()
 
 if(TARGET disabled_ini_config_ut)
     set_target_properties(disabled_ini_config_ut PROPERTIES FOLDER sdk)
+endif()
