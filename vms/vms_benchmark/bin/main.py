@@ -177,6 +177,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 10 * 1024 * 1024
         },
+        "timeDiffThresholdSeconds": {
+            "optional": True,
+            "type": 'float',
+            "default": 180
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -341,9 +346,9 @@ def main(conf_file, ini_file):
     box_time_output = box.eval('date +%s.%N')
     box_time = float(box_time_output.strip())
     host_time = time.time()
-    time_diff_threshold = 3 * 60
-    if abs(box_time - host_time) > time_diff_threshold:
-        raise exceptions.BoxStateError(f"Box time differs from host time by more than {time_diff_threshold} sec")
+    if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
+        raise exceptions.BoxStateError(
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} sec")
 
     vmses = VmsScanner.scan(box, linux_distribution)
 
