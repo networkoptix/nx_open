@@ -424,8 +424,8 @@ def main(conf_file, ini_file):
 
     print('Camera archives cleaned.')
 
-    swapped_before = get_cumulative_swap_bytes(box)
-    if swapped_before is None:
+    swapped_before_bytes = get_cumulative_swap_bytes(box)
+    if swapped_before_bytes is None:
         print("Cannot obtain swap information.")
 
     vms.start(exc=True)
@@ -854,12 +854,12 @@ def main(conf_file, ini_file):
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
 
-    if swapped_before is not None:
-        swapped_after = get_cumulative_swap_bytes(box)
-        swapping_threshold_mb = 100
-        swapped_during_test = swapped_after - swapped_before
-        if swapped_during_test > swapping_threshold_mb * 1024 * 1024:
-            raise exceptions.BoxStateError(f"More than {swapping_threshold_mb} MB was swapped during the tests.")
+    if swapped_before_bytes is not None:
+        swapped_after_bytes = get_cumulative_swap_bytes(box)
+        swapping_threshold_megabytes = 100
+        swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
+        if swapped_during_test_bytes > swapping_threshold_megabytes * 1024 * 1024:
+            raise exceptions.BoxStateError(f"More than {swapping_threshold_megabytes} MB was swapped during the tests.")
 
     print('\nSUCCESS: All tests finished.')
     return 0
