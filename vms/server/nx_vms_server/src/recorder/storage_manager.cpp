@@ -534,11 +534,13 @@ public:
 
     virtual void run() override
     {
+        NX_DEBUG(this, "Starting to test storages");
         for (const auto& storage: storagesToTest())
             m_owner->updateMountedStatus(storage);
 
         for (const auto& storage : storagesToTest())
         {
+            NX_DEBUG(this, "Testing storage %1", storage->getUrl());
             if (needToStop())
                 return;
 
@@ -553,6 +555,8 @@ public:
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
                     m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
+
+            NX_DEBUG(this, "Testing storage %1 done", storage->getUrl());
         }
 
         m_owner->testStoragesDone();

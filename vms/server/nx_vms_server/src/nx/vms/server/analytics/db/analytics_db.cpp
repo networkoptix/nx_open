@@ -276,7 +276,12 @@ bool EventsStorage::ensureDbDirIsWritable(const QString& path)
         return false;
     }
 
-    if (!m_mediaServerModule->rootFileSystem()->changeOwner(path))
+    NX_DEBUG(
+        this,
+        "Directory %1 exists or has been created successfully. Starting to change access rights...",
+        path);
+
+    if (!m_mediaServerModule->rootFileSystem()->changeOwner(path, /*isRecursive*/ false))
     {
         NX_WARNING(this, "Failed to change owner of directory %1 on root FS", path);
         return false;
