@@ -656,7 +656,7 @@ Chunk DeviceFileCatalog::updateDuration(
         chunk.setFileSize(fileSize);
         if (indexWithDuration)
             chunk.fileIndex = Chunk::FILE_INDEX_WITH_DURATION;
-        m_chunks.update(std::distance(m_chunks.cbegin(), itr), chunk);
+        m_chunks.update(itr, chunk);
         return chunk;
     }
     else
