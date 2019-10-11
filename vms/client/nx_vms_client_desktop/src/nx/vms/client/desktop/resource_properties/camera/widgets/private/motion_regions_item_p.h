@@ -48,6 +48,7 @@ public:
     void setFillOpacity(qreal value);
 
     QSGNode* updatePaintNode(QSGNode* node);
+    void releaseResources();
 
 private:
     void invalidateRegionsTexture();
@@ -105,6 +106,7 @@ private:
 
     core::MotionGrid m_motionGrid;
     QImage m_regionsImage;
+    bool m_updateRegionsTexture = true;
 };
 
 } // namespace nx::vms::client::desktop

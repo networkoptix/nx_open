@@ -181,7 +181,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
         NX_VERBOSE(kLogTag, lm("Start executing async PTZ command. Sequence %1").arg(sequence));
         QtConcurrent::run(
             serverModule()->ptzControllerPool()->commandThreadPool(),
-            std::bind(&QnPtzRestHandler::asyncExecutor, this, sequence, function));
+            [this, sequence, function]() { return asyncExecutor(sequence, function); });
     }
     return nx::network::http::StatusCode::ok;
 }

@@ -19,7 +19,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         nx::utils::random::QtDevice rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(60, 3600);
-        position = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000;
+        position = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000ll;
     }
     NX_INFO(this, "Start test rtps session: %1 %2",
         url,

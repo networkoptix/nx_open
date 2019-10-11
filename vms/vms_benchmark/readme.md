@@ -20,9 +20,9 @@ The following prerequisites should be assured before running the tool:
 
 * Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, and 4G RAM.
 * Host PC OS: Ubuntu 18.04 or Windows 10.
-   * The tool may work with other OS versions, but it is not officially supported.
-   * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
-       officially supported.
+    * The tool may work with other OS versions, but it is not officially supported.
+    * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
+        officially supported.
 * Host PC should not run any other software at the time of running VMS Benchmark, besides built-in
     OS components. Such software may or may not interfere with VMS Benchmark and may or may not
     affect its ability to run or the accuracy of its report.
@@ -31,6 +31,12 @@ The following prerequisites should be assured before running the tool:
     isolated network.
 * VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
     in the Server web-admin.
+    * No other manipulations with the installed VMS Server should be performed before running the
+        tool, including adding cameras and configuring the Server from the Client - such activities
+        may influence the Server state and thus lead to an incorrect report.
+    * NOTE: After running the tool, it is not recommended to use the Server for further
+        experiments without re-installation or at least deleting the Server database and restarting
+        the Server, because the tool configures the Server specifically to its needs.
 * No more than one VMS should be installed on the box.
 * If the box Linux user is not root, it should be in sudoers and `sudo` should not ask for
     password.

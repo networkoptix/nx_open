@@ -5,6 +5,7 @@ import sys
 import platform
 import subprocess
 from io import StringIO
+from contextlib import contextmanager
 
 def log_remote_command(command):
     logging.info(f'Executing remote command:\n    {command}')
@@ -83,6 +84,23 @@ if platform.system() == 'Linux':
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
+
+        @contextmanager
+        def sh2(self, command, su=False):
+            command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
+
+            log_remote_command(command_wrapped)
+
+            proc = subprocess.Popen(
+                [*self.ssh_args, command_wrapped],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            try:
+                yield proc
+            finally:
+                proc.terminate()
 
         def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'

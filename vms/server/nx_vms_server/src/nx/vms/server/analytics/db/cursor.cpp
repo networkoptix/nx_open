@@ -61,7 +61,7 @@ void Cursor::setOnBeforeCursorDestroyed(
 std::tuple<const ObjectTrack*, std::size_t /*track position*/> Cursor::readNextTrackPosition()
 {
     // Selecting track position with minimal timestamp.
-    auto it = findTrackPosition();
+    auto it = std::get<0>(findTrackPosition());
     if (it == m_currentTracks.end())
         return std::make_tuple(nullptr, 0);
 
@@ -102,11 +102,11 @@ void Cursor::loadNextTrack()
 
 qint64 Cursor::nextTrackPositionTimestamp()
 {
-    auto it = findTrackPosition();
-    return it->first.objectPositionSequence[it->second].timestampUs;
+    return std::get<1>(findTrackPosition());
 }
 
-Cursor::Tracks::iterator Cursor::findTrackPosition()
+std::tuple<Cursor::Tracks::iterator /*track*/, qint64 /*track position timestamp*/>
+    Cursor::findTrackPosition()
 {
     // Selecting track position with minimal timestamp.
     qint64 currentMinTimestamp = std::numeric_limits<qint64>::max();
@@ -128,9 +128,9 @@ Cursor::Tracks::iterator Cursor::findTrackPosition()
         ++it;
     }
 
-    return pos >= 0
-        ? m_currentTracks.begin() + pos
-        : m_currentTracks.end();
+    return std::make_tuple(
+        pos >= 0 ? (m_currentTracks.begin() + pos) : m_currentTracks.end(),
+        currentMinTimestamp);
 }
 
 qint64 Cursor::maxObjectTrackStartTimestamp()
