@@ -859,7 +859,7 @@ def main(conf_file, ini_file):
         swapping_threshold_mb = 100
         swapped_during_test = swapped_after - swapped_before
         if swapped_during_test > swapping_threshold_mb * 1024 * 1024:
-            raise exceptions.BoxStateError(f"More than {swapping_threshold_mb}M was swapped during the tests")
+            raise exceptions.BoxStateError(f"More than {swapping_threshold_mb} MB was swapped during the tests.")
 
     print('\nSUCCESS: All tests finished.')
     return 0
