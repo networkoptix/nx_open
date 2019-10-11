@@ -211,7 +211,7 @@ protected:
         const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
         for (int i = 0; i < (int) serverChunks.size(); ++i)
-            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].chunk().startTimeMs);
+            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
     }
 
     QString fullCatalogPath(const QString& cameraUniqueId, QnServer::ChunksCatalog quality) const

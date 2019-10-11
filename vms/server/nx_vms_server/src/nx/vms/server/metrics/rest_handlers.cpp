@@ -7,7 +7,6 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/timer_manager.h>
 
 namespace nx::vms::server::metrics {
@@ -90,9 +89,7 @@ static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
 template<typename Values>
 JsonRestResponse queryAndMerge(Values values, const QString& api, const QString& query, QnMediaServerModule* module)
 {
-    nx::utils::Mutex valuesMutex;
-    std::vector<std::unique_ptr<nx::network::http::AsyncClient>> clients; // < TODO: Use client pool?
-    auto waiter = std::make_unique<nx::utils::BarrierWaiter>();
+    std::vector<std::future<Values>> serverFutures;
     for (const auto& server: module->commonModule()->resourcePool()->getResources<QnMediaServerResource>())
     {
         if (server->getId() == module->commonModule()->moduleGUID() || server->getStatus() == Qn::Offline)
@@ -105,24 +102,25 @@ JsonRestResponse queryAndMerge(Values values, const QString& api, const QString&
             continue;
         }
 
+        std::promise<Values> promise;
+        serverFutures.push_back(promise.get_future());
         const auto url = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName).setEndpoint(route.addr)
             .setPath("/api/metrics" + api).setQuery(query);
 
-        clients.push_back(std::make_unique<nx::network::http::AsyncClient>());
-
-        const auto client = clients.back().get();
+        auto client = std::make_unique<nx::network::http::AsyncClient>(); // TODO: use client pool?
         client->addAdditionalHeader(Qn::EC2_SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
         client->setUserName(server->getId().toString());
         client->setUserPassword(server->getAuthKey());
-        client->doGet(
+        NX_DEBUG(kTag, "Connecting to %1 (%2)...", server, url);
+        client.get()->doGet(
             url,
-            [client, server, url, onDone = waiter->fork(), &values, &valuesMutex]()
+            [client = std::move(client), server, url, promise = std::move(promise)]() mutable
             {
-                const auto onDoneGuard = nx::utils::makeScopeGuard(onDone);
                 if (!client->response())
                 {
                     NX_DEBUG(kTag, "Connect to %1 (%2) has failed", server, url);
+                    promise.set_value(Values());
                     return;
                 }
 
@@ -133,18 +131,21 @@ JsonRestResponse queryAndMerge(Values values, const QString& api, const QString&
                     || result.error != QnJsonRestResult::NoError)
                 {
                     NX_DEBUG(kTag, "Request to %1 (%2) has failed %3 (%4)", server, url, httpCode, result.errorString);
+                    promise.set_value(Values());
                     return;
                 }
 
                 auto serverValues = result.deserialized<Values>();
                 NX_DEBUG(kTag, "%1 (%2) returned %3", server, url, forLog(serverValues));
-
-                NX_MUTEX_LOCKER lock(&valuesMutex);
-                api::metrics::merge(&values, &serverValues);
+                promise.set_value(std::move(serverValues));
             });
     }
 
-    waiter.reset();
+    for (auto& future: serverFutures)
+    {
+        auto serverValues = future.get();
+        api::metrics::merge(&values, &serverValues);
+    }
     return JsonRestResponse(values);
 }
 

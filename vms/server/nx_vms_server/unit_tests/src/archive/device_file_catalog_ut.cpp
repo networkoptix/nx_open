@@ -99,7 +99,7 @@ TEST(DeviceFileCatalog, mergeData)
     catalog.addChunks(chunks1);
     ASSERT_EQ(kRecordsToTest, catalog.size());
 
-    nx::vms::server::ChunksDeque chunks2;
+    std::deque<Chunk> chunks2;
     for (int i = 0; i < kRecordsToTest; ++i)
     {
         nx::vms::server::Chunk chunk;

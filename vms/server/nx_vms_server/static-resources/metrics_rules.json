@@ -43,53 +43,58 @@
         }
     },
     "servers": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
-                "cpu": {
-                    "name": "CPU",
-                    "description": "CPU name",
-                    "display": "panel"
-                },
-                "ram": {
-                    "name": "RAM",
-                    "format": "GB",
-                    "display": "panel"
+                }
+            }
+        },
+        "info": {
+            "values": {
+                "publicIp": {
+                    "name": "Public IP",
+                    "display": "table|panel"
                 },
                 "os": {
                     "name": "OS",
                     "display": "panel"
                 },
-                "publicIp": {
-                    "name": "Public IP",
+                "osTime": {
+                    "name": "OS time",
                     "display": "table|panel"
                 },
                 "vmsTime": {
                     "name": "VMS time",
                     "display": "table|panel"
                 },
-                "osTime": {
-                    "name": "OS time",
-                    "display": "table|panel"
-                },
-                "cores": {
-                    "display": "panel"
-                },
-                "timeChanged24h": {
+                "vmsTimeChanged24h": {
                     "name": "Events: Time Changed (24h)",
                     "description": "Events count: Time Changed (24h)",
                     "display": "table|panel",
-                    "calculate": "sum %timeChanged 24h",
+                    "calculate": "sum %vmsTimeChanged 24h",
                     "insert": "timeChanged",
                     "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThan %timeChanged24h 5",
-                            "text": "has changed time %timeChanged24h times in last 24 hours"
+                            "condition": "greaterThan %vmsTimeChanged24h 5",
+                            "text": "has changed time %vmsTimeChanged24h times in last 24 hours"
                         }
                     ]
+                },
+                "cpu": {
+                    "name": "CPU",
+                    "description": "CPU name",
+                    "display": "panel"
+                },
+                "cpuCores": {
+                    "name": "Cores",
+                    "display": "panel"
+                },
+                "ram": {
+                    "name": "RAM",
+                    "format": "GB",
+                    "display": "panel"
                 }
             }
         },
@@ -122,7 +127,7 @@
                 }
             }
         },
-        "serverLoad": {
+        "load": {
             "values": {
                 "logLevel": {
                     "name": "Logging level",
@@ -131,12 +136,12 @@
                         {
                             "level": "warning",
                             "condition": "equal %logLevel debug",
-                            "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
+                            "text": "Current logging level is %logLevel. Recommended logging level is info."
                         },
                         {
                             "level": "warning",
                             "condition": "equal %logLevel verbose",
-                            "text": "current logging level is %logLevel. Recommended logging level is \"info\"."
+                            "text": "Current logging level is %logLevel. Recommended logging level is info."
                         }
                     ]
                 },
@@ -209,13 +214,6 @@
                     "name": "Camera channels",
                     "display": "panel"
                 },
-                "transactionsPerSecond1m": {
-                    "name": "Transactions per second",
-                    "display": "panel",
-                    "format": "Transactions/s",
-                    "calculate": "average %transactionsPerSecond 1m",
-                    "insert": "transactionsPerSecond"
-                },
                 "decodingSpeed3s": {
                     "name": "Decoding speed",
                     "display": "panel",
@@ -230,27 +228,6 @@
                     "calculate": "average %encodedPixels 3s",
                     "insert": "encodedPixels"
                 },
-                "actionsTriggered1m": {
-                    "name": "Rules activations/s",
-                    "description": "Event Rules activations per second",
-                    "display": "panel",
-                    "calculate": "average %actionsTriggered 1m",
-                    "insert": "actionsTriggered"
-                },
-                "thumbnails1m": {
-                    "name": "Thumbnails/s",
-                    "description": "Thumbnails per second",
-                    "display": "panel",
-                    "calculate": "average %thumbnails 1m",
-                    "insert": "thumbnails"
-                },
-                "apiCalls1m": {
-                    "name": "API calls/s",
-                    "description": "REST API calls per second",
-                    "display": "panel",
-                    "calculate": "average %apiCalls 1m",
-                    "insert": "apiCalls"
-                },
                 "primaryStreams": {
                     "name": "Primary streams",
                     "display": "panel"
@@ -260,14 +237,54 @@
                     "display": "panel"
                 }
             }
+        },
+        "activity": {
+            "values": {
+                "transactionsPerSecond1m": {
+                    "name": "Transactions per second",
+                    "display": "panel",
+                    "format": "Transactions/s",
+                    "calculate": "average %transactionsPerSecond 1m",
+                    "insert": "transactionsPerSecond"
+                },
+                "actionsTriggered1m": {
+                    "name": "Rules activations/s",
+                    "description": "Event Rules activations per second",
+                    "display": "panel",
+                    "calculate": "average %actionsTriggered 1m",
+                    "insert": "actionsTriggered"
+                },
+                "apiCalls1m": {
+                    "name": "API calls/s",
+                    "description": "REST API calls per second",
+                    "display": "panel",
+                    "calculate": "average %apiCalls 1m",
+                    "insert": "apiCalls"
+                },
+                "thumbnails1m": {
+                    "name": "Thumbnails/s",
+                    "description": "Thumbnails per second",
+                    "display": "panel",
+                    "calculate": "average %thumbnails 1m",
+                    "insert": "thumbnails"
+                },
+                "plugins": {
+                    "name": "Active plugins list",
+                    "display": "panel"
+                }
+            }
         }
     },
     "cameras": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },
@@ -315,6 +332,7 @@
                     "description": "Events count: Camera offline (1h)",
                     "display": "table|panel",
                     "calculate": "countValues %status 24h Offline",
+                    "insert": "streamIssues",
                     "alarms": [
                         {
                             "level": "warning",
@@ -359,22 +377,22 @@
             }
         },
         "primaryStream": {
+            "name": "Primary Stream",
             "values": {
                 "resolution": {
                     "name": "Resolution",
                     "display": "table|panel"
                 },
-                "targetFps": {
-                    "display": "Target fps"
-                },
                 "actualFps": {
-                    "display": "Actual fps"
+                    "name": "Actual fps",
+                    "display": "panel"
                 },
-                "fpsDeltaAvarage": {
+                "fpsDeltaAverage": {
                     "name": "Avg FPS drop (10 min)",
                     "description": "Average FPS drop (10 min)",
                     "display": "panel",
                     "calculate": "average %fpsDelta 10m",
+                    "insert": "fpsDelta",
                     "alarms": [
                     {
                         "level": "warning",
@@ -403,6 +421,7 @@
             }
         },
         "secondaryStream": {
+            "name": "Secondary Stream",
             "values": {
                 "resolution": {
                     "name": "Resolution",
@@ -415,11 +434,16 @@
                         }
                     ]
                 },
-                "targetFps": {
-                    "display": "Target fps"
-                },
                 "actualFps": {
-                    "display": "Actual fps"
+                    "name": "Actual fps",
+                    "display": "panel"
+                },
+                "fpsDeltaAverage": {
+                    "name": "Avg FPS drop (10 min)",
+                    "description": "Average FPS drop (10 min)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m",
+                    "insert": "fpsDelta"
                 },
                 "actualBitrateBps": {
                     "name": "Bitrate",
@@ -432,16 +456,11 @@
                             "text": "Actual bitrate is 0 KBps"
                         }
                     ]
-                },
-                "fpsDeltaAvarage": {
-                    "name": "Avg FPS drop (10 min)",
-                    "description": "Average FPS drop (10 min)",
-                    "display": "panel",
-                    "calculate": "average %fpsDelta 10m"
                 }
             }
         },
-        "analytics": {
+        "storage": {
+            "name": "Storage Analytics",
             "values": {
                 "archiveLengthS": {
                     "name": "Forecast",
@@ -462,18 +481,22 @@
                     "alarms": [{
                         "level": "error",
                         "condition": "greaterThan %minArchiveLengthS %archiveLengthS",
-                        "text": "Actual archive length %archiveLengthS is less than user defined minumal archive length %minArchiveLengthS"
+                        "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
                     }]
                 }
             }
         }
     },
     "storages": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },
@@ -514,7 +537,7 @@
                 },
                "transactionsPerSecond": {
                     "name": "Transactions/s",
-                    "description": "DB transactions per second",
+                    "description": "Analytics DB transactions per second",
                     "display": "panel",
                     "format": "Transactions/s"
                 }
@@ -544,11 +567,15 @@
         }
     },
     "networkInterfaces": {
-        "info": {
+        "_": {
             "values": {
                 "name": {
                     "display": "table|panel"
-                },
+                }
+            }
+        },
+        "info": {
+            "values": {
                 "server": {
                     "display": "table|panel"
                 },

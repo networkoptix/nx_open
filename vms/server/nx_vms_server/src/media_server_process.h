@@ -114,6 +114,7 @@ public:
     }
 
     nx::vms::server::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
+    QnMediaServerResourcePtr thisServer() const { return m_mediaServer; };
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 

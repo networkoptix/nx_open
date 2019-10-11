@@ -211,7 +211,7 @@ void QnStorageDb::replaceChunks(
 {
     deleteRecords(cameraUniqueId, catalog, -1);
     for (const auto &chunk: chunks)
-        addRecord(cameraUniqueId, catalog, chunk.chunk());
+        addRecord(cameraUniqueId, catalog, chunk);
 }
 
 bool QnStorageDb::open(const QString& fileName)

@@ -76,9 +76,6 @@ static auto infoGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getPath()); }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
                 "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -152,6 +149,12 @@ static auto spaceGroupProvider()
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "_",
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "name", [](const auto& r) { return Value(r->getPath()); }
+            )
+        ),
         infoGroupProvider(),
         stateGroupProvider(),
         activityGroupProvider(),
