@@ -182,6 +182,11 @@ def load_configs(conf_file, ini_file):
             "type": 'float',
             "default": 180
         },
+        "swapThresholdMegabytes": {
+            "optional": True,
+            "type": 'float',
+            "default": 100,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -856,10 +861,9 @@ def main(conf_file, ini_file):
 
     if swapped_before_bytes is not None:
         swapped_after_bytes = get_cumulative_swap_bytes(box)
-        swapping_threshold_megabytes = 100
         swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
-        if swapped_during_test_bytes > swapping_threshold_megabytes * 1024 * 1024:
-            raise exceptions.BoxStateError(f"More than {swapping_threshold_megabytes} MB was swapped during the tests.")
+        if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
+            raise exceptions.BoxStateError(f"More than {ini['swapThresholdMegabytes']} MB was swapped during the tests.")
 
     print('\nSUCCESS: All tests finished.')
     return 0
