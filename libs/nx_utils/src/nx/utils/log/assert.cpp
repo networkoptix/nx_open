@@ -7,7 +7,10 @@
     #include <pthread.h>
 #endif
 
+#if defined(__APPLE__) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE
+#endif
+
 #include <boost/stacktrace.hpp>
 
 #include "log.h"
