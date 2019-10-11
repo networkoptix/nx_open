@@ -31,22 +31,6 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 
     if (nx::vms::client::desktop::ini().useWebEngine)
     {
-        m_webView = new QWebView(parent);
-        QnWebPage* page = new QnWebPage(m_webView);
-        m_webView->setPage(page);
-
-        QWebFrame *frame = page->mainFrame();
-
-        connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
-            this, [this, frame]()
-            {
-                frame->addToJavaScriptWindowObject(exportedName, this);
-            });
-
-        connect(page, &QWebPage::windowCloseRequested, q, &QnSetupWizardDialog::accept);
-    }
-    else
-    {
         m_quickWidget = new QQuickWidget(QUrl(), parent);
         connect(m_quickWidget, &QQuickWidget::statusChanged,
             this, [this, q](QQuickWidget::Status status){
@@ -62,6 +46,22 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
                 nx::vms::client::desktop::GraphicsWebEngineView::registerObject(webView, exportedName, this);
             });
         m_quickWidget->setSource(nx::vms::client::desktop::GraphicsWebEngineView::kQmlSourceUrl);
+    }
+    else
+    {
+        m_webView = new QWebView(parent);
+        QnWebPage* page = new QnWebPage(m_webView);
+        m_webView->setPage(page);
+
+        QWebFrame *frame = page->mainFrame();
+
+        connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
+            this, [this, frame]()
+            {
+                frame->addToJavaScriptWindowObject(exportedName, this);
+            });
+
+        connect(page, &QWebPage::windowCloseRequested, q, &QnSetupWizardDialog::accept);
     }
 }
 
