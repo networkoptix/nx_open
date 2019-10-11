@@ -8,6 +8,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
+#include <QWebEngineView>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
@@ -18,6 +19,8 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +35,22 @@ EulaDialog::EulaDialog(QWidget* parent):
     ui(new Ui::EulaDialog())
 {
     ui->setupUi(this);
+
+    if (ini().useWebEngine)
+    {
+        m_webEngineView = new QWebEngineView(this);
+        m_webEngineView->setSizePolicy(ui->eulaView->sizePolicy());
+        m_webEngineView->page()->setBackgroundColor(Qt::transparent);
+        auto previous = ui->verticalLayout->replaceWidget(ui->eulaView, m_webEngineView);
+        delete previous;
+
+        ui->eulaView = nullptr;
+    }
+    else
+    {
+        m_webEngineView = nullptr;
+    }
+
     ui->iconLabel->setPixmap(
         QnSkin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
 
@@ -58,7 +77,10 @@ EulaDialog::EulaDialog(QWidget* parent):
 
     setAccentStyle(ui->accept);
 
-    NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
+    if (m_webEngineView)
+        NxUi::setupWebViewStyle(m_webEngineView, NxUi::WebViewStyle::eula);
+    else
+        NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
 }
 
 EulaDialog::~EulaDialog()
@@ -85,7 +107,10 @@ void EulaDialog::setEulaHtml(const QString& html)
         lit("<head>"),
         lit("<head><style>%1</style>").arg(eulaHtmlStyle));
 
-    ui->eulaView->setHtml(eulaText);
+    if (m_webEngineView)
+        m_webEngineView->setHtml(eulaText, QUrl("qrc://"));
+    else
+        ui->eulaView->setHtml(eulaText);
 
     // We do not want to copy embedded style to clipboard.
     QTextDocument doc;
