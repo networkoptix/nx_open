@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
@@ -39,6 +40,18 @@ private:
         std::string urlPath;
         std::unique_ptr<network::http::AsyncMessagePipeline> connection;
         std::tuple<ApplicationData...> requestData;
+        debug::ObjectInstanceCounter<TunnelContext> objectInstanceCounter;
+
+        TunnelContext(
+            std::string urlPath,
+            std::unique_ptr<network::http::AsyncMessagePipeline> connection,
+            std::tuple<ApplicationData...> requestData)
+            :
+            urlPath(std::move(urlPath)),
+            connection(std::move(connection)),
+            requestData(std::move(requestData))
+        {
+        }
     };
 
     using Tunnels = std::map<network::http::AsyncMessagePipeline*, TunnelContext>;
@@ -187,10 +200,10 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
 
     auto insertionResult = m_tunnelsInProgress.emplace(
         httpPipePtr,
-        TunnelContext{
+        TunnelContext(
             requestPath,
             std::move(httpPipe),
-            std::make_tuple(std::move(requestData)...)});
+            std::make_tuple(std::move(requestData)...)));
 
     insertionResult.first->second.connection->setMessageHandler(
         [this, httpPipePtr](auto&&... args)

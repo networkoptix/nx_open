@@ -300,14 +300,19 @@ SocketGlobals& SocketGlobals::instance()
     return *s_instance;
 }
 
-const DebugCounters& SocketGlobals::debugCounters() const
+const debug::ObjectCounters& SocketGlobals::debugCounters() const
 {
     return m_debugCounters;
 }
 
-DebugCounters& SocketGlobals::debugCounters()
+debug::ObjectCounters& SocketGlobals::debugCounters()
 {
     return m_debugCounters;
+}
+
+nx::utils::debug::AllocationAnalyzer& SocketGlobals::allocationAnalyzer()
+{
+    return m_allocationAnalyzer;
 }
 
 void SocketGlobals::reloadIni()

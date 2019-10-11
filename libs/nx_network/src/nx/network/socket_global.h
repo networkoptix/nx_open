@@ -6,9 +6,11 @@
 #include <nx/kit/ini_config.h>
 
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/debug/allocation_analyzer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
 
+#include "debug/object_counters.h"
 #include "socket_common.h"
 
 namespace nx {
@@ -30,18 +32,7 @@ struct NX_NETWORK_API Ini:
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 };
 
-struct DebugCounters
-{
-    std::atomic<int> tcpSocketCount{0};
-    std::atomic<int> udpSocketCount{0};
-    std::atomic<int> sslSocketCount{0};
-    std::atomic<int> stunClientConnectionCount{0};
-    std::atomic<int> stunOverHttpClientConnectionCount{0};
-    std::atomic<int> stunServerConnectionCount{0};
-    std::atomic<int> httpClientConnectionCount{0};
-    std::atomic<int> httpServerConnectionCount{0};
-    std::atomic<int> websocketConnectionCount{0};
-};
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API SocketGlobals
 {
@@ -68,8 +59,10 @@ public:
     void unblockHost(const std::string& hostname);
     bool isHostBlocked(const HostAddress& address) const;
 
-    const DebugCounters& debugCounters() const;
-    DebugCounters& debugCounters();
+    const debug::ObjectCounters& debugCounters() const;
+    debug::ObjectCounters& debugCounters();
+
+    nx::utils::debug::AllocationAnalyzer& allocationAnalyzer();
 
     static SocketGlobals& instance();
 
@@ -87,7 +80,8 @@ public:
 
 private:
     std::unique_ptr<SocketGlobalsImpl> m_impl;
-    DebugCounters m_debugCounters;
+    debug::ObjectCounters m_debugCounters;
+    nx::utils::debug::AllocationAnalyzer m_allocationAnalyzer;
 
     /**
      * @param initializationFlags Bitset of nx::network::InitializationFlags.

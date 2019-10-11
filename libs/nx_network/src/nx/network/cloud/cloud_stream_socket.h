@@ -2,6 +2,7 @@
 
 #include <queue>
 
+#include <nx/network/debug/object_instance_counter.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/thread/mutex.h>
@@ -112,6 +113,7 @@ private:
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
     std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
+    debug::ObjectInstanceCounter<CloudStreamSocket> m_objectInstanceCounter;
 
     QnMutex m_mutex;
     bool m_terminated;

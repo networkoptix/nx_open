@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -42,6 +43,7 @@ private:
         std::unique_ptr<AbstractStreamSocket> downChannel;
         std::unique_ptr<AbstractStreamSocket> upChannel;
         std::tuple<ApplicationData...> requestData;
+        debug::ObjectInstanceCounter<TunnelContext> objectInstanceCounter;
 
         bool isReady() const
         {
