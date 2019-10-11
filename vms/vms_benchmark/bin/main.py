@@ -344,7 +344,10 @@ def main(conf_file, ini_file):
     ]
 
     box_time_output = box.eval('date +%s.%N')
-    box_time = float(box_time_output.strip())
+    try:
+        box_time = float(box_time_output.strip())
+    except ValueError:
+        raise exceptions.BoxStateError("Cannot parse output of the date command")
     host_time = time.time()
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
