@@ -33,7 +33,7 @@ TYPED_TEST_P(HttpTunneling, error_is_reported)
     this->thenTunnelIsNotEstablished();
 }
 
-TYPED_TEST_P(HttpTunneling, timeout_supported)
+TYPED_TEST_P(HttpTunneling, client_supports_timeout)
 {
     this->setEstablishTunnelTimeout(std::chrono::milliseconds(1));
 
@@ -58,7 +58,7 @@ TYPED_TEST_P(HttpTunneling, custom_http_headers_are_transferred)
 REGISTER_TYPED_TEST_CASE_P(HttpTunneling,
     tunnel_is_established,
     error_is_reported,
-    timeout_supported,
+    client_supports_timeout,
     custom_http_headers_are_transferred);
 
 //-------------------------------------------------------------------------------------------------

@@ -4,8 +4,10 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/aio/repetitive_timer.h>
 #include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/elapsed_timer_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -55,6 +57,8 @@ private:
 
     mutable QnMutex m_mutex;
     Tunnels m_tunnelsInProgress;
+    nx::utils::ElapsedTimerPool<std::string /*tunnelId*/> m_inactiveConnectionTimerPool;
+    aio::RepetitiveTimer m_removeInactiveTunnelsTimer;
 
     virtual network::http::RequestResult processOpenTunnelRequest(
         const RequestContext& requestContext,
@@ -74,6 +78,12 @@ private:
 
     void reportTunnelIfReady(const std::string& tunnelId);
 
+    void startIdleTimeout(
+        const std::string& tunnelId,
+        std::chrono::milliseconds timeout);
+
+    void dropTunnel(const std::string& tunnelId);
+
     bool validateOpenUpChannelRequest(
         const RequestContext& requestContext);
 };
@@ -84,13 +94,26 @@ template<typename ...ApplicationData>
 SeparateUpDownConnectionsTunnelServer<ApplicationData...>::SeparateUpDownConnectionsTunnelServer(
     typename base_type::NewTunnelHandler newTunnelHandler)
     :
-    base_type(std::move(newTunnelHandler))
+    base_type(std::move(newTunnelHandler)),
+    m_inactiveConnectionTimerPool(
+        [this](const auto& tunnelId) { dropTunnel(tunnelId); })
 {
+    static constexpr auto kCheckForInactiveTunnelsPeriod = std::chrono::seconds(1);
+
+    m_removeInactiveTunnelsTimer.start(
+        kCheckForInactiveTunnelsPeriod,
+        [this]()
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_inactiveConnectionTimerPool.processTimers();
+        });
 }
 
 template<typename ...ApplicationData>
 SeparateUpDownConnectionsTunnelServer<ApplicationData...>::~SeparateUpDownConnectionsTunnelServer()
 {
+    m_removeInactiveTunnelsTimer.pleaseStopSync();
+
     closeAllTunnels();
 }
 
@@ -170,10 +193,12 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::saveDownChannel(
     {
         QnMutexLocker lock(&m_mutex);
 
-        TunnelContext& tunnelContext = m_tunnelsInProgress[tunnelId];
-        // TODO: #ak For a new tunnel start some expiration timer.
-        tunnelContext.downChannel = connection->takeSocket();
-        tunnelContext.requestData = std::make_tuple(std::move(requestData)...);
+        auto [it, inserted] = m_tunnelsInProgress.emplace(tunnelId, TunnelContext());
+        if (inserted && connection->inactivityTimeout())
+            startIdleTimeout(tunnelId, *connection->inactivityTimeout());
+
+        it->second.downChannel = connection->takeSocket();
+        it->second.requestData = std::make_tuple(std::move(requestData)...);
     }
 
     reportTunnelIfReady(tunnelId);
@@ -209,9 +234,11 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::saveUpChannel(
     {
         QnMutexLocker lock(&m_mutex);
 
-        TunnelContext& tunnelContext = m_tunnelsInProgress[tunnelId];
-        // TODO: #ak For a new tunnel start some expiration timer.
-        tunnelContext.upChannel = connection->takeSocket();
+        auto [it, inserted] = m_tunnelsInProgress.emplace(tunnelId, TunnelContext());
+        if (inserted && connection->inactivityTimeout())
+            startIdleTimeout(tunnelId, *connection->inactivityTimeout());
+
+        it->second.upChannel = connection->takeSocket();
     }
 
     reportTunnelIfReady(tunnelId);
@@ -234,6 +261,8 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::reportTunnelIfRe
             return;
         }
 
+        m_inactiveConnectionTimerPool.removeTimer(tunnelId);
+
         tunnelContext = std::move(tunnelContextIter->second);
         m_tunnelsInProgress.erase(tunnelContextIter);
     }
@@ -250,6 +279,21 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::reportTunnelIfRe
 }
 
 template<typename ...ApplicationData>
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::startIdleTimeout(
+    const std::string& tunnelId,
+    std::chrono::milliseconds timeout)
+{
+    m_inactiveConnectionTimerPool.addTimer(tunnelId, timeout);
+}
+
+template<typename ...ApplicationData>
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::dropTunnel(
+    const std::string& tunnelId)
+{
+    m_tunnelsInProgress.erase(tunnelId);
+}
+
+template<typename ...ApplicationData>
 bool SeparateUpDownConnectionsTunnelServer<ApplicationData...>::validateOpenUpChannelRequest(
     const RequestContext& requestContext)
 {
@@ -258,7 +302,8 @@ bool SeparateUpDownConnectionsTunnelServer<ApplicationData...>::validateOpenUpCh
     {
         return false;
     }
-    // TODO
+
+    // TODO: #ak Looks like the validation should be stronger.
 
     return true;
 }

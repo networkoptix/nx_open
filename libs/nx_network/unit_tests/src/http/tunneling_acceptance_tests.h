@@ -80,6 +80,12 @@ protected:
     void setHttpConnectionInactivityTimeout(std::chrono::milliseconds timeout)
     {
         m_httpConnectionInactivityTimeout = timeout;
+
+        if (m_httpServer)
+        {
+            m_httpServer->server().setConnectionInactivityTimeout(
+                *m_httpConnectionInactivityTimeout);
+        }
     }
 
     void givenTunnellingServer()
