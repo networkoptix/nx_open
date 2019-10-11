@@ -537,7 +537,7 @@
                 },
                "transactionsPerSecond": {
                     "name": "Transactions/s",
-                    "description": "DB transactions per second",
+                    "description": "Analytics DB transactions per second",
                     "display": "panel",
                     "format": "Transactions/s"
                 }
