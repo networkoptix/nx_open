@@ -5,6 +5,7 @@
 #include <QtWebKitWidgets/QWebView>
 #include <QWebEngineView>
 #include <QWebEnginePage>
+#include <QWebEngineSettings>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
@@ -330,8 +331,19 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
         // Setting up a policy for link redirection. We should not open release notes right here.
         view->setPage(new RedirectLinksToDesktopPage(view));
         view->page()->setBackgroundColor(Qt::transparent);
+        view->page()->settings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
         NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
         view->setHtml(html, QUrl("qrc://"));
+
+        // Synchronously wait for page to load in order to match QWebView behavior.
+        static const std::chrono::milliseconds kLoadTimeout(3000);
+        QTimer timer;
+        timer.setSingleShot(true);
+        QEventLoop loop;
+        connect(view, &QWebEngineView::loadFinished, this, [&loop](){loop.quit(); });
+        connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+        timer.start(kLoadTimeout);
+        loop.exec();
     }
     else
     {
