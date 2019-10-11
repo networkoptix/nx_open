@@ -4,6 +4,8 @@ include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
@@ -231,10 +233,12 @@ include(fix_qt_vars)
 
 if(withClouds)
     add_custom_target(cloud DEPENDS cloud-backend)
+    set_target_properties(cloud PROPERTIES FOLDER cloud)
 
     if(LINUX)
         add_subdirectory(cloud_portal)
         add_custom_target(cloud-frontend DEPENDS cloud_portal)
+        set_target_properties(cloud-frontend PROPERTIES FOLDER cloud)
         add_dependencies(cloud cloud-frontend)
     endif()
 endif()

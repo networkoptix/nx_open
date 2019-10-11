@@ -30,4 +30,5 @@ nx_add_target(wix_custom_actions LIBRARY LIBRARY_TYPE SHARED
         dutil
         wcautil
         Version
+    FOLDER distribution
 )

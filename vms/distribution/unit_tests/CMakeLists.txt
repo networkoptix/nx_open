@@ -38,3 +38,4 @@ add_custom_command(
 add_custom_target(distribution_unit_tests ALL
     DEPENDS ${package_file}
 )
+set_target_properties(distribution_unit_tests PROPERTIES FOLDER distribution)

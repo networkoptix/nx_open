@@ -20,4 +20,7 @@ if(doxygen_directory)
             "${CMAKE_CURRENT_BINARY_DIR}/index.html"
             "${CMAKE_CURRENT_BINARY_DIR}/html"
     )
+
+    set_target_properties(documentation documentation_zip
+        PROPERTIES FOLDER sdk)
 endif()

@@ -1,1 +1,3 @@
-nx_add_target(p2p_connection_testing_utility EXECUTABLE PUBLIC_LIBS appserver2)
+nx_add_target(p2p_connection_testing_utility EXECUTABLE
+    PUBLIC_LIBS appserver2
+    FOLDER utils)

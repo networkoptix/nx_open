@@ -61,6 +61,7 @@ qt5_wrap_cpp(moc_sources
 )
 
 add_library(qtkeychain SHARED ${sources} ${moc_sources})
+set_target_properties(qtkeychain PROPERTIES FOLDER third_party)
 
 target_link_libraries(qtkeychain PUBLIC ${libs})
 target_include_directories(qtkeychain

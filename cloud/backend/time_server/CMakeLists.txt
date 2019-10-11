@@ -7,4 +7,5 @@ nx_add_target(time_server EXECUTABLE NO_MOC
         "${CMAKE_CURRENT_BINARY_DIR}/time_server_app_info_impl.cpp"
     PUBLIC_LIBS
         nx_network nx_utils
+    FOLDER cloud
 )

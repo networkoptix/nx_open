@@ -114,3 +114,4 @@ add_custom_command(OUTPUT ${zip_file} ${server_resource_zip_file}
 )
 
 add_custom_target(nx_storage_sdk ALL DEPENDS ${zip_file})
+set_target_properties(nx_storage_sdk PROPERTIES FOLDER sdk)

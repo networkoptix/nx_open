@@ -39,7 +39,7 @@ private:
     void loadNextTrack();
 
     qint64 nextTrackPositionTimestamp();
-    Tracks::iterator findTrackPosition();
+    std::tuple<Tracks::iterator /*track*/, qint64 /*track position timestamp*/> findTrackPosition();
     qint64 maxObjectTrackStartTimestamp();
 
     std::tuple<const ObjectTrack*, std::size_t /*track position*/> readNextTrackPosition();

@@ -16,4 +16,6 @@ target_link_libraries(GTest INTERFACE gtest gtest_main)
 add_library(GMock INTERFACE)
 target_link_libraries(GMock INTERFACE gmock gmock_main)
 
+set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER third_party)
+
 set(BUILD_SHARED_LIBS ${build_shared_libs} CACHE INTERNAL "")

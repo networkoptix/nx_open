@@ -31,11 +31,11 @@ class VmsScanner:
                     return None
             return None
 
-        def restart(self, exc=False):
+        def execute_service_command(self, command, exc=False):
             try:
                 if self.linux_distribution.with_systemd:
                     self.device.sh(
-                        f'systemctl restart {self.customization}-mediaserver',
+                        f'systemctl {command} {self.customization}-mediaserver',
                         timeout=30,
                         su=True,
                         exc=True,
@@ -44,7 +44,7 @@ class VmsScanner:
                     )
                 else:
                     self.device.sh(
-                        f'/etc/init.d/{self.customization}-mediaserver restart',
+                        f'/etc/init.d/{self.customization}-mediaserver {command}',
                         timeout=30,
                         su=True,
                         exc=True,
@@ -53,14 +53,23 @@ class VmsScanner:
                     )
             except exceptions.BoxCommandError as e:
                 if exc:
-                    raise exceptions.ServerError("Unable to restart Server.", original_exception=e)
+                    raise exceptions.ServerError(f"Unable to {command} Server.", original_exception=e)
                 else:
                     return False
             except Exception as e:
-                raise exceptions.ServerError("Unable to restart Server.", original_exception=e)
+                raise exceptions.ServerError(f"Unable to {command} Server.", original_exception=e)
 
             if not exc:
                 return True
+
+        def restart(self, exc=False):
+            return self.execute_service_command('restart', exc)
+
+        def start(self, exc=False):
+            return self.execute_service_command('start', exc)
+
+        def stop(self, exc=False):
+            return self.execute_service_command('stop', exc)
 
         def crash_reason(self):
             if self.is_up():

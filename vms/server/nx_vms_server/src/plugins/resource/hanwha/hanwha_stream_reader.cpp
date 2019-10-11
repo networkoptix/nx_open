@@ -57,6 +57,14 @@ QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
     }
 }
 
+QString hanwhaNvrAddUrlParam(const QString& url, const QString& param)
+{
+    // In hanwha API first parameter delimeter is '/' instead of '?',
+    // see Video/Audio SUNAPI v2.5.2 (3.1.2 Live URL for NVR).
+    QString delimiter = url.contains("media.smp/") ? "&" : "/";
+    return url + delimiter + param;
+}
+
 } // namespace
 
 HanwhaStreamReader::HanwhaStreamReader(
@@ -96,9 +104,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         if (m_sessionContext.isNull())
             return CameraDiagnostics::TooManyOpenedConnectionsResult();
 
-        // QUrl isn't used here intentionally, since session parameter works correct
-        // if it added to the end of URL only.
-        streamUrlString.append(lit("/session=%1").arg(m_sessionContext->sessionId));
+        streamUrlString = hanwhaNvrAddUrlParam(
+            streamUrlString, lit("session=%1").arg(m_sessionContext->sessionId));
     }
     else
     {

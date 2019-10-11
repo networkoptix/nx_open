@@ -12,3 +12,5 @@ if(NOT targetDevice STREQUAL "linux_arm64")
         add_dependencies(unit_tests tegra_video_ut)
     endif()
 endif()
+set_target_properties(tegra_video tegra_video_ut tegra_video_EXCLUDED
+    PROPERTIES FOLDER third_party)

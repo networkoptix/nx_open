@@ -90,7 +90,7 @@ else()
             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
         )
     endif()
-    
+
     if(targetDevice STREQUAL "linux_arm32")
         set(extraArgs ${extraArgs}
             --with-rpi-samples
@@ -135,3 +135,4 @@ add_custom_command(OUTPUT ${zip_file} ${server_resource_zip_file}
 )
 
 add_custom_target(nx_video_source_sdk ALL DEPENDS ${zip_file})
+set_target_properties(nx_video_source_sdk PROPERTIES FOLDER sdk)
