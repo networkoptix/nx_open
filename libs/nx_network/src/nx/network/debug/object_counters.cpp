@@ -8,7 +8,6 @@ std::string ObjectCounters::toJson() const
     values.emplace("tcpSocketCount", tcpSocketCount);
     values.emplace("udpSocketCount", udpSocketCount);
     values.emplace("sslSocketCount", sslSocketCount);
-    values.emplace("cloudSocketCount", cloudSocketCount);
     values.emplace("stunClientConnectionCount", stunClientConnectionCount);
     values.emplace("stunOverHttpClientConnectionCount", stunOverHttpClientConnectionCount);
     values.emplace("stunServerConnectionCount", stunServerConnectionCount);

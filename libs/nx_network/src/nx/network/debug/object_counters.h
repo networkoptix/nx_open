@@ -15,7 +15,6 @@ public:
     std::atomic<int> tcpSocketCount{0};
     std::atomic<int> udpSocketCount{0};
     std::atomic<int> sslSocketCount{0};
-    std::atomic<int> cloudSocketCount{0};
     std::atomic<int> stunClientConnectionCount{0};
     std::atomic<int> stunOverHttpClientConnectionCount{0};
     std::atomic<int> stunServerConnectionCount{0};
