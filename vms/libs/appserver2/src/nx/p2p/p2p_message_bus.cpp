@@ -42,6 +42,8 @@ struct GotTransactionFuction
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader) const
     {
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+            bus->printTran(connection, transaction, Connection::Direction::incoming);
         bus->gotTransaction(transaction, connection, transportHeader);
     }
 };
@@ -1069,21 +1071,19 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
     }
 }
 
+template <>
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
     [[maybe_unused]] const TransportHeader& transportHeader)
 {
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
 }
 
-void MessageBus::processRuntimeInfo(
-    const QnTransaction<RuntimeData> &tran,
+template <>
+void MessageBus::gotTransaction(
+    const QnTransaction<nx::vms::api::RuntimeData>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
@@ -1110,37 +1110,12 @@ void MessageBus::processRuntimeInfo(
     sendTransaction(tran, transportHeader);
 }
 
-template<typename T>
-bool MessageBus::processSpecialTransaction(
-    const QnTransaction<T>& tran,
-    const nx::p2p::P2pConnectionPtr& connection,
-    const nx::p2p::TransportHeader& transportHeader)
-{
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    // Process special cases.
-    switch (tran.command)
-    {
-    case ApiCommand::runtimeInfoChanged:
-        processRuntimeInfo(tran, connection, transportHeader);
-        return true;
-    default:
-        return false; //< Not a special case.
-    }
-}
-
 template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
-    if (processSpecialTransaction(tran, connection, transportHeader))
-        return;
-
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
 }

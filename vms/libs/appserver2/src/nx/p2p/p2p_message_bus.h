@@ -148,22 +148,6 @@ protected:
     void startReading(P2pConnectionPtr connection);
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<vms::api::PersistentIdData>& peers);
 
-    template<typename T>
-    bool processSpecialTransaction(
-        const QnTransaction<T>& tran,
-        const nx::p2p::P2pConnectionPtr& connection,
-        const nx::p2p::TransportHeader& transportHeader);
-
-    void gotTransaction(
-        const QnTransaction<vms::api::UpdateSequenceData> &tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
-
-    void processRuntimeInfo(
-        const QnTransaction<vms::api::RuntimeData> &tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
-
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 private:

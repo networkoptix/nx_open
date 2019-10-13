@@ -31,6 +31,8 @@ struct GotTransactionFuction
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader) const
     {
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+            bus->printTran(connection, transaction, Connection::Direction::incoming);
         bus->gotTransaction(transaction, connection, transportHeader);
     }
 };
@@ -735,6 +737,7 @@ void ServerMessageBus::resotreAfterDbError()
     dropConnections();
 }
 
+template<>
 void ServerMessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData>& tran,
     const P2pConnectionPtr& connection,
@@ -760,15 +763,21 @@ void ServerMessageBus::gotTransaction(
     }
 }
 
+template<>
+void ServerMessageBus::gotTransaction(
+    const QnTransaction<nx::vms::api::RuntimeData>& tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader)
+{
+    base_type::gotTransaction(tran, connection, transportHeader);
+}
+
 template <class T>
 void ServerMessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
-    if (processSpecialTransaction(tran, connection, transportHeader))
-        return;
-
     vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     const auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
     if (transactionDescriptor->isPersistent)
