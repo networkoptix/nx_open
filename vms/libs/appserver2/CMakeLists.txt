@@ -8,7 +8,7 @@ if(withTests AND (withMediaServer OR withClouds))
 endif()
 
 execute_process(
-COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gen_transaction_types.py
-    --input=${CMAKE_CURRENT_SOURCE_DIR}/src/transaction/transaction.h
-    --output=${CMAKE_CURRENT_BINARY_DIR}/transaction_types.i
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gen_transaction_types.py
+        --input=${CMAKE_CURRENT_SOURCE_DIR}/src/transaction/transaction.h
+        --output=${CMAKE_CURRENT_BINARY_DIR}/transaction_types.i
 )
