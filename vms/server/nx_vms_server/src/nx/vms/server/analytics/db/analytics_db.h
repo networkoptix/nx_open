@@ -67,6 +67,12 @@ public:
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 
 private:
+    enum class ChownMode
+    {
+        recursive,
+        nonRecursive
+    };
+
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
@@ -81,8 +87,6 @@ private:
     ObjectTrackGroupDao m_trackGroupDao;
     bool m_stopped = false;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
-
-    bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 
@@ -112,6 +116,8 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
+    bool mkPath(const QString& path);
+    bool changeOwner(const QString& path, ChownMode mode);
 
     static QRect packRect(const QRectF& rectf);
     static QRectF unpackRect(const QRect& rect);
