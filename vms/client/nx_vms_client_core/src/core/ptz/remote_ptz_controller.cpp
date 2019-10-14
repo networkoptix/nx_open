@@ -368,7 +368,7 @@ bool QnRemotePtzController::getAuxiliaryTraits(
 {
     QnRequestParamList params;
     params.insert("type", QnLexical::serialized(options.type));
-    auto helper = makeDeserializationHelper<QnPtzObject>();
+    auto helper = makeDeserializationHelper<QnPtzAuxiliaryTraitList>();
     return sendRequest(Qn::GetAuxiliaryTraitsPtzCommand, params, nx::Buffer(), options, helper);
 }
 
