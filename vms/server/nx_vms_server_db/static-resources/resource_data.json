@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.115",
+    "version": "1.0.1.126",
     "data": [
         {
             "keys": [
@@ -2170,6 +2170,7 @@
         {
             "keys": ["Dahua|22204TNI"],
             "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
+            "_case": "VMS-13871",
             "forcedOnvifParams":
             {
                 "videoEncoders": ["000"],
@@ -2177,8 +2178,25 @@
             }
         },
         {
+            "keys": [
+                "Dahua|IPC-HDW4831EM*",
+                "Dahua|IPC-HDBW4300R*",
+                "Dahua|IPC-HDW5831R*"
+            ],
+            "_comment1": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "_comment2": "No correct URI can be picked up for videoencoder '002', so we ignore '002'",
+            "_case": "VMS-15911, VMS-15969",
+            "forcedOnvifParams":
+            {
+                "videoEncoders": ["000,001"],
+                "profiles": ["MediaProfile000,MediaProfile001"]
+            },
+            "fixWrongUri": true
+        },
+        {
             "keys": ["Dahua|IPC-HDBW8241E*"],
             "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "_case": "VMS-14077",
             "fixWrongUri": true
         },
         {
