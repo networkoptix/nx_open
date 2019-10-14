@@ -255,6 +255,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
         isWebKitInitialized = true;
     }
 
+    qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
     QtWebEngine::initialize();
     const auto settings = QWebEngineSettings::defaultSettings();
     settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
