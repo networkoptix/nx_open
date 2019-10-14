@@ -20,7 +20,7 @@ static const QString CPU_UNKNOWN = "unknown";
 
 const HardwareInformation& HardwareInformation::instance()
 {
-    static const HardwareInformation hwInfo;
+    static HardwareInformation hwInfo;
     return hwInfo;
 }
 

@@ -5,7 +5,7 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <core/resource/media_server_resource.h>
 
-namespace nx::vms::server { class GlobalMonitor; }
+namespace nx::vms::server { class PlatformMonitor; }
 
 namespace nx::vms::server::metrics {
 
@@ -43,9 +43,9 @@ private:
 
     qint64 getMetric(Metrics parameter);
     qint64 getDelta(Metrics key, qint64 value);
+    nx::vms::server::PlatformMonitor* platform();
 
 private:
-    nx::vms::server::GlobalMonitor* m_platform = nullptr;
     std::vector<std::atomic<qint64>> m_counters;
     std::atomic<int> m_timeChangeEvents = 0;
 };

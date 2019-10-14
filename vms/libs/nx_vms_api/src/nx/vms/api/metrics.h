@@ -1,17 +1,21 @@
 #pragma once
 
-#include <vector>
-#include <map>
+#include <chrono>
 #include <functional>
-#include <QtCore/QJsonValue>
+#include <map>
+#include <vector>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx::vms::api::metrics {
 
-//< TODO: std::variant<QString, int>.
-struct NX_VMS_API Value: QJsonValue { using QJsonValue::QJsonValue; };
+struct NX_VMS_API Value: QJsonValue //< TODO: std::variant<QString, int>.
+{
+    using QJsonValue::QJsonValue;
+    Value(std::chrono::milliseconds duration): QJsonValue(double(duration.count()) / 1000) {}
+};
 
 NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
 NX_VMS_API void merge(Value* destination, Value* source);

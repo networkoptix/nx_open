@@ -12,16 +12,9 @@ class QnPlatformAbstraction: public QnCorePlatformAbstraction
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(QObject *parent = nullptr);
-    virtual ~QnPlatformAbstraction();
-
-    nx::vms::server::GlobalMonitor *monitor() const
-    {
-        return m_monitor;
-    }
-
-    void setServerModule(QnMediaServerModule* serverModule);
+    QnPlatformAbstraction(nx::vms::server::PlatformMonitor* monitor = nullptr, QObject *parent = nullptr);
+    nx::vms::server::PlatformMonitor *monitor() const { return m_monitor; }
 
 private:
-    nx::vms::server::GlobalMonitor *m_monitor;
+    nx::vms::server::PlatformMonitor* m_monitor = nullptr;
 };

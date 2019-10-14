@@ -40,7 +40,6 @@ static QString dateTimeToString(const QDateTime& datetime)
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_platform(this->serverModule()->platform()->monitor()),
     m_counters((int) Metrics::count)
 {
     Qn::directConnect(
@@ -111,7 +110,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "uptimeS",
-            [this](const auto&) { return Value(static_cast<qint64>(m_platform->processUptime().count()) / 1000); }
+            [this](const auto&) { return Value(platform()->processUptime()); }
         )
     );
 }
@@ -121,25 +120,24 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeLocalValueProvider<Resource>(
             "cpuUsageP",
-            [this](const auto&) { return Value(m_platform->totalCpuUsage()); },
-            nx::vms::server::metrics::timerWatch<Resource>(kUpdateInterval)
+            [this](const auto&) { return Value(platform()->totalCpuUsage()); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "serverCpuUsageP", [this](const auto&) { return Value(m_platform->thisProcessCpuUsage()); }
+            "serverCpuUsageP", [this](const auto&) { return Value(platform()->thisProcessCpuUsage()); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "ramUsageB", [this](const auto&) { return Value(qint64(m_platform->totalRamUsageBytes())); }
+            "ramUsageB", [this](const auto&) { return Value(qint64(platform()->totalRamUsageBytes())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "ramUsageP",
-            [this](const auto&) { return Value(ramUsageToPercentages(m_platform->totalRamUsageBytes())); }
+            [this](const auto&) { return Value(ramUsageToPercentages(platform()->totalRamUsageBytes())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "serverRamUsage", [this](const auto&) { return Value(qint64(m_platform->thisProcessRamUsageBytes())); }
+            "serverRamUsage", [this](const auto&) { return Value(qint64(platform()->thisProcessRamUsageBytes())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "serverRamUsageP",
-            [this](const auto&) { return Value(ramUsageToPercentages(m_platform->thisProcessRamUsageBytes())); }
+            [this](const auto&) { return Value(ramUsageToPercentages(platform()->thisProcessRamUsageBytes())); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "cameras",
@@ -196,7 +194,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             "osTime", [](const auto&) { return Value(dateTimeToString(QDateTime::currentDateTime())); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "vmsTime", [](const auto& r) { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
+            "vmsTime", [](const auto&) { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "vmsTimeChanged",
@@ -210,7 +208,8 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             "cpuCores", [this](const auto&) { return Value(HardwareInformation::instance().physicalCores); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "ram", [](const auto& r) { return Value(r->getProperty(ResourcePropertyKey::Server::kPhysicalMemory)); }
+            "ram",
+            [](const auto& r) { return Value(r->getProperty(ResourcePropertyKey::Server::kPhysicalMemory).toDouble()); }
         )
     );
 }
@@ -243,7 +242,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "plugins",
-            [this](const auto& r)
+            [this](const auto&)
             {
                 QStringList result;
                 for (const auto& value: serverModule()->pluginManager()->metrics())
@@ -287,6 +286,11 @@ qint64 ServerController::getDelta(Metrics key, qint64 value)
     qint64 result = value - counter;
     counter = value;
     return result;
+}
+
+nx::vms::server::PlatformMonitor* ServerController::platform()
+{
+    return serverModule()->platform()->monitor();
 }
 
 } // namespace nx::vms::server::metrics

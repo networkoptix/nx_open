@@ -30,18 +30,7 @@ public:
     GlobalMonitor(nx::vms::server::PlatformMonitor *base, QObject *parent);
     virtual ~GlobalMonitor();
 
-    void logStatistics();
-
-    /**
-     * \returns                         Update period of this global monitor object, in milliseconds.
-     */
-    qint64 updatePeriodMs() const;
-
-    /**
-     * Server uptime in milliseconds.
-     */
-    std::chrono::milliseconds processUptime() const;
-
+    virtual void logStatistics() override;
     virtual qreal totalCpuUsage() override;
     virtual quint64 totalRamUsageBytes() override;
     virtual qreal thisProcessCpuUsage() override;
@@ -50,7 +39,8 @@ public:
     virtual QList<NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual QString partitionByPath(const QString &path) override;
-
+    virtual std::chrono::milliseconds processUptime() const override;
+    virtual std::chrono::milliseconds updatePeriod() const override;
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
 
 private:
@@ -64,6 +54,29 @@ private:
     nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
     nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
+};
+
+class StubMonitor: public nx::vms::server::PlatformMonitor
+{
+public:
+    StubMonitor(QObject *parent = NULL): nx::vms::server::PlatformMonitor(parent) {}
+
+    virtual qreal totalCpuUsage() override { return totalCpuUsage_; }
+    virtual quint64 totalRamUsageBytes() override { return totalRamUsageBytes_; }
+    virtual qreal thisProcessCpuUsage() override { return thisProcessCpuUsage_; }
+    virtual quint64 thisProcessRamUsageBytes() override { return thisProcessRamUsageBytes_; }
+    virtual QList<HddLoad> totalHddLoad() override { return {}; }
+    virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
+    virtual QString partitionByPath(const QString &) override { return {}; }
+    virtual std::chrono::milliseconds processUptime() const override { return processUptime_; }
+
+public:
+    std::atomic<qreal> totalCpuUsage_{0};
+    std::atomic<quint64> totalRamUsageBytes_{0};
+    std::atomic<qreal> thisProcessCpuUsage_{0};
+    std::atomic<quint64> thisProcessRamUsageBytes_{0};
+    std::atomic<std::chrono::milliseconds> processUptime_{std::chrono::seconds(1)};
 };
 
 } // namespace nx::vms::server

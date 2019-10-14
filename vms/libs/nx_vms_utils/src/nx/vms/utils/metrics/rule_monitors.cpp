@@ -200,7 +200,8 @@ public:
                     {
                         const double ageS = seconds(time);
                         maxAgeS = std::max(ageS, maxAgeS);
-                        total += extraction(lastValue, lastAgeS - ageS);
+                        if (maxAgeS != 0) //< Skip first.
+                            total += extraction(lastValue, lastAgeS - ageS);
                         lastValue = value.toDouble();
                         lastAgeS = ageS;
                     });

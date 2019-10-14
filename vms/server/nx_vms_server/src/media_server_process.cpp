@@ -4657,7 +4657,7 @@ void MediaServerProcess::run()
 
     m_serverModule = serverModule;
 
-    m_platform->setServerModule(serverModule.get());
+    m_platform->monitor()->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();

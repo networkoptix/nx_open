@@ -4,6 +4,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/metrics.h>
+#include <platform/hardware_information.h>
 #include <server_for_tests.h>
 
 namespace nx::vms::server::test {
@@ -11,34 +12,64 @@ namespace nx::vms::server::test {
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
-class MetricsServersApi: public testing::Test, public ServerForTests {};
+qreal kGb = 1024 * 1024 * 1024;
 
-TEST_F(MetricsServersApi, values)
+class MetricsServersApi: public testing::Test, public ServerForTests
 {
+public:
+    static void SetUpTestCase()
+    {
+        auto& hardware = const_cast<HardwareInformation&>(HardwareInformation::instance());
+        hardware.physicalMemory = 8 * kGb;
+        hardware.cpuModelName = "NX Core 10 Trio";
+        hardware.logicalCores = 8;
+        hardware.physicalCores = 4;
+    }
+
+    MetricsServersApi(): platformAbstraction(&systemMonitor)
+    {
+        serverModule()->setPlatform(&platformAbstraction);
+    }
+
+protected:
+    StubMonitor systemMonitor;
+    QnPlatformAbstraction platformAbstraction;
+};
+
+#define EXPECT_DOUBLE(VALUE, EXPECTED) EXPECT_NEAR(VALUE.toDouble(), EXPECTED, double(EXPECTED) / 1000)
+
+TEST_F(MetricsServersApi, oneServer)
+{
+    systemMonitor.totalCpuUsage_ = 0.2;
+    systemMonitor.totalRamUsageBytes_ = 2 * kGb;
+    systemMonitor.thisProcessCpuUsage_ = 0.1;
+    systemMonitor.thisProcessRamUsageBytes_ = 1 * kGb;
+
     auto startValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
     EXPECT_EQ(startValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
-
     EXPECT_EQ(startValues["availability"]["status"], "Online");
     EXPECT_EQ(startValues["availability"]["offlineEvents"], 1);
-    EXPECT_GT(startValues["availability"]["uptimeS"].toDouble(), 0);
+    EXPECT_EQ(startValues["availability"]["uptimeS"], 1);
 
-    // TODO: Mockup platform monitor on check info group.
+    // TODO: Mockup & check.
     EXPECT_NE(startValues["info"]["publicIp"].toString(), "");
     EXPECT_NE(startValues["info"]["os"].toString(), "");
     EXPECT_NE(startValues["info"]["osTime"].toString(), "");
     EXPECT_NE(startValues["info"]["vmsTime"].toString(), "");
     EXPECT_EQ(startValues["info"]["vmsTimeChanged24h"], 0);
-    EXPECT_NE(startValues["info"]["cpu"].toString(), "");
-    // EXPECT_GT(startValues["info"]["cpuCores"].toDouble(), 0);
-    // EXPECT_GT(startValues["info"]["ram"].toDouble(), 0);
 
-    // EXPECT_GT(startValues["load"]["cpuUsageP"].toDouble(), 0);
-    // EXPECT_GT(startValues["load"]["serverCpuUsageP"].toDouble(), 0);
-    // EXPECT_GT(startValues["load"]["ramUsageB"].toDouble(), 0);
-    // EXPECT_GT(startValues["load"]["ramUsageP"].toDouble(), 0);
-    // EXPECT_GT(startValues["load"]["serverRamUsage"].toDouble(), 0);
-    // EXPECT_GT(startValues["load"]["serverRamUsageP"].toDouble(), 0);
+    EXPECT_EQ(startValues["info"]["cpu"], "NX Core 10 Trio");
+    EXPECT_EQ(startValues["info"]["cpuCores"], 4);
+    EXPECT_DOUBLE(startValues["info"]["ram"], 8 * kGb);
+    EXPECT_DOUBLE(startValues["load"]["cpuUsageP"], 0.2);
+    EXPECT_DOUBLE(startValues["load"]["serverCpuUsageP"], 0.1);
+    EXPECT_DOUBLE(startValues["load"]["ramUsageB"], 2 * kGb);
+    EXPECT_DOUBLE(startValues["load"]["ramUsageP"], 2.0 / 8);
+    EXPECT_DOUBLE(startValues["load"]["serverRamUsage"], 1 * kGb);
+    EXPECT_DOUBLE(startValues["load"]["serverRamUsageP"], 1.0 / 8);
     EXPECT_EQ(startValues["load"]["cameras"], 0);
+
+    // TODO: Mockup & check.
     EXPECT_EQ(startValues["load"]["decodingSpeed3s"], 0);
     EXPECT_EQ(startValues["load"]["encodingSpeed3s"], 0);
     EXPECT_EQ(startValues["load"]["encodingThreads"], 0);
@@ -46,18 +77,52 @@ TEST_F(MetricsServersApi, values)
     EXPECT_EQ(startValues["load"]["secondaryStreams"], 0);
     EXPECT_GT(startValues["load"]["incomingConnections"].toDouble(), 0);
     EXPECT_NE(startValues["load"]["logLevel"].toString(), "");
-
     EXPECT_GT(startValues["activity"]["transactionsPerSecond1m"].toDouble(), 0);
     EXPECT_EQ(startValues["activity"]["actionsTriggered"], 0);
     EXPECT_EQ(startValues["activity"]["apiCalls1m"], 0);
     EXPECT_EQ(startValues["activity"]["thumbnails1m"], 0);
-    // EXPECT_NE(startValues["activity"]["plugins"].toString(), "");
+    EXPECT_EQ(startValues["activity"]["plugins"], api::metrics::Value());
 
     auto startAlarms = get<Alarms>("/ec2/metrics/alarms");
     nx::utils::remove_if(startAlarms, [](const auto& i) { return i.parameter == "load.logLevel"; });
     ASSERT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
-    // TODO: Cause values modification and check for response changes.
+    systemMonitor.totalCpuUsage_ = 0.95;
+    systemMonitor.totalRamUsageBytes_ = 7 * kGb;
+    systemMonitor.thisProcessCpuUsage_ = 0.85;
+    systemMonitor.thisProcessRamUsageBytes_ = 6 * kGb;
+    systemMonitor.processUptime_ = std::chrono::minutes{1};
+
+    auto runValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    EXPECT_EQ(runValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
+    EXPECT_EQ(runValues["availability"]["uptimeS"], 60);
+    EXPECT_DOUBLE(runValues["load"]["cpuUsageP"], 0.95);
+    EXPECT_DOUBLE(runValues["load"]["serverCpuUsageP"], 0.85);
+    EXPECT_DOUBLE(runValues["load"]["ramUsageB"], 7 * kGb);
+    EXPECT_DOUBLE(runValues["load"]["ramUsageP"], 7.0 / 8);
+    EXPECT_DOUBLE(runValues["load"]["serverRamUsage"], 6 * kGb);
+    EXPECT_DOUBLE(runValues["load"]["serverRamUsageP"], 6.0 / 8);
+
+    auto runAlarms = get<Alarms>("/ec2/metrics/alarms");
+    nx::utils::remove_if(runAlarms, [](const auto& i) { return i.parameter == "load.logLevel"; });
+    ASSERT_EQ(runAlarms.size(), 2) << QJson::serialized(runAlarms).data();
+
+    EXPECT_EQ(runAlarms[0].label, "servers");
+    EXPECT_EQ(runAlarms[0].resource, id);
+    EXPECT_EQ(runAlarms[0].level, api::metrics::AlarmLevel::warning);
+    EXPECT_EQ(runAlarms[0].parameter, "load.cpuUsageP");
+    EXPECT_EQ(runAlarms[0].text, "Total CPU Usage is 95 %. VMS is using 85 %.");
+
+    EXPECT_EQ(runAlarms[1].label, "servers");
+    EXPECT_EQ(runAlarms[1].resource, id);
+    EXPECT_EQ(runAlarms[1].level, api::metrics::AlarmLevel::warning);
+    EXPECT_EQ(runAlarms[1].parameter, "load.ramUsageP");
+    EXPECT_EQ(runAlarms[1].text, "Total RAM usage is 87.500 %. VMS is using 75 %.");
+
+    for (int i = 0; i < 5; ++i)
+        addCamera(i);
+    while (get<SystemValues>("/ec2/metrics/values")["servers"][id]["load"]["cameras"].toDouble() != 5)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 TEST_F(MetricsServersApi, twoServers)
