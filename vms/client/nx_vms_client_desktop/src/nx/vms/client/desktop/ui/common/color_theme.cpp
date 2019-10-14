@@ -38,8 +38,8 @@ struct ColorTheme::Private
 
     /** Initialize color values, color groups and color substitutions. */
     void loadColors(
-        const QString& mainColorsFile = QStringLiteral(":/skin/customization_common.json"),
-        const QString& skinColorsFile = QStringLiteral(":/skin/skin.json"));
+        const QString& mainColorsFile = ":/skin/customization_common.json",
+        const QString& skinColorsFile = ":/skin/skin.json");
 
 private:
     QJsonObject readColorDataFromFile(const QString& fileName) const;
