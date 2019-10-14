@@ -7,12 +7,7 @@
     #include <pthread.h>
 #endif
 
-#if defined(__APPLE__) && !defined(_GNU_SOURCE)
-#define _GNU_SOURCE
-#endif
-
-#include <boost/stacktrace.hpp>
-
+#include "../stack_trace.h"
 #include "log.h"
 
 #include <nx/utils/unused.h>
@@ -23,13 +18,6 @@ namespace nx::utils {
 static const size_t kShowTheMostCount(30);
 
 static std::function<void(const log::Message&)> g_onAssertHandler;
-
-std::string getStackTrace()
-{
-    std::stringstream ss;
-    ss << "\n\n" << boost::stacktrace::stacktrace();
-    return ss.str();
-}
 
 void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 {
@@ -63,9 +51,12 @@ bool assertFailure(bool isCritical, const log::Message& message)
 
     const bool isCrashRequired = isCritical || ini().assertCrash;
     const auto& kTag = isCrashRequired ? kCrashTag : kAssertTag;
-    const auto stackTrace = ini().printStackTraceOnAssert ? getStackTrace() : std::string();
-    NX_ERROR(kTag, message, stackTrace);
-    std::cerr << std::endl << ">>> " << message.toStdString() << stackTrace << std::endl;
+    const auto stackTrace = ini().printStackTraceOnAssert ? utils::stackTrace() : std::string();
+    NX_ERROR(kTag, "%1\n\n%2", message, stackTrace);
+    std::cerr << std::endl << ">>> " << message.toStdString() <<
+        std::endl <<
+        std::endl <<
+        stackTrace << std::endl;
 
     if (g_onAssertHandler)
         g_onAssertHandler(message);

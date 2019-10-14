@@ -1,0 +1,18 @@
+#include "stack_trace.h"
+
+#if defined(__APPLE__) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
+
+#include <boost/stacktrace.hpp>
+
+namespace nx::utils {
+
+std::string stackTrace()
+{
+    std::stringstream ss;
+    ss << boost::stacktrace::stacktrace();
+    return ss.str();
+}
+
+} // namespace nx::utils
