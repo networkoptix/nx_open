@@ -116,7 +116,7 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
-    bool mkPath(const QString& path);
+    bool makePath(const QString& path);
     bool changeOwner(const QString& path, ChownMode mode);
 
     static QRect packRect(const QRectF& rectf);
