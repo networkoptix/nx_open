@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 import subprocess
+from typing import List
 from contextlib import contextmanager
 
 from vms_benchmark import exceptions
@@ -13,20 +14,13 @@ debug = False
 @contextmanager
 def stream_reader_running(
     camera_ids,
-    streams_per_camera,
-    archive_streams_count,
+    total_live_stream_count: int,
+    total_archive_stream_count: int,
     user,
     password,
     box_ip,
     vms_port
 ):
-    camera_ids = list(camera_ids)
-
-    archive_streams_list = []
-
-    for i in range(archive_streams_count):
-        archive_streams_list.append(camera_ids[i % len(camera_ids)])
-
     args = [
         binary_file,
         '-u',
@@ -38,13 +32,16 @@ def stream_reader_running(
 
     streams = {}
 
+    def make_number_of_ids(count):
+        return (camera_ids[i % len(camera_ids)] for i in range(count))
+
     for camera_id, opts in (
         [
             [camera_id, {"type": 'live'}]
-            for camera_id in camera_ids*streams_per_camera
+            for camera_id in make_number_of_ids(total_live_stream_count)
         ] + [
             [camera_id, {"type": 'archive'}]
-            for camera_id in archive_streams_list
+            for camera_id in make_number_of_ids(total_archive_stream_count)
         ]
     ):
         import uuid

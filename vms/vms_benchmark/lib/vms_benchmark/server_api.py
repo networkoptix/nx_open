@@ -1,5 +1,6 @@
 import urllib.request
 from collections import namedtuple
+from typing import List
 from urllib.parse import urlencode
 from urllib.error import URLError
 import base64
@@ -125,7 +126,7 @@ class ServerApi:
 
         return None
 
-    def get_test_cameras(self):
+    def get_test_cameras(self) -> List[Camera]:
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))

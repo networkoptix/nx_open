@@ -224,7 +224,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host, 'sh']
 
             self.host_key = None
-            self.ip = None
+            self.ip: str = None
             self.local_ip = None
             self.is_root = False
             self.eth_name = None
@@ -246,7 +246,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 raise exceptions.BoxCommandError(
                     'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
 
-            eth_name_check_result = self.sh(f'test -f "/sys/class/net/{eth_name}"')
+            eth_name_check_result = self.sh(f'test -d "/sys/class/net/{eth_name}"')
 
             if not eth_name_check_result or eth_name_check_result.return_code != 0:
                 raise exceptions.BoxCommandError(
@@ -277,7 +277,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 proc = subprocess.Popen(self.ssh_command(), **opts)
                 out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
                 if stdin:
-                    proc.stdin.write(str(stdin))
+                    proc.stdin.write(str(stdin).encode('UTF-8'))
                 proc.stdin.close()
             except subprocess.TimeoutExpired:
                 message = f'Timeout {timeout} seconds expired'

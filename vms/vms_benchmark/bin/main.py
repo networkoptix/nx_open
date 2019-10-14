@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
 import datetime
+import math
 import platform
 import signal
 import sys
 import time
 import os
 import logging
+from typing import List, Tuple, Optional
+
+from vms_benchmark.camera import Camera
 
 logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
@@ -102,10 +106,15 @@ def load_configs(conf_file, ini_file):
             "optional": False,
             "type": "integers",
         },
-        "streamsPerTestCamera": {  # TODO: #mshevchenko: Split into total live and archive stream count.
+        "liveStreamsPerCameraRatio": {
             "optional": True,
-            "type": 'integer',
-            "default": 1,
+            "type": 'float',
+            "default": 1.0,
+        },
+        "archiveStreamsPerCameraRatio": {
+            "optional": True,
+            "type": 'float',
+            "default": 0.2,
         },
         "streamingTestDurationMinutes": {
             "optional": True,
@@ -553,7 +562,7 @@ def main(conf_file, ini_file):
         with test_camera_context_manager as test_camera_context:
             print(f"    Started {test_cameras_count} virtual cameras.")
 
-            def wait_test_cameras_discovered(timeout, online_duration):
+            def wait_test_cameras_discovered(timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
@@ -603,9 +612,9 @@ def main(conf_file, ini_file):
             print("Waiting finishedWaiting finished..")
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
-                camera_ids=(camera.id for camera in cameras),
-                live_stream_count=conf['streamsPerTestCamera'],  # TODO: #mshevchenko: Must default to cameraCount.
-                archive_stream_count=1,  # TODO: #mshevchenko: Must default to cameraCount / 5.
+                camera_ids=[camera.id for camera in cameras],
+                total_live_stream_count=math.ceil(conf['liveStreamsPerCameraRatio'] * len(cameras)),
+                total_archive_stream_count=math.ceil(conf['archiveStreamsPerCameraRatio'] * len(cameras)),
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
