@@ -1,5 +1,5 @@
 nx_add_target(appserver2 LIBRARY 
-    ADDITIONAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/transaction/transaction.h
+    ADDITIONAL_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/transaction_types.i
     PUBLIC_LIBS common cloud_db_client nx_fusion nx_network
 )
 
