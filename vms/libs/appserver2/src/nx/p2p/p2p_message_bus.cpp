@@ -1585,7 +1585,7 @@ template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&); \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&);
 
-#include <transaction_types.i>
+#include <transaction_types.h>
 BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
 
 
