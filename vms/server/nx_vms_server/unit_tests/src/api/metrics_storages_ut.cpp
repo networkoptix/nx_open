@@ -65,6 +65,49 @@ public:
 
 std::unique_ptr<ServerForTests> MetricsStoragesApi::launcher;
 
+TEST_F(MetricsStoragesApi, space)
+{
+    auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
+    ASSERT_FALSE(storages.isEmpty());
+    auto storage = storages[0];
+    auto storage2 = storages[1];
+
+    const QString kUniqueId = "12345";
+    auto catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+        kUniqueId, QnServer::HiQualityCatalog);
+
+    auto currentTimeMs = 0;
+    static const qint64 kMsInMinute = 1000 * 60;
+    static const qint64 kMsInHour = kMsInMinute * 60;
+    static const qint64 kMsInDay = kMsInHour * 24;
+    nx::vms::server::Chunk chunk;
+    chunk.durationMs = 45 * 1000;
+    static const int kChunkSize = 1000 * 1000;
+    chunk.setFileSize(kChunkSize);
+    static const int kChunks = 100;
+    for (int i = 0; i < kChunks; ++i)
+    {
+        auto s = i % 2 ? storage : storage2;
+        chunk.storageIndex = launcher->serverModule()->storageDbPool()->getStorageIndex(s);
+        chunk.startTimeMs = currentTimeMs;
+        catalog->addRecord(chunk);
+        currentTimeMs += kMsInMinute * 2;
+    }
+
+    auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
+    auto spaceData = storageData["space"];
+    ASSERT_GT(1024*1024, spaceData["totalSpaceB"].toDouble());
+    auto mediaSpace = spaceData["mediaSpaceB"].toDouble();
+    ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
+
+    auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];
+    auto spaceData2 = storageData2["space"];
+    ASSERT_GT(1024 * 1024, spaceData2["totalSpaceB"].toDouble());
+    auto mediaSpace2 = spaceData2["mediaSpaceB"].toDouble();
+    ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
+}
+
 TEST_F(MetricsStoragesApi, state)
 {
     auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
@@ -102,7 +145,6 @@ TEST_F(MetricsStoragesApi, state)
     auto stateData2 = storageData2["state"];
     ASSERT_EQ(0, stateData2["issues24h"].toInt());
 }
-
 
 TEST_F(MetricsStoragesApi, activity)
 {
