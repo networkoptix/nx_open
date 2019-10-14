@@ -4,6 +4,7 @@ import QtWebChannel 1.0
 
 WebEngineView {
     property bool enableInjections: false
+    property bool enablePromises: false
     property list<WebEngineScript> injectScripts: [
         WebEngineScript {
             injectionPoint: WebEngineScript.DocumentCreation
@@ -16,9 +17,35 @@ WebEngineView {
             worldId: WebEngineScript.MainWorld
             injectionPoint: WebEngineScript.DocumentReady
             name: "NxObjectInjectorScript"
+            // Code that wraps each slot call into a function which returns slot
+            // result as ES6 promise.
+            property string wrapCode: !enablePromises ? "" : "\
+                        if (typeof(obj.__objectSignals__) !== 'object') return; \
+                        var qtFunctions = ['unwrapQObject', 'unwrapProperties', 'propertyUpdate', 'signalEmitted', 'deleteLater']; \
+                        Object.keys(obj).forEach(function(funcName) { \
+                            if (typeof(obj[funcName]) !== 'function') return; \
+                            if (typeof(obj.__objectSignals__[funcName]) !== 'undefined') return; \
+                            if (qtFunctions.includes(funcName)) return; \
+                            var savedFuncName = '_original_' + funcName; \
+                            obj[savedFuncName] = obj[funcName]; \
+                            obj[funcName] = function() { \
+                                var funcThis = this; \
+                                var funcArgs = new Array(arguments.length); \
+                                for (var i = 0; i < funcArgs.length; ++i) \
+                                    funcArgs[i] = arguments[i]; \
+                                return new Promise(function(resolve, reject) { \
+                                    funcThis[savedFuncName].apply(funcThis, funcArgs.concat([function(result){ resolve(result); }])); \
+                                }); \
+                            }; \
+                            console.log('Promise: ' + name + '.' + funcName);\
+                        });"
             sourceCode: "\
                 window.channel = new QWebChannel(qt.webChannelTransport, function(channel) { \
-                    Object.keys(channel.objects).forEach(function(e){ window[e] = channel.objects[e] }); \
+                    function wrapObject(name, obj) {"
+                        + wrapCode +
+                        "window[name] = obj; \
+                    }; \
+                    Object.keys(channel.objects).forEach(function(e){ wrapObject(e, channel.objects[e]); }); \
                 });"
         }
     ]

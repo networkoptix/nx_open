@@ -86,7 +86,7 @@ GraphicsWebEngineView::~GraphicsWebEngineView()
 {
 }
 
-void GraphicsWebEngineView::registerObject(QQuickItem* webView, const QString& name, QObject* object)
+void GraphicsWebEngineView::registerObject(QQuickItem* webView, const QString& name, QObject* object, bool enablePromises)
 {
     if (!webView)
         return;
@@ -97,6 +97,7 @@ void GraphicsWebEngineView::registerObject(QQuickItem* webView, const QString& n
     objects.insert(name,  QVariant::fromValue<QObject*>(object));
     QMetaObject::invokeMethod(webChannel, "registerObjects", Q_ARG(QVariantMap, objects));
     webView->setProperty("enableInjections", true);
+    webView->setProperty("enablePromises", enablePromises);
 }
 
 void GraphicsWebEngineView::addToJavaScriptWindowObject(const QString& name, QObject* object)

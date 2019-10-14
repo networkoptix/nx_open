@@ -50,7 +50,8 @@ public:
 
     void whenRootReady(RootReadyCallback callback);
 
-    static void registerObject(QQuickItem* webView, const QString& name, QObject* object);
+    static void registerObject(
+        QQuickItem* webView, const QString& name, QObject* object, bool enablePromises = false);
 
 public slots:
     void back();

@@ -43,7 +43,10 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 
                 connect(webView, SIGNAL(windowCloseRequested()), q, SLOT(accept()));
 
-                nx::vms::client::desktop::GraphicsWebEngineView::registerObject(webView, exportedName, this);
+                // Workaround for webadmin JS code which expects synchronous slot calls.
+                const bool enablePromises = true;
+                nx::vms::client::desktop::GraphicsWebEngineView::registerObject(
+                    webView, exportedName, this, enablePromises);
             });
 
         m_quickWidget->setClearColor(parent->palette().window().color());
