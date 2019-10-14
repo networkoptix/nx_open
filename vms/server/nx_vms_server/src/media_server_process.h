@@ -123,6 +123,7 @@ public:
     void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
     bool installUpdateRequestReceived() const { return m_installUpdateRequestReceived; }
 
+    bool initializeAnalyticsEvents();
 signals:
     void started();
     void startedWithSignalsProcessed();
@@ -239,7 +240,6 @@ private:
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
-    bool initializeAnalyticsEvents();
     void saveMediaServerUserAttributes(
         ec2::AbstractECConnectionPtr ec2Connection,
         const nx::vms::api::MediaServerUserAttributesData& userAttrsData);
