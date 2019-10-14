@@ -56,7 +56,7 @@ EventsStorage::~EventsStorage()
 
 bool EventsStorage::makePath(const QString& path)
 {
-    if (!NX_ASSERT(m_mediaServerModule))
+    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
         return true;
 
     if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
@@ -71,7 +71,7 @@ bool EventsStorage::makePath(const QString& path)
 
 bool EventsStorage::changeOwner(const QString& path, ChownMode mode)
 {
-    if (!NX_ASSERT(m_mediaServerModule))
+    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
         return true;
 
     const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
