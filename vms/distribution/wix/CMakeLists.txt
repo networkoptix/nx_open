@@ -56,44 +56,48 @@ if (withMediaServer OR withDesktopClient)
         TARGET_DIR_ALIAS resources
         COMPONENT_GROUP webengine_resources)
 
-    add_custom_target(distribution_wix_client_msi_webengine_resources_candle
+    set(distribution_wix_client_msi_webengine_resources_obj
+        ${CMAKE_CURRENT_BINARY_DIR}/obj/client-msi/webengine_resources.wixobj)
+    add_custom_command(
         COMMENT "[Wix] Candle webengine resources for msi"
-        DEPENDS ${webengine_resources_file}
+        MAIN_DEPENDENCY ${webengine_resources_file}
         COMMAND ${candle_executable}
             -arch x64
             -nologo
             -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
-            -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-msi/webengine_resources.wixobj
+            -out ${distribution_wix_client_msi_webengine_resources_obj}
             ${webengine_resources_file}
+        OUTPUT ${distribution_wix_client_msi_webengine_resources_obj}
+        VERBATIM
     )
 
-    add_custom_target(distribution_wix_client_strip_webengine_resources_candle
+    set(distribution_wix_client_strip_webengine_resources_obj
+        ${CMAKE_CURRENT_BINARY_DIR}/obj/client-strip/webengine_resources.wixobj)
+    add_custom_command(
         COMMENT "[Wix] Candle webengine resources for exe"
         DEPENDS ${webengine_resources_file}
         COMMAND ${candle_executable}
             -arch x64
             -nologo
             -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
-            -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-strip/webengine_resources.wixobj
+            -out ${distribution_wix_client_strip_webengine_resources_obj}
             ${webengine_resources_file}
+        OUTPUT ${distribution_wix_client_strip_webengine_resources_obj}
+        VERBATIM
     )
 
     add_custom_target(distribution_wix ALL
         DEPENDS
             wix_custom_actions
-            distribution_wix_client_msi_webengine_resources_candle
-            distribution_wix_client_strip_webengine_resources_candle
+            ${distribution_wix_client_strip_webengine_resources_obj}
+            ${distribution_wix_client_msi_webengine_resources_obj}
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
-    set_target_properties(
-        distribution_wix
-        distribution_wix_client_msi_webengine_resources_candle
-        distribution_wix_client_strip_webengine_resources_candle
-        PROPERTIES FOLDER distribution)
+    set_target_properties(distribution_wix PROPERTIES FOLDER distribution)
 endif()
 
 
