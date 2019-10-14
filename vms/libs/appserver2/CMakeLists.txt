@@ -1,3 +1,7 @@
+nx_configure_file(
+    transaction_types.h
+    ${CMAKE_CURRENT_BINARY_DIR})
+
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gen_transaction_types.py
         --input=${CMAKE_CURRENT_SOURCE_DIR}/src/transaction/transaction.h
