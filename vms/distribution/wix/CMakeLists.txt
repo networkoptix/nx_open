@@ -64,7 +64,7 @@ if (withMediaServer OR withDesktopClient)
             -nologo
             -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
             -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-msi/webengine_resources.wixobj
-            ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
+            ${webengine_resources_file}
     )
 
     add_custom_target(distribution_wix_client_strip_webengine_resources_candle
@@ -75,7 +75,7 @@ if (withMediaServer OR withDesktopClient)
             -nologo
             -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
             -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-strip/webengine_resources.wixobj
-            ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
+            ${webengine_resources_file}
     )
 
     add_custom_target(distribution_wix ALL
@@ -157,6 +157,7 @@ if(withDesktopClient)
             "--output" ${client_qml_dir}
             "--prefer-compiled"
             "--skip-styles"
+            "--clean"
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 
