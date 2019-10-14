@@ -5,8 +5,10 @@ execute_process(
 )
 
 nx_add_target(appserver2 LIBRARY 
-    ADDITIONAL_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/transaction_types.h
-    PUBLIC_LIBS common cloud_db_client nx_fusion nx_network
+    ADDITIONAL_SOURCES 
+        "${CMAKE_CURRENT_BINARY_DIR}/transaction_types.h"
+    PUBLIC_LIBS 
+        common cloud_db_client nx_fusion nx_network
 )
 
 if(withTests AND (withMediaServer OR withClouds))
