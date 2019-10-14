@@ -48,7 +48,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-	watchSslCertificateFileIfNeeded(settings);
+	//watchSslCertificateFileIfNeeded(settings);
 
     Model model(settings);
     while (!model.doMandatoryInitialization())
