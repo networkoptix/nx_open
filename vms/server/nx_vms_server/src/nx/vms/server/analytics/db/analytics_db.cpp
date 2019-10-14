@@ -54,7 +54,7 @@ EventsStorage::~EventsStorage()
     done.get_future().wait();
 }
 
-bool EventsStorage::mkPath(const QString& path)
+bool EventsStorage::makePath(const QString& path)
 {
     if (!NX_ASSERT(m_mediaServerModule))
         return true;
@@ -105,7 +105,7 @@ bool EventsStorage::initialize(const Settings& settings)
 
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     const auto archivePath = closeDirPath(settings.path) + "archive/";
-    if (!mkPath(archivePath)
+    if (!makePath(archivePath)
         || !changeOwner(settings.path, ChownMode::nonRecursive)
         || !changeOwner(archivePath, ChownMode::recursive)
         || !m_dbController->initialize()
