@@ -39,6 +39,14 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
 
 ResourceDirectoryBrowser::~ResourceDirectoryBrowser()
 {
+    stop();
+}
+
+void ResourceDirectoryBrowser::stop()
+{
+    if (m_resourceProducerThread->isFinished())
+        return;
+
     m_resourceProducerThread->requestInterruption();
     m_resourceProducerThread->exit();
     m_resourceProducerThread->wait();

@@ -27,6 +27,8 @@ public:
     ResourceDirectoryBrowser(QObject* parent = nullptr);
     virtual ~ResourceDirectoryBrowser() override;
 
+    void stop();
+
     void setLocalResourcesDirectories(const QStringList& paths);
 
     static QnFileLayoutResourcePtr layoutFromFile(const QString& filename,
