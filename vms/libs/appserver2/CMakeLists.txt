@@ -4,10 +4,10 @@ execute_process(
         --output=${CMAKE_CURRENT_BINARY_DIR}/transaction_types.h
 )
 
-nx_add_target(appserver2 LIBRARY 
-    ADDITIONAL_SOURCES 
+nx_add_target(appserver2 LIBRARY
+    ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/transaction_types.h"
-    PUBLIC_LIBS 
+    PUBLIC_LIBS
         common cloud_db_client nx_fusion nx_network
 )
 
