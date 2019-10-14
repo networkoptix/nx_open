@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.126",
+    "version": "1.0.1.127",
     "data": [
         {
             "keys": [
@@ -2179,6 +2179,8 @@
         },
         {
             "keys": [
+                "Dahua|IPC-HFW5442E*",
+                "Dahua|IPC-HDBW7442H*",
                 "Dahua|IPC-HDW4831EM*",
                 "Dahua|IPC-HDBW4300R*",
                 "Dahua|IPC-HDW5831R*"
