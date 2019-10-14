@@ -65,6 +65,21 @@ public:
 
 std::unique_ptr<ServerForTests> MetricsStoragesApi::launcher;
 
+TEST_F(MetricsStoragesApi, info)
+{
+    auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
+    ASSERT_FALSE(storages.isEmpty());
+    auto storage = storages[0];
+    static const QString kTestServerName("Test name");
+    storage->getParentServer()->setName(kTestServerName);
+
+    auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
+    auto infoData = storageData["info"];
+    ASSERT_EQ(kTestServerName, infoData["server"].toString());
+    ASSERT_EQ("local", infoData["type"].toString());
+}
+
 TEST_F(MetricsStoragesApi, space)
 {
     auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
