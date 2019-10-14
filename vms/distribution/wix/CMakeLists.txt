@@ -46,15 +46,54 @@ set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
 if (withMediaServer OR withDesktopClient)
+
+    set(qt_webengine_resources_dir ${qt.dir}/resources)
+    set(webengine_resources_file ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs)
+
+    nx_wix_heat(${webengine_resources_file}
+        SOURCE_DIR ${qt_webengine_resources_dir}
+        SOURCE_DIR_ALIAS var.qt_webengine_resources_dir
+        TARGET_DIR_ALIAS resources
+        COMPONENT_GROUP webengine_resources)
+
+    add_custom_target(distribution_wix_client_msi_webengine_resources_candle
+        COMMENT "[Wix] Candle webengine resources for msi"
+        DEPENDS ${webengine_resources_file}
+        COMMAND ${candle_executable}
+            -arch x64
+            -nologo
+            -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
+            -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-msi/webengine_resources.wixobj
+            ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
+    )
+
+    add_custom_target(distribution_wix_client_strip_webengine_resources_candle
+        COMMENT "[Wix] Candle webengine resources for exe"
+        DEPENDS ${webengine_resources_file}
+        COMMAND ${candle_executable}
+            -arch x64
+            -nologo
+            -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
+            -out ${CMAKE_CURRENT_BINARY_DIR}/obj/client-strip/webengine_resources.wixobj
+            ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
+    )
+
     add_custom_target(distribution_wix ALL
         DEPENDS
             wix_custom_actions
+            distribution_wix_client_msi_webengine_resources_candle
+            distribution_wix_client_strip_webengine_resources_candle
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    set_target_properties(
+        distribution_wix
+        distribution_wix_client_msi_webengine_resources_candle
+        distribution_wix_client_strip_webengine_resources_candle
+        PROPERTIES FOLDER distribution)
 endif()
 
 
@@ -106,11 +145,6 @@ endif()
 if(withDesktopClient)
     set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml/")
     set(desktop_client_executable "${bin_source_dir}/nx_vms_client_desktop.dll")
-
-    nx_generate_wxs(${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs
-        SOURCE_DIR ${qt.dir}/resources
-        TARGET_DIR_ALIAS resources
-        COMPONENT_GROUP webengine_resources)
 
     add_custom_target(collect_qml_dependencies
         DEPENDS
