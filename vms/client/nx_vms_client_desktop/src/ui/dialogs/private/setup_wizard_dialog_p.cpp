@@ -45,6 +45,10 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 
                 nx::vms::client::desktop::GraphicsWebEngineView::registerObject(webView, exportedName, this);
             });
+
+        m_quickWidget->setClearColor(parent->palette().window().color());
+        m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
         m_quickWidget->setSource(nx::vms::client::desktop::GraphicsWebEngineView::kQmlSourceUrl);
     }
     else
