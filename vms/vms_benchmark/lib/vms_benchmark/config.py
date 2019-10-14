@@ -16,7 +16,7 @@ class InvalidConfigOption(exceptions.VmsBenchmarkError):
 class ConfigOptionValueError(exceptions.VmsBenchmarkError):
     def __init__(self, conf_file, name, value, original_exception=None):
         super(ConfigOptionValueError, self).__init__(
-            f"Error in config '{conf_file}' processing value '{value}' of option '{name}'."
+            f"Error in file {conf_file}: Invalid value '{value}' of option '{name}'."
         )
         self.original_exception = original_exception
 
@@ -70,15 +70,28 @@ class ConfigParser:
                         self.options[name] = self.options.get(name, option_descriptions[name]['default'])
 
                     if option_descriptions[name]['type'] == 'integer' and name in self.options:
-                        self.options[name] = int(self.options[name])
+                        value = int(self.options[name])
+                        self.options[name] = value
                     if option_descriptions[name]['type'] == 'float' and name in self.options:
                         self.options[name] = float(self.options[name])
                     if option_descriptions[name]['type'] == 'boolean' and name in self.options:
-                        self.options[name] = self.options[name] in ('true', 'True', 't', 'yes', 'Yes', '1')
+                        if self.options[name] in ('true', 'True', 'yes', 'Yes', '1'):
+                            value = True
+                        elif self.options[name] in ('false', 'False', 'no', 'No', '0'):
+                            value = False
+                        else:
+                            raise Exception(
+                                'Expected one of: true, True, yes, Yes, 1, false, False, no, No, 0.')
+                        self.options[name] = value
                     elif option_descriptions[name]['type'] == 'integers' and name in self.options:
-                        self.options[name] = [int(item.strip()) for item in self.options[name].split(',')]
-                    elif option_descriptions[name]['type'] == 'strings' and name in self.options:
-                        self.options[name] = [item.strip() for item in self.options[name].split(',')]
+                        # Parse integers from string into list. Brackets are optional.
+                        value = self.options[name]
+                        value_list_str = \
+                            value[1:-1] if value.startswith('[') and value.endswith(']') else value
+                        value_list = [item.strip() for item in value_list_str.strip().split(',')]
+                        if len(value_list) == 0 or (len(value_list) == 1 and value_list[0] == ''):
+                            raise Exception('List of integers is empty.')
+                        self.options[name] = [int(item.strip()) for item in value_list]
                 except Exception as e:
                     raise ConfigOptionValueError(filepath, name, self.options[name], e)
 

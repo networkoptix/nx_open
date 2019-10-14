@@ -85,7 +85,7 @@ def load_configs(conf_file, ini_file):
         "boxSshPort": {
             "optional": True,
             "type": 'integer',
-            "range": [0, 31768],
+            "range": [0, 65535],
             "default": 22,
         },
         "vmsUser": {
@@ -98,11 +98,11 @@ def load_configs(conf_file, ini_file):
             "type": "string",
             "default": "admin",
         },
-        "virtualCamerasCount": {
+        "virtualCameraCount": {
             "optional": False,
             "type": "integers",
         },
-        "streamsPerTestCamera": {
+        "streamsPerTestCamera": {  # TODO: #mshevchenko: Split into total live and archive stream count.
             "optional": True,
             "type": 'integer',
             "default": 1,
@@ -110,12 +110,12 @@ def load_configs(conf_file, ini_file):
         "streamingTestDurationMinutes": {
             "optional": True,
             "type": 'integer',
-            "default": 1 if os.path.exists('.not_installed') else 4 * 60,
+            "default": 4 * 60,
         },
         "cameraDiscoveryTimeoutSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 180,
+            "default": 3 * 60,
         },
     }
 
@@ -286,9 +286,13 @@ def main(conf_file, ini_file):
     conf, ini = load_configs(conf_file, ini_file)
 
     if ini.ORIGINAL_OPTIONS is not None:
-        print(f"Overriding default options via '{ini_file}':")
+        print(f"Overriding default options via {ini_file}:")
         for k, v in ini.ORIGINAL_OPTIONS.items():
             print(f"    {k}={v}")
+
+    print(f"Configuration defined in {conf_file}:")
+    for k, v in conf.options.items():
+        print(f"    {k}={v}")
 
     password = conf.get('boxPassword', None)
 
@@ -527,7 +531,7 @@ def main(conf_file, ini_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in conf['virtualCamerasCount']:
+    for test_cameras_count in conf['virtualCameraCount']:
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
@@ -600,8 +604,8 @@ def main(conf_file, ini_file):
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=(camera.id for camera in cameras),
-                streams_per_camera=conf['streamsPerTestCamera'],
-                archive_streams_count=1,
+                live_stream_count=conf['streamsPerTestCamera'],  # TODO: #mshevchenko: Must default to cameraCount.
+                archive_stream_count=1,  # TODO: #mshevchenko: Must default to cameraCount / 5.
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
@@ -871,9 +875,9 @@ def main(conf_file, ini_file):
 
 def nx_format_exception(exception):
     if isinstance(exception, ValueError):
-        return f"Error value {exception}"
+        return f"Invalid value: {exception}"
     elif isinstance(exception, KeyError):
-        return f"No key {exception}"
+        return f"Missing key: {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
             return 'Server refuses passed credentials: check .conf options vmsUser and vmsPassword'
