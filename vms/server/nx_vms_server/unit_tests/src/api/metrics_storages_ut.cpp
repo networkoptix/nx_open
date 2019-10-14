@@ -8,6 +8,7 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <analytics/db/abstract_storage.h>
+#include <nx/vms/server/event/event_connector.h>
 
 #include "test_api_requests.h"
 #include <thread>
@@ -63,6 +64,45 @@ public:
 };
 
 std::unique_ptr<ServerForTests> MetricsStoragesApi::launcher;
+
+TEST_F(MetricsStoragesApi, state)
+{
+    auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
+    ASSERT_FALSE(storages.isEmpty());
+    auto storage = storages[0];
+    auto storage2 = storages[1];
+    storage.dynamicCast<QnFileStorageResource>()->setMounted(true);
+    storage->setStatus(Qn::Offline);
+
+    auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
+    auto stateData = storageData["state"];
+    ASSERT_EQ("Offline", stateData["status"].toString());
+    ASSERT_EQ(0, stateData["issues24h"].toInt());
+
+    auto eventConnector = launcher->serverModule()->eventConnector();
+    static const int kIssues = 10;
+    for (int i = 0; i < kIssues; ++i)
+    {
+        eventConnector->at_storageFailure(storage->getParentServer(), /*time*/ 0,
+            nx::vms::api::EventReason::storageFull, storage);
+    }
+    storage->setStatus(Qn::Online);
+
+    do
+    {
+        systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+        storageData = systemValues["storages"][storage->getId().toSimpleString()];
+        stateData = storageData["state"];
+    } while (kIssues != stateData["issues24h"].toInt());
+    ASSERT_EQ("Online", stateData["status"].toString());
+    ASSERT_EQ(kIssues, stateData["issues24h"].toInt());
+
+    auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];
+    auto stateData2 = storageData2["state"];
+    ASSERT_EQ(0, stateData2["issues24h"].toInt());
+}
+
 
 TEST_F(MetricsStoragesApi, activity)
 {
