@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include <ui/style/skin.h>
 #include <ui/style/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
@@ -119,20 +118,19 @@ protected:
     virtual void SetUp() override
     {
         m_colorer.reset(new SvgIconColorer(svg_data, "mock_svg"));
-        m_skin.reset(new QnSkin({":/svg_icon_colorer_ut"}));
-        m_colorTheme.reset(new ColorTheme());
+        m_colorTheme.reset(new ColorTheme(
+            ":/svg_icon_colorer_ut/customization_common.json",
+            ":/svg_icon_colorer_ut/skin.json"));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown() override
     {
-        m_skin.reset();
         m_colorTheme.reset();
     }
 
 private:
     std::unique_ptr<ColorTheme> m_colorTheme;
-    std::unique_ptr<QnSkin> m_skin;
 };
 
 TEST_F(SvgIconColorerTest, checkNormalIcon)
@@ -160,4 +158,4 @@ TEST_F(SvgIconColorerTest, checkErrorIcon)
     ASSERT_EQ(m_colorer->makeErrorIcon(), svg_data_error);
 }
 
-}
+} // namespace nx::vms::client::desktop
