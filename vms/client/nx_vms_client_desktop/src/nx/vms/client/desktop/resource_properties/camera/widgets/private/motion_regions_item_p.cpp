@@ -13,6 +13,7 @@
 #include <nx/client/core/motion/helpers/camera_motion_helper.h>
 
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/utils/thread/custom_runnable.h>
 
 namespace nx::vms::client::desktop {
 
@@ -213,8 +214,19 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 
 void MotionRegionsItem::Private::releaseResources()
 {
-    m_currentState.texture.reset();
-    m_labelsTexture.reset();
+    const auto clearTextures =
+        [texture = std::move(m_currentState.texture),
+            labelsTexture = std::move(m_labelsTexture)]() mutable
+        {
+            texture.reset();
+            labelsTexture.reset();
+        };
+
+    const auto window = q->window();
+    window->scheduleRenderJob(
+        new nx::utils::thread::CustomRunnable(clearTextures),
+        QQuickWindow::AfterSynchronizingStage);
+    window->update();
 }
 
 void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
