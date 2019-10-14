@@ -4,6 +4,7 @@
 
 class QUrl;
 class QWebView;
+class QWebEngineView;
 class QNetworkRequest;
 
 namespace nx::vms::client::desktop {
@@ -17,13 +18,15 @@ public:
     WebWidget(QWidget* parent = nullptr);
 
     QWebView* view() const;
+    QWebEngineView* webEngineView() const;
 
     void load(const QUrl& url);
     void load(const QNetworkRequest& request);
     void reset();
 
 private:
-    QWebView* const m_webView;
+    QWebView* m_webView;
+    QWebEngineView* m_webEngineView;
 };
 
 } // namespace nx::vms::client::desktop

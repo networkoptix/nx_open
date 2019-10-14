@@ -322,9 +322,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         d->advancedSettingsWidget,
         tr("Advanced"));
 
+    auto cameraWebPage = new CameraWebPageWidget(d->store, ui->tabWidget);
+    connect(this, &QDialog::finished, cameraWebPage, &CameraWebPageWidget::resetApplicationProxy);
     addPage(
         int(CameraSettingsTab::web),
-        new CameraWebPageWidget(d->store, ui->tabWidget),
+        cameraWebPage,
         tr("Web Page"));
 
     addPage(

@@ -12,6 +12,10 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
+#include <QWebEngineProfile>
+#include <QWebEngineView>
+#include <QWebEnginePage>
+#include <QWebEngineCookieStore>
 
 #include <common/common_module.h>
 #include <ui/widgets/common/web_page.h>
@@ -27,6 +31,16 @@
 
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
+namespace {
+
+    // This User-Agent is required for vista camera to use html/js page, not java applet.
+    const QString kUserAgentForCameraPage(
+        "Mozilla/5.0 (Windows; U; Windows NT based; en-US)"
+        " AppleWebKit/534.34 (KHTML, like Gecko)"
+        "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
+
+} // anonymous namespace
+
 namespace nx::vms::client::desktop {
 
 struct CameraWebPageWidget::Private
@@ -34,6 +48,7 @@ struct CameraWebPageWidget::Private
     Private(CameraWebPageWidget* parent);
 
     class WebPage;
+    class WebEnginePage;
     class CookieJar;
 
     WebWidget* const webWidget;
@@ -42,6 +57,7 @@ struct CameraWebPageWidget::Private
     CameraSettingsDialogState::Credentials credentials;
     QNetworkRequest lastRequest;
     bool loadNeeded = false;
+    QScopedPointer<QWebEngineProfile> webEngineProfile;
 
     QnMutex mutex;
 };
@@ -80,10 +96,22 @@ public:
 protected:
     virtual QString userAgentForUrl(const QUrl& /*url*/) const
     {
-        // This User-Agent is required for vista camera to use html/js page, not java applet.
-        return lit("Mozilla/5.0 (Windows; U; Windows NT based; en-US)"
-            " AppleWebKit/534.34 (KHTML, like Gecko)"
-            "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
+        return kUserAgentForCameraPage;
+    }
+};
+
+class CameraWebPageWidget::Private::WebEnginePage: public QWebEnginePage
+{
+    using base_type = QWebEnginePage;
+
+public:
+    using base_type::base_type; //< Forward constructors.
+
+protected:
+    virtual bool certificateError(const QWebEngineCertificateError&) override
+    {
+        // Ignore the error and complete the request.
+        return true;
     }
 };
 
@@ -91,25 +119,85 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget(new WebWidget(parent)),
     cookieJar(new CookieJar())
 {
-    auto webView = webWidget->view();
-    webView->setPage(new WebPage(webView));
+    if (auto webView = webWidget->view())
+    {
+        webView->setPage(new WebPage(webView));
+
+        anchorWidgetToParent(webWidget);
+
+        // Special actions list for context menu for links.
+        webView->insertActions(nullptr, {
+            webView->pageAction(QWebPage::OpenLink),
+            webView->pageAction(QWebPage::Copy),
+            webView->pageAction(QWebPage::CopyLinkToClipboard)});
+
+        const auto accessManager = webView->page()->networkAccessManager();
+        accessManager->setCookieJar(cookieJar.data());
+
+        QObject::connect(accessManager, &QNetworkAccessManager::authenticationRequired,
+            [this](QNetworkReply* reply, QAuthenticator* authenticator)
+            {
+                QnMutexLocker lock(&mutex);
+                if (lastRequest != reply->request())
+                    return;
+
+                NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
+                authenticator->setUser(credentials.login());
+                authenticator->setPassword(credentials.password());
+        });
+
+        QObject::connect(accessManager, &QNetworkAccessManager::proxyAuthenticationRequired,
+            [this, parent](const QNetworkProxy& /*proxy*/, QAuthenticator* authenticator)
+            {
+                const auto user = parent->commonModule()->currentUrl().userName();
+                const auto password = parent->commonModule()->currentUrl().password();
+                authenticator->setUser(user);
+                authenticator->setPassword(password);
+            });
+
+        installEventHandler(webView, QEvent::ContextMenu, webView,
+            [webView](QObject* watched, QEvent* event)
+            {
+                NX_ASSERT(watched == webView && event->type() == QEvent::ContextMenu);
+                const auto frame = webView->page()->mainFrame();
+                if (!frame)
+                    return;
+
+                const auto menuEvent = static_cast<QContextMenuEvent*>(event);
+                const auto hitTest = frame->hitTestContent(menuEvent->pos());
+
+                webView->setContextMenuPolicy(hitTest.linkUrl().isEmpty()
+                    ? Qt::DefaultContextMenu
+                    : Qt::ActionsContextMenu); //< Special context menu for links.
+            });
+
+        installEventHandler(parent, QEvent::Show, parent,
+            [this]()
+            {
+                if (!loadNeeded)
+                    return;
+
+                webWidget->load(lastRequest);
+                loadNeeded = false;
+            });
+            return;
+    }
+
+    auto webView = webWidget->webEngineView();
+    // Creating off-the-record profile.
+    webEngineProfile.reset(new QWebEngineProfile(QString()));
+    webEngineProfile->setHttpUserAgent(kUserAgentForCameraPage);
+    webView->setPage(new WebEnginePage(webEngineProfile.data()));
 
     anchorWidgetToParent(webWidget);
 
-    // Special actions list for context menu for links.
-    webView->insertActions(nullptr, {
-        webView->pageAction(QWebPage::OpenLink),
-        webView->pageAction(QWebPage::Copy),
-        webView->pageAction(QWebPage::CopyLinkToClipboard)});
+    // TODO: Add special context menu for links
 
-    const auto accessManager = webView->page()->networkAccessManager();
-    accessManager->setCookieJar(cookieJar.data());
-
-    QObject::connect(accessManager, &QNetworkAccessManager::authenticationRequired,
-        [this](QNetworkReply* reply, QAuthenticator* authenticator)
+    QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
+        [this](const QUrl& requestUrl, QAuthenticator* authenticator)
         {
             QnMutexLocker lock(&mutex);
-            if (lastRequest != reply->request())
+            if (lastRequest.url() != requestUrl)
                 return;
 
             NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
@@ -117,29 +205,13 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
             authenticator->setPassword(credentials.password());
     });
 
-    QObject::connect(accessManager, &QNetworkAccessManager::proxyAuthenticationRequired,
-        [this, parent](const QNetworkProxy& /*proxy*/, QAuthenticator* authenticator)
+    QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
+        [this, parent](const QUrl&, QAuthenticator* authenticator, const QString&)
         {
             const auto user = parent->commonModule()->currentUrl().userName();
             const auto password = parent->commonModule()->currentUrl().password();
             authenticator->setUser(user);
             authenticator->setPassword(password);
-        });
-
-    installEventHandler(webView, QEvent::ContextMenu, webView,
-        [webView](QObject* watched, QEvent* event)
-        {
-            NX_ASSERT(watched == webView && event->type() == QEvent::ContextMenu);
-            const auto frame = webView->page()->mainFrame();
-            if (!frame)
-                return;
-
-            const auto menuEvent = static_cast<QContextMenuEvent*>(event);
-            const auto hitTest = frame->hitTestContent(menuEvent->pos());
-
-            webView->setContextMenuPolicy(hitTest.linkUrl().isEmpty()
-                ? Qt::DefaultContextMenu
-                : Qt::ActionsContextMenu); //< Special context menu for links.
         });
 
     installEventHandler(parent, QEvent::Show, parent,
@@ -148,7 +220,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
             if (!loadNeeded)
                 return;
 
-            webWidget->load(lastRequest);
+            webWidget->load(lastRequest.url());
             loadNeeded = false;
         });
 }
@@ -165,6 +237,11 @@ CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidg
 CameraWebPageWidget::~CameraWebPageWidget()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+void CameraWebPageWidget::resetApplicationProxy()
+{
+    QNetworkProxy::setApplicationProxy(QNetworkProxy());
 }
 
 void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
@@ -194,6 +271,16 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setPassword(d->credentials.password()).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
+        if (auto webEngineView = d->webWidget->webEngineView())
+        {
+            QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, QnUuid(state.singleCameraProperties.id).toByteArray());
+            QUrl origin(targetUrl);
+            origin.setUserName(QString());
+            origin.setPassword(QString());
+            origin.setPath(QString());
+            webEngineView->page()->profile()->cookieStore()->setCookie(cameraCookie, origin);
+        }
+
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
 
         // NOTE: Work-around to create ssl tunnel between gateway and server (not between the client
@@ -222,7 +309,11 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             QNetworkProxy::HttpProxy,
             gatewayAddress.address.toString(), gatewayAddress.port,
             currentServerUrl.userName(), currentServerUrl.password());
-        d->webWidget->view()->page()->networkAccessManager()->setProxy(gatewayProxy);
+
+        if (d->webWidget->view())
+            d->webWidget->view()->page()->networkAccessManager()->setProxy(gatewayProxy);
+        else
+            QNetworkProxy::setApplicationProxy(gatewayProxy);
 
         const QNetworkRequest request(targetUrl);
         if (d->lastRequest == request)
