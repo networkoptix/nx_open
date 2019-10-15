@@ -31,6 +31,8 @@ TextInput
 
     font.pixelSize: 16
 
+    property real backgroundRightOffset: 0
+
     background: Item
     {
         Rectangle
@@ -38,10 +40,12 @@ TextInput
             width: parent.width
             anchors
             {
-                margins: 4
                 bottom: parent ? parent.bottom : undefined
+                bottomMargin: 4
                 left: parent ? parent.left : undefined
+                leftMargin: 4
                 right: parent ? parent.right : undefined
+                rightMargin: 4 - control.backgroundRightOffset
             }
             height: 1
             color: control.activeFocus ? activeColor : inactiveColor
@@ -67,7 +71,7 @@ TextInput
             anchors
             {
                 right: parent ? parent.right : undefined
-                rightMargin: 4
+                rightMargin: 4 - control.backgroundRightOffset
                 bottom: parent ? parent.bottom : undefined
                 bottomMargin: 4
             }
