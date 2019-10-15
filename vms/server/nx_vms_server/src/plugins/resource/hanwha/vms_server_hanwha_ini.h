@@ -50,8 +50,8 @@ struct HanwhaIni: public nx::kit::IniConfig
         "Allows normalized speed usage for continuous movement\n"
         "(if it is supported by the camera).");
 
-    NX_INI_INT(5, chunkReaderResponseTimeoutS, "Chunk response read timeout is seconds.");
-    NX_INI_INT(30, chunkReaderMessageBodyTimeoutS, "Chunk message body read timeout is seconds.");
+    NX_INI_INT(5 * 60, chunkReaderResponseTimeoutS, "Chunk response read timeout in seconds.");
+    NX_INI_INT(1 * 60, chunkReaderMessageBodyTimeoutS, "Chunk message body read timeout in seconds.");
 };
 
 inline HanwhaIni& ini()
