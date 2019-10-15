@@ -602,8 +602,9 @@ bool QnAviArchiveDelegate::findStreams()
                 const auto stream = m_formatContext->streams[0];
                 if (stream->cur_dts != AV_NOPTS_VALUE)
                 {
-                    const auto dtsRange = stream->cur_dts -
-                        (stream->first_dts != AV_NOPTS_VALUE ? stream->first_dts : 0);
+                    const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
+                        ? stream->cur_dts
+                        : stream->cur_dts - stream->first_dts;
                     const static AVRational r{1, 1000000};
                     m_durationUs = av_rescale_q(dtsRange, stream->time_base, r);
                 }
