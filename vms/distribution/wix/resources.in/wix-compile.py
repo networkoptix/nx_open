@@ -89,21 +89,27 @@ def sign(output_file, code_signing):
     sign_binary(url, output_file, output_file, customization, trusted_timestamping)
 
 
-def candle_and_light(project, filename, components, candle_variables):
+def candle_and_light(project, filename, components, candle_variables, external_components=None):
     candle_output_folder = os.path.join(engine_tmp_folder, project)
     candle(candle_output_folder, components, candle_variables, wix_extensions)
-    light(filename, candle_output_folder, wix_extensions)
+
+    light_sources = [
+        '{}/*.wixobj'.format(candle_output_folder),
+    ]
+    if external_components:
+        light_sources += external_components
+    light(filename, light_sources, wix_extensions)
 
 
-def build_msi(project, filename, components, candle_variables, config):
-    candle_and_light(project, filename, components, candle_variables)
+def build_msi(project, filename, components, candle_variables, config, external_components=None):
+    candle_and_light(project, filename, components, candle_variables, external_components)
     code_signing = config['code_signing']
     if code_signing['enabled']:
         sign(filename, code_signing)
 
 
-def build_exe(project, filename, components, candle_variables, config):
-    candle_and_light(project, filename, components, candle_variables)
+def build_exe(project, filename, components, candle_variables, config, external_components=None):
+    candle_and_light(project, filename, components, candle_variables, external_components)
     code_signing = config['code_signing']
     if code_signing['enabled']:
         engine_filename = project + '.engine.exe'
@@ -119,6 +125,16 @@ def set_embedded_cabs(params, value):
 
 
 def build_client(config):
+
+    client_common_components = [
+        'webengine_resources.wixobj'
+    ]
+
+    client_common_components_paths = [
+        os.path.join('desktop_client', component)
+        for component in client_common_components
+    ]
+
     candle_msi_variables = {
         'ClientFontsSourceDir': environment.client_fonts_source_dir,
         'VoxSourceDir': environment.vox_source_dir,
@@ -127,10 +143,22 @@ def build_client(config):
         'ClientBgSourceDir': environment.client_background_source_dir
     }
     set_embedded_cabs(candle_msi_variables, True)
-    build_msi('client-msi', client_msi_file, client_components, candle_msi_variables, config)
+    build_msi(
+        'client-msi',
+        client_msi_file,
+        client_components,
+        candle_msi_variables,
+        config,
+        external_components=client_common_components_paths)
 
     set_embedded_cabs(candle_msi_variables, False)
-    build_msi('client-strip', client_stripped_file, client_components, candle_msi_variables, config)
+    build_msi(
+        'client-strip',
+        client_stripped_file,
+        client_components,
+        candle_msi_variables,
+        config,
+        external_components=client_common_components_paths)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,

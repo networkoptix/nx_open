@@ -45,52 +45,15 @@ file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
-if (withMediaServer OR withDesktopClient)
+if(withDesktopClient)
+    add_subdirectory(desktop_client)
+endif()
 
-    set(qt_webengine_resources_dir ${qt.dir}/resources)
-    set(webengine_resources_file ${CMAKE_CURRENT_BINARY_DIR}/webengine_resources.wxs)
-
-    nx_wix_heat(${webengine_resources_file}
-        SOURCE_DIR ${qt_webengine_resources_dir}
-        SOURCE_DIR_ALIAS var.qt_webengine_resources_dir
-        TARGET_DIR_ALIAS resources
-        COMPONENT_GROUP webengine_resources)
-
-    set(distribution_wix_client_msi_webengine_resources_obj
-        ${CMAKE_CURRENT_BINARY_DIR}/obj/client-msi/webengine_resources.wixobj)
-    add_custom_command(
-        COMMENT "[Wix] Candle webengine resources for msi"
-        MAIN_DEPENDENCY ${webengine_resources_file}
-        COMMAND ${candle_executable}
-            -arch x64
-            -nologo
-            -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
-            -out ${distribution_wix_client_msi_webengine_resources_obj}
-            ${webengine_resources_file}
-        OUTPUT ${distribution_wix_client_msi_webengine_resources_obj}
-        VERBATIM
-    )
-
-    set(distribution_wix_client_strip_webengine_resources_obj
-        ${CMAKE_CURRENT_BINARY_DIR}/obj/client-strip/webengine_resources.wixobj)
-    add_custom_command(
-        COMMENT "[Wix] Candle webengine resources for exe"
-        DEPENDS ${webengine_resources_file}
-        COMMAND ${candle_executable}
-            -arch x64
-            -nologo
-            -dqt_webengine_resources_dir=${qt_webengine_resources_dir}
-            -out ${distribution_wix_client_strip_webengine_resources_obj}
-            ${webengine_resources_file}
-        OUTPUT ${distribution_wix_client_strip_webengine_resources_obj}
-        VERBATIM
-    )
-
+if(withMediaServer OR withDesktopClient)
     add_custom_target(distribution_wix ALL
         DEPENDS
             wix_custom_actions
-            ${distribution_wix_client_strip_webengine_resources_obj}
-            ${distribution_wix_client_msi_webengine_resources_obj}
+            distribution_wix_desktop_client_resources
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
