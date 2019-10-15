@@ -271,7 +271,7 @@ def main():
         if not args.output:
             exit("Output directory is not specified.")
 
-        if args.clean:
+        if args.clean and os.path.exists(args.output):
             shutil.rmtree(args.output)
 
         deploy_util.deploy(
