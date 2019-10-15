@@ -563,17 +563,19 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex str
     };
 
     using namespace nx::media;
-    auto mergeIntField = [](int& dst, const int& src)
-    {
-        if (dst == 0)
-            dst = src;
-    };
+    auto mergeIntField =
+        [](int& dst, const int& src)
+        {
+            if (dst == 0)
+                dst = src;
+        };
 
-    auto mergeFloatField = [](float& dst, const float& src)
-    {
-        if (qFuzzyIsNull(dst))
-            dst = src;
-    };
+    auto mergeFloatField =
+        [](float& dst, const float& src)
+        {
+            if (qFuzzyIsNull(dst))
+                dst = src;
+        };
 
     StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
@@ -838,7 +840,7 @@ std::optional<QnLiveStreamParams> Camera::targetParams(StreamIndex streamIndex)
 {
     if (auto reader = findReader(streamIndex); reader && reader->isRunning())
         return reader->getLiveParams();
-    return std::optional<QnLiveStreamParams>();
+    return std::nullopt;
 }
 
 std::optional<QnLiveStreamParams> Camera::actualParams(StreamIndex streamIndex)
