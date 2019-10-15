@@ -73,8 +73,9 @@ class SshHostKeyObtainingFailed(VmsBenchmarkError):
     pass
 
 
-class InsuficientResourcesError(VmsBenchmarkError):
+class InsufficientResourcesError(VmsBenchmarkError):
     pass
+
 
 class HostOperationError(VmsBenchmarkError):
     pass

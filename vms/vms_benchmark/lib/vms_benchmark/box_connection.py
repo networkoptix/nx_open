@@ -33,11 +33,12 @@ if platform.system() == 'Linux':
             def message(self):
                 return self.message
 
-        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
+        def __init__(self, host, port, login, password, conf_file):
             self.host = host
             self.port = port
             self.login = login
             self.password = password
+            self.conf_file = conf_file
             if password:
                 self.ssh_command = 'sshpass'
                 self.ssh_args = [
@@ -80,7 +81,7 @@ if platform.system() == 'Linux':
             ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
             if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
 
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
@@ -90,13 +91,14 @@ if platform.system() == 'Linux':
             eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
             if not eth_name:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to detect box network adapter which serves ip {self.ip}.')
 
-            eth_name_check_result = self.sh(f'test -d "/sys/class/net/{eth_name}"')
+            eth_dir = "/sys/class/net/{eth_name}"
+            eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
 
             if not eth_name_check_result or eth_name_check_result.return_code != 0:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to find box network adapter info dir {repr(eth_dir)}.')
 
             self.eth_name = eth_name
 
@@ -137,7 +139,7 @@ if platform.system() == 'Linux':
                 )
             except subprocess.TimeoutExpired:
                 message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
-                          'check boxHostnameOrIp in vms_benchmark.conf.')
+                          f'check boxHostnameOrIp in {repr(self.conf_file)}.')
                 if exc:
                     raise exceptions.BoxCommandError(message=message)
                 else:
@@ -197,11 +199,12 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             def message(self):
                 return self.message
 
-        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
+        def __init__(self, host, port, login, password, conf_file):
             self.host = host
             self.port = port
             self.login = login
             self.password = password
+            self.conf_file = conf_file
             if password:
                 self._ssh_command = [
                     'plink',
@@ -234,7 +237,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
             if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
 
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]

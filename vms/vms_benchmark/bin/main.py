@@ -12,8 +12,6 @@ from typing import List, Tuple, Optional
 
 from vms_benchmark.camera import Camera
 
-logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
-
 # This block ensures that ^C interrupts are handled quietly.
 try:
     def exit_handler(signum, _frame):
@@ -216,14 +214,14 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.debug = ini['testcameraDebug']
 
     if ini.ORIGINAL_OPTIONS is not None:
-        print(f"\nOverriding default options via {ini_file}:")
+        print(f"Overriding default options via {ini_file}:")
         for k, v in ini.ORIGINAL_OPTIONS.items():
             print(f"    {k}={v}")
+    print('')
 
-    print(f"\nConfiguration defined in {conf_file}:")
+    print(f"Configuration defined in {conf_file}:")
     for k, v in conf.options.items():
         print(f"    {k}={v}")
-
     print('')
 
     return conf, ini
@@ -302,12 +300,24 @@ def get_cumulative_swap_bytes(box):
     return kilobytes_swapped * 1024
 
 
+# Refers to the log file in the messages to the user. Filled after determining the log file path.
+log_file_ref = None
+
+
 @click.command()
 @click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
-@click.option('-C', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
 @click.option('--ini-config', 'ini_file', default='vms_benchmark.ini',
     help='Internal configuration file for experimenting and debugging.')
-def main(conf_file, ini_file):
+@click.option('--log', 'log_file', default='vms_benchmark.log',
+    help='Detailed log of all actions; intended to be studied by the support team.')
+def main(conf_file, ini_file, log_file):
+    global log_file_ref
+    log_file_ref = repr(log_file)
+    print(f"VMS Benchmark started; logging to {log_file_ref}.")
+    print('')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
+    logging.info('VMS Benchmark started.')
+
     conf, ini = load_configs(conf_file, ini_file)
 
     password = conf.get('boxPassword', None)
@@ -326,19 +336,12 @@ def main(conf_file, ini_file):
         host=conf['boxHostnameOrIp'],
         login=conf.get('boxLogin', None),
         password=password,
-        port=conf['boxSshPort']
+        port=conf['boxSshPort'],
+        conf_file=conf_file
     )
 
-    res = box_tests.SshHostKeyIsKnown(box).call()
-
-    if not res.success:
-        raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain ssh host key of the box." +
-            (f"\n    Details: {res.formatted_message()}" if res.formatted_message() else "")
-        )
-    else:
-        box.host_key = res.details[0]
-        box.obtain_connection_info()
+    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    box.obtain_connection_info()
 
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
@@ -554,7 +557,7 @@ def main(conf_file, ini_file):
         if ram_available_bytes and ram_available_bytes < (
                 test_cameras_count * ram_bytes_per_camera_by_arch.get(box_platform.arch, 200) * 1024 * 1024
         ):
-            raise exceptions.InsuficientResourcesError(
+            raise exceptions.InsufficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
         print(f"Serving {test_cameras_count} virtual cameras.")
@@ -873,8 +876,7 @@ def main(conf_file, ini_file):
                 if max_lag > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
-                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds; ' +
-                        'can be caused by network issues or poor performance of either the host or the box.'
+                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
@@ -924,19 +926,30 @@ def nx_print_exception(exception, recursive_level=0):
 
 
 if __name__ == '__main__':
-    print("VMS Benchmark started")
     try:
-        logging.info('VMS Benchmark started')
         try:
             sys.exit(main())
-        except (exceptions.VmsBenchmarkError, urllib.error.HTTPError) as e:
+        except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
+            print(f'ISSUE: ', file=sys.stderr, end='')
+            nx_print_exception(e)
+            print('')
+            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.')
+            log_exception('ISSUE', e)
+        except exceptions.VmsBenchmarkError as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
+            if log_file_ref:
+                print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
             log_exception('ERROR', e)
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
+            print(f'UNEXPECTED ERROR: {e}')
+            if log_file_ref:
+                print(f'\nNOTE: Details may be available in {log_file_ref}.')
             log_exception('UNEXPECTED ERROR', e)
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
+        print(f'INTERNAL ERROR: {e}')
+        print(f'\nPlease send the complete output ' +
+            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
+            file=sys.stderr)
 
     sys.exit(1)
