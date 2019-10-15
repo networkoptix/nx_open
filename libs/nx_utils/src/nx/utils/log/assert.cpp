@@ -7,7 +7,7 @@
     #include <pthread.h>
 #endif
 
-#include "../stack_trace.h"
+#include <nx/utils/stack_trace.h>
 #include "log.h"
 
 #include <nx/utils/unused.h>
@@ -51,12 +51,11 @@ bool assertFailure(bool isCritical, const log::Message& message)
 
     const bool isCrashRequired = isCritical || ini().assertCrash;
     const auto& kTag = isCrashRequired ? kCrashTag : kAssertTag;
-    const auto stackTrace = ini().printStackTraceOnAssert ? utils::stackTrace() : std::string();
-    NX_ERROR(kTag, "%1\n\n%2", message, stackTrace);
-    std::cerr << std::endl << ">>> " << message.toStdString() <<
-        std::endl <<
-        std::endl <<
-        stackTrace << std::endl;
+    const auto output = ini().printStackTraceOnAssert
+        ? lm("%1\n\n%2").args(message, stackTrace())
+        : message;
+    NX_ERROR(kTag, output);
+    std::cerr << std::endl << ">>> " << output.toStdString() << std::endl;
 
     if (g_onAssertHandler)
         g_onAssertHandler(message);
