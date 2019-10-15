@@ -73,6 +73,8 @@ private:
         nonRecursive
     };
 
+    using PathAndMode = std::tuple<QString, ChownMode>;
+
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
@@ -117,8 +119,9 @@ private:
 
     void logDataSaveResult(sql::DBResult resultCode);
     bool makePath(const QString& path);
-    bool changeOwner(const QString& path, ChownMode mode);
+    bool changeOwner(const std::vector<PathAndMode>& pathAndModeList);
 
+    static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
     static QRect packRect(const QRectF& rectf);
     static QRectF unpackRect(const QRect& rect);
 };
