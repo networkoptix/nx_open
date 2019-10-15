@@ -43,7 +43,8 @@ public:
         Connecting,
         Connected,
         Error,
-        Unauthorized
+        Unauthorized,
+        forbidden,
     };
 
     enum class Direction
@@ -104,7 +105,7 @@ public:
     void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
 
     QString idForToStringFromPtr() const;
-
+    QString lastErrorMessage() const { return m_lastErrorMessage; }
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -170,6 +171,7 @@ private:
     std::multimap<QString, QString> m_remoteQueryParams;
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
+    QString m_lastErrorMessage;
 };
 
 QString toString(ConnectionBase::State value);

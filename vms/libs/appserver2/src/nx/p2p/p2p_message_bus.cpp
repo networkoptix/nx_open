@@ -495,7 +495,14 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
+    {
         emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id);
+    }
+    else if (connection->state() == Connection::State::forbidden)
+    {
+        emitAsync(this, &MessageBus::remotePeerIncompatible, remotePeer.id,
+            connection->lastErrorMessage());
+    }
 }
 
 void MessageBus::at_stateChanged(
@@ -534,6 +541,7 @@ void MessageBus::at_stateChanged(
                 if (removeUrlInfo.peerId == remoteId)
                     removeUrlInfo.unauthorizedTimer.restart();
             }
+        case Connection::State::forbidden:
         case Connection::State::Error:
         {
             removeConnectionUnsafe(weakRef);
