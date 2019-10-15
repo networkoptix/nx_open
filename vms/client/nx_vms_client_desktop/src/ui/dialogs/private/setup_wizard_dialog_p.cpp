@@ -14,6 +14,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <client_core/client_core_module.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSetupWizardDialogPrivate::LoginInfo, (json), LoginInfo_Fields);
 
@@ -31,7 +32,7 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 
     if (nx::vms::client::desktop::ini().useWebEngine)
     {
-        m_quickWidget = new QQuickWidget(QUrl(), parent);
+        m_quickWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent);
         connect(m_quickWidget, &QQuickWidget::statusChanged,
             this, [this, q](QQuickWidget::Status status){
                 if (status != QQuickWidget::Ready)
