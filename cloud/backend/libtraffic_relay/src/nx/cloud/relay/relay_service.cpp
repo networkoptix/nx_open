@@ -94,15 +94,6 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 	if (m_fileWatcher)
 		m_fileWatcher.reset();
 
-    // Stop view (stop listening and close all connections)
-    // to ensure there will be no new requests and, thus, view will not initiate
-    // new requests to the controller.
-    view.stop();
-
-    controller.reset();
-
-    model.reset();
-
     return result;
 }
 

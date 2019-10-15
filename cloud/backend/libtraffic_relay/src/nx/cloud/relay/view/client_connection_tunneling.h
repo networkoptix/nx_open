@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/http/tunneling/server.h>
+#include <nx/utils/async_operation_guard.h>
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
 
@@ -16,6 +17,8 @@ public:
     ClientConnectionTunnelingServer(
         controller::AbstractConnectSessionManager* connectSessionManager);
 
+    ~ClientConnectionTunnelingServer();
+
     void registerHandlers(
         const std::string& basePath,
         network::http::server::rest::MessageDispatcher* messageDispatcher);
@@ -30,6 +33,7 @@ private:
         nx::network::http::tunneling::Server<
             controller::AbstractConnectSessionManager::StartRelayingFunc>;
 
+    nx::utils::AsyncOperationGuard m_operationGuard;
     controller::AbstractConnectSessionManager* m_connectSessionManager = nullptr;
     TunnelingServer m_tunnelingServer;
 

@@ -14,7 +14,6 @@
 #include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
 #include <nx/cloud/relaying/http_view/listening_peer_connection_tunneling.h>
 
-//#include "authentication_manager.h"
 #include "client_connection_tunneling.h"
 
 namespace nx {

@@ -17,6 +17,11 @@ ListeningPeerConnectionTunnelingServer::ListeningPeerConnectionTunnelingServer(
 {
 }
 
+ListeningPeerConnectionTunnelingServer::~ListeningPeerConnectionTunnelingServer()
+{
+    m_operationGuard.reset();
+}
+
 void ListeningPeerConnectionTunnelingServer::registerHandlers(
     const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
@@ -62,15 +67,19 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     m_listeningPeerManager->beginListening(
         std::move(beginListeningRequest),
         [this, completionHandler = std::move(completionHandler),
-            beginListeningRequest,
-            response = requestContext->response](
-                auto... args) mutable
+            beginListeningRequest, response = requestContext->response,
+            guard = m_operationGuard.sharedGuard()](
+                auto&&... args) mutable
         {
+            auto lock = guard->lock();
+            if (!lock)
+                return;
+
             onBeginListeningCompletion(
                 std::move(completionHandler),
                 std::move(beginListeningRequest),
                 response,
-                std::move(args)...);
+                std::forward<decltype(args)>(args)...);
         });
 }
 

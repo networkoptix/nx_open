@@ -16,6 +16,11 @@ ClientConnectionTunnelingServer::ClientConnectionTunnelingServer(
 {
 }
 
+ClientConnectionTunnelingServer::~ClientConnectionTunnelingServer()
+{
+    m_operationGuard.reset();
+}
+
 void ClientConnectionTunnelingServer::registerHandlers(
     const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
@@ -46,11 +51,15 @@ void ClientConnectionTunnelingServer::authorize(
 
     m_connectSessionManager->connectToPeer(
         inputData,
-        [this, httpResponse = requestContext->response,
+        [this, httpResponse = requestContext->response, guard = m_operationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
                 controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc) mutable
         {
+            auto lock = m_operationGuard->lock();
+            if (!lock)
+                return;
+
             onConnectToPeerFinished(
                 resultCode,
                 httpResponse,

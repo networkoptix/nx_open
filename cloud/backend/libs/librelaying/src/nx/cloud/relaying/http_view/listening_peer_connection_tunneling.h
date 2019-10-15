@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/http/tunneling/server.h>
+#include <nx/utils/async_operation_guard.h>
 
 #include "../listening_peer_pool.h"
 #include "../listening_peer_manager.h"
@@ -15,6 +16,8 @@ public:
         relaying::AbstractListeningPeerManager* listeningPeerManager,
         relaying::AbstractListeningPeerPool* listeningPeerPool);
 
+    ~ListeningPeerConnectionTunnelingServer();
+
     void registerHandlers(
         const std::string& basePath,
         network::http::server::rest::MessageDispatcher* messageDispatcher);
@@ -28,6 +31,7 @@ private:
     using TunnelingServer =
         nx::network::http::tunneling::Server<relay::api::BeginListeningRequest>;
 
+    nx::utils::AsyncOperationGuard m_operationGuard;
     relaying::AbstractListeningPeerManager* m_listeningPeerManager = nullptr;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool = nullptr;
     TunnelingServer m_tunnelingServer;
