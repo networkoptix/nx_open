@@ -208,12 +208,10 @@ protected:
         addRelayInstance(args);
     }
 
-    void givenManyListeningPeers()
+    void givenMultipleListeningPeers(int peerCount)
     {
-        static constexpr int kPeerCount = 71;
-
         std::vector<std::string> hostNames;
-        for (int i = 0; i < kPeerCount; ++i)
+        for (int i = 0; i < peerCount; ++i)
             hostNames.push_back(nx::utils::generateRandomName(7).toStdString());
 
         auto peers = addListeningPeers(hostNames);
@@ -241,10 +239,9 @@ protected:
         relay().stop();
     }
 
-    void startConnectingToRandomPeersSimultaneously()
+    void startConnectingToRandomPeersSimultaneously(
+        int concurrentConnectionCount)
     {
-        static constexpr int kSimultaneousRequestCount = 101;
-
         std::vector<std::string> hostNames;
         std::transform(
             m_listeningPeers.begin(), m_listeningPeers.end(),
@@ -252,10 +249,16 @@ protected:
             [](const ListeningPeer& value) { return value.hostName; });
 
         m_requestGenerator = std::make_unique<ListeningPeerRequestGenerator>(
-            kSimultaneousRequestCount,
+            concurrentConnectionCount,
             relay().httpUrl(),
             std::move(hostNames));
         m_requestGenerator->start();
+    }
+
+    void whenCompletedRequestCountExceeded(int count)
+    {
+        while (m_requestGenerator->completedRequestCount() < count)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
 private:
@@ -290,13 +293,16 @@ TEST_F(RelayService, can_be_stopped_regardless_of_db_host_availability)
     thenRelayCanStillBeStopped();
 }
 
-TEST_F(RelayService, DISABLED_can_be_stopped_under_load)
+TEST_F(RelayService, can_be_stopped_under_load)
 {
-    givenStartedRelay();
-    givenManyListeningPeers();
-    startConnectingToRandomPeersSimultaneously();
+    static constexpr int kPeerCount = 11;
+    static constexpr int kSimultaneousRequestCount = 101;
 
-    std::this_thread::sleep_for(std::chrono::seconds(nx::utils::random::number<int>(0, 7)));
+    givenStartedRelay();
+    givenMultipleListeningPeers(kPeerCount);
+    startConnectingToRandomPeersSimultaneously(kSimultaneousRequestCount);
+
+    whenCompletedRequestCountExceeded(kPeerCount * 2);
 
     thenRelayCanStillBeStopped();
 }

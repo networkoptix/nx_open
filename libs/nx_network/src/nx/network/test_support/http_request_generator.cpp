@@ -26,6 +26,11 @@ void RequestGenerator::start()
     dispatch([this]() { startNewRequestsIfNeeded(); });
 }
 
+std::size_t RequestGenerator::completedRequestCount() const
+{
+    return m_completedRequestCount;
+}
+
 void RequestGenerator::stopWhileInAioThread()
 {
     m_requests.clear();
@@ -40,6 +45,7 @@ void RequestGenerator::startNewRequestsIfNeeded()
             [this, requestIter = std::prev(m_requests.end())]()
             {
                 m_requests.erase(requestIter);
+                ++m_completedRequestCount;
                 startNewRequestsIfNeeded();
             });
     }

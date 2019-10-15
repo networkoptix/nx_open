@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <list>
 #include <vector>
@@ -22,6 +23,8 @@ public:
 
     void start();
 
+    std::size_t completedRequestCount() const;
+
 protected:
     /**
      * The started request is considered running until completionHandler has been invoked.
@@ -37,6 +40,7 @@ private:
 
     const std::size_t m_maxSimultaneousRequestCount;
     std::list<Request> m_requests;
+    std::atomic<std::size_t> m_completedRequestCount = 0;
 
     virtual void stopWhileInAioThread() override;
 
