@@ -83,6 +83,8 @@ public:
         const nx::utils::Url& relayUrl,
         std::vector<std::string> peerNames);
 
+    ~ListeningPeerRequestGenerator();
+
 protected:
     virtual std::unique_ptr<nx::network::aio::BasicPollable> startRequest(
         nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -108,6 +110,11 @@ ListeningPeerRequestGenerator::ListeningPeerRequestGenerator(
     m_relayUrl(relayUrl),
     m_peerNames(std::move(peerNames))
 {
+}
+
+ListeningPeerRequestGenerator::~ListeningPeerRequestGenerator()
+{
+    pleaseStopSync();
 }
 
 std::unique_ptr<nx::network::aio::BasicPollable> ListeningPeerRequestGenerator::startRequest(
@@ -143,7 +150,7 @@ void ListeningPeerRequestGenerator::onCreateSessionCompletion(
 
     client->openConnectionToTheTargetHost(
         response.sessionId,
-        [this, completionHandler = std::move(completionHandler)](
+        [completionHandler = std::move(completionHandler)](
             auto&&... /*args*/)
         {
             completionHandler();
@@ -203,7 +210,7 @@ protected:
 
     void givenManyListeningPeers()
     {
-        static constexpr int kPeerCount = 11;
+        static constexpr int kPeerCount = 71;
 
         std::vector<std::string> hostNames;
         for (int i = 0; i < kPeerCount; ++i)
@@ -242,7 +249,7 @@ protected:
         std::transform(
             m_listeningPeers.begin(), m_listeningPeers.end(),
             std::back_inserter(hostNames),
-            [this](const ListeningPeer& value) { return value.hostName; });
+            [](const ListeningPeer& value) { return value.hostName; });
 
         m_requestGenerator = std::make_unique<ListeningPeerRequestGenerator>(
             kSimultaneousRequestCount,
@@ -289,7 +296,7 @@ TEST_F(RelayService, DISABLED_can_be_stopped_under_load)
     givenManyListeningPeers();
     startConnectingToRandomPeersSimultaneously();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(nx::utils::random::number<int>(0, 7)));
 
     thenRelayCanStillBeStopped();
 }
