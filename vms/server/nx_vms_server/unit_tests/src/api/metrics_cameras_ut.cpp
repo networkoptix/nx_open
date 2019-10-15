@@ -17,6 +17,8 @@ using namespace std::chrono;
 
 static const int kMinDays = 5;
 
+namespace {
+
 class DataProviderStub : public resource::test::LiveStreamProviderMock
 {
 public:
@@ -37,6 +39,8 @@ public:
         m_stat[0].onData(data);
     }
 };
+
+} // namespace
 
 class MetricsCamerasApi: public ::testing::Test
 {
