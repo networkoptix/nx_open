@@ -6,7 +6,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/utils/counter.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/cf/async_queued_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -100,7 +100,7 @@ private:
     relaying::ListeningPeerPool* m_listeningPeerPool;
     model::AbstractRemoteRelayPeerPool* m_remoteRelayPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
-    utils::Counter m_apiCallCounter;
+    utils::AsyncOperationGuard m_operationGuard;
     std::list<RelaySession> m_relaySessions;
     QnMutex m_mutex;
     bool m_terminated = false;

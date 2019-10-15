@@ -40,6 +40,11 @@ public:
 
     void start();
 
+    /**
+     * Stops listening ports and terminates all opened connections.
+     */
+    void stop();
+
     std::vector<network::SocketAddress> httpEndpoints() const;
     std::vector<network::SocketAddress> httpsEndpoints() const;
 

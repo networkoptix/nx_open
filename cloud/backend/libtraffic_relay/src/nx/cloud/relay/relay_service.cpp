@@ -50,8 +50,10 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
 	//watchSslCertificateFileIfNeeded(settings);
 
-    Model model(settings);
-    while (!model.doMandatoryInitialization())
+    auto model = std::make_unique<Model>(settings);
+    m_model = model.get();
+
+    while (!m_model->doMandatoryInitialization())
     {
         if (isTerminated())
             return -1;
@@ -59,21 +61,19 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         NX_INFO(this, lm("Retrying model initialization after delay"));
         std::this_thread::sleep_for(settings.listeningPeerDb().connectionRetryDelay);
     }
-    m_model = &model;
 
-    Controller controller(settings, &model);
-    m_controller = &controller;
+    auto controller = std::make_unique<Controller>(settings, model.get());
 
-    View view(settings, &model, &controller);
+    View view(settings, model.get(), controller.get());
     m_view = &view;
 
     const auto remoteRelayPeerPool =
-        dynamic_cast<const model::RemoteRelayPeerPool*>(&model.remoteRelayPeerPool());
+        dynamic_cast<const model::RemoteRelayPeerPool*>(&model->remoteRelayPeerPool());
 
     auto statisticsProvider = StatisticsProviderFactory::instance().create(
-        model.listeningPeerPool(),
+        model->listeningPeerPool(),
         view.httpServer(),
-        controller.trafficRelay(),
+        controller->trafficRelay(),
         remoteRelayPeerPool && remoteRelayPeerPool->peerDb()
             ? &remoteRelayPeerPool->peerDb()->synchronizationEngine().statisticsProvider()
             : nullptr,
@@ -82,7 +82,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
             : nullptr);
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
-    if (!registerThisInstanceNameInCluster(settings))
+    if (!registerThisInstanceNameInCluster(settings, controller.get()))
         return -1;
 
     // TODO: #ak: process rights reduction should be done here.
@@ -94,17 +94,26 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 	if (m_fileWatcher)
 		m_fileWatcher.reset();
 
-    model.stop();
+    // Stop view (stop listening and close all connections)
+    // to ensure there will be no new requests and, thus, view will not initiate
+    // new requests to the controller.
+    view.stop();
+
+    controller.reset();
+
+    model.reset();
 
     return result;
 }
 
-bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& settings)
+bool RelayService::registerThisInstanceNameInCluster(
+    const conf::Settings& settings,
+    Controller* controller)
 {
     nx::utils::Url publicUrl;
     if (settings.server().name.empty())
     {
-        const auto publicIp = m_controller->discoverPublicAddress();
+        const auto publicIp = controller->discoverPublicAddress();
         if (!publicIp)
         {
             NX_ERROR(this, "Failed to discover public address. Terminating.");

@@ -18,6 +18,11 @@ ListeningPeerManager::ListeningPeerManager(
 {
 }
 
+ListeningPeerManager::~ListeningPeerManager()
+{
+    m_guard.reset();
+}
+
 void ListeningPeerManager::beginListening(
     const relay::api::BeginListeningRequest& request,
     BeginListeningHandler completionHandler)
@@ -52,7 +57,12 @@ void ListeningPeerManager::beginListening(
 
     nx::network::http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        std::bind(&ListeningPeerManager::saveServerConnection, this, request, _1);
+        [this, request, guard = m_guard.sharedGuard()](
+            nx::network::http::HttpServerConnection* httpConnection)
+        {
+            if (auto lock = guard->lock())
+                saveServerConnection(request, httpConnection);
+        };
 
     completionHandler(
         relay::api::ResultCode::ok,

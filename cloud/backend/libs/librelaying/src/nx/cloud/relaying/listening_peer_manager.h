@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/basic_factory.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
@@ -37,6 +38,8 @@ public:
         const Settings& settings,
         ListeningPeerPool* listeningPeerPool);
 
+    ~ListeningPeerManager();
+
     virtual void beginListening(
         const relay::api::BeginListeningRequest& request,
         BeginListeningHandler completionHandler) override;
@@ -44,6 +47,7 @@ public:
 private:
     const Settings& m_settings;
     ListeningPeerPool* m_listeningPeerPool;
+    nx::utils::AsyncOperationGuard m_guard;
 
     void saveServerConnection(
         const relay::api::BeginListeningRequest& request,

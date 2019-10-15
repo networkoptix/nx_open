@@ -47,10 +47,11 @@ private:
 	std::unique_ptr<nx::utils::file_system::FileWatcher> m_fileWatcher;
 
     Model* m_model = nullptr;
-    Controller* m_controller = nullptr;
     View* m_view = nullptr;
 
-    bool registerThisInstanceNameInCluster(const conf::Settings& settings);
+    bool registerThisInstanceNameInCluster(
+        const conf::Settings& settings,
+        Controller* controller);
 
 	void watchSslCertificateFileIfNeeded(const conf::Settings& settings);
 };

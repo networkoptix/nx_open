@@ -107,6 +107,15 @@ void View::start()
         containerString(m_multiAddressHttpServer.sslEndpoints()));
 }
 
+void View::stop()
+{
+    // Stopping accepting new connections.
+    m_multiAddressHttpServer.pleaseStopSync();
+
+    m_multiAddressHttpServer.forEachListener(
+        [](const auto& listener) { listener->closeAllConnections(); });
+}
+
 std::vector<network::SocketAddress> View::httpEndpoints() const
 {
     return m_multiAddressHttpServer.endpoints();

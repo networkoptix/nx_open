@@ -37,7 +37,7 @@ ConnectSessionManager::ConnectSessionManager(
 ConnectSessionManager::~ConnectSessionManager()
 {
     // Waiting scheduled async operations completion.
-    m_apiCallCounter.wait();
+    m_operationGuard.reset();
 
     std::list<RelaySession> relaySessions;
     {
@@ -72,10 +72,14 @@ void ConnectSessionManager::createClientSession(
 
     m_remoteRelayPeerPool->findRelayByDomain(
         request.targetPeerName,
-        [completionHandler = std::move(completionHandler), response = std::move(response),
-            request, this](
+        [this, completionHandler = std::move(completionHandler), response = std::move(response),
+            request, guard = m_operationGuard.sharedGuard()](
                 std::string redirectEndpointString) mutable
         {
+            auto lock = guard->lock();
+            if (!lock)
+                return;
+
             if (redirectEndpointString.empty())
             {
                 NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
@@ -124,18 +128,21 @@ void ConnectSessionManager::connectToPeer(
         clientInfo,
         peerName,
         [this, clientSessionId = request.sessionId, peerName,
-            scopedCallGuard = m_apiCallCounter.getScopedIncrement(),
+            guard = m_operationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
                 std::unique_ptr<network::AbstractStreamSocket> serverConnection,
                 const std::string& /*actualPeerName*/) mutable
         {
-            onAcquiredListeningPeerConnection(
-                clientSessionId,
-                peerName,
-                std::move(completionHandler),
-                resultCode,
-                std::move(serverConnection));
+            if (auto lock = guard->lock())
+            {
+                onAcquiredListeningPeerConnection(
+                    clientSessionId,
+                    peerName,
+                    std::move(completionHandler),
+                    resultCode,
+                    std::move(serverConnection));
+            }
         });
 }
 
