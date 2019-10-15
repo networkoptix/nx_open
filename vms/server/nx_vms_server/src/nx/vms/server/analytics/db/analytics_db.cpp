@@ -1,7 +1,5 @@
 #include "analytics_db.h"
 
-#include <cmath>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/sql/filter.h>
@@ -17,6 +15,8 @@
 #include "object_track_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
+
+#include <cmath>
 
 namespace nx::analytics::db {
 
@@ -69,22 +69,54 @@ bool EventsStorage::makePath(const QString& path)
     return true;
 }
 
-bool EventsStorage::changeOwner(const QString& path, ChownMode mode)
+bool EventsStorage::changeOwner(const std::vector<PathAndMode>& pathAndModeList)
 {
     if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
         return true;
 
-    const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
-    if (!m_mediaServerModule->rootFileSystem()->changeOwner(path, mode == ChownMode::recursive))
+    for (const auto& entry: pathAndModeList)
     {
-        NX_WARNING(
-            this, "Failed to change access rights. Mode: %1. Path: %2", modeString, path);
-        return false;
+        const ChownMode mode = std::get<ChownMode>(entry);
+        const QString path = std::get<QString>(entry);
+        const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
+        const auto rootFs = m_mediaServerModule->rootFileSystem();
+
+        if (!rootFs->isPathExists(path))
+        {
+            NX_DEBUG(
+                this,
+                "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
+            continue;
+        }
+
+        if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
+        {
+            NX_WARNING(
+                this, "Failed to change access rights. Mode: %1. Path: %2", modeString, path);
+            return false;
+        }
+
+        NX_DEBUG(
+            this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
     }
 
-    NX_DEBUG(
-        this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
     return true;
+}
+
+std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const QString& dbFileName)
+{
+    const auto fileInfo = QFileInfo(dbFileName);
+    const auto dirPath = fileInfo.canonicalPath();
+    NX_ASSERT(!dirPath.isEmpty(), "Invalid path");
+
+    const auto baseName = closeDirPath(dirPath) + fileInfo.baseName();
+    const QStringList possibleExtensions = {".sqlite", ".sqlite-shm", ".sqlite-wal"};
+    std::vector<PathAndMode> result;
+
+    for (const auto& ext: possibleExtensions)
+        result.push_back(std::make_tuple(baseName + ext, ChownMode::nonRecursive));
+
+    return result;
 }
 
 bool EventsStorage::initialize(const Settings& settings)
@@ -106,8 +138,10 @@ bool EventsStorage::initialize(const Settings& settings)
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     const auto archivePath = closeDirPath(settings.path) + "archive/";
     if (!makePath(archivePath)
-        || !changeOwner(settings.path, ChownMode::nonRecursive)
-        || !changeOwner(archivePath, ChownMode::recursive)
+        || !changeOwner({
+            {settings.path, ChownMode::nonRecursive},
+            {archivePath, ChownMode::nonRecursive}})
+        || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName))
         || !m_dbController->initialize()
         || !readMaximumEventTimestamp()
         || !loadDictionaries())
