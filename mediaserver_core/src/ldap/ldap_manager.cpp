@@ -40,23 +40,24 @@
 #include <nx/utils/string.h>
 
 namespace {
-    static const int kPageSize = 1000;
+static const int kPageSize = 1000;
 
-    Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+{
+    switch(ldapCode)
     {
-        switch(ldapCode)
-        {
-        case LDAP_SUCCESS:
-            return Qn::Ldap_NoError;
-        case LDAP_SIZELIMIT_EXCEEDED:
-            return Qn::Ldap_SizeLimit;
-        case LDAP_INVALID_CREDENTIALS:
-            return Qn::Ldap_InvalidCredentials;
-        default:
-            return Qn::Ldap_Other;
-        }
+    case LDAP_SUCCESS:
+        return Qn::Ldap_NoError;
+    case LDAP_SIZELIMIT_EXCEEDED:
+        return Qn::Ldap_SizeLimit;
+    case LDAP_INVALID_CREDENTIALS:
+        return Qn::Ldap_InvalidCredentials;
+    default:
+        return Qn::Ldap_Other;
     }
 }
+
+} // namespace
 
 #ifdef Q_OS_WIN
 static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert)
@@ -243,6 +244,7 @@ public:
 
 private:
     bool detectLdapVendor(LdapVendor &);
+    void logResponseReferences(LDAPMessage* response);
 
     const QnLdapSettings m_settings;
     LDAP_RESULT m_lastErrorCode;
@@ -291,6 +293,14 @@ bool LdapSession::connect()
 
     int desired_version = LDAP_VERSION3;
     int rc = ldap_set_option(m_ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+    if (rc != 0)
+    {
+        m_lastErrorCode = rc;
+        return false;
+    }
+
+    // NOTE: Chasing referrals does work with paging controls, see: VMS-15694.
+    rc = ldap_set_option(m_ld, LDAP_OPT_REFERRALS, LDAP_OPT_OFF);
     if (rc != 0)
     {
         m_lastErrorCode = rc;
@@ -347,6 +357,36 @@ QString LdapSession::getUserDn(const QString& login)
         return QString();
 
     return users[0].dn;
+}
+
+void LdapSession::logResponseReferences(LDAPMessage* response)
+{
+    // TODO: Should be changed to verbose.
+    if (nx::utils::log::mainLogger()->maxLevel() < nx::utils::log::Level::info)
+        return;
+
+    for (LDAPMessage *entry = ldap_first_reference(m_ld, response);
+        entry != nullptr; entry = ldap_next_reference(m_ld, entry))
+    {
+        char **refs = nullptr;
+        const auto memoryGuard = makeScopeGuard(
+            [&refs, this]()
+            {
+                if (refs != nullptr)
+                    ldap_value_free(refs);
+                refs = nullptr;
+            });
+
+        LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs, nullptr, 0);
+        if (rc != LDAP_SUCCESS)
+        {
+            NX_INFO(this, lm("Failed to parse ldap reference entry: %1").args(LdapErrorStr(rc)));
+            return;
+        }
+
+        for (int i = 0; refs != nullptr && refs[i] != nullptr; i++)
+            NX_INFO(this, lm("Not chasing reference received from server: %1").args(refs[i]));
+    }
 }
 
 bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
@@ -418,7 +458,6 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
         serverControls[0] = pControl;
         serverControls[1] = NULL;
-
         rc = ldap_search_ext_s(
             /* ld */ m_ld,
             /* base */ QSTOCW(m_settings.searchBase),
@@ -438,8 +477,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
         }
 
         LDAP_RESULT lerrno = 0;
-        if((rc = ldap_parse_result(
-            m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0)) != LDAP_SUCCESS)
+        rc = ldap_parse_result(m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0);
+        if (rc != LDAP_SUCCESS)
         {
             NX_ASSERT(lerrno == rc, lm("lerrno (%1) != rc (%2)").args(lerrno, rc));
             m_lastErrorCode = rc;
@@ -487,6 +526,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             }
         }
 
+        logResponseReferences(result);
+
         NX_INFO(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
             LdapErrorStr(LdapGetLastError()), users.size()));
         NX_INFO(this, lm("cookie: %1, cookie->bv_val: %2, length: %3 (%4)").args(
@@ -495,7 +536,6 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             (cookie != nullptr && cookie->bv_val != nullptr) ? strlen(cookie->bv_val) : -7,
             (cookie != nullptr && cookie->bv_val != nullptr) ? cookie->bv_len : -7));
     } while (cookie && cookie->bv_val != NULL && cookie->bv_len > 0);
-
 
     NX_INFO(this, lm("Fetched %1 user(s)%2").args(
         users.size(), users.size() < 10 ? " - " + containerString(users) : QString()));
