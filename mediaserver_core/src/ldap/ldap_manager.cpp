@@ -489,11 +489,16 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
         NX_INFO(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
             LdapErrorStr(LdapGetLastError()), users.size()));
-    } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
+        NX_INFO(this, lm("cookie: %1, cookie->bv_val: %2, length: %3 (%4)").args(
+            cookie != nullptr,
+            cookie != nullptr ? (cookie->bv_val != nullptr) : false,
+            (cookie != nullptr && cookie->bv_val != nullptr) ? strlen(cookie->bv_val) : -7,
+            (cookie != nullptr && cookie->bv_val != nullptr) ? cookie->bv_len : -7));
+    } while (cookie && cookie->bv_val != NULL && cookie->bv_len > 0);
+
 
     NX_INFO(this, lm("Fetched %1 user(s)%2").args(
-        users.size(),
-        users.size() < 10 ? " - " + containerString(users) : QString()));
+        users.size(), users.size() < 10 ? " - " + containerString(users) : QString()));
 
     return true;
 }
@@ -649,7 +654,7 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
         dn = session.getUserDn(login);
         if (dn.isEmpty())
         {
-            NX_INFO(this, lm("User not found: %1").args(session.lastErrorString()));
+            NX_INFO(this, lm("User not found, LDAP code: %1").args(session.lastErrorString()));
             return Qn::Auth_WrongLogin;
         }
 
