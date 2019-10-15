@@ -1088,7 +1088,7 @@ struct FilterListByAccess<ModifyResourceAccess>
     void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, this, commonModule](const typename ParamContainer::value_type &param)
+            [&accessData, commonModule](const typename ParamContainer::value_type &param)
         {
             return ModifyResourceAccess()(commonModule, accessData, param) != ErrorCode::ok;
         }), outList.end());

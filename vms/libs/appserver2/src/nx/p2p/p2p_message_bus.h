@@ -81,7 +81,6 @@ public:
     virtual void dropConnections() override;
     virtual ConnectionInfoList connectionsInfo() const override;
 
-    void sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran);
     template<class T> void sendTransaction(const ec2::QnTransaction<T>& tran);
 
     template<class T>

@@ -1113,8 +1113,8 @@ void MessageBus::gotTransaction(
 template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
+    const P2pConnectionPtr& /*connection*/,
+    const TransportHeader& /*transportHeader*/)
 {
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
@@ -1463,14 +1463,7 @@ bool MessageBus::validateRemotePeerData(const vms::api::PeerDataEx& /*remotePeer
     return true;
 }
 
-template<class T>
-void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
-{
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& connection : m_connections)
-        sendTransactionImpl(connection, tran, header);
-}
-
+template <>
 void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
 {
     QnMutexLocker lock(&m_mutex);
@@ -1478,6 +1471,14 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>
     m_lastRuntimeInfo[peerId] = tran.params;
     for (const auto& connection : m_connections)
         sendTransactionImpl(connection, tran, TransportHeader());
+}
+
+template<class T>
+void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& connection : m_connections)
+        sendTransactionImpl(connection, tran, header);
 }
 
 template<class T>
