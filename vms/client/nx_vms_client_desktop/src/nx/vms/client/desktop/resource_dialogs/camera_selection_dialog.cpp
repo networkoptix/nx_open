@@ -10,7 +10,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <nx_ec/access_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
@@ -111,7 +110,6 @@ NodePtr createServerNode(
 
 NodePtr createCameraNodes(
     const Data& data,
-    bool adminMode,
     bool showInvalidCameras,
     QnResourcePool* pool)
 {
@@ -170,10 +168,9 @@ NodePtr createCameraNodes(
         if (children.isEmpty())
             continue;
 
-        const NodePtr targetNode = adminMode ? createServerNode(serverId, pool, children) : root;
-        targetNode->addChildren(children);
-        if (adminMode)
-            root->addChild(targetNode);
+        const NodePtr serverNode = createServerNode(serverId, pool, children);
+        serverNode->addChildren(children);
+        root->addChild(serverNode);
     }
 
     return root;
@@ -205,7 +202,6 @@ struct CameraSelectionDialog::Private: public QObject
     const CameraSelectionDialog* q;
     const GetText getText;
     const QnUserResourcePtr currentUser;
-    const bool isAdminUser;
     QnUuidSet selectedCameras;
     Data data;
     bool showInvalidCameras = false;
@@ -220,8 +216,6 @@ CameraSelectionDialog::Private::Private(
     q(owner),
     getText(getText),
     currentUser(q->context()->user()),
-    isAdminUser(q->globalPermissionsManager()->hasGlobalPermission(
-        currentUser, GlobalPermission::adminPermissions)),
     selectedCameras(selectedCameras),
     data(createCamerasData(currentUser, q->commonModule(), selectedCameras, validResourceCheck))
 {
@@ -267,7 +261,7 @@ void CameraSelectionDialog::Private::reloadViewData()
     if (view->state().rootNode)
         view->applyPatch(NodeViewStatePatch::clearNodeView());
 
-    const auto root = createCameraNodes(data, isAdminUser, showInvalidCameras, q->resourcePool());
+    const auto root = createCameraNodes(data, showInvalidCameras, q->resourcePool());
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));
     view->setLeafResourcesSelected(selectedCameras, true);
 
