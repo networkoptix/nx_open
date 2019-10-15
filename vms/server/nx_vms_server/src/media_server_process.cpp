@@ -4138,6 +4138,21 @@ void MediaServerProcess::connectSignals()
             }
         });
 
+    m_createDbBackupTimer = std::make_unique<QTimer>();
+    connect(
+        m_createDbBackupTimer.get(),
+        &QTimer::timeout,
+        [firstRun = true, this]() mutable
+        {
+            auto utils = nx::vms::server::Utils(serverModule());
+            utils.backupDatabase();
+            if (firstRun)
+            {
+                m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
+                firstRun = false;
+            }
+        });
+
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -4339,15 +4354,6 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
     }
 }
 
-void MediaServerProcess::onBackupDbTimer()
-{
-    auto utils = nx::vms::server::Utils(serverModule());
-    utils.backupDatabase();
-    m_createDbBackupTimer->addTimer(
-        [this](auto /*timerId*/){ onBackupDbTimer(); },
-        serverModule()->settings().dbBackupPeriodMS());
-}
-
 void MediaServerProcess::startObjects()
 {
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
@@ -4378,11 +4384,7 @@ void MediaServerProcess::startObjects()
                 std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
         }
     }
-
-    m_createDbBackupTimer = std::make_unique<nx::utils::TimerManager>();
-    m_createDbBackupTimer->addTimer(
-        [this](auto /*timerId*/) { onBackupDbTimer(); },
-        std::chrono::milliseconds(initialBackupDbPeriodMs));
+    m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 
