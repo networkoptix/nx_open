@@ -7,6 +7,7 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 #include <QOpenGLWidget>
+#include <QTimer>
 
 
 namespace nx::vms::client::desktop {
@@ -50,9 +51,12 @@ protected:
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 
+private slots:
+    void updateSizes();
+
 private:
     void ensureFbo();
-    void updateSizes();
+    void scheduleUpdateSizes();
     void componentStatusChanged(QQmlComponent::Status status);
     void initialize(const QRectF& rect, QOpenGLWidget* glWidget);
 
@@ -64,6 +68,7 @@ private:
     QOpenGLFramebufferObject* m_fbo;
     QQmlComponent* m_qmlComponent;
     QQmlEngine* m_qmlEngine;
+    QTimer* m_resizeTimer;
 };
 
 } // namespace nx::vms::client::desktop

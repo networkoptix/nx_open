@@ -15,6 +15,8 @@
 
 namespace {
 
+const std::chrono::milliseconds kResizeTimeout(200);
+
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
     if (!widget)
@@ -205,6 +207,11 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
     m_qmlEngine = new QQmlEngine();
     if (!m_qmlEngine->incubationController())
         m_qmlEngine->setIncubationController(m_quickWindow->incubationController());
+    m_resizeTimer = new QTimer(this);
+    m_resizeTimer->setSingleShot(true);
+    m_resizeTimer->setInterval(kResizeTimeout);
+    connect(m_resizeTimer, &QTimer::timeout, this, &GraphicsQmlView::updateSizes);
+
 
     m_qmlComponent = new QQmlComponent(m_qmlEngine);
     connect(m_qmlComponent, &QQmlComponent::statusChanged, this, &GraphicsQmlView::componentStatusChanged);
@@ -224,6 +231,11 @@ GraphicsQmlView::~GraphicsQmlView()
     delete m_renderControl;
     if (m_fbo)
         delete m_fbo;
+}
+
+void GraphicsQmlView::scheduleUpdateSizes()
+{
+    m_resizeTimer->start();
 }
 
 QQmlEngine* GraphicsQmlView::engine() const
@@ -277,7 +289,7 @@ bool GraphicsQmlView::event(QEvent* event)
             return eventResult;
         }
         case QEvent::GraphicsSceneResize:
-            updateSizes();
+            scheduleUpdateSizes();
             event->accept();
             break;
         case QEvent::ShortcutOverride:
@@ -309,7 +321,7 @@ void GraphicsQmlView::componentStatusChanged(QQmlComponent::Status status)
         return;
     }
 
-    if( QQmlComponent::Ready != status)
+    if(QQmlComponent::Ready != status)
         return;
 
     QObject* rootObject = m_qmlComponent->create();
@@ -326,7 +338,7 @@ void GraphicsQmlView::componentStatusChanged(QQmlComponent::Status status)
 
     m_rootItem->setParentItem(m_quickWindow->contentItem());
 
-    updateSizes();
+    scheduleUpdateSizes();
 }
 
 void GraphicsQmlView::updateSizes()
