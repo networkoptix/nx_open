@@ -93,7 +93,7 @@ if platform.system() == 'Linux':
                 raise exceptions.BoxCommandError(
                     f'Unable to detect box network adapter which serves ip {self.ip}.')
 
-            eth_dir = "/sys/class/net/{eth_name}"
+            eth_dir = f'/sys/class/net/{eth_name}'
             eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
 
             if not eth_name_check_result or eth_name_check_result.return_code != 0:
