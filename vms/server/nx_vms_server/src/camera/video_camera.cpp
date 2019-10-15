@@ -556,9 +556,14 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) con
     return nullptr; //< Fallback for the failed assertion.
 }
 
-void QnVideoCamera::beforeStop()
+void QnVideoCamera::stopAndCleanup()
 {
     QnMutexLocker lock(&m_getReaderMutex);
+
+    if (m_primaryReader)
+        m_primaryReader->disableStartThread();
+    if (m_secondaryReader)
+        m_secondaryReader->disableStartThread();
 
     if (m_primaryGopKeeper)
         m_primaryGopKeeper->beforeDisconnectFromResource();
@@ -583,6 +588,8 @@ void QnVideoCamera::beforeStop()
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
     }
+
+    stop();
 }
 
 void QnVideoCamera::stop()
@@ -595,18 +602,7 @@ void QnVideoCamera::stop()
 
 QnVideoCamera::~QnVideoCamera()
 {
-    beforeDestroy();
-}
-
-void QnVideoCamera::beforeDestroy()
-{
-    if (m_primaryReader)
-        m_primaryReader->beforeDestroy();
-    if (m_secondaryReader)
-        m_secondaryReader->beforeDestroy();
-
-    beforeStop();
-    stop();
+    stopAndCleanup();
 }
 
 void QnVideoCamera::at_camera_resourceChanged()
