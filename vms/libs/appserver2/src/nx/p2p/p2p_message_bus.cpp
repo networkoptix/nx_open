@@ -1469,7 +1469,7 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>
     QnMutexLocker lock(&m_mutex);
     vms::api::PersistentIdData peerId(tran.params.peer);
     m_lastRuntimeInfo[peerId] = tran.params;
-    for (const auto& connection : m_connections)
+    for (const auto& connection: m_connections)
         sendTransactionImpl(connection, tran, TransportHeader());
 }
 
@@ -1477,7 +1477,7 @@ template<class T>
 void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
 {
     QnMutexLocker lock(&m_mutex);
-    for (const auto& connection : m_connections)
+    for (const auto& connection: m_connections)
         sendTransactionImpl(connection, tran, header);
 }
 
@@ -1493,7 +1493,7 @@ template<class T>
 void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
 {
     QnMutexLocker lock(&m_mutex);
-    for (const auto& connection : m_connections)
+    for (const auto& connection: m_connections)
         sendTransactionImpl(connection, tran, TransportHeader());
 }
 
@@ -1584,7 +1584,9 @@ void MessageBus::sendUnicastTransactionImpl(
 #define INSTANTIATE(unused1, unused2, T) \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&); \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
-template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&);
+template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
+template void MessageBus::sendTransactionImpl(const P2pConnectionPtr&, \
+    const ec2::QnTransaction<T>&, TransportHeader);
 
 #include <transaction_types.h>
 BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
