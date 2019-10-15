@@ -83,7 +83,7 @@ Object
             d.tryFixWearableCameraPosition = false
 
             if (controller.liveWearableCamera)
-                jumpBackward();
+                jumpToFirstChunk();
         }
 
         ChunkPositionWatcher
@@ -336,6 +336,11 @@ Object
     function jumpBackward()
     {
         forcePosition(chunkPositionWatcher.prevChunkStartTimeMs())
+    }
+
+    function jumpToFirstChunk()
+    {
+        forcePosition(chunkPositionWatcher.firstChunkStartTimeMs())
     }
 
     function setResourceId(id)

@@ -198,6 +198,12 @@ qint64 ChunkPositionWatcher::prevChunkStartTimeMs() const
     return d->prevChunkStartTimeMs;
 }
 
+qint64 ChunkPositionWatcher::firstChunkStartTimeMs() const
+{
+    const auto result = getChunkTime(0, d->periods, true);
+    return result == DATETIME_NOW ? -1 : result;
+}
+
 void ChunkPositionWatcher::registerQmlType()
 {
     qmlRegisterType<nx::client::mobile::ChunkPositionWatcher>(

@@ -47,6 +47,7 @@ public:
 
     Q_INVOKABLE qint64 nextChunkStartTimeMs() const;
     Q_INVOKABLE qint64 prevChunkStartTimeMs() const;
+    Q_INVOKABLE qint64 firstChunkStartTimeMs() const;
 
 signals:
     void motionSearchModeChanged();
