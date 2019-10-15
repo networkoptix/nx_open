@@ -22,6 +22,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
+#include <utils/web_downloader.h>
 
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
@@ -528,4 +529,9 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
 bool QnWorkbench::isInLayoutChangeProcess() const
 {
     return m_inLayoutChangeProcess;
+}
+
+void QnWorkbench::requestDownload(QObject* item)
+{
+    utils::WebDownloader::download(item, context());
 }

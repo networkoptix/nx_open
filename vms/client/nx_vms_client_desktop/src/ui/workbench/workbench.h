@@ -163,6 +163,11 @@ public:
      */
     void setItem(Qn::ItemRole role, QnWorkbenchItem *item);
 
+    /**
+     * Requests downloading of QQuickWebEngineDownloadItem.
+     */
+    Q_INVOKABLE void requestDownload(QObject* item);
+
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);
 

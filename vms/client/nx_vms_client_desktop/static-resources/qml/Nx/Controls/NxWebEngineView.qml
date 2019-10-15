@@ -66,4 +66,6 @@ WebEngineView {
         id: "nxWebChannel"
         objectName: "nxWebChannel"
     }
+
+    profile.onDownloadRequested: workbench.requestDownload(download)
 }

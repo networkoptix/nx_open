@@ -11,8 +11,8 @@
 namespace nx::vms::client::desktop {
 namespace utils {
 
-/*
- * Downloads QNetworkReply and reports download progress in right panel.
+/**
+ * Downloads QNetworkReply or QQuickWebEngineDownloadItem and reports download progress in right panel.
  */
 class WebDownloader: public QObject, public QnWorkbenchContextAware
 {
@@ -27,27 +27,44 @@ class WebDownloader: public QObject, public QnWorkbenchContextAware
         Failed
     };
 
-public:
     WebDownloader(QObject* parent,
         std::shared_ptr<QNetworkAccessManager> networkManager,
         QNetworkReply* reply,
         std::unique_ptr<QFile> file,
         const QFileInfo& fileInfo);
+
+    WebDownloader(QObject* parent,
+        const QFileInfo& fileInfo,
+        QObject* item);
+
     virtual ~WebDownloader();
 
+public:
+
+    // Handle download from QWebKit-based browser.
     static bool download(
         std::shared_ptr<QNetworkAccessManager> manager, QNetworkReply* reply, QObject* parent);
+
+    // Handle download from QWebEngine-based browser.
+    static bool download(QObject* item, QnWorkbenchContext* context);
 
 private:
     void startDownload();
     void setState(State state);
     void removeProgress();
+    static bool selectFile(const QString& suggestedName,
+        QWidget* widget,
+        std::unique_ptr<QFile>& file,
+        QFileInfo& fileInfo);
 
 private slots:
     void cancel();
     void onDownloadProgress(qint64 bytesRead, qint64 bytesTotal);
     void writeAvailableData();
     void onReplyFinished();
+
+    void onReceivedBytesChanged();
+    void onStateChanged();
 
 private:
     State m_state = State::Init;
@@ -59,6 +76,9 @@ private:
     QnUuid m_activityId;
     bool m_cancelRequested = false;
     bool m_hasWriteError = false;
+    QPointer<QObject> m_item;
+    qint64 m_initBytesRead = 0;
+    qint64 m_initElapsed = 0;
 };
 
 } // namespace utils
