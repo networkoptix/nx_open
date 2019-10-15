@@ -99,9 +99,10 @@ const TrafficRelay& TrafficRelayCluster::relay(int index) const
     return *m_relays[index];
 }
 
-bool TrafficRelayCluster::peerInformationSynchronizedInCluster(const std::string& hostname) const
+bool TrafficRelayCluster::peerInformationSynchronizedInCluster(
+    const std::vector<std::string>& hostnames) const
 {
-    const auto doesRelayhaveHostname =
+    const auto doesRelayHaveHostname =
         [](const TrafficRelay* relay, const std::string& hostname)->bool
         {
             if (relay->moduleInstance()->listeningPeerPool().isPeerOnline(hostname))
@@ -114,13 +115,21 @@ bool TrafficRelayCluster::peerInformationSynchronizedInCluster(const std::string
             return hasHostname.pop();
         };
 
-    for (const auto& relay : m_relays)
+    int onlinePeerCount = 0;
+    int offlinePeerCount = 0;
+
+    for (const auto& relay: m_relays)
     {
-        if (!doesRelayhaveHostname(relay.get(), hostname))
-            return false;
+        for (const auto& hostname: hostnames)
+        {
+            if (doesRelayHaveHostname(relay.get(), hostname))
+                ++onlinePeerCount;
+            else
+                ++offlinePeerCount;
+        }
     }
 
-    return true;
+    return offlinePeerCount == 0;
 }
 
 void TrafficRelayCluster::addClusterArgs(int index, TrafficRelay* relay)

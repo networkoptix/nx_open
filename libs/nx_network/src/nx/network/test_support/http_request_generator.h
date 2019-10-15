@@ -1,0 +1,46 @@
+#pragma once
+
+#include <memory>
+#include <list>
+#include <vector>
+
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/url.h>
+
+namespace nx::network::test {
+
+class NX_NETWORK_API RequestGenerator:
+    public nx::network::aio::BasicPollable
+{
+    using base_type = nx::network::aio::BasicPollable;
+
+public:
+    RequestGenerator(std::size_t maxSimultaneousRequestCount);
+    ~RequestGenerator();
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+    void start();
+
+protected:
+    /**
+     * The started request is considered running until completionHandler has been invoked.
+     */
+    virtual std::unique_ptr<nx::network::aio::BasicPollable> startRequest(
+        nx::utils::MoveOnlyFunc<void()> completionHandler) = 0;
+
+private:
+    struct Request
+    {
+        std::unique_ptr<nx::network::aio::BasicPollable> client;
+    };
+
+    const std::size_t m_maxSimultaneousRequestCount;
+    std::list<Request> m_requests;
+
+    virtual void stopWhileInAioThread() override;
+
+    void startNewRequestsIfNeeded();
+};
+
+} // nx::network::test

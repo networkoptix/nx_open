@@ -4,7 +4,10 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/http_request_generator.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/string.h>
@@ -19,7 +22,6 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace test {
-
 
 namespace {
 
@@ -68,6 +70,88 @@ private:
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
+class ListeningPeerRequestGenerator:
+    public nx::network::test::RequestGenerator
+{
+    using base_type = nx::network::test::RequestGenerator;
+
+public:
+    ListeningPeerRequestGenerator(
+        std::size_t maxSimultaneousRequestCount,
+        const nx::utils::Url& relayUrl,
+        std::vector<std::string> peerNames);
+
+protected:
+    virtual std::unique_ptr<nx::network::aio::BasicPollable> startRequest(
+        nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+private:
+    const nx::utils::Url m_relayUrl;
+    std::vector<std::string> m_peerNames;
+    nx::utils::Mutex m_mutex;
+
+    void onCreateSessionCompletion(
+        nx::cloud::relay::api::Client* client,
+        nx::utils::MoveOnlyFunc<void()> completionHandler,
+        cloud::relay::api::ResultCode resultCode,
+        cloud::relay::api::CreateClientSessionResponse response);
+};
+
+ListeningPeerRequestGenerator::ListeningPeerRequestGenerator(
+    std::size_t maxSimultaneousRequestCount,
+    const nx::utils::Url& relayUrl,
+    std::vector<std::string> peerNames)
+    :
+    base_type(maxSimultaneousRequestCount),
+    m_relayUrl(relayUrl),
+    m_peerNames(std::move(peerNames))
+{
+}
+
+std::unique_ptr<nx::network::aio::BasicPollable> ListeningPeerRequestGenerator::startRequest(
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto relayClient = std::make_unique<nx::cloud::relay::api::Client>(m_relayUrl);
+    relayClient->startSession(
+        QnUuid::createUuid().toSimpleString().toStdString(),
+        nx::utils::random::choice(m_peerNames),
+        [this, relayClientPtr = relayClient.get(),
+            completionHandler = std::move(completionHandler)](
+                auto&&... args) mutable
+        {
+            onCreateSessionCompletion(
+                relayClientPtr,
+                std::move(completionHandler),
+                std::forward<decltype(args)>(args)...);
+        });
+
+    return relayClient;
+}
+
+void ListeningPeerRequestGenerator::onCreateSessionCompletion(
+    nx::cloud::relay::api::Client* client,
+    nx::utils::MoveOnlyFunc<void()> completionHandler,
+    cloud::relay::api::ResultCode resultCode,
+    cloud::relay::api::CreateClientSessionResponse response)
+{
+    if (resultCode != cloud::relay::api::ResultCode::ok)
+        return completionHandler();
+
+    client->openConnectionToTheTargetHost(
+        response.sessionId,
+        [this, completionHandler = std::move(completionHandler)](
+            auto&&... /*args*/)
+        {
+            completionHandler();
+        });
+}
+
+//-------------------------------------------------------------------------------------------------
+
 class RelayService:
     public ::testing::Test,
     public BasicComponentTest
@@ -80,6 +164,8 @@ public:
 
     ~RelayService()
     {
+        m_requestGenerator.reset();
+
         stopAllInstances();
 
         if (m_factoryFunctionBak)
@@ -115,6 +201,19 @@ protected:
         addRelayInstance(args);
     }
 
+    void givenManyListeningPeers()
+    {
+        static constexpr int kPeerCount = 11;
+
+        std::vector<std::string> hostNames;
+        for (int i = 0; i < kPeerCount; ++i)
+            hostNames.push_back(nx::utils::generateRandomName(7).toStdString());
+
+        auto peers = addListeningPeers(hostNames);
+        for (std::size_t i = 0; i < peers.size(); ++i)
+            m_listeningPeers.push_back({hostNames[i], std::move(peers[i])});
+    }
+
     void whenStartDb()
     {
         m_forceConnectionFailure = false;
@@ -135,10 +234,35 @@ protected:
         relay().stop();
     }
 
+    void startConnectingToRandomPeersSimultaneously()
+    {
+        static constexpr int kSimultaneousRequestCount = 101;
+
+        std::vector<std::string> hostNames;
+        std::transform(
+            m_listeningPeers.begin(), m_listeningPeers.end(),
+            std::back_inserter(hostNames),
+            [this](const ListeningPeer& value) { return value.hostName; });
+
+        m_requestGenerator = std::make_unique<ListeningPeerRequestGenerator>(
+            kSimultaneousRequestCount,
+            relay().httpUrl(),
+            std::move(hostNames));
+        m_requestGenerator->start();
+    }
+
 private:
+    struct ListeningPeer
+    {
+        std::string hostName;
+        std::unique_ptr<nx::network::http::TestHttpServer> server;
+    };
+
     bool m_forceConnectionFailure = false;
     nx::utils::SyncQueue<bool> m_initEvents;
     std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
+    std::vector<ListeningPeer> m_listeningPeers;
+    std::unique_ptr<ListeningPeerRequestGenerator> m_requestGenerator;
 };
 
 // cassandra specific functionality that doesn't apply to sync engine
@@ -156,6 +280,17 @@ TEST_F(RelayService, waits_for_db_availability_if_db_host_is_specified)
 TEST_F(RelayService, can_be_stopped_regardless_of_db_host_availability)
 {
     givenRelayThatFailedToConnectToDb();
+    thenRelayCanStillBeStopped();
+}
+
+TEST_F(RelayService, DISABLED_can_be_stopped_under_load)
+{
+    givenStartedRelay();
+    givenManyListeningPeers();
+    startConnectingToRandomPeersSimultaneously();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
     thenRelayCanStillBeStopped();
 }
 

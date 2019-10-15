@@ -51,7 +51,8 @@ public:
     TrafficRelay& relay(int index);
     const TrafficRelay& relay(int index) const;
 
-    bool peerInformationSynchronizedInCluster(const std::string& hostname) const;
+    bool peerInformationSynchronizedInCluster(
+        const std::vector<std::string>& hostnames) const;
 
 private:
     void addClusterArgs(int index, TrafficRelay* relay);

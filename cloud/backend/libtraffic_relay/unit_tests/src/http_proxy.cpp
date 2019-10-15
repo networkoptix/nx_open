@@ -4,12 +4,10 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/ssl/ssl_engine.h>
-#include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_client.h>
-#include <nx/network/http/test_http_server.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_delegate.h>
@@ -25,72 +23,6 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace test {
-
-template<typename Acceptor>
-class AcceptorToServerSocketAdapter:
-    public nx::network::StreamServerSocketDelegate
-{
-    using base_type = nx::network::StreamServerSocketDelegate;
-
-public:
-    AcceptorToServerSocketAdapter(std::unique_ptr<Acceptor> acceptor):
-        base_type(nullptr),
-        m_acceptor(std::move(acceptor))
-    {
-    }
-
-    virtual nx::network::aio::AbstractAioThread* getAioThread() const override
-    {
-        return m_acceptor->getAioThread();
-    }
-
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
-    {
-        m_acceptor->bindToAioThread(aioThread);
-    }
-
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_acceptor->post(std::move(handler));
-    }
-
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_acceptor->dispatch(std::move(handler));
-    }
-
-    virtual void pleaseStopSync() override
-    {
-        m_acceptor->pleaseStopSync();
-    }
-
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_acceptor->pleaseStop(std::move(handler));
-    }
-
-    virtual bool getRecvTimeout(unsigned int* millis) const override
-    {
-        *millis = network::kNoTimeout.count();
-        return true;
-    }
-
-    virtual void acceptAsync(network::AcceptCompletionHandler handler) override
-    {
-        m_acceptor->acceptAsync(std::move(handler));
-    }
-
-protected:
-    virtual void cancelIoInAioThread() override
-    {
-        m_acceptor->cancelIOSync();
-    }
-
-private:
-    std::unique_ptr<Acceptor> m_acceptor;
-};
-
-using RelayConnectionAcceptor = nx::network::cloud::relay::ConnectionAcceptor;
 
 constexpr char kTestPath[] = "/HttpProxy";
 constexpr char kTestMessage[] = "Hello, world";
@@ -144,6 +76,22 @@ protected:
         url.setPath(kTestPath);
 
         return url;
+    }
+
+    std::unique_ptr<nx::network::http::TestHttpServer> addListeningPeer(
+        const std::string& listeningPeerHostName,
+        const nx::Buffer& messageBody,
+        network::ssl::EncryptionUse encryptionUse)
+    {
+        using namespace std::placeholders;
+
+        auto peerServer = BasicComponentTest::addListeningPeer(
+            listeningPeerHostName, encryptionUse);
+        peerServer->registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpProxy::processHttpRequest, this, _1, _2, messageBody),
+            nx::network::http::Method::get);
+        return peerServer;
     }
 
     void givenListeningPeer(
@@ -278,48 +226,6 @@ protected:
     const nx::network::http::Response& lastResponse() const
     {
         return *m_lastResponse;
-    }
-
-    std::unique_ptr<nx::network::http::TestHttpServer> addListeningPeer(
-        const std::string& listeningPeerHostName,
-        const nx::Buffer& messageBody,
-        network::ssl::EncryptionUse encryptionUse = network::ssl::EncryptionUse::never)
-    {
-        using namespace std::placeholders;
-
-        auto url = relay().httpUrl();
-        url.setUserName(listeningPeerHostName.c_str());
-
-        auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
-
-        std::unique_ptr<nx::network::http::TestHttpServer> peerServer;
-        if (encryptionUse == network::ssl::EncryptionUse::always)
-        {
-            auto sslAcceptor = std::make_unique<network::ssl::StreamServerSocket>(
-                std::make_unique<AcceptorToServerSocketAdapter<RelayConnectionAcceptor>>(
-                    std::move(acceptor)),
-                network::ssl::EncryptionUse::always);
-            sslAcceptor->setNonBlockingMode(true);
-
-            peerServer = std::make_unique<nx::network::http::TestHttpServer>(
-                std::move(sslAcceptor));
-        }
-        else if (encryptionUse == network::ssl::EncryptionUse::never)
-        {
-            peerServer = std::make_unique<nx::network::http::TestHttpServer>(
-                std::move(acceptor));
-        }
-
-        peerServer->registerRequestProcessorFunc(
-            kTestPath,
-            std::bind(&HttpProxy::processHttpRequest, this, _1, _2, messageBody),
-            nx::network::http::Method::get);
-        peerServer->server().start();
-
-        while (!peerInformationSynchronizedInCluster(listeningPeerHostName))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-        return peerServer;
     }
 
     nx::network::http::Request& lastRequestOnTargetServer()
@@ -480,7 +386,8 @@ protected:
                 lm("%1.%2").args(
                     nx::utils::generateRandomName(7).toStdString(),
                     m_domainName).toStdString(),
-                lm("%1 from peer %2").args(kTestMessage, i).toUtf8()));
+                lm("%1 from peer %2").args(kTestMessage, i).toUtf8(),
+                network::ssl::EncryptionUse::never));
         }
     }
 
