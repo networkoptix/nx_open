@@ -37,7 +37,7 @@ public:
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const override;
 
-    virtual void beforeStop() override;
+    virtual void stopAndCleanup() override;
     virtual bool isSomeActivity() const override;
     virtual void stopIfNoActivity() override;
     virtual void updateActivity() override;
@@ -54,9 +54,6 @@ public:
         MediaQuality streamQuality,
         qint64 targetDurationUSec) override;
     virtual QnResourcePtr resource() const override;
-
-    virtual void beforeDestroy() override {}
-
 
     void setPrimaryReader(QnLiveStreamProviderPtr reader);
     void setSecondaryReader(QnLiveStreamProviderPtr reader);

@@ -11,7 +11,6 @@ namespace nx::vms::server::metrics {
 
 using namespace nx::vms::api;
 using namespace nx::vms::server::resource;
-using namespace std::chrono;
 using namespace nx::vms::text;
 
 using Resource = CameraController::Resource;
@@ -175,8 +174,8 @@ auto makeStorageProviders()
             "archiveLengthS",
             [](const auto& r)
             {
-                const auto value = duration_cast<seconds>(r->calendarDuration());
-                return value.count() > 0 ? Value((double) value.count()) : Value();
+                const auto value = r->calendarDuration();
+                return value.count() > 0 ? Value(value) : Value();
             }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
@@ -184,7 +183,7 @@ auto makeStorageProviders()
             [](const auto& r)
             {
                 if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
-                    return Value((double) duration_cast<seconds>(hours(days * 24)).count());
+                    return Value(std::chrono::hours(days * 24));
                 return Value();
             }
         ),

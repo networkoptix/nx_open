@@ -19,7 +19,14 @@ static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_c
 
 QString AppInfo::defaultCloudHostName()
 {
-    return QString::fromUtf8(kCloudHostName);
+    static const auto result = []() {
+        const QString override = SocketGlobals::ini().cloudHostOverride;
+        if (!override.isEmpty())
+            return override;
+
+        return QString::fromUtf8(kCloudHostName);
+    }();
+    return result;
 }
 
 QString AppInfo::defaultCloudPortalUrl(const QString& cloudHost)

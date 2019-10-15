@@ -36,7 +36,7 @@ void QnVideoCameraPool::stop()
     }
 
     for( const QnVideoCameraPtr& camera: m_cameras.values())
-        camera->beforeStop();
+        camera->stopAndCleanup();
 
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         VMaxStreamFetcher::pleaseStopAll(); //< increase stop time
@@ -123,8 +123,8 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
         removedCamera = itr.value();
         m_cameras.erase(itr);
     }
-    // Ensure readers are stopped before destroy QnVideoCamera.
-    removedCamera->beforeDestroy();
+    // Ensure readers are stopped and can not be started again before ~QnVideoCamera().
+    removedCamera->stopAndCleanup();
 }
 
 std::unique_ptr<VideoCameraLocker>

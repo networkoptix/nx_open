@@ -1549,8 +1549,8 @@ float QnSecurityCamResource::suggestBitrateKbps(
         auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
         if (streamCapability.maxBitrateKbps > 0)
         {
-            result = qBound((float) streamCapability.minBitrateKbps,
-                result, (float) streamCapability.maxBitrateKbps);
+            result = qBound(streamCapability.minBitrateKbps,
+                result, streamCapability.maxBitrateKbps);
         }
         return result;
     }

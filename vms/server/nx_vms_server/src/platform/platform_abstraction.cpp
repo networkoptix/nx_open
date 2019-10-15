@@ -18,21 +18,14 @@
 #   define QnMonitorImpl QnSigarMonitor
 #endif
 
-QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
+QnPlatformAbstraction::QnPlatformAbstraction(nx::vms::server::PlatformMonitor* monitor, QObject *parent):
     base_type(parent)
 {
-    if(!qApp)
+    if (!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
-    m_monitor = new nx::vms::server::GlobalMonitor(new QnMonitorImpl(this), this);
-}
+    if (!monitor)
+        monitor = new nx::vms::server::GlobalMonitor(new QnMonitorImpl(this), this);
 
-QnPlatformAbstraction::~QnPlatformAbstraction()
-{
-    return;
-}
-
-void QnPlatformAbstraction::setServerModule(QnMediaServerModule* serverModule)
-{
-    m_monitor->setServerModule(serverModule);
+    m_monitor = monitor;
 }

@@ -4,6 +4,7 @@
 
 #include <api/test_api_requests.h>
 #include <nx/mediaserver/camera_mock.h>
+#include <core/resource/storage_resource.h>
 #include <rest/server/json_rest_result.h>
 
 namespace nx::vms::server::test {
@@ -18,6 +19,9 @@ public:
 
     /** Creates a camera mock on this server. */
     QnSharedResourcePointer<resource::test::CameraMock> addCamera(std::optional<int> id = {});
+
+    /** Creates a storage resource */
+    QnStorageResourcePtr addStorage(const QString& name);
 
     template<typename T>
     T get(const QString& api)

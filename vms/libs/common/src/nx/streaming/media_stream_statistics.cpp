@@ -23,7 +23,7 @@ void QnMediaStreamStatistics::onData(
             return std::lower_bound(m_data.begin(), m_data.end(), timestamp);
         };
 
-    auto cleanupRange =
+    auto removeRange =
         [this](auto left, auto right)
     {
         if (left >= right)
@@ -37,8 +37,9 @@ void QnMediaStreamStatistics::onData(
     m_data.insert(toIterator(timestamp), Data{ timestamp, dataSize, isKeyFrame });
     m_totalSizeBytes += dataSize;
 
-    cleanupRange(toIterator(timestamp + kWindowSize), m_data.end());
-    cleanupRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
+    // Remove old and future data in case of media stream time has been changed.
+    removeRange(toIterator(timestamp + kWindowSize), m_data.end());
+    removeRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
 }
 
 void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)

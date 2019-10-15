@@ -76,7 +76,7 @@ static auto infoGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+                "server", [](const auto& r) { return Value(r->getParentServer()->getName()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "type", [](const auto& r) { return Value(r->getStorageType()); }

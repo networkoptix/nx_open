@@ -47,6 +47,8 @@ QString toString(ConnectionBase::State value)
         return "Error";
     case ConnectionBase::State::Unauthorized:
         return "Unauthorized";
+    case ConnectionBase::State::forbidden:
+        return "Forbidden";
     default:
         NX_ASSERT(false, "Unknown enum value");
         return "Unknown";
@@ -183,6 +185,7 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
         .arg(m_remotePeer.id.toString())
         .arg(toString(state()))
         .arg(reason));
+    m_lastErrorMessage = reason;
     setState(newState);
 }
 
@@ -247,7 +250,7 @@ void ConnectionBase::onHttpClientDone()
     if (statusCode == nx::network::http::StatusCode::forbidden)
     {
         cancelConnecting(
-            State::Error,
+            State::forbidden,
             lm("Remote peer forbid connection with message: %1")
             .arg(m_httpClient->fetchMessageBodyBuffer()));
         return;

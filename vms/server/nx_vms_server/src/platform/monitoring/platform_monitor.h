@@ -136,6 +136,7 @@ public:
     virtual ~PlatformMonitor() {}
 
     virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
+    virtual void logStatistics() {}
 
     /**
      * @returns Percent of CPU time (both user and kernel) consumed by all running processes since
@@ -193,6 +194,12 @@ public:
      *     to the user.
      */
     virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
+
+    /** @returns Update period of values, in milliseconds. */
+    virtual std::chrono::milliseconds updatePeriod() const { return std::chrono::milliseconds(0); }
+
+    /** @returns Server uptime in milliseconds. */
+    virtual std::chrono::milliseconds processUptime() const { return std::chrono::milliseconds(0); }
 
 private:
     Q_DISABLE_COPY(PlatformMonitor)

@@ -58,7 +58,7 @@ std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequ
     return nullptr;
 }
 
-void MediaServerVideoCameraMock::beforeStop()
+void MediaServerVideoCameraMock::stopAndCleanup()
 {
 }
 

@@ -856,7 +856,7 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     return result;
 }
 
-std::chrono::milliseconds QnStorageManager::calendarDuration(
+std::chrono::milliseconds QnStorageManager::archiveAge(
     const QnVirtualCameraResourcePtr& camera) const
 {
     std::chrono::milliseconds result{};

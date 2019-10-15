@@ -28,20 +28,6 @@ const std::chrono::milliseconds GlobalMonitor::kCacheExpirationTime = 2s;
 
 namespace {
 
-class StubMonitor: public nx::vms::server::PlatformMonitor {
-public:
-    StubMonitor(QObject *parent = NULL): nx::vms::server::PlatformMonitor(parent) {}
-
-    virtual qreal totalCpuUsage() override { return 0.0; }
-    virtual quint64 totalRamUsageBytes() override { return 0; }
-    virtual qreal thisProcessCpuUsage() override { return 0.0; }
-    virtual quint64 thisProcessRamUsageBytes() override { return 0; }
-    virtual QList<HddLoad> totalHddLoad() override { return {}; }
-    virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
-    virtual QString partitionByPath(const QString &) override { return {}; }
-};
-
 #if defined (__linux__)
     void logMallocStatistics()
     {
@@ -201,9 +187,9 @@ void GlobalMonitor::logStatistics()
 
 }
 
-qint64 GlobalMonitor::updatePeriodMs() const
+std::chrono::milliseconds GlobalMonitor::updatePeriod() const
 {
-    return kCacheExpirationTime.count();
+    return kCacheExpirationTime;
 }
 
 qreal GlobalMonitor::totalCpuUsage() {

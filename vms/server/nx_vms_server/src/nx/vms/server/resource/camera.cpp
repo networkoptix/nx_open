@@ -563,9 +563,15 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex str
     };
 
     using namespace nx::media;
-    auto mergeField = [](int& dst, const int& src)
+    auto mergeIntField = [](int& dst, const int& src)
     {
         if (dst == 0)
+            dst = src;
+    };
+
+    auto mergeFloatField = [](float& dst, const float& src)
+    {
+        if (qFuzzyIsNull(dst))
             dst = src;
     };
 
@@ -586,11 +592,11 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex str
     {
         auto& value = itr.value();
         const auto defaultValue = defaultStreamCapability(itr.key());
-        mergeField(value.minBitrateKbps, defaultValue.minBitrateKbps);
-        mergeField(value.maxBitrateKbps, defaultValue.maxBitrateKbps);
-        mergeField(value.defaultBitrateKbps, defaultValue.defaultBitrateKbps);
-        mergeField(value.defaultFps, defaultValue.defaultFps);
-        mergeField(value.maxFps, defaultValue.maxFps);
+        mergeFloatField(value.minBitrateKbps, defaultValue.minBitrateKbps);
+        mergeFloatField(value.maxBitrateKbps, defaultValue.maxBitrateKbps);
+        mergeFloatField(value.defaultBitrateKbps, defaultValue.defaultBitrateKbps);
+        mergeIntField(value.defaultFps, defaultValue.defaultFps);
+        mergeIntField(value.maxFps, defaultValue.maxFps);
     }
 
     return result;
@@ -871,9 +877,9 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
 std::chrono::milliseconds Camera::calendarDuration() const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();
-    return std::chrono::milliseconds(std::max(
-        serverModule()->normalStorageManager()->calendarDuration(ptr).count(),
-        serverModule()->backupStorageManager()->calendarDuration(ptr).count()));
+    return std::max(
+        serverModule()->normalStorageManager()->archiveAge(ptr),
+        serverModule()->backupStorageManager()->archiveAge(ptr));
 }
 
 qint64 Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const

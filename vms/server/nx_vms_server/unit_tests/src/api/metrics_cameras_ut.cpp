@@ -17,8 +17,6 @@ using namespace std::chrono;
 
 static const int kMinDays = 5;
 
-namespace {
-
 class DataProviderStub : public resource::test::LiveStreamProviderMock
 {
 public:
@@ -31,9 +29,7 @@ public:
     virtual void run() override
     {
         while (!m_needStop)
-        {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        }
     }
 
     void onData(const QnAbstractMediaDataPtr& data)
@@ -41,8 +37,6 @@ public:
         m_stat[0].onData(data);
     }
 };
-
-} // namespace
 
 class MetricsCamerasApi: public ::testing::Test
 {
@@ -106,10 +100,13 @@ public:
         }
     }
 
-    static bool hasAlarm(const Alarms& alarms, const QString& value)
+    static bool hasAlarm(const Alarms& alarms, const QString& value, const QnUuid& resource)
     {
         return std::any_of(alarms.begin(), alarms.end(),
-            [value](const auto& alarm) { return alarm.parameter == value; });
+            [value, resource](const auto& alarm)
+            {
+                return alarm.parameter == value && alarm.resource == resource.toSimpleString();
+            });
     }
 
     static void TearDownTestCase()
@@ -148,16 +145,16 @@ public:
         auto alarms = launcher->get<Alarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
-            ASSERT_TRUE(hasAlarm(alarms, "secondaryStream.resolution"));
+            ASSERT_TRUE(hasAlarm(alarms, "secondaryStream.resolution", m_camera->getId()));
 
             liveParams.resolution = QSize(1280, 720);
             dataProvider->setPrimaryStreamParams(liveParams);
             alarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-            ASSERT_FALSE(hasAlarm(alarms, "secondaryStream.resolution"));
+            ASSERT_FALSE(hasAlarm(alarms, "secondaryStream.resolution", m_camera->getId()));
         }
 
-        ASSERT_FALSE(hasAlarm(alarms, lm("%1.fpsDeltaAvarage").args(streamPrefix)));
-        ASSERT_FALSE(hasAlarm(alarms, lm("%1.actualBitrateBps").args(streamPrefix)));
+        ASSERT_FALSE(hasAlarm(alarms, lm("%1.fpsDeltaAvarage").args(streamPrefix), m_camera->getId()));
+        ASSERT_FALSE(hasAlarm(alarms, lm("%1.actualBitrateBps").args(streamPrefix), m_camera->getId()));
 
         // Add some 'live' data to get actual bitrate.
         QnWritableCompressedVideoDataPtr video(new QnWritableCompressedVideoData());
@@ -239,12 +236,12 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     ASSERT_EQ(1 + kOfflineIterations, offlineEvents);
 
     auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.offlineEvents"));
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.status"));
+    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.offlineEvents", m_camera->getId()));
+    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.status", m_camera->getId()));
 
     m_camera->setStatus(Qn::Online);
     systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_FALSE(hasAlarm(systemAlarms, "availability.status"));
+    ASSERT_FALSE(hasAlarm(systemAlarms, "availability.status", m_camera->getId()));
 
     auto eventConnector = launcher->serverModule()->eventConnector();
     QStringList macAddrList;
@@ -257,8 +254,9 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     do
     {
         systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    } while (!hasAlarm(systemAlarms, "availability.ipConflicts3min") && !timer.hasExpired(15s));
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.ipConflicts3min"));
+    } while (!hasAlarm(systemAlarms, "availability.ipConflicts3min", m_camera->getId())
+        && !timer.hasExpired(15s));
+    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.ipConflicts3min", m_camera->getId()));
 }
 
 TEST_F(MetricsCamerasApi, analyticsGroup)
@@ -273,7 +271,7 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     EXPECT_EQ(analyticsData["minArchiveLengthS"], 24 * 3600 * kMinDays);
 
     auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    EXPECT_TRUE(hasAlarm(systemAlarms, "storage.minArchiveLengthS"));
+    EXPECT_TRUE(hasAlarm(systemAlarms, "storage.minArchiveLengthS", m_camera->getId()));
 
     m_camera->setLicenseUsed(false);
 }

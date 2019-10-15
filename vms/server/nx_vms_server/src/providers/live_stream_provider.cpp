@@ -609,7 +609,7 @@ void QnLiveStreamProvider::start(Priority priority)
         QnAbstractMediaStreamDataProvider::start(priority);
 }
 
-void QnLiveStreamProvider::beforeDestroy()
+void QnLiveStreamProvider::disableStartThread()
 {
     m_canStartThread = false;
 }
