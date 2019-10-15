@@ -257,7 +257,7 @@ protected:
 
     void whenCompletedRequestCountExceeded(int count)
     {
-        while (m_requestGenerator->completedRequestCount() < count)
+        while (m_requestGenerator->completedRequestCount() < (std::size_t) count)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
