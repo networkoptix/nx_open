@@ -51,7 +51,9 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
         if (!NX_ASSERT(groupIt != manifest.end(), "Group not found: %1", groupId))
             continue;
 
-        groupIt->name = groupRules.name;
+        if (!groupRules.name.isEmpty())
+            groupIt->name = groupRules.name;
+
         for (const auto& [valueId, valueRule]: groupRules.values)
         {
             const auto existing = std::find_if(

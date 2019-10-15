@@ -36,8 +36,12 @@ api::metrics::ResourceManifest ResourceProvider<ResourceType>::manifest() const
 {
     api::metrics::ResourceManifest groups;
     for (const auto& provider: m_providers)
-        groups.push_back(provider->manifest());
-
+    {
+        api::metrics::ValueGroupManifest group(api::metrics::Label{provider->id()});
+        for (const auto& id: provider->children())
+            group.values.push_back(api::metrics::Label{id});
+        groups.push_back(std::move(group));
+    }
     return groups;
 }
 

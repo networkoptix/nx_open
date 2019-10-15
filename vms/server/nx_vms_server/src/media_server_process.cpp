@@ -2918,15 +2918,18 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()));
 
-    /**%apidoc GET /ec2/metrics/rules
-     * %return:object Metric rules, which are currently in use in the system. See metrics.md
-     * for details.
-     *
-     * %apidoc GET /ec2/metrics/manifest
+    /**%apidoc GET /ec2/metrics/manifest
      * %return:object Metrics parameter manifest. See metrics.md for details.
      *
      * %apidoc GET /ec2/metrics/values
      * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/alarms
+     * %return:object Metrics parameter alarms with parameter links. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
         m_metricsController.get(), serverModule()));

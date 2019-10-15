@@ -82,6 +82,13 @@ private:
     {
         return nx::utils::make_container<ValueGroupProviders<Resource>>(
             makeValueGroupProvider<Resource>(
+                "_",
+                makeLocalValueProvider<Resource>(
+                    "name",
+                    [](const auto& r) { return "TR" + r.idForToStringFromPtr(); }
+                )
+            ),
+            makeValueGroupProvider<Resource>(
                 "g1",
                 makeLocalValueProvider<Resource>(
                     "i",

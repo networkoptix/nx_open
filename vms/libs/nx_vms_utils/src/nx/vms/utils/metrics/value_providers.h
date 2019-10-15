@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <nx/utils/std/cppnx.h>
 
 #include "value_group_monitor.h"
@@ -22,7 +23,6 @@ public:
         Watch<ResourceType> watch = nullptr);
 
     const QString& id() const { return m_id; }
-    api::metrics::ValueManifest manifest() const { return {m_id}; }
     std::unique_ptr<ValueMonitor> monitor(const ResourceType& resource, Scope resourceScope) const;
 
 private:
@@ -55,7 +55,7 @@ public:
     ValueGroupProvider(QString id, Providers... providers);
 
     const QString& id() const { return m_id; }
-    api::metrics::ValueGroupManifest manifest() const;
+    std::vector<QString> children() const;
     std::unique_ptr<ValueGroupMonitor> monitor(const ResourceType& resource, Scope resourceScope) const;
 
 private:
@@ -129,13 +129,12 @@ ValueGroupProvider<ResourceType>::ValueGroupProvider(QString id, Providers... pr
 }
 
 template<typename ResourceType>
-api::metrics::ValueGroupManifest ValueGroupProvider<ResourceType>::manifest() const
+std::vector<QString> ValueGroupProvider<ResourceType>::children() const
 {
-    api::metrics::ValueGroupManifest manifest(m_id);
+    std::vector<QString> ids;
     for (const auto& provider: m_providers)
-        manifest.values.push_back(provider->manifest());
-
-    return manifest;
+        ids.push_back(provider->id());
+    return ids;
 }
 
 template<typename ResourceType>

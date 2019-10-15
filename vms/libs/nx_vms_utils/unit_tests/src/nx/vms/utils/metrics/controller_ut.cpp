@@ -44,11 +44,8 @@ static const QByteArray kRules(R"json({
             }
         },
         "g2": {
-            "name": "group 2",
             "values": {
                 "i": {
-                    "name": "int parameter",
-                    "description": "integer parameter",
                     "display": "table",
                     "alarms": [{
                         "level": "warning",
@@ -101,9 +98,17 @@ public:
         EXPECT_EQ(systemManifest.size(), 1);
 
         auto testManifest = systemManifest["tests"];
-        ASSERT_EQ(testManifest.size(), 2);
+        ASSERT_EQ(testManifest.size(), 3);
 
-        const auto group1 = testManifest[0];
+        const auto group0 = testManifest[0];
+        EXPECT_EQ(group0.id, "_");
+        EXPECT_EQ(group0.name, "");
+        ASSERT_EQ(group0.values.size(), 1);
+        EXPECT_EQ(group0.values[0].id, "name");
+        EXPECT_EQ(group0.values[0].name, "Name");
+        EXPECT_EQ(group0.values[0].display, displayNone);
+
+        const auto group1 = testManifest[1];
         EXPECT_EQ(group1.id, "g1");
         EXPECT_EQ(group1.name, includeRules ? "group 1" : "G1");
         ASSERT_EQ(group1.values.size(), includeRules ? 4 : 2);
@@ -128,14 +133,14 @@ public:
         EXPECT_EQ(group1.values[b + 1].name, includeRules ? "text parameter" : "T");
         EXPECT_EQ(group1.values[b + 1].display, includeRules ? displayPanel : displayNone);
 
-        const auto group2 = testManifest[1];
+        const auto group2 = testManifest[2];
         EXPECT_EQ(group2.id, "g2");
-        EXPECT_EQ(group2.name, includeRules ? "group 2" : "G2");
+        EXPECT_EQ(group2.name, "G2");
         ASSERT_EQ(group2.values.size(), includeRules? 3 : 2);
 
         EXPECT_EQ(group2.values[0].id, "i");
-        EXPECT_EQ(group2.values[0].name, includeRules ? "int parameter" : "I");
-        EXPECT_EQ(group2.values[0].description, includeRules ? "integer parameter" : "");
+        EXPECT_EQ(group2.values[0].name, "I");
+        EXPECT_EQ(group2.values[0].description, "");
         EXPECT_EQ(group2.values[0].display, includeRules ? displayTable : displayNone);
         EXPECT_EQ(group2.values[1].id, "t");
         EXPECT_EQ(group2.values[1].name, "T");
@@ -161,8 +166,10 @@ public:
             ASSERT_EQ(testResources.size(), (scope == Scope::system) ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 2 : 1);
+            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 3 : 2);
             {
+                EXPECT_EQ(local1["_"]["name"], "TR0");
+
                 auto group1 = local1["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.001 KB") : api::metrics::Value(1));
@@ -190,8 +197,10 @@ public:
             }
 
             auto local2 = testResources["R2"];
-            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 2 : 1);
+            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 3 : 2);
             {
+                EXPECT_EQ(local2["_"]["name"], "TR2");
+
                 auto group1 = local2["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
