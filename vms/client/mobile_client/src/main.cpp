@@ -67,6 +67,8 @@ extern "C"
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <nx/utils/crash_dump/systemexcept.h>
 
+#include <nx/utils/rlimit.h>
+
 using namespace nx::mobile_client;
 using namespace std::chrono;
 using namespace nx::media;
@@ -84,6 +86,12 @@ bool forceSoftwareDecoding()
 
 int runUi(QtSingleGuiApplication* application)
 {
+    if (nx::utils::AppInfo::isIos())
+    {
+        static constexpr int kBigReasonableFileDescriptorsCount = 2048;
+        nx::utils::rlimit::setMaxFileDescriptors(kBigReasonableFileDescriptorsCount);
+    }
+
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
@@ -373,7 +381,7 @@ int main(int argc, char *argv[])
     if (nx::utils::AppInfo::isAndroid())
         qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
 
-	nx::kit::OutputRedirector::ensureOutputRedirection();
+    nx::kit::OutputRedirector::ensureOutputRedirection();
 
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
