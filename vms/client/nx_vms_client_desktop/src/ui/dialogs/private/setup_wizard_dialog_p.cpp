@@ -18,6 +18,7 @@
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSetupWizardDialogPrivate::LoginInfo, (json), LoginInfo_Fields);
 
+using namespace nx::vms::client::desktop;
 
 QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
     QnSetupWizardDialog *parent)
@@ -30,7 +31,7 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 
     static const QString exportedName("setupDialog");
 
-    if (nx::vms::client::desktop::ini().useWebEngine)
+    if (ini().useWebEngine)
     {
         m_quickWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent);
         connect(m_quickWidget, &QQuickWidget::statusChanged,
@@ -45,15 +46,14 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
                 connect(webView, SIGNAL(windowCloseRequested()), q, SLOT(accept()));
 
                 // Workaround for webadmin JS code which expects synchronous slot calls.
-                const bool enablePromises = true;
-                nx::vms::client::desktop::GraphicsWebEngineView::registerObject(
-                    webView, exportedName, this, enablePromises);
+                static constexpr bool enablePromises = true;
+                GraphicsWebEngineView::registerObject(webView, exportedName, this, enablePromises);
             });
 
         m_quickWidget->setClearColor(parent->palette().window().color());
         m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-        m_quickWidget->setSource(nx::vms::client::desktop::GraphicsWebEngineView::kQmlSourceUrl);
+        m_quickWidget->setSource(GraphicsWebEngineView::kQmlSourceUrl);
     }
     else
     {
@@ -89,14 +89,16 @@ void QnSetupWizardDialogPrivate::load(const QUrl& url)
         return;
     }
 
-    auto setUrlFunc = [this, url](QQuickWidget::Status status){
-        if (status != QQuickWidget::Ready)
-            return;
-        QQuickItem* webView = m_quickWidget->rootObject();
-        if (!webView)
-            return;
-        webView->setProperty("url", url);
-    };
+    const auto setUrlFunc =
+        [this, url](QQuickWidget::Status status)
+        {
+            if (status != QQuickWidget::Ready)
+                return;
+            QQuickItem* webView = m_quickWidget->rootObject();
+            if (!webView)
+                return;
+            webView->setProperty("url", url);
+        };
 
     if (m_quickWidget->status() != QQuickWidget::Ready)
     {

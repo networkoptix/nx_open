@@ -33,13 +33,13 @@
 
 namespace {
 
-    // This User-Agent is required for vista camera to use html/js page, not java applet.
-    const QString kUserAgentForCameraPage(
-        "Mozilla/5.0 (Windows; U; Windows NT based; en-US)"
-        " AppleWebKit/534.34 (KHTML, like Gecko)"
-        "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
+// This User-Agent is required for vista camera to use html/js page, not java applet.
+const QString kUserAgentForCameraPage(
+    "Mozilla/5.0 (Windows; U; Windows NT based; en-US)"
+    " AppleWebKit/534.34 (KHTML, like Gecko)"
+    "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
 
-} // anonymous namespace
+} // namespace
 
 namespace nx::vms::client::desktop {
 
