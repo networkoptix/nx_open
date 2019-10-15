@@ -2625,7 +2625,8 @@ int HanwhaResource::streamBitrate(
         .streamCapabilities
         .value(toStreamIndex(role));
 
-    return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
+    return qBound((int) streamCapability.minBitrateKbps,
+        bitrateKbps, (int) streamCapability.maxBitrateKbps);
 }
 
 int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const

@@ -88,9 +88,9 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
         const auto coefficient = bitrateCoefficient(quality);
         const auto bitrate = streamCapability.defaultBitrateKbps * coefficient;
         return qBound(
-            (float)streamCapability.minBitrateKbps,
+            streamCapability.minBitrateKbps,
             bitrate * ((float)fps / streamCapability.defaultFps),
-            (float)streamCapability.maxBitrateKbps);
+            streamCapability.maxBitrateKbps);
     }
 
     auto result = suggestBitrateForQualityKbps(quality, resolution, fps, codec);
@@ -101,9 +101,9 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     if (streamCapability.maxBitrateKbps > 0)
     {
         result = qBound(
-            (float)streamCapability.minBitrateKbps,
+            streamCapability.minBitrateKbps,
             result,
-            (float)streamCapability.maxBitrateKbps);
+            streamCapability.maxBitrateKbps);
     }
 
     return result;
