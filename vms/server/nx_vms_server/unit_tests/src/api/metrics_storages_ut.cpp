@@ -19,10 +19,6 @@ using namespace nx::vms::api::metrics;
 using namespace nx::test;
 using namespace nx::analytics::db;
 
-namespace {
-
-} // namespace
-
 class MetricsStoragesApi: public ::testing::Test
 {
 public:
@@ -37,16 +33,7 @@ public:
         vms::api::StorageDataList storages;
         vms::api::StorageData storage;
         for (int i = 0; i < 2; ++i)
-        {
-            QString storageName = lm("Storage %1").arg(i);
-            storage.id = QnUuid::createUuid();
-            storage.name = storageName;
-            storage.parentId = launcher->commonModule()->moduleGUID();
-            storage.spaceLimit = 113326;
-            storage.storageType = "local";
-            storage.url = launcher->dataDir() + L'/' + storageName;
-            NX_TEST_API_POST(launcher.get(), lit("/ec2/saveStorage"), storage);
-        }
+            launcher->addStorage(lm("Storage %1").arg(i));
     }
 
     static bool hasAlarm(const Alarms& alarms, const QString& value)
@@ -76,8 +63,8 @@ TEST_F(MetricsStoragesApi, info)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto infoData = storageData["info"];
-    ASSERT_EQ(kTestServerName, infoData["server"].toString());
-    ASSERT_EQ("local", infoData["type"].toString());
+    EXPECT_EQ(kTestServerName, infoData["server"].toString());
+    EXPECT_EQ("local", infoData["type"].toString());
 }
 
 TEST_F(MetricsStoragesApi, space)
@@ -173,7 +160,7 @@ TEST_F(MetricsStoragesApi, activity)
     auto server = resourcePool->getOwnMediaServer();
     server->setMetadataStorageId(storage->getId());
 
-    // In test mode it doesn't have event loop to call it
+    // 'MediaServerProcess' doesn't call it in the test mode.
     launcher->mediaServerProcess()->initializeAnalyticsEvents();
 
     double readRate = 0;
@@ -201,10 +188,7 @@ TEST_F(MetricsStoragesApi, activity)
         auto db = launcher->serverModule()->analyticsEventsStorage();
         std::promise<void> future;
         db->lookupTimePeriods(Filter(), TimePeriodsLookupOptions(),
-            [&future](auto&&... args)
-        {
-            future.set_value();
-        });
+            [&future](auto&&...) { future.set_value(); });
         future.get_future().wait();
 
         systemValues = launcher->get<SystemValues>("/ec2/metrics/values");

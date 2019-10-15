@@ -122,8 +122,8 @@ public:
     void initStaticCommonModule();
     void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
     bool installUpdateRequestReceived() const { return m_installUpdateRequestReceived; }
-
     bool initializeAnalyticsEvents();
+
 signals:
     void started();
     void startedWithSignalsProcessed();
