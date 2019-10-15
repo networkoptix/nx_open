@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.137",
+    "version": "1.0.1.138",
     "data": [
         {
             "keys": [
@@ -2181,7 +2181,8 @@
             "keys": [
                 "Dahua|IPC-HFW*",
                 "Dahua|IPC-HDB*",
-                "Dahua|IPC-HDW*"
+                "Dahua|IPC-HDW*",
+                "Dahua|N45BL5Z"
             ],
             "_comment1": "The camera returns the same URI for all videoencoders, so we fix it.",
             "_comment2": "No correct URI can be picked up for videoencoder '002', so we ignore '002'",
