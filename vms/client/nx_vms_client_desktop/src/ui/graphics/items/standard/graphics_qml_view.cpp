@@ -11,6 +11,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QApplication>
 
+#include <client_core/client_core_module.h>
 #include <ui/workaround/gl_native_painting.h>
 
 namespace {
@@ -204,14 +205,12 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
         }
     );
 
-    m_qmlEngine = new QQmlEngine();
-    if (!m_qmlEngine->incubationController())
-        m_qmlEngine->setIncubationController(m_quickWindow->incubationController());
     m_resizeTimer = new QTimer(this);
     m_resizeTimer->setSingleShot(true);
     m_resizeTimer->setInterval(kResizeTimeout);
     connect(m_resizeTimer, &QTimer::timeout, this, &GraphicsQmlView::updateSizes);
 
+    m_qmlEngine = qnClientCoreModule->mainQmlEngine();
 
     m_qmlComponent = new QQmlComponent(m_qmlEngine);
     connect(m_qmlComponent, &QQmlComponent::statusChanged, this, &GraphicsQmlView::componentStatusChanged);
@@ -226,7 +225,6 @@ GraphicsQmlView::~GraphicsQmlView()
     if (m_rootItem)
         delete m_rootItem;
     delete m_qmlComponent;
-    delete m_qmlEngine;
     delete m_quickWindow;
     delete m_renderControl;
     if (m_fbo)
