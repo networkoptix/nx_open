@@ -156,7 +156,7 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr}'
+                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
 
             if stdout:
@@ -244,21 +244,26 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
             if not eth_name:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to detect box network adapter which serves ip {self.ip}.')
 
-            eth_name_check_result = self.sh(f'test -d "/sys/class/net/{eth_name}"')
+            eth_dir = f'/sys/class/net/{eth_name}'
+            eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
 
             if not eth_name_check_result or eth_name_check_result.return_code != 0:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to find box network adapter info dir {repr(eth_dir)}.')
 
             self.eth_name = eth_name
 
-        def ssh_command(self):
+        def ssh_command(self, command=None):
             res = self._ssh_command.copy()
             if self.host_key:
                 res.insert(2, '-hostkey')
                 res.insert(3, self.host_key)
+            if command:
+                escaped_command = '"' + command.replace('"', '\\"') + '"'
+                res += ['-c', escaped_command]
+            #logging.info("Executing command: %r", res)
             return res
 
         _SH_DEFAULT = object()
@@ -274,11 +279,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             log_remote_command(command_wrapped)
             try:
-                proc = subprocess.Popen(self.ssh_command(), **opts)
-                out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
-                if stdin:
-                    proc.stdin.write(str(stdin).encode('UTF-8'))
-                proc.stdin.close()
+                proc = subprocess.Popen(self.ssh_command(command_wrapped), **opts)
+                out, err = proc.communicate(stdin.encode('UTF-8') if stdin else b'', timeout)
             except subprocess.TimeoutExpired:
                 message = f'Timeout {timeout} seconds expired'
                 if exc:

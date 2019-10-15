@@ -1,7 +1,11 @@
+import logging
 import tempfile
+from pprint import pprint, pformat
+
 from vms_benchmark import exceptions
 from vms_benchmark.config import ConfigParser
 from vms_benchmark.box_platform import BoxPlatform
+from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError, BoxFileContentError
 
 
 class VmsScanner:
@@ -91,8 +95,8 @@ class VmsScanner:
             base_dir = '/etc'
 
             if uid != 0:
-                username = self.device.eval(f'id -u {uid} -n', exc=True, su=True)
-                homedir = self.device.eval(f'echo ~{username}', exc=True, su=True)
+                username = self.device.eval(f'id -u {uid} -n', su=True)
+                homedir = self.device.eval(f'echo ~{username}', su=True)
                 base_dir = f'{homedir}/.config'
 
             ini_dir_path = f'{base_dir}/nx_ini'
@@ -106,8 +110,9 @@ class VmsScanner:
             tmp_dir = self.device.eval('mktemp -d --suffix -nx_ini')
 
             if not tmp_dir:
-                pass
-                # TODO: process the error
+                raise BoxCommandError(f'Unable to create temp dir at the box via "mktemp".')
+
+            self.device.eval(f'chmod 777 {tmp_dir}', su=True)
 
             if uid != 0:
                 self.device.sh(f'chown {uid} "{tmp_dir}"', exc=True, su=True)
@@ -135,50 +140,65 @@ class VmsScanner:
 
     @staticmethod
     def scan(device, linux_distribution):
+
         if linux_distribution.with_systemd:
-            systemd_scripts = device.eval('systemctl list-unit-files --type=service *-mediaserver.service', stderr=None)
+            systemd_scripts = device.eval('systemctl list-unit-files --type=service "*"-mediaserver.service', stderr=None)
 
             if not systemd_scripts:
                 return None
 
-            customizations = [
-                line.split()[0].split('-')[0]
-                for line in systemd_scripts.split('\n')
-                if '.service' in line
-            ]
+            customizations = []
+            for line in systemd_scripts.splitlines():
+                [customization, *_] = line.rpartition('-mediaserver.service')
+                if customization:
+                    customizations.append(customization)
         else:
             initd_scripts = device.eval('cd /etc/init.d; ls *-mediaserver', stderr=None)
 
             if not initd_scripts:
                 return None
 
-            customizations = [line.split('-')[0] for line in initd_scripts.split('\n') if len(line.strip()) > 0]
+            customizations = []
+            for line in initd_scripts.splitlines():
+                [customization, *_] = line.rpartition('-')
+                if customization:
+                    customizations.append(customization)
+
+        logging.info("Detected services: %s", pformat(customizations))
 
         vms_descriptions = [{"customization": customization} for customization in customizations]
 
         for vms in vms_descriptions:
-            probably_vms_dir = f"/opt/{vms['customization']}/mediaserver"
-            res = device.sh(f"test -d {probably_vms_dir}")
-
+            vms_dir = f"/opt/{vms['customization']}/mediaserver"
+            res = device.sh(f"test -d {vms_dir}")
             if res:
-                vms['dir'] = probably_vms_dir
+                vms['dir'] = vms_dir
             else:
-                # Directory of the VMS is not found
-                vms['dir'] = None
+                raise BoxStateError(f'VMS Server dir at the box does not exist: {repr(vms_dir)}.')
 
-            # TODO: this is a kostyl :)
-            server_config = device.eval(f"cat {vms['dir']}/etc/mediaserver.conf")
+            server_config_path = f"{vms['dir']}/etc/mediaserver.conf"
+            server_config = device.eval(f"cat {server_config_path}")
             if server_config:
                 try:
-                    tmp_file_fd, tmp_file_path = tempfile.mkstemp()
+                    [tmp_file_fd, tmp_file_path] = tempfile.mkstemp()
                 except:
+                    # TODO: #alevenkov: Rewrite properly.
                     import time
                     time.sleep(100)
+                    try:
+                        [tmp_file_fd, tmp_file_path] = tempfile.mkstemp()
+                    except:
+                        raise HostOperationError('Unable to create temp file at the host.')
 
-                tf = open(tmp_file_fd, 'w+b')
-                tf.write(server_config.encode())
-                tf.close()
-                vms['port'] = int(ConfigParser(tmp_file_path).options.get('port', 7001))
+                tmp_file = open(tmp_file_fd, 'w+b')
+                tmp_file.write(server_config.encode())
+                tmp_file.close()
+                try:
+                    vms['port'] = int(ConfigParser(tmp_file_path).options.get('port', 7001))
+                except ValueError:
+                    raise BoxStateError(f'Unable to get box Server port from {repr(server_config_path)}.')
+            else:
+                raise BoxStateError(f"VMS Server at {repr(vms['dir'])} has none or empty \"mediaserver.conf\".")
 
             vms['host'] = device.host
 

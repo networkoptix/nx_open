@@ -17,7 +17,8 @@ class LinuxDistributionDetector:
     @staticmethod
     def detect(device):
         command = r"uname -r | grep -Eo '[0-9]+\.[0-9]+(\.[0-9]+)?'"
-        kernel_version = device.eval(command).split('.')
+        output = device.eval(command)
+        kernel_version = output.split('.') if output else None
 
         if not kernel_version:
             raise LinuxDistributionDetector.LinuxDistributionDetectionError(

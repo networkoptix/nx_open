@@ -131,7 +131,7 @@ def load_configs(conf_file, ini_file):
     conf = ConfigParser(conf_file, conf_option_descriptions)
 
     ini_option_descriptions = {
-        "testCameraBin": {
+        "testcameraBin": {
             "optional": True,
             "type": 'string',
             "default": './testcamera/testcamera'
@@ -171,10 +171,15 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 7
         },
-        "testCameraDebug": {
+        "testcameraDebug": {
             "optional": True,
             "type": 'boolean',
             "default": False
+        },
+        "testcameraLocalInterface": {
+            "optional": True,
+            "type": 'string',
+            "default": ''
         },
         "cpuUsageThreshold": {
             "optional": True,
@@ -200,15 +205,26 @@ def load_configs(conf_file, ini_file):
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
-    if ini['testCameraBin']:
-        test_camera_runner.binary_file = ini['testCameraBin']
+    if ini['testcameraBin']:
+        test_camera_runner.binary_file = ini['testcameraBin']
     if ini['rtspPerfBin']:
         stream_reader_runner.binary_file = ini['rtspPerfBin']
     if ini['testFileHighResolution']:
         test_camera_runner.test_file_high_resolution = ini['testFileHighResolution']
     if ini['testFileLowResolution']:
         test_camera_runner.test_file_low_resolution = ini['testFileLowResolution']
-    test_camera_runner.debug = ini['testCameraDebug']
+    test_camera_runner.debug = ini['testcameraDebug']
+
+    if ini.ORIGINAL_OPTIONS is not None:
+        print(f"\nOverriding default options via {ini_file}:")
+        for k, v in ini.ORIGINAL_OPTIONS.items():
+            print(f"    {k}={v}")
+
+    print(f"\nConfiguration defined in {conf_file}:")
+    for k, v in conf.options.items():
+        print(f"    {k}={v}")
+
+    print('')
 
     return conf, ini
 
@@ -294,15 +310,6 @@ def get_cumulative_swap_bytes(box):
 def main(conf_file, ini_file):
     conf, ini = load_configs(conf_file, ini_file)
 
-    if ini.ORIGINAL_OPTIONS is not None:
-        print(f"Overriding default options via {ini_file}:")
-        for k, v in ini.ORIGINAL_OPTIONS.items():
-            print(f"    {k}={v}")
-
-    print(f"Configuration defined in {conf_file}:")
-    for k, v in conf.options.items():
-        print(f"    {k}={v}")
-
     password = conf.get('boxPassword', None)
 
     if password and platform.system() == 'Linux':
@@ -383,23 +390,23 @@ def main(conf_file, ini_file):
         print(f"Detected VMS installation(s):")
         for vms in vmses:
             print(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
-            print(f" PID {vms.pid if vms.pid else '-'})", end='')
+            print(f" pid {vms.pid if vms.pid else '-'}", end='')
             vms_uid = vms.uid()
             if vms_uid:
-                print(f" UID {vms_uid})", end='')
-            print('')
+                print(f" uid {vms_uid}", end='')
+            print(')')
     else:
         print("No VMS installations found on the box.")
         print("Nothing to do.")
         return 0
 
     if len(vmses) > 1:
-        raise exceptions.BoxStateError("More than one customizations found.")
+        raise exceptions.BoxStateError("More than one Server installation found at the box.")
 
     vms = vmses[0]
 
     if not vms.is_up():
-        raise exceptions.BoxStateError("VMS is not running currently.")
+        raise exceptions.BoxStateError("VMS is not running currently at the box.")
 
     if not vms.override_ini_config(
         {
@@ -553,8 +560,9 @@ def main(conf_file, ini_file):
         print(f"Serving {test_cameras_count} virtual cameras.")
         print("")
 
+        ini_local_ip = ini['testcameraLocalInterface']
         test_camera_context_manager = test_camera_runner.test_camera_running(
-            local_ip=box.local_ip,
+            local_ip=ini_local_ip if ini_local_ip else box.local_ip,
             count=test_cameras_count,
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
@@ -702,7 +710,7 @@ def main(conf_file, ini_file):
 
                             cpu_usage_avg_collector.append(cpu_usage_last_minute)
                             if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                                raise exceptions.CPUUsageThresholdExceededIssue(
+                                raise exceptions.CpuUsageThresholdExceededIssue(
                                     cpu_usage_last_minute,
                                     ini['cpuUsageThreshold']
                                 )
