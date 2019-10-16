@@ -40,11 +40,12 @@ void testCalcDigestResponse(
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
     const boost::optional<BufferType>& predefinedHA1,
-    const StringType& algorithm = {})
+    const StringType& algorithm = {},
+    const StringType& qualityOfProtection = {})
 {
     header::WWWAuthenticate authHeader(header::AuthScheme::digest);
     authHeader.params.emplace("realm", "test@networkoptix.com");
-    authHeader.params.emplace("qop", "auth");
+    authHeader.params.emplace("qop", qualityOfProtection);
     authHeader.params.emplace("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
     if (!algorithm.isEmpty())
         authHeader.params.emplace("algorithm", algorithm);
@@ -69,10 +70,24 @@ TEST(HttpAuthDigest, calcDigestResponse)
             {
                 for (const StringType& algorithm: {"", "MD5", "SHA-256"})
                 {
-                    NX_DEBUG(this, lm("Test method='%1', user='%2', password='%3', algorithm='%4'")
-                        .args(method, user, password, algorithm));
+                    for (const StringType& qop: {"", "auth", "auth,auth-int", "auth-int,auth"})
+                    {
+                        NX_DEBUG(this,
+                            "Test method='%1', user='%2', password='%3', algorithm='%4', qop='%5'",
+                            method,
+                            user,
+                            password,
+                            algorithm,
+                            qop);
 
-                    testCalcDigestResponse(method, user, password, boost::none, algorithm);
+                        testCalcDigestResponse(
+                            method,
+                            user,
+                            password,
+                            /*predefinedHa1*/ boost::none,
+                            algorithm,
+                            qop);
+                    }
                 }
             }
         }
