@@ -876,6 +876,13 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
         serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
 }
 
+bool Camera::hasRemovedFile() const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->hasRemovedFile(ptr) ||
+        serverModule()->backupStorageManager()->hasRemovedFile(ptr);
+}
+
 std::chrono::milliseconds Camera::calendarDuration() const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();

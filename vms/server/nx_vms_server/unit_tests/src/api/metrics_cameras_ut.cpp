@@ -54,6 +54,9 @@ public:
 
         launcher = std::make_unique<ServerForTests>();
 
+        auto storage = launcher->addStorage(lm("Storage 1"));
+        auto storageIndex = launcher->serverModule()->storageDbPool()->getStorageIndex(storage);
+
         auto resourcePool = launcher->serverModule()->resourcePool();
         // Some tests here add camera to VideoCameraPool manually.
         // Recording manager do the same but async. Block it.
@@ -89,6 +92,7 @@ public:
         chunk1.startTimeMs = currentTimeMs - kMsInDay * 2;
         chunk1.durationMs = 45 * 1000;
         chunk1.setFileSize(1000 * 1000);
+        chunk1.storageIndex = storageIndex;
         catalog->addRecord(chunk1);
 
         // Fill last 24 hours with 50% archive density.
@@ -98,6 +102,7 @@ public:
             nx::vms::server::Chunk chunk;
             chunk.startTimeMs = timeMs;
             chunk.durationMs = kMsInMinute;
+            chunk1.storageIndex = storageIndex;
             chunk.setFileSize(1000 * 1000 * 60); //< Bitrate 8 Mbit.
             catalog->addRecord(chunk);
             timeMs += kMsInMinute * 2;
@@ -275,6 +280,29 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     EXPECT_EQ(analyticsData["minArchiveLengthS"], 24 * 3600 * kMinDays);
 
     auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
+    EXPECT_FALSE(hasAlarm(systemAlarms, "storage.minArchiveLengthS", m_camera->getId()));
+
+    ASSERT_FALSE(analyticsData["hasArchiveCleanup"].toBool());
+
+    auto catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+        m_camera->getUniqueId(), QnServer::LowQualityCatalog);
+    catalog->deleteFirstRecord(); //< This catalog is empty.
+
+    systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    analyticsData = cameraData["storage"];
+    ASSERT_FALSE(analyticsData["hasArchiveCleanup"].toBool());
+
+    catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+        m_camera->getUniqueId(), QnServer::HiQualityCatalog);
+    catalog->deleteFirstRecord(); //< This catalog is non empty.
+
+    systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    analyticsData = cameraData["storage"];
+    ASSERT_TRUE(analyticsData["hasArchiveCleanup"].toBool());
+
+    systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
     EXPECT_TRUE(hasAlarm(systemAlarms, "storage.minArchiveLengthS", m_camera->getId()));
 
     m_camera->setLicenseUsed(false);

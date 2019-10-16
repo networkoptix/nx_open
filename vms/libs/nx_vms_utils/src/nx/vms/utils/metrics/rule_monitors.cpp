@@ -148,6 +148,12 @@ public:
         if (function() == "<=" || function() == "lessOrEqual")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
 
+        if (function() == "&&" || function() == "and")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() && v2.toBool(); });
+
+        if (function() == "||" || function() == "or")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() || v2.toBool(); });
+
         return nullptr;
     }
 

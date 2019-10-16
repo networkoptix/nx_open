@@ -478,6 +478,9 @@
                     "display": "table|panel",
                     "format": "KBps"
                 },
+                "isArchiveTooSmall": { 
+                    "calculate": "greaterThan %minArchiveLengthS %archiveLengthS"
+                },
                 "minArchiveLengthS": {
                     "name": "Min Archive length",
                     "description": "Minimum Archive length",
@@ -485,7 +488,7 @@
                     "format": "durationS",
                     "alarms": [{
                         "level": "error",
-                        "condition": "greaterThan %minArchiveLengthS %archiveLengthS",
+                        "condition": "and %isArchiveTooSmall %hasArchiveCleanup",
                         "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
                     }]
                 }

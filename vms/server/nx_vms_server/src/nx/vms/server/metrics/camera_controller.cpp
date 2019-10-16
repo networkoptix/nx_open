@@ -196,6 +196,9 @@ auto makeStorageProviders()
                 const auto result = r->recordingBitrateBps(kBitratePeriod);
                 return result > 0 ? Value(result) : Value();
             }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "hasArchiveCleanup", [](const auto& r) { return Value(r->hasRemovedFile()); }
         )
     );
 }
