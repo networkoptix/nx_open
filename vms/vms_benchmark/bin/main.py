@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import datetime
 import math
 import platform
 import signal
 import sys
 import time
-import os
 import logging
 from typing import List, Tuple, Optional
 
