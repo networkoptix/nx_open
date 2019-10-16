@@ -34,7 +34,7 @@ if platform.system() == 'Linux':
         pdb.set_trace()
 
     if platform.python_implementation() == 'Jython':
-        debug_signum = signal.SIGUSR2 # bug #424259
+        debug_signum = signal.SIGUSR2  # bug #424259
     else:
         debug_signum = signal.SIGUSR1
 
@@ -456,6 +456,7 @@ def main(conf_file, ini_file, log_file):
 
     report('Server stopped.')
 
+    # TODO: Properly enumerate all actual storages; consider that they can be relocated via Server configuration.
     for camera in cameras:
         box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
         box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
@@ -823,9 +824,9 @@ def main(conf_file, ini_file, log_file):
                             max_lag_s = max(max_lag_s, this_frame_lag_s)
 
                         pts_diff_deviation_factor_max = 0.03
-                        pts_diff_expected = 1000000./float(ini['testFileFps'])
+                        pts_diff_expected = 1000000.0 / float(ini['testFileFps'])
                         pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
-                        pts_diff_max = (1000000./float(ini['testFileFps']))*(1.0 + pts_diff_deviation_factor_max)
+                        pts_diff_max = (1000000.0 / float(ini['testFileFps'])) * (1.0 + pts_diff_deviation_factor_max)
 
                         # The value is negative because the first PTS of new loop is less than last PTS of the previous
                         # loop.
@@ -861,7 +862,7 @@ def main(conf_file, ini_file, log_file):
                 cpu_usage_max = cpu_usage_max_collector[0]
 
                 if cpu_usage_avg_collector is not None:
-                    cpu_usage_avg = sum(cpu_usage_avg_collector)/len(cpu_usage_avg_collector)
+                    cpu_usage_avg = sum(cpu_usage_avg_collector) / len(cpu_usage_avg_collector)
                 else:
                     cpu_usage_avg = None
 
@@ -951,16 +952,16 @@ def nx_format_exception(exception):
 
 
 def nx_print_exception(exception, recursive_level=0):
-    string_indent = '  '*recursive_level
+    string_indent = '  ' * recursive_level
     if isinstance(exception, exceptions.VmsBenchmarkError):
         print(f"{string_indent}{str(exception)}", file=sys.stderr)
         if exception.original_exception:
             print(f'{string_indent}Caused by:', file=sys.stderr)
             if isinstance(exception.original_exception, list):
                 for e in exception.original_exception:
-                    nx_print_exception(e, recursive_level=recursive_level+2)
+                    nx_print_exception(e, recursive_level=recursive_level + 2)
             else:
-                nx_print_exception(exception.original_exception, recursive_level=recursive_level+2)
+                nx_print_exception(exception.original_exception, recursive_level=recursive_level + 2)
     else:
         print(
             f'{string_indent}{nx_format_exception(exception)}'
