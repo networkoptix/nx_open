@@ -150,12 +150,6 @@ public:
     }
 
 private:
-    QString getGLString(GLenum id)
-	{
-        const auto functions = m_glWidget->context()->functions();
-        return QLatin1String(reinterpret_cast<const char *>(functions->glGetString(id)));
-	}
-
     QOpenGLWidget* const m_glWidget;
     QnGlFunctions::Features m_features;
 };
@@ -193,12 +187,7 @@ QnGlFunctions::Features QnGlFunctions::features() const
     return d->features();
 }
 
-const QnGlFunctions::OpenGLInfo& QnGlFunctions::openGLInfo() const
-{
-    return StaticOpenGLInfo::instance().info();
-}
-
-QnGlFunctions::OpenGLInfo QnGlFunctions::openGLCachedInfo()
+QnGlFunctions::OpenGLInfo QnGlFunctions::openGLInfo()
 {
     return StaticOpenGLInfo::instance().info();
 }

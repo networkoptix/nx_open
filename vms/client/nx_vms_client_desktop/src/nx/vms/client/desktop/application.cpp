@@ -71,6 +71,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <ui/help/help_handler.h>
+#include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -268,7 +269,10 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
         }
     }
 
+    QnGLCheckerInstrument::checkGLHardware();
+
     mainWindow->show();
+
     joystickManager->start(mainWindow->winId());
 
     const bool instantlyMaximize = !startupParams.fullScreenDisabled

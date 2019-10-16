@@ -131,7 +131,7 @@ nx::vms::api::ClientInfoData clientInfo()
     clientData.cpuArchitecture = hw.cpuArchitecture;
     clientData.cpuModelName = hw.cpuModelName;
 
-    const auto gl = QnGlFunctions::openGLCachedInfo();
+    const auto gl = QnGlFunctions::openGLInfo();
     clientData.openGLRenderer = gl.renderer;
     clientData.openGLVersion = gl.version;
     clientData.openGLVendor = gl.vendor;
