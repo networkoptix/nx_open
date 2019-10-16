@@ -34,7 +34,7 @@ struct HanwhaChunkLoaderSettings
         const std::chrono::seconds& messageBodyReadTimeout);
 
     std::chrono::seconds responseTimeout = std::chrono::minutes(5);
-    std::chrono::seconds messageBodyReadTimeout = std::chrono::minutes(30);
+    std::chrono::seconds messageBodyReadTimeout = std::chrono::minutes(1);
 };
 
 class HanwhaChunkLoader: public QObject

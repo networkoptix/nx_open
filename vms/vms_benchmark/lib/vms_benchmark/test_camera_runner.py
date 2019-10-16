@@ -45,7 +45,7 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     try:
         proc = subprocess.Popen(camera_args, **opts)
     except Exception as exception:
-        raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
+        raise exceptions.TestCameraError(f"Unable to spawn virtual cameras: {str(exception)}")
 
     try:
         yield proc

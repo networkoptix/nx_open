@@ -54,52 +54,6 @@ private:
     bool m_fglrxMode = false;
 };
 
-//--------------------------------------------------------------------------------------------------
-
-QByteArray getString(QOpenGLFunctions* functions, GLint id)
-{
-    return reinterpret_cast<const char*>(functions->glGetString(id));
-}
-
-void checkGLHardware(QOpenGLWidget* viewport)
-{
-    const auto context = viewport->context();
-    if (!context)
-    {
-        NX_ASSERT(false, "No current OpenGL context!");
-        return;
-    }
-
-    const auto functions = context->functions();
-    const auto info = QnGlFunctions(viewport).openGLInfo();
-
-    NX_INFO(NX_SCOPE_TAG, "Version: %1.", info.version);
-    NX_INFO(NX_SCOPE_TAG, "Renderer: %1.", info.renderer);
-    NX_INFO(NX_SCOPE_TAG, "Vendor: %1.", info.vendor);
-    NX_DEBUG(NX_SCOPE_TAG, "Extensions: %1.", info.extensions);
-
-    bool contextIsValid = true;
-
-    if (!info.version.contains("ES 2.0"))
-    {
-        if (nx::utils::SoftwareVersion(info.version) < nx::utils::SoftwareVersion(2, 0))
-        {
-            NX_ERROR(NX_SCOPE_TAG, "OpenGL version %1 is not supported.", info.version);
-            contextIsValid = false;
-        }
-    }
-
-    /* Note that message will be shown in destructor,
-     * close to the event loop. */
-    if (contextIsValid)
-        return;
-
-    QnMessageBox::warning(nullptr,
-        QnGLCheckerInstrument::tr("Video card drivers are outdated or not installed"),
-        QnGLCheckerInstrument::tr("%1 may not work properly.")
-            .arg(QnClientAppInfo::applicationDisplayName()));
-}
-
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
@@ -128,6 +82,36 @@ QnGLCheckerInstrument::~QnGLCheckerInstrument()
 {
 }
 
+void QnGLCheckerInstrument::checkGLHardware()
+{
+    const auto info = QnGlFunctions::openGLInfo();
+
+    NX_INFO(NX_SCOPE_TAG, "Version: %1.", info.version);
+    NX_INFO(NX_SCOPE_TAG, "Renderer: %1.", info.renderer);
+    NX_INFO(NX_SCOPE_TAG, "Vendor: %1.", info.vendor);
+    NX_DEBUG(NX_SCOPE_TAG, "Extensions: %1.", info.extensions);
+
+    bool contextIsValid = true;
+
+    if (!info.version.contains("ES 2.0"))
+    {
+        if (nx::utils::SoftwareVersion(info.version) < nx::utils::SoftwareVersion(2, 0))
+        {
+            NX_ERROR(NX_SCOPE_TAG, "OpenGL version %1 is not supported.", info.version);
+            contextIsValid = false;
+        }
+    }
+
+    // Note that message will be shown in destructor, close to the event loop.
+    if (contextIsValid)
+        return;
+
+    QnMessageBox::warning(nullptr,
+        tr("Video card drivers are outdated or not installed"),
+        tr("%1 may not work properly.")
+            .arg(QnClientAppInfo::applicationDisplayName()));
+}
+
 bool QnGLCheckerInstrument::registeredNotify(QWidget *viewport)
 {
     viewport->installEventFilter(this);
@@ -147,8 +131,6 @@ bool QnGLCheckerInstrument::eventFilter(QObject* watched, QEvent* event)
         return result;
 
     viewport->removeEventFilter(this);
-
-    checkGLHardware(viewport);
     d->fglrxWorkaround.update(viewport);
 
     return result;

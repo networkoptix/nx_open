@@ -662,11 +662,11 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        NX_VERBOSE(this, "Init storages begin");
+        NX_VERBOSE(this, "[Storages init] Init storages begin");
         const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
-                NX_VERBOSE(this, "Init storages end");
+                NX_VERBOSE(this, "[Storages init] Init storages end");
                 m_initStoragesAsyncPromise->set_value();
             });
 
@@ -678,7 +678,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
             QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
-            NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
+            NX_DEBUG(this, lm("[Storages init] Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -686,7 +686,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_DEBUG(this, lm("Existing storage: %1, spaceLimit = %2")
+            NX_DEBUG(this, lm("[Storages init] Existing storage: %1, spaceLimit = %2")
                 .args(storage.url, storage.spaceLimit));
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
@@ -725,10 +725,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                 storagesToRemove.append(smallStorage);
         }
 
-        NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
+        NX_DEBUG(this, lm("[Storages init] Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
         {
-            NX_DEBUG(this, lm("Storage to remove: %2, id: %3").args(
+            NX_DEBUG(this, lm("[Storages init] Storage to remove: %2, id: %3").args(
                 storage->getUrl(), storage->getId()));
         }
 
@@ -738,21 +738,25 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-                qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
+                qWarning() << "[Storages init] Failed to remove deprecated storage on startup. Postpone removing to the next start...";
             commonModule()->resourcePool()->removeResources(storagesToRemove);
         }
 
         QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
         modifiedStorages.append(updateStorages(m_mediaServer));
+
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
+        NX_DEBUG(this, "[Storages init] Updated storages saved and update resource signal sent");
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
             &MediaServerProcess::at_serverPropertyChanged);
 
         if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
             initializeAnalyticsEvents();
+
+        NX_DEBUG(this, "[Storages init] Analytics storage DB initialized");
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
@@ -4135,6 +4139,21 @@ void MediaServerProcess::connectSignals()
             }
         });
 
+    m_createDbBackupTimer = std::make_unique<QTimer>();
+    connect(
+        m_createDbBackupTimer.get(),
+        &QTimer::timeout,
+        [firstRun = true, this]() mutable
+        {
+            auto utils = nx::vms::server::Utils(serverModule());
+            utils.backupDatabase();
+            if (firstRun)
+            {
+                m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
+                firstRun = false;
+            }
+        });
+
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -4336,15 +4355,6 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
     }
 }
 
-void MediaServerProcess::onBackupDbTimer()
-{
-    auto utils = nx::vms::server::Utils(serverModule());
-    utils.backupDatabase();
-    m_createDbBackupTimer->addTimer(
-        [this](auto /*timerId*/){ onBackupDbTimer(); },
-        serverModule()->settings().dbBackupPeriodMS());
-}
-
 void MediaServerProcess::startObjects()
 {
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
@@ -4375,11 +4385,7 @@ void MediaServerProcess::startObjects()
                 std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
         }
     }
-
-    m_createDbBackupTimer = std::make_unique<nx::utils::TimerManager>();
-    m_createDbBackupTimer->addTimer(
-        [this](auto /*timerId*/) { onBackupDbTimer(); },
-        std::chrono::milliseconds(initialBackupDbPeriodMs));
+    m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 

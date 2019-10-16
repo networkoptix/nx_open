@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 import datetime
+import math
 import platform
 import signal
 import sys
 import time
 import os
 import logging
+from typing import List, Tuple, Optional
 
-logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
+from vms_benchmark.camera import Camera
 
 # This block ensures that ^C interrupts are handled quietly.
 try:
@@ -85,7 +87,7 @@ def load_configs(conf_file, ini_file):
         "boxSshPort": {
             "optional": True,
             "type": 'integer',
-            "range": [0, 31768],
+            "range": [0, 65535],
             "default": 22,
         },
         "vmsUser": {
@@ -98,31 +100,36 @@ def load_configs(conf_file, ini_file):
             "type": "string",
             "default": "admin",
         },
-        "virtualCamerasCount": {
+        "virtualCameraCount": {
             "optional": False,
             "type": "integers",
         },
-        "streamsPerTestCamera": {
+        "liveStreamsPerCameraRatio": {
             "optional": True,
-            "type": 'integer',
-            "default": 1,
+            "type": 'float',
+            "default": 1.0,
+        },
+        "archiveStreamsPerCameraRatio": {
+            "optional": True,
+            "type": 'float',
+            "default": 0.2,
         },
         "streamingTestDurationMinutes": {
             "optional": True,
             "type": 'integer',
-            "default": 1 if os.path.exists('.not_installed') else 4 * 60,
+            "default": 4 * 60,
         },
         "cameraDiscoveryTimeoutSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 180,
+            "default": 3 * 60,
         },
     }
 
     conf = ConfigParser(conf_file, conf_option_descriptions)
 
     ini_option_descriptions = {
-        "testCameraBin": {
+        "testcameraBin": {
             "optional": True,
             "type": 'string',
             "default": './testcamera/testcamera'
@@ -162,10 +169,15 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 7
         },
-        "testCameraDebug": {
+        "testcameraDebug": {
             "optional": True,
             "type": 'boolean',
             "default": False
+        },
+        "testcameraLocalInterface": {
+            "optional": True,
+            "type": 'string',
+            "default": ''
         },
         "cpuUsageThreshold": {
             "optional": True,
@@ -177,19 +189,40 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 10 * 1024 * 1024
         },
+        "timeDiffThresholdSeconds": {
+            "optional": True,
+            "type": 'float',
+            "default": 180
+        },
+        "swapThresholdMegabytes": {
+            "optional": True,
+            "type": 'float',
+            "default": 0,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
-    if ini['testCameraBin']:
-        test_camera_runner.binary_file = ini['testCameraBin']
+    if ini['testcameraBin']:
+        test_camera_runner.binary_file = ini['testcameraBin']
     if ini['rtspPerfBin']:
         stream_reader_runner.binary_file = ini['rtspPerfBin']
     if ini['testFileHighResolution']:
         test_camera_runner.test_file_high_resolution = ini['testFileHighResolution']
     if ini['testFileLowResolution']:
         test_camera_runner.test_file_low_resolution = ini['testFileLowResolution']
-    test_camera_runner.debug = ini['testCameraDebug']
+    test_camera_runner.debug = ini['testcameraDebug']
+
+    if ini.ORIGINAL_OPTIONS is not None:
+        print(f"Overriding default options via {ini_file}:")
+        for k, v in ini.ORIGINAL_OPTIONS.items():
+            print(f"    {k}={v}")
+    print('')
+
+    print(f"Configuration defined in {conf_file}:")
+    for k, v in conf.options.items():
+        print(f"    {k}={v}")
+    print('')
 
     return conf, ini
 
@@ -256,23 +289,36 @@ def get_writable_storages(api, ini):
 def get_cumulative_swap_bytes(box):
     output = box.eval('cat /proc/vmstat')
     raw = [line.split() for line in output.splitlines()]
-    data = {k: int(v) for k, v in raw}
-    kilobytes_swapped = data['pgpgin']  # pswpin is the number of pages.
+    try:
+        data = {k: int(v) for k, v in raw}
+    except ValueError:
+        return None
+    try:
+        kilobytes_swapped = data['pgpgin']  # pswpin is the number of pages.
+    except KeyError:
+        return None
     return kilobytes_swapped * 1024
+
+
+# Refers to the log file in the messages to the user. Filled after determining the log file path.
+log_file_ref = None
 
 
 @click.command()
 @click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
-@click.option('-C', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
 @click.option('--ini-config', 'ini_file', default='vms_benchmark.ini',
     help='Internal configuration file for experimenting and debugging.')
-def main(conf_file, ini_file):
-    conf, ini = load_configs(conf_file, ini_file)
+@click.option('--log', 'log_file', default='vms_benchmark.log',
+    help='Detailed log of all actions; intended to be studied by the support team.')
+def main(conf_file, ini_file, log_file):
+    global log_file_ref
+    log_file_ref = repr(log_file)
+    print(f"VMS Benchmark started; logging to {log_file_ref}.")
+    print('')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
+    logging.info('VMS Benchmark started.')
 
-    if ini.ORIGINAL_OPTIONS is not None:
-        print(f"Overriding default options via '{ini_file}':")
-        for k, v in ini.ORIGINAL_OPTIONS.items():
-            print(f"    {k}={v}")
+    conf, ini = load_configs(conf_file, ini_file)
 
     password = conf.get('boxPassword', None)
 
@@ -290,19 +336,12 @@ def main(conf_file, ini_file):
         host=conf['boxHostnameOrIp'],
         login=conf.get('boxLogin', None),
         password=password,
-        port=conf['boxSshPort']
+        port=conf['boxSshPort'],
+        conf_file=conf_file
     )
 
-    res = box_tests.SshHostKeyIsKnown(box).call()
-
-    if not res.success:
-        raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain ssh host key of the box." +
-            (f"\n    Details: {res.formatted_message()}" if res.formatted_message() else "")
-        )
-    else:
-        box.host_key = res.details[0]
-        box.obtain_connection_info()
+    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    box.obtain_connection_info()
 
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
@@ -315,6 +354,7 @@ def main(conf_file, ini_file):
             )
 
     print(f"Box IP: {box.ip}")
+    print(f"Used network device name: {box.eth_name}")
     if box.is_root:
         print(f"Box ssh user is root.")
 
@@ -338,11 +378,14 @@ def main(conf_file, ini_file):
     ]
 
     box_time_output = box.eval('date +%s.%N')
-    box_time = float(box_time_output.strip())
+    try:
+        box_time = float(box_time_output.strip())
+    except ValueError:
+        raise exceptions.BoxStateError("Cannot parse output of the date command")
     host_time = time.time()
-    time_diff_threshold = 3 * 60
-    if abs(box_time - host_time) > time_diff_threshold:
-        raise exceptions.BoxStateError(f"Box time differs from host time by more than {time_diff_threshold} sec")
+    if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
+        raise exceptions.BoxStateError(
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} sec")
 
     vmses = VmsScanner.scan(box, linux_distribution)
 
@@ -350,23 +393,23 @@ def main(conf_file, ini_file):
         print(f"Detected VMS installation(s):")
         for vms in vmses:
             print(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
-            print(f" PID {vms.pid if vms.pid else '-'})", end='')
+            print(f" pid {vms.pid if vms.pid else '-'}", end='')
             vms_uid = vms.uid()
             if vms_uid:
-                print(f" UID {vms_uid})", end='')
-            print('')
+                print(f" uid {vms_uid}", end='')
+            print(')')
     else:
         print("No VMS installations found on the box.")
         print("Nothing to do.")
         return 0
 
     if len(vmses) > 1:
-        raise exceptions.BoxStateError("More than one customizations found.")
+        raise exceptions.BoxStateError("More than one Server installation found at the box.")
 
     vms = vmses[0]
 
     if not vms.is_up():
-        raise exceptions.BoxStateError("VMS is not running currently.")
+        raise exceptions.BoxStateError("VMS is not running currently at the box.")
 
     if not vms.override_ini_config(
         {
@@ -409,7 +452,9 @@ def main(conf_file, ini_file):
 
     print('Camera archives cleaned.')
 
-    swapped_before = get_cumulative_swap_bytes(box)
+    swapped_before_bytes = get_cumulative_swap_bytes(box)
+    if swapped_before_bytes is None:
+        print("Cannot obtain swap information.")
 
     vms.start(exc=True)
 
@@ -505,21 +550,22 @@ def main(conf_file, ini_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in conf['virtualCamerasCount']:
+    for test_cameras_count in conf['virtualCameraCount']:
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
         if ram_available_bytes and ram_available_bytes < (
                 test_cameras_count * ram_bytes_per_camera_by_arch.get(box_platform.arch, 200) * 1024 * 1024
         ):
-            raise exceptions.InsuficientResourcesError(
+            raise exceptions.InsufficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
         print(f"Serving {test_cameras_count} virtual cameras.")
         print("")
 
+        ini_local_ip = ini['testcameraLocalInterface']
         test_camera_context_manager = test_camera_runner.test_camera_running(
-            local_ip=box.local_ip,
+            local_ip=ini_local_ip if ini_local_ip else box.local_ip,
             count=test_cameras_count,
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
@@ -527,7 +573,7 @@ def main(conf_file, ini_file):
         with test_camera_context_manager as test_camera_context:
             print(f"    Started {test_cameras_count} virtual cameras.")
 
-            def wait_test_cameras_discovered(timeout, online_duration):
+            def wait_test_cameras_discovered(timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
@@ -577,9 +623,9 @@ def main(conf_file, ini_file):
             print("Waiting finishedWaiting finished..")
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
-                camera_ids=(camera.id for camera in cameras),
-                streams_per_camera=conf['streamsPerTestCamera'],
-                archive_streams_count=1,
+                camera_ids=[camera.id for camera in cameras],
+                total_live_stream_count=math.ceil(conf['liveStreamsPerCameraRatio'] * len(cameras)),
+                total_archive_stream_count=math.ceil(conf['archiveStreamsPerCameraRatio'] * len(cameras)),
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
@@ -667,7 +713,7 @@ def main(conf_file, ini_file):
 
                             cpu_usage_avg_collector.append(cpu_usage_last_minute)
                             if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                                raise exceptions.CPUUsageThresholdExceededIssue(
+                                raise exceptions.CpuUsageThresholdExceededIssue(
                                     cpu_usage_last_minute,
                                     ini['cpuUsageThreshold']
                                 )
@@ -830,18 +876,17 @@ def main(conf_file, ini_file):
                 if max_lag > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
-                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds; ' +
-                        'can be caused by network issues or poor performance of either the host or the box.'
+                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
 
-    swapped_after = get_cumulative_swap_bytes(box)
-    swapping_threshold_mb = 100
-    swapped_during_test = swapped_after - swapped_before
-    if swapped_during_test > swapping_threshold_mb * 1024 * 1024:
-        raise exceptions.BoxStateError(f"More than {swapping_threshold_mb}M was swapped during the tests")
+    if swapped_before_bytes is not None:
+        swapped_after_bytes = get_cumulative_swap_bytes(box)
+        swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
+        if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
+            raise exceptions.BoxStateError(f"More than {ini['swapThresholdMegabytes']} MB was swapped during the tests.")
 
     print('\nSUCCESS: All tests finished.')
     return 0
@@ -849,9 +894,9 @@ def main(conf_file, ini_file):
 
 def nx_format_exception(exception):
     if isinstance(exception, ValueError):
-        return f"Error value {exception}"
+        return f"Invalid value: {exception}"
     elif isinstance(exception, KeyError):
-        return f"No key {exception}"
+        return f"Missing key: {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
             return 'Server refuses passed credentials: check .conf options vmsUser and vmsPassword'
@@ -881,19 +926,30 @@ def nx_print_exception(exception, recursive_level=0):
 
 
 if __name__ == '__main__':
-    print("VMS Benchmark started")
     try:
-        logging.info('VMS Benchmark started')
         try:
             sys.exit(main())
-        except (exceptions.VmsBenchmarkError, urllib.error.HTTPError) as e:
+        except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
+            print(f'ISSUE: ', file=sys.stderr, end='')
+            nx_print_exception(e)
+            print('')
+            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.')
+            log_exception('ISSUE', e)
+        except exceptions.VmsBenchmarkError as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
+            if log_file_ref:
+                print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
             log_exception('ERROR', e)
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
+            print(f'UNEXPECTED ERROR: {e}')
+            if log_file_ref:
+                print(f'\nNOTE: Details may be available in {log_file_ref}.')
             log_exception('UNEXPECTED ERROR', e)
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
+        print(f'INTERNAL ERROR: {e}')
+        print(f'\nPlease send the complete output ' +
+            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
+            file=sys.stderr)
 
     sys.exit(1)

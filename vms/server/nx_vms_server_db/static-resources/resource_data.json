@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.115",
+    "version": "1.0.1.140",
     "data": [
         {
             "keys": [
@@ -2170,6 +2170,7 @@
         {
             "keys": ["Dahua|22204TNI"],
             "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
+            "_case": "VMS-13871",
             "forcedOnvifParams":
             {
                 "videoEncoders": ["000"],
@@ -2177,8 +2178,20 @@
             }
         },
         {
-            "keys": ["Dahua|IPC-HDBW8241E*"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "keys": [
+                "Dahua|IPC-HFW*",
+                "Dahua|IPC-HDB*",
+                "Dahua|IPC-HDW*",
+                "Dahua|N45BL5Z"
+            ],
+            "_comment1": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "_comment2": "No correct URI can be picked up for videoencoder '002', so we ignore '002'",
+            "_case": "VMS-15911, VMS-15969, VMS-14077",
+            "forcedOnvifParams":
+            {
+                "videoEncoders": ["000,001"],
+                "profiles": ["MediaProfile000,MediaProfile001"]
+            },
             "fixWrongUri": true
         },
         {
@@ -3675,6 +3688,34 @@
             ],
             "onvifIgnoreMedia2":  true,
             "trustToVideoSourceSize": false
+        },
+        {
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
+            "keys": [
+                "hikvision|DS-2DE4225W-DE"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.68, 4.64, 6.29, 8.00, 9.75, 11.21, 12.36, 13.14, 13.82, 14.32],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }

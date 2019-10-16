@@ -33,11 +33,12 @@ if platform.system() == 'Linux':
             def message(self):
                 return self.message
 
-        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
+        def __init__(self, host, port, login, password, conf_file):
             self.host = host
             self.port = port
             self.login = login
             self.password = password
+            self.conf_file = conf_file
             if password:
                 self.ssh_command = 'sshpass'
                 self.ssh_args = [
@@ -73,17 +74,33 @@ if platform.system() == 'Linux':
             self.ip = None
             self.local_ip = None
             self.is_root = False
+            self.eth_name = None
 
         def obtain_connection_info(self):
-            # Obtain device ip address
-            eval_reply = self.eval('echo $SSH_CONNECTION')
-            ssh_connection_info = eval_reply.strip().split() if eval_reply else None
-            if not eval_reply or len(ssh_connection_info) < 3:
+            ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
+            ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
+            if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
+
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
+
+            line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
+            eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
+            if not eth_name:
+                raise exceptions.BoxCommandError(
+                    f'Unable to detect box network adapter which serves ip {self.ip}.')
+
+            eth_dir = f'/sys/class/net/{eth_name}'
+            eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
+
+            if not eth_name_check_result or eth_name_check_result.return_code != 0:
+                raise exceptions.BoxCommandError(
+                    f'Unable to find box network adapter info dir {repr(eth_dir)}.')
+
+            self.eth_name = eth_name
 
         @contextmanager
         def sh2(self, command, su=False):
@@ -122,7 +139,7 @@ if platform.system() == 'Linux':
                 )
             except subprocess.TimeoutExpired:
                 message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
-                          'check boxHostnameOrIp in vms_benchmark.conf.')
+                          f'check boxHostnameOrIp in {repr(self.conf_file)}.')
                 if exc:
                     raise exceptions.BoxCommandError(message=message)
                 else:
@@ -141,7 +158,7 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr}'
+                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
 
             if stdout:
@@ -182,11 +199,12 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             def message(self):
                 return self.message
 
-        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
+        def __init__(self, host, port, login, password, conf_file):
             self.host = host
             self.port = port
             self.login = login
             self.password = password
+            self.conf_file = conf_file
             if password:
                 self._ssh_command = [
                     'plink',
@@ -209,26 +227,46 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host, 'sh']
 
             self.host_key = None
-            self.ip = None
+            self.ip: str = None
             self.local_ip = None
             self.is_root = False
+            self.eth_name = None
 
         def obtain_connection_info(self):
-            # Obtain device ip address
-            eval_reply = self.eval('echo $SSH_CONNECTION')
-            ssh_connection_info = eval_reply.strip().split() if eval_reply else None
-            if not eval_reply or len(ssh_connection_info) < 3:
+            ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
+            ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
+            if not ssh_connection_var_value or len(ssh_connection_info) < 3:
                 raise exceptions.BoxCommandError(
-                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
+                    f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
+
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
 
-        def ssh_command(self):
+            line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
+            eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
+            if not eth_name:
+                raise exceptions.BoxCommandError(
+                    f'Unable to detect box network adapter which serves ip {self.ip}.')
+
+            eth_dir = f'/sys/class/net/{eth_name}'
+            eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
+
+            if not eth_name_check_result or eth_name_check_result.return_code != 0:
+                raise exceptions.BoxCommandError(
+                    f'Unable to find box network adapter info dir {repr(eth_dir)}.')
+
+            self.eth_name = eth_name
+
+        def ssh_command(self, command=None):
             res = self._ssh_command.copy()
             if self.host_key:
                 res.insert(2, '-hostkey')
                 res.insert(3, self.host_key)
+            if command:
+                escaped_command = '"' + command.replace('"', '\\"') + '"'
+                res += ['-c', escaped_command]
+            #logging.info("Executing command: %r", res)
             return res
 
         _SH_DEFAULT = object()
@@ -244,11 +282,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             log_remote_command(command_wrapped)
             try:
-                proc = subprocess.Popen(self.ssh_command(), **opts)
-                out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
-                if stdin:
-                    proc.stdin.write(str(stdin))
-                proc.stdin.close()
+                proc = subprocess.Popen(self.ssh_command(command_wrapped), **opts)
+                out, err = proc.communicate(stdin.encode('UTF-8') if stdin else b'', timeout)
             except subprocess.TimeoutExpired:
                 message = f'Timeout {timeout} seconds expired'
                 if exc:

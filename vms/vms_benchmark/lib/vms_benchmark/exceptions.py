@@ -50,9 +50,9 @@ class StorageFailuresIssue(VmsBenchmarkIssue):
         super(StorageFailuresIssue, self).__init__(f"{failures_count} storage failures detected")
 
 
-class CPUUsageThresholdExceededIssue(VmsBenchmarkIssue):
+class CpuUsageThresholdExceededIssue(VmsBenchmarkIssue):
     def __init__(self, cpu_usage, threshold):
-        super(CPUUsageThresholdExceededIssue, self).__init__(
+        super(CpuUsageThresholdExceededIssue, self).__init__(
             f"CPU usage {round(cpu_usage*100)}% exceeds maximum ({round(threshold*100)}%)"
         )
 
@@ -73,5 +73,9 @@ class SshHostKeyObtainingFailed(VmsBenchmarkError):
     pass
 
 
-class InsuficientResourcesError(VmsBenchmarkError):
+class InsufficientResourcesError(VmsBenchmarkError):
+    pass
+
+
+class HostOperationError(VmsBenchmarkError):
     pass
