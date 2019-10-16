@@ -416,15 +416,14 @@ def main(conf_file, ini_file, log_file):
     if not vms.is_up():
         raise exceptions.BoxStateError("VMS is not running currently at the box.")
 
-    if not vms.override_ini_config(
-        {
-            'nx_streaming': {
-                'enableTimeCorrection': 0,
-                'unloopCameraPtsWithModulus': ini['testFileHighDurationMs']*1000 + 1000000//ini['testStreamFpsHigh'],
-            },
-        }
-    ):
-        print("Unable to override VMS internal configs.")
+    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
+    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
+    vms.override_ini_config({
+        'nx_streaming': {
+            'enableTimeCorrection': 0,
+            'unloopCameraPtsWithModulus': modulus_us,
+        },
+    })
 
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
 
