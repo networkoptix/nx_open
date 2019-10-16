@@ -4,6 +4,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 #include <QtWebKitWidgets/QWebPage>
+#include <QWebEnginePage>
+#include <QQuickItem>
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>
@@ -314,39 +316,67 @@ QList<QAction*> WebPageFactory::newActions(const Parameters& parameters,
 {
     QList<QAction*> result;
 
-    auto widget = qobject_cast<QnWebResourceWidget*>(parameters.widget());
+    QPointer<QnWebResourceWidget> widget(qobject_cast<QnWebResourceWidget*>(parameters.widget()));
     if (!NX_ASSERT(widget))
         return result;
 
-    std::vector<QWebPage::WebAction> allowedActions = {
-        QWebPage::Back,
-        QWebPage::Forward,
-        QWebPage::Stop,
-        QWebPage::Reload
-    };
-
-    if (ini().enableWebKitDeveloperExtras)
-        allowedActions.push_back(QWebPage::InspectElement);
-
-    // TODO: calculate actual position.
-    static const QPoint kExamplePosition(1, 1);
-
-    QPointer<QWebPage> page = widget->page();
-    for (auto actionId: allowedActions)
+    if (QPointer<QWebPage> page = widget->page())
     {
-        auto sourceAction = page->action(actionId);
-        if (sourceAction && sourceAction->isEnabled())
+        std::vector<QWebPage::WebAction> allowedActions = {
+            QWebPage::Back,
+            QWebPage::Forward,
+            QWebPage::Stop,
+            QWebPage::Reload
+        };
+
+        if (ini().enableWebKitDeveloperExtras)
+            allowedActions.push_back(QWebPage::InspectElement);
+
+        // TODO: calculate actual position.
+        static const QPoint kExamplePosition(1, 1);
+
+        for (auto actionId: allowedActions)
         {
+            auto sourceAction = page->action(actionId);
+            if (sourceAction && sourceAction->isEnabled())
+            {
+                auto action = new QAction(parent);
+                action->setText(sourceAction->text());
+                connect(action, &QAction::triggered, this,
+                    [this, actionId, page]
+                    {
+                        if (!page)
+                            return;
+
+                        page->updatePositionDependentActions(kExamplePosition);
+                        page->triggerAction(actionId);
+                    });
+                result.push_back(action);
+            }
+        }
+    }
+    else
+    {
+        std::vector<QWebEnginePage::WebAction> allowedActions = {
+            QWebEnginePage::Back,
+            QWebEnginePage::Forward,
+            QWebEnginePage::Stop,
+            QWebEnginePage::Reload
+        };
+
+        for (auto actionId: allowedActions)
+        {
+            if (!widget->isWebActionEnabled(actionId))
+                continue;
             auto action = new QAction(parent);
-            action->setText(sourceAction->text());
+            action->setText(widget->webActionText(actionId));
             connect(action, &QAction::triggered, this,
-                [this, actionId, page]
+                [actionId, widget]
                 {
-                    if (!page)
+                    if (!widget)
                         return;
 
-                    page->updatePositionDependentActions(kExamplePosition);
-                    page->triggerAction(actionId);
+                    widget->triggerWebAction(actionId);
                 });
             result.push_back(action);
         }

@@ -1,5 +1,9 @@
 #include "web_resource_widget.h"
 
+#include <QMetaObject>
+#include <QQuickItem>
+#include <QAction>
+
 #include <core/resource/resource.h>
 
 #include <ui/style/skin.h>
@@ -21,14 +25,22 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     , m_webEngineView(nullptr)
 {
     if (ini().useWebEngine)
+    {
         m_webEngineView = new GraphicsWebEngineView(resource()->getUrl());
+        initWebActionText();
+    }
     else
+    {
         m_webView = new QnGraphicsWebView(resource()->getUrl());
+    }
 
     setOption(AlwaysShowName, true);
 
     if (m_webView)
         m_webView->installEventFilter(this);
+    else
+        m_webEngineView->installEventFilter(this);
+
     const auto iconButton = titleBar()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
     const auto webParams = detail::OverlayParams(Visible
@@ -197,10 +209,15 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
 
 bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == m_webView )
+    if (object == m_webEngineView || object == m_webView)
     {
         if (event->type() == QEvent::GraphicsSceneMousePress)
-            mousePressEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
+        {
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent *>(event);
+            mousePressEvent(mouseEvent);
+            if (object == m_webEngineView && mouseEvent->button() == Qt::RightButton)
+                return true;
+        }
         else if (event->type() == QEvent::GraphicsSceneContextMenu)
             return true;
     }
@@ -213,6 +230,66 @@ QWebPage* QnWebResourceWidget::page() const
     if (m_webView)
         return m_webView->page();
     return nullptr;
+}
+
+void QnWebResourceWidget::triggerWebAction(QWebEnginePage::WebAction action)
+{
+    if (!m_webEngineView)
+        return;
+    if (QQuickItem* webEngineView = m_webEngineView->rootObject())
+        QMetaObject::invokeMethod(webEngineView, "triggerAction", Q_ARG(QVariant, action));
+}
+
+bool QnWebResourceWidget::isWebActionEnabled(QWebEnginePage::WebAction action)
+{
+    if (!m_webEngineView)
+        return false;
+
+    QQuickItem* webEngineView = m_webEngineView->rootObject();
+
+    if (!webEngineView)
+        return false;
+
+    // TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
+    switch(action)
+    {
+        case QWebEnginePage::Back:
+            return webEngineView->property("canGoBack").toBool();
+        case QWebEnginePage::Forward:
+            return webEngineView->property("canGoForward").toBool();
+        case QWebEnginePage::Stop:
+            return webEngineView->property("loading").toBool();
+        default:
+            return true;
+    }
+}
+
+// TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
+QString QnWebResourceWidget::webActionText(QWebEnginePage::WebAction action)
+{
+    const auto item = m_webActionText.find(action);
+    if (item != m_webActionText.end())
+        return item.value();
+
+    QScopedPointer<QWebEnginePage> tmpPage(new QWebEnginePage());
+    const auto text = tmpPage->action(action)->text();
+    m_webActionText.insert(action, text);
+    return text;
+}
+
+// TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
+void QnWebResourceWidget::initWebActionText()
+{
+    static const std::array<QWebEnginePage::WebAction, 4> actions {
+        QWebEnginePage::Back,
+        QWebEnginePage::Forward,
+        QWebEnginePage::Stop,
+        QWebEnginePage::Reload
+    };
+
+    QScopedPointer<QWebEnginePage> tmpPage(new QWebEnginePage());
+    for (auto action: actions)
+        m_webActionText.insert(action, tmpPage->action(action)->text());
 }
 
 int QnWebResourceWidget::calculateButtonsVisibility() const

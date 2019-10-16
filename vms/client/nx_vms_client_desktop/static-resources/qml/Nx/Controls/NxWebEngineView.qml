@@ -35,6 +35,9 @@ WebEngineView
     signal loadingStatusChanged(int status)
     onLoadingChanged: loadingStatusChanged(loadRequest.status)
     profile.onDownloadRequested: workbench.requestDownload(download)
+    onContextMenuRequested: function(request) { request.accepted = true }
+
+    function triggerAction(action) { triggerWebAction(action) }
 
     WebChannel
     {

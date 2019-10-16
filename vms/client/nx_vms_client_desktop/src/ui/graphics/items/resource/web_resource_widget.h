@@ -1,9 +1,10 @@
 #pragma once
 
+#include <QWebEnginePage>
+
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 
-class QWebPage;
 class QnGraphicsWebView;
 
 class QnWebResourceWidget : public QnResourceWidget
@@ -19,6 +20,10 @@ public:
 
     QWebPage* page() const;
 
+    void triggerWebAction(QWebEnginePage::WebAction action);
+    bool isWebActionEnabled(QWebEnginePage::WebAction action);
+    QString webActionText(QWebEnginePage::WebAction action);
+
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
 
@@ -28,6 +33,7 @@ protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
 private:
+    void initWebActionText();
     void setupOverlays();
 
     virtual int calculateButtonsVisibility() const override;
@@ -37,4 +43,5 @@ private:
 protected:
     QnGraphicsWebView* m_webView;
     nx::vms::client::desktop::GraphicsWebEngineView* m_webEngineView;
+    QHash<QWebEnginePage::WebAction, QString> m_webActionText;
 };
