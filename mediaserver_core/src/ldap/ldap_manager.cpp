@@ -299,7 +299,7 @@ bool LdapSession::connect()
         return false;
     }
 
-    // NOTE: Chasing referrals does work with paging controls, see: VMS-15694.
+    // NOTE: Chasing referrals doesn't work with paging controls, see: VMS-15694.
     rc = ldap_set_option(m_ld, LDAP_OPT_REFERRALS, LDAP_OPT_OFF);
     if (rc != 0)
     {
@@ -368,7 +368,7 @@ void LdapSession::logResponseReferences(LDAPMessage* response)
     for (LDAPMessage *entry = ldap_first_reference(m_ld, response);
         entry != nullptr; entry = ldap_next_reference(m_ld, entry))
     {
-        char **refs = nullptr;
+        PWCHAR *refs = nullptr;
         const auto memoryGuard = makeScopeGuard(
             [&refs, this]()
             {
@@ -377,7 +377,11 @@ void LdapSession::logResponseReferences(LDAPMessage* response)
                 refs = nullptr;
             });
 
-        LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs, nullptr, 0);
+        #if defined Q_OS_WIN
+            LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs);
+        #else
+            LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs, nullptr, 0);
+        #endif
         if (rc != LDAP_SUCCESS)
         {
             NX_INFO(this, lm("Failed to parse ldap reference entry: %1").args(LdapErrorStr(rc)));
