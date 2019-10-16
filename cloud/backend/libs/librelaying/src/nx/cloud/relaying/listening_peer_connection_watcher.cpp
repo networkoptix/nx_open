@@ -5,6 +5,8 @@
 
 namespace nx::cloud::relaying {
 
+static constexpr auto kNotificationSendTimeout = std::chrono::seconds(11);
+
 ListeningPeerConnectionWatcher::ListeningPeerConnectionWatcher(
     std::unique_ptr<network::AbstractStreamSocket> connection,
     const std::string& peerProtocolVersion,
@@ -133,7 +135,15 @@ void ListeningPeerConnectionWatcher::openTunnel(
         [this, handler = std::move(handler)](SystemError::ErrorCode resultCode)
         {
             if (m_connection)
+            {
                 m_connection->cancelIOSync(network::aio::etNone);
+                if (!m_connection->setSendTimeout(nx::network::kNoTimeout))
+                {
+                    NX_DEBUG(this, "Failed to set connection send timeout to %1. %2",
+                        nx::network::kNoTimeout, SystemError::getLastOSErrorText());
+                }
+            }
+
             handler(resultCode, std::exchange(m_connection, nullptr));
         });
 }
@@ -155,6 +165,14 @@ void ListeningPeerConnectionWatcher::sendNotification(
                 post([handler = std::move(handler)]()
                     { handler(SystemError::connectionReset); });
                 return;
+            }
+
+            // Setting send timeout on the connection. Otherwise, there is no guarantee
+            // that the completion handler will ever be invoked.
+            if (!m_connection->setSendTimeout(kNotificationSendTimeout))
+            {
+                NX_DEBUG(this, "Failed to set connection send timeout to %1. %2",
+                    kNotificationSendTimeout, SystemError::getLastOSErrorText());
             }
 
             m_connection->sendAsync(
