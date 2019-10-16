@@ -18,7 +18,7 @@ using Value = CameraController::Value;
 
 static const std::chrono::minutes kIssuesRateUpdateInterval(1);
 static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
-static std::chrono::hours kBitratePeriod(24);
+static std::chrono::minutes kBitratePeriod(5);
 static const std::chrono::seconds kFpsDeltaCheckInterval(5);
 
 CameraController::CameraController(QnMediaServerModule* serverModule):
