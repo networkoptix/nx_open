@@ -933,22 +933,22 @@ if __name__ == '__main__':
         except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
             print(f'ISSUE: ', file=sys.stderr, end='')
             nx_print_exception(e)
-            print('')
-            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.')
+            print('', file=sys.stderr)
+            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr)
             log_exception('ISSUE', e)
         except exceptions.VmsBenchmarkError as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
             if log_file_ref:
-                print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
+                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr)
             log_exception('ERROR', e)
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}')
+            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
             if log_file_ref:
-                print(f'\nNOTE: Details may be available in {log_file_ref}.')
+                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr)
             log_exception('UNEXPECTED ERROR', e)
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}')
+        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
         print(f'\nPlease send the complete output ' +
             (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
             file=sys.stderr)
