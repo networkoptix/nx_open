@@ -127,6 +127,8 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "targetFps",
             [streamIndex](const auto& r)
             {
+                if (r->isCameraControlDisabled())
+                    return Value();
                 if (auto params = r->targetParams(streamIndex))
                     return Value(params->fps);
                 return Value();
