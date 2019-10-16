@@ -773,13 +773,6 @@ TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
     thenProxyingHasBeenStarted();
 }
 
-TEST_F(ConnectSessionManagerConnectingPeerConnectTo, waits_for_request_completion)
-{
-    givenOngoingConnectToPeerRequest();
-    whenFreedConnectionManager();
-    thenConnectRequestSucceeded();
-}
-
 } // namespace test
 } // namespace controller
 } // namespace relay
