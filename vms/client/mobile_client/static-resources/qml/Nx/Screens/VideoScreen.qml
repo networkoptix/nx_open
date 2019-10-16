@@ -556,6 +556,7 @@ PageBase
             onWarningTextChanged: banner.showText(warningText)
 
             hasCustomRoi: video.motionController.customRoiExists
+            hasCustomVisualArea: video.motionController.hasCustomVisualArea
             canViewArchive: controller.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             controller: controller

@@ -16,6 +16,7 @@ Item
     property alias motionProvider: mediaPlayerMotionProvider
     property string motionFilter
 
+    readonly property bool hasCustomVisualArea: motionFilter != d.kDefaultFilter
     readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
@@ -217,6 +218,12 @@ Item
         property MotionRoi selectionRoi: null
         property MotionRoi customRoi: null
 
+        readonly property int kFilterHorizontalRange: 44
+        readonly property int kFilterVerticalRange: 32
+        readonly property string kDefaultFilter: getMotionFilter(
+            Qt.point(0, 0),
+            Qt.point(kFilterHorizontalRange - 1, kFilterVerticalRange - 1)).filter
+
         readonly property real kMaxDistance: 0.05
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
@@ -256,20 +263,18 @@ Item
                 Math.max(first.x, second.x),
                 Math.max(first.y, second.y))
 
-            var horizontalRange = 44
-            var verticalRange = 32
-            var maxHorizontalValue = horizontalRange - 1
-            var maxVerticalValue = verticalRange - 1
+            var maxHorizontalValue = kFilterHorizontalRange - 1
+            var maxVerticalValue = kFilterVerticalRange - 1
 
-            var left = Math.floor(topLeft.x * horizontalRange)
-            var right = Math.floor(bottomRight.x * horizontalRange)
-            var top = Math.floor(topLeft.y * verticalRange)
-            var bottom = Math.floor(bottomRight.y * verticalRange)
+            var left = Math.floor(topLeft.x * kFilterHorizontalRange)
+            var right = Math.floor(bottomRight.x * kFilterHorizontalRange)
+            var top = Math.floor(topLeft.y * kFilterVerticalRange)
+            var bottom = Math.floor(bottomRight.y * kFilterVerticalRange)
 
             result.correctBounds =
-                left < horizontalRange
+                left < kFilterHorizontalRange
                 && right >= 0
-                && top < verticalRange
+                && top < kFilterVerticalRange
                 && bottom >= 0
 
             left = result.correctBounds ? Math.max(left, 0) : 0

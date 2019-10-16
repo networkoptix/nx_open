@@ -30,6 +30,7 @@ Item
     property alias motionFilter: cameraChunkProvider.motionFilter
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
+    property bool hasCustomVisualArea: false;
     property bool drawingRoi: false
     property string warningText
 
@@ -43,6 +44,7 @@ Item
 
     onDrawingRoiChanged: updateWarningTextTimer.restart()
     onHasCustomRoiChanged: updateWarningTextTimer.restart()
+    onHasCustomVisualAreaChanged: updateWarningTextTimer.restart()
     onMotionSearchModeChanged: updateWarningTextTimer.restart()
 
     Connections
@@ -119,10 +121,19 @@ Item
             var motionMode = videoNavigation.motionSearchMode
             var hasMotionChunks = cameraChunkProvider.hasMotionChunks()
             if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
+            {
                 videoNavigation.warningText = ""
-            else if (!cameraChunkProvider.hasChunks() || !cameraChunkProvider.hasMotionChunks())
+                return
+            }
+
+            if (!cameraChunkProvider.hasChunks()
+                || (!hasMotionChunks && !hasCustomRoi && !hasCustomVisualArea))
+            {
                 videoNavigation.warningText = qsTr("No motion data for this camera")
-            else if (videoNavigation.hasCustomRoi)
+                return
+            }
+
+            if (videoNavigation.hasCustomRoi)
                 videoNavigation.warningText = qsTr("No motion found in the selected area")
             else
                 videoNavigation.warningText = qsTr("No motion found in the visible area")
