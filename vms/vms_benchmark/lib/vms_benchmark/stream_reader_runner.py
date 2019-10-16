@@ -56,6 +56,8 @@ def stream_reader_running(
         if opts.get('type', 'live') == 'archive':
             params['pos'] = 0
 
+        params['stream'] = 0
+
         url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
         args.append('--url')
