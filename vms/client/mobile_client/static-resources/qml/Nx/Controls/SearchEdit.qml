@@ -18,6 +18,11 @@ Item
             textField.forceActiveFocus()
     }
 
+    function resetFocus()
+    {
+        textField.focus = false
+    }
+
     TextField
     {
         id: textField

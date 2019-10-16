@@ -42,7 +42,7 @@ Page
         onPressed:
         {
             mouse.accepted = false
-            searchEdit.focus = false
+            searchEdit.resetFocus()
         }
     }
 
