@@ -66,6 +66,7 @@ def stream_reader_running(
             "type": opts.get('type', 'live')
         }
 
+    # E.g. if 3 URLs are passed to rtsp_perf and --count is 5, it may open streams 1, 1, 2, 2, 3.
     args.append('--count')
     args.append(len(streams.items()))
 
