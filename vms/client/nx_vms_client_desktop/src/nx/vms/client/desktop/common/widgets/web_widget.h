@@ -15,7 +15,7 @@ class WebWidget: public QWidget
     using base_type = QWidget;
 
 public:
-    WebWidget(QWidget* parent = nullptr);
+    WebWidget(QWidget* parent = nullptr, bool useActionsForLinks = false);
 
     QWebView* view() const;
     QWebEngineView* webEngineView() const;

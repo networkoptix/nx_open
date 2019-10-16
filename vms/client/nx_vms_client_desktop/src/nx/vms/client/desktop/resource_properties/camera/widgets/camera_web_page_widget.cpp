@@ -9,7 +9,6 @@
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
-#include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
 #include <QWebEngineProfile>
@@ -116,7 +115,7 @@ protected:
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
-    webWidget(new WebWidget(parent)),
+    webWidget(new WebWidget(parent, /*useActionsForLinks*/ true)),
     cookieJar(new CookieJar())
 {
     if (auto webView = webWidget->view())
@@ -155,22 +154,6 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
                 authenticator->setPassword(password);
             });
 
-        installEventHandler(webView, QEvent::ContextMenu, webView,
-            [webView](QObject* watched, QEvent* event)
-            {
-                NX_ASSERT(watched == webView && event->type() == QEvent::ContextMenu);
-                const auto frame = webView->page()->mainFrame();
-                if (!frame)
-                    return;
-
-                const auto menuEvent = static_cast<QContextMenuEvent*>(event);
-                const auto hitTest = frame->hitTestContent(menuEvent->pos());
-
-                webView->setContextMenuPolicy(hitTest.linkUrl().isEmpty()
-                    ? Qt::DefaultContextMenu
-                    : Qt::ActionsContextMenu); //< Special context menu for links.
-            });
-
         installEventHandler(parent, QEvent::Show, parent,
             [this]()
             {
@@ -191,7 +174,11 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
 
     anchorWidgetToParent(webWidget);
 
-    // TODO: Add special context menu for links
+    // Special actions list for context menu for links.
+    webView->insertActions(nullptr, {
+        webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
+        webView->pageAction(QWebEnginePage::Copy),
+        webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
         [this](const QUrl& requestUrl, QAuthenticator* authenticator)
