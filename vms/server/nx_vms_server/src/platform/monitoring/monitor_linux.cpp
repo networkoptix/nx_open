@@ -623,3 +623,9 @@ void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
     d_ptr->partitionsInfoProvider.reset(
         new nx::vms::server::fs::PartitionsInformationProvider(serverModule->rootFileSystem()));
 }
+
+int QnLinuxMonitor::thisProcessThreads()
+{
+    const QString path = lm("/proc/%1/task").arg(QCoreApplication::applicationPid());
+    return QDir(path).entryList(QDir::Files).count();
+}

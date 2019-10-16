@@ -195,6 +195,11 @@
                     "name": "Incoming connections",
                     "display": "panel"
                 },
+                "threads": {
+                    "name": "Server threads",
+                    "description": "The number of threads inside Server processes.",
+                    "display": "panel"
+                },
                 "encodingThreads": {
                     "name": "Encoding threads",
                     "display": "panel",

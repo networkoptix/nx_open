@@ -139,6 +139,9 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             "serverRamUsageP",
             [this](const auto&) { return Value(ramUsageToPercentages(platform()->thisProcessRamUsageBytes())); }
         ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "threads", [this](const auto&) { return Value(platform()->thisProcessThreads()); }
+        ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "cameras",
             [](const auto& r)

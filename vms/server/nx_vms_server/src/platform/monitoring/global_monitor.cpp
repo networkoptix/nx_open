@@ -229,6 +229,11 @@ QString GlobalMonitor::partitionByPath(const QString &path) {
     return m_monitorBase->partitionByPath(path);
 }
 
+int GlobalMonitor::thisProcessThreads()
+{
+    return m_monitorBase->thisProcessThreads();
+}
+
 std::chrono::milliseconds GlobalMonitor::processUptime() const
 {
     return m_uptimeTimer.elapsed();

@@ -20,6 +20,8 @@ public:
     virtual QList<HddLoad> totalHddLoad() override;
     /** Implementation of nx::vms::server::PlatformMonitor::totalNetworkLoad */
     virtual QList<NetworkLoad> totalNetworkLoad() override;
+    /** Implementation of nx::vms::server::PlatformMonitor::thisProcessThreads */
+    virtual int thisProcessThreads() override;
 
 private:
     Q_DECLARE_PRIVATE(QnWindowsMonitor);

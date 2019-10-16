@@ -18,6 +18,7 @@
 #include <iphlpapi.h>
 #include <pdh.h>
 #include <pdhmsg.h>
+#include <tlhelp32.h>
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "pdh.lib")
@@ -637,4 +638,20 @@ QList<nx::vms::server::PlatformMonitor::NetworkLoad> QnWindowsMonitor::totalNetw
     d->recalcNetworkStatistics();
 
     return d->networkInterfacelLoadData();
+}
+
+int QnWindowsMonitor::thisProcessThreads()
+{
+    const auto pid = GetCurrentProcessId();
+    const auto handle = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if (handle == INVALID_HANDLE_VALUE)
+        return 0;
+
+    THREADENTRY32 entry{sizeof(THREADENTRY32)};
+    int counter = 0;
+    for (auto rez = Thread32First(handle, &entry); rez; rez = Thread32Next(handle, &entry))
+        counter += entry.th32OwnerProcessID == pid ? 1 : 0;
+
+    CloseHandle(handle);
+    return counter;
 }

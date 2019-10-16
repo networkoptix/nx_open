@@ -171,6 +171,11 @@ public:
     virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
+     * @returns A total number of threads for the current process. Return 0 on error.
+     */
+    virtual int thisProcessThreads() = 0;
+
+    /**
      * @returns A list of network load entries for all network interfaces of the given types on
      * this PC.
      */
