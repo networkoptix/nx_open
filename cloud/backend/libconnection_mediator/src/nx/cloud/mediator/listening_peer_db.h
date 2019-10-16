@@ -4,15 +4,9 @@
 
 #include "mediator_endpoint.h"
 #include "mediator_selector.h"
+#include "settings.h"
 
 namespace nx::hpm {
-
-namespace conf {
-
-class Settings;
-struct ListeningPeerDb;
-
-}
 
 /**
  * Associates peer domains (e.g. mediaserverid.systemid) with a mediator instance domain
@@ -87,7 +81,7 @@ private:
     std::string buildInfoJson(const MediatorEndpoint& endpoint) const;
 
 private:
-    const conf::ListeningPeerDb& m_settings;
+    conf::ListeningPeerDb m_settings;
     std::unique_ptr<AbstractMediatorSelector> m_mediatorSelector;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;

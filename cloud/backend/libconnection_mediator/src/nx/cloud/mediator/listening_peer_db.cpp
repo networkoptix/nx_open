@@ -9,8 +9,6 @@
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 
-#include "settings.h"
-
 namespace nx::hpm {
 
 namespace {
@@ -92,6 +90,14 @@ ListeningPeerDb::ListeningPeerDb(const conf::Settings& settings):
     m_settings(settings.listeningPeerDb()),
     m_mediatorSelector(MediatorSelectorFactory::instance().create(settings))
 {
+    // Disabling timeout so that queries are not cancelled by timeout.
+    // Currently, the implementation ignores DB save error.
+    // So, we need a way to minimize such errors.
+    m_settings.sql.maxPeriodQueryWaitsForAvailableConnection =
+        std::chrono::milliseconds::zero();
+
+    // Speeding up saving to the DB in case of high load (e.g., just after start).
+    m_settings.map.synchronizationSettings.groupCommandsUnderDbTransaction = true;
 }
 
 bool ListeningPeerDb::initialize()
