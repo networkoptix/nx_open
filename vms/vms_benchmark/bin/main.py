@@ -199,6 +199,11 @@ def load_configs(conf_file, ini_file):
             "type": 'float',
             "default": 0,
         },
+        "sleepBeforeCheckingArchiveSeconds": {
+            "optional": True,
+            "type": 'integer',
+            "default": 60,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -617,9 +622,8 @@ def main(conf_file, ini_file, log_file):
                 log_exception('Discovering cameras', e)
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
-            wait_for_archive_timeout_minutes = 1
-            print(f"Waiting the archives are ready to stream ({wait_for_archive_timeout_minutes} minutes)...")
-            time.sleep(wait_for_archive_timeout_minutes*60)
+            print(f"Waiting for the archives to be ready for streaming ({ini['sleepBeforeCheckingArchiveSeconds']} s)...")
+            time.sleep(ini['sleepBeforeCheckingArchiveSeconds'])
             print("Waiting finishedWaiting finished..")
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
