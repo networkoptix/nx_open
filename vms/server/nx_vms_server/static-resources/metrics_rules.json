@@ -474,7 +474,7 @@
                     "format": "durationS"
                 },
                 "recordingBitrateBps": {
-                    "name": "Recording Bitrate (24h)",
+                    "name": "Recording Bitrate (5min)",
                     "display": "table|panel",
                     "format": "KBps"
                 },
