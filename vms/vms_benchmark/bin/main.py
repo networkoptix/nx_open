@@ -194,13 +194,13 @@ def load_configs(conf_file, ini_file):
         },
         "swapThresholdMegabytes": {
             "optional": True,
-            "type": 'float',
+            "type": 'integer',
             "default": 0,
         },
         "sleepBeforeCheckingArchiveSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 60,
+            "default": 90,
         },
     }
 
