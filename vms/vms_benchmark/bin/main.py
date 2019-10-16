@@ -390,7 +390,7 @@ def main(conf_file, ini_file, log_file):
     host_time = time.time()
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
-            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} sec")
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
 
     vmses = VmsScanner.scan(box, linux_distribution)
 
@@ -604,7 +604,7 @@ def main(conf_file, ini_file, log_file):
 
                 print(
                     ("    Waiting for virtual cameras discovery and going live " +
-                        f"(timeout is {discovering_timeout_seconds} sec).")
+                        f"(timeout is {discovering_timeout_seconds} s).")
                 )
                 res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_seconds, online_duration=3)
                 if not res:
