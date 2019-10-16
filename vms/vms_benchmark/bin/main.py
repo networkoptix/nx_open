@@ -876,7 +876,7 @@ def main(conf_file, ini_file, log_file):
                     issues.append(e)
 
                 max_allowed_lag_seconds = 5
-                max_lag = max(lags.values())
+                max_lag = max((0, *lags.values()))
                 if max_lag > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
