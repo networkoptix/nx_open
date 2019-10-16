@@ -316,11 +316,15 @@ def report(message, end='\n'):
 log_file_ref = None
 
 
-@click.command()
-@click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
-@click.option('--ini-config', 'ini_file', default='vms_benchmark.ini',
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
+    help='Configuration file.')
+@click.option(
+    '--ini-config', '-i', 'ini_file', default='vms_benchmark.ini', metavar='<filename>', show_default=True,
     help='Internal configuration file for experimenting and debugging.')
-@click.option('--log', 'log_file', default='vms_benchmark.log',
+@click.option(
+    '--log', '-l', 'log_file', default='vms_benchmark.log', metavar='<filename>', show_default=True,
     help='Detailed log of all actions; intended to be studied by the support team.')
 def main(conf_file, ini_file, log_file):
     global log_file_ref
