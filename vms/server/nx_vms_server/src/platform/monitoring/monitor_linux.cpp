@@ -627,5 +627,5 @@ void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
 int QnLinuxMonitor::thisProcessThreads()
 {
     const QString path = lm("/proc/%1/task").arg(QCoreApplication::applicationPid());
-    return QDir(path).entryList(QDir::Files).count();
+    return QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot).count();
 }
