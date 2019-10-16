@@ -9,6 +9,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
 #include <QWebEngineView>
+#include <QAction>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
@@ -41,6 +42,8 @@ EulaDialog::EulaDialog(QWidget* parent):
         m_webEngineView = new QWebEngineView(this);
         m_webEngineView->setSizePolicy(ui->eulaView->sizePolicy());
         m_webEngineView->page()->setBackgroundColor(Qt::transparent);
+        m_webEngineView->pageAction(QWebEnginePage::ViewSource)->setVisible(false);
+        m_webEngineView->pageAction(QWebEnginePage::SavePage)->setVisible(false);
         auto previous = ui->verticalLayout->replaceWidget(ui->eulaView, m_webEngineView);
         delete previous;
 
