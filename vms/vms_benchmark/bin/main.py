@@ -208,6 +208,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 90,
         },
+        "maxAllowedNetworkErrors": {
+            "optional": True,
+            "type": 'integer',
+            "default": 0,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -925,9 +930,12 @@ def main(conf_file, ini_file, log_file):
                         original_exception=e
                     ))
 
-                if tx_rx_errors_collector[0] is None or tx_rx_errors_collector[0] > 0:
+                if tx_rx_errors_collector[0] is None:
+                    tx_rx_errors_collector[0] = 0
+
+                if tx_rx_errors_collector[0] > ini['maxAllowedNetworkErrors']:
                     issues.append(exceptions.TestCameraStreamingIssue(
-                        "Network errors detected."
+                        f"Network errors detected: {tx_rx_errors_collector[0]}"
                     ))
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
