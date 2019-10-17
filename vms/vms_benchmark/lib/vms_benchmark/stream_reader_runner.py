@@ -28,6 +28,7 @@ def stream_reader_running(
         '-p',
         password,
         '--timestamps',
+        '--disable-restart',
     ]
 
     streams = {}

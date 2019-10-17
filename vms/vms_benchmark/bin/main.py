@@ -692,6 +692,9 @@ def main(conf_file, ini_file, log_file):
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
                     line = stream_reader_process.stdout.readline().decode('UTF-8')
+                    warning_prefix = 'WARNING: '
+                    if line.startswith(warning_prefix):
+                        raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
                     import re
                     match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
