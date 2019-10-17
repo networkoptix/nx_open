@@ -345,6 +345,34 @@ def report(message, end='\n'):
 log_file_ref = None
 
 
+def _test_api(api):
+    logging.info('Starting REST API basic test...')
+
+    def wait_for_api(timeout=60):
+        started_at = time.time()
+
+        while True:
+            resp = api.ping()
+
+            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
+                break
+
+            if time.time() - started_at > timeout:
+                return False
+
+            time.sleep(0.5)
+
+        time.sleep(5)
+        return True
+
+    if not wait_for_api():
+        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
+    report('REST API basic test is OK.')
+    logging.info('Starting REST API authentication test...')
+    api.check_authentication()
+    report('REST API authentication test is OK.')
+
+
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
     '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
@@ -535,34 +563,7 @@ def main(conf_file, ini_file, log_file):
         ram_free_bytes = box_platform.ram_free_bytes()
     report(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
-    logging.info('Starting REST API basic test...')
-    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
-
-    def wait_for_api(timeout=60):
-        started_at = time.time()
-
-        while True:
-            resp = api.ping()
-
-            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
-                break
-
-            if time.time() - started_at > timeout:
-                return False
-
-            time.sleep(0.5)
-
-        time.sleep(5)
-        return True
-
-    if not wait_for_api():
-        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
-
-    report('REST API basic test is OK.')
-
-    logging.info('Starting REST API authentication test...')
-    api.check_authentication()
-    report('REST API authentication test is OK.')
+    _test_api(api)
 
     try:
         storages = get_writable_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
