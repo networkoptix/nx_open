@@ -19,6 +19,8 @@ CameraMock::CameraMock(QnMediaServerModule* serverModule, std::optional<int> id)
     setModel("Model_" + current);
     setVendor("Vendor_" + current);
     setFirmware("1.0." + current);
+    if (id)
+        setLogicalId(*id);
     setMAC(nx::utils::MacAddress(QLatin1String("12:12:12:12:12:12")));
 }
 

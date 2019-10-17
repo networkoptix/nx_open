@@ -7,6 +7,8 @@
 #include <platform/hardware_information.h>
 #include <server_for_tests.h>
 #include <nx/metrics/streams_metric_helper.h>
+#include "test_api_requests.h"
+#include <nx/vms/server/metrics/helpers.h>
 
 namespace nx::vms::server::test {
 
@@ -217,6 +219,22 @@ TEST_F(MetricsServersApi, streamCount)
         checkCounters(/*primary*/ 0, /*secondary*/ 1);
     }
     checkCounters(/*primary*/ 0, /*secondary*/ 0);
+}
+
+TEST_F(MetricsServersApi, apiCalls)
+{
+    nx::vms::server::metrics::setTimerMultiplier(100);
+
+    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    int apiCalls1 = values["activity"]["apiCalls1m"].toDouble();
+    int apiCalls2 = 0;
+    do
+    {
+        values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+        apiCalls2 = values["activity"]["apiCalls1m"].toDouble();
+    } while (apiCalls2 == apiCalls1);
+    ASSERT_GT(apiCalls2, apiCalls1);
+    nx::vms::server::metrics::setTimerMultiplier(1);
 }
 
 } // namespace nx::vms::server::test
