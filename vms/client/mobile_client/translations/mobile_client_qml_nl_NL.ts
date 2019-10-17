@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Server has too old version. Please update it to the latest one</source>
-      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
+      <translation>Deze server heeft een te oude versie. Update deze naar de nieuwste versie</translation>
     </message>
   </context>
   <context>
@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Use server time</source>
-      <translation type="unfinished">Use server time</translation>
+      <translation>Gebruik de servertijd</translation>
     </message>
   </context>
   <context>
