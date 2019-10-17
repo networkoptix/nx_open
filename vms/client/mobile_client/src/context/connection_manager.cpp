@@ -437,12 +437,12 @@ bool QnConnectionManagerPrivate::doConnect(
         {
             result->deleteLater();
 
+            // If connection takes a lot of time (for example to the unavailable server)
+            // user can abort it by disconnecting during the process. If user tries to establish
+            // new connection in the short time after that, it may be situation when old callback
+            // is called. So, we just skip old callback handling in this case.
             if (connectionHandle != result->handle())
-            {
-                NX_DEBUG(this, "doConnect() Invalid handle");
-                callUnexpectedErrorCallback(callback);
                 return;
-            }
 
             connectionHandle = kInvalidHandle;
 
