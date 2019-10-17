@@ -231,7 +231,6 @@ def load_configs(conf_file, ini_file):
     report(f"Configuration defined in {conf_file}:")
     for k, v in conf.options.items():
         report(f"    {k}={v}")
-    report('')
 
     return conf, ini
 
@@ -367,7 +366,7 @@ def _test_api(api):
 
     if not wait_for_api():
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
-    report('REST API basic test is OK.')
+    report('\nREST API basic test is OK.')
     logging.info('Starting REST API authentication test...')
     api.check_authentication()
     report('REST API authentication test is OK.')
@@ -463,7 +462,7 @@ def main(conf_file, ini_file, log_file):
     vmses = VmsScanner.scan(box, linux_distribution)
 
     if vmses and len(vmses) > 0:
-        report(f"Detected VMS installation(s):")
+        report(f"\nDetected VMS installation(s):")
         for vms in vmses:
             report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
             report(f" pid {vms.pid if vms.pid else '-'}", end='')
@@ -540,7 +539,7 @@ def main(conf_file, ini_file, log_file):
     ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
         ram_free_bytes = box_platform.ram_free_bytes()
-    report(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
     try:
         storages = get_writable_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
@@ -749,7 +748,7 @@ def main(conf_file, ini_file, log_file):
                                 cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
                                 report(
                                     f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
-                                    f"CPU usage: {round(cpu_usage_last_minute * 100)}%, "
+                                    f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
                                     f"dropped frames: {frame_drops_sum}, "
                                     f"max stream lag: {max_lag_s:.3f} s.")
                                 if not cpu_usage_max_collector[0] is None:
@@ -806,7 +805,7 @@ def main(conf_file, ini_file, log_file):
                                 issues.append(
                                     exceptions.TestCameraStreamingIssue(
                                         (
-                                            'Unexpected error during acquiaring VMS server CPU usage. ' +
+                                            'Unexpected error during acquiring VMS Server CPU usage. ' +
                                             'Can be caused by network issues or Server issues.'
                                         ),
                                         original_exception=box_poller_thread_exceptions_collector
@@ -918,17 +917,23 @@ def main(conf_file, ini_file, log_file):
                     ))
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
-
-                report(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
-                if tx_rx_errors_collector[0] is not None:
-                    report(f"    Network errors: {tx_rx_errors_collector[0]} (expected 0)")
-                if cpu_usage_max is not None:
-                    report(f"    Maximum CPU usage: {str(cpu_usage_max)}")
-                if cpu_usage_avg is not None:
-                    report(f"    Average CPU usage: {str(cpu_usage_avg)}")
-                if ram_free_bytes is not None:
-                    report(f"    Free RAM: {to_megabytes(ram_free_bytes)} MB")
-                report(f"    Streaming test duration: {streaming_test_duration_s} s.")
+                report(
+                    f"    Streaming test statistics:\n"
+                    f"        Frame drops: {sum(frame_drops.values())} (expected 0)\n"
+                    + (
+                        f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
+                        if tx_rx_errors_collector[0] is not None else '')
+                    + (
+                        f"        Maximum box CPU usage: {cpu_usage_max * 100:.0f}%\n"
+                        if cpu_usage_max is not None else '')
+                    + (
+                        f"        Average box CPU usage: {cpu_usage_avg * 100:.0f}%\n"
+                        if cpu_usage_avg is not None else '')
+                    + (
+                        f"        Box free RAM: {to_megabytes(ram_free_bytes)} MB\n"
+                        if ram_free_bytes is not None else '')
+                    + f"        Streaming test duration: {streaming_test_duration_s} s"
+                )
 
                 if frame_drops_sum > 0:
                     issues.append(exceptions.VmsBenchmarkIssue(f'{frame_drops_sum} frame drops detected.'))
