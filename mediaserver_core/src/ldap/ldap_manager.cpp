@@ -309,7 +309,7 @@ bool LdapSession::connect()
 
     if (m_settings.searchTimeoutS > 0)
     {
-        NX_INFO(this, lm("Set time limit and timeout to %1 seconds").arg(m_settings.searchTimeoutS));
+        NX_VERBOSE(this, lm("Set time limit and timeout to %1 seconds").arg(m_settings.searchTimeoutS));
         rc = ldap_set_option(m_ld, LDAP_OPT_TIMELIMIT, &m_settings.searchTimeoutS);
         if (rc != 0)
         {
@@ -345,7 +345,7 @@ bool LdapSession::connect()
     else
         m_dType.reset(new OpenLdapType());
 
-    NX_INFO(this, lm("Connected to vendor %1").arg(m_dType));
+    NX_VERBOSE(this, lm("Connected to vendor %1").arg(m_dType));
     return true;
 }
 
@@ -361,8 +361,9 @@ QString LdapSession::getUserDn(const QString& login)
 
 void LdapSession::logResponseReferences(LDAPMessage* response)
 {
-    // TODO: Should be changed to verbose.
-    if (nx::utils::log::mainLogger()->maxLevel() < nx::utils::log::Level::info)
+    // NOTE: The function is only useful for debugging, let's disable it if logs are not verbose
+    // for better performance.
+    if (nx::utils::log::mainLogger()->maxLevel() < nx::utils::log::Level::verbose)
         return;
 
     for (LDAPMessage *entry = ldap_first_reference(m_ld, response);
@@ -384,12 +385,12 @@ void LdapSession::logResponseReferences(LDAPMessage* response)
         #endif
         if (rc != LDAP_SUCCESS)
         {
-            NX_INFO(this, lm("Failed to parse ldap reference entry: %1").args(LdapErrorStr(rc)));
+            NX_DEBUG(this, lm("Failed to parse ldap reference entry: %1").args(LdapErrorStr(rc)));
             return;
         }
 
         for (int i = 0; refs != nullptr && refs[i] != nullptr; i++)
-            NX_INFO(this, lm("Not chasing reference received from server: %1").args(refs[i]));
+            NX_VERBOSE(this, lm("Not chasing reference received from server: %1").args(refs[i]));
     }
 }
 
@@ -498,7 +499,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             m_lastErrorCode = rc;
             return false;
         }
-        NX_INFO(this, lm("Entities received on page: %1").args(entcnt));
+        // NOTE: Most of the time is zero, LDAP servers doesn't like to provide it =(
+        NX_VERBOSE(this, lm("Entities received on page: %1").args(entcnt));
 
         LDAPMessage *entry = NULL;
         for (entry = ldap_first_entry(m_ld, result);
@@ -518,23 +520,23 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
                 if (!user.login.isEmpty())
                     users.append(user);
                 else
-                    NX_INFO(this, lm("Ignoring entry with empty login: %1").args(user.dn));
+                    NX_DEBUG(this, lm("Ignoring entry with empty login: %1").args(user.dn));
                 ldap_memfree(dn);
             }
             else
             {
                 // NOTE: it may be changed to ldap_get_option(ld, LDAP_OPT_RESULT_CODE, &err)
                 // TODO: Can LdapErrorStr be used here? Is LdapGetLastError another value?
-                NX_INFO(this, lm("Failed to extract DN of LDAP entry: %1").args(
+                NX_DEBUG(this, lm("Failed to extract DN of LDAP entry: %1").args(
                     LdapErrorStr(LdapGetLastError())));
             }
         }
 
         logResponseReferences(result);
 
-        NX_INFO(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
+        NX_VERBOSE(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
             LdapErrorStr(LdapGetLastError()), users.size()));
-        NX_INFO(this, lm("cookie: %1, cookie->bv_val: %2, length: %3 (%4)").args(
+        NX_VERBOSE(this, lm("cookie: %1, cookie->bv_val: %2, length: %3 (%4)").args(
             cookie != nullptr,
             cookie != nullptr ? (cookie->bv_val != nullptr) : false,
             (cookie != nullptr && cookie->bv_val != nullptr) ? strlen(cookie->bv_val) : -7,
