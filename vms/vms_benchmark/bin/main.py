@@ -494,35 +494,13 @@ def main(conf_file, ini_file, log_file):
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
     _test_api(api)
 
-    for i in 1, 2, 3:
-        cameras = api.get_test_cameras_all()
-        if cameras is not None:
-            break
-        report(f"Attempt #{i}to get camera list")
-        time.sleep(i)
-
-    if cameras is None:
-        raise exceptions.ServerApiError(message="Unable to get camera list.")
-
-    module_information = api.get_module_information()
-
-    if module_information is None:
-        raise exceptions.ServerApiError(message="Unable to get module information.")
-
-    vms_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
-    vms_id = vms_id_raw[1:-1] if vms_id_raw[0] == '{' and vms_id_raw[-1] == '}' else vms_id_raw
+    cameras = _get_cameras_reliably(api)
 
     vms.stop(exc=True)
 
     report('Server stopped.')
 
-    # TODO: Properly enumerate all actual storages; consider that they can be relocated via Server configuration.
-    for camera in cameras:
-        box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
-
-    report('Camera archives cleaned.')
+    _clear_storages(api, box, cameras, vms)
 
     swapped_before_bytes = get_cumulative_swap_bytes(box)
     if swapped_before_bytes is None:
@@ -987,6 +965,29 @@ def main(conf_file, ini_file, log_file):
 
     report('\nSUCCESS: All tests finished.')
     return 0
+
+
+def _clear_storages(api, box, cameras, vms):
+    vms_id = api.get_server_id()
+
+    # TODO: Properly enumerate all actual storages; consider that they can be relocated via Server configuration.
+    for camera in cameras:
+        box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
+        box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
+        box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
+    report('Camera archives cleaned.')
+
+
+def _get_cameras_reliably(api):
+    for i in 1, 2, 3:
+        cameras = api.get_test_cameras_all()
+        if cameras is not None:
+            break
+        report(f"Attempt #{i}to get camera list")
+        time.sleep(i)
+    if cameras is None:
+        raise exceptions.ServerApiError(message="Unable to get camera list.")
+    return cameras
 
 
 def nx_format_exception(exception):
