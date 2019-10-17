@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import itertools
 import math
 import platform
 import signal
@@ -7,8 +8,6 @@ import sys
 import time
 import logging
 from typing import List, Tuple, Optional
-
-from future.moves import itertools
 
 from vms_benchmark.camera import Camera
 
