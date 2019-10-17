@@ -7,6 +7,7 @@
 #include <nx/utils/url.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
+#include <transaction/amend_transaction_data.h>
 
 #include <gtest/gtest.h>
 
@@ -138,7 +139,7 @@ protected:
         ASSERT_NE(storages.cend(), dataIt);
         ASSERT_EQ(expected.isBackup, dataIt->isBackup);
 
-        #if 0 //< Enable when saveStorage starts saving additional params.
+        #if 0 //< Enable when /ec2/saveStorage starts saving additional params.
             ASSERT_EQ(expected.addParams, dataIt->addParams);
         #endif
 
@@ -146,7 +147,7 @@ protected:
         ASSERT_EQ(expected.storageType, dataIt->storageType);
         ASSERT_EQ(expected.usedForWriting, dataIt->usedForWriting);
 
-        assertUrls(expected.url, dataIt->url, Credentials::Encryption::on);
+        assertUrls(expected.url, dataIt->url, Credentials::EncryptionMode::asteriks);
     }
 
     void thenResourceShouldHaveUrlUnencrypted(const nx::vms::api::StorageData& expected)
@@ -183,10 +184,11 @@ protected:
 private:
     struct Credentials
     {
-        enum class Encryption
+        enum class EncryptionMode
         {
-            on,
+            hexEncrypted,
             off,
+            asteriks,
         };
 
         QString username;
@@ -202,7 +204,7 @@ private:
     MediaServerLauncher m_server;
 
     void assertUrls(
-        const QString& expected, const QString& actual, Credentials::Encryption encryption)
+        const QString& expected, const QString& actual, Credentials::EncryptionMode encryption)
     {
         if (expected.isEmpty())
         {
@@ -223,18 +225,24 @@ private:
     }
 
     void assertCredentials(
-        const Credentials& expected, const Credentials& actual, Credentials::Encryption encryption)
+        const Credentials& expected,
+        const Credentials& actual,
+        Credentials::EncryptionMode encryption)
     {
         switch (encryption)
         {
-            case Credentials::Encryption::off:
+            case Credentials::EncryptionMode::off:
                 ASSERT_EQ(expected.username, actual.username);
                 ASSERT_EQ(expected.password, actual.password);
                 break;
-            case Credentials::Encryption::on:
+            case Credentials::EncryptionMode::hexEncrypted:
                 using namespace nx::utils;
-                ASSERT_EQ(expected.username, encodeHexStringFromStringAES128CBC(actual.username));
-                ASSERT_EQ(expected.password, encodeHexStringFromStringAES128CBC(actual.password));
+                ASSERT_EQ(encodeHexStringFromStringAES128CBC(expected.username), actual.username);
+                ASSERT_EQ(encodeHexStringFromStringAES128CBC(expected.password), actual.password);
+                break;
+            case Credentials::EncryptionMode::asteriks:
+                ASSERT_EQ(ec2::kHiddenPasswordFiller, actual.username);
+                ASSERT_EQ(ec2::kHiddenPasswordFiller, actual.password);
                 break;
         }
     }
@@ -251,7 +259,14 @@ TEST_P(Storage, EmptyUrl)
 INSTANTIATE_TEST_CASE_P(Storage_SaveGet_differentUrls,
     Storage,
     ::testing::Values(
-        Param("")
+        Param(""),
+        Param("test://user:password@host/some/path"),
+        Param("test://:password@host/some/path"),
+        Param("test://user:@host/some/path"),
+        Param("test://u:p@host/some/path"),
+        Param("test://:p@host/some/path"),
+        Param("test://u:@host/some/path"),
+        Param("test://host/some/path")
         ));
 
 } // namespace test
