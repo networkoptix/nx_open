@@ -492,6 +492,7 @@ def main(conf_file, ini_file, log_file):
     })
 
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
+    _test_api(api)
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -562,8 +563,6 @@ def main(conf_file, ini_file, log_file):
     if ram_free_bytes is None:
         ram_free_bytes = box_platform.ram_free_bytes()
     report(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
-
-    _test_api(api)
 
     try:
         storages = get_writable_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
