@@ -349,4 +349,13 @@ Object
         resourceHelper.resourceId = id
         audioController.resourceId = id
     }
+
+    onServerOfflineChanged:
+    {
+        if (serverOffline)
+            return;
+
+        if (d.playing && !(mediaPlayer.playing || mediaPlayer.loading))
+            mediaPlayer.play()
+    }
 }
