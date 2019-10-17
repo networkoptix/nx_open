@@ -581,11 +581,11 @@ def main(conf_file, ini_file, log_file):
             raise exceptions.InsufficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
-        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * len(cameras))
-        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * len(cameras))
+        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_cameras_count)
+        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_cameras_count)
         report(
             f"Load test #{test_number}: "
-            f"{len(cameras)} virtual camera(s), "
+            f"{test_cameras_count} virtual camera(s), "
             f"{total_live_stream_count} live stream(s), "
             f"{total_archive_stream_count} archive stream(s)...")
 
