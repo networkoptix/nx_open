@@ -121,7 +121,9 @@ void executeGet(
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus, authName,
         authPassword));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(
@@ -141,7 +143,9 @@ void executeGet(
     nx::network::http::BufferType response;
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(
