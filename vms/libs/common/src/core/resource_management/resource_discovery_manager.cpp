@@ -182,6 +182,8 @@ void QnResourceDiscoveryManager::stop()
 {
     pleaseStop();
     wait();
+    QnMutexLocker lock(&m_searchersListMutex);
+    m_searchersList.clear();
 }
 
 void QnResourceDiscoveryManager::pleaseStop()
