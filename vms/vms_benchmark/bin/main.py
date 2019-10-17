@@ -183,15 +183,15 @@ def load_configs(conf_file, ini_file):
             "type": 'float',
             "default": 0.5
         },
-        "minimumStorageFreeBytes": {
+        "archiveBitratePerCameraMbps": {
             "optional": True,
             "type": 'integer',
-            "default": 10 * 1024 * 1024
+            "default": 10,
         },
-        "minimumStorageFreeBytesPerCamera": {
+        "minimumArchiveFreeSpacePerCameraSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 10 * 1024 * 1024
+            "default": 180,
         },
         "timeDiffThresholdSeconds": {
             "optional": True,
@@ -271,28 +271,20 @@ def report_server_storage_failures(api, streaming_started_at):
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
-def get_writable_storages(api, ini, camera_count):
-    try:
-        storages = api.get_storage_spaces()
-    except exceptions.VmsBenchmarkError as e:
-        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP', original_exception=e)
-
-    if storages is None:
-        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP: request failed')
-
-    def storage_is_writable(storage):
-        free_space = int(storage['freeSpace'])
-        reserved_space = int(storage['reservedSpace'])
-
-        space_for_recordings_bytes = camera_count * ini['minimumStorageFreeBytesPerCamera']
-        return free_space >= reserved_space + ini['minimumStorageFreeBytes'] + space_for_recordings_bytes
-
-    try:
-        result = [storage for storage in storages if storage_is_writable(storage)]
-    except (ValueError, KeyError) as e:
-        raise exceptions.ServerApiResponseError("Bad response body for storage info request", original_exception=e)
-
-    return result
+def _check_storages(api, ini, camera_count):
+    space_for_recordings_bytes = (
+        camera_count
+        * ini['minimumArchiveFreeSpacePerCameraSeconds']
+        * ini['archiveBitratePerCameraMbps'] * 1000 * 1000 // 8
+    )
+    for storage in _get_storages(api):
+        if storage.free_space >= storage.reserved_space + space_for_recordings_bytes:
+            break
+    else:
+        raise exceptions.BoxStateError(
+            f"Server has no video archive Storage "
+            f"with at least {space_for_recordings_bytes // 1024 ** 2} MB "
+            f"of non-reserved free space.")
 
 
 def get_cumulative_swap_bytes(box):
@@ -370,6 +362,31 @@ def _test_api(api):
     logging.info('Starting REST API authentication test...')
     api.check_authentication()
     report('REST API authentication test is OK.')
+
+
+class Storage:
+    def __init__(self, raw):
+        try:
+            self.url = raw['url']
+            self.free_space = int(raw['freeSpace'])
+            self.reserved_space = int(raw['reservedSpace'])
+        except Exception as e:
+            raise exceptions.ServerApiError(
+                'Incorrect Storage info received from the Server.',
+                original_exception=e)
+
+
+def _get_storages(api) -> List[Storage]:
+    try:
+        reply = api.get_storage_spaces()
+    except Exception as e:
+        raise exceptions.ServerApiError(
+            'Unable to get VMS Storages via REST HTTP: request failed',
+            original_exception=e)
+    if reply is None:
+        raise exceptions.ServerApiError(
+            'Unable to get VMS Storages via REST HTTP: invalid reply.')
+    return [Storage(item) for item in reply]
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -493,7 +510,7 @@ def main(conf_file, ini_file, log_file):
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
     _test_api(api)
 
-    storages = api.get_storage_spaces()
+    storages = _get_storages(api)
 
     vms.stop(exc=True)
 
@@ -541,13 +558,7 @@ def main(conf_file, ini_file, log_file):
         ram_free_bytes = box_platform.ram_free_bytes()
     report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
-    try:
-        storages = get_writable_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
-    except Exception as e:
-        raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
-
-    if len(storages) == 0:
-        raise exceptions.BoxStateError("Server has no suitable video archive storage, check the free space.")
+    _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -972,13 +983,13 @@ def main(conf_file, ini_file, log_file):
     return 0
 
 
-def _clear_storages(box, storages):
+def _clear_storages(box, storages: List[Storage]):
     for storage in storages:
         box.sh(
-            f"rm -r "
-            f"'{storage['url']}/hi_quality' "
-            f"'{storage['url']}/low_quality' "
-            f"'{storage['url']}/'*_media.nxdb",
+            f"rm -rf "
+            f"'{storage.url}/hi_quality' "
+            f"'{storage.url}/low_quality' "
+            f"'{storage.url}/'*_media.nxdb",
             su=True, exc=True)
     report('Server video archives deleted.')
 

@@ -49,7 +49,7 @@ class VmsBenchmarkIssue(VmsBenchmarkError):
 
 class StorageFailuresIssue(VmsBenchmarkIssue):
     def __init__(self, failures_count):
-        super(StorageFailuresIssue, self).__init__(f"{failures_count} storage failures detected")
+        super(StorageFailuresIssue, self).__init__(f"{failures_count} Storage failures detected")
 
 
 class CpuUsageThresholdExceededIssue(VmsBenchmarkIssue):

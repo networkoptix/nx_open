@@ -89,7 +89,7 @@ class VmsScanner:
         def override_ini_config(self, features):
             storages = BoxPlatform.get_storages_map(self.device)
             if not storages:
-                raise BoxCommandError('Unable to get box storages.')
+                raise BoxCommandError('Unable to get box Storages.')
 
             uid = self.uid()
             base_dir = '/etc'
