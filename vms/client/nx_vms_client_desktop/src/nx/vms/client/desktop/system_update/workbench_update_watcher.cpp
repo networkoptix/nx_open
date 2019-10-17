@@ -3,9 +3,6 @@
 #include <QtCore/QTimer>
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebView>
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#include <QWebEngineSettings>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
@@ -21,6 +18,7 @@
 #include <network/system_helpers.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -56,25 +54,6 @@ namespace {
 
     const auto kCheckUpdatePeriod = std::chrono::minutes(60);
     const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
-
-class RedirectLinksToDesktopPage: public QWebEnginePage
-{
-    using base_type = QWebEnginePage;
-public:
-    RedirectLinksToDesktopPage(QObject* p): base_type(p) {}
-
-protected:
-    virtual bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override
-    {
-        if (type == QWebEnginePage::NavigationTypeLinkClicked)
-        {
-            QDesktopServices::openUrl(url);
-            return false;
-        }
-        return base_type::acceptNavigationRequest(url, type, isMainFrame);
-    }
-};
-
 } // anonymous namespace
 
 namespace nx::vms::client::desktop {
@@ -326,24 +305,19 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
     QWidget* webWidget = nullptr;
     if (ini().useWebEngine)
     {
-        auto view = new QWebEngineView(&messageBox);
+        auto view = new WebEngineView(&messageBox);
         webWidget = view;
         // Setting up a policy for link redirection. We should not open release notes right here.
-        view->setPage(new RedirectLinksToDesktopPage(view));
+        view->setRedirectLinksToDesktop(true);
+        view->setUseActionsForLinks(true);
+        view->insertActions(nullptr, {view->pageAction(QWebEnginePage::CopyLinkToClipboard)});
         view->page()->setBackgroundColor(Qt::transparent);
-        view->page()->settings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
         NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
         view->setHtml(html, QUrl("qrc://"));
 
         // Synchronously wait for page to load in order to match QWebView behavior.
         static const std::chrono::milliseconds kLoadTimeout(3000);
-        QTimer timer;
-        timer.setSingleShot(true);
-        QEventLoop loop;
-        connect(view, &QWebEngineView::loadFinished, this, [&loop](){loop.quit(); });
-        connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-        timer.start(kLoadTimeout);
-        loop.exec();
+        view->waitLoadFinished(kLoadTimeout);
     }
     else
     {

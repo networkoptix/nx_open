@@ -4,53 +4,15 @@
 #include <QtWebKitWidgets/QWebView>
 #include <QWebFrame>
 #include <QtWidgets/QLabel>
-#include <QWebEngineView>
-#include <QWebEngineContextMenuData>
-#include <QMenu>
 
 #include <ui/style/webview_style.h>
 
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include <utils/common/event_processors.h>
-
-namespace {
-
-class WebEngineView: public QWebEngineView
-{
-    using base_type = QWebEngineView;
-
-public:
-    WebEngineView(QWidget* parent, bool useActionsForLinks)
-        : base_type(parent)
-        , m_useActionsForLinks(useActionsForLinks)
-    {}
-
-protected:
-    virtual void contextMenuEvent(QContextMenuEvent* event) override
-    {
-        if (m_useActionsForLinks)
-        {
-            const QWebEngineContextMenuData data = page()->contextMenuData();
-
-            if (!data.linkUrl().isEmpty())
-            {
-                QMenu* menu = new QMenu(this);
-                menu->addActions(actions());
-                menu->popup(event->globalPos());
-                return;
-            }
-        }
-
-        base_type::contextMenuEvent(event);
-    }
-private:
-    bool m_useActionsForLinks;
-};
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -62,7 +24,8 @@ WebWidget::WebWidget(QWidget* parent, bool useActionsForLinks):
     QWidget* view = nullptr;
     if (ini().useWebEngine)
     {
-        m_webEngineView = new WebEngineView(this, useActionsForLinks);
+        m_webEngineView = new WebEngineView(this);
+        m_webEngineView->setUseActionsForLinks(true);
         view = m_webEngineView;
     }
     else
@@ -127,7 +90,7 @@ QWebView* WebWidget::view() const
     return m_webView;
 }
 
-QWebEngineView* WebWidget::webEngineView() const
+WebEngineView* WebWidget::webEngineView() const
 {
     return m_webEngineView;
 }

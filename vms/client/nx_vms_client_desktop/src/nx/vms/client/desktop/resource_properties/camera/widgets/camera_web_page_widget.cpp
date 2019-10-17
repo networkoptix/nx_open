@@ -11,8 +11,6 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
-#include <QWebEngineProfile>
-#include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QWebEngineCookieStore>
 
@@ -22,6 +20,7 @@
 
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/http/custom_headers.h>
@@ -47,7 +46,6 @@ struct CameraWebPageWidget::Private
     Private(CameraWebPageWidget* parent);
 
     class WebPage;
-    class WebEnginePage;
     class CookieJar;
 
     WebWidget* const webWidget;
@@ -56,7 +54,6 @@ struct CameraWebPageWidget::Private
     CameraSettingsDialogState::Credentials credentials;
     QNetworkRequest lastRequest;
     bool loadNeeded = false;
-    QScopedPointer<QWebEngineProfile> webEngineProfile;
 
     QnMutex mutex;
 };
@@ -96,21 +93,6 @@ protected:
     virtual QString userAgentForUrl(const QUrl& /*url*/) const
     {
         return kUserAgentForCameraPage;
-    }
-};
-
-class CameraWebPageWidget::Private::WebEnginePage: public QWebEnginePage
-{
-    using base_type = QWebEnginePage;
-
-public:
-    using base_type::base_type; //< Forward constructors.
-
-protected:
-    virtual bool certificateError(const QWebEngineCertificateError&) override
-    {
-        // Ignore the error and complete the request.
-        return true;
     }
 };
 
@@ -167,10 +149,9 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     }
 
     auto webView = webWidget->webEngineView();
-    // Creating off-the-record profile.
-    webEngineProfile.reset(new QWebEngineProfile(QString()));
-    webEngineProfile->setHttpUserAgent(kUserAgentForCameraPage);
-    webView->setPage(new WebEnginePage(webEngineProfile.data()));
+    webView->setIgnoreSslErrors(true);
+    webView->setUseActionsForLinks(true);
+    webView->setUserAgent(kUserAgentForCameraPage);
 
     anchorWidgetToParent(webWidget);
 

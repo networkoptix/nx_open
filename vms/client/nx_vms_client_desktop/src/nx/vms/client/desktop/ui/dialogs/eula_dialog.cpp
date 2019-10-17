@@ -8,7 +8,6 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
-#include <QWebEngineView>
 #include <QAction>
 
 #include <client/client_app_info.h>
@@ -22,6 +21,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 
 namespace nx::vms::client::desktop {
 
@@ -39,11 +39,13 @@ EulaDialog::EulaDialog(QWidget* parent):
 
     if (ini().useWebEngine)
     {
-        m_webEngineView = new QWebEngineView(this);
+        m_webEngineView = new WebEngineView(this);
+        m_webEngineView->setRedirectLinksToDesktop(true);
+        m_webEngineView->setUseActionsForLinks(true);
+        m_webEngineView->insertActions(nullptr,
+            {m_webEngineView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
         m_webEngineView->setSizePolicy(ui->eulaView->sizePolicy());
         m_webEngineView->page()->setBackgroundColor(Qt::transparent);
-        m_webEngineView->pageAction(QWebEnginePage::ViewSource)->setVisible(false);
-        m_webEngineView->pageAction(QWebEnginePage::SavePage)->setVisible(false);
         auto previous = ui->verticalLayout->replaceWidget(ui->eulaView, m_webEngineView);
         delete previous;
 
