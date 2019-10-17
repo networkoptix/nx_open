@@ -322,6 +322,18 @@ def box_uptime(box):
     return uptime_s, idle_time_s
 
 
+def box_tx_rx_errors(box):
+    errors_content = box.eval(f'cat /sys/class/net/{box.eth_name}/statistics/tx_errors /sys/class/net/{box.eth_name}/statistics/rx_errors')
+
+    if errors_content is None:
+        raise exceptions.BoxFileContentError(f'/sys/class/net/{box.eth_name}/statistics/{{tx,rx}}_errors')
+
+    errors_components = errors_content.split('\n')
+    tx_errors, rx_errors = [int(v) for v in errors_components[0:2]]
+
+    return tx_errors + rx_errors
+
+
 # TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
 def report(message, end='\n'):
     print(message, end=end)
@@ -738,11 +750,18 @@ def main(conf_file, ini_file, log_file):
                 issues = []
                 cpu_usage_max_collector = [None]
                 cpu_usage_avg_collector = []
+                tx_rx_errors_collector = [None]
 
                 box_poller_thread_stop_event = threading.Event()
                 box_poller_thread_exceptions_collector = []
 
-                def box_poller(stop_event, exception_collector, cpu_usage_max_collector, cpu_usage_avg_collector):
+                def box_poller(
+                        stop_event,
+                        exception_collector,
+                        cpu_usage_max_collector,
+                        cpu_usage_avg_collector,
+                        tx_rx_errors_collector
+                ):
                     prev_uptime, prev_idle_time_s = None, None
                     try:
                         while not stop_event.isSet():
@@ -768,6 +787,14 @@ def main(conf_file, ini_file, log_file):
                                         ini['cpuUsageThreshold']
                                     )
                             prev_uptime, prev_idle_time_s = uptime, idle_time_s
+
+                            tx_rx_errors = box_tx_rx_errors(box)
+
+                            if tx_rx_errors_collector[0] is None:
+                                tx_rx_errors_collector[0] = 0
+
+                            tx_rx_errors_collector[0] += tx_rx_errors
+
                             stop_event.wait(60)
                     except Exception as e:
                         exception_collector.append(e)
@@ -780,6 +807,7 @@ def main(conf_file, ini_file, log_file):
                         box_poller_thread_exceptions_collector,
                         cpu_usage_max_collector,
                         cpu_usage_avg_collector,
+                        tx_rx_errors_collector,
                     )
                 )
 
@@ -908,9 +936,16 @@ def main(conf_file, ini_file, log_file):
                         original_exception=e
                     ))
 
+                if tx_rx_errors_collector[0] is None or tx_rx_errors_collector[0] > 0:
+                    issues.append(exceptions.TestCameraStreamingIssue(
+                        "Network errors detected."
+                    ))
+
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
 
                 report(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
+                if tx_rx_errors_collector[0] is not None:
+                    report(f"    Network errors: {tx_rx_errors_collector[0]} (expected 0)")
                 if cpu_usage_max is not None:
                     report(f"    Maximum CPU usage: {str(cpu_usage_max)}")
                 if cpu_usage_avg is not None:
