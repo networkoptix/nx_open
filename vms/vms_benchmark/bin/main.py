@@ -398,30 +398,29 @@ def main(conf_file, ini_file, log_file):
                 f"Details of the error: {res.formatted_message()}"
             )
 
-    report(f"Box IP: {box.ip}")
-    report(f"Used network device name: {box.eth_name}")
-    report(f"Box network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}")
-    if box.is_root:
-        report(f"Box ssh user is root.")
-
     linux_distribution = LinuxDistributionDetector.detect(box)
-
-    report(f"Linux distribution name: {linux_distribution.name}")
-    report(f"Linux distribution version: {linux_distribution.version}")
-    report(f"Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}")
-
     box_platform = BoxPlatform.gather(box, linux_distribution)
-
-    report(f"Arch: {box_platform.arch}")
-    report(f"Number of CPUs: {box_platform.cpu_count}")
-    report(f"CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else '-'}")
-    report(f"RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)")
-    report("Volumes:")
-    [
-        report(f"    {storage['fs']} on {storage['point']}: free {storage['space_free']} of {storage['space_total']}")
-        for (point, storage) in
-        box_platform.storages_list.items()
-    ]
+    report(
+        "\nBox properties detected:\n"
+        f"    IP address: {box.ip}\n"
+        f"    Network adapter name: {box.eth_name}\n"
+        f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
+        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
+        f"    Linux distribution name: {linux_distribution.name}\n"
+        f"    Linux distribution version: {linux_distribution.version}\n"
+        f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
+        f"    Arch: {box_platform.arch}\n"
+        f"    Number of CPUs: {box_platform.cpu_count}\n"
+        f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
+        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
+        "    Volumes:\n"
+        + '\n'.join(
+            f"        {storage['fs']} "
+            f"on {storage['point']}: "
+            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
+            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
+            for (point, storage) in box_platform.storages_list.items())
+    )
 
     box_time_output = box.eval('date +%s.%N')
     try:
