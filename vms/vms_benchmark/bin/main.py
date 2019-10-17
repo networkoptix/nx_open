@@ -304,6 +304,18 @@ def get_cumulative_swap_bytes(box):
     return kilobytes_swapped * 1024
 
 
+def box_uptime(box):
+    uptime_content = box.eval('cat /proc/uptime')
+
+    if uptime_content is None:
+        raise exceptions.BoxFileContentError('/proc/uptime')
+
+    uptime_components = uptime_content.split()
+    uptime_s, idle_time_s = [float(v) for v in uptime_components[0:2]]
+
+    return uptime_s, idle_time_s
+
+
 # TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
 def report(message, end='\n'):
     print(message, end=end)
@@ -725,33 +737,31 @@ def main(conf_file, ini_file, log_file):
                 box_poller_thread_exceptions_collector = []
 
                 def box_poller(stop_event, exception_collector, cpu_usage_max_collector, cpu_usage_avg_collector):
+                    prev_uptime, prev_idle_time_s = None, None
                     try:
                         while not stop_event.isSet():
-                            loadavg = box.eval('cat /proc/loadavg')
-                            if not loadavg:
-                                # TODO: raise
-                                pass
-                            match = re.match(r'(\d+\.\d+) (\d+\.\d+) (\d+\.\d+) .*', loadavg)
-                            if not match:
-                                # TODO: raise
-                                pass
-                            cpu_usage_last_minute = float(match.group(1))
-                            report(
-                                f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
-                                f"CPU usage: {cpu_usage_last_minute}, "
-                                f"dropped frames: {frame_drops_sum}, "
-                                f"max stream lag: {max_lag_s} s.")
-                            if not cpu_usage_max_collector[0] is None:
-                                cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
-                            else:
-                                cpu_usage_max_collector[0] = cpu_usage_last_minute
-
-                            cpu_usage_avg_collector.append(cpu_usage_last_minute)
-                            if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                                raise exceptions.CpuUsageThresholdExceededIssue(
-                                    cpu_usage_last_minute,
-                                    ini['cpuUsageThreshold']
-                                )
+                            uptime, idle_time_s = box_uptime(box)
+                            if prev_idle_time_s is not None and prev_uptime is not None:
+                                idle_time_delta_total_s = idle_time_s - prev_idle_time_s
+                                idle_time_delta_per_core_s = idle_time_delta_total_s / box_platform.cpu_count
+                                uptime_delta_s = uptime - prev_uptime
+                                cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
+                                report(
+                                    f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
+                                    f"CPU usage: {round(cpu_usage_last_minute * 100)}%, "
+                                    f"dropped frames: {frame_drops_sum}, "
+                                    f"max stream lag: {max_lag_s} s.")
+                                if not cpu_usage_max_collector[0] is None:
+                                    cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
+                                else:
+                                    cpu_usage_max_collector[0] = cpu_usage_last_minute
+                                cpu_usage_avg_collector.append(cpu_usage_last_minute)
+                                if cpu_usage_last_minute > ini['cpuUsageThreshold']:
+                                    raise exceptions.CpuUsageThresholdExceededIssue(
+                                        cpu_usage_last_minute,
+                                        ini['cpuUsageThreshold']
+                                    )
+                            prev_uptime, prev_idle_time_s = uptime, idle_time_s
                             stop_event.wait(60)
                     except Exception as e:
                         exception_collector.append(e)
