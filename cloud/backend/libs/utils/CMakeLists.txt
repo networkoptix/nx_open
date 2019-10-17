@@ -1,5 +1,4 @@
-nx_add_target(nx_cloud_utils LIBRARY NO_MOC
-    WERROR_IF NOT WINDOWS
-    PUBLIC_LIBS nx_network)
+add_library(nx_cloud_utils INTERFACE)
+target_include_directories(nx_cloud_utils INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src)
 
-set_target_properties(nx_cloud_utils PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(nx_cloud_utils INTERFACE nx_network nx_utils)
