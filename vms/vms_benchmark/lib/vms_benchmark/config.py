@@ -71,11 +71,13 @@ class ConfigParser:
                     if 'default' in option_descriptions[name]:
                         self.options[name] = self.options.get(name, option_descriptions[name]['default'])
 
-                    if option_descriptions[name]['type'] == 'integer' and name in self.options:
+                    if name not in self.options:
+                        continue
+                    if option_descriptions[name]['type'] == 'integer':
                         self.options[name] = int(self.options[name])
-                    if option_descriptions[name]['type'] == 'float' and name in self.options:
+                    elif option_descriptions[name]['type'] == 'float':
                         self.options[name] = float(self.options[name])
-                    if option_descriptions[name]['type'] == 'boolean' and name in self.options:
+                    elif option_descriptions[name]['type'] == 'boolean':
                         if self.options[name] in (True, 'true', 'True', 'yes', 'Yes', '1'):
                             value = True
                         elif self.options[name] in (False, 'false', 'False', 'no', 'No', '0'):
@@ -84,7 +86,7 @@ class ConfigParser:
                             raise Exception(
                                 'Expected one of: true, True, yes, Yes, 1, false, False, no, No, 0.')
                         self.options[name] = value
-                    elif option_descriptions[name]['type'] == 'integers' and name in self.options:
+                    elif option_descriptions[name]['type'] == 'integers':
                         value = self.options[name]
                         if not isinstance(value, list):
                             # Parse integers from string into list. Brackets are optional.
@@ -94,6 +96,15 @@ class ConfigParser:
                             if len(value_list) == 0 or (len(value_list) == 1 and value_list[0] == ''):
                                 raise Exception('List of integers is empty.')
                             self.options[name] = [int(item.strip()) for item in value_list]
+                    elif option_descriptions[name]['type'] == 'string':
+                        pass
+                    else:
+                        raise InvalidConfigOption(
+                            f"Unexpected type {option_descriptions[name]['type']!r} "
+                            f"in '{name}' option "
+                            f"in the definition for {filepath!r}.")
+                except InvalidConfigOption:
+                    raise
                 except Exception as e:
                     raise ConfigOptionValueError(filepath, name, self.options[name], e)
 
