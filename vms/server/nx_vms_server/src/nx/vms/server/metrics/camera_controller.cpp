@@ -206,7 +206,7 @@ auto makeStorageProviders()
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "hasArchiveCleanup",
-            [](const auto& r) { return Value(r->hasRemovedFile()); }
+            [](const auto& r) { return Value(r->hasArchiveRotated()); }
         )
     );
 }

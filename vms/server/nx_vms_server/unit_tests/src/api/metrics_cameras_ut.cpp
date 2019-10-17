@@ -88,21 +88,20 @@ public:
         static const qint64 kMsInMinute = 1000 * 60;
         static const qint64 kMsInHour = kMsInMinute * 60;
         static const qint64 kMsInDay = kMsInHour * 24;
-        nx::vms::server::Chunk chunk1;
-        chunk1.startTimeMs = currentTimeMs - kMsInDay * 2;
-        chunk1.durationMs = 45 * 1000;
-        chunk1.setFileSize(1000 * 1000);
-        chunk1.storageIndex = storageIndex;
-        catalog->addRecord(chunk1);
+        nx::vms::server::Chunk chunk;
+        chunk.startTimeMs = currentTimeMs - kMsInDay * 2;
+        chunk.durationMs = 45 * 1000;
+        chunk.setFileSize(1000 * 1000);
+        chunk.storageIndex = storageIndex;
+        catalog->addRecord(chunk);
 
         // Fill last 24 hours with 50% archive density.
         auto timeMs = currentTimeMs - kMsInDay + kMsInMinute;
         while (timeMs < currentTimeMs)
         {
-            nx::vms::server::Chunk chunk;
             chunk.startTimeMs = timeMs;
             chunk.durationMs = kMsInMinute;
-            chunk1.storageIndex = storageIndex;
+            chunk.storageIndex = storageIndex;
             chunk.setFileSize(1000 * 1000 * 60); //< Bitrate 8 Mbit.
             catalog->addRecord(chunk);
             timeMs += kMsInMinute * 2;

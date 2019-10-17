@@ -856,13 +856,13 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     return result;
 }
 
-bool QnStorageManager::hasRemovedFile(const QnVirtualCameraResourcePtr& camera) const
+bool QnStorageManager::hasArchiveRotated(const QnVirtualCameraResourcePtr& camera) const
 {
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
     {
         QnMutexLocker lock(&m_mutexCatalog);
         auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
-        if (itr != m_devFileCatalog[i].end() && itr.value()->hasRemovedFile())
+        if (itr != m_devFileCatalog[i].end() && itr.value()->hasArchiveRotated())
             return true;
     }
     return false;
@@ -993,7 +993,7 @@ void QnStorageManager::scanMediaCatalog(
         newCatalog->addChunk(chunk);
     replaceChunks(filter.scanPeriod, storage, newCatalog, cameraUuid, quality);
     if (auto ownCatalog = getFileCatalogInternal(cameraUuid, quality))
-        ownCatalog->setHasRemovedFile(false); //< Reset flag after rebuild archive.
+        ownCatalog->setHasArchiveRotated(false); //< Reset flag after rebuild archive.
 }
 
 void QnStorageManager::initDone()

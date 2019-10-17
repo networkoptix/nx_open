@@ -876,11 +876,11 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
         serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
 }
 
-bool Camera::hasRemovedFile() const
+bool Camera::hasArchiveRotated() const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();
-    return serverModule()->normalStorageManager()->hasRemovedFile(ptr) ||
-        serverModule()->backupStorageManager()->hasRemovedFile(ptr);
+    return serverModule()->normalStorageManager()->hasArchiveRotated(ptr) ||
+        serverModule()->backupStorageManager()->hasArchiveRotated(ptr);
 }
 
 std::chrono::milliseconds Camera::calendarDuration() const

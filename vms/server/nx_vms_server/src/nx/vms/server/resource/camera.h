@@ -214,7 +214,7 @@ public:
     std::chrono::milliseconds nxOccupiedDuration() const;
     std::chrono::milliseconds calendarDuration() const;
     qint64 recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
-    bool hasRemovedFile() const;
+    bool hasArchiveRotated() const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
