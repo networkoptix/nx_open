@@ -113,6 +113,14 @@ private:
     MatchMode m_matchMode;
 };
 
+class PreventWhenFullscreenTransition: public Condition
+{
+public:
+    static ConditionWrapper condition();
+
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+};
+
 /** Base condition class for actions that should be visible in videowall review mode only. */
 class VideoWallReviewModeCondition: public Condition
 {
