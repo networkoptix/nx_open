@@ -14,10 +14,21 @@
 
 namespace nx::utils {
 
+namespace {
+
 /** Change to see more or less records at the end of execution */
 static const size_t kShowTheMostCount(30);
 
 static std::function<void(const log::Message&)> g_onAssertHandler;
+
+static bool g_printStackTraceOnAssert = false;
+
+} // namespace
+
+void printStackTraceOnAssert(bool value)
+{
+    g_printStackTraceOnAssert = value;
+}
 
 void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 {
@@ -51,7 +62,7 @@ bool assertFailure(bool isCritical, const log::Message& message)
 
     const bool isCrashRequired = isCritical || ini().assertCrash;
     const auto& kTag = isCrashRequired ? kCrashTag : kAssertTag;
-    const auto output = ini().printStackTraceOnAssert
+    const auto output = g_printStackTraceOnAssert
         ? lm("%1\n\n%2").args(message, stackTrace())
         : message;
     NX_ERROR(kTag, output);

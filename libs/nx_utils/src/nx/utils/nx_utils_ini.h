@@ -12,7 +12,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr const char* kDefaultMutexImplementation = "debug";
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
-        static constexpr int kDefaultPrintStackTraceOnAssert = 0;
         static constexpr int kShowPasswordsInLogs = 1;
         static constexpr int kLogLevelReducerPassLimit = 100;
         static constexpr int kLogLevelReducerWindowSizeS = 20;
@@ -20,7 +19,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr const char* kDefaultMutexImplementation = "qt";
         static constexpr int kDefaultAssertCrash = 0;
         static constexpr int kDefaultAssertHeavyCondition = 0;
-        static constexpr int kDefaultPrintStackTraceOnAssert = 0;
         static constexpr int kShowPasswordsInLogs = 0;
         static constexpr int kLogLevelReducerPassLimit = 100;
         static constexpr int kLogLevelReducerWindowSizeS = 600;
@@ -38,9 +36,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(kDefaultAssertHeavyCondition, assertHeavyCondition,
         "Enable assertions for heavy conditions.");
-
-    NX_INI_FLAG(kDefaultPrintStackTraceOnAssert, printStackTraceOnAssert,
-        "Print stack trace leading to failed assertion.");
 
     NX_INI_FLAG(kShowPasswordsInLogs, showPasswordsInLogs,
         "Show passwords in the log messages.");

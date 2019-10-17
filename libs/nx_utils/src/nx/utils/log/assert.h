@@ -19,6 +19,11 @@
 
 namespace nx::utils {
 
+/**
+ * @param value if true, stack trace is logged on assertion failure and printed to stderr.
+ *     Default value is false.
+ */
+void NX_UTILS_API printStackTraceOnAssert(bool value);
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 void NX_UTILS_API crashProgram(const log::Message& message);
 
