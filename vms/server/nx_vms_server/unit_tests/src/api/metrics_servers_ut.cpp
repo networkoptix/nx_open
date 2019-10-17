@@ -83,9 +83,8 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["activity"]["thumbnails1m"], 0);
     EXPECT_EQ(startValues["activity"]["plugins"], api::metrics::Value());
 
-    auto startAlarms = get<Alarms>("/ec2/metrics/alarms");
-    nx::utils::remove_if(startAlarms, [](const auto& i) { return i.parameter == "load.logLevel"; });
-    ASSERT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
+    auto startAlarms = get<SystemAlarms>("/ec2/metrics/alarms");
+    EXPECT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
     systemMonitor.totalCpuUsage_ = 0.95;
     systemMonitor.totalRamUsageBytes_ = 7 * kGb;
@@ -103,21 +102,11 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_DOUBLE(runValues["load"]["serverRamUsage"], 6 * kGb);
     EXPECT_DOUBLE(runValues["load"]["serverRamUsageP"], 6.0 / 8);
 
-    auto runAlarms = get<Alarms>("/ec2/metrics/alarms");
-    nx::utils::remove_if(runAlarms, [](const auto& i) { return i.parameter == "load.logLevel"; });
+    auto runAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    runAlarms = nx::utils::filter_if(runAlarms, [](auto i) { return !i.first.endsWith(".load.logLevel"); });
     ASSERT_EQ(runAlarms.size(), 2) << QJson::serialized(runAlarms).data();
-
-    EXPECT_EQ(runAlarms[0].label, "servers");
-    EXPECT_EQ(runAlarms[0].resource, id);
-    EXPECT_EQ(runAlarms[0].level, api::metrics::AlarmLevel::warning);
-    EXPECT_EQ(runAlarms[0].parameter, "load.cpuUsageP");
-    EXPECT_EQ(runAlarms[0].text, "Total CPU Usage is 95 %. VMS is using 85 %.");
-
-    EXPECT_EQ(runAlarms[1].label, "servers");
-    EXPECT_EQ(runAlarms[1].resource, id);
-    EXPECT_EQ(runAlarms[1].level, api::metrics::AlarmLevel::warning);
-    EXPECT_EQ(runAlarms[1].parameter, "load.ramUsageP");
-    EXPECT_EQ(runAlarms[1].text, "Total RAM usage is 87.500 %. VMS is using 75 %.");
+    EXPECT_EQ(runAlarms["servers." + id + ".load.cpuUsageP.0"].level, api::metrics::AlarmLevel::warning);
+    EXPECT_EQ(runAlarms["servers." + id + ".load.ramUsageP.0"].level, api::metrics::AlarmLevel::warning);
 
     for (int i = 0; i < 5; ++i)
         addCamera(i);
@@ -127,18 +116,6 @@ TEST_F(MetricsServersApi, oneServer)
 
 TEST_F(MetricsServersApi, twoServers)
 {
-    auto rules = get<SystemRules>("/ec2/metrics/rules");
-    EXPECT_EQ(rules["systems"].size(), 1);
-    EXPECT_EQ(rules["servers"].size(), 5);
-    EXPECT_EQ(rules["cameras"].size(), 6);
-    EXPECT_EQ(rules["storages"].size(), 5);
-
-    auto manifest = get<SystemManifest>("/ec2/metrics/manifest");
-    EXPECT_EQ(manifest["systems"].size(), 1);
-    EXPECT_EQ(manifest["servers"].size(), 5);
-    EXPECT_EQ(manifest["cameras"].size(), 6);
-    EXPECT_EQ(manifest["storages"].size(), 5);
-
     const auto systemId = commonModule()->globalSettings()->localSystemId().toSimpleString();
     const auto mainServerId = commonModule()->moduleGUID().toSimpleString();
     {
@@ -165,12 +142,6 @@ TEST_F(MetricsServersApi, twoServers)
     auto secondServer = addServer();
     const auto secondServerId = secondServer->commonModule()->moduleGUID().toSimpleString();
     {
-        auto secondRules = secondServer->get<SystemRules>("/ec2/metrics/rules");
-        EXPECT_EQ(QJson::serialized(rules), QJson::serialized(secondRules));
-
-        auto secondManifest = secondServer->get<SystemManifest>("/ec2/metrics/manifest");
-        EXPECT_EQ(QJson::serialized(manifest), QJson::serialized(secondManifest));
-
         auto mainServerValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(mainServerValues["systems"].size(), 0);
         EXPECT_EQ(mainServerValues["servers"].size(), 1);

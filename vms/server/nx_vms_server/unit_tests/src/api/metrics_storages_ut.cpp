@@ -36,12 +36,6 @@ public:
             launcher->addStorage(lm("Storage %1").arg(i));
     }
 
-    static bool hasAlarm(const Alarms& alarms, const QString& value)
-    {
-        return std::any_of(alarms.begin(), alarms.end(),
-            [value](const auto& alarm) { return alarm.parameter == value; });
-    }
-
     static void TearDownTestCase()
     {
         nx::vms::server::metrics::setTimerMultiplier(1);

@@ -353,13 +353,11 @@ void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) 
 }
 
 AlarmMonitor::AlarmMonitor(
-    QString parameter,
     api::metrics::AlarmLevel level,
     ValueGeneratorResult condition,
     TextGenerator text)
 :
     m_scope(condition.scope),
-    m_parameter(std::move(parameter)),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
     m_text(std::move(text))
@@ -371,7 +369,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     if (!m_condition().toBool())
         return std::nullopt;
 
-    return api::metrics::Alarm{"UNKNOWN", "UNKNOWN", m_parameter, m_level, m_text()};
+    return api::metrics::Alarm{m_level, m_text()};
 }
 
 } // namespace nx::vms::utils::metrics

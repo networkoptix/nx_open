@@ -17,22 +17,17 @@ api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope,
     return groupValues;
 }
 
-std::vector<api::metrics::Alarm> ResourceController::alarms(Scope requestScope) const
+api::metrics::ResourceGroupAlarms ResourceController::alarms(Scope requestScope) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    std::vector<api::metrics::Alarm> allAlarms;
+    api::metrics::ResourceGroupAlarms groupAlarms;
     for (const auto& [id, monitor]: m_monitors)
     {
-        auto alarms = monitor->alarms(requestScope);
-        for (auto& alarm: alarms)
-        {
-            alarm.label = m_label;
-            alarm.resource = id;
-            allAlarms.push_back(std::move(alarm));
-        }
+        if (auto alarms = monitor->alarms(requestScope); !alarms.empty())
+            groupAlarms[id] = std::move(alarms);
     }
 
-    return allAlarms;
+    return groupAlarms;
 }
 
 api::metrics::ResourceRules ResourceController::rules() const

@@ -38,7 +38,6 @@ struct NX_VMS_API Label
 {
     QString id;
     QString name;
-    QString description;
 
     Label(QString id = {}, QString name = {});
 };
@@ -54,6 +53,7 @@ Q_DECLARE_FLAGS(Displays, Display)
 
 struct NX_VMS_API ValueManifest: Label
 {
+    QString description;
     Displays display;
     QString format;
 
@@ -66,20 +66,27 @@ struct NX_VMS_API ValueGroupManifest: Label
 {
     std::vector<ValueManifest> values;
 
-    ValueGroupManifest(Label label = {});
+    using Label::Label;
 };
-#define ValueGroupManifest_Fields (id)(name)(description)(values)
+#define ValueGroupManifest_Fields (id)(name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
 
-using ResourceManifest
-    = std::vector<ValueGroupManifest>;
+struct NX_VMS_API ResourceManifest: Label
+{
+    QString resource;
+    std::vector<ValueGroupManifest> values;
+
+    using Label::Label;
+};
+#define ResourceManifest_Fields (id)(name)(resource)(values)
+QN_FUSION_DECLARE_FUNCTIONS(ResourceManifest, (json), NX_VMS_API)
 
 using SystemManifest
-    = std::map<QString /*resourceTypeGroup*/, ResourceManifest>;
+    = std::vector<ResourceManifest>;
 
 // -----------------------------------------------------------------------------------------------
 
-enum class AlarmLevel { warning, danger };
+enum class AlarmLevel { none, warning, danger };
 
 struct NX_VMS_API AlarmRule
 {
@@ -90,16 +97,20 @@ struct NX_VMS_API AlarmRule
 #define AlarmRule_Fields (level)(condition)(text)
 QN_FUSION_DECLARE_FUNCTIONS(AlarmRule, (json), NX_VMS_API)
 
-struct NX_VMS_API ValueRule: ValueManifest
+struct NX_VMS_API ValueRule
 {
+    QString name;
+    QString description;
+    Displays display;
+    QString format;
     QString calculate;
     QString insert;
     std::vector<AlarmRule> alarms;
 };
-#define ValueRule_Fields ValueManifest_Fields(calculate)(insert)(alarms)
+#define ValueRule_Fields (name)(description)(display)(format)(calculate)(insert)(alarms)
 QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
 
-struct ValueGroupRules
+struct NX_VMS_API ValueGroupRules
 {
     QString name;
     std::map<QString /*id*/, ValueRule> values;
@@ -107,26 +118,42 @@ struct ValueGroupRules
 #define ValueGroupRules_Fields (name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupRules, (json), NX_VMS_API)
 
-using ResourceRules
-    = std::map<QString /*id*/, ValueGroupRules>;
+struct NX_VMS_API ResourceRules
+{
+    QString name;
+    QString resource;
+    std::map<QString /*id*/, ValueGroupRules> values;
+};
+#define ResourceRules_Fields (name)(resource)(values)
+QN_FUSION_DECLARE_FUNCTIONS(ResourceRules, (json), NX_VMS_API)
 
 using SystemRules
-    = std::map<QString /*resourceTypeGroup*/, ResourceRules>;
+    = std::map<QString /*resourceGroupId*/, ResourceRules>;
 
 // -----------------------------------------------------------------------------------------------
 
 struct NX_VMS_API Alarm
 {
-    QString label;
-    QString resource;
-    QString parameter;
     AlarmLevel level;
     QString text;
 };
-#define Alarm_Fields (label)(resource)(parameter)(level)(text)
+#define Alarm_Fields (level)(text)
 QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
 
-using Alarms = std::vector<Alarm>;
+using ValueAlarms
+    = std::vector<Alarm>;
+
+using ValueGroupAlarms
+    = std::map<QString /*id*/, ValueAlarms>;
+
+using ResourceAlarms
+    = std::map<QString /*groupId*/, ValueGroupAlarms>;
+
+using ResourceGroupAlarms =
+    std::map<QString /*resourceId*/, ResourceAlarms>;
+
+using SystemAlarms
+    = std::map<QString /*resourceGroupId*/, ResourceGroupAlarms>;
 
 // -----------------------------------------------------------------------------------------------
 

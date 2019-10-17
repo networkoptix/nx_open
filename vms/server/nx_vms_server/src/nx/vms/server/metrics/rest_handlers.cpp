@@ -71,17 +71,13 @@ JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
     return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
 }
 
-static QString forLog(const api::metrics::SystemValues& serverValues)
+template<typename Values>
+QString forLog(const Values& serverValues)
 {
     QStringList strings;
     for (const auto& [name, values]: serverValues)
         strings << nx::utils::log::makeMessage("%1 %2").args(values.size(), name);
     return strings.join(", ");
-}
-
-static QString forLog(const api::metrics::Alarms& alarms)
-{
-    return nx::utils::log::makeMessage("%1 alarms", alarms.size());
 }
 
 static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));

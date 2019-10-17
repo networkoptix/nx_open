@@ -15,13 +15,13 @@ public:
 
     api::metrics::SystemManifest manifest() const;
     api::metrics::SystemValues values(Scope requestScope, bool formatted) const;
-    std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
+    api::metrics::SystemAlarms alarms(Scope requestScope) const;
 
     api::metrics::SystemRules rules() const;
     void setRules(api::metrics::SystemRules rules);
 
 private:
-    std::map<QString /*label*/, std::unique_ptr<ResourceController>> m_resourceControllers;
+    std::vector<std::unique_ptr<ResourceController>> m_resourceControllers;
 
     mutable nx::utils::Mutex m_mutex;
     mutable std::unique_ptr<api::metrics::SystemManifest> m_manifestCache;

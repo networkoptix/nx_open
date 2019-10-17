@@ -42,7 +42,6 @@ class NX_VMS_UTILS_API AlarmMonitor
 {
 public:
     AlarmMonitor(
-        QString parameter,
         api::metrics::AlarmLevel level,
         ValueGeneratorResult condition,
         TextGenerator text);
@@ -52,12 +51,11 @@ public:
 
 private:
     const Scope m_scope = Scope::local;
-    const QString m_parameter;
     const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;
     const TextGenerator m_text;
 };
 
-using AlarmMonitors = std::vector<std::unique_ptr<AlarmMonitor>>;
+using AlarmMonitors = std::map<QString, std::vector<std::unique_ptr<AlarmMonitor>>>;
 
 } // namespace nx::vms::utils::metrics

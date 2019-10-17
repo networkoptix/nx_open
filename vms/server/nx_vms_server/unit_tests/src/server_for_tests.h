@@ -3,8 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <api/test_api_requests.h>
-#include <nx/mediaserver/camera_mock.h>
 #include <core/resource/storage_resource.h>
+#include <nx/mediaserver/camera_mock.h>
+#include <nx/utils/std/algorithm.h>
 #include <rest/server/json_rest_result.h>
 
 namespace nx::vms::server::test {
@@ -32,6 +33,9 @@ public:
         EXPECT_EQ(result.error, QnJsonRestResult::NoError);
         return result.deserialized<T>();
     }
+
+    template<typename T>
+    auto getFlat(const QString& api) { return nx::utils::flat_map(get<T>(api)); }
 
 public:
     const QString id; //< For debug.

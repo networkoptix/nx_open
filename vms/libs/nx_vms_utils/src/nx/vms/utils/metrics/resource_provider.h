@@ -15,7 +15,7 @@ class ResourceProvider
 public:
     ResourceProvider(ValueGroupProviders<ResourceType> providers);
 
-    api::metrics::ResourceManifest manifest() const;
+    std::vector<api::metrics::ValueGroupManifest> manifest() const;
     std::unique_ptr<ResourceMonitor> monitor(
         std::unique_ptr<TypedResourceDescription<ResourceType>> resource) const;
 
@@ -32,12 +32,12 @@ ResourceProvider<ResourceType>::ResourceProvider(ValueGroupProviders<ResourceTyp
 }
 
 template<typename ResourceType>
-api::metrics::ResourceManifest ResourceProvider<ResourceType>::manifest() const
+std::vector<api::metrics::ValueGroupManifest> ResourceProvider<ResourceType>::manifest() const
 {
-    api::metrics::ResourceManifest groups;
+    std::vector<api::metrics::ValueGroupManifest> groups;
     for (const auto& provider: m_providers)
     {
-        api::metrics::ValueGroupManifest group(api::metrics::Label{provider->id()});
+        api::metrics::ValueGroupManifest group(provider->id());
         for (const auto& id: provider->children())
             group.values.push_back(api::metrics::Label{id});
         groups.push_back(std::move(group));
