@@ -25,7 +25,7 @@ static bool g_printStackTraceOnAssert = false;
 
 } // namespace
 
-void printStackTraceOnAssert(bool value)
+void enablePrintStackTraceOnAssert(bool value)
 {
     g_printStackTraceOnAssert = value;
 }
