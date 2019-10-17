@@ -39,7 +39,7 @@ static const QByteArray kRules(R"json({
                             "condition": "greaterThan %i 100",
                             "text": "i = %i (>100), ip = %ip"
                         },{
-                            "level": "danger",
+                            "level": "error",
                             "condition": "lessThan %i 0",
                             "text": "i = %i (<0), ip = %ip"
                         }]
@@ -336,11 +336,11 @@ public:
             {
                 EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
                 EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
-                EXPECT_ALARM("R2", "g1", "ip", danger, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
             }
             else
             {
-                EXPECT_ALARM("R2", "g1", "ip", danger, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
             }
         }
 

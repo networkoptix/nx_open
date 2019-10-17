@@ -146,7 +146,7 @@ public:
         auto alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
-            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::danger);
+            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::error);
 
             liveParams.resolution = QSize(1280, 720);
             dataProvider->setPrimaryStreamParams(liveParams);
@@ -240,7 +240,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
 
     auto systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
     EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.offlineEvents.0"].level, AlarmLevel::warning);
-    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.status.0"].level, AlarmLevel::danger);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.status.0"].level, AlarmLevel::error);
 
     m_camera->setStatus(Qn::Online);
     systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
@@ -259,7 +259,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
         systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
     } while (systemAlarms.count("cameras." + cameraId + ".availability.ipConflicts3min.0") == 0
         && !timer.hasExpired(15s));
-    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.ipConflicts3min.0"].level, AlarmLevel::danger);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.ipConflicts3min.0"].level, AlarmLevel::error);
 }
 
 TEST_F(MetricsCamerasApi, analyticsGroup)
@@ -297,7 +297,7 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     ASSERT_TRUE(analyticsData["hasArchiveCleanup"].toBool());
 
     systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::danger);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::error);
 
     m_camera->setLicenseUsed(false);
 }

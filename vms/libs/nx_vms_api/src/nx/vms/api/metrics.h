@@ -86,7 +86,7 @@ using SystemManifest
 
 // -----------------------------------------------------------------------------------------------
 
-enum class AlarmLevel { none, warning, danger };
+enum class AlarmLevel { none, warning, error };
 
 struct NX_VMS_API AlarmRule
 {

@@ -136,7 +136,7 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::metrics, AlarmLevel,
     (nx::vms::api::metrics::AlarmLevel::none, "")
     (nx::vms::api::metrics::AlarmLevel::warning, "warning")
-    (nx::vms::api::metrics::AlarmLevel::danger, "danger")
+    (nx::vms::api::metrics::AlarmLevel::error, "error")
 )
 
 #define METRICS_DISPLAY_NAMES \

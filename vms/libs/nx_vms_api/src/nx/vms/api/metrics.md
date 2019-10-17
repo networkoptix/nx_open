@@ -29,7 +29,7 @@ Format:
             "insert": "<relation> <parameterId>", //< Optional for new parameters: specifies value.
             "alarms": [ // Optional: specifies alarm conditions for this parameter.
               {
-                "level": "warning|danger",
+                "level": "warning|error",
                 "condition": "<comparator> <arguments>...",
                 "text": "<template>", //< Optional, by default `<parameter.name> is <parameter.value>`.
               }
@@ -66,7 +66,7 @@ Example:
       "licenses": {
         "professional": { "alarms": [
           {
-            "level": "danger",
+            "level": "error",
             "condition": "greaterThen %requiredProfessional 0",
             "text": "%requiredProfessional Professional License Channels are required"
           }, {
@@ -84,7 +84,7 @@ Example:
     "resource": "Server",
     "values": {
       "availability": {
-        "status": { "alarms": [{ "level": "danger", "condition": "notEqual %status Online" }]},
+        "status": { "alarms": [{ "level": "error", "condition": "notEqual %status Online" }]},
         "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThen %offlineEvents 0" }]},
       },
       "load": {
@@ -106,7 +106,7 @@ Example:
       "info": {
         "status": { "alarms": [
           { "level": "warning", "condition": "equal status 'Unauthorized'" },
-          { "level": "danger", "condition": "equal status 'Offline'" }
+          { "level": "error", "condition": "equal status 'Offline'" }
         ]}
       },
       "issues": { "group": {
@@ -367,7 +367,7 @@ Format:
       "<groupId>": {
         "<parameterId>": [
           {
-            "level": "warning|danger",
+            "level": "warning|error",
             "text": "<alarmText>"
           }
         ]
@@ -395,8 +395,8 @@ Example:
       },
       "licenses": {
         "professional": [
-          { "level": "danger", "text": "5 Professional License Channels are required" },
-          { "level": "danger", "text": "10 Professional License Channels expiring within 30 days" }
+          { "level": "error", "text": "5 Professional License Channels are required" },
+          { "level": "error", "text": "10 Professional License Channels expiring within 30 days" }
         ]
       }
     }

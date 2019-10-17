@@ -26,7 +26,7 @@ static const QByteArray kRulesExample(R"json({
                 "values": {
                     "status": {
                         "display": "table|panel",
-                        "alarms": [{ "level": "danger", "condition": "ne status 'Online'" }]
+                        "alarms": [{ "level": "error", "condition": "ne status 'Online'" }]
                     },
                     "offlineEvents": {
                         "name": "Offline events",
@@ -61,7 +61,7 @@ static const QByteArray kRulesExample(R"json({
                 "values": {
                     "status": { "alarms": [
                         { "level": "warning", "condition": "eq status 'Unauthorized'" },
-                        { "level": "danger", "condition": "eq status 'Offline'" }
+                        { "level": "error", "condition": "eq status 'Offline'" }
                     ]}
                 }
             },
@@ -93,7 +93,7 @@ TEST(Metrics, Rules)
         EXPECT_EQ(status.display, Displays(Display::both));
         EXPECT_EQ(status.format, "");
         ASSERT_EQ(status.alarms.size(), 1);
-        EXPECT_EQ(status.alarms[0].level, AlarmLevel::danger);
+        EXPECT_EQ(status.alarms[0].level, AlarmLevel::error);
         EXPECT_EQ(status.alarms[0].condition, "ne status 'Online'");
 
         auto events = servers.values["availability"].values["offlineEvents"];
@@ -124,7 +124,7 @@ TEST(Metrics, Rules)
         ASSERT_EQ(status.alarms.size(), 2);
         EXPECT_EQ(status.alarms[0].level, AlarmLevel::warning);
         EXPECT_EQ(status.alarms[0].condition, "eq status 'Unauthorized'");
-        EXPECT_EQ(status.alarms[1].level, AlarmLevel::danger);
+        EXPECT_EQ(status.alarms[1].level, AlarmLevel::error);
         EXPECT_EQ(status.alarms[1].condition, "eq status 'Offline'");
     }
 
@@ -381,8 +381,8 @@ TEST(Metrics, ValuesMerge)
 
 static const QByteArray kAlarmsExample(R"json({
     "servers": {
-        "SERVER_UUID_1": { "load": { "totalCpuUsageP": [ { "level": "danger", "text": "CPU Usage is 95%" } ] } },
-        "SERVER_UUID_2": { "availability": { "status": [ { "level": "danger", "text": "Status is Offline" } ] } }
+        "SERVER_UUID_1": { "load": { "totalCpuUsageP": [ { "level": "error", "text": "CPU Usage is 95%" } ] } },
+        "SERVER_UUID_2": { "availability": { "status": [ { "level": "error", "text": "Status is Offline" } ] } }
     },
     "cameras": {
         "CAMERA_UUID_1": { "primaryStream": { "targetFps": [ { "level": "warning", "text": "Actual FPS is 30" } ] } },
@@ -398,12 +398,12 @@ TEST(Metrics, Alarms)
 
     const auto s1 = alarms["servers"]["SERVER_UUID_1"]["load"]["totalCpuUsageP"];
     EXPECT_EQ(s1.size(), 1);
-    EXPECT_EQ(s1[0].level, AlarmLevel::danger);
+    EXPECT_EQ(s1[0].level, AlarmLevel::error);
     EXPECT_EQ(s1[0].text, "CPU Usage is 95%");
 
     const auto s2 = alarms["servers"]["SERVER_UUID_2"]["availability"]["status"];
     EXPECT_EQ(s2.size(), 1);
-    EXPECT_EQ(s2[0].level, AlarmLevel::danger);
+    EXPECT_EQ(s2[0].level, AlarmLevel::error);
     EXPECT_EQ(s2[0].text, "Status is Offline");
 
     const auto c1 = alarms["cameras"]["CAMERA_UUID_1"]["primaryStream"]["targetFps"];

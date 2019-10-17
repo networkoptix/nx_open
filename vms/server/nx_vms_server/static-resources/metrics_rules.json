@@ -107,7 +107,7 @@
                     "status": {
                         "display": "table|panel",
                         "alarms": [{
-                            "level": "danger",
+                            "level": "error",
                             "condition": "notEqual %status Online",
                             "text": "Status is %status"
                         }]
@@ -333,7 +333,7 @@
                                 "text": "Status is %status"
                             },
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "equal %status Offline",
                                 "text": "Status is %status"
                             }
@@ -366,7 +366,7 @@
                                 "text": "has stream issues %streamIssues1h times in last hour"
                             },
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "greaterThan %streamIssues1h 5",
                                 "text": "has stream issues %streamIssues1h times in last hour"
                             }
@@ -380,7 +380,7 @@
                         "insert": "ipConflicts",
                         "alarms": [
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "greaterThan %ipConflicts3min 0",
                                 "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
                             }
@@ -412,7 +412,7 @@
                             "text": "has actual fps less for %fpsDelta frames/s"
                         },
                         {
-                            "level": "danger",
+                            "level": "error",
                             "condition": "greaterThan %fpsDelta 10",
                             "text": "has actual fps less for %fpsDelta frames/s"
                         }
@@ -424,7 +424,7 @@
                         "format": "KBps",
                         "alarms": [
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "equal %actualBitrateBps 0",
                                 "text": "Actual bitrate is 0 KBps"
                             }
@@ -440,7 +440,7 @@
                         "display": "table|panel",
                         "alarms": [
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "resolutionGreaterThan %resolution 1280x720",
                                 "text": "Resolution '%resolution' is too high"
                             }
@@ -463,7 +463,7 @@
                         "format": "KBps",
                         "alarms": [
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "equal %actualBitrateBps 0",
                                 "text": "Actual bitrate is 0 KBps"
                             }
@@ -495,7 +495,7 @@
                         "format": "durationS",
                         "alarms": [
                             {
-                                "level": "danger",
+                                "level": "error",
                                 "condition": "and %isArchiveTooSmall %hasArchiveCleanup",
                                 "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
                             }
