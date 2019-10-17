@@ -6,6 +6,7 @@
 #include <nx/vms/api/metrics.h>
 #include <platform/hardware_information.h>
 #include <server_for_tests.h>
+#include <nx/metrics/streams_metric_helper.h>
 
 namespace nx::vms::server::test {
 
@@ -75,8 +76,6 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["load"]["decodingSpeed3s"], 0);
     EXPECT_EQ(startValues["load"]["encodingSpeed3s"], 0);
     EXPECT_EQ(startValues["load"]["encodingThreads"], 0);
-    EXPECT_EQ(startValues["load"]["primaryStreams"], 0);
-    EXPECT_EQ(startValues["load"]["secondaryStreams"], 0);
     EXPECT_GT(startValues["load"]["incomingConnections"].toDouble(), 0);
     EXPECT_NE(startValues["load"]["logLevel"].toString(), "");
     EXPECT_GT(startValues["activity"]["transactionsPerSecond1m"].toDouble(), 0);
@@ -195,6 +194,29 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_FALSE(systemValues["servers"][secondServerId]["availability"].count("uptimeS"));
         EXPECT_FALSE(systemValues["servers"][secondServerId]["activity"].count("transactionsPerSecond1m"));
     }
+}
+
+TEST_F(MetricsServersApi, streamCount)
+{
+    auto checkCounters =
+        [this](int primary, int secondary)
+        {
+            auto valuess = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+            EXPECT_EQ(valuess["load"]["primaryStreams"], primary);
+            EXPECT_EQ(valuess["load"]["secondaryStreams"], secondary);
+        };
+
+    {
+        nx::vms::metrics::StreamMetricHelper helper(commonModule()->metrics());
+        checkCounters(/*primary*/ 0, /*secondary*/ 0);
+
+        helper.setStream(api::StreamIndex::primary);
+        checkCounters(/*primary*/ 1, /*secondary*/ 0);
+
+        helper.setStream(api::StreamIndex::secondary);
+        checkCounters(/*primary*/ 0, /*secondary*/ 1);
+    }
+    checkCounters(/*primary*/ 0, /*secondary*/ 0);
 }
 
 } // namespace nx::vms::server::test
