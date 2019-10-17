@@ -218,15 +218,15 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.debug = ini['testcameraDebug']
 
     if ini.ORIGINAL_OPTIONS is not None:
-        print(f"Overriding default options via {ini_file}:")
+        report(f"Overriding default options via {ini_file}:")
         for k, v in ini.ORIGINAL_OPTIONS.items():
-            print(f"    {k}={v}")
-    print('')
+            report(f"    {k}={v}")
+    report('')
 
-    print(f"Configuration defined in {conf_file}:")
+    report(f"Configuration defined in {conf_file}:")
     for k, v in conf.options.items():
-        print(f"    {k}={v}")
-    print('')
+        report(f"    {k}={v}")
+    report('')
 
     return conf, ini
 
@@ -254,14 +254,14 @@ def box_combined_cpu_usage(box):
 
 
 def report_server_storage_failures(api, streaming_started_at):
-    print(f"    Requesting potential failure events from the Server...")
+    report(f"    Requesting potential failure events from the Server...")
     log_events = api.get_events(streaming_started_at)
     storage_failure_events_count = sum(
         event['aggregationCount']
         for event in log_events
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
-    print(f"        Storage failures: {storage_failure_events_count}")
+    report(f"        Storage failures: {storage_failure_events_count}")
 
     if storage_failure_events_count > 0:
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
@@ -354,7 +354,7 @@ def main(conf_file, ini_file, log_file):
 
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
-                "ERROR: sshpass is not on PATH" +
+                "sshpass is not on PATH" +
                 " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
                 f"Details for the error: {res.formatted_message()}"
             )
@@ -554,7 +554,7 @@ def main(conf_file, ini_file, log_file):
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
     if len(storages) == 0:
-        raise exceptions.BoxStateError("Server has no suitable video archive storage, check the free space")
+        raise exceptions.BoxStateError("Server has no suitable video archive storage, check the free space.")
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -750,7 +750,7 @@ def main(conf_file, ini_file, log_file):
                                     f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
                                     f"CPU usage: {round(cpu_usage_last_minute * 100)}%, "
                                     f"dropped frames: {frame_drops_sum}, "
-                                    f"max stream lag: {max_lag_s} s.")
+                                    f"max stream lag: {max_lag_s:.3f} s.")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
@@ -925,11 +925,11 @@ def main(conf_file, ini_file, log_file):
                 if max_lag_s > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
-                        f'the video lag {round(max_lag_s)} seconds is more than {max_allowed_lag_seconds} seconds.'
+                        f'the video lag {max_lag_s:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
-                    raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
+                    raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
 
                 report(f"    Streaming test #{test_number} with {test_cameras_count} virtual camera(s) succeeded.")
 
@@ -968,6 +968,9 @@ def nx_print_exception(exception, recursive_level=0):
     string_indent = '  ' * recursive_level
     if isinstance(exception, exceptions.VmsBenchmarkError):
         print(f"{string_indent}{str(exception)}", file=sys.stderr)
+        if isinstance(exception, exceptions.VmsBenchmarkIssue):
+            for e in exception.sub_issues:
+                nx_print_exception(e, recursive_level=recursive_level + 2)
         if exception.original_exception:
             print(f'{string_indent}Caused by:', file=sys.stderr)
             if isinstance(exception.original_exception, list):
@@ -979,7 +982,8 @@ def nx_print_exception(exception, recursive_level=0):
         print(
             f'{string_indent}{nx_format_exception(exception)}'
             if recursive_level > 0
-            else f'{string_indent}ERROR: {nx_format_exception(exception)}'
+            else f'{string_indent}ERROR: {nx_format_exception(exception)}',
+            file=sys.stderr,
         )
 
 
