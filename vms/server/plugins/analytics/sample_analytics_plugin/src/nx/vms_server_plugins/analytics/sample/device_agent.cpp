@@ -24,7 +24,7 @@ static int64_t usSinceEpoch()
         system_clock::now().time_since_epoch()).count();
 }
 
-DeviceAgent::DeviceAgent(Engine* /*engine*/, const nx::sdk::IDeviceInfo* deviceInfo):
+DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(deviceInfo, /*enableOutput*/true)
 {
 }

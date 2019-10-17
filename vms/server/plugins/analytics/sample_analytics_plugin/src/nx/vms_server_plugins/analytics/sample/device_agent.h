@@ -15,7 +15,7 @@ namespace sample {
 class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
-    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
 protected:
