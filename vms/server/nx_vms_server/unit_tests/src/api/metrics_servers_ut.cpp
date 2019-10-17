@@ -12,7 +12,7 @@ namespace nx::vms::server::test {
 using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
-qreal kGb = 1024 * 1024 * 1024;
+constexpr qreal operator""_GB(unsigned long long int v) { return v * 1024 * 1024 * 1024; }
 
 class MetricsServersApi: public testing::Test, public ServerForTests
 {
@@ -20,19 +20,21 @@ public:
     static void SetUpTestCase()
     {
         auto& hardware = const_cast<HardwareInformation&>(HardwareInformation::instance());
-        hardware.physicalMemory = 8 * kGb;
+        hardware.physicalMemory = 8_GB;
         hardware.cpuModelName = "NX Core 10 Trio";
         hardware.logicalCores = 8;
         hardware.physicalCores = 4;
     }
 
-    MetricsServersApi(): platformAbstraction(&systemMonitor)
+    MetricsServersApi():
+        systemMonitor(new StubMonitor()),
+        platformAbstraction(systemMonitor)
     {
         serverModule()->setPlatform(&platformAbstraction);
     }
 
 protected:
-    StubMonitor systemMonitor;
+    StubMonitor* systemMonitor = nullptr;
     QnPlatformAbstraction platformAbstraction;
 };
 
@@ -40,10 +42,10 @@ protected:
 
 TEST_F(MetricsServersApi, oneServer)
 {
-    systemMonitor.totalCpuUsage_ = 0.2;
-    systemMonitor.totalRamUsageBytes_ = 2 * kGb;
-    systemMonitor.thisProcessCpuUsage_ = 0.1;
-    systemMonitor.thisProcessRamUsageBytes_ = 1 * kGb;
+    systemMonitor->totalCpuUsage_ = 0.2;
+    systemMonitor->totalRamUsageBytes_ = 2_GB;
+    systemMonitor->thisProcessCpuUsage_ = 0.1;
+    systemMonitor->thisProcessRamUsageBytes_ = 1_GB;
 
     auto startValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
     EXPECT_EQ(startValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
@@ -60,12 +62,12 @@ TEST_F(MetricsServersApi, oneServer)
 
     EXPECT_EQ(startValues["info"]["cpu"], "NX Core 10 Trio");
     EXPECT_EQ(startValues["info"]["cpuCores"], 4);
-    EXPECT_DOUBLE(startValues["info"]["ram"], 8 * kGb);
+    EXPECT_DOUBLE(startValues["info"]["ram"], 8_GB);
     EXPECT_DOUBLE(startValues["load"]["cpuUsageP"], 0.2);
     EXPECT_DOUBLE(startValues["load"]["serverCpuUsageP"], 0.1);
-    EXPECT_DOUBLE(startValues["load"]["ramUsageB"], 2 * kGb);
+    EXPECT_DOUBLE(startValues["load"]["ramUsageB"], 2_GB);
     EXPECT_DOUBLE(startValues["load"]["ramUsageP"], 2.0 / 8);
-    EXPECT_DOUBLE(startValues["load"]["serverRamUsage"], 1 * kGb);
+    EXPECT_DOUBLE(startValues["load"]["serverRamUsage"], 1_GB);
     EXPECT_DOUBLE(startValues["load"]["serverRamUsageP"], 1.0 / 8);
     EXPECT_EQ(startValues["load"]["cameras"], 0);
 
@@ -86,20 +88,20 @@ TEST_F(MetricsServersApi, oneServer)
     auto startAlarms = get<SystemAlarms>("/ec2/metrics/alarms");
     EXPECT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
-    systemMonitor.totalCpuUsage_ = 0.95;
-    systemMonitor.totalRamUsageBytes_ = 7 * kGb;
-    systemMonitor.thisProcessCpuUsage_ = 0.85;
-    systemMonitor.thisProcessRamUsageBytes_ = 6 * kGb;
-    systemMonitor.processUptime_ = std::chrono::minutes{1};
+    systemMonitor->totalCpuUsage_ = 0.95;
+    systemMonitor->totalRamUsageBytes_ = 7_GB;
+    systemMonitor->thisProcessCpuUsage_ = 0.85;
+    systemMonitor->thisProcessRamUsageBytes_ = 6_GB;
+    systemMonitor->processUptime_ = std::chrono::minutes{1};
 
     auto runValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
     EXPECT_EQ(runValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
     EXPECT_EQ(runValues["availability"]["uptimeS"], 60);
     EXPECT_DOUBLE(runValues["load"]["cpuUsageP"], 0.95);
     EXPECT_DOUBLE(runValues["load"]["serverCpuUsageP"], 0.85);
-    EXPECT_DOUBLE(runValues["load"]["ramUsageB"], 7 * kGb);
+    EXPECT_DOUBLE(runValues["load"]["ramUsageB"], 7_GB);
     EXPECT_DOUBLE(runValues["load"]["ramUsageP"], 7.0 / 8);
-    EXPECT_DOUBLE(runValues["load"]["serverRamUsage"], 6 * kGb);
+    EXPECT_DOUBLE(runValues["load"]["serverRamUsage"], 6_GB);
     EXPECT_DOUBLE(runValues["load"]["serverRamUsageP"], 6.0 / 8);
 
     auto runAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");

@@ -67,25 +67,32 @@ auto makeInfoProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
-            "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+            "server",
+            [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "type", [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
+            "type",
+            [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "ip", [](const auto& r) { return Value(r->getHostAddress()); }
+            "ip",
+            [](const auto& r) { return Value(r->getHostAddress()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "vendor", [](const auto& r) { return Value(r->getVendor()); }
+            "vendor",
+            [](const auto& r) { return Value(r->getVendor()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "model", [](const auto& r) { return Value(r->getModel()); }
+            "model",
+            [](const auto& r) { return Value(r->getModel()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "firmware", [](const auto& r) { return Value(r->getFirmware()); }
+            "firmware",
+            [](const auto& r) { return Value(r->getFirmware()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
-            "recording", [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
+            "recording",
+            [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
         )
     );
 }
@@ -101,12 +108,12 @@ auto makeAvailabilityProviders()
         utils::metrics::makeLocalValueProvider<Resource>(
             "streamIssues",
             [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
-            nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
+            timerWatch<Camera*>(kIssuesRateUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "ipConflicts",
             [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
-            nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
+            timerWatch<Camera*>(kipConflictsRateUpdateInterval)
         )
     );
 }
@@ -154,7 +161,7 @@ auto makeStreamProviders(StreamIndex streamIndex)
                     return Value(targetParams->fps - actualParams->fps);
                 return Value();
             },
-            nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
+            timerWatch<Camera*>(kFpsDeltaCheckInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "actualBitrateBps",
@@ -198,7 +205,8 @@ auto makeStorageProviders()
             }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "hasArchiveCleanup", [](const auto& r) { return Value(r->hasRemovedFile()); }
+            "hasArchiveCleanup",
+            [](const auto& r) { return Value(r->hasRemovedFile()); }
         )
     );
 }
