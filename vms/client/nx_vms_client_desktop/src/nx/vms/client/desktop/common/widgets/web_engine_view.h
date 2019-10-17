@@ -37,7 +37,7 @@ public:
     // Synchronously wait for page to load.
     void waitLoadFinished(std::chrono::milliseconds timeout);
 
-    void insertStyleSheet(const QString &name, const QString &source, bool immediately = true);
+    void insertStyleSheet(const QString& name, const QString& source, bool immediately = true);
     void removeStyleSheet(const QString& name, bool immediately = true);
 
 protected:

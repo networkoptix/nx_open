@@ -52,7 +52,7 @@ protected:
         return base_type::certificateError(certificateError);
     }
 
-    virtual bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override
+    virtual bool acceptNavigationRequest(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame) override
     {
         if (m_view.isRedirectLinksToDesktop() && type == QWebEnginePage::NavigationTypeLinkClicked)
         {
