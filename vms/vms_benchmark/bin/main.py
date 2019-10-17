@@ -400,6 +400,7 @@ def main(conf_file, ini_file, log_file):
 
     report(f"Box IP: {box.ip}")
     report(f"Used network device name: {box.eth_name}")
+    report(f"Box network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}")
     if box.is_root:
         report(f"Box ssh user is root.")
 

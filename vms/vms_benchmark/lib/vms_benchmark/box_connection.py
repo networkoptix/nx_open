@@ -75,6 +75,7 @@ if platform.system() == 'Linux':
             self.local_ip = None
             self.is_root = False
             self.eth_name = None
+            self.eth_speed = None
 
         def obtain_connection_info(self):
             ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
@@ -101,6 +102,8 @@ if platform.system() == 'Linux':
                     f'Unable to find box network adapter info dir {repr(eth_dir)}.')
 
             self.eth_name = eth_name
+            eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
+            self.eth_speed = eth_speed.strip() if eth_speed else None
 
         @contextmanager
         def sh2(self, command, su=False):
@@ -231,6 +234,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             self.local_ip = None
             self.is_root = False
             self.eth_name = None
+            self.eth_speed = None
 
         def obtain_connection_info(self):
             ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
@@ -257,6 +261,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                     f'Unable to find box network adapter info dir {repr(eth_dir)}.')
 
             self.eth_name = eth_name
+            eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
+            self.eth_speed = eth_speed.strip() if eth_speed else None
 
         def ssh_command(self, command=None):
             res = self._ssh_command.copy()
