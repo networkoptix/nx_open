@@ -7,6 +7,10 @@
 
 #include <ui/style/nx_style.h>
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
+using namespace nx::vms::client::desktop;
+
 namespace NxUi {
 
 namespace {
@@ -63,7 +67,7 @@ QString generateCssStyle()
         font-style: normal;
     }
     * {
-        color: %1;
+        color: {windowText};
         font-family: 'Roboto-Regular', 'Roboto';
         font-weight: 600;
         font-size: 13px;
@@ -73,25 +77,43 @@ QString generateCssStyle()
         padding-left: 0px;
         margin: 0px;
         overscroll-behavior: none;
-        background-color: %2;
+        background-color: {window};
     }
     p {
         padding-left: 0px;
     }
     a {
-        color: %3;
+        color: {link};
         font-size: 13px;
     }
     a:hover {
-        color: %4;
-    })css");
+        color: {highlight};
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: {scrollbar-track};
+    }
+    ::-webkit-scrollbar-thumb {
+        background: {scrollbar-thumb};
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: {scrollbar-thumb-hover};
+    }
+    )css");
 
     const auto palette = qApp->palette();
-    const auto windowText = palette.color(QPalette::WindowText).name();
-    const auto window = palette.color(QPalette::Window).name();
-    const auto highlight = palette.color(QPalette::Highlight).name();
-    const auto link = palette.color(QPalette::Link).name();
-    return styleBase.arg(windowText, window, link, highlight);
+
+    return QString(styleBase)
+        .replace("{windowText}", palette.color(QPalette::WindowText).name())
+        .replace("{window}", palette.color(QPalette::Window).name())
+        .replace("{link}", palette.color(QPalette::Link).name())
+        .replace("{highlight}", palette.color(QPalette::Highlight).name())
+        .replace("{scrollbar-track}", colorTheme()->color("dark9").name())
+        .replace("{scrollbar-thumb}", colorTheme()->color("dark13").name())
+        .replace("{scrollbar-thumb-hover}", colorTheme()->color("dark15").name())
+        .simplified();
 }
 
 } // namespace NxUi
