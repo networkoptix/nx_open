@@ -21,7 +21,7 @@ int run(int argc, char* argv[], CloudServiceFunc func)
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
 
-    nx::utils::printStackTraceOnAssert(true);
+    nx::utils::enablePrintStackTraceOnAssert(true);
 
     return func();
 }
