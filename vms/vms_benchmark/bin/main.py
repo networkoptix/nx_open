@@ -188,6 +188,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 10 * 1024 * 1024
         },
+        "minimumStorageFreeBytesPerCamera": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10 * 1024 * 1024
+        },
         "timeDiffThresholdSeconds": {
             "optional": True,
             "type": 'float',
@@ -267,7 +272,7 @@ def report_server_storage_failures(api, streaming_started_at):
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
-def get_writable_storages(api, ini):
+def get_writable_storages(api, ini, camera_count):
     try:
         storages = api.get_storage_spaces()
     except exceptions.VmsBenchmarkError as e:
@@ -280,7 +285,8 @@ def get_writable_storages(api, ini):
         free_space = int(storage['freeSpace'])
         reserved_space = int(storage['reservedSpace'])
 
-        return free_space >= reserved_space + ini['minimumStorageFreeBytes']
+        space_for_recordings_bytes = camera_count * ini['minimumStorageFreeBytesPerCamera']
+        return free_space >= reserved_space + ini['minimumStorageFreeBytes'] + space_for_recordings_bytes
 
     try:
         result = [storage for storage in storages if storage_is_writable(storage)]
@@ -549,7 +555,7 @@ def main(conf_file, ini_file, log_file):
     report('REST API authentication test is OK.')
 
     try:
-        storages = get_writable_storages(api, ini)
+        storages = get_writable_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
     except Exception as e:
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
