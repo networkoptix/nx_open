@@ -2,17 +2,15 @@
 * 27 aug 2013
 * a.kolesnikov
 ***********************************************************/
-#include <QtCore/QCoreApplication>
-
-#include <nx/cloud/mediator/mediator_process_public.h>
-#include <nx/network/socket_global.h>
-
 #ifdef _WIN32
     #include <windows.h>
 #else
     #include <sys/types.h>
     #include <signal.h>
 #endif
+
+#include <nx/cloud/mediator/mediator_process_public.h>
+#include <nx/cloud/utils/service/run.h>
 
 static nx::hpm::MediatorProcessPublic* serviceInstance = NULL;
 
@@ -31,13 +29,9 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-int main(int argc, char* argv[])
+int connectionMediatorMain(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    nx::network::SocketGlobals::InitGuard sgGuard(
-        nx::network::InitializationFlags::disableUdt);
-
-#ifdef _WIN32
+    #ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);
 #else
     signal(SIGINT, stopServer);
@@ -57,4 +51,12 @@ int main(int argc, char* argv[])
 
     serviceInstance = NULL;
     return result;
+}
+
+int main(int argc, char* argv[])
+{
+    return nx::cloud::utils::service::run(
+        argc, 
+        argv,
+        std::bind(connectionMediatorMain, argc, argv));
 }

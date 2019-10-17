@@ -1,3 +1,4 @@
 add_subdirectory(librelaying)
 add_subdirectory(nx_clusterdb_engine)
 add_subdirectory(nx_clusterdb_map)
+add_subdirectory(utils)

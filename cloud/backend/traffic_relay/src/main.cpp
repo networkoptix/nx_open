@@ -1,15 +1,10 @@
-#include <QtCore/QCoreApplication>
-
-#include <nx/network/http/auth_tools.h>
-#include <nx/network/socket_global.h>
-
+#include <nx/cloud/utils/service/run.h>
 #include <nx/cloud/relay/libtraffic_relay_main.h>
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-
-    nx::network::SocketGlobals::InitGuard sgGuard(
-        nx::network::InitializationFlags::disableUdt);
-    return nx::cloud::relay::trafficRelayMain(argc, argv);
+    return nx::cloud::utils::service::run(
+        argc,
+        argv,
+        std::bind(nx::cloud::relay::trafficRelayMain, argc, argv));
 }
