@@ -444,9 +444,7 @@ def main(conf_file, ini_file, log_file):
                 report(f" uid {vms_uid}", end='')
             report(')')
     else:
-        report("No VMS installations found on the box.")
-        report("Nothing to do.")
-        return 0
+        raise exceptions.BoxStateError("No VMS installations found on the box.")
 
     if len(vmses) > 1:
         raise exceptions.BoxStateError("More than one Server installation found at the box.")
