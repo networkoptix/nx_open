@@ -76,7 +76,7 @@ void ChunksDeque::resize(size_t size)
 
 void ChunksDeque::update(ConstIterator itr, const Chunk& value)
 {
-    return update(std::distance(itr, m_deque.cbegin()), value);
+    return update(std::distance(m_deque.cbegin(), itr), value);
 }
 
 void ChunksDeque::update(int index, const Chunk& value)
