@@ -27,7 +27,11 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
-    NX_INI_STRING("", cloudHostOverride, "Overrides cloud host name if specified");
+
+    NX_INI_STRING("", cloudHostOverride,
+        "Overrides cloud host name if specified, empty value implies default.\n"
+        "WARNING: Do not change unless you know what you are doing. The value must correspond to\n"
+        "the customization. Otherwise, there will be weird behavior.");
 };
 
 class NX_NETWORK_API SocketGlobals
