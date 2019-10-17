@@ -31,7 +31,7 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 
 int connectionMediatorMain(int argc, char* argv[])
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);
 #else
     signal(SIGINT, stopServer);
