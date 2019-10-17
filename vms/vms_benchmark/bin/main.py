@@ -494,13 +494,13 @@ def main(conf_file, ini_file, log_file):
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
     _test_api(api)
 
-    cameras = _get_cameras_reliably(api)
+    storages = api.get_storage_spaces()
 
     vms.stop(exc=True)
 
     report('Server stopped.')
 
-    _clear_storages(api, box, cameras, vms)
+    _clear_storages(box, storages)
 
     swapped_before_bytes = get_cumulative_swap_bytes(box)
     if swapped_before_bytes is None:
@@ -967,15 +967,15 @@ def main(conf_file, ini_file, log_file):
     return 0
 
 
-def _clear_storages(api, box, cameras, vms):
-    vms_id = api.get_server_id()
-
-    # TODO: Properly enumerate all actual storages; consider that they can be relocated via Server configuration.
-    for camera in cameras:
-        box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
-    report('Camera archives cleaned.')
+def _clear_storages(box, storages):
+    for storage in storages:
+        box.sh(
+            f"rm -r "
+            f"'{storage['url']}/hi_quality' "
+            f"'{storage['url']}/low_quality' "
+            f"'{storage['url']}/'*_media.nxdb",
+            su=True, exc=True)
+    report('Server video archives deleted.')
 
 
 def _get_cameras_reliably(api):
