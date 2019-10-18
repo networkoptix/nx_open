@@ -103,7 +103,7 @@ class VmsScanner:
 
             self.device.sh(f'install -m 755 -o {uid} -d "{ini_dir_path}"', exc=True, su=True)
 
-            if len([v for k, v in storages.items() if v['point'] == '/etc/nx_ini']) != 0:
+            if len([v for k, v in storages.items() if v['point'] == ini_dir_path]) != 0:
                 self.device.sh(f'umount "{ini_dir_path}"', su=True)
                 # TODO: check error
 
