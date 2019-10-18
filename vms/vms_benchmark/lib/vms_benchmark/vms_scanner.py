@@ -86,11 +86,23 @@ class VmsScanner:
 
             return 'undefined'
 
-        def override_ini_config(self, features):
-            storages = BoxPlatform.get_storages_map(self.device)
-            if not storages:
-                raise BoxCommandError('Unable to get box Storages.')
+        def dismount_ini_dirs(self):
+            logging.info("Dismounting ini dirs...")
+            try:
+                storages = BoxPlatform.get_storages_map(self.device)
+                if not storages:
+                    raise BoxCommandError('Unable to get box Storages.')
+                if len([v for k, v in storages.items() if v['point'] == self._ini_dir_path]) != 0:
+                    self.device.sh(f'umount "{self._ini_dir_path}"', exc=True, su=True)
+                self.device.sh(
+                    'rm -r '
+                    f'"$(dirname "$(mktemp --dry-run)")"/tmp.*"{self._tmp_dir_suffix}" '
+                    f'"{self._ini_dir_path}"',
+                    exc=True, su=True)
+            except Exception:
+                logging.exception("Exception while dismounting ini dirs")
 
+        def override_ini_config(self, features):
             uid = self.uid()
             base_dir = '/etc'
 
@@ -99,15 +111,14 @@ class VmsScanner:
                 homedir = self.device.eval(f'echo ~{username}', su=True)
                 base_dir = f'{homedir}/.config'
 
-            ini_dir_path = f'{base_dir}/nx_ini'
+            self._tmp_dir_suffix = '-nx_ini'
+            self._ini_dir_path = f'{base_dir}/nx_ini'
 
-            self.device.sh(f'install -m 755 -o {uid} -d "{ini_dir_path}"', exc=True, su=True)
+            self.dismount_ini_dirs()
 
-            if len([v for k, v in storages.items() if v['point'] == ini_dir_path]) != 0:
-                self.device.sh(f'umount "{ini_dir_path}"', su=True)
-                # TODO: check error
+            self.device.sh(f'install -m 755 -o {uid} -d "{self._ini_dir_path}"', exc=True, su=True)
 
-            tmp_dir = self.device.eval('mktemp -d --suffix -nx_ini')
+            tmp_dir = self.device.eval(f'mktemp -d --suffix {self._tmp_dir_suffix}')
 
             if not tmp_dir:
                 raise BoxCommandError(f'Unable to create temp dir at the box via "mktemp".')
@@ -125,7 +136,7 @@ class VmsScanner:
                 if uid != 0:
                     self.device.sh(f'chown {uid} "{full_ini_path}"', exc=True, su=True)
 
-            self.device.sh(f'mount -o bind "{tmp_dir}" "{ini_dir_path}"', exc=True, su=True)
+            self.device.sh(f'mount -o bind "{tmp_dir}" "{self._ini_dir_path}"', exc=True, su=True)
 
         @staticmethod
         def server_bin(linux_distribution):

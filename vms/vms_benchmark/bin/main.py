@@ -990,6 +990,9 @@ def main(conf_file, ini_file, log_file):
     report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
 
     report('\nSUCCESS: All tests finished.')
+
+    vms.dismount_ini_dirs()
+
     return 0
 
 
