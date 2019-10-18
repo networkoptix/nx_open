@@ -134,8 +134,8 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
         ++m_runningRequests;
     }
 
-    const auto info = QString::fromUtf8(QJson::serialized(clientInfo) );
-    NX_DEBUG(this, lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info));
+    const auto info = QString::fromUtf8(QJson::serialized(clientInfo));
+    NX_DEBUG(this, "%1 to %2 with %3", Q_FUNC_INFO, addr, info);
 
     auto func =
         [this, reqId, addr, handler](

@@ -120,8 +120,8 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
             nx::network::http::AsyncClient::State state = httpClient->state();
             if (state == nx::network::http::AsyncClient::State::sFailed)
             {
-                NX_WARNING(this,
-                    lm("Failed to establish reverse connection to the target server=%1").arg(httpClient->url()));
+                NX_WARNING(this, "Failed to establish reverse connection to the target server: %1",
+                    httpClient->url());
             }
             else
             {

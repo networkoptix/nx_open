@@ -552,8 +552,7 @@ void AsyncClient::stopWhileInAioThread()
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
-    NX_VERBOSE(this, lm("Opened connection to url %1. Result code %2")
-        .args(m_contentLocationUrl, errorCode));
+    NX_VERBOSE(this, "Opened connection to url %1. Result code %2", m_contentLocationUrl, errorCode);
 
     if (m_terminated)
         return;
@@ -571,14 +570,14 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         serializeRequest();
         m_state = State::sSendingRequest;
         using namespace std::placeholders;
-        NX_VERBOSE(this, lm("Sending request to url %1").arg(m_contentLocationUrl));
+        NX_VERBOSE(this, "Sending request to url %1", m_contentLocationUrl);
 
         m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
         return;
     }
 
-    NX_DEBUG(this, lm("Failed to establish tcp connection to %1. %2")
-        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
+    NX_DEBUG(this, "Failed to establish tcp connection to %1. %2",
+        m_contentLocationUrl, SystemError::toString(errorCode));
     m_lastSysErrorCode = errorCode;
 
     m_state = State::sFailed;
@@ -627,9 +626,9 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    NX_VERBOSE(this, lm("Request has been successfully sent to %1 from %2. %3")
-        .args(m_contentLocationUrl, m_socket->getLocalAddress(),
-            logTraffic() ? request().toString() : request().requestLine.toString()));
+    NX_VERBOSE(this, "Request has been successfully sent to %1 from %2. %3",
+        m_contentLocationUrl, m_socket->getLocalAddress(),
+        logTraffic() ? request().toString() : request().requestLine.toString());
 
     const auto requestSequenceBak = m_requestSequence;
     if (emitRequestHasBeenSent(m_authorizationTried) == Result::thisDestroyed)
@@ -769,8 +768,8 @@ void AsyncClient::initiateHttpMessageDelivery()
 
                 serializeRequest();
                 m_state = State::sSendingRequest;
-                NX_VERBOSE(this, lm("Sending request to url %1 via reused connection")
-                    .args(m_contentLocationUrl));
+                NX_VERBOSE(this, "Sending request to url %1 via reused connection",
+                    m_contentLocationUrl);
                 m_socket->sendAsync(
                     m_requestBuffer,
                     std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
@@ -834,8 +833,8 @@ void AsyncClient::initiateTcpConnection()
             isSecureConnection,
             nx::network::NatTraversalSupport::enabled,
             ipVersion);
-        NX_VERBOSE(this, lm("Opening connection to %1. url %2, socket %3")
-            .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()));
+        NX_VERBOSE(this, "Opening connection to %1, URL %2, socket %3",
+            remoteAddress, m_contentLocationUrl, m_socket->handle());
     }
 
     m_socket->bindToAioThread(getAioThread());
@@ -1135,8 +1134,8 @@ AsyncClient::Result AsyncClient::startReadingMessageBody(bool* const continueRec
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
         {
-            NX_DEBUG(this, lm("Failed to read (1) response body from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()));
+            NX_DEBUG(this, "Failed to read (1) response body from %1. %2",
+                m_contentLocationUrl, SystemError::getLastOSErrorText());
 
             m_state = State::sFailed;
             return emitDone();
@@ -1162,9 +1161,9 @@ bool AsyncClient::isMalformed(const nx::network::http::Response& response) const
     {
         if (nx::network::http::getHeaderValue(response.headers, "Upgrade").isEmpty())
         {
-            NX_DEBUG(this, lm("Received malformed response from %1. "
-                "Status code is %2 and no Upgrade header present")
-                .arg(m_contentLocationUrl).arg(response.statusLine.statusCode));
+            NX_DEBUG(this, "Received malformed response from %1. "
+                "Status code is %2 and no Upgrade header present",
+                m_contentLocationUrl, response.statusLine.statusCode);
             return true;
         }
     }
