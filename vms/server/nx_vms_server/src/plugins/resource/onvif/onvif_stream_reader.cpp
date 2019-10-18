@@ -228,18 +228,15 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         return result;
     }
 
-    {
-        MediaSoapWrapper soapWrapper(m_onvifRes);
+    result = fetchStreamUrl(info.profileToken, isPrimary, outStreamUrl);
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return result;
 
-        result = fetchStreamUrl(soapWrapper, info.profileToken, isPrimary, outStreamUrl);
-        if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-            return result;
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
+        .arg(*outStreamUrl)
+        .arg(m_resource->getUrl())
+        .arg(getRole()));
 
-        NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
-            .arg(*outStreamUrl)
-            .arg(m_resource->getUrl())
-            .arg(getRole()));
-    }
     return result;
 }
 
@@ -365,31 +362,108 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::fixStreamUrl(QString* mediaUrl, const std::string& profileToken) const
+/**
+ Heuristic algorithm, that tries to fix incorrect URI of media stream for Dahua cameras.
+
+ Many Dahua cameras have a bug in ONVIF API implementation: GetMediaUri returns the same URL for
+ different profiles (namely the ULR for the zero profile). This algorithm uses several assumptions,
+ that were made after experimenting with Dahua cameras. Some of these assumptions may be wrong for
+ some devices. In this case this function apparently should be updated.
+
+ Common stream URL looks like the following:
+ rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
+ If incoming URL does not look like it, the function does nothing (otherwise it can corrupt
+ the correct URL)
+
+ The symptom of incorrect ULR is a zero value of subtype parameter. If so, the URL potentially
+ should be fixed.
+*/
+void QnOnvifStreamReader::fixDahuaStreamUrl(
+    QString* urlString, const std::string& profileToken) const
 {
-    // Try to detect the Profile index. Common profile name is something like "MediaProfile002".
+    NX_ASSERT(urlString);
+
+    // 1. Try to detect the Profile index. Common profile name is something like "MediaProfile102".
+    // Last three digits encode channel and subtype. The first digit is channel number.
+    // The two next - is subtype number minus 1 (subtype number corresponds to videoEncoder token).
+
     const QString token = QString::fromStdString(profileToken);
     bool isNumber = false;
-    int profileIndex = token.right(3).toInt(&isNumber);
+    const int code = token.right(3).toInt(&isNumber);
     if (!isNumber)
-        return; //< Failed to detect index => can not fix Uri.
+        return; //< Failed to detect index => can not fix url.
 
-    if (profileIndex == 0)
-        return; //< Uri is always correct for zero profile.
+    const int neededSubtypeNumber = code % 100;
+    const int neededChannelNumber = code / 100 + 1;
 
+    if (neededSubtypeNumber == 0)
+        return; //< Practice shows that urls are always correct for zero profile, no fix needed.
+
+    constexpr auto kPath("/cam/realmonitor");
+    constexpr auto kChannel("channel");
+    constexpr auto kSubtype("subtype");
+
+    // Fixable url should somewhat look like this:
+    // rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
+    // Let's check it.
+
+    const QUrl url(*urlString);
+    const QString path = url.path();
+    const QString query = url.query();
+    if (path != kPath)
+        return; //< Unknown url format => url should not be fixed.
+
+    const auto queryParameters = query.split('&');
+    QMap<QString, QString> queryMap;
+    for (const auto& parameter: queryParameters)
+    {
+        const auto parameterList = parameter.split('=');
+        if (parameterList.size() == 2)
+            queryMap[parameterList[0]] = parameterList[1];
+    }
+
+    const int currentChannelNumber = queryMap.value(kChannel).toInt(&isNumber);
+    if (!isNumber)
+        return; //< Unknown url format => url should not be fixed.
+    const int currentSubtypeNumber = queryMap.value(kSubtype).toInt(&isNumber);
+    if (!isNumber)
+        return; //< Unknown url format => url should not be fixed.
+
+    if (currentChannelNumber != neededChannelNumber)
+    {
+        // Practice shows that `neededChannelNumber` (taken form Profile token) and
+        // `neededChannelNumber` (taken from ulr) are always equal. If not - url has
+        // unexpected format and better not to be fixed.
+        return;
+    }
+
+    // Here we consider, that url is fixable.
+
+    if (currentSubtypeNumber != 0)
+    {
+        // Practice shows that ULRs with non-zero subtype are correct.
+        return;
+    }
+
+    if (currentSubtypeNumber == neededSubtypeNumber)
+    {
+        // Ulr seems to be correct, no fix needed.
+        return;
+    }
+
+    // Lets fix url.
     const QString kBrokenSubstring("subtype=0");
-    int position = mediaUrl->indexOf(kBrokenSubstring);
-    if (position == -1)
-        return; //< No substring to fix found in Uri.
+    const QString kDesiredSubstring =
+        QString("%1=%2").arg(kSubtype, QString::number(neededSubtypeNumber));
+    urlString->replace(kBrokenSubstring, kDesiredSubstring);
 
-    position += (kBrokenSubstring.length() - 1); // Position of the symbol to fix.
-
-    mediaUrl->replace(position, 1, QString::number(profileIndex));
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
+CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
     const std::string& profileToken, bool isPrimary, QString* mediaUrl) const
 {
+    MediaSoapWrapper soapWrapper(m_onvifRes);
+
     Q_UNUSED(isPrimary);
 
     StreamUriResp response;
@@ -445,9 +519,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     *mediaUrl = relutUrl.toString();
 
-    const bool fixWrongUri = m_onvifRes->resourceData().value<bool>(QString("fixWrongUri"));
-    if (fixWrongUri)
-        fixStreamUrl(mediaUrl, request.ProfileToken);
+    const bool isDahua = m_onvifRes->getVendor().toLower() == "dahua";
+    const bool fixWrongUri = m_onvifRes->resourceData().value<bool>(ResourceDataKey::kFixWrongUri);
+
+    if (isDahua || fixWrongUri)
+        fixDahuaStreamUrl(mediaUrl, request.ProfileToken);
 
     return CameraDiagnostics::NoErrorResult();
 }
