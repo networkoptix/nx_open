@@ -118,8 +118,13 @@ class Storage: public ::testing::TestWithParam<Param>
 protected:
     virtual void SetUp() override
     {
-        m_server.addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-        ASSERT_TRUE(m_server.start());
+        whenServerStarted();
+    }
+
+    virtual void TearDown() override
+    {
+        m_db = QSqlDatabase();
+        QSqlDatabase::removeDatabase(kDbConnectionName);
     }
 
     void whenStorageDataSaved(const nx::vms::api::StorageData& data)
@@ -152,18 +157,14 @@ protected:
 
     void thenResourceShouldHaveUrlUnencrypted(const nx::vms::api::StorageData& expected)
     {
-        const auto resourcePool = m_server.serverModule()->resourcePool();
-        QnStorageResourcePtr storage;
+        const auto storage = storageByName(expected.name);
 
-        while (!storage)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            const auto resources = resourcePool->getResources();
-            auto it = std::find_if(
-                resources.cbegin(), resources.cend(),
-                [expected](const auto& resource) { return resource->getName() == expected.name; });
-            storage = (*it).dynamicCast<QnStorageResource>();
-        }
+        const auto u1 = nx::utils::Url(expected.url);
+        const auto u2 = nx::utils::Url(storage->getUrl());
+
+        ASSERT_EQ(u1.toString(QUrl::RemoveUserInfo), u2.toString(QUrl::RemoveUserInfo));
+        ASSERT_EQ(u1.userName(), u2.userName());
+        ASSERT_EQ(u1.password(), u2.password());
     }
 
     nx::vms::api::StorageData storageDataWithUrl(const QString& url)
@@ -179,6 +180,35 @@ protected:
         result.parentId = m_server.commonModule()->moduleGUID();
 
         return result;
+    }
+
+    void whenServerStopped()
+    {
+        ASSERT_TRUE(m_server.stop());
+    }
+
+    void whenServerStarted()
+    {
+        ASSERT_TRUE(m_server.start());
+    }
+
+    void initializeDbConnection()
+    {
+        m_db = QSqlDatabase::addDatabase("QSQLITE", kDbConnectionName);
+        m_db.setDatabaseName(serverDbFilePath());
+        ASSERT_TRUE(m_db.open());
+    }
+
+    void whenStorageMigrationRecordRemoved()
+    {
+        assertMigrationExists();
+        auto query = createAndExecQuery(
+            "delete from south_migrationhistory where migration = ?", kMigrationFileName);
+    }
+
+    void whenStorageUrlInDbAltered(const nx::vms::api::StorageData& data)
+    {
+
     }
 
 private:
@@ -201,7 +231,16 @@ private:
         {}
     };
 
-    MediaServerLauncher m_server;
+    static constexpr const char* const kDbConnectionName = "test";
+    static constexpr const char* const kMigrationFileName =
+        ":/updates/100_10172019_encrypt_storage_url_credentials.sql";
+
+    MediaServerLauncher m_server = MediaServerLauncher(
+        QString(), 0,
+        {MediaServerLauncher::DisabledFeature::noPlugins,
+            MediaServerLauncher::DisabledFeature::noMonitorStatistics,
+            MediaServerLauncher::DisabledFeature::noResourceDiscovery});
+    QSqlDatabase m_db;
 
     void assertUrls(
         const QString& expected, const QString& actual, Credentials::EncryptionMode encryption)
@@ -246,12 +285,76 @@ private:
                 break;
         }
     }
+
+    QString serverDbFilePath() const
+    {
+        return closeDirPath(m_server.dataDir()) + "ecs.sqlite";
+    }
+
+    QnStorageResourcePtr storageByName(const QString& name)
+    {
+        const auto resourcePool = m_server.serverModule()->resourcePool();
+        QnStorageResourcePtr storage;
+
+        while (!storage)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            const auto resources = resourcePool->getResources();
+            auto it = std::find_if(
+                resources.cbegin(), resources.cend(),
+                [name](const auto& resource) { return resource->getName() == name; });
+
+            if (it == resources.cend())
+                continue;
+
+            storage = (*it).dynamicCast<QnStorageResource>();
+        }
+
+        return storage;
+    }
+
+    template<typename... Args>
+    QSqlQuery createAndExecQuery(const QString& queryString, Args&&... args)
+    {
+        QSqlQuery query(m_db);
+        [&]() { ASSERT_TRUE(query.prepare(queryString)) << queryString.toStdString(); }();
+        std::initializer_list<int> dummy = {(query.addBindValue(std::forward<Args>(args)), 42)...};
+        (void) dummy;
+
+        [&]() { ASSERT_TRUE(query.exec()); }();
+        return query;
+    }
+
+    void assertMigrationExists()
+    {
+        auto query = createAndExecQuery("SELECT migration from south_migrationhistory");
+        while (query.next())
+        {
+            if (query.value(0).toString() == kMigrationFileName)
+                return;
+        }
+
+        ASSERT_TRUE(false) << "Migration not found";
+    }
 };
 
-TEST_P(Storage, EmptyUrl)
+TEST_P(Storage, CredentialsEncryption)
 {
     const auto data = storageDataWithUrl(GetParam().url);
     whenStorageDataSaved(data);
+    thenItShouldBeRetrievableViaApiWithEncryptedCredentials(data);
+    thenResourceShouldHaveUrlUnencrypted(data);
+}
+
+TEST_P(Storage, Migration)
+{
+    auto data = storageDataWithUrl(GetParam().url);
+    whenStorageDataSaved(data);
+    whenServerStopped();
+    initializeDbConnection();
+    whenStorageMigrationRecordRemoved();
+    whenStorageUrlInDbAltered(data);
+    whenServerStarted();
     thenItShouldBeRetrievableViaApiWithEncryptedCredentials(data);
     thenResourceShouldHaveUrlUnencrypted(data);
 }
