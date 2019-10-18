@@ -871,21 +871,22 @@ def _check_time_diff(box, ini):
 
 def _obtain_running_vms(box, linux_distribution):
     vmses = VmsScanner.scan(box, linux_distribution)
-    if vmses and len(vmses) > 0:
-        report(f"\nDetected VMS installation(s):")
-        for vms in vmses:
-            report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
-            report(f" pid {vms.pid if vms.pid else '-'}", end='')
-            if vms.uid:
-                report(f" uid {vms.uid}", end='')
-            report(')')
-    else:
-        raise exceptions.BoxStateError("No VMS installations found on the box.")
+    if not vmses:
+        raise exceptions.BoxStateError("No Server installations found at the box.")
+    report(
+        f"\nDetected Server installation(s):\n"
+        + '\n'.join(
+            f"    {vms.customization} in {vms.dir} ("
+            f"port {vms.port or 'N/A'}, "
+            f"pid {vms.pid or 'N/A'}, "
+            f"uid {vms.uid or 'N/A'})"
+            for vms in vmses)
+    )
     if len(vmses) > 1:
         raise exceptions.BoxStateError("More than one Server installation found at the box.")
     vms = vmses[0]
     if not vms.is_up():
-        raise exceptions.BoxStateError("VMS is not running currently at the box.")
+        raise exceptions.BoxStateError("Server is not running currently at the box.")
     return vms
 
 
