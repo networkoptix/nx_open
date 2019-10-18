@@ -409,23 +409,15 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
 
     const QUrl url(*urlString);
     const QString path = url.path();
-    const QString query = url.query();
+    const QUrlQuery query(url.query());
+
     if (path != kPath)
         return; //< Unknown url format => url should not be fixed.
 
-    const auto queryParameters = query.split('&');
-    QMap<QString, QString> queryMap;
-    for (const auto& parameter: queryParameters)
-    {
-        const auto parameterList = parameter.split('=');
-        if (parameterList.size() == 2)
-            queryMap[parameterList[0]] = parameterList[1];
-    }
-
-    const int currentChannelNumber = queryMap.value(kChannel).toInt(&isNumber);
+    const int currentChannelNumber = query.queryItemValue(kChannel).toInt(&isNumber);
     if (!isNumber)
         return; //< Unknown url format => url should not be fixed.
-    const int currentSubtypeNumber = queryMap.value(kSubtype).toInt(&isNumber);
+    const int currentSubtypeNumber = query.queryItemValue(kSubtype).toInt(&isNumber);
     if (!isNumber)
         return; //< Unknown url format => url should not be fixed.
 
