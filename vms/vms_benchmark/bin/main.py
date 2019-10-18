@@ -240,8 +240,8 @@ def load_configs(conf_file, ini_file):
     return conf, ini
 
 
-def log_exception(context_name, exception):
-    logging.exception(f'Exception: {context_name}: {type(exception)}: {str(exception)}')
+def log_exception(context_name):
+    logging.exception(f'Exception yielding {context_name}')
 
 
 def box_combined_cpu_usage(box):
@@ -664,7 +664,6 @@ def main(conf_file, ini_file, log_file):
                         raise exceptions.TestCameraError(
                             f"Failed enabling recording on camera {camera.id}.")
             except Exception as e:
-                log_exception('Discovering cameras', e)
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
             report(
@@ -1063,18 +1062,18 @@ if __name__ == '__main__':
             nx_print_exception(e)
             print('', file=sys.stderr)
             print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr)
-            log_exception('ISSUE', e)
+            log_exception('ISSUE')
         except exceptions.VmsBenchmarkError as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
             if log_file_ref:
                 print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr)
-            log_exception('ERROR', e)
+            log_exception('ERROR')
         except Exception as e:
             print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
             if log_file_ref:
                 print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr)
-            log_exception('UNEXPECTED ERROR', e)
+            log_exception('UNEXPECTED ERROR')
     except Exception as e:
         print(f'INTERNAL ERROR: {e}', file=sys.stderr)
         print(f'\nPlease send the complete output ' +
