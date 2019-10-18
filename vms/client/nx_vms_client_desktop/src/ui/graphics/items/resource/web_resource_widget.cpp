@@ -281,12 +281,12 @@ QString QnWebResourceWidget::webActionText(QWebEnginePage::WebAction action)
 void QnWebResourceWidget::initWebActionText()
 {
     static const std::vector<QWebEnginePage::WebAction> actions = {
-            QWebEnginePage::Back,
-            QWebEnginePage::Forward,
-            QWebEnginePage::Stop,
-            QWebEnginePage::Reload,
-            QWebEnginePage::SavePage
-        };
+        QWebEnginePage::Back,
+        QWebEnginePage::Forward,
+        QWebEnginePage::Stop,
+        QWebEnginePage::Reload,
+        QWebEnginePage::SavePage
+    };
 
     QScopedPointer<QWebEnginePage> tmpPage(new QWebEnginePage());
     for (auto action: actions)
