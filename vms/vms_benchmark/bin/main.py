@@ -883,8 +883,8 @@ def main(conf_file, ini_file, log_file):
                             ):
                                 frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
                                 frame_drops_sum += 1
-                                report(
-                                    f'    Detected frame drop on camera {streams[pts_stream_id]["camera_id"]}: '
+                                logging.info(
+                                    f'Detected frame drop on camera {streams[pts_stream_id]["camera_id"]}: '
                                     f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
                                     f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
                                 )
