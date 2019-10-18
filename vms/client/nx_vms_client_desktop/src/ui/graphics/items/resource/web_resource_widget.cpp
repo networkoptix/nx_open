@@ -280,12 +280,13 @@ QString QnWebResourceWidget::webActionText(QWebEnginePage::WebAction action)
 // TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
 void QnWebResourceWidget::initWebActionText()
 {
-    static const std::array<QWebEnginePage::WebAction, 4> actions {
-        QWebEnginePage::Back,
-        QWebEnginePage::Forward,
-        QWebEnginePage::Stop,
-        QWebEnginePage::Reload
-    };
+    static const std::vector<QWebEnginePage::WebAction> actions = {
+            QWebEnginePage::Back,
+            QWebEnginePage::Forward,
+            QWebEnginePage::Stop,
+            QWebEnginePage::Reload,
+            QWebEnginePage::SavePage
+        };
 
     QScopedPointer<QWebEnginePage> tmpPage(new QWebEnginePage());
     for (auto action: actions)

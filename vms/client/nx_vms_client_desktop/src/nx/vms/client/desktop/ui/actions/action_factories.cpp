@@ -361,7 +361,8 @@ QList<QAction*> WebPageFactory::newActions(const Parameters& parameters,
             QWebEnginePage::Back,
             QWebEnginePage::Forward,
             QWebEnginePage::Stop,
-            QWebEnginePage::Reload
+            QWebEnginePage::Reload,
+            QWebEnginePage::SavePage
         };
 
         for (auto actionId: allowedActions)
