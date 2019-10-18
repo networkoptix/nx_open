@@ -81,7 +81,16 @@ WebWidget::WebWidget(QWidget* parent, bool useActionsForLinks):
         connect(m_webEngineView, &QWebEngineView::loadStarted, busyIndicator, &QWidget::show);
         connect(m_webEngineView, &QWebEngineView::loadFinished, busyIndicator, &QWidget::hide);
         connect(m_webEngineView, &QWebEngineView::loadStarted, errorLabel, &QWidget::hide);
-        connect(m_webEngineView, &QWebEngineView::loadFinished, errorLabel, &QWidget::setHidden);
+        connect(m_webEngineView, &QWebEngineView::loadFinished, this,
+            [this, errorLabel](bool ok)
+            {
+                static const QUrl kEmptyPage("about:blank");
+                errorLabel->setVisible(m_webEngineView->url() == kEmptyPage);
+                if (ok)
+                    return;
+                // Replicate QWebKit behavior.
+                m_webEngineView->load(kEmptyPage);
+            });
     }
 }
 
