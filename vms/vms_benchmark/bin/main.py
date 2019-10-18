@@ -911,6 +911,17 @@ def _obtain_restarted_vms(box, linux_distribution):
     return vms
 
 
+def _override_ini_config(vms, ini):
+    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
+    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
+    vms.override_ini_config({
+        'nx_streaming': {
+            'enableTimeCorrection': 0,
+            'unloopCameraPtsWithModulus': modulus_us,
+        },
+    })
+
+
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
     '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
@@ -971,14 +982,7 @@ def main(conf_file, ini_file, log_file):
 
     vms = _obtain_running_vms(box, linux_distribution)
 
-    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
-    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
-    vms.override_ini_config({
-        'nx_streaming': {
-            'enableTimeCorrection': 0,
-            'unloopCameraPtsWithModulus': modulus_us,
-        },
-    })
+    _override_ini_config(vms, ini)
 
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
     _test_api(api)
