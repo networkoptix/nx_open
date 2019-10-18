@@ -922,6 +922,38 @@ def _override_ini_config(vms, ini):
     })
 
 
+def _connect_to_box(conf, conf_file):
+    password = conf.get('boxPassword', None)
+    if password and platform.system() == 'Linux':
+        res = host_tests.SshPassInstalled().call()
+
+        if not res.success:
+            raise exceptions.HostPrerequisiteFailed(
+                "sshpass is not on PATH" +
+                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
+                f"Details for the error: {res.formatted_message()}"
+            )
+    box = BoxConnection(
+        host=conf['boxHostnameOrIp'],
+        login=conf.get('boxLogin', None),
+        password=password,
+        port=conf['boxSshPort'],
+        conf_file=conf_file
+    )
+    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    box.obtain_connection_info()
+    if not box.is_root:
+        res = box_tests.SudoConfigured(box).call()
+
+        if not res.success:
+            raise exceptions.SshHostKeyObtainingFailed(
+                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
+                'without typing a password.\n' +
+                f"Details of the error: {res.formatted_message()}"
+            )
+    return box
+
+
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
     '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
@@ -942,42 +974,9 @@ def main(conf_file, ini_file, log_file):
 
     conf, ini = load_configs(conf_file, ini_file)
 
-    password = conf.get('boxPassword', None)
-
-    if password and platform.system() == 'Linux':
-        res = host_tests.SshPassInstalled().call()
-
-        if not res.success:
-            raise exceptions.HostPrerequisiteFailed(
-                "sshpass is not on PATH" +
-                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
-                f"Details for the error: {res.formatted_message()}"
-            )
-
-    box = BoxConnection(
-        host=conf['boxHostnameOrIp'],
-        login=conf.get('boxLogin', None),
-        password=password,
-        port=conf['boxSshPort'],
-        conf_file=conf_file
-    )
-
-    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
-    box.obtain_connection_info()
-
-    if not box.is_root:
-        res = box_tests.SudoConfigured(box).call()
-
-        if not res.success:
-            raise exceptions.SshHostKeyObtainingFailed(
-                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
-                'without typing a password.\n' +
-                f"Details of the error: {res.formatted_message()}"
-            )
-
+    box = _connect_to_box(conf, conf_file)
     linux_distribution = LinuxDistributionDetector.detect(box)
     box_platform = _obtain_box_platform(box, linux_distribution)
-
     _check_time_diff(box, ini)
 
     vms = _obtain_running_vms(box, linux_distribution)
