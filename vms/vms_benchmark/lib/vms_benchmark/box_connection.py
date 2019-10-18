@@ -161,7 +161,9 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr.decode("UTF-8")}'
+                    f'Command `{command_wrapped}` failed '
+                    f'with code {run.returncode}, '
+                    f'stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
 
             if stdout:
@@ -170,6 +172,9 @@ if platform.system() == 'Linux':
             if stderr:
                 stderr.write(run.stderr.decode())
                 stderr.flush()
+            else:
+                if run.stderr:
+                    logging.debug('Remote command stderr:\n' + run.stderr.decode())
 
             return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 

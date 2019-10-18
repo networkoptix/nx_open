@@ -462,7 +462,7 @@ def main(conf_file, ini_file, log_file):
         f"    Number of CPUs: {box_platform.cpu_count}\n"
         f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
         f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
-        "    Volumes:\n"
+        "    File systems:\n"
         + '\n'.join(
             f"        {storage['fs']} "
             f"on {storage['point']}: "
