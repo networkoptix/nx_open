@@ -6,5 +6,5 @@ int main(int argc, char* argv[])
     return nx::cloud::utils::service::run(
         argc,
         argv,
-        std::bind(nx::cloud::relay::trafficRelayMain, argc, argv));
+        &nx::cloud::relay::trafficRelayMain);
 }

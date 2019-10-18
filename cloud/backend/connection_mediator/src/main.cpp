@@ -58,5 +58,5 @@ int main(int argc, char* argv[])
     return nx::cloud::utils::service::run(
         argc, 
         argv,
-        std::bind(connectionMediatorMain, argc, argv));
+        &connectionMediatorMain);
 }

@@ -11,7 +11,7 @@ namespace nx::cloud::utils::service {
 /**
  * Creates a QCoreApplication with argc and argv, disables udt in SocketGlobals, 
  * enables stacktrace on assertion, and invokes func with no arguments. 
- * func should be bound with all arguments needed to run it and should return an int.
+ * func should have the following signature: int(int, char**).
  */
 template<typename CloudServiceFunc>
 int run(int argc, char* argv[], CloudServiceFunc func)
@@ -21,9 +21,9 @@ int run(int argc, char* argv[], CloudServiceFunc func)
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
 
-    nx::utils::enablePrintStackTraceOnAssert(true);
+    nx::utils::setPrintStackTraceOnAssertEnabled(true);
 
-    return func();
+    return func(argc, argv);
 }
 
 } // namespace nx::cloud::utils::service
