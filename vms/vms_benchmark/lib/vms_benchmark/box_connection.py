@@ -1,11 +1,12 @@
 import logging
-
-from vms_benchmark import exceptions
-import sys
 import platform
 import subprocess
-from io import StringIO
+import sys
 from contextlib import contextmanager
+from io import StringIO
+
+from vms_benchmark import exceptions
+
 
 def log_remote_command(command):
     logging.info(f'Executing remote command:\n    {command}')

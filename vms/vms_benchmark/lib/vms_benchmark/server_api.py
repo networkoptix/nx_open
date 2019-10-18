@@ -1,16 +1,15 @@
-import urllib.request
-from collections import namedtuple
-from typing import List
-from urllib.parse import urlencode
-from urllib.error import URLError
 import base64
 import json
 import logging
+import urllib.request
+from collections import namedtuple
+from typing import List
+from urllib.error import URLError
+from urllib.parse import urlencode
 
 from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
-
 
 Response = namedtuple('Response', ['code', 'body'])
 

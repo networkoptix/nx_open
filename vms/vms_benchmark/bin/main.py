@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import datetime
 import itertools
+import logging
 import math
 import platform
 import signal
 import sys
 import time
-import logging
 from typing import List, Tuple, Optional
 
 from vms_benchmark.camera import Camera

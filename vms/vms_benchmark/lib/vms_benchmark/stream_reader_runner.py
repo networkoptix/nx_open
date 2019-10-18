@@ -2,7 +2,6 @@ import logging
 import os
 import platform
 import subprocess
-from typing import List
 from contextlib import contextmanager
 
 from vms_benchmark import exceptions

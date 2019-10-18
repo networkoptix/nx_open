@@ -1,4 +1,5 @@
 from functools import reduce
+
 from vms_benchmark.utils import human_readable_size
 
 

@@ -1,7 +1,8 @@
 import logging
+import platform
 import re
 from io import StringIO
-import platform
+
 from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 
 

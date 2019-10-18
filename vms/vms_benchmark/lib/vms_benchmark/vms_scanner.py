@@ -1,11 +1,11 @@
 import logging
 import tempfile
-from pprint import pprint, pformat
+from pprint import pformat
 
 from vms_benchmark import exceptions
-from vms_benchmark.config import ConfigParser
 from vms_benchmark.box_platform import BoxPlatform
-from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError, BoxFileContentError
+from vms_benchmark.config import ConfigParser
+from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError
 
 
 class VmsScanner:
