@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import datetime
 import itertools
 import math
 import platform
@@ -410,7 +410,7 @@ def main(conf_file, ini_file, log_file):
     print(f"VMS Benchmark started; logging to {log_file_ref}.")
     print('')
     logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
-    logging.info('VMS Benchmark started.')
+    logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
 
     conf, ini = load_configs(conf_file, ini_file)
 
@@ -1077,6 +1077,8 @@ if __name__ == '__main__':
             if log_file_ref:
                 print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr)
             log_exception('UNEXPECTED ERROR')
+        finally:
+            logging.info(f'VMS Benchmark finished at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
     except Exception as e:
         print(f'INTERNAL ERROR: {e}', file=sys.stderr)
         print(f'\nPlease send the complete output ' +
