@@ -961,10 +961,9 @@ def main(conf_file, ini_file, log_file):
 
     if not wait_for_server_up():
         raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
+    report('Server started successfully.')
 
     vms = vmses[0]
-
-    report('Server started successfully.')
 
     ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
