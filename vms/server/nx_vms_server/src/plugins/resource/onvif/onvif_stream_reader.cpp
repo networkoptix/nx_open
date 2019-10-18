@@ -410,9 +410,9 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     // rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
     // Let's check it.
 
-    const QUrl url(*urlString);
+    QUrl url(*urlString);
     const QString path = url.path();
-    const QUrlQuery query(url.query());
+    QUrlQuery query(url.query());
 
     if (path != kPath)
         return; //< Unknown url format => url should not be fixed.
@@ -445,13 +445,11 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
         // Ulr seems to be correct, no fix needed.
         return;
     }
+    query.removeQueryItem(kSubtype);
+    query.addQueryItem(kSubtype, QString::number(neededSubtypeNumber));
 
-    // Lets fix url.
-    const QString kBrokenSubstring("subtype=0");
-    const QString kDesiredSubstring =
-        QString("%1=%2").arg(kSubtype, QString::number(neededSubtypeNumber));
-    urlString->replace(kBrokenSubstring, kDesiredSubstring);
-
+    url.setQuery(query.toString());
+    *urlString = url.toString();
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
