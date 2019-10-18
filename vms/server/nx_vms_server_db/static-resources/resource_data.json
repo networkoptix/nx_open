@@ -192,7 +192,9 @@
             "keys": [
                 "ActiveCam|*",
                 "ACTI|B915",
-                "*|ACTi-915"
+                "*|ACTi-915",
+                "ACTi|Z*", "Z*|ACTi",
+                "ACTi Corporation|Z*", "Z*|ACTi Corporation"
             ],
             "forceONVIF": true
         },
