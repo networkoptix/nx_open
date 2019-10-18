@@ -53,7 +53,8 @@ bool amendOutputDataIfNeeded(
     nx::utils::Url url(storageData->url);
     if (!url.isValid())
         return false;
-
+    if (url.password().isEmpty())
+        return true;
     auto decryptOrReplace =
         [&accessData](const QString& s)
     {
@@ -63,7 +64,6 @@ bool amendOutputDataIfNeeded(
         return kHiddenPasswordFiller;
     };
 
-    url.setUserName(decryptOrReplace(url.userName()));
     url.setPassword(decryptOrReplace(url.password()));
     storageData->url = url.toString();
 
