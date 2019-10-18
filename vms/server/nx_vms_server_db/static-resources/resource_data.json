@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.115",
+    "version": "1.0.1.152",
     "data": [
         {
             "keys": [
@@ -192,7 +192,9 @@
             "keys": [
                 "ActiveCam|*",
                 "ACTI|B915",
-                "*|ACTi-915"
+                "*|ACTi-915",
+                "ACTi|Z*", "Z*|ACTi",
+                "ACTi Corporation|Z*", "Z*|ACTi Corporation"
             ],
             "forceONVIF": true
         },
@@ -2168,20 +2170,6 @@
             }
         },
         {
-            "keys": ["Dahua|22204TNI"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
-            "forcedOnvifParams":
-            {
-                "videoEncoders": ["000"],
-                "profiles": ["MediaProfile000"]
-            }
-        },
-        {
-            "keys": ["Dahua|IPC-HDBW8241E*"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
-            "fixWrongUri": true
-        },
-        {
             "keys": [
                 "*Grandeye*|EVO-05NxD"
             ],
@@ -3422,7 +3410,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8836*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3450,7 +3438,7 @@
             "keys": [
                 "Hikvision|DS-2DE4A320*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3675,6 +3663,62 @@
             ],
             "onvifIgnoreMedia2":  true,
             "trustToVideoSourceSize": false
+        },
+        {
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
+            "keys": [
+                "hikvision|DS-2DE4225W-DE"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.68, 4.64, 6.29, 8.00, 9.75, 11.21, 12.36, 13.14, 13.82, 14.32],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for V5.5.0 build 170724",
+            "keys": [
+                "hikvision|DS-2DE5330*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1.00, 2.85, 4.92, 6.46, 8.31, 10.08, 12.15, 14.00, 16.00, 18.23, 19.77],
+                        "logicalMultiplier": 33,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
