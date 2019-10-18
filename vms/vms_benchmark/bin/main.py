@@ -213,6 +213,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 0,
         },
+        "ramPerCameraMegabytes": {
+            "optional": True,
+            "type": 'integer',
+            "default": 40,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -582,13 +587,6 @@ def main(conf_file, ini_file, log_file):
     else:
         raise exceptions.ServerApiError(message="Unable to get camera list.")
 
-    # TODO: Move this to internal config.
-    ram_bytes_per_camera_by_arch = {
-        "armv7l": 100,
-        "aarch64": 200,
-        "x86_64": 200
-    }
-
     report('')
     report('Starting load test...')
     load_test_started_at_s = time.time()
@@ -597,9 +595,8 @@ def main(conf_file, ini_file, log_file):
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
-        if ram_available_bytes and ram_available_bytes < (
-                test_cameras_count * ram_bytes_per_camera_by_arch.get(box_platform.arch, 200) * 1024 * 1024
-        ):
+        ram_required_bytes = test_cameras_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
+        if ram_available_bytes and ram_available_bytes < ram_required_bytes:
             raise exceptions.InsufficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
