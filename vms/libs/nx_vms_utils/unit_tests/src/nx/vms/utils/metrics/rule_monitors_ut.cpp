@@ -141,8 +141,7 @@ TEST_F(MetricsGenerators, ValueCounts)
     const auto value = GETTER(); \
     const auto number = value.toDouble(); \
     EXPECT_TRUE((number > ((VALUE) - 0.1)) && (number < ((VALUE) + 0.1))) \
-        << "Value: " << value.toVariant().toString().toStdString() << std::endl \
-        << "History: " << QJson::serialized(history()).toStdString(); \
+        << "Value: " << value.toVariant().toString().toStdString() << std::endl; \
 }
 
 TEST_F(MetricsGenerators, ValueFloat)
@@ -151,7 +150,6 @@ TEST_F(MetricsGenerators, ValueFloat)
     const auto sum = parseFormulaOrThrow("sum %b 1m", monitors).generator;
     const auto average = parseFormulaOrThrow("average %b 1m", monitors).generator;
     const auto perSecond = parseFormulaOrThrow("perSecond %b 30s", monitors).generator;
-    const auto history = parseFormulaOrThrow("history %b 1h", monitors).generator;
 
     resource.update("b", 0);
     EXPECT_EQ(sum(), api::metrics::Value(0));
@@ -194,7 +192,6 @@ TEST_F(MetricsGenerators, ValueSpike)
     const auto sum = parseFormulaOrThrow("sum %b 10s", monitors).generator;
     const auto average = parseFormulaOrThrow("average %b 10s", monitors).generator;
     const auto perSecond = parseFormulaOrThrow("perSecond %b 10s", monitors).generator;
-    const auto history = parseFormulaOrThrow("history %b 1h", monitors).generator;
 
     resource.update("b", 0);
     EXPECT_EQ(sum(), api::metrics::Value(0));
