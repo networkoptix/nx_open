@@ -45,28 +45,27 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *par
 {
     setProperty(Qn::NoHandScrollOver, true);
 
-    // TODO: Fix WebEngine styles
-    //NxUi::setupWebViewStyle(this);
-
-    connect(this, &GraphicsQmlView::statusChanged, this, [this, url](QQmlComponent::Status status){
-        if (status != QQmlComponent::Ready)
-            return;
-
-        QQuickItem* webView = rootObject();
-        if (!webView)
-            return;
-
-        if (m_rootReadyCallback)
+    connect(this, &GraphicsQmlView::statusChanged, this,
+        [this, url](QQmlComponent::Status status)
         {
-            m_rootReadyCallback();
-            m_rootReadyCallback = nullptr;
-        }
+            if (status != QQmlComponent::Ready)
+                return;
 
-        connect(webView, SIGNAL(urlChanged()), this, SLOT(viewUrlChanged()));
-        connect(webView, SIGNAL(loadingStatusChanged(int)), this, SLOT(setViewStatus(int)));
+            QQuickItem* webView = rootObject();
+            if (!webView)
+                return;
 
-        webView->setProperty("url", url);
-    });
+            if (m_rootReadyCallback)
+            {
+                m_rootReadyCallback();
+                m_rootReadyCallback = nullptr;
+            }
+
+            connect(webView, SIGNAL(urlChanged()), this, SLOT(viewUrlChanged()));
+            connect(webView, SIGNAL(loadingStatusChanged(int)), this, SLOT(setViewStatus(int)));
+
+            webView->setProperty("url", url);
+        });
 
     setSource(kQmlSourceUrl);
 }
