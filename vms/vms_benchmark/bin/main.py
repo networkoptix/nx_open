@@ -982,8 +982,6 @@ def main(conf_file, ini_file, log_file):
 
     vms = _obtain_running_vms(box, linux_distribution)
 
-    _override_ini_config(vms, ini)
-
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
     _test_api(api)
 
@@ -993,6 +991,7 @@ def main(conf_file, ini_file, log_file):
     vms.stop(exc=True)
     report('Server stopped.')
 
+    _override_ini_config(vms, ini)
     _clear_storages(box, storages)
 
     report('Starting Server...')
