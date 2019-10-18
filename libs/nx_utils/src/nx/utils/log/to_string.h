@@ -47,6 +47,9 @@ QString toString(const T& value)
     return toStringSfinae(value, 0);
 }
 
+NX_UTILS_API QString toString(const std::type_info& value);
+NX_UTILS_API QString demangleTypeName(const char* type);
+
 NX_UTILS_API QString toString(char value);
 NX_UTILS_API QString toString(wchar_t value);
 NX_UTILS_API QString toString(const char* value);
@@ -65,11 +68,14 @@ NX_UTILS_API QString toString(const std::chrono::milliseconds& value);
 NX_UTILS_API QString toString(const std::chrono::microseconds& value);
 NX_UTILS_API QString toString(const std::chrono::nanoseconds& value);
 
+template<typename Clock, typename Duration>
+QString toString(const std::chrono::time_point<Clock, Duration>& value)
+{
+    return toString(value.time_since_epoch());
+}
+
 //-------------------------------------------------------------------------------------------------
 // Pointers.
-
-NX_UTILS_API QString toString(const std::type_info& value);
-NX_UTILS_API QString demangleTypeName(const char* type);
 NX_UTILS_API QString pointerTypeName(const void* value);
 
 NX_UTILS_API std::string scopeOfFunction(

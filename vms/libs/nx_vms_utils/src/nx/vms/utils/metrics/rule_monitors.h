@@ -29,7 +29,7 @@ public:
     void setGenerator(ValueGenerator generator);
 
     api::metrics::Value value() const override;
-    void forEach(Duration maxAge, const ValueIterator& iterator) const override;
+    void forEach(Duration maxAge, const ValueIterator& iterator, bool inOnly) const override;
 
 private:
     ValueGenerator m_generator;

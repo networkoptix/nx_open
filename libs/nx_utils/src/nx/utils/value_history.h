@@ -18,11 +18,11 @@ public:
     void update(Value value);
     Value current() const;
 
-    template<typename Action> // void(const Value& value, std::chrono::milliseconds age)
-    void forEach(const Action& action) const { return forEach(m_maxAge, action); }
+    template<typename Action> // void(const Value& value, std::chrono::milliseconds duration)
+    void forEach(const Action& action, bool inOnly = false) const { return forEach(m_maxAge, action, inOnly); }
 
-    template<typename Action> // void(const Value& value, std::chrono::milliseconds age)
-    void forEach(std::chrono::milliseconds maxAge, const Action& action) const;
+    template<typename Action> // void(const Value& value, std::chrono::milliseconds duration)
+    void forEach(std::chrono::milliseconds maxAge, const Action& action, bool inOnly = false) const;
 
 private:
     const std::chrono::milliseconds m_maxAge;
@@ -59,8 +59,9 @@ Value ValueHistory<Value>::current() const
 }
 
 template<typename Value>
-template<typename Action> // void(const Value& value, std::chrono::milliseconds age)
-void ValueHistory<Value>::forEach(std::chrono::milliseconds maxAge, const Action& action) const
+template<typename Action> // void(const Value& value, std::chrono::milliseconds duration)
+void ValueHistory<Value>::forEach(
+    std::chrono::milliseconds maxAge, const Action& action, bool inOnly) const
 {
     auto now = monotonicTime();
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -73,10 +74,16 @@ void ValueHistory<Value>::forEach(std::chrono::milliseconds maxAge, const Action
     while ((next = std::next(bound)) != m_values.end() && next->second < deadline)
         bound = next;
 
+    if (inOnly && bound != m_values.end() && bound->second < deadline)
+        bound = std::next(bound);
+
     for (auto it = bound; it != m_values.end(); ++it)
     {
-        const auto age = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->second);
-        action(it->first, std::min(age, maxAge));
+        const auto begin = std::max(it->second, deadline);
+        const auto next = std::next(it);
+        const auto end = next != m_values.end() ? next->second : now;
+        NX_CRITICAL(begin < end, "begin: %1, end: %2, now: %3", begin, end, now);
+        action(it->first, std::chrono::round<std::chrono::milliseconds>(end - begin));
     }
 }
 

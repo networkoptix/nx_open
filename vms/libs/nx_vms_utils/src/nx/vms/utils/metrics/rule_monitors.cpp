@@ -1,6 +1,6 @@
 #include "rule_monitors.h"
 
-#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
@@ -9,6 +9,8 @@
 #include "value_group_monitor.h"
 
 namespace nx::vms::utils::metrics {
+
+using Value = api::metrics::Value;
 
 namespace {
 
@@ -69,9 +71,9 @@ public:
 
         bool isNumber = false;
         if (const auto n = id.toDouble(&isNumber); isNumber)
-            return [n] { return api::metrics::Value(n); };
+            return [n] { return Value(n); };
 
-        return [id] { return api::metrics::Value(id); };
+        return [id] { return Value(id); };
     }
 
     template<typename Operation> //< Value(Value, Value)
@@ -84,11 +86,11 @@ public:
                 // result should be missing too.
                 // TODO: Add optionality marker to all formulas and report error if any of
                 // non-optional values is missing.
-                auto v1 = getter1();
-                auto v2 = getter2();
+                const Value v1 = getter1();
+                const Value v2 = getter2();
                 return (v1.isNull() || v2.isNull())
-                    ? api::metrics::Value() //< No value if 1 of arguments is missing.
-                    : api::metrics::Value(operation(std::move(v1), std::move(v2)));
+                    ? Value() //< No value if 1 of arguments is missing.
+                    : Value(operation(std::move(v1), std::move(v2)));
             };
     }
 
@@ -97,7 +99,7 @@ public:
     {
         return binaryOperation(
             firstI, secondI,
-            [operation](api::metrics::Value v1, api::metrics::Value v2)
+            [operation](Value v1, Value v2)
             {
                 // Currenlty we do not have any way of reporting errors to the user. Returning the
                 // error string is the only option for error detection during manual testing. End
@@ -105,22 +107,22 @@ public:
                 // properly :).
                 // TODO: Implement some kind of error handling, visible to the user.
                 return (!v1.isDouble() || !v2.isDouble())
-                    ? api::metrics::Value("ERROR: One of the arguments is not an integer")
-                    : api::metrics::Value(operation(v1.toDouble(), v2.toDouble()));
+                    ? Value("ERROR: One of the arguments is not an integer")
+                    : Value(operation(v1.toDouble(), v2.toDouble()));
             });
+    }
+
+    static auto square(Value value)
+    {
+        const auto params = value.toString().split(L'x');
+        if (params.size() == 2)
+            return params[0].toInt() * params[1].toInt();
+
+        return 0;
     }
 
     ValueGenerator getBinaryOperation() const
     {
-        static auto square =
-            [](QJsonValue value)
-            {
-                const auto params = value.toString().split(L'x');
-                if (params.size() == 2)
-                    return params[0].toInt() * params[1].toInt();
-                return 0;
-            };
-
         if (function() == "+" || function() == "add")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
@@ -158,22 +160,26 @@ public:
     }
 
     template<typename Operation> //< Value(void(Value, std::chrono::duration) forEach)
-    ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
+    ValueGenerator durationOperation(int valueI, int durationI, bool inOnly, Operation operation) const
     {
         return
-            [operation = std::move(operation), monitor = monitor(valueI), getDuration = value(durationI)]
+            [inOnly, operation = std::move(operation), monitor = monitor(valueI),
+                getDuration = value(durationI)]
             {
-                const auto durationStr = getDuration().toVariant().toString();
-                const auto duration = nx::utils::parseTimerDuration(durationStr);
+                const QString durationStr = getDuration().toVariant().toString();
+                const std::chrono::milliseconds duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
                     // TODO: Error handling.
-                    return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
+                    return Value("ERROR: Wrong duration: " + durationStr);
                 }
 
-                return api::metrics::Value(operation(
-                    [&monitor, &duration](const auto& action) { monitor->forEach(duration, action); }
-                ));
+                return Value(operation(
+                    duration,
+                    [inOnly, &monitor, &duration](const auto& action)
+                    {
+                        monitor->forEach(duration, action, inOnly);
+                    }));
             };
     }
 
@@ -181,8 +187,9 @@ public:
     ValueGenerator durationCount(int valueI, int durationI, Condition condition) const
     {
         return durationOperation(
-            valueI, durationI,
-            [condition = std::move(condition)](const auto& forEach)
+            valueI, durationI, /*inOnly*/ true,
+            [condition = std::move(condition)](
+                std::chrono::milliseconds /*duration*/, const auto& forEach)
             {
                 size_t count = 0;
                 forEach([&](const auto& v, auto) { count += condition(v) ? 1 : 0; });
@@ -191,34 +198,31 @@ public:
     }
 
     template<typename Extraction> // double(double value, double durationS)
-    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction, bool divideByTime) const
+    ValueGenerator durationExtraction(
+        int valueI, int durationI, bool strictRange, bool divideByTime, Extraction extraction) const
     {
         return durationOperation(
-            valueI, durationI,
-            [extraction = std::move(extraction), divideByTime](const auto& forEach)
+            valueI, durationI, strictRange,
+            [strictRange, divideByTime, extraction = std::move(extraction)](
+                std::chrono::milliseconds totalDuration, const auto& forEach)
             {
-                double maxAgeS = 0;
-                double total = 0;
-                double lastValue = 0;
-                double lastAgeS = 0;
+                double totalValue = 0;
+                double totalDurationS = 0;
                 forEach(
-                    [&](const auto& value, auto time)
+                    [&](const Value& value, std::chrono::milliseconds duration)
                     {
-                        const double ageS = seconds(time);
-                        maxAgeS = std::max(ageS, maxAgeS);
-                        if (maxAgeS != 0) //< Skip first.
-                            total += extraction(lastValue, lastAgeS - ageS);
-                        lastValue = value.toDouble();
-                        lastAgeS = ageS;
+                        const double durationS = seconds(duration);
+                        totalDurationS += durationS;
+                        totalValue += extraction(value.toDouble(), durationS);
                     });
-                total += extraction(lastValue, lastAgeS);
-                if (divideByTime)
-                {
-                    if (maxAgeS == 0.0)
-                        return api::metrics::Value();
-                    total /= maxAgeS;
-                }
-                return api::metrics::Value(total);
+
+                if (totalDurationS == 0)
+                    return strictRange ? Value(0) : Value();
+
+                if (strictRange)
+                    totalDurationS = seconds(totalDuration);
+
+                return Value(divideByTime ? (totalValue / totalDurationS) : totalValue);
             });
     }
 
@@ -227,11 +231,11 @@ public:
         if (function() == "history") // value duration
         {
             return durationOperation(
-                1, 2,
-                [](const auto& forEach)
+                1, 2, /*strictRange*/ false,
+                [](std::chrono::milliseconds /*totalDuration*/, const auto& forEach)
                 {
-                    QJsonObject items;
-                    forEach([&](const auto& v, auto a) { items[QString::number(seconds(a))] = v; });
+                    QJsonArray items;
+                    forEach([&](auto v, auto d) { items.append(QJsonArray() << v << ::toString(d)); });
                     return items;
                 });
         }
@@ -247,20 +251,23 @@ public:
 
         if (function() == "sum") // value duration
         {
-            return durationExtraction(1, 2,
-                [](double v, double /*d*/) { return v; }, /*divideByTime*/ false);
+            return durationExtraction(
+                1, 2, /*strictRange*/ true, /*divideByTime*/ false,
+                [](double v, double) { return v; });
         }
 
         if (function() == "average") // value duration
         {
-            return durationExtraction(1, 2,
-                [](double v, double d) { return v * d; }, /*divideByTime*/ true);
+            return durationExtraction(
+                1, 2, /*strictRange*/ false, /*divideByTime*/ true,
+                [](double v, double d) { return v * d; });
         }
 
         if (function() == "perSecond") // value duration
         {
-            return durationExtraction(1, 2,
-                [](double v, double) { return v; }, /*divideByTime*/ true);
+            return durationExtraction(
+                1, 2, /*strictRange*/ true, /*divideByTime*/ true,
+                [](double v, double) { return v; });
         }
 
         return nullptr;
@@ -347,7 +354,8 @@ api::metrics::Value ExtraValueMonitor::value() const
     return m_generator();
 }
 
-void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) const
+void ExtraValueMonitor::forEach(
+    Duration maxAge, const ValueIterator& iterator, bool /*inOnly*/) const
 {
     iterator(value(), maxAge);
 }

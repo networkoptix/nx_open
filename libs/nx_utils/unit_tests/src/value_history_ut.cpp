@@ -17,7 +17,7 @@ TEST(ValueHistoryTest, main)
             const auto addValue =
                 [&values](int value, milliseconds age)
                 {
-                    values.emplace_back(value, duration_cast<hours>(age).count());
+                    values.emplace_back(value, round<hours>(age).count());
                 };
 
             maxAge ? history.forEach(*maxAge, addValue) : history.forEach(addValue);
@@ -39,12 +39,12 @@ TEST(ValueHistoryTest, main)
     EXPECT_EQ(values(std::nullopt), "{ ( 10: 2 ), ( 20: 0 ) }");
 
     timeShift.applyRelativeShift(hours(2));
-    EXPECT_EQ(values(std::nullopt), "{ ( 10: 4 ), ( 20: 2 ) }");
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 2 ), ( 20: 2 ) }");
 
     history.update(30);
     EXPECT_EQ(history.current(), 30);
-    EXPECT_EQ(values(std::nullopt), "{ ( 10: 4 ), ( 20: 2 ), ( 30: 0 ) }");
-    EXPECT_EQ(values(hours(3)), "{ ( 10: 3 ), ( 20: 2 ), ( 30: 0 ) }");
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 2 ), ( 20: 2 ), ( 30: 0 ) }");
+    EXPECT_EQ(values(hours(3)), "{ ( 10: 1 ), ( 20: 2 ), ( 30: 0 ) }");
     EXPECT_EQ(values(hours(1)), "{ ( 20: 1 ), ( 30: 0 ) }");
 
     timeShift.applyRelativeShift(hours(15));
