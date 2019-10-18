@@ -12,7 +12,7 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr const char* kDefaultMutexImplementation = "debug";
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
-        static constexpr int kShowPasswordsInLogs = 1;
+        static constexpr int kShowPasswordsInLogs = 0;
         static constexpr int kLogLevelReducerPassLimit = 5;
         static constexpr int kLogLevelReducerWindowSizeS = 1;
     #else
