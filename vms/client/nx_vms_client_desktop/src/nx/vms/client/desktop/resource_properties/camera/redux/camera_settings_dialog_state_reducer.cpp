@@ -1553,14 +1553,27 @@ State CameraSettingsDialogStateReducer::setCredentials(
 }
 
 State CameraSettingsDialogStateReducer::setStreamUrls(
-    State state, const QString& primary, const QString& secondary)
+    State state, const QString& primary, const QString& secondary, ModificationSource source)
 {
-    if (!state.isSingleCamera() || !state.singleCameraProperties.editableStreamUrls)
+    if ((source == ModificationSource::local && !state.singleCameraProperties.editableStreamUrls)
+        || !state.isSingleCamera())
+    {
         return state;
+    }
 
-    state.singleCameraSettings.primaryStream.setUser(primary);
-    state.singleCameraSettings.secondaryStream.setUser(secondary);
-    state.hasChanges = true;
+    if (source == ModificationSource::local)
+    {
+        state.singleCameraSettings.primaryStream.setUser(primary);
+        state.singleCameraSettings.secondaryStream.setUser(secondary);
+        state.hasChanges = true;
+    }
+    else if (NX_ASSERT(source == ModificationSource::remote))
+    {
+
+        state.singleCameraSettings.primaryStream.setBase(primary);
+        state.singleCameraSettings.secondaryStream.setBase(secondary);
+    }
+
     return state;
 }
 

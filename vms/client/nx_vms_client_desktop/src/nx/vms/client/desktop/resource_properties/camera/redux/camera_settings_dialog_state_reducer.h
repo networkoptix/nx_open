@@ -74,7 +74,8 @@ public:
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(
         State state, const std::optional<QString>& login, const std::optional<QString>& password);
-    static State setStreamUrls(State state, const QString& primary, const QString& secondary);
+    static State setStreamUrls(
+        State state, const QString& primary, const QString& secondary, ModificationSource source);
 };
 
 } // namespace nx::vms::client::desktop
