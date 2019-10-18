@@ -876,9 +876,8 @@ def _obtain_running_vms(box, linux_distribution):
         for vms in vmses:
             report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
             report(f" pid {vms.pid if vms.pid else '-'}", end='')
-            vms_uid = vms.uid()
-            if vms_uid:
-                report(f" uid {vms_uid}", end='')
+            if vms.uid:
+                report(f" uid {vms.uid}", end='')
             report(')')
     else:
         raise exceptions.BoxStateError("No VMS installations found on the box.")
@@ -980,29 +979,30 @@ def main(conf_file, ini_file, log_file):
     _check_time_diff(box, ini)
 
     vms = _obtain_running_vms(box, linux_distribution)
-
-    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
-    _test_api(api)
-
-    storages = _get_storages(api)
-
-    report('Stopping server...')
-    vms.stop(exc=True)
-    report('Server stopped.')
-
-    _override_ini_config(vms, ini)
-    _clear_storages(box, storages)
-
-    report('Starting Server...')
-    vms.start(exc=True)
-    vms = _obtain_restarted_vms(box, linux_distribution)
-    report('Server started successfully.')
-
-    _test_vms(api, box, box_platform, conf, ini, vms)
-
-    report('\nSUCCESS: All tests finished.')
-
     vms.dismount_ini_dirs()
+    try:
+        api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
+        _test_api(api)
+
+        storages = _get_storages(api)
+
+        report('Stopping server...')
+        vms.stop(exc=True)
+        report('Server stopped.')
+
+        _override_ini_config(vms, ini)
+        _clear_storages(box, storages)
+
+        report('Starting Server...')
+        vms.start(exc=True)
+        vms = _obtain_restarted_vms(box, linux_distribution)
+        report('Server started successfully.')
+
+        _test_vms(api, box, box_platform, conf, ini, vms)
+
+        report('\nSUCCESS: All tests finished.')
+    finally:
+        vms.dismount_ini_dirs()
 
     return 0
 
