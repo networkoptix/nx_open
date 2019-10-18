@@ -377,6 +377,8 @@ NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
 NX_DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
 NX_DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+    _onvifMedia2__GetStreamUri, _onvifMedia2__GetStreamUriResponse)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<class RequestT, class ResponseT>
@@ -617,8 +619,8 @@ namespace Media2
         _onvifMedia2__SetVideoEncoderConfiguration,
         onvifMedia2__SetConfigurationResponse>;
 
-    using VideoEncoderConfigurationOptions =
-        RequestWrapper<onvifMedia2__GetConfiguration,
+    using VideoEncoderConfigurationOptions = RequestWrapper<
+        onvifMedia2__GetConfiguration,
         _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
 
     using Profiles = RequestWrapper<
@@ -628,6 +630,10 @@ namespace Media2
     using ProfileCreator = RequestWrapper<
         _onvifMedia2__CreateProfile,
         _onvifMedia2__CreateProfileResponse>;
+
+    using StreamUri = RequestWrapper<
+        _onvifMedia2__GetStreamUri,
+        _onvifMedia2__GetStreamUriResponse>;
 }
 // ------------------------------------------------------------------------------------------------
 class DeviceSoapWrapper : public SoapWrapper<DeviceBindingProxy>
