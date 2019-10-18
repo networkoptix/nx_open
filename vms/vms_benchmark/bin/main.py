@@ -7,6 +7,7 @@ import platform
 import signal
 import sys
 import time
+import uuid
 from typing import List, Tuple, Optional
 
 from vms_benchmark.camera import Camera
@@ -380,6 +381,17 @@ class Storage:
             self.url = raw['url']
             self.free_space = int(raw['freeSpace'])
             self.reserved_space = int(raw['reservedSpace'])
+            flags_joined = raw['storageStatus']
+            if flags_joined == '' or flags_joined == 'none':
+                flags = []
+            else:
+                flags = flags_joined.split('|')
+            id = uuid.UUID(raw['storageId'])
+            self.initialized = all((
+                id != uuid.UUID(int=0),
+                'beingChecked' not in flags,
+                self.free_space >= 0,
+            ))
         except Exception as e:
             raise exceptions.ServerApiError(
                 'Incorrect Storage info received from the Server.',
@@ -387,16 +399,24 @@ class Storage:
 
 
 def _get_storages(api) -> List[Storage]:
-    try:
-        reply = api.get_storage_spaces()
-    except Exception as e:
-        raise exceptions.ServerApiError(
-            'Unable to get VMS Storages via REST HTTP: request failed',
-            original_exception=e)
-    if reply is None:
-        raise exceptions.ServerApiError(
-            'Unable to get VMS Storages via REST HTTP: invalid reply.')
-    return [Storage(item) for item in reply]
+    for attempt in range(1, 6):
+        logging.info(f"Try to get Storages, attempt #{attempt}...")
+        try:
+            reply = api.get_storage_spaces()
+        except Exception as e:
+            raise exceptions.ServerApiError(
+                'Unable to get Server Storages via REST HTTP: request failed',
+                original_exception=e)
+        if reply is None:
+            raise exceptions.ServerApiError(
+                'Unable to get Server Storages via REST HTTP: invalid reply.')
+        if reply:
+            storages = [Storage(item) for item in reply]
+            if all(storage.initialized for storage in storages):
+                return storages
+        time.sleep(3)
+    raise exceptions.ServerApiError(
+        'Unable to get Server Storages via REST HTTP: not all Storages are initialized.')
 
 
 def _run_load_test(api, box, box_platform, conf, ini, vms):
