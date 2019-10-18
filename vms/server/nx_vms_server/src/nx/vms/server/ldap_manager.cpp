@@ -43,12 +43,13 @@
 #include <nx/utils/string.h>
 #include <nx/utils/scope_guard.h>
 
-namespace nx {
-namespace vms::server {
+namespace nx::vms::server {
 
-static const int kPageSize = 1000;
+namespace {
 
-static LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+const int kPageSize = 1000;
+
+LdapResult translateErrorCode(LDAP_RESULT ldapCode)
 {
     switch(ldapCode)
     {
@@ -62,6 +63,8 @@ static LdapResult translateErrorCode(LDAP_RESULT ldapCode)
             return LdapResult::Other;
     }
 }
+
+} // namespace
 
 #ifdef Q_OS_WIN
 static BOOLEAN _cdecl VerifyServerCertificate(PLDAP /*Connection*/, PCCERT_CONTEXT *ppServerCert)
@@ -259,6 +262,7 @@ public:
 
 private:
     bool detectLdapVendor(LdapVendor&);
+    void logResponseReferences(LDAPMessage* response);
 
     const QnLdapSettings m_settings;
     LDAP_RESULT m_lastErrorCode;
@@ -281,7 +285,7 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_DEBUG(this, "Connecting with settings %1",
+    NX_INFO(this, "Connecting with settings %1",
         m_settings.toString(!nx::utils::log::showPasswords()));
     QUrl uri = m_settings.uri;
 
@@ -306,6 +310,14 @@ bool LdapSession::connect()
 
     int desired_version = LDAP_VERSION3;
     int rc = ldap_set_option(m_ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+    if (rc != 0)
+    {
+        m_lastErrorCode = rc;
+        return false;
+    }
+
+    // NOTE: Chasing referrals doesn't work with paging controls, see: VMS-15694.
+    rc = ldap_set_option(m_ld, LDAP_OPT_REFERRALS, LDAP_OPT_OFF);
     if (rc != 0)
     {
         m_lastErrorCode = rc;
@@ -350,7 +362,7 @@ bool LdapSession::connect()
     else
         m_dType.reset(new OpenLdapType());
 
-    NX_DEBUG(this, lm("Connected to vendor %1").arg(m_dType));
+    NX_VERBOSE(this, "Connected to vendor %1", m_dType);
     return true;
 }
 
@@ -364,9 +376,46 @@ QString LdapSession::getUserDn(const QString& login)
     return users[0].dn;
 }
 
+void LdapSession::logResponseReferences(LDAPMessage* response)
+{
+    // NOTE: The function is only useful for debugging, let's disable it if logs are not verbose
+    // for better performance.
+    if (nx::utils::log::mainLogger()->maxLevel() < nx::utils::log::Level::verbose)
+        return;
+
+    for (LDAPMessage *entry = ldap_first_reference(m_ld, response);
+        entry != nullptr; entry = ldap_next_reference(m_ld, entry))
+    {
+        PWCHAR *refs = nullptr;
+        const auto memoryGuard = nx::utils::makeScopeGuard(
+            [&refs, this]()
+            {
+                if (refs != nullptr)
+                    ldap_value_free(refs);
+                refs = nullptr;
+            });
+
+        #if defined Q_OS_WIN
+            LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs);
+        #else
+            LDAP_RESULT rc = ldap_parse_reference(m_ld, entry, &refs, nullptr, 0);
+        #endif
+        if (rc != LDAP_SUCCESS)
+        {
+            NX_DEBUG(this, lm("Failed to parse ldap reference entry: %1").args(LdapErrorStr(rc)));
+            return;
+        }
+
+        for (int i = 0; refs != nullptr && refs[i] != nullptr; i++)
+            NX_VERBOSE(this, lm("Not chasing reference received from server: %1").args(refs[i]));
+    }
+}
+
 bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 {
-    NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(customFilter));
+    QString filter = QnLdapFilter(m_dType->Filter()) &
+        (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
+    NX_INFO(this, "Fetching users with filter [%1]'", filter);
 
     LDAP_RESULT rc =
         ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
@@ -375,9 +424,6 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
         m_lastErrorCode = rc;
         return false;
     }
-
-    QString filter = QnLdapFilter(m_dType->Filter()) &
-        (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
 
     berval *cookie = NULL;
     const auto cleanUpCookie =
@@ -440,7 +486,6 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 
         serverControls[0] = pControl;
         serverControls[1] = NULL;
-
         rc = ldap_search_ext_s(
             /* ld */ m_ld,
             /* base */ QSTOCW(m_settings.searchBase),
@@ -460,12 +505,14 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
         }
 
         LDAP_RESULT lerrno = 0;
-        if((rc = ldap_parse_result(
-            m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0)) != LDAP_SUCCESS)
+        rc = ldap_parse_result(m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0);
+        if (rc != LDAP_SUCCESS)
         {
+            NX_ASSERT(lerrno == rc, lm("lerrno (%1) != rc (%2)").args(lerrno, rc));
             m_lastErrorCode = rc;
             return false;
         }
+        NX_ASSERT(lerrno == LDAP_SUCCESS, lm("lerrno: %1").args(lerrno));
 
         LDAP_RESULT entcnt = 0;
         cleanUpCookie();
@@ -475,6 +522,8 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             m_lastErrorCode = rc;
             return false;
         }
+        // NOTE: Most of the time is zero, LDAP servers doesn't like to provide it =(
+        NX_VERBOSE(this, lm("Entities received on page: %1").args(entcnt));
 
         LDAPMessage *entry = NULL;
         for (entry = ldap_first_entry(m_ld, result);
@@ -493,15 +542,32 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 
                 if (!user.login.isEmpty())
                     users.append(user);
+                else
+                    NX_DEBUG(this, lm("Ignoring entry with empty login: %1").args(user.dn));
                 ldap_memfree(dn);
             }
+            else
+            {
+                // NOTE: it may be changed to ldap_get_option(ld, LDAP_OPT_RESULT_CODE, &err)
+                // TODO: Can LdapErrorStr be used here? Is LdapGetLastError another value?
+                NX_DEBUG(this, lm("Failed to extract DN of LDAP entry: %1").args(
+                    LdapErrorStr(LdapGetLastError())));
+            }
         }
-        NX_VERBOSE(this, "Fetched page with %1 users", users.size());
-    } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
 
-    NX_VERBOSE(this, lm("Fetched %1 user(s)%2").args(
-        users.size(),
-        users.size() < 10 ? " - " + containerString(users) : QString()));
+        logResponseReferences(result);
+
+        NX_VERBOSE(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
+            LdapErrorStr(LdapGetLastError()), users.size()));
+        NX_VERBOSE(this, lm("cookie: %1, cookie->bv_val: %2, length: %3 (%4)").args(
+            cookie != nullptr,
+            cookie != nullptr ? (cookie->bv_val != nullptr) : false,
+            (cookie != nullptr && cookie->bv_val != nullptr) ? strlen(cookie->bv_val) : -7,
+            (cookie != nullptr && cookie->bv_val != nullptr) ? cookie->bv_len : -7));
+    } while (cookie && cookie->bv_val != NULL && cookie->bv_len > 0);
+
+    NX_INFO(this, lm("Fetched %1 user(s)%2").args(
+        users.size(), users.size() < 10 ? " - " + containerString(users) : QString()));
 
     return true;
 }
@@ -658,7 +724,10 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
     {
         dn = session.getUserDn(login);
         if (dn.isEmpty())
+        {
+            NX_INFO(this, lm("User not found, LDAP code: %1").args(session.lastErrorString()));
             return Qn::Auth_WrongLogin;
+        }
 
         QnMutexLocker lock(&m_cacheMutex);
         m_dnCache[login] = dn;
@@ -666,7 +735,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
 
     auto authResult = session.authenticate(dn, password);
     if (authResult != Qn::Auth_OK)
-        NX_WARNING(this, lm("authenticate: %1").arg(session.lastErrorString()));
+        NX_WARNING(this, lm("Authentication failed: %1").arg(session.lastErrorString()));
 
     return authResult;
 }
@@ -677,6 +746,4 @@ void LdapManager::clearCache()
     m_dnCache.clear();
 }
 
-} // namespace vms::server
-} // namespace nx
-
+} // namespace nx::vms::server
