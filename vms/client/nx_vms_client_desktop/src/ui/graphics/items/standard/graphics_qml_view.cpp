@@ -304,6 +304,11 @@ void GraphicsQmlView::Private::scheduleUpdateSizes()
     m_resizeTimer->start();
 }
 
+void GraphicsQmlView::updateGeometry()
+{
+    d->scheduleUpdateSizes();
+}
+
 QQmlEngine* GraphicsQmlView::engine() const
 {
     return d->m_qmlEngine;
@@ -351,6 +356,7 @@ bool GraphicsQmlView::event(QEvent* event)
             return eventResult;
         }
         case QEvent::GraphicsSceneResize:
+        case QEvent::GraphicsSceneMove:
             d->scheduleUpdateSizes();
             event->accept();
             break;

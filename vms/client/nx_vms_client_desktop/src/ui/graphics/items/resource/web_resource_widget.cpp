@@ -46,9 +46,14 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     const auto webParams = detail::OverlayParams(Visible
         , false, true, BaseLayer, contentMargins);
     if (m_webView)
+    {
         addOverlayWidget(m_webView, webParams);
+    }
     else
+    {
         addOverlayWidget(m_webEngineView, webParams);
+        connect(this, &QGraphicsWidget::geometryChanged, m_webEngineView, &GraphicsQmlView::updateGeometry);
+    }
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     updateTitleText();
