@@ -40,7 +40,7 @@ const QUrl GraphicsWebEngineView::kQmlSourceUrl("qrc:/qml/Nx/Controls/NxWebEngin
 
 GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *parent)
     : GraphicsQmlView(parent)
-    , m_status(kPageLoadFailed)
+    , m_status(kPageInitialLoadInProgress)
     , m_canGoBack(false)
 {
     setProperty(Qn::NoHandScrollOver, true);
@@ -63,9 +63,31 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *par
 
             connect(webView, SIGNAL(urlChanged()), this, SLOT(viewUrlChanged()));
             connect(webView, SIGNAL(loadingStatusChanged(int)), this, SLOT(setViewStatus(int)));
+            connect(webView, SIGNAL(loadProgressChanged()), this, SLOT(onLoadProgressChanged()));
 
             webView->setProperty("url", url);
         });
+
+    const auto progressHandler = [this](int progress)
+    {
+        setStatus(statusFromProgress(progress));
+    };
+
+    const auto loadStartedHander = [this, progressHandler]()
+    {
+        connect(this, &GraphicsWebEngineView::loadProgress, this, progressHandler);
+        setStatus(statusFromProgress(kProgressValueStarted));
+    };
+
+    const auto loadFinishedHandler = [this](bool successful)
+    {
+        disconnect(this, &GraphicsWebEngineView::loadProgress, this, nullptr);
+        setStatus(statusFromProgress(successful? kProgressValueLoaded : kProgressValueFailed));
+    };
+
+    connect(this, &GraphicsWebEngineView::loadStarted, this, loadStartedHander);
+    connect(this, &GraphicsWebEngineView::loadFinished, this, loadFinishedHandler);
+    connect(this, &GraphicsWebEngineView::loadProgress, this, progressHandler);
 
     setSource(kQmlSourceUrl);
 }
@@ -83,6 +105,14 @@ void GraphicsWebEngineView::whenRootReady(RootReadyCallback callback)
 
 GraphicsWebEngineView::~GraphicsWebEngineView()
 {
+}
+
+void GraphicsWebEngineView::onLoadProgressChanged()
+{
+    QQuickItem* webView = rootObject();
+    if (!webView)
+        return;
+    emit loadProgress(webView->property("loadProgress").toInt());
 }
 
 void GraphicsWebEngineView::registerObject(QQuickItem* webView, const QString& name, QObject* object, bool enablePromises)
@@ -109,18 +139,21 @@ void GraphicsWebEngineView::setViewStatus(int status)
     switch(status)
     {
         case 0: // WebEngineView.LoadStartedStatus
-            setStatus(kPageLoading);
+            setStatus(kPageInitialLoadInProgress);
             emit loadStarted();
             break;
         case 1: // WebEngineView.LoadStoppedStatus
             setStatus(kPageLoaded);
+            emit loadFinished(true);
             break;
         case 2: // WebEngineView.LoadSucceededStatus
             setStatus(kPageLoaded);
+            emit loadFinished(true);
             break;
         case 3: // WebEngineView.LoadFailedStatus
         default:
             setStatus(kPageLoadFailed);
+            emit loadFinished(false);
     }
 }
 

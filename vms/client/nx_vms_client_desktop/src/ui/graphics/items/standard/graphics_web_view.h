@@ -63,10 +63,16 @@ signals:
 
     void canGoBackChanged();
 
+    void loadProgress(int progress);
+
+    void loadFinished(bool ok);
+
 private slots:
     void viewUrlChanged();
 
     void setViewStatus(int status);
+
+    void onLoadProgressChanged();
 
 private:
     WebViewPageStatus m_status;
