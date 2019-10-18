@@ -907,7 +907,6 @@ def _obtain_restarted_vms(box, linux_distribution):
 
     time.sleep(5)  # TODO: Investigate this sleep
 
-    report('Server started successfully.')
     vms = vmses[0]
     return vms
 
@@ -986,17 +985,16 @@ def main(conf_file, ini_file, log_file):
 
     storages = _get_storages(api)
 
+    report('Stopping server...')
     vms.stop(exc=True)
-
     report('Server stopped.')
 
     _clear_storages(box, storages)
 
-    vms.start(exc=True)
-
     report('Starting Server...')
-
+    vms.start(exc=True)
     vms = _obtain_restarted_vms(box, linux_distribution)
+    report('Server started successfully.')
 
     _test_vms(api, box, box_platform, conf, ini, vms)
 
