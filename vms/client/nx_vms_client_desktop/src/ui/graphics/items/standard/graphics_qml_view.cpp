@@ -18,6 +18,8 @@
 #include <QApplication>
 #include <QTimer>
 
+#include <QtMath>
+
 #include <client_core/client_core_module.h>
 #include <ui/workaround/gl_native_painting.h>
 
@@ -391,7 +393,7 @@ void GraphicsQmlView::Private::updateSizes()
     QWindow* w = m_renderControl->renderWindow(&offset);
     const QPoint pos = w ? w->mapToGlobal(offset) : offset;
 
-    m_quickWindow->setGeometry(pos.x(), pos.y(), size.width(), size.height());
+    m_quickWindow->setGeometry(pos.x(), pos.y(), qCeil(size.width()), qCeil(size.height()));
 }
 
 void GraphicsQmlView::Private::initialize(const QRectF&, QOpenGLWidget* glWidget)
@@ -532,6 +534,9 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     const auto functions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
     functions->glBindTexture(GL_TEXTURE_2D, d->m_fbo->texture());
+
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     functions->glEnable(GL_TEXTURE_2D);
     functions->glBegin(GL_QUADS);
