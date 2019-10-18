@@ -62,6 +62,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
@@ -70,6 +71,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/utils/app_info.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -431,6 +433,20 @@ ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets,
         })
         ? EnabledAction
         : InvisibleAction;
+}
+
+ConditionWrapper PreventWhenFullscreenTransition::condition()
+{
+    return new PreventWhenFullscreenTransition();
+}
+
+ActionVisibility PreventWhenFullscreenTransition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
+{
+    return !nx::utils::AppInfo::isMacOsX() || context->mainWindow()->updatesEnabled()
+        ? EnabledAction
+        : DisabledAction;
 }
 
 bool VideoWallReviewModeCondition::isVideoWallReviewMode(QnWorkbenchContext* context) const

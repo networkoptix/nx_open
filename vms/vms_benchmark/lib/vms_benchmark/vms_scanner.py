@@ -89,7 +89,7 @@ class VmsScanner:
         def override_ini_config(self, features):
             storages = BoxPlatform.get_storages_map(self.device)
             if not storages:
-                return False
+                raise BoxCommandError('Unable to get box Storages.')
 
             uid = self.uid()
             base_dir = '/etc'
@@ -125,11 +125,7 @@ class VmsScanner:
                 if uid != 0:
                     self.device.sh(f'chown {uid} "{full_ini_path}"', exc=True, su=True)
 
-            if not self.device.sh(f'mount -o bind "{tmp_dir}" "{ini_dir_path}"', su=True):
-                # TODO: process the error
-                pass
-
-            return True
+            self.device.sh(f'mount -o bind "{tmp_dir}" "{ini_dir_path}"', exc=True, su=True)
 
         @staticmethod
         def server_bin(linux_distribution):

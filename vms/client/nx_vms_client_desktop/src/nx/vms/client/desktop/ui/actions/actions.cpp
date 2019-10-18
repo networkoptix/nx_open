@@ -542,7 +542,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+Enter"))
         .shortcut(lit("Alt+Return"))
         .shortcut(lit("Ctrl+F"), Builder::Mac, true) // Uncomment me later, workaround for 4.0 beta (VMS-11557).
-        .shortcutContext(Qt::ApplicationShortcut);
+        .shortcutContext(Qt::ApplicationShortcut)
+        .condition(PreventWhenFullscreenTransition::condition());
 
     factory(VersionMismatchMessageAction)
         .flags(NoTarget)

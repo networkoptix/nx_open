@@ -1985,6 +1985,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    if (updateName.endsWith(lit("/99_20180329_02_add_record_thresholds_camera_attributes.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
     const auto logTag = nx::utils::log::Tag(typeid(QnDbManager));
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {

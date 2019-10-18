@@ -33,9 +33,6 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
-            const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
-            saveSystemTimeDeltaMs(systemTimeDeltaMs);
-
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
             {
@@ -44,6 +41,11 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                     .arg(qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID()))
                     .arg(QDateTime::fromMSecsSinceEpoch(syncTimeMs).toString(Qt::ISODate)));
                 broadcastSystemTime();
+            }
+            else
+            {
+                const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
+                saveSystemTimeDeltaMs(systemTimeDeltaMs);
             }
         });
 }
@@ -212,8 +214,9 @@ void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
 
 void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
 {
-    const qint64 systemTimeDeltaMs = qAbs(
-        std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
+    const auto ownId = commonModule()->moduleGUID();
+    qint64 systemTimeDeltaMs = getPrimaryTimeServerId() == ownId ? 0 :
+        qAbs(std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
     if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) > kMaxJitterForLocalClock.count())
         saveSystemTimeDeltaMs(systemTimeDeltaMs);
 }

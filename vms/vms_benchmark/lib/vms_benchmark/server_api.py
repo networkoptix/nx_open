@@ -85,6 +85,17 @@ class ServerApi:
 
             return result.payload['reply']
 
+    def get_server_id(self):
+        module_information = self.get_module_information()
+
+        if module_information is None:
+            raise exceptions.ServerApiError(message="Unable to get module information.")
+
+        server_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
+        server_id = server_id_raw[1:-1] if server_id_raw[0] == '{' and server_id_raw[-1] == '}' else server_id_raw
+
+        return server_id
+
     def check_authentication(self):
         try:
             request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")

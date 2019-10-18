@@ -28,6 +28,7 @@ def stream_reader_running(
         '-p',
         password,
         '--timestamps',
+        '--disable-restart',
     ]
 
     streams = {}
@@ -56,6 +57,8 @@ def stream_reader_running(
         if opts.get('type', 'live') == 'archive':
             params['pos'] = 0
 
+        params['stream'] = 0
+
         url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
         args.append('--url')
@@ -66,6 +69,7 @@ def stream_reader_running(
             "type": opts.get('type', 'live')
         }
 
+    # E.g. if 3 URLs are passed to rtsp_perf and --count is 5, it may open streams 1, 1, 2, 2, 3.
     args.append('--count')
     args.append(len(streams.items()))
 

@@ -42,18 +42,20 @@ class RtspPerfError(VmsBenchmarkError):
 
 
 class VmsBenchmarkIssue(VmsBenchmarkError):
-    pass
+    def __init__(self, message, original_exception=None, sub_issues=[]):
+        super(VmsBenchmarkIssue, self).__init__(message, original_exception=original_exception)
+        self.sub_issues = sub_issues
 
 
 class StorageFailuresIssue(VmsBenchmarkIssue):
     def __init__(self, failures_count):
-        super(StorageFailuresIssue, self).__init__(f"{failures_count} storage failures detected")
+        super(StorageFailuresIssue, self).__init__(f"{failures_count} Storage failures detected")
 
 
 class CpuUsageThresholdExceededIssue(VmsBenchmarkIssue):
     def __init__(self, cpu_usage, threshold):
         super(CpuUsageThresholdExceededIssue, self).__init__(
-            f"CPU usage {round(cpu_usage*100)}% exceeds maximum ({round(threshold*100)}%)"
+            f"CPU usage {round(cpu_usage*100)}% exceeds maximum ({round(threshold*100)}%)."
         )
 
 

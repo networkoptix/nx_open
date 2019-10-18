@@ -360,7 +360,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.rotation = rotation;
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
-    request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
+    request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;

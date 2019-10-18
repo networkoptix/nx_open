@@ -17,14 +17,7 @@ namespace sample {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-static int64_t usSinceEpoch()
-{
-    using namespace std::chrono;
-    return duration_cast<microseconds>(
-        system_clock::now().time_since_epoch()).count();
-}
-
-DeviceAgent::DeviceAgent(Engine* /*engine*/, const nx::sdk::IDeviceInfo* deviceInfo):
+DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(deviceInfo, /*enableOutput*/true)
 {
 }
@@ -82,7 +75,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
         return nullptr;
 
     const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
-    eventMetadataPacket->setTimestampUs(usSinceEpoch());
+    eventMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
     eventMetadataPacket->setDurationUs(0);
 
     const auto eventMetadata = makePtr<EventMetadata>();

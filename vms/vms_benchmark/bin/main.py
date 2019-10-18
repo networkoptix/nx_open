@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import datetime
+import itertools
 import math
 import platform
 import signal
 import sys
 import time
-import os
 import logging
 from typing import List, Tuple, Optional
 
@@ -34,7 +33,7 @@ if platform.system() == 'Linux':
         pdb.set_trace()
 
     if platform.python_implementation() == 'Jython':
-        debug_signum = signal.SIGUSR2 # bug #424259
+        debug_signum = signal.SIGUSR2  # bug #424259
     else:
         debug_signum = signal.SIGUSR1
 
@@ -184,10 +183,15 @@ def load_configs(conf_file, ini_file):
             "type": 'float',
             "default": 0.5
         },
-        "minimumStorageFreeBytes": {
+        "archiveBitratePerCameraMbps": {
             "optional": True,
             "type": 'integer',
-            "default": 10 * 1024 * 1024
+            "default": 10,
+        },
+        "minimumArchiveFreeSpacePerCameraSeconds": {
+            "optional": True,
+            "type": 'integer',
+            "default": 180,
         },
         "timeDiffThresholdSeconds": {
             "optional": True,
@@ -196,7 +200,17 @@ def load_configs(conf_file, ini_file):
         },
         "swapThresholdMegabytes": {
             "optional": True,
-            "type": 'float',
+            "type": 'integer',
+            "default": 0,
+        },
+        "sleepBeforeCheckingArchiveSeconds": {
+            "optional": True,
+            "type": 'integer',
+            "default": 90,
+        },
+        "maxAllowedNetworkErrors": {
+            "optional": True,
+            "type": 'integer',
             "default": 0,
         },
     }
@@ -214,15 +228,14 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.debug = ini['testcameraDebug']
 
     if ini.ORIGINAL_OPTIONS is not None:
-        print(f"Overriding default options via {ini_file}:")
+        report(f"Overriding default options via {ini_file}:")
         for k, v in ini.ORIGINAL_OPTIONS.items():
-            print(f"    {k}={v}")
-    print('')
+            report(f"    {k}={v}")
+    report('')
 
-    print(f"Configuration defined in {conf_file}:")
+    report(f"Configuration defined in {conf_file}:")
     for k, v in conf.options.items():
-        print(f"    {k}={v}")
-    print('')
+        report(f"    {k}={v}")
 
     return conf, ini
 
@@ -250,40 +263,33 @@ def box_combined_cpu_usage(box):
 
 
 def report_server_storage_failures(api, streaming_started_at):
-    print(f"    Requesting potential failure events from the Server...")
+    report(f"    Requesting potential failure events from the Server...")
     log_events = api.get_events(streaming_started_at)
     storage_failure_events_count = sum(
         event['aggregationCount']
         for event in log_events
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
-    print(f"        Storage failures: {storage_failure_events_count}")
+    report(f"        Storage failures: {storage_failure_events_count}")
 
     if storage_failure_events_count > 0:
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
-def get_writable_storages(api, ini):
-    try:
-        storages = api.get_storage_spaces()
-    except exceptions.VmsBenchmarkError as e:
-        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP', original_exception=e)
-
-    if storages is None:
-        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP: request failed')
-
-    def storage_is_writable(storage):
-        free_space = int(storage['freeSpace'])
-        reserved_space = int(storage['reservedSpace'])
-
-        return free_space >= reserved_space + ini['minimumStorageFreeBytes']
-
-    try:
-        result = [storage for storage in storages if storage_is_writable(storage)]
-    except (ValueError, KeyError) as e:
-        raise exceptions.ServerApiResponseError("Bad response body for storage info request", original_exception=e)
-
-    return result
+def _check_storages(api, ini, camera_count):
+    space_for_recordings_bytes = (
+        camera_count
+        * ini['minimumArchiveFreeSpacePerCameraSeconds']
+        * ini['archiveBitratePerCameraMbps'] * 1000 * 1000 // 8
+    )
+    for storage in _get_storages(api):
+        if storage.free_space >= storage.reserved_space + space_for_recordings_bytes:
+            break
+    else:
+        raise exceptions.BoxStateError(
+            f"Server has no video archive Storage "
+            f"with at least {space_for_recordings_bytes // 1024 ** 2} MB "
+            f"of non-reserved free space.")
 
 
 def get_cumulative_swap_bytes(box):
@@ -300,15 +306,103 @@ def get_cumulative_swap_bytes(box):
     return kilobytes_swapped * 1024
 
 
+def box_uptime(box):
+    uptime_content = box.eval('cat /proc/uptime')
+
+    if uptime_content is None:
+        raise exceptions.BoxFileContentError('/proc/uptime')
+
+    uptime_components = uptime_content.split()
+    uptime_s, idle_time_s = [float(v) for v in uptime_components[0:2]]
+
+    return uptime_s, idle_time_s
+
+
+def box_tx_rx_errors(box):
+    errors_content = box.eval(f'cat /sys/class/net/{box.eth_name}/statistics/tx_errors /sys/class/net/{box.eth_name}/statistics/rx_errors')
+
+    if errors_content is None:
+        raise exceptions.BoxFileContentError(f'/sys/class/net/{box.eth_name}/statistics/{{tx,rx}}_errors')
+
+    errors_components = errors_content.split('\n')
+    tx_errors, rx_errors = [int(v) for v in errors_components[0:2]]
+
+    return tx_errors + rx_errors
+
+
+# TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
+def report(message, end='\n'):
+    print(message, end=end)
+    if message.strip():
+        logging.info(message.strip())
+
+
 # Refers to the log file in the messages to the user. Filled after determining the log file path.
 log_file_ref = None
 
 
-@click.command()
-@click.option('--config', 'conf_file', default='vms_benchmark.conf', help='Configuration file.')
-@click.option('--ini-config', 'ini_file', default='vms_benchmark.ini',
+def _test_api(api):
+    logging.info('Starting REST API basic test...')
+
+    def wait_for_api(timeout=60):
+        started_at = time.time()
+
+        while True:
+            resp = api.ping()
+
+            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
+                break
+
+            if time.time() - started_at > timeout:
+                return False
+
+            time.sleep(0.5)
+
+        time.sleep(5)
+        return True
+
+    if not wait_for_api():
+        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
+    report('\nREST API basic test is OK.')
+    logging.info('Starting REST API authentication test...')
+    api.check_authentication()
+    report('REST API authentication test is OK.')
+
+
+class Storage:
+    def __init__(self, raw):
+        try:
+            self.url = raw['url']
+            self.free_space = int(raw['freeSpace'])
+            self.reserved_space = int(raw['reservedSpace'])
+        except Exception as e:
+            raise exceptions.ServerApiError(
+                'Incorrect Storage info received from the Server.',
+                original_exception=e)
+
+
+def _get_storages(api) -> List[Storage]:
+    try:
+        reply = api.get_storage_spaces()
+    except Exception as e:
+        raise exceptions.ServerApiError(
+            'Unable to get VMS Storages via REST HTTP: request failed',
+            original_exception=e)
+    if reply is None:
+        raise exceptions.ServerApiError(
+            'Unable to get VMS Storages via REST HTTP: invalid reply.')
+    return [Storage(item) for item in reply]
+
+
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
+    help='Configuration file.')
+@click.option(
+    '--ini-config', '-i', 'ini_file', default='vms_benchmark.ini', metavar='<filename>', show_default=True,
     help='Internal configuration file for experimenting and debugging.')
-@click.option('--log', 'log_file', default='vms_benchmark.log',
+@click.option(
+    '--log', '-l', 'log_file', default='vms_benchmark.log', metavar='<filename>', show_default=True,
     help='Detailed log of all actions; intended to be studied by the support team.')
 def main(conf_file, ini_file, log_file):
     global log_file_ref
@@ -327,7 +421,7 @@ def main(conf_file, ini_file, log_file):
 
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
-                "ERROR: sshpass is not on PATH" +
+                "sshpass is not on PATH" +
                 " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
                 f"Details for the error: {res.formatted_message()}"
             )
@@ -353,29 +447,29 @@ def main(conf_file, ini_file, log_file):
                 f"Details of the error: {res.formatted_message()}"
             )
 
-    print(f"Box IP: {box.ip}")
-    print(f"Used network device name: {box.eth_name}")
-    if box.is_root:
-        print(f"Box ssh user is root.")
-
     linux_distribution = LinuxDistributionDetector.detect(box)
-
-    print(f"Linux distribution name: {linux_distribution.name}")
-    print(f"Linux distribution version: {linux_distribution.version}")
-    print(f"Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}")
-
     box_platform = BoxPlatform.gather(box, linux_distribution)
-
-    print(f"Arch: {box_platform.arch}")
-    print(f"Number of CPUs: {box_platform.cpu_count}")
-    print(f"CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else '-'}")
-    print(f"RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)")
-    print("Volumes:")
-    [
-        print(f"    {storage['fs']} on {storage['point']}: free {storage['space_free']} of {storage['space_total']}")
-        for (point, storage) in
-        box_platform.storages_list.items()
-    ]
+    report(
+        "\nBox properties detected:\n"
+        f"    IP address: {box.ip}\n"
+        f"    Network adapter name: {box.eth_name}\n"
+        f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
+        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
+        f"    Linux distribution name: {linux_distribution.name}\n"
+        f"    Linux distribution version: {linux_distribution.version}\n"
+        f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
+        f"    Arch: {box_platform.arch}\n"
+        f"    Number of CPUs: {box_platform.cpu_count}\n"
+        f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
+        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
+        "    Volumes:\n"
+        + '\n'.join(
+            f"        {storage['fs']} "
+            f"on {storage['point']}: "
+            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
+            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
+            for (point, storage) in box_platform.storages_list.items())
+    )
 
     box_time_output = box.eval('date +%s.%N')
     try:
@@ -385,23 +479,21 @@ def main(conf_file, ini_file, log_file):
     host_time = time.time()
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
-            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} sec")
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
 
     vmses = VmsScanner.scan(box, linux_distribution)
 
     if vmses and len(vmses) > 0:
-        print(f"Detected VMS installation(s):")
+        report(f"\nDetected VMS installation(s):")
         for vms in vmses:
-            print(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
-            print(f" pid {vms.pid if vms.pid else '-'}", end='')
+            report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
+            report(f" pid {vms.pid if vms.pid else '-'}", end='')
             vms_uid = vms.uid()
             if vms_uid:
-                print(f" uid {vms_uid}", end='')
-            print(')')
+                report(f" uid {vms_uid}", end='')
+            report(')')
     else:
-        print("No VMS installations found on the box.")
-        print("Nothing to do.")
-        return 0
+        raise exceptions.BoxStateError("No VMS installations found on the box.")
 
     if len(vmses) > 1:
         raise exceptions.BoxStateError("More than one Server installation found at the box.")
@@ -411,54 +503,33 @@ def main(conf_file, ini_file, log_file):
     if not vms.is_up():
         raise exceptions.BoxStateError("VMS is not running currently at the box.")
 
-    if not vms.override_ini_config(
-        {
-            'nx_streaming': {
-                'enableTimeCorrection': 0,
-                'unloopCameraPtsWithModulus': ini['testFileHighDurationMs']*1000 + 1000000//ini['testStreamFpsHigh'],
-            },
-        }
-    ):
-        print("Unable to override VMS internal configs.")
+    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
+    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
+    vms.override_ini_config({
+        'nx_streaming': {
+            'enableTimeCorrection': 0,
+            'unloopCameraPtsWithModulus': modulus_us,
+        },
+    })
 
     api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
+    _test_api(api)
 
-    for i in 1, 2, 3:
-        cameras = api.get_test_cameras_all()
-        if cameras is not None:
-            break
-        print(f"Attempt #{i}to get camera list")
-        time.sleep(i)
-
-    if cameras is None:
-        raise exceptions.ServerApiError(message="Unable to get camera list.")
-
-    module_information = api.get_module_information()
-
-    if module_information is None:
-        raise exceptions.ServerApiError(message="Unable to get module information.")
-
-    vms_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
-    vms_id = vms_id_raw[1:-1] if vms_id_raw[0] == '{' and vms_id_raw[-1] == '}' else vms_id_raw
+    storages = _get_storages(api)
 
     vms.stop(exc=True)
 
-    print('Server stopped.')
+    report('Server stopped.')
 
-    for camera in cameras:
-        box.sh(f"rm -rf '{vms.dir}/var/data/hi_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -rf '{vms.dir}/var/data/low_quality/{camera.mac}'", su=True, exc=True)
-        box.sh(f"rm -f '{vms.dir}/var/data/{vms_id}_media.nxdb'", su=True, exc=True)
-
-    print('Camera archives cleaned.')
+    _clear_storages(box, storages)
 
     swapped_before_bytes = get_cumulative_swap_bytes(box)
     if swapped_before_bytes is None:
-        print("Cannot obtain swap information.")
+        report("Cannot obtain swap information.")
 
     vms.start(exc=True)
 
-    print('Server starting...')
+    report('Starting Server...')
 
     def wait_for_server_up(timeout=30):
         started_at = time.time()
@@ -485,53 +556,20 @@ def main(conf_file, ini_file, log_file):
 
     vms = vmses[0]
 
-    print('Server started successfully.')
+    report('Server started successfully.')
 
     ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
         ram_free_bytes = box_platform.ram_free_bytes()
-    print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
-    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
-
-    def wait_for_api(timeout=60):
-        started_at = time.time()
-
-        while True:
-            resp = api.ping()
-
-            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
-                break
-
-            if time.time() - started_at > timeout:
-                return False
-
-            time.sleep(0.5)
-
-        time.sleep(5)
-        return True
-
-    if not wait_for_api():
-        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
-
-    print('REST API basic test is OK.')
-
-    api.check_authentication()
-    print('REST API authentication test is OK.')
-
-    try:
-        storages = get_writable_storages(api, ini)
-    except Exception as e:
-        raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
-
-    if len(storages) == 0:
-        raise exceptions.BoxStateError("Server has no suitable video archive storage, check the free space")
+    _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
         if cameras is not None:
             break
-        print(f"Attempt #{i}to get camera list")
+        report(f"Attempt #{i}to get camera list")
         time.sleep(i)
 
     if cameras is not None:
@@ -550,7 +588,11 @@ def main(conf_file, ini_file, log_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in conf['virtualCameraCount']:
+    report('')
+    report('Starting load test...')
+    load_test_started_at_s = time.time()
+
+    for [test_number, test_cameras_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
@@ -560,9 +602,15 @@ def main(conf_file, ini_file, log_file):
             raise exceptions.InsufficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
-        print(f"Serving {test_cameras_count} virtual cameras.")
-        print("")
+        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_cameras_count)
+        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_cameras_count)
+        report(
+            f"Load test #{test_number}: "
+            f"{test_cameras_count} virtual camera(s), "
+            f"{total_live_stream_count} live stream(s), "
+            f"{total_archive_stream_count} archive stream(s)...")
 
+        logging.info(f'Starting {test_cameras_count} virtual camera(s)...')
         ini_local_ip = ini['testcameraLocalInterface']
         test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=ini_local_ip if ini_local_ip else box.local_ip,
@@ -570,8 +618,10 @@ def main(conf_file, ini_file, log_file):
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
         )
+        frame_drops_sum = 0
+        max_lag_s = 0
         with test_camera_context_manager as test_camera_context:
-            print(f"    Started {test_cameras_count} virtual cameras.")
+            report(f"    Started {test_cameras_count} virtual camera(s).")
 
             def wait_test_cameras_discovered(timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
                 started_at = time.time()
@@ -597,19 +647,19 @@ def main(conf_file, ini_file, log_file):
             try:
                 discovering_timeout_seconds = conf['cameraDiscoveryTimeoutSeconds']
 
-                print(
-                    ("    Waiting for virtual cameras discovery and going live " +
-                        f"(timeout is {discovering_timeout_seconds} sec).")
+                report(
+                    "    Waiting for virtual camera discovery and going live "
+                    f"(timeout is {discovering_timeout_seconds} s)..."
                 )
                 res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_seconds, online_duration=3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
-                print("    All virtual cameras discovered and went live.")
+                report("    All virtual cameras discovered and went live.")
 
                 for camera in cameras:
                     if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
-                        print(f"    Recording on camera {camera.id} enabled.")
+                        report(f"    Recording on camera {camera.id} enabled.")
                     else:
                         raise exceptions.TestCameraError(
                             f"Failed enabling recording on camera {camera.id}.")
@@ -617,15 +667,17 @@ def main(conf_file, ini_file, log_file):
                 log_exception('Discovering cameras', e)
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
-            wait_for_archive_timeout_minutes = 1
-            print(f"Waiting the archives are ready to stream ({wait_for_archive_timeout_minutes} minutes)...")
-            time.sleep(wait_for_archive_timeout_minutes*60)
-            print("Waiting finishedWaiting finished..")
+            report(
+                f"    Waiting for the archives to be ready for streaming "
+                f"({ini['sleepBeforeCheckingArchiveSeconds']} s)...")
+            time.sleep(ini['sleepBeforeCheckingArchiveSeconds'])
+
+            report('    Streaming test...')
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
                 camera_ids=[camera.id for camera in cameras],
-                total_live_stream_count=math.ceil(conf['liveStreamsPerCameraRatio'] * len(cameras)),
-                total_archive_stream_count=math.ceil(conf['archiveStreamsPerCameraRatio'] * len(cameras)),
+                total_live_stream_count=total_live_stream_count,
+                total_archive_stream_count=total_archive_stream_count,
                 user=conf['vmsUser'],
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
@@ -636,15 +688,18 @@ def main(conf_file, ini_file, log_file):
                 streams = stream_reader_context[1]
 
                 started = False
-                stream_opening_started_at = time.time()
+                stream_opening_started_at_s = time.time()
 
                 streams_started_flags = dict((stream_id, False) for stream_id, _ in streams.items())
 
-                while time.time() - stream_opening_started_at < 25:
+                while time.time() - stream_opening_started_at_s < 25:
                     if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
                     line = stream_reader_process.stdout.readline().decode('UTF-8')
+                    warning_prefix = 'WARNING: '
+                    if line.startswith(warning_prefix):
+                        raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
                     import re
                     match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
@@ -675,48 +730,65 @@ def main(conf_file, ini_file, log_file):
                     raise exceptions.TestCameraStreamingIssue(
                         f'Cannot open video streams: timeout expired.')
 
-                print("All streams opened.")
+                report("    All streams opened.")
 
                 streaming_duration_mins = conf['streamingTestDurationMinutes']
-                streaming_started_at = time.time()
+                streaming_test_started_at_s = time.time()
 
                 last_ptses = {}
-                first_tses = {}
+                first_timestamps_s = {}
                 frames = {}
                 frame_drops = {}
                 lags = {}
-                streaming_ended_expected = False
+                streaming_ended_expectedly = False
                 issues = []
                 cpu_usage_max_collector = [None]
                 cpu_usage_avg_collector = []
+                tx_rx_errors_collector = [None]
 
                 box_poller_thread_stop_event = threading.Event()
                 box_poller_thread_exceptions_collector = []
 
-                def box_poller(stop_event, exception_collector, cpu_usage_max_collector, cpu_usage_avg_collector):
+                def box_poller(
+                        stop_event,
+                        exception_collector,
+                        cpu_usage_max_collector,
+                        cpu_usage_avg_collector,
+                        tx_rx_errors_collector
+                ):
+                    prev_uptime, prev_idle_time_s = None, None
                     try:
                         while not stop_event.isSet():
-                            loadavg = box.eval('cat /proc/loadavg')
-                            if not loadavg:
-                                # TODO: raise
-                                pass
-                            match = re.match(r'(\d+\.\d+) (\d+\.\d+) (\d+\.\d+) .*', loadavg)
-                            if not match:
-                                # TODO: raise
-                                pass
-                            cpu_usage_last_minute = float(match.group(1))
-                            print(f"{round(time.time() - streaming_started_at)} seconds after the test started. CPU usage={cpu_usage_last_minute}.")
-                            if not cpu_usage_max_collector[0] is None:
-                                cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
-                            else:
-                                cpu_usage_max_collector[0] = cpu_usage_last_minute
+                            uptime, idle_time_s = box_uptime(box)
+                            if prev_idle_time_s is not None and prev_uptime is not None:
+                                idle_time_delta_total_s = idle_time_s - prev_idle_time_s
+                                idle_time_delta_per_core_s = idle_time_delta_total_s / box_platform.cpu_count
+                                uptime_delta_s = uptime - prev_uptime
+                                cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
+                                report(
+                                    f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
+                                    f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
+                                    f"dropped frames: {frame_drops_sum}, "
+                                    f"max stream lag: {max_lag_s:.3f} s.")
+                                if not cpu_usage_max_collector[0] is None:
+                                    cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
+                                else:
+                                    cpu_usage_max_collector[0] = cpu_usage_last_minute
+                                cpu_usage_avg_collector.append(cpu_usage_last_minute)
+                                if cpu_usage_last_minute > ini['cpuUsageThreshold']:
+                                    raise exceptions.CpuUsageThresholdExceededIssue(
+                                        cpu_usage_last_minute,
+                                        ini['cpuUsageThreshold']
+                                    )
+                            prev_uptime, prev_idle_time_s = uptime, idle_time_s
 
-                            cpu_usage_avg_collector.append(cpu_usage_last_minute)
-                            if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                                raise exceptions.CpuUsageThresholdExceededIssue(
-                                    cpu_usage_last_minute,
-                                    ini['cpuUsageThreshold']
-                                )
+                            tx_rx_errors = box_tx_rx_errors(box)
+
+                            if tx_rx_errors_collector[0] is None:
+                                tx_rx_errors_collector[0] = 0
+
+                            tx_rx_errors_collector[0] += tx_rx_errors
+
                             stop_event.wait(60)
                     except Exception as e:
                         exception_collector.append(e)
@@ -729,13 +801,14 @@ def main(conf_file, ini_file, log_file):
                         box_poller_thread_exceptions_collector,
                         cpu_usage_max_collector,
                         cpu_usage_avg_collector,
+                        tx_rx_errors_collector,
                     )
                 )
 
                 box_poller_thread.start()
 
                 try:
-                    while time.time() - streaming_started_at < streaming_duration_mins*60:
+                    while time.time() - streaming_test_started_at_s < streaming_duration_mins * 60:
                         if stream_reader_process.poll() is not None:
                             raise exceptions.RtspPerfError("Streaming unxpectedly ended.")
 
@@ -751,13 +824,13 @@ def main(conf_file, ini_file, log_file):
                                 issues.append(
                                     exceptions.TestCameraStreamingIssue(
                                         (
-                                            'Unexpected error during acquiaring VMS server CPU usage. ' +
+                                            'Unexpected error during acquiring VMS Server CPU usage. ' +
                                             'Can be caused by network issues or Server issues.'
                                         ),
                                         original_exception=box_poller_thread_exceptions_collector
                                     )
                                 )
-                            streaming_ended_expected = True
+                            streaming_ended_expectedly = True
                             break
 
                         line = stream_reader_process.stdout.readline().decode('UTF-8')
@@ -779,23 +852,22 @@ def main(conf_file, ini_file, log_file):
 
                         frames[pts_stream_id] = frames.get(pts_stream_id, 0) + 1
 
-                        if pts_stream_id not in first_tses:
-                            first_tses[pts_stream_id] = time.time()
-                        elif streams[pts_stream_id]['type'] == 'live':
-                            lags[pts_stream_id] = max(
-                                lags.get(pts_stream_id, 0),
-                                time.time() - (
-                                    first_tses[pts_stream_id] +
-                                        frames.get(pts_stream_id, 0) * (1.0/float(ini['testFileFps']))
-                                )
-                            )
+                        timestamp_s = time.time()
 
-                        ts = time.time()
+                        if pts_stream_id not in first_timestamps_s:
+                            first_timestamps_s[pts_stream_id] = timestamp_s
+                        elif streams[pts_stream_id]['type'] == 'live':
+                            frame_interval_s = 1.0 / float(ini['testFileFps'])
+                            this_frame_offset_s = frames.get(pts_stream_id, 0) * frame_interval_s
+                            expected_frame_time_s = first_timestamps_s[pts_stream_id] + this_frame_offset_s
+                            this_frame_lag_s = timestamp_s - expected_frame_time_s
+                            lags[pts_stream_id] = max(lags.get(pts_stream_id, 0), this_frame_lag_s)
+                            max_lag_s = max(max_lag_s, this_frame_lag_s)
 
                         pts_diff_deviation_factor_max = 0.03
-                        pts_diff_expected = 1000000./float(ini['testFileFps'])
+                        pts_diff_expected = 1000000.0 / float(ini['testFileFps'])
                         pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
-                        pts_diff_max = (1000000./float(ini['testFileFps']))*(1.0 + pts_diff_deviation_factor_max)
+                        pts_diff_max = (1000000.0 / float(ini['testFileFps'])) * (1.0 + pts_diff_deviation_factor_max)
 
                         # The value is negative because the first PTS of new loop is less than last PTS of the previous
                         # loop.
@@ -811,12 +883,17 @@ def main(conf_file, ini_file, log_file):
                                 pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
                             ):
                                 frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
-                                print(f'Detected framedrop from camera {streams[pts_stream_id]["camera_id"]}: ', end='')
-                                print(f'{pts_diff} (max={pts_diff_max}) {pts} {time.time()}')
+                                frame_drops_sum += 1
+                                report(
+                                    f'    Detected frame drop on camera {streams[pts_stream_id]["camera_id"]}: '
+                                    f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
+                                    f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
+                                )
 
-                        if time.time() - streaming_started_at > streaming_duration_mins*60:
-                            streaming_ended_expected = True
-                            print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
+                        if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
+                            streaming_ended_expectedly = True
+                            report(
+                                f"    Streaming test #{test_number} with {test_cameras_count} virtual camera(s) finished.")
                             break
 
                         last_ptses[pts_stream_id] = pts
@@ -826,11 +903,11 @@ def main(conf_file, ini_file, log_file):
                 cpu_usage_max = cpu_usage_max_collector[0]
 
                 if cpu_usage_avg_collector is not None:
-                    cpu_usage_avg = sum(cpu_usage_avg_collector)/len(cpu_usage_avg_collector)
+                    cpu_usage_avg = sum(cpu_usage_avg_collector) / len(cpu_usage_avg_collector)
                 else:
                     cpu_usage_avg = None
 
-                if not streaming_ended_expected:
+                if not streaming_ended_expectedly:
                     raise exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
                         'the stream has unexpectedly finished; ' +
@@ -838,10 +915,10 @@ def main(conf_file, ini_file, log_file):
                         original_exception=issues
                     )
 
-                if time.time() - ts > 5:
+                if time.time() - timestamp_s > 5:
                     raise exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
-                        'the stream had been hanged; ' +
+                        'the stream has hung; ' +
                         'can be caused by network issues or Server issues.')
 
                 try:
@@ -853,43 +930,91 @@ def main(conf_file, ini_file, log_file):
                         original_exception=e
                     ))
 
-                frame_drops_sum = sum(frame_drops.values())
+                if tx_rx_errors_collector[0] is None:
+                    tx_rx_errors_collector[0] = 0
 
-                print(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
-                if cpu_usage_max is not None:
-                    print(f"    Maximum CPU usage: {str(cpu_usage_max)}")
-                if cpu_usage_avg is not None:
-                    print(f"    Average CPU usage: {str(cpu_usage_avg)}")
-                if ram_free_bytes is not None:
-                    print(f"    Free RAM: {to_megabytes(ram_free_bytes)} MB")
+                if tx_rx_errors_collector[0] > ini['maxAllowedNetworkErrors']:
+                    issues.append(exceptions.TestCameraStreamingIssue(
+                        f"Network errors detected: {tx_rx_errors_collector[0]}"
+                    ))
+
+                streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
+                report(
+                    f"    Streaming test statistics:\n"
+                    f"        Frame drops: {sum(frame_drops.values())} (expected 0)\n"
+                    + (
+                        f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
+                        if tx_rx_errors_collector[0] is not None else '')
+                    + (
+                        f"        Maximum box CPU usage: {cpu_usage_max * 100:.0f}%\n"
+                        if cpu_usage_max is not None else '')
+                    + (
+                        f"        Average box CPU usage: {cpu_usage_avg * 100:.0f}%\n"
+                        if cpu_usage_avg is not None else '')
+                    + (
+                        f"        Box free RAM: {to_megabytes(ram_free_bytes)} MB\n"
+                        if ram_free_bytes is not None else '')
+                    + f"        Streaming test duration: {streaming_test_duration_s} s"
+                )
 
                 if frame_drops_sum > 0:
                     issues.append(exceptions.VmsBenchmarkIssue(f'{frame_drops_sum} frame drops detected.'))
 
                 try:
-                    report_server_storage_failures(api, round(streaming_started_at*1000))
+                    report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
                 except exceptions.VmsBenchmarkIssue as e:
                     issues.append(e)
 
                 max_allowed_lag_seconds = 5
-                max_lag = max(lags.values())
-                if max_lag > max_allowed_lag_seconds:
+                if max_lag_s > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: ' +
-                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds.'
+                        f'the video lag {max_lag_s:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
-                    raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
+                    raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
+
+                report(f"    Streaming test #{test_number} with {test_cameras_count} virtual camera(s) succeeded.")
 
     if swapped_before_bytes is not None:
         swapped_after_bytes = get_cumulative_swap_bytes(box)
         swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
         if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
-            raise exceptions.BoxStateError(f"More than {ini['swapThresholdMegabytes']} MB was swapped during the tests.")
+            if swapped_during_test_bytes > 1024 * 1024:
+                swapped_str = f'{swapped_during_test_bytes // (1024 * 1024)} MB'
+            else:
+                swapped_str = f'{swapped_during_test_bytes} bytes'
+            raise exceptions.BoxStateError(
+                f"More than {ini['swapThresholdMegabytes']} MB swapped at the box during the tests: {swapped_str}.")
 
-    print('\nSUCCESS: All tests finished.')
+    report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
+
+    report('\nSUCCESS: All tests finished.')
     return 0
+
+
+def _clear_storages(box, storages: List[Storage]):
+    for storage in storages:
+        box.sh(
+            f"rm -rf "
+            f"'{storage.url}/hi_quality' "
+            f"'{storage.url}/low_quality' "
+            f"'{storage.url}/'*_media.nxdb",
+            su=True, exc=True)
+    report('Server video archives deleted.')
+
+
+def _get_cameras_reliably(api):
+    for i in 1, 2, 3:
+        cameras = api.get_test_cameras_all()
+        if cameras is not None:
+            break
+        report(f"Attempt #{i}to get camera list")
+        time.sleep(i)
+    if cameras is None:
+        raise exceptions.ServerApiError(message="Unable to get camera list.")
+    return cameras
 
 
 def nx_format_exception(exception):
@@ -907,21 +1032,25 @@ def nx_format_exception(exception):
 
 
 def nx_print_exception(exception, recursive_level=0):
-    string_indent = '  '*recursive_level
+    string_indent = '  ' * recursive_level
     if isinstance(exception, exceptions.VmsBenchmarkError):
         print(f"{string_indent}{str(exception)}", file=sys.stderr)
+        if isinstance(exception, exceptions.VmsBenchmarkIssue):
+            for e in exception.sub_issues:
+                nx_print_exception(e, recursive_level=recursive_level + 2)
         if exception.original_exception:
             print(f'{string_indent}Caused by:', file=sys.stderr)
             if isinstance(exception.original_exception, list):
                 for e in exception.original_exception:
-                    nx_print_exception(e, recursive_level=recursive_level+2)
+                    nx_print_exception(e, recursive_level=recursive_level + 2)
             else:
-                nx_print_exception(exception.original_exception, recursive_level=recursive_level+2)
+                nx_print_exception(exception.original_exception, recursive_level=recursive_level + 2)
     else:
         print(
             f'{string_indent}{nx_format_exception(exception)}'
             if recursive_level > 0
-            else f'{string_indent}ERROR: {nx_format_exception(exception)}'
+            else f'{string_indent}ERROR: {nx_format_exception(exception)}',
+            file=sys.stderr,
         )
 
 
@@ -932,22 +1061,22 @@ if __name__ == '__main__':
         except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
             print(f'ISSUE: ', file=sys.stderr, end='')
             nx_print_exception(e)
-            print('')
-            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.')
+            print('', file=sys.stderr)
+            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr)
             log_exception('ISSUE', e)
         except exceptions.VmsBenchmarkError as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
             if log_file_ref:
-                print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
+                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr)
             log_exception('ERROR', e)
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}')
+            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
             if log_file_ref:
-                print(f'\nNOTE: Details may be available in {log_file_ref}.')
+                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr)
             log_exception('UNEXPECTED ERROR', e)
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}')
+        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
         print(f'\nPlease send the complete output ' +
             (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
             file=sys.stderr)

@@ -12,7 +12,7 @@ namespace sample {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* /*plugin*/):
+Engine::Engine():
     nx::sdk::analytics::Engine(/*enableOutput*/ true)
 {
 }
@@ -23,7 +23,7 @@ Engine::~Engine()
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    *outResult = new DeviceAgent(this, deviceInfo);
+    *outResult = new DeviceAgent(deviceInfo);
 }
 
 std::string Engine::manifestString() const
@@ -53,8 +53,8 @@ extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kPluginManifest,
-        [](nx::sdk::analytics::Plugin* plugin)
+        [](nx::sdk::analytics::Plugin* /*plugin*/)
         {
-            return new nx::vms_server_plugins::analytics::sample::Engine(plugin);
+            return new nx::vms_server_plugins::analytics::sample::Engine();
         });
 }
