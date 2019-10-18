@@ -270,15 +270,15 @@ def box_combined_cpu_usage(box):
 def report_server_storage_failures(api, streaming_started_at):
     report(f"    Requesting potential failure events from the Server...")
     log_events = api.get_events(streaming_started_at)
-    storage_failure_events_count = sum(
+    storage_failure_event_count = sum(
         event['aggregationCount']
         for event in log_events
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
-    report(f"        Storage failures: {storage_failure_events_count}")
+    report(f"        Storage failures: {storage_failure_event_count}")
 
-    if storage_failure_events_count > 0:
-        raise exceptions.StorageFailuresIssue(storage_failure_events_count)
+    if storage_failure_event_count > 0:
+        raise exceptions.StorageFailuresIssue(storage_failure_event_count)
 
 
 def _check_storages(api, ini, camera_count):
@@ -591,35 +591,35 @@ def main(conf_file, ini_file, log_file):
     report('Starting load test...')
     load_test_started_at_s = time.time()
 
-    for [test_number, test_cameras_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
+    for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_available_bytes = box_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
-        ram_required_bytes = test_cameras_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
+        ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
         if ram_available_bytes and ram_available_bytes < ram_required_bytes:
             raise exceptions.InsufficientResourcesError(
-                f"Not enough free RAM on the box for {test_cameras_count} cameras.")
+                f"Not enough free RAM on the box for {test_camera_count} cameras.")
 
-        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_cameras_count)
-        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_cameras_count)
+        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_camera_count)
+        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_camera_count)
         report(
             f"Load test #{test_number}: "
-            f"{test_cameras_count} virtual camera(s), "
+            f"{test_camera_count} virtual camera(s), "
             f"{total_live_stream_count} live stream(s), "
             f"{total_archive_stream_count} archive stream(s)...")
 
-        logging.info(f'Starting {test_cameras_count} virtual camera(s)...')
+        logging.info(f'Starting {test_camera_count} virtual camera(s)...')
         ini_local_ip = ini['testcameraLocalInterface']
         test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=ini_local_ip if ini_local_ip else box.local_ip,
-            count=test_cameras_count,
+            count=test_camera_count,
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
         )
         frame_drops_sum = 0
         max_lag_s = 0
         with test_camera_context_manager as test_camera_context:
-            report(f"    Started {test_cameras_count} virtual camera(s).")
+            report(f"    Started {test_camera_count} virtual camera(s).")
 
             def wait_test_cameras_discovered(timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
                 started_at = time.time()
@@ -631,7 +631,7 @@ def main(conf_file, ini_file, log_file):
 
                     cameras = api.get_test_cameras()
 
-                    if len(cameras) >= test_cameras_count:
+                    if len(cameras) >= test_camera_count:
                         if detection_started_at is None:
                             detection_started_at = time.time()
                         elif time.time() - detection_started_at >= online_duration:
@@ -890,7 +890,7 @@ def main(conf_file, ini_file, log_file):
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
                             report(
-                                f"    Streaming test #{test_number} with {test_cameras_count} virtual camera(s) finished.")
+                                f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) finished.")
                             break
 
                         last_ptses[pts_stream_id] = pts
@@ -972,7 +972,7 @@ def main(conf_file, ini_file, log_file):
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
 
-                report(f"    Streaming test #{test_number} with {test_cameras_count} virtual camera(s) succeeded.")
+                report(f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) succeeded.")
 
     if swapped_before_bytes is not None:
         swapped_after_bytes = get_cumulative_swap_bytes(box)
