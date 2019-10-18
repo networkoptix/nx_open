@@ -477,6 +477,7 @@ def main(conf_file, ini_file, log_file):
     except ValueError:
         raise exceptions.BoxStateError("Cannot parse output of the date command")
     host_time = time.time()
+    logging.info(f"Time difference (box time minus host time): {box_time - host_time:.3f} s.")
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
             f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
