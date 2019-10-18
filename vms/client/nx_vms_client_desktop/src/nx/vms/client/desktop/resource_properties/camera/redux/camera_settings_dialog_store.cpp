@@ -473,10 +473,14 @@ void CameraSettingsDialogStore::setCredentials(
         [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
 }
 
-void CameraSettingsDialogStore::setStreamUrls(const QString& primary, const QString& secondary)
+void CameraSettingsDialogStore::setStreamUrls(
+    const QString& primary, const QString& secondary, ModificationSource source)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setStreamUrls(std::move(state), primary, secondary); });
+        [&](State state)
+        {
+            return Reducer::setStreamUrls(std::move(state), primary, secondary, source);
+        });
 }
 
 } // namespace nx::vms::client::desktop

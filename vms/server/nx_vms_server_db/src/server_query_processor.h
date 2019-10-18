@@ -226,15 +226,10 @@ inline void fixRequestDataIfNeeded(nx::vms::api::EventRuleData* const paramData)
 inline void fixRequestDataIfNeeded(nx::vms::api::StorageData* const paramData)
 {
     nx::utils::Url url = paramData->url;
-    if (!url.isValid())
+    if (!url.isValid() || url.password().isEmpty())
         return;
 
-    if (!url.userName().isEmpty())
-        url.setUserName(nx::utils::encodeHexStringFromStringAES128CBC(url.userName()));
-
-    if (!url.password().isEmpty())
-        url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
-
+    url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
     paramData->url = url.toString();
 }
 

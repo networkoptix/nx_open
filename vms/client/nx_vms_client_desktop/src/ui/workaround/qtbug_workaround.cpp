@@ -87,33 +87,31 @@ class QnQtbugWorkaroundPrivate {};
 QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     QObject(parent)
 {
-    if (nx::utils::AppInfo::isMacOsX())
-    {
-        // Workaround of QTBUG-34767
-        QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp,
-             []()
-             {
-                 const auto modalWindow = qApp->modalWindow();
-                 if (modalWindow && !qApp->focusWindow())
-                     modalWindow->requestActivate();
-             });
+    if (!nx::utils::AppInfo::isMacOsX())
+        return;
 
-        QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp,
-            []()
-            {
-                const auto raiseModelWindow =
-                    []()
+    // Workaround for QTBUG-34767.
+    const auto tryRaiseModalWindow =
+        []()
+        {
+            static constexpr int kRaiseDelay = 100;
+            const auto updateWindow =
+                []()
+                {
+                    const auto modalWindow = qApp->modalWindow();
+                    if (modalWindow && modalWindow != qApp->focusWindow()
+                        && qApp->applicationState() == Qt::ApplicationActive)
                     {
-                        const auto modalWindow = qApp->modalWindow();
-                        if (modalWindow && qApp->applicationState() == Qt::ApplicationActive)
-                            modalWindow->raise();
-                    };
+                        modalWindow->raise();
+                        modalWindow->requestActivate();
+                    }
+                };
 
-                static constexpr int kRaiseDelay = 1000;
-                executeDelayed(raiseModelWindow, kRaiseDelay);
-            });
-    }
+            executeDelayedParented(updateWindow, kRaiseDelay, qApp);
+        };
 
+    QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp, tryRaiseModalWindow);
+    QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp, tryRaiseModalWindow);
 }
 
 QnQtbugWorkaround::~QnQtbugWorkaround() {

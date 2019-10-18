@@ -166,14 +166,13 @@ private:
     {
         if (!m_webSocketConnector->hasRequestSucceeded())
         {
-            NX_DEBUG(this, lm("Failed to establish websocket connection to %1. "
-                "system result code %2, http result code %3")
-                .args(
-                    m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
-                    m_webSocketConnector->response()
-                        ? nx::network::http::StatusCode::toString(
-                            m_webSocketConnector->response()->statusLine.statusCode)
-                        : nx::String("none")));
+            NX_DEBUG(this,
+                "Failed to establish websocket connection to %1 (system code: %2, http code: %3)",
+                m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
+                m_webSocketConnector->response()
+                    ? nx::network::http::StatusCode::toString(
+                        m_webSocketConnector->response()->statusLine.statusCode)
+                    : nx::String("none"));
 
             // TODO Reconnecting.
             return;

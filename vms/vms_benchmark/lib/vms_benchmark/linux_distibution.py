@@ -1,5 +1,4 @@
 from .exceptions import VmsBenchmarkError
-from io import StringIO
 
 
 class LinuxDistributionDetector:

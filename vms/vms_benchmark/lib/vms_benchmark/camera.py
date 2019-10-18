@@ -1,7 +1,6 @@
-import urllib.request
 import base64
 import json
-import sys
+import urllib.request
 
 
 class Camera:

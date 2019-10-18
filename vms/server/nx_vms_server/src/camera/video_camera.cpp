@@ -686,7 +686,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     else
         m_secondaryGopKeeper = std::move(gopKeeper);
 
-    connect(reader.get(), &QThread::finished, this,
+    connect(reader.get(), &QThread::started, this,
         [this, streamIndex]()
         {
             auto gopKeeper = getGopKeeper(streamIndex);

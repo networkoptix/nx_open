@@ -1,11 +1,12 @@
 import logging
-
-from vms_benchmark import exceptions
-import sys
 import platform
 import subprocess
-from io import StringIO
+import sys
 from contextlib import contextmanager
+from io import StringIO
+
+from vms_benchmark import exceptions
+
 
 def log_remote_command(command):
     logging.info(f'Executing remote command:\n    {command}')
@@ -161,7 +162,9 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr.decode("UTF-8")}'
+                    f'Command `{command_wrapped}` failed '
+                    f'with code {run.returncode}, '
+                    f'stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
 
             if stdout:
@@ -170,6 +173,9 @@ if platform.system() == 'Linux':
             if stderr:
                 stderr.write(run.stderr.decode())
                 stderr.flush()
+            else:
+                if run.stderr:
+                    logging.debug('Remote command stderr:\n' + run.stderr.decode())
 
             return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 

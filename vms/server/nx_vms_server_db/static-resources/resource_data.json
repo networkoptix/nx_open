@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.142",
+    "version": "1.0.1.153",
     "data": [
         {
             "keys": [
@@ -1124,7 +1124,8 @@
             "keys": [
                 "AXIS|AXISP8221",
                 "AXIS|AXISC3003E",
-                "AXIS|AXISA9161"
+                "AXIS|AXISA9161",
+                "AXIS|AXISC1004E"
             ],
             "noVideoSupport": true
         },
@@ -2168,33 +2169,6 @@
             "forcedOnvifParams": {
                 "profiles": ["FisheyeView,MOBILE"]
             }
-        },
-        {
-            "keys": ["Dahua|22204TNI"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
-            "_case": "VMS-13871",
-            "forcedOnvifParams":
-            {
-                "videoEncoders": ["000"],
-                "profiles": ["MediaProfile000"]
-            }
-        },
-        {
-            "keys": [
-                "Dahua|IPC-HFW*",
-                "Dahua|IPC-HDB*",
-                "Dahua|IPC-HDW*",
-                "Dahua|N45BL5Z"
-            ],
-            "_comment1": "The camera returns the same URI for all videoencoders, so we fix it.",
-            "_comment2": "No correct URI can be picked up for videoencoder '002', so we ignore '002'",
-            "_case": "VMS-15911, VMS-15969, VMS-14077",
-            "forcedOnvifParams":
-            {
-                "videoEncoders": ["000,001"],
-                "profiles": ["MediaProfile000,MediaProfile001"]
-            },
-            "fixWrongUri": true
         },
         {
             "keys": [
