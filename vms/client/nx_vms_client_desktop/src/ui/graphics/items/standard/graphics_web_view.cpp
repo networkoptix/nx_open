@@ -46,9 +46,9 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *par
     setProperty(Qn::NoHandScrollOver, true);
 
     connect(this, &GraphicsQmlView::statusChanged, this,
-        [this, url](QQmlComponent::Status status)
+        [this, url](QQuickWidget::Status status)
         {
-            if (status != QQmlComponent::Ready)
+            if (status != QQuickWidget::Ready)
                 return;
 
             QQuickItem* webView = rootObject();

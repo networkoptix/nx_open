@@ -1,19 +1,19 @@
 #pragma once
 
 #include <QGraphicsWidget>
-#include <QQuickWindow>
-#include <QOffscreenSurface>
-#include <QOpenGLFramebufferObject>
-#include <QQmlComponent>
-#include <QQmlEngine>
-#include <QOpenGLWidget>
-#include <QTimer>
+#include <QQuickWidget>
 
+class QQmlEngine;
+class QQuickWindow;
+class QQuickItem;
+class QQmlError;
+class QOpenGLWidget;
 
 namespace nx::vms::client::desktop {
 
-class RenderControl;
-
+/**
+ * Shows QML on scene using interface similar to QQuickWidget.
+ */
 class GraphicsQmlView : public QGraphicsWidget
 {
     Q_OBJECT
@@ -27,15 +27,15 @@ public:
     QQmlEngine* engine() const;
     void setData(const QByteArray& data, const QUrl& url);
 
-    QQuickWindow* quickWindow() { return m_quickWindow; }
-    QQuickItem* rootObject() const { return m_rootItem; }
-    QList<QQmlError> errors() const { return m_qmlComponent->errors(); }
+    QQuickWindow* quickWindow() const;
+    QQuickItem* rootObject() const;
+    QList<QQmlError> errors() const;
 
 public slots:
     void setSource(const QUrl& url);
 
 signals:
-    void statusChanged(QQmlComponent::Status status);
+    void statusChanged(QQuickWidget::Status status);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) override;
@@ -51,24 +51,9 @@ protected:
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 
-private slots:
-    void updateSizes();
-
 private:
-    void ensureFbo();
-    void scheduleUpdateSizes();
-    void componentStatusChanged(QQmlComponent::Status status);
-    void initialize(const QRectF& rect, QOpenGLWidget* glWidget);
-
-    bool m_initialized;
-    QQuickWindow* m_quickWindow;
-    QQuickItem* m_rootItem;
-    RenderControl* m_renderControl;
-    QOffscreenSurface* m_offscreenSurface;
-    QOpenGLFramebufferObject* m_fbo;
-    QQmlComponent* m_qmlComponent;
-    QQmlEngine* m_qmlEngine;
-    QTimer* m_resizeTimer;
+    struct Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

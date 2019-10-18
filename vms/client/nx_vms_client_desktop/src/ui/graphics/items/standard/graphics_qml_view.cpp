@@ -2,14 +2,21 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QQmlComponent>
+#include <QQmlEngine>
 #include <QQuickRenderControl>
+#include <QQuickWindow>
 #include <QQuickItem>
+#include <QOffscreenSurface>
+#include <QOpenGLFramebufferObject>
 #include <QOpenGLContext>
 #include <QtGui/QOpenGLFunctions_1_5>
 #include <QOpenGLFunctions>
+#include <QOpenGLWidget>
 
 #include <QGraphicsSceneHoverEvent>
 #include <QApplication>
+#include <QTimer>
 
 #include <client_core/client_core_module.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -172,49 +179,99 @@ QWindow* RenderControl::renderWindow(QPoint* offset)
     return window;
 }
 
-GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
-    : QGraphicsWidget(parent, wFlags)
+struct GraphicsQmlView::Private
 {
-    m_initialized = false;
-    m_fbo = nullptr;
-    m_rootItem = nullptr;
+    GraphicsQmlView* m_view;
+    bool m_initialized;
+    QQuickWindow* m_quickWindow;
+    QQuickItem* m_rootItem;
+    RenderControl* m_renderControl;
+    QOffscreenSurface* m_offscreenSurface;
+    QOpenGLFramebufferObject* m_fbo;
+    QQmlComponent* m_qmlComponent;
+    QQmlEngine* m_qmlEngine;
+    QTimer* m_resizeTimer;
 
-    m_renderControl = new RenderControl(this);
-    connect( m_renderControl, &QQuickRenderControl::renderRequested, this,
+    Private(GraphicsQmlView* view): m_view(view) {}
+
+    void initialize(const QRectF& rect, QOpenGLWidget* glWidget);
+    void updateSizes();
+    void ensureFbo();
+    void scheduleUpdateSizes();
+};
+
+GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
+    : QGraphicsWidget(parent, wFlags), d(new Private(this))
+{
+    d->m_initialized = false;
+    d->m_fbo = nullptr;
+    d->m_rootItem = nullptr;
+
+    d->m_renderControl = new RenderControl(this);
+    connect(d->m_renderControl, &QQuickRenderControl::renderRequested, this,
         [this]()
         {
             this->update();
         }
     );
-    connect( m_renderControl, &QQuickRenderControl::sceneChanged, this,
+
+    connect(d->m_renderControl, &QQuickRenderControl::sceneChanged, this,
         [this]()
         {
             this->update();
         }
     );
 
-    m_quickWindow = new QQuickWindow(m_renderControl);
-    m_quickWindow->setTitle(QString::fromLatin1("Offscreen"));
+    d->m_quickWindow = new QQuickWindow(d->m_renderControl);
+    d->m_quickWindow->setTitle(QString::fromLatin1("Offscreen"));
+    d->m_quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
 
-    m_quickWindow->setGeometry(0, 0, 1920, 1080);
-
-    connect(m_quickWindow, &QQuickWindow::sceneGraphInitialized, this,
+    connect(d->m_quickWindow, &QQuickWindow::sceneGraphInitialized, this,
         [this]()
         {
-            ensureFbo();
+            d->ensureFbo();
         }
     );
 
-    m_resizeTimer = new QTimer(this);
-    m_resizeTimer->setSingleShot(true);
-    m_resizeTimer->setInterval(kResizeTimeout);
-    connect(m_resizeTimer, &QTimer::timeout, this, &GraphicsQmlView::updateSizes);
+    d->m_resizeTimer = new QTimer(this);
+    d->m_resizeTimer->setSingleShot(true);
+    d->m_resizeTimer->setInterval(kResizeTimeout);
+    connect(d->m_resizeTimer, &QTimer::timeout, this, [this](){ d->updateSizes(); });
 
-    m_qmlEngine = qnClientCoreModule->mainQmlEngine();
+    d->m_qmlEngine = qnClientCoreModule->mainQmlEngine();
 
-    m_qmlComponent = new QQmlComponent(m_qmlEngine);
-    connect(m_qmlComponent, &QQmlComponent::statusChanged, this, &GraphicsQmlView::componentStatusChanged);
-    connect(m_qmlComponent, &QQmlComponent::statusChanged, this, &GraphicsQmlView::statusChanged);
+    d->m_qmlComponent = new QQmlComponent(d->m_qmlEngine);
+    connect(d->m_qmlComponent, &QQmlComponent::statusChanged, this,
+        [this](QQmlComponent::Status status)
+        {
+            switch(status)
+            {
+                case QQmlComponent::Null:
+                    emit statusChanged(QQuickWidget::Null);
+                    return;
+                case QQmlComponent::Ready:
+                {
+                    QObject* rootObject = d->m_qmlComponent->create();
+                    d->m_rootItem = qobject_cast<QQuickItem*>(rootObject);
+                    if (!d->m_rootItem)
+                        return;
+
+                    d->m_rootItem->setParentItem(d->m_quickWindow->contentItem());
+
+                    d->scheduleUpdateSizes();
+                    emit statusChanged(QQuickWidget::Ready);
+                    return;
+                }
+                case QQmlComponent::Loading:
+                    emit statusChanged(QQuickWidget::Loading);
+                    return;
+                case QQmlComponent::Error:
+                    for (const auto& error : errors())
+                        NX_ERROR(this, "QML Error: %1", error.toString());
+                    emit statusChanged(QQuickWidget::Error);
+                    return;
+            }
+        });
 
     setAcceptHoverEvents(true);
     setFocusPolicy(Qt::StrongFocus);
@@ -222,26 +279,41 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
 
 GraphicsQmlView::~GraphicsQmlView()
 {
-    if (m_rootItem)
-        delete m_rootItem;
-    delete m_qmlComponent;
-    delete m_quickWindow;
-    delete m_renderControl;
-    if (m_fbo)
-        delete m_fbo;
+    if (d->m_rootItem)
+        delete d->m_rootItem;
+    delete d->m_qmlComponent;
+    delete d->m_quickWindow;
+    delete d->m_renderControl;
+    if (d->m_fbo)
+        delete d->m_fbo;
 }
 
-void GraphicsQmlView::scheduleUpdateSizes()
+QQuickWindow* GraphicsQmlView::quickWindow() const
+{
+    return d->m_quickWindow;
+}
+
+QQuickItem* GraphicsQmlView::rootObject() const
+{
+    return d->m_rootItem;
+}
+
+QList<QQmlError> GraphicsQmlView::errors() const
+{
+    return d->m_qmlComponent->errors();
+}
+
+void GraphicsQmlView::Private::scheduleUpdateSizes()
 {
     m_resizeTimer->start();
 }
 
 QQmlEngine* GraphicsQmlView::engine() const
 {
-    return m_qmlEngine;
+    return d->m_qmlEngine;
 }
 
-void GraphicsQmlView::ensureFbo()
+void GraphicsQmlView::Private::ensureFbo()
 {
     if (!m_quickWindow)
         return;
@@ -263,7 +335,6 @@ void GraphicsQmlView::ensureFbo()
 
 bool GraphicsQmlView::event(QEvent* event)
 {
-
     // From https://github.com/qt/qtdeclarative/blob/dev/src/quickwidgets/qquickwidget.cpp
     switch (event->type())
     {
@@ -273,25 +344,25 @@ bool GraphicsQmlView::event(QEvent* event)
         case QEvent::TouchUpdate:
         case QEvent::TouchCancel:
             // Touch events only have local and global positions, no need to map.
-            return QCoreApplication::sendEvent(m_quickWindow, event);
+            return QCoreApplication::sendEvent(d->m_quickWindow, event);
         case QEvent::InputMethod:
-            return QCoreApplication::sendEvent(m_quickWindow, event);
+            return QCoreApplication::sendEvent(d->m_quickWindow, event);
         case QEvent::InputMethodQuery:
         {
-            bool eventResult = QCoreApplication::sendEvent(m_quickWindow->focusObject(), event);
+            bool eventResult = QCoreApplication::sendEvent(d->m_quickWindow->focusObject(), event);
             // The result in focusObject are based on m_quickWindow. But
             // the inputMethodTransform won't get updated because the focus
             // is on GraphicsQmlView. We need to remap the value based on the
             // widget.
-            remapInputMethodQueryEvent(m_quickWindow->focusObject(), static_cast<QInputMethodQueryEvent*>(event));
+            remapInputMethodQueryEvent(d->m_quickWindow->focusObject(), static_cast<QInputMethodQueryEvent*>(event));
             return eventResult;
         }
         case QEvent::GraphicsSceneResize:
-            scheduleUpdateSizes();
+            d->scheduleUpdateSizes();
             event->accept();
             break;
         case QEvent::ShortcutOverride:
-            return QCoreApplication::sendEvent(m_quickWindow, event);
+            return QCoreApplication::sendEvent(d->m_quickWindow, event);
         default:
             break;
     }
@@ -301,59 +372,30 @@ bool GraphicsQmlView::event(QEvent* event)
 
 void GraphicsQmlView::setSource(const QUrl& url)
 {
-    m_qmlComponent->loadUrl(url);
+    d->m_qmlComponent->loadUrl(url);
 }
 
 void GraphicsQmlView::setData(const QByteArray& data, const QUrl& url)
 {
-    m_qmlComponent->setData(data, url);
+    d->m_qmlComponent->setData(data, url);
 }
 
-void GraphicsQmlView::componentStatusChanged(QQmlComponent::Status status)
-{
-    if (m_qmlComponent->isError())
-    {
-        const QList<QQmlError> errorList = m_qmlComponent->errors();
-        for (const QQmlError &error : errorList)
-            qDebug() << error.url() << error.line() << error;
-        return;
-    }
-
-    if(QQmlComponent::Ready != status)
-        return;
-
-    QObject* rootObject = m_qmlComponent->create();
-    if (m_qmlComponent->isError())
-    {
-        const QList<QQmlError> errorList = m_qmlComponent->errors();
-        for (const QQmlError &error : errorList)
-            qDebug() << error.url() << error.line() << error;
-        return;
-    }
-    m_rootItem = qobject_cast<QQuickItem*>(rootObject);
-    if (!m_rootItem)
-        return;
-
-    m_rootItem->setParentItem(m_quickWindow->contentItem());
-
-    scheduleUpdateSizes();
-}
-
-void GraphicsQmlView::updateSizes()
+void GraphicsQmlView::Private::updateSizes()
 {
     if (!m_rootItem || !m_quickWindow)
         return;
 
-    m_rootItem->setSize(size());
+    const auto size = m_view->size();
+    m_rootItem->setSize(size);
 
     QPoint offset;
     QWindow* w = m_renderControl->renderWindow(&offset);
     const QPoint pos = w ? w->mapToGlobal(offset) : offset;
 
-    m_quickWindow->setGeometry(pos.x(), pos.y(), size().width(), size().height());
+    m_quickWindow->setGeometry(pos.x(), pos.y(), size.width(), size.height());
 }
 
-void GraphicsQmlView::initialize(const QRectF& rect, QOpenGLWidget* glWidget)
+void GraphicsQmlView::Private::initialize(const QRectF& rect, QOpenGLWidget* glWidget)
 {
     auto context = glWidget->context();
 
@@ -383,7 +425,7 @@ void GraphicsQmlView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     Qt::KeyboardModifiers modifiers = event->modifiers();
 
     QMouseEvent mappedEvent(QEvent::MouseMove, mousePoint, mousePoint, event->screenPos(), button, buttons, modifiers);
-    QCoreApplication::sendEvent(m_quickWindow, &mappedEvent);
+    QCoreApplication::sendEvent(d->m_quickWindow, &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
 
@@ -396,7 +438,7 @@ void GraphicsQmlView::mousePressEvent(QGraphicsSceneMouseEvent* event)
     Qt::KeyboardModifiers modifiers = event->modifiers();
 
     QMouseEvent mappedEvent(QEvent::MouseButtonPress, mousePoint, mousePoint, event->screenPos(), button, buttons, modifiers);
-    QCoreApplication::sendEvent(m_quickWindow, &mappedEvent);
+    QCoreApplication::sendEvent(d->m_quickWindow, &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
 
@@ -408,7 +450,7 @@ void GraphicsQmlView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     Qt::KeyboardModifiers modifiers = event->modifiers();
 
     QMouseEvent mappedEvent(QEvent::MouseButtonRelease, mousePoint, mousePoint, event->screenPos(), button, buttons, modifiers);
-    QCoreApplication::sendEvent(m_quickWindow, &mappedEvent);
+    QCoreApplication::sendEvent(d->m_quickWindow, &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
 
@@ -421,7 +463,7 @@ void GraphicsQmlView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     Qt::KeyboardModifiers modifiers = event->modifiers();
 
     QMouseEvent mappedEvent(QEvent::MouseMove, mousePoint, mousePoint, event->screenPos(), button, buttons, modifiers);
-    QCoreApplication::sendEvent(m_quickWindow, &mappedEvent);
+    QCoreApplication::sendEvent(d->m_quickWindow, &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
 
@@ -430,33 +472,33 @@ void GraphicsQmlView::wheelEvent(QGraphicsSceneWheelEvent* event)
     const QPointF mousePoint = event->pos();
     const QPoint globalPos = event->screenPos();
     QWheelEvent mappedEvent(mousePoint, globalPos, event->delta(), event->buttons(), event->modifiers(), event->orientation());
-    QCoreApplication::sendEvent(m_quickWindow, &mappedEvent);
+    QCoreApplication::sendEvent(d->m_quickWindow, &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
 
 void GraphicsQmlView::keyPressEvent(QKeyEvent* event)
 {
-    QCoreApplication::sendEvent(m_quickWindow, event);
+    QCoreApplication::sendEvent(d->m_quickWindow, event);
 }
 
 void GraphicsQmlView::keyReleaseEvent(QKeyEvent* event)
 {
-    QCoreApplication::sendEvent(m_quickWindow, event);
+    QCoreApplication::sendEvent(d->m_quickWindow, event);
 }
 
 void GraphicsQmlView::focusInEvent(QFocusEvent* event)
 {
-    QCoreApplication::sendEvent(m_quickWindow, event);
+    QCoreApplication::sendEvent(d->m_quickWindow, event);
 }
 
 void GraphicsQmlView::focusOutEvent(QFocusEvent* event)
 {
-    QCoreApplication::sendEvent(m_quickWindow, event);
+    QCoreApplication::sendEvent(d->m_quickWindow, event);
 }
 
 void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    if (!m_rootItem)
+    if (!d->m_rootItem)
         return;
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(scene()->views().first()->viewport());
@@ -465,35 +507,32 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 
     QnGlNativePainting::begin(glWidget, painter);
 
-    if (!m_initialized)
-        initialize(channelRect, glWidget);
+    if (!d->m_initialized)
+        d->initialize(channelRect, glWidget);
 
-    ensureFbo();
+    d->ensureFbo();
 
-    if(glWidget->context()->makeCurrent(m_offscreenSurface))
+    if(glWidget->context()->makeCurrent(d->m_offscreenSurface))
     {
-        m_renderControl->polishItems();
-        m_renderControl->sync();
+        d->m_renderControl->polishItems();
+        d->m_renderControl->sync();
 
-        m_renderControl->render();
-        m_quickWindow->resetOpenGLState();
+        d->m_renderControl->render();
+        d->m_quickWindow->resetOpenGLState();
         glWidget->context()->functions()->glFlush();
         glWidget->context()->doneCurrent();
     }
 
     QnGlNativePainting::end(painter);
 
-    if (!m_fbo)
+    if (!d->m_fbo)
         return;
 
     QnGlNativePainting::begin(glWidget, painter);
 
     const auto functions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
-    // const float pixels[] = {0.0, 1.0, 1.0, 0.0};
-    // functions->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RED, GL_FLOAT, pixels);
-
-    functions->glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
+    functions->glBindTexture(GL_TEXTURE_2D, d->m_fbo->texture());
 
     functions->glEnable(GL_TEXTURE_2D);
     functions->glBegin(GL_QUADS);
