@@ -17,8 +17,13 @@ namespace sample {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+/**
+ * @param deviceInfo Various information about the related device, such as its id, vendor, model,
+ *     etc.
+ */
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(deviceInfo, /*enableOutput*/true)
+    // Call the DeviceAgent helper class constructor telling it to verbosely report to stderr.
+    VideoFrameProcessingDeviceAgent(deviceInfo, /*enableOutput*/ true)
 {
 }
 
@@ -26,9 +31,18 @@ DeviceAgent::~DeviceAgent()
 {
 }
 
+/**
+ *  @return JSON with the particular structure. Note that it is possible to fill in the values
+ * that are not known at compile time, but should not depend on the DeviceAgent settings.
+ */
 std::string DeviceAgent::manifestString() const
 {
-    return /*suppress newline*/1 + R"json(
+    // Tell the Server that the plugin can generate the events and objects of certain types.
+    // Id values are strings and should be unique. Format of ids:
+    // `{vendor_id}.{plugin_id}.{event_id|object_id}`
+    //
+    // See the plugin manifest for the explanation of vendor_id and plugin_id.
+    return /*suppress newline*/ 1 + R"json(
 {
     "eventTypes": [
         {
@@ -46,6 +60,9 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
+/**
+ * Called when the Server sends a new uncompressed frame from a camera.
+ */
 bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
 {
     ++m_frameIndex;
@@ -53,16 +70,27 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 
     auto eventMetadataPacket = generateEventMetadataPacket();
     if (eventMetadataPacket)
+        // Send generated metadata packet to the Server.
         pushMetadataPacket(eventMetadataPacket.releasePtr());
 
-    return true;
+    return true; //< There were no errors while processing the video frame.
 }
 
+/**
+ * Serves the similar purpose as pushMetadataPacket(). The differences are:
+ * - pushMetadataPacket() is called by the plugin, while pullMetadataPackets() is called by Server.
+ * - pushMetadataPacket() expects one metadata packet, while pullMetadataPacket expects the
+ *     std::vector of them.
+ *
+ * There are no strict rules for deciding which method is "better". A rule of thumb is to use
+ * pushMetadataPacket() when you generate one metadata packet and do not want to store it in the
+ * class field, and use pullMetadataPackets otherwise.
+ */
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
 {
     metadataPackets->push_back(generateObjectMetadataPacket().releasePtr());
 
-    return true;
+    return true; //< There were no errors while filling the metadataPackets.
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -70,15 +98,20 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
 
 Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
 {
-    // Generate event with period kTrackFrameCount.
+    // Generate event every kTrackFrameCount'th frame.
     if (m_frameIndex % kTrackFrameCount != 0)
         return nullptr;
 
+    // EventMetadataPacket contains arbitrary number of EventMetadata.
     const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
+    // Bind event metadata packet to the last video frame using a timestamp.
     eventMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    // Zero duration means that the event is not sustained, but momental.
     eventMetadataPacket->setDurationUs(0);
 
+    // EventMetadata contains an information about event.
     const auto eventMetadata = makePtr<EventMetadata>();
+    // Set all required fields.
     eventMetadata->setTypeId(kNewTrackEventType);
     eventMetadata->setIsActive(true);
     eventMetadata->setCaption("New sample plugin track started");
@@ -86,6 +119,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
 
     eventMetadataPacket->addItem(eventMetadata.get());
 
+    // Generate index and track id for the next track.
     ++m_trackIndex;
     m_trackId = nx::sdk::UuidHelper::randomUuid();
 
@@ -94,19 +128,21 @@ Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
 
 Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket()
 {
+    // ObjectMetadataPacket contains arbitrary number of ObjectMetadata.
     const auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
 
-    // Binding the object metadata to the particular video frame.
+    // Bind the object metadata to the last video frame using a timestamp.
     objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-
     objectMetadataPacket->setDurationUs(0);
 
+    // ObjectMetadata contains information about an object on the frame.
     const auto objectMetadata = makePtr<ObjectMetadata>();
+    // Set all required fields.
     objectMetadata->setTypeId(kHelloWorldObjectType);
     objectMetadata->setTrackId(m_trackId);
 
     // Calculate bounding box coordinates each frame so that it moves from the top left corner
-    // to the bottom right corner in kTrackFrameCount frames.
+    // to the bottom right corner during kTrackFrameCount frames.
     static constexpr float d = 0.5F / kTrackFrameCount;
     static constexpr float width = 0.5F;
     static constexpr float height = 0.5F;
@@ -116,6 +152,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket()
     objectMetadata->setBoundingBox(Rect(x, y, width, height));
 
     objectMetadataPacket->addItem(objectMetadata.get());
+
     return objectMetadataPacket;
 }
 
