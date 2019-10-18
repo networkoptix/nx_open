@@ -285,7 +285,7 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_INFO(this, "Connecting with settings %1",
+    NX_DEBUG(this, "Connecting with settings %1",
         m_settings.toString(!nx::utils::log::showPasswords()));
     QUrl uri = m_settings.uri;
 
@@ -415,7 +415,7 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 {
     QString filter = QnLdapFilter(m_dType->Filter()) &
         (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
-    NX_INFO(this, "Fetching users with filter [%1]'", filter);
+    NX_DEBUG(this, "Fetching users with filter [%1]", filter);
 
     LDAP_RESULT rc =
         ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
@@ -566,7 +566,7 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             (cookie != nullptr && cookie->bv_val != nullptr) ? cookie->bv_len : -7);
     } while (cookie && cookie->bv_val != NULL && cookie->bv_len > 0);
 
-    NX_INFO(this, "Fetched %1 user(s)%2",
+    NX_DEBUG(this, "Fetched %1 user(s)%2",
         users.size(), users.size() < 10 ? " - " + containerString(users) : QString());
 
     return true;
@@ -685,13 +685,13 @@ LdapResult LdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& set
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_WARNING(this, "LDAP connect failed: %1", session.lastErrorString());
+        NX_INFO(this, "LDAP connect failed: %1", session.lastErrorString());
         return translateErrorCode(session.lastErrorCode());
     }
 
     if (!session.fetchUsers(users))
     {
-        NX_WARNING(this, "Users fetch failed: %1", session.lastErrorString());
+        NX_INFO(this, "Users fetch failed: %1", session.lastErrorString());
         return translateErrorCode(session.lastErrorCode());
     }
 
@@ -710,7 +710,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_WARNING(this, "Connection error: %1", session.lastErrorString());
+        NX_INFO(this, "Connection error: %1", session.lastErrorString());
         return Qn::Auth_LDAPConnectError;
     }
 
@@ -725,7 +725,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
         dn = session.getUserDn(login);
         if (dn.isEmpty())
         {
-            NX_INFO(this, "User not found, LDAP error: %1", session.lastErrorString());
+            NX_DEBUG(this, "User not found, LDAP error: %1", session.lastErrorString());
             return Qn::Auth_WrongLogin;
         }
 
@@ -735,7 +735,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
 
     auto authResult = session.authenticate(dn, password);
     if (authResult != Qn::Auth_OK)
-        NX_WARNING(this, "Authentication failed: %1", session.lastErrorString());
+        NX_INFO(this, "Authentication failed: %1", session.lastErrorString());
 
     return authResult;
 }
