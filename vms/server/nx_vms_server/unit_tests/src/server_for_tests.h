@@ -29,9 +29,18 @@ public:
     {
         using namespace nx::test;
         QnJsonRestResult result;
-        [&](){ NX_TEST_API_GET(this, api, &result); }();
+        [&]() { NX_TEST_API_GET(this, api, &result); }();
         EXPECT_EQ(result.error, QnJsonRestResult::NoError);
         return result.deserialized<T>();
+    }
+
+    template<>
+    QByteArray get<QByteArray>(const QString& api)
+    {
+        using namespace nx::test;
+        QByteArray result;
+        [&]() { NX_TEST_API_GET(this, api, &result); }();
+        return result;
     }
 
     template<typename T>

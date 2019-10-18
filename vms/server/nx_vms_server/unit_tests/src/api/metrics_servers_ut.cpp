@@ -9,6 +9,8 @@
 #include <nx/metrics/streams_metric_helper.h>
 #include "test_api_requests.h"
 #include <nx/vms/server/metrics/helpers.h>
+#include <test_support/storage_utils.h>
+#include <recorder/storage_manager.h>
 
 namespace nx::vms::server::test {
 
@@ -114,6 +116,7 @@ TEST_F(MetricsServersApi, oneServer)
 
     for (int i = 0; i < 5; ++i)
         addCamera(i);
+
     while (get<SystemValues>("/ec2/metrics/values")["servers"][id]["load"]["cameras"].toDouble() != 5)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
@@ -234,6 +237,49 @@ TEST_F(MetricsServersApi, apiCalls)
         apiCalls2 = values["activity"]["apiCalls1m"].toDouble();
     } while (apiCalls2 == apiCalls1);
     ASSERT_GT(apiCalls2, apiCalls1);
+    nx::vms::server::metrics::setTimerMultiplier(1);
+}
+
+TEST_F(MetricsServersApi, thumbnails)
+{
+    nx::vms::server::metrics::setTimerMultiplier(100);
+
+    auto camera = addCamera(0);
+    auto storage = addStorage("Storage 1");
+
+    auto catalog = serverModule()->normalStorageManager()->getFileCatalog(
+        camera->getUniqueId(), QnServer::HiQualityCatalog);
+
+    static const int kDurationMs = 5000;
+    auto data = test_support::createTestMkvFileData(kDurationMs/1000, 640, 480);
+    const auto chunks = test_support::generateChunksForQuality(
+        storage->getUrl(),
+        camera->getPhysicalId(),
+        "hi_quality",
+        /*time*/ 0, kDurationMs,
+        /*count*/ 1, data);
+    for (const auto& testChunk: chunks)
+    {
+        Chunk chunk;
+        chunk.startTimeMs = testChunk.startTimeMs;
+        chunk.durationMs = testChunk.durationsMs;
+        chunk.fileIndex = nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION;
+        chunk.setFileSize(data.size());
+        chunk.storageIndex = serverModule()->storageDbPool()->getStorageIndex(storage);
+        catalog->addRecord(chunk);
+    }
+
+    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    double thumbnailCalls1 = values["activity"]["thumbnails1m"].toDouble();
+    double thumbnailCalls2 = 0;
+    do
+    {
+        get<QByteArray>(lm("/ec2/cameraThumbnails?time=0&cameraId=%1").arg(camera->getPhysicalId()));
+        values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+        thumbnailCalls2 = values["activity"]["thumbnails1m"].toDouble();
+    } while (thumbnailCalls1 == thumbnailCalls2);
+    ASSERT_GT(thumbnailCalls2, thumbnailCalls1);
+
     nx::vms::server::metrics::setTimerMultiplier(1);
 }
 

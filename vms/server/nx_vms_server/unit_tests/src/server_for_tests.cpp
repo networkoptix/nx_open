@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <api/test_api_requests.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 namespace nx::vms::server::test {
 
@@ -41,7 +42,11 @@ QnStorageResourcePtr ServerForTests::addStorage(const QString& storageName)
     storage.storageType = "local";
     storage.url = dataDir() + L'/' + storageName;
     [&](){ NX_TEST_API_POST(this, lit("/ec2/saveStorage"), storage); }();
-    return commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
+
+    auto storageRes = commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
+    storageRes.dynamicCast<QnFileStorageResource>()->setMounted(true);
+    storageRes->initOrUpdate();
+    return storageRes;
 }
 
 } // namespace nx::vms::server::test

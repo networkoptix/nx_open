@@ -82,7 +82,7 @@ static bool storagePresent(MediaServerLauncher* server, const QString& storagePa
 
 } // namespace
 
-void addStorage(MediaServerLauncher* server, const QString& path)
+QnStorageResourcePtr addStorage(MediaServerLauncher* server, const QString& path)
 {
     NX_ASSERT(!path.isEmpty());
     if (storagePresent(server, path))
@@ -93,14 +93,16 @@ void addStorage(MediaServerLauncher* server, const QString& path)
             path);
     }
 
-    server->serverModule()->normalStorageManager()->onNewResource(
-        TestFileStorage::create(server, path));
+    auto storage = TestFileStorage::create(server, path);
+    server->serverModule()->normalStorageManager()->onNewResource(storage);
     server->serverModule()->normalStorageManager()->initDone();
+    server->commonModule()->resourcePool()->addResource(storage);
 
     NX_DEBUG(
         typeid(TestFileStorage),
         "Storage %1 has been successfully added to the mediaserver's storage pool",
         path);
+    return storage;
 }
 
 class StorageFixtureResource: public StorageResource
@@ -272,10 +274,11 @@ void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs)
             .toBase64());
 }
 
-static ChunkDataList generateChunksForQuality(const QString& baseDir,
+ChunkDataList generateChunksForQuality(const QString& baseDir,
     const QString& cameraName,
     const QString& quality,
     qint64 startTimeMs,
+    int durationMs,
     int count,
     QByteArray& payload)
 {
@@ -283,7 +286,7 @@ static ChunkDataList generateChunksForQuality(const QString& baseDir,
     ChunkDataList result;
     for (int i = 0; i < count; ++i)
     {
-        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(kMediaFileDurationMs);
+        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(durationMs);
         QString pathString =
             QnStorageManager::dateTimeStr(startTimeMs, currentTimeZone() / 60, "/");
 
@@ -298,7 +301,7 @@ static ChunkDataList generateChunksForQuality(const QString& baseDir,
         NX_ASSERT(dataFile.open(QIODevice::WriteOnly));
         NX_ASSERT(dataFile.write(payload));
 
-        result.push_back(ChunkData{startTimeMs, kMediaFileDurationMs, fullFileName});
+        result.push_back(ChunkData{startTimeMs, durationMs, fullFileName});
         startTimeMs += kMediaFileDurationMs + kMediaFilesGapMs;
     }
 
@@ -314,11 +317,11 @@ Catalog generateCameraArchive(
         kMediaFileDurationMs / 1000, kLowQualityFileWidth, kLowQualityFileHeight);
 
     Catalog result;
-    result.lowQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "low_quality", startTimeMs, count, lowQualityPayLoad);
+    result.lowQualityChunks = generateChunksForQuality(baseDir,
+        cameraName, "low_quality", startTimeMs, kMediaFileDurationMs, count, lowQualityPayLoad);
 
-    result.highQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "hi_quality", startTimeMs, count, hiQualityPayLoad);
+    result.highQualityChunks = generateChunksForQuality(baseDir,
+        cameraName, "hi_quality", startTimeMs, kMediaFileDurationMs, count, hiQualityPayLoad);
 
     return result;
 }

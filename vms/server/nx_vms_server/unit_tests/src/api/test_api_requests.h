@@ -132,7 +132,10 @@ void executeGet(
         authPassword));
     if (responseData)
     {
-        ASSERT_TRUE(QJson::deserialize(response, responseData));
+        if constexpr (std::is_same_v<ResponseData, QByteArray>)
+            *responseData = response;
+        else
+            ASSERT_TRUE(QJson::deserialize(response, responseData));
     }
 }
 

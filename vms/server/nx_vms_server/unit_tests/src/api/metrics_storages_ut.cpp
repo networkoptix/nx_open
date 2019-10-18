@@ -93,13 +93,13 @@ TEST_F(MetricsStoragesApi, space)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto spaceData = storageData["space"];
-    ASSERT_GT(1024*1024, spaceData["totalSpaceB"].toDouble());
+    ASSERT_GT(spaceData["totalSpaceB"].toDouble(), 1024*1024);
     auto mediaSpace = spaceData["mediaSpaceB"].toDouble();
     ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
 
     auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];
     auto spaceData2 = storageData2["space"];
-    ASSERT_GT(1024 * 1024, spaceData2["totalSpaceB"].toDouble());
+    ASSERT_GT(spaceData2["totalSpaceB"].toDouble(), 1024 * 1024);
     auto mediaSpace2 = spaceData2["mediaSpaceB"].toDouble();
     ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
 }
@@ -147,8 +147,6 @@ TEST_F(MetricsStoragesApi, activity)
     auto storages = launcher->commonModule()->resourcePool()->getResources<QnStorageResource>();
     ASSERT_FALSE(storages.isEmpty());
     auto storage = storages[0];
-    storage.dynamicCast<QnFileStorageResource>()->setMounted(true);
-    storage->initOrUpdate();
 
     auto resourcePool = launcher->commonModule()->resourcePool();
     auto server = resourcePool->getOwnMediaServer();
