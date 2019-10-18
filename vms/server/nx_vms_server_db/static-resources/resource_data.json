@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.140",
+    "version": "1.0.1.142",
     "data": [
         {
             "keys": [
@@ -3435,7 +3435,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8836*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3463,7 +3463,7 @@
             "keys": [
                 "Hikvision|DS-2DE4A320*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3712,6 +3712,34 @@
                         "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
                         "logical": [1, 2.68, 4.64, 6.29, 8.00, 9.75, 11.21, 12.36, 13.14, 13.82, 14.32],
                         "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for V5.5.0 build 170724",
+            "keys": [
+                "hikvision|DS-2DE5330*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1.00, 2.85, 4.92, 6.46, 8.31, 10.08, 12.15, 14.00, 16.00, 18.23, 19.77],
+                        "logicalMultiplier": 33,
                         "space": "35MmEquiv"
                     }
                 }
