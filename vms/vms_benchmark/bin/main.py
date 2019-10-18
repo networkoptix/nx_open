@@ -399,197 +399,14 @@ def _get_storages(api) -> List[Storage]:
     return [Storage(item) for item in reply]
 
 
-@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
-@click.option(
-    '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
-    help='Configuration file.')
-@click.option(
-    '--ini-config', '-i', 'ini_file', default='vms_benchmark.ini', metavar='<filename>', show_default=True,
-    help='Internal configuration file for experimenting and debugging.')
-@click.option(
-    '--log', '-l', 'log_file', default='vms_benchmark.log', metavar='<filename>', show_default=True,
-    help='Detailed log of all actions; intended to be studied by the support team.')
-def main(conf_file, ini_file, log_file):
-    global log_file_ref
-    log_file_ref = repr(log_file)
-    print(f"VMS Benchmark started; logging to {log_file_ref}.")
-    print('')
-    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
-    logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
-
-    conf, ini = load_configs(conf_file, ini_file)
-
-    password = conf.get('boxPassword', None)
-
-    if password and platform.system() == 'Linux':
-        res = host_tests.SshPassInstalled().call()
-
-        if not res.success:
-            raise exceptions.HostPrerequisiteFailed(
-                "sshpass is not on PATH" +
-                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
-                f"Details for the error: {res.formatted_message()}"
-            )
-
-    box = BoxConnection(
-        host=conf['boxHostnameOrIp'],
-        login=conf.get('boxLogin', None),
-        password=password,
-        port=conf['boxSshPort'],
-        conf_file=conf_file
-    )
-
-    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
-    box.obtain_connection_info()
-
-    if not box.is_root:
-        res = box_tests.SudoConfigured(box).call()
-
-        if not res.success:
-            raise exceptions.SshHostKeyObtainingFailed(
-                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
-                'without typing a password.\n' +
-                f"Details of the error: {res.formatted_message()}"
-            )
-
-    linux_distribution = LinuxDistributionDetector.detect(box)
-    box_platform = BoxPlatform.gather(box, linux_distribution)
-    report(
-        "\nBox properties detected:\n"
-        f"    IP address: {box.ip}\n"
-        f"    Network adapter name: {box.eth_name}\n"
-        f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
-        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
-        f"    Linux distribution name: {linux_distribution.name}\n"
-        f"    Linux distribution version: {linux_distribution.version}\n"
-        f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
-        f"    Arch: {box_platform.arch}\n"
-        f"    Number of CPUs: {box_platform.cpu_count}\n"
-        f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
-        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
-        "    File systems:\n"
-        + '\n'.join(
-            f"        {storage['fs']} "
-            f"on {storage['point']}: "
-            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
-            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
-            for (point, storage) in box_platform.storages_list.items())
-    )
-
-    box_time_output = box.eval('date +%s.%N')
-    try:
-        box_time = float(box_time_output.strip())
-    except ValueError:
-        raise exceptions.BoxStateError("Cannot parse output of the date command")
-    host_time = time.time()
-    logging.info(f"Time difference (box time minus host time): {box_time - host_time:.3f} s.")
-    if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
-        raise exceptions.BoxStateError(
-            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
-
-    vmses = VmsScanner.scan(box, linux_distribution)
-
-    if vmses and len(vmses) > 0:
-        report(f"\nDetected VMS installation(s):")
-        for vms in vmses:
-            report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
-            report(f" pid {vms.pid if vms.pid else '-'}", end='')
-            vms_uid = vms.uid()
-            if vms_uid:
-                report(f" uid {vms_uid}", end='')
-            report(')')
-    else:
-        raise exceptions.BoxStateError("No VMS installations found on the box.")
-
-    if len(vmses) > 1:
-        raise exceptions.BoxStateError("More than one Server installation found at the box.")
-
-    vms = vmses[0]
-
-    if not vms.is_up():
-        raise exceptions.BoxStateError("VMS is not running currently at the box.")
-
-    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
-    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
-    vms.override_ini_config({
-        'nx_streaming': {
-            'enableTimeCorrection': 0,
-            'unloopCameraPtsWithModulus': modulus_us,
-        },
-    })
-
-    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
-    _test_api(api)
-
-    storages = _get_storages(api)
-
-    vms.stop(exc=True)
-
-    report('Server stopped.')
-
-    _clear_storages(box, storages)
+def _run_load_test(api, box, box_platform, conf, ini, vms):
+    report('')
+    report('Starting load test...')
+    load_test_started_at_s = time.time()
 
     swapped_before_bytes = get_cumulative_swap_bytes(box)
     if swapped_before_bytes is None:
         report("Cannot obtain swap information.")
-
-    vms.start(exc=True)
-
-    report('Starting Server...')
-
-    def wait_for_server_up(timeout=30):
-        started_at = time.time()
-
-        while True:
-            global vmses
-
-            vmses = VmsScanner.scan(box, linux_distribution)
-
-            if vmses and len(vmses) > 0 and vmses[0].is_up():
-                break
-
-            if time.time() - started_at > timeout:
-                return False
-
-            time.sleep(0.5)
-
-        time.sleep(5)  # TODO: Investigate this sleep
-
-        return True
-
-    if not wait_for_server_up():
-        raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
-
-    vms = vmses[0]
-
-    report('Server started successfully.')
-
-    ram_free_bytes = box_platform.ram_available_bytes()
-    if ram_free_bytes is None:
-        ram_free_bytes = box_platform.ram_free_bytes()
-    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
-
-    _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
-
-    for i in 1, 2, 3:
-        cameras = api.get_test_cameras_all()
-        if cameras is not None:
-            break
-        report(f"Attempt #{i}to get camera list")
-        time.sleep(i)
-
-    if cameras is not None:
-        for camera in cameras:
-            if not api.remove_camera(camera.id):
-                raise exceptions.ServerApiError(
-                    message=f"Unable to remove camera with id={camera.id}"
-                )
-    else:
-        raise exceptions.ServerApiError(message="Unable to get camera list.")
-
-    report('')
-    report('Starting load test...')
-    load_test_started_at_s = time.time()
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_available_bytes = box_platform.ram_available_bytes()
@@ -986,6 +803,193 @@ def main(conf_file, ini_file, log_file):
                 f"More than {ini['swapThresholdMegabytes']} MB swapped at the box during the tests: {swapped_str}.")
 
     report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
+
+
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
+    help='Configuration file.')
+@click.option(
+    '--ini-config', '-i', 'ini_file', default='vms_benchmark.ini', metavar='<filename>', show_default=True,
+    help='Internal configuration file for experimenting and debugging.')
+@click.option(
+    '--log', '-l', 'log_file', default='vms_benchmark.log', metavar='<filename>', show_default=True,
+    help='Detailed log of all actions; intended to be studied by the support team.')
+def main(conf_file, ini_file, log_file):
+    global log_file_ref
+    log_file_ref = repr(log_file)
+    print(f"VMS Benchmark started; logging to {log_file_ref}.")
+    print('')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
+    logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
+
+    conf, ini = load_configs(conf_file, ini_file)
+
+    password = conf.get('boxPassword', None)
+
+    if password and platform.system() == 'Linux':
+        res = host_tests.SshPassInstalled().call()
+
+        if not res.success:
+            raise exceptions.HostPrerequisiteFailed(
+                "sshpass is not on PATH" +
+                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
+                f"Details for the error: {res.formatted_message()}"
+            )
+
+    box = BoxConnection(
+        host=conf['boxHostnameOrIp'],
+        login=conf.get('boxLogin', None),
+        password=password,
+        port=conf['boxSshPort'],
+        conf_file=conf_file
+    )
+
+    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    box.obtain_connection_info()
+
+    if not box.is_root:
+        res = box_tests.SudoConfigured(box).call()
+
+        if not res.success:
+            raise exceptions.SshHostKeyObtainingFailed(
+                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
+                'without typing a password.\n' +
+                f"Details of the error: {res.formatted_message()}"
+            )
+
+    linux_distribution = LinuxDistributionDetector.detect(box)
+    box_platform = BoxPlatform.gather(box, linux_distribution)
+    report(
+        "\nBox properties detected:\n"
+        f"    IP address: {box.ip}\n"
+        f"    Network adapter name: {box.eth_name}\n"
+        f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
+        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
+        f"    Linux distribution name: {linux_distribution.name}\n"
+        f"    Linux distribution version: {linux_distribution.version}\n"
+        f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
+        f"    Arch: {box_platform.arch}\n"
+        f"    Number of CPUs: {box_platform.cpu_count}\n"
+        f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
+        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
+        "    File systems:\n"
+        + '\n'.join(
+            f"        {storage['fs']} "
+            f"on {storage['point']}: "
+            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
+            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
+            for (point, storage) in box_platform.storages_list.items())
+    )
+
+    box_time_output = box.eval('date +%s.%N')
+    try:
+        box_time = float(box_time_output.strip())
+    except ValueError:
+        raise exceptions.BoxStateError("Cannot parse output of the date command")
+    host_time = time.time()
+    logging.info(f"Time difference (box time minus host time): {box_time - host_time:.3f} s.")
+    if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
+        raise exceptions.BoxStateError(
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
+
+    vmses = VmsScanner.scan(box, linux_distribution)
+
+    if vmses and len(vmses) > 0:
+        report(f"\nDetected VMS installation(s):")
+        for vms in vmses:
+            report(f"    {vms.customization} in {vms.dir} (port {vms.port},", end='')
+            report(f" pid {vms.pid if vms.pid else '-'}", end='')
+            vms_uid = vms.uid()
+            if vms_uid:
+                report(f" uid {vms_uid}", end='')
+            report(')')
+    else:
+        raise exceptions.BoxStateError("No VMS installations found on the box.")
+
+    if len(vmses) > 1:
+        raise exceptions.BoxStateError("More than one Server installation found at the box.")
+
+    vms = vmses[0]
+
+    if not vms.is_up():
+        raise exceptions.BoxStateError("VMS is not running currently at the box.")
+
+    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
+    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
+    vms.override_ini_config({
+        'nx_streaming': {
+            'enableTimeCorrection': 0,
+            'unloopCameraPtsWithModulus': modulus_us,
+        },
+    })
+
+    api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
+    _test_api(api)
+
+    storages = _get_storages(api)
+
+    vms.stop(exc=True)
+
+    report('Server stopped.')
+
+    _clear_storages(box, storages)
+
+    vms.start(exc=True)
+
+    report('Starting Server...')
+
+    def wait_for_server_up(timeout=30):
+        started_at = time.time()
+
+        while True:
+            global vmses
+
+            vmses = VmsScanner.scan(box, linux_distribution)
+
+            if vmses and len(vmses) > 0 and vmses[0].is_up():
+                break
+
+            if time.time() - started_at > timeout:
+                return False
+
+            time.sleep(0.5)
+
+        time.sleep(5)  # TODO: Investigate this sleep
+
+        return True
+
+    if not wait_for_server_up():
+        raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
+
+    vms = vmses[0]
+
+    report('Server started successfully.')
+
+    ram_free_bytes = box_platform.ram_available_bytes()
+    if ram_free_bytes is None:
+        ram_free_bytes = box_platform.ram_free_bytes()
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
+
+    _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
+
+    for i in 1, 2, 3:
+        cameras = api.get_test_cameras_all()
+        if cameras is not None:
+            break
+        report(f"Attempt #{i}to get camera list")
+        time.sleep(i)
+
+    if cameras is not None:
+        for camera in cameras:
+            if not api.remove_camera(camera.id):
+                raise exceptions.ServerApiError(
+                    message=f"Unable to remove camera with id={camera.id}"
+                )
+    else:
+        raise exceptions.ServerApiError(message="Unable to get camera list.")
+
+    _run_load_test(api, box, box_platform, conf, ini, vms)
 
     report('\nSUCCESS: All tests finished.')
 
