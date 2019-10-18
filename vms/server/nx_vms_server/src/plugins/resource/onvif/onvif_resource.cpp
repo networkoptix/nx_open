@@ -383,7 +383,7 @@ public:
 private:
     using RankMap = QMap<QString, int>;
 
-    const RankMap createRankMap(const QString& profileNames)
+    RankMap createRankMap(const QString& profileNames)
     {
         RankMap result;
         QStringList profileNameList = profileNames.split(L',');
