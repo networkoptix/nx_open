@@ -51,22 +51,15 @@ bool amendOutputDataIfNeeded(
     nx::vms::api::StorageData* storageData)
 {
     nx::utils::Url url(storageData->url);
-    if (!url.isValid())
-        return false;
     if (url.password().isEmpty())
-        return true;
-    auto decryptOrReplace =
-        [&accessData](const QString& s)
-    {
-        if (accessData == Qn::kSystemAccess)
-            return nx::utils::decodeStringFromHexStringAES128CBC(s);
+        return false;
 
-        return kHiddenPasswordFiller;
-    };
+	if (accessData == Qn::kSystemAccess)
+        url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC((url.password())));
+    else
+        url.setPassword(kHiddenPasswordFiller);
 
-    url.setPassword(decryptOrReplace(url.password()));
     storageData->url = url.toString();
-
     return true;
 }
 

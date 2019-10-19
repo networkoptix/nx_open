@@ -30,7 +30,8 @@ static void findStorageByName(
 {
     ASSERT_TRUE(storages.size() > 0);
 
-    const auto foundStorage = std::find_if(storages.cbegin(), storages.cend(),
+    const auto foundStorage = std::find_if(storages.cbegin(),
+        storages.cend(),
         [name](const vms::api::StorageData& s) { return s.name == name; });
 
     ASSERT_TRUE(foundStorage != storages.cend());
@@ -64,8 +65,7 @@ TEST(GetStorages, saveAndMerge)
     storage.parentId = launcher.commonModule()->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
-    NX_TEST_API_POST(&launcher,
-        lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
+    NX_TEST_API_POST(&launcher, lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
 
     NX_INFO(this, "Retrieve the created storage.");
     NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
@@ -74,8 +74,8 @@ TEST(GetStorages, saveAndMerge)
 
     NX_INFO(this, "Rename the storage via Merge.");
     storage.name = "new name";
-    NX_TEST_API_POST(&launcher,
-        lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"}));
+    NX_TEST_API_POST(
+        &launcher, lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"}));
 
     NX_INFO(this, "Check that the storage is renamed.");
     NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
@@ -83,14 +83,14 @@ TEST(GetStorages, saveAndMerge)
     ASSERT_EQ(1U, storages.size());
 
     NX_INFO(this, "Check the storage can be found by its parent server id.");
-    NX_TEST_API_GET(&launcher,
-        lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages);
+    NX_TEST_API_GET(
+        &launcher, lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages);
     NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
     ASSERT_EQ(1U, storages.size());
 
     NX_INFO(this, "Check that no storages are found by another (non-existing) parent server id.");
-    NX_TEST_API_GET(&launcher,
-        lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()), &storages);
+    NX_TEST_API_GET(
+        &launcher, lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()), &storages);
     ASSERT_TRUE(storages.empty());
 }
 
@@ -144,27 +144,22 @@ protected:
         ASSERT_NE(storages.cend(), dataIt);
         ASSERT_EQ(expected.isBackup, dataIt->isBackup);
 
-        #if 0 //< Enable when /ec2/saveStorage starts saving additional params.
+#if 0 //< Enable when /ec2/saveStorage starts saving additional params.
             ASSERT_EQ(expected.addParams, dataIt->addParams);
-        #endif
+#endif
 
         ASSERT_EQ(expected.spaceLimit, dataIt->spaceLimit);
         ASSERT_EQ(expected.storageType, dataIt->storageType);
         ASSERT_EQ(expected.usedForWriting, dataIt->usedForWriting);
 
-        assertUrls(expected.url, dataIt->url, Credentials::EncryptionMode::asteriks);
+        assertUrls(expected.url, dataIt->url);
     }
 
     void thenResourceShouldHaveUrlUnencrypted(const nx::vms::api::StorageData& expected)
     {
         const auto storage = storageByName(expected.name);
-
         const auto u1 = nx::utils::Url(expected.url);
-        const auto u2 = nx::utils::Url(storage->getUrl());
-
-        ASSERT_EQ(u1.toString(QUrl::RemoveUserInfo), u2.toString(QUrl::RemoveUserInfo));
-        ASSERT_EQ(u1.userName(), u2.userName());
-        ASSERT_EQ(u1.password(), u2.password());
+        ASSERT_EQ(expected.url, storage->getUrl());
     }
 
     nx::vms::api::StorageData storageDataWithUrl(const QString& url)
@@ -182,15 +177,8 @@ protected:
         return result;
     }
 
-    void whenServerStopped()
-    {
-        ASSERT_TRUE(m_server.stop());
-    }
-
-    void whenServerStarted()
-    {
-        ASSERT_TRUE(m_server.start());
-    }
+    void whenServerStopped() { ASSERT_TRUE(m_server.stop()); }
+    void whenServerStarted() { ASSERT_TRUE(m_server.start()); }
 
     void initializeDbConnection()
     {
@@ -203,93 +191,46 @@ protected:
     {
         assertMigrationExists();
         auto query = createAndExecQuery(
-            "delete from south_migrationhistory where migration = ?", kMigrationFileName);
+            "DELETE FROM south_migrationhistory WHERE migration = ?", kMigrationFileName);
     }
 
     void whenStorageUrlInDbAltered(const nx::vms::api::StorageData& data)
     {
-
+        auto query = createAndExecQuery(
+            "UPDATE vms_resource SET url = ? where name = ?", data.url, data.name);
     }
 
 private:
-    struct Credentials
-    {
-        enum class EncryptionMode
-        {
-            hexEncrypted,
-            off,
-            asteriks,
-        };
-
-        QString username;
-        QString password;
-
-        Credentials() = default;
-        Credentials(const nx::utils::Url& url):
-            username(url.userName()),
-            password(url.password())
-        {}
-    };
-
     static constexpr const char* const kDbConnectionName = "test";
     static constexpr const char* const kMigrationFileName =
         ":/updates/100_10172019_encrypt_storage_url_credentials.sql";
 
-    MediaServerLauncher m_server = MediaServerLauncher(
-        QString(), 0,
+    MediaServerLauncher m_server = MediaServerLauncher(QString(),
+        0,
         {MediaServerLauncher::DisabledFeature::noPlugins,
             MediaServerLauncher::DisabledFeature::noMonitorStatistics,
             MediaServerLauncher::DisabledFeature::noResourceDiscovery});
     QSqlDatabase m_db;
 
-    void assertUrls(
-        const QString& expected, const QString& actual, Credentials::EncryptionMode encryption)
+    void assertUrls(const QString& expected, const QString& actual)
     {
-        if (expected.isEmpty())
-        {
-            ASSERT_TRUE(actual.isEmpty());
-            return;
-        }
-
         const auto expectedUrl = nx::utils::Url(expected);
         const auto actualUrl = nx::utils::Url(actual);
 
-        if (!expectedUrl.isValid())
+        if (expectedUrl.password().isEmpty())
         {
-            ASSERT_FALSE(actualUrl.isValid());
-            return;
+            ASSERT_EQ(expected, actual);
         }
-
-        assertCredentials(Credentials(expectedUrl), Credentials(actualUrl), encryption);
-    }
-
-    void assertCredentials(
-        const Credentials& expected,
-        const Credentials& actual,
-        Credentials::EncryptionMode encryption)
-    {
-        switch (encryption)
+        else
         {
-            case Credentials::EncryptionMode::off:
-                ASSERT_EQ(expected.username, actual.username);
-                ASSERT_EQ(expected.password, actual.password);
-                break;
-            case Credentials::EncryptionMode::hexEncrypted:
-                using namespace nx::utils;
-                ASSERT_EQ(encodeHexStringFromStringAES128CBC(expected.username), actual.username);
-                ASSERT_EQ(encodeHexStringFromStringAES128CBC(expected.password), actual.password);
-                break;
-            case Credentials::EncryptionMode::asteriks:
-                ASSERT_EQ(ec2::kHiddenPasswordFiller, actual.username);
-                ASSERT_EQ(ec2::kHiddenPasswordFiller, actual.password);
-                break;
+            ASSERT_EQ(
+                expectedUrl.toString(QUrl::RemovePassword),
+				actualUrl.toString(QUrl::RemovePassword));
+            ASSERT_EQ(ec2::kHiddenPasswordFiller, actualUrl.password());
         }
     }
 
-    QString serverDbFilePath() const
-    {
-        return closeDirPath(m_server.dataDir()) + "ecs.sqlite";
-    }
+    QString serverDbFilePath() const { return closeDirPath(m_server.dataDir()) + "ecs.sqlite"; }
 
     QnStorageResourcePtr storageByName(const QString& name)
     {
@@ -300,8 +241,8 @@ private:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             const auto resources = resourcePool->getResources();
-            auto it = std::find_if(
-                resources.cbegin(), resources.cend(),
+            auto it = std::find_if(resources.cbegin(),
+                resources.cend(),
                 [name](const auto& resource) { return resource->getName() == name; });
 
             if (it == resources.cend())
@@ -359,18 +300,35 @@ TEST_P(Storage, Migration)
     thenResourceShouldHaveUrlUnencrypted(data);
 }
 
-INSTANTIATE_TEST_CASE_P(Storage_SaveGet_differentUrls,
-    Storage,
-    ::testing::Values(
-        Param(""),
-        Param("test://user:password@host/some/path"),
-        Param("test://:password@host/some/path"),
-        Param("test://user:@host/some/path"),
-        Param("test://u:p@host/some/path"),
-        Param("test://:p@host/some/path"),
-        Param("test://u:@host/some/path"),
-        Param("test://host/some/path")
+#if defined (Q_OS_UNIX)
+    INSTANTIATE_TEST_CASE_P(Storage_SaveGet_differentUrls,
+        Storage,
+        ::testing::Values(
+            Param("/some/local/path"),
+            Param(""),
+            Param("test://user:password@host/some/path"),
+            Param("test://:password@host/some/path"),
+            Param("test://user:@host/some/path"),
+            Param("test://u:p@host/some/path"),
+            Param("test://:p@host/some/path"),
+            Param("test://u:@host/some/path"),
+            Param("test://host/some/path")
         ));
+#elif defined (Q_OS_WIN)
+    INSTANTIATE_TEST_CASE_P(Storage_SaveGet_differentUrls,
+        Storage,
+        ::testing::Values(
+            Param("C:\\some\\local\\path"),
+            Param(""),
+            Param("test://user:password@host/some/path"),
+            Param("test://:password@host/some/path"),
+            Param("test://user:@host/some/path"),
+            Param("test://u:p@host/some/path"),
+            Param("test://:p@host/some/path"),
+            Param("test://u:@host/some/path"),
+            Param("test://host/some/path")
+        ));
+#endif
 
 } // namespace test
 } // namespace nx

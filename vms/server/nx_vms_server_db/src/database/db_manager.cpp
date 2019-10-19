@@ -1715,6 +1715,61 @@ bool QnDbManager::encryptKvPairs()
     return true;
 }
 
+static std::optional<std::vector<std::tuple<int, QString>>> storageIdAndUrls(const QSqlDatabase& db)
+{
+    QSqlQuery query(db);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT id, url FROM vms_storage as s LEFT JOIN vms_resource as r ON s.resource_ptr_id = r.id";
+    if (!query.prepare(queryStr))
+    {
+        NX_ERROR(typeid(QnDbManager), "Failed to prepare query %1. Error: %2", queryStr, query.lastError());
+        return std::nullopt;
+    }
+
+    if (!query.exec())
+    {
+        NX_ERROR(typeid(QnDbManager), "Failed to exec query %1. Error: %2", queryStr, query.lastError());
+        return std::nullopt;
+    }
+
+    std::vector<std::tuple<int, QString>> result;
+    while (query.next())
+        result.push_back(std::make_tuple(query.value(0).toInt(), query.value(1).toString()));
+
+    return result;
+}
+
+bool QnDbManager::encryptStoragePasswords()
+{
+    QSqlQuery query(m_sdb);
+    QString queryString = "UPDATE vms_resource SET url = ? WHERE id = ?";
+    if (!query.prepare(queryString))
+        return false;
+
+    const auto idUrls = storageIdAndUrls(m_sdb);
+    if (!idUrls)
+        return false;
+
+    for (const auto& [id, url]: *idUrls)
+    {
+        nx::utils::Url u(url);
+        if (u.password().isEmpty())
+            continue;
+
+        u.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(u.password()));
+        query.addBindValue(u.toString());
+        query.addBindValue(id);
+
+        if (!query.exec())
+        {
+            NX_ERROR(this, "Failed to execute query %1. Error: %2", queryString, query.lastError());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::encryptBusinessRules()
 {
     QSqlQuery query(m_sdb);
@@ -2048,6 +2103,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
         return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
+
+    if (updateName.endsWith(lit("/100_10172019_encrypt_storage_url_credentials.sql")))
+        return encryptStoragePasswords() && resyncIfNeeded({ResyncStorages});
 
     if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
         return resyncIfNeeded(ResyncRules);
