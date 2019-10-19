@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/router.h>
 #include <rest/server/json_rest_result.h>
-#include <utils/common/rfc868_servers.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/http/custom_headers.h>
