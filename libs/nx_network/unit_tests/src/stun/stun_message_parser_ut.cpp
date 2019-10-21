@@ -115,6 +115,15 @@ protected:
         m_prevParseResult = m_parser.parse("malformed header", &bytesRead);
     }
 
+    void whenParseBuffer(const nx::Buffer& buf)
+    {
+        m_parsedMessage = Message();
+        m_parser.setMessage(&m_parsedMessage);
+
+        std::size_t bytesRead = 0;
+        m_prevParseResult = m_parser.parse(buf, &bytesRead);
+    }
+
     void thenParserIsAbleToParseCorrectPacket()
     {
         prepareRandomMessage();
@@ -259,6 +268,18 @@ TEST_F(StunMessageParser, detects_malformed_header)
 {
     whenParseMalformedHeader();
     thenParseFailed();
+}
+
+static constexpr char kCorruptedMessage[] =
+    "AKYA9CESpEIdpZkCcDPOqQY2DZPgAwAyZGNfMWY1M2Q1OTUtMTQxNC00YWVkLTlhOWMtZTQzODAzMDJhNWFhX"
+    "zEwOTY5ODMzOTYAAOAEACZ7MDk1YmIzYjAtZGU3MC00YjFiLTgzOGUtZjg1MWU2MDIzODhjfQAA4AUABAAAAA"
+    "TiAABJMWZjYzhkN2UtNDQ0Zi00MmRhLTdjNTEtM2M3MjI2MTZmMjE0LmJjYzAyOWI3LTljNDctNDU0Yy1iZWR"
+    "iLWRlNzUzZjg4MmRmZAAAAOIEACE2NS4xMjQuMjQ2LjE3NSwxNzIuMjMuNC4yMzc6NTM3N1ZOZW0mmVBlALtO"
+    "BevgR1K2RtD2";
+
+TEST_F(StunMessageParser, corrupted_message)
+{
+    whenParseBuffer(QByteArray::fromBase64(kCorruptedMessage));
 }
 
 } // namespace test

@@ -44,6 +44,7 @@ nx::network::server::ParserState MessageParser::parse(
         QnByteArrayConstRef bufToParse;
         if (m_cache.isEmpty() && bytesToCopy == m_bytesToCache)
         {
+            // Analyzing original buffer, skipping caching.
             bufToParse = input.mid(0, bytesToCopy);
             input.pop_front(bytesToCopy);
             *bytesProcessed += bytesToCopy;
@@ -67,7 +68,9 @@ nx::network::server::ParserState MessageParser::parse(
             return nx::network::server::ParserState::failed;
 
         m_cache.clear();
-        if (result != server::ParserState::readingMessage)
+        if (result != server::ParserState::readingMessage ||
+            m_cachedContent == CachedContent::attributes &&
+                bytesParsed == m_bytesToCache)
         {
             // Parsing completed or failed. Anyway, current message cannot be continued.
             m_cachedContent = CachedContent::header;
