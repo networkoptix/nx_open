@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource_proxy.h"
 
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
@@ -85,3 +87,5 @@ QnPlVmax480ResourcePtr QnVmax480ResourceProxy::resourceUnsafe(const QString& gro
 
     return nullptr;
 }
+
+#endif // ENABLE_VMAX
