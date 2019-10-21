@@ -4600,7 +4600,7 @@ void MediaServerProcess::initMetricsController()
     m_metricsController->add(std::make_unique<server::metrics::ServerController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::CameraController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::StorageController>(serverModule()));
-    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(commonModule()->moduleGUID()));
+    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(serverModule()));
 
     QFile rulesFile(":/metrics_rules.json");
     const auto rulesJson = rulesFile.open(QIODevice::ReadOnly) ? rulesFile.readAll() : QByteArray();
