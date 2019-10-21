@@ -4606,8 +4606,9 @@ void MediaServerProcess::initMetricsController()
     const auto rulesJson = rulesFile.open(QIODevice::ReadOnly) ? rulesFile.readAll() : QByteArray();
     api::metrics::SystemRules rules;
     NX_CRITICAL(QJson::deserialize(rulesJson, &rules), rulesJson);
-    m_metricsController->setRules(std::move(rules));
 
+    m_metricsController->setRules(std::move(rules));
+    m_metricsController->manifest(); //< Cause manifest to cache for faster future use.
     m_metricsController->start();
 }
 
