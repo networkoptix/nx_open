@@ -82,7 +82,7 @@ void RtspPerf::startSessionsThread(const std::vector<QString>& urls)
 {
     while (true)
     {
-        for (int i = 0; i < (int)m_sessions.size(); ++i)
+        for (int i = 0; i < (int) m_sessions.size(); ++i)
         {
             if (!m_sessions[i].failed)
                 continue;
