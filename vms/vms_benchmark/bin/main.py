@@ -736,7 +736,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                 cpu_usage_max = cpu_usage_max_collector[0]
 
-                if cpu_usage_avg_collector is not None:
+                if cpu_usage_avg_collector:
                     cpu_usage_avg = sum(cpu_usage_avg_collector) / len(cpu_usage_avg_collector)
                 else:
                     cpu_usage_avg = None
