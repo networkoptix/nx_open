@@ -28,7 +28,7 @@ public:
 
     bool setCameras(const QnVirtualCameraResourceList& cameras, bool force = false);
 
-    virtual void reject() override;
+    virtual void done(int result) override;
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
