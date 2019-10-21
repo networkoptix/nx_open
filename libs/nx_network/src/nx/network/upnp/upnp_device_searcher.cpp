@@ -94,7 +94,7 @@ void DeviceSearcher::pleaseStop()
 
     // Canceling ongoing http requests.
     // NOTE: m_httpClients cannot be modified by other threads, since UDP socket processing is
-    // over and m_terminated == true
+    // over and m_terminated == true.
     for (auto it = m_httpClients.begin();
         it != m_httpClients.end();
         ++it)
