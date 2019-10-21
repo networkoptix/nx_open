@@ -377,6 +377,13 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int main(int argc, char *argv[])
 {
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // We do not rely on Mac OS OpenGL implementation-related throttling.
+        // Otherwise all animations go faster.
+        qputenv("QSG_RENDER_LOOP", "basic");
+    }
+
     // Disables platform-specific text input handles since we have our custom ones.
     if (nx::utils::AppInfo::isAndroid())
         qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
