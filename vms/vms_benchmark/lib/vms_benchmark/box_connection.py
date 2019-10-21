@@ -49,9 +49,6 @@ if platform.system() == 'Linux':
                     "-o", "StrictHostKeyChecking=no",
                     "-o", "PubkeyAuthentication=no",
                     "-o", "PasswordAuthentication=yes",
-                    '-o', 'ControlMaster=auto',
-                    '-o', 'ControlPersist=1h',
-                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     "-T",
                     f"-p{port}",
                     f"{login}@{host}" if login else host,
@@ -66,9 +63,6 @@ if platform.system() == 'Linux':
                     "-o", "BatchMode=yes",
                     "-o", "PubkeyAuthentication=yes",
                     "-o", "PasswordAuthentication=no",
-                    '-o', 'ControlMaster=auto',
-                    '-o', 'ControlPersist=1h',
-                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     ]
 
             self.host_key = None
