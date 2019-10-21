@@ -103,28 +103,28 @@ TEST_F(MetricsGenerators, ValueCounts)
     const auto count7 = parseFormulaOrThrow("countValues %a 40m 7", monitors).generator;
     const auto countHello = parseFormulaOrThrow("countValues %a 50m Hello", monitors).generator;
 
-    EXPECT_EQ(count(), api::metrics::Value(1));
+    EXPECT_EQ(count(), api::metrics::Value(0));
     EXPECT_EQ(count7(), api::metrics::Value(0));
     EXPECT_EQ(countHello(), api::metrics::Value(0));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(5));
     resource.update("a", 7);
 
-    EXPECT_EQ(count(), api::metrics::Value(2));
+    EXPECT_EQ(count(), api::metrics::Value(1));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(0));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(15));
     resource.update("a", "Hello");
 
-    EXPECT_EQ(count(), api::metrics::Value(3));
+    EXPECT_EQ(count(), api::metrics::Value(2));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(25));
     resource.update("a", "hello");
 
-    EXPECT_EQ(count(), api::metrics::Value(4));
+    EXPECT_EQ(count(), api::metrics::Value(3));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
@@ -154,19 +154,19 @@ TEST_F(MetricsGenerators, ValueFloat)
     resource.update("b", 0);
     EXPECT_EQ(sum(), api::metrics::Value(0));
     EXPECT_EQ(average(), api::metrics::Value());
-    EXPECT_EQ(perSecond(), api::metrics::Value(0));
+    EXPECT_EQ(perSecond(), api::metrics::Value());
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(10));
     resource.update("b", 100);
     EXPECT_VALUE(sum, 100);
     EXPECT_VALUE(average, 0);
-    EXPECT_VALUE(perSecond, 3.3);
+    EXPECT_VALUE(perSecond, 10);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(20));
     resource.update("b", 200);
     EXPECT_VALUE(sum, 300);
     EXPECT_VALUE(average, 50);
-    EXPECT_VALUE(perSecond, 10);
+    EXPECT_VALUE(perSecond, 15);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(40));
     resource.update("b", 600);
@@ -196,7 +196,7 @@ TEST_F(MetricsGenerators, ValueSpike)
     resource.update("b", 0);
     EXPECT_EQ(sum(), api::metrics::Value(0));
     EXPECT_EQ(average(), api::metrics::Value());
-    EXPECT_EQ(perSecond(), api::metrics::Value(0));
+    EXPECT_EQ(perSecond(), api::metrics::Value());
 
     for (int i = 1; i <= 4; ++i)
     {
@@ -211,20 +211,20 @@ TEST_F(MetricsGenerators, ValueSpike)
     resource.update("b", 100);
     EXPECT_VALUE(sum, 100);
     EXPECT_VALUE(average, 0);
-    EXPECT_VALUE(perSecond, 10);
+    EXPECT_VALUE(perSecond, 25);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(6));
     resource.update("b", 0);
     EXPECT_VALUE(sum, 100);
     EXPECT_VALUE(average, 100.0 * 2 / 6);
-    EXPECT_VALUE(perSecond, 10);
+    EXPECT_VALUE(perSecond, 16.6);
 
     for (int i = 6; i <= 10; ++i)
     {
         timeShift.applyAbsoluteShift(std::chrono::seconds(i));
         EXPECT_VALUE(sum, 100);
         EXPECT_VALUE(average, 100.0 * 2 / i);
-        EXPECT_VALUE(perSecond, 10);
+        EXPECT_VALUE(perSecond, 100.0 / i);
     }
 
     for (int i = 1; i <= 3; ++i)

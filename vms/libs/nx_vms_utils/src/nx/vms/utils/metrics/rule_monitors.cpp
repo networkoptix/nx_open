@@ -160,14 +160,15 @@ public:
     }
 
     template<typename Operation> //< Value(void(Value, std::chrono::duration) forEach)
-    ValueGenerator durationOperation(int valueI, int durationI, bool inOnly, Operation operation) const
+    ValueGenerator durationOperation(
+        int valueI, int durationI, Border border, Operation operation) const
     {
         return
-            [inOnly, operation = std::move(operation), monitor = monitor(valueI),
-                getDuration = value(durationI)]
+            [operation = std::move(operation), monitor = monitor(valueI),
+                getDuration = value(durationI), border]
             {
                 const QString durationStr = getDuration().toVariant().toString();
-                const std::chrono::milliseconds duration = nx::utils::parseTimerDuration(durationStr);
+                const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
                     // TODO: Error handling.
@@ -175,64 +176,49 @@ public:
                 }
 
                 return Value(operation(
-                    duration,
-                    [inOnly, &monitor, &duration](const auto& action)
+                    [&monitor, &duration, border](const auto& action)
                     {
-                        monitor->forEach(duration, action, inOnly);
+                        monitor->forEach(duration, action, border);
                     }));
             };
     }
 
-    template<typename Condition> //< bool(Value)
-    ValueGenerator durationCount(int valueI, int durationI, Condition condition) const
-    {
-        return durationOperation(
-            valueI, durationI, /*inOnly*/ true,
-            [condition = std::move(condition)](
-                std::chrono::milliseconds /*duration*/, const auto& forEach)
-            {
-                size_t count = 0;
-                forEach([&](const auto& v, auto) { count += condition(v) ? 1 : 0; });
-                return (double) count;
-            });
-    }
-
     template<typename Extraction> // double(double value, double durationS)
-    ValueGenerator durationExtraction(
-        int valueI, int durationI, bool strictRange, bool divideByTime, Extraction extraction) const
+    ValueGenerator durationAggregation(
+        int valueI, int durationI, Border border, Extraction extract,
+        bool divideByTime = false) const
     {
         return durationOperation(
-            valueI, durationI, strictRange,
-            [strictRange, divideByTime, extraction = std::move(extraction)](
-                std::chrono::milliseconds totalDuration, const auto& forEach)
+            valueI, durationI, border,
+            [border, divideByTime, extract = std::move(extract)](const auto& forEach)
             {
                 double totalValue = 0;
                 double totalDurationS = 0;
                 forEach(
                     [&](const Value& value, std::chrono::milliseconds duration)
                     {
+                        if (value == Value())
+                            return;
+
                         const double durationS = seconds(duration);
                         totalDurationS += durationS;
-                        totalValue += extraction(value.toDouble(), durationS);
+                        totalValue += extract(value.toDouble(), durationS);
                     });
 
-                if (totalDurationS == 0)
-                    return strictRange ? Value(0) : Value();
+                if (divideByTime)
+                    return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
 
-                if (strictRange)
-                    totalDurationS = seconds(totalDuration);
-
-                return Value(divideByTime ? (totalValue / totalDurationS) : totalValue);
+                return Value(totalValue);
             });
     }
 
     ValueGenerator getDurationOperation() const
     {
-        if (function() == "history") // value duration
+        if (function() == "history")
         {
             return durationOperation(
-                1, 2, /*strictRange*/ false,
-                [](std::chrono::milliseconds /*totalDuration*/, const auto& forEach)
+                1, 2, Border::move(),
+                [](const auto& forEach)
                 {
                     QJsonArray items;
                     forEach([&](auto v, auto d) { items.append(QJsonArray() << v << ::toString(d)); });
@@ -240,34 +226,36 @@ public:
                 });
         }
 
-        if (function() == "count") // value duration
-            return durationCount(1, 2, [](const auto&) { return true; });
+        if (function() == "count")
+            return durationAggregation(1, 2, Border::drop(), [](double, double) { return 1; });
 
-        if (function() == "countValues") // value duration expected
+        if (function() == "countValues")
         {
-            return durationCount(1, 2,
-                [expected = value(3)](const auto& v) { return v == expected(); });
+            return durationOperation(
+                1, 2, Border::drop(),
+                [expected = value(3)](const auto& forEach)
+                {
+                    int count = 0;
+                    forEach([&](auto v, auto) { if (v == expected()) count += 1; });
+                    return count;
+                });
         }
 
-        if (function() == "sum") // value duration
+        if (function() == "sum")
+            return durationAggregation(1, 2, Border::drop(), [](double v, double) { return v; });
+
+        if (function() == "average")
         {
-            return durationExtraction(
-                1, 2, /*strictRange*/ true, /*divideByTime*/ false,
-                [](double v, double) { return v; });
+            return durationAggregation(
+                1, 2, Border::move(), [](double v, double d) { return v * d; },
+                /*divideByTime*/ true);
         }
 
-        if (function() == "average") // value duration
+        if (function() == "perSecond")
         {
-            return durationExtraction(
-                1, 2, /*strictRange*/ false, /*divideByTime*/ true,
-                [](double v, double d) { return v * d; });
-        }
-
-        if (function() == "perSecond") // value duration
-        {
-            return durationExtraction(
-                1, 2, /*strictRange*/ true, /*divideByTime*/ true,
-                [](double v, double) { return v; });
+            return durationAggregation(
+                1, 2, Border::hardcode(0), [](double v, double) { return v; },
+                /*divideByTime*/ true);
         }
 
         return nullptr;
@@ -355,7 +343,7 @@ api::metrics::Value ExtraValueMonitor::value() const
 }
 
 void ExtraValueMonitor::forEach(
-    Duration maxAge, const ValueIterator& iterator, bool /*inOnly*/) const
+    Duration maxAge, const ValueIterator& iterator, Border /*border*/) const
 {
     iterator(value(), maxAge);
 }
