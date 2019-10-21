@@ -338,7 +338,7 @@ def box_tx_rx_errors(box):
 
 # TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
 def report(message, end='\n'):
-    print(message, end=end)
+    print(message, end=end, flush=True)
     if message.strip():
         logging.info(message.strip())
 
@@ -987,8 +987,8 @@ def _connect_to_box(conf, conf_file):
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
-    print(f"VMS Benchmark started; logging to {log_file_ref}.")
-    print('')
+    print(f"VMS Benchmark started; logging to {log_file_ref}.", flush=True)
+    print('', flush=True)
     logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
     logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
 
@@ -1068,12 +1068,12 @@ def nx_format_exception(exception):
 def nx_print_exception(exception, recursive_level=0):
     string_indent = '  ' * recursive_level
     if isinstance(exception, exceptions.VmsBenchmarkError):
-        print(f"{string_indent}{str(exception)}", file=sys.stderr)
+        print(f"{string_indent}{str(exception)}", file=sys.stderr, flush=True)
         if isinstance(exception, exceptions.VmsBenchmarkIssue):
             for e in exception.sub_issues:
                 nx_print_exception(e, recursive_level=recursive_level + 2)
         if exception.original_exception:
-            print(f'{string_indent}Caused by:', file=sys.stderr)
+            print(f'{string_indent}Caused by:', file=sys.stderr, flush=True)
             if isinstance(exception.original_exception, list):
                 for e in exception.original_exception:
                     nx_print_exception(e, recursive_level=recursive_level + 2)
@@ -1084,7 +1084,7 @@ def nx_print_exception(exception, recursive_level=0):
             f'{string_indent}{nx_format_exception(exception)}'
             if recursive_level > 0
             else f'{string_indent}ERROR: {nx_format_exception(exception)}',
-            file=sys.stderr,
+            file=sys.stderr, flush=True,
         )
 
 
@@ -1093,28 +1093,28 @@ if __name__ == '__main__':
         try:
             sys.exit(main())
         except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
-            print(f'ISSUE: ', file=sys.stderr, end='')
+            print(f'ISSUE: ', file=sys.stderr, end='', flush=True)
             nx_print_exception(e)
-            print('', file=sys.stderr)
-            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr)
+            print('', file=sys.stderr, flush=True)
+            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr, flush=True)
             log_exception('ISSUE')
         except exceptions.VmsBenchmarkError as e:
-            print(f'ERROR: ', file=sys.stderr, end='')
+            print(f'ERROR: ', file=sys.stderr, end='', flush=True)
             nx_print_exception(e)
             if log_file_ref:
-                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr)
+                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
             log_exception('ERROR')
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
+            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr, flush=True)
             if log_file_ref:
-                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr)
+                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
             log_exception('UNEXPECTED ERROR')
         finally:
             logging.info(f'VMS Benchmark finished at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
+        print(f'INTERNAL ERROR: {e}', file=sys.stderr, flush=True)
         print(f'\nPlease send the complete output ' +
             (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
-            file=sys.stderr)
+            file=sys.stderr, flush=True)
 
     sys.exit(1)
