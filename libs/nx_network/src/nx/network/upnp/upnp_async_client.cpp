@@ -156,9 +156,9 @@ void fetchMappingsRecursive(
     collected->push_back(std::move(newMap));
     client->getMapping(url, collected->size(),
         [client, url, callback, collected](AsyncClient::MappingInfo nextMap)
-    {
-        fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
-    });
+        {
+            fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
+        });
 }
 
 } // namespace
