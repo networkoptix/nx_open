@@ -379,8 +379,7 @@ int main(int argc, char *argv[])
 {
     if (nx::utils::AppInfo::isMacOsX())
     {
-        // We do not rely on Mac OS OpenGL implementation-related throttling.
-        // Otherwise all animations go faster.
+        // Prevents crash on MacOs.
         qputenv("QSG_RENDER_LOOP", "basic");
     }
 
