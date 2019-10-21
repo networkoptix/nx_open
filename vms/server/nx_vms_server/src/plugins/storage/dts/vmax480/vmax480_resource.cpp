@@ -143,7 +143,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
     QnMutexLocker lock( &m_chunkReaderMutex );
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());
     if (chunkReader == 0) {
-        m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
+        m_chunkReader = new QnVMax480ChunkReader(this);
         m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
         connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)), Qt::DirectConnection);
         m_chunkReader->start();
