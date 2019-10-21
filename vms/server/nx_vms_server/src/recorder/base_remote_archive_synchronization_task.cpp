@@ -113,10 +113,16 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
 
 bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 {
+    if (m_canceled)
+        return false;
+
     const auto overlappedIdOrder = m_resource->remoteArchiveManager()->overlappedIdImportOrder();
     NX_INFO(this, "Starting archive synchronization, resource: %1 %2, overlapped id order %3",
         m_resource->getUserDefinedName(), m_resource->getUniqueId(),
         static_cast<int>(overlappedIdOrder));
+
+    if (m_canceled)
+        return false;
 
     if (!fetchChunks(&m_chunks))
         return false;
@@ -133,6 +139,9 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
     const auto import =
         [this, &result](const auto& iterator)
         {
+            if (m_canceled)
+                return false;
+
             const auto overlappedId = iterator->first;
             const auto& chunks = iterator->second;
 
@@ -143,13 +152,27 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
     switch (m_resource->remoteArchiveManager()->overlappedIdImportOrder())
     {
         case core::resource::ImportOrder::Direct:
+        {
             for (auto iterator = m_chunks.begin(); iterator != m_chunks.end(); ++iterator)
+            {
+                if (m_canceled)
+                    return false;
+
                 import(iterator);
+            }
             break;
+        }
         case core::resource::ImportOrder::Reverse:
+        {
             for (auto iterator = m_chunks.rbegin(); iterator != m_chunks.rend(); ++iterator)
+            {
+                if (m_canceled)
+                    return false;
+
                 import(iterator);
+            }
             break;
+        }
     };
 
     return result;
@@ -158,6 +181,9 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
     const OverlappedId& overlappedId)
 {
+    if (m_canceled)
+        return false;
+
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device: %2.")
         .args(overlappedId, m_resource->getUserDefinedName()));
 
