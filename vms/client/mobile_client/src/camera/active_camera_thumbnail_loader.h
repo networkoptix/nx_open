@@ -6,6 +6,7 @@
 #include <client_core/connection_context_aware.h>
 
 #include <camera/thumbnail_cache_base.h>
+#include <nx/utils/uuid.h>
 
 class QnActiveCameraThumbnailLoaderPrivate;
 class QnActiveCameraThumbnailLoader:
@@ -15,7 +16,7 @@ class QnActiveCameraThumbnailLoader:
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QUrl thumbnailUrl READ thumbnailUrl NOTIFY thumbnailUrlChanged)
 
@@ -23,8 +24,8 @@ public:
     QnActiveCameraThumbnailLoader(QObject *parent = nullptr);
     ~QnActiveCameraThumbnailLoader();
 
-    QString resourceId() const;
-    void setResourceId(const QString &id);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid &id);
 
     qint64 position() const;
     void setPosition(qint64 position);

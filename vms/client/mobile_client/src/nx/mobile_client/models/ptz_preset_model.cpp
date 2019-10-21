@@ -89,18 +89,17 @@ QHash<int, QByteArray> PtzPresetModel::roleNames() const
     return base_type::roleNames().unite(kRoleNames);
 }
 
-QString PtzPresetModel::resourceId() const
+QnUuid PtzPresetModel::resourceId() const
 {
-    return d->uniqueResourceId.toString();
+    return d->uniqueResourceId;
 }
 
-void PtzPresetModel::setResourceId(const QString& value)
+void PtzPresetModel::setResourceId(const QnUuid& value)
 {
-    const auto id = QnUuid::fromStringSafe(value);
-    if (d->uniqueResourceId == id)
+    if (d->uniqueResourceId == value)
         return;
 
-    d->uniqueResourceId = id;
+    d->uniqueResourceId = value;
     emit resourceIdChanged();
 }
 

@@ -23,12 +23,12 @@ QnActiveCameraThumbnailLoader::~QnActiveCameraThumbnailLoader() {
         d->imageProvider->setThumbnailCache(nullptr);
 }
 
-QString QnActiveCameraThumbnailLoader::resourceId() const {
+QnUuid QnActiveCameraThumbnailLoader::resourceId() const {
     Q_D(const QnActiveCameraThumbnailLoader);
     if (!d->camera)
-        return QString();
+        return QnUuid();
 
-    return d->camera->getId().toString();
+    return d->camera->getId();
 }
 
 qint64 QnActiveCameraThumbnailLoader::position() const {
@@ -47,14 +47,14 @@ void QnActiveCameraThumbnailLoader::setPosition(qint64 position) {
     emit positionChanged();
 }
 
-void QnActiveCameraThumbnailLoader::setResourceId(const QString &id) {
+void QnActiveCameraThumbnailLoader::setResourceId(const QnUuid &id) {
     Q_D(QnActiveCameraThumbnailLoader);
 
     if (resourceId() == id)
         return;
 
     d->clear();
-    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     d->refresh();
 
     emit resourceIdChanged();

@@ -2,6 +2,7 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QAbstractListModel>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
@@ -12,15 +13,15 @@ class PtzPresetModel: public QAbstractListModel
     Q_OBJECT
     using base_type = QAbstractListModel;
 
-    Q_PROPERTY(QString resourceId READ resourceId
+    Q_PROPERTY(QnUuid resourceId READ resourceId
         WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
     PtzPresetModel(QObject* parent = nullptr);
     virtual ~PtzPresetModel();
 
-    QString resourceId() const;
-    void setResourceId(const QString& value);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& value);
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

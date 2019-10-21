@@ -36,19 +36,19 @@ QnThumbnailCacheAccessor::~QnThumbnailCacheAccessor()
 {
 }
 
-QString QnThumbnailCacheAccessor::resourceId() const
+QnUuid QnThumbnailCacheAccessor::resourceId() const
 {
     Q_D(const QnThumbnailCacheAccessor);
-    return d->resourceId.toString();
+    return d->resourceId;
 }
 
-void QnThumbnailCacheAccessor::setResourceId(const QString& resourceId)
+void QnThumbnailCacheAccessor::setResourceId(const QnUuid& resourceId)
 {
     Q_D(QnThumbnailCacheAccessor);
-    if (d->resourceId.toString() == resourceId)
+    if (d->resourceId == resourceId)
         return;
 
-    d->resourceId = QnUuid::fromStringSafe(resourceId);
+    d->resourceId = resourceId;
     emit resourceIdChanged();
 
     if (d->resourceId.isNull())
