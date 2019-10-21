@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_VMAX
+
 #include <set>
 #include <map>
 
@@ -32,3 +34,5 @@ private:
     mutable QnMutex m_mutex;
     std::map<QString, std::set<QnPlVmax480ResourcePtr>> m_vmaxResourcesByGroupId;
 };
+
+#endif // ENABLE_VMAX
