@@ -244,18 +244,39 @@ public:
         if (function() == "sum")
             return durationAggregation(1, 2, Border::drop(), [](double v, double) { return v; });
 
-        if (function() == "average")
+        if (function() == "sampleAvg") //< sum(v * dt) / t
         {
             return durationAggregation(
                 1, 2, Border::move(), [](double v, double d) { return v * d; },
                 /*divideByTime*/ true);
         }
 
-        if (function() == "perSecond")
+        if (function() == "deltaAvg") //< sum(v) / t
         {
             return durationAggregation(
                 1, 2, Border::hardcode(0), [](double v, double) { return v; },
                 /*divideByTime*/ true);
+        }
+
+        if (function() == "counterToAvg") //< dv / t
+        {
+            return durationOperation(
+                1, 2, Border::move(),
+                [](const auto& forEach)
+                {
+                    std::optional<double> first;
+                    double last = 0;
+                    double totalTimeS = 0;
+                    forEach(
+                        [&](auto value, auto duration)
+                        {
+                            last = value.toDouble();
+                            if (!first) first = last;
+                            totalTimeS += seconds(duration);
+                        });
+
+                    return (first && totalTimeS)  ? Value((last - *first) / totalTimeS) : Value();
+                });
         }
 
         return nullptr;

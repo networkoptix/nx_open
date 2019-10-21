@@ -227,14 +227,14 @@
                         "name": "Decoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "perSecond %decodedPixels 3s",
+                        "calculate": "deltaAvg %decodedPixels 3s",
                         "insert": "decodedPixels"
                     },
                     "encodingSpeed3s": {
                         "name": "Encoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "perSecond %encodedPixels 3s",
+                        "calculate": "deltaAvg %encodedPixels 3s",
                         "insert": "encodedPixels"
                     },
                     "primaryStreams": {
@@ -253,28 +253,28 @@
                         "name": "Transactions/s",
                         "display": "panel",
                         "format": "Transactions/s",
-                        "calculate": "perSecond %transactionsPerSecond 1m",
+                        "calculate": "deltaAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
                     "actionsTriggered1m": {
                         "name": "Rules Activations/s",
                         "description": "Event Rules activations per second",
                         "display": "panel",
-                        "calculate": "perSecond %actionsTriggered 1m",
+                        "calculate": "deltaAvg %actionsTriggered 1m",
                         "insert": "actionsTriggered"
                     },
                     "apiCalls1m": {
                         "name": "API Calls/s",
                         "description": "REST API calls per second",
                         "display": "panel",
-                        "calculate": "perSecond %apiCalls 1m",
+                        "calculate": "deltaAvg %apiCalls 1m",
                         "insert": "apiCalls"
                     },
                     "thumbnails1m": {
                         "name": "Thumbnails/s",
                         "description": "Thumbnails per second",
                         "display": "panel",
-                        "calculate": "perSecond %thumbnails 1m",
+                        "calculate": "deltaAvg %thumbnails 1m",
                         "insert": "thumbnails"
                     },
                     "plugins": {
@@ -403,7 +403,7 @@
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "display": "panel",
-                        "calculate": "average %fpsDelta 10m",
+                        "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
                         {
@@ -454,7 +454,7 @@
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "display": "panel",
-                        "calculate": "average %fpsDelta 10m",
+                        "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
                     "actualBitrateBps": {
@@ -546,14 +546,14 @@
                         "name": "Read Rate",
                         "display": "table|panel",
                         "format": "KBps",
-                        "calculate": "perSecond %readRateBps 1m",
+                        "calculate": "deltaAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                 "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
                         "format": "KBps",
-                        "calculate": "perSecond %writeRateBps 1m",
+                        "calculate": "deltaAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
                 "transactionsPerSecond": {
