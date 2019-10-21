@@ -18,6 +18,8 @@ using namespace nx::vms::api::metrics;
 using namespace nx::vms::server;
 
 constexpr qreal operator""_GB(unsigned long long int v) { return v * 1024 * 1024 * 1024; }
+const static int kTestDataWidth = 640;
+const static int kTestDataHeight = 480;
 
 class MetricsServersApi: public testing::Test, public ServerForTests
 {
@@ -240,7 +242,7 @@ TEST_F(MetricsServersApi, apiCalls)
     nx::vms::server::metrics::setTimerMultiplier(1);
 }
 
-TEST_F(MetricsServersApi, thumbnails)
+TEST_F(MetricsServersApi, thumbnailAndDecodingSpeed)
 {
     nx::vms::server::metrics::setTimerMultiplier(100);
 
@@ -251,7 +253,7 @@ TEST_F(MetricsServersApi, thumbnails)
         camera->getUniqueId(), QnServer::HiQualityCatalog);
 
     static const int kDurationMs = 5000;
-    auto data = test_support::createTestMkvFileData(kDurationMs/1000, 640, 480);
+    auto data = test_support::createTestMkvFileData(kDurationMs/1000, kTestDataWidth, kTestDataHeight);
     const auto chunks = test_support::generateChunksForQuality(
         storage->getUrl(),
         camera->getPhysicalId(),
@@ -269,16 +271,32 @@ TEST_F(MetricsServersApi, thumbnails)
         catalog->addRecord(chunk);
     }
 
-    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
-    double thumbnailCalls1 = values["activity"]["thumbnails1m"].toDouble();
-    double thumbnailCalls2 = 0;
+    const int kTestDataPixels  = kTestDataWidth * kTestDataHeight;
+
+    double expectedThumbnailsRate = 0;
+    double expectedPixelsRate = 0;
+    double thumbnailsRate = 0;
+    double pixelsRate = 0;
+
+    static const int kIterations = 10;
+    for (int i = 0; i < kIterations; ++i)
+        get<QByteArray>(lm("/ec2/cameraThumbnails?time=0&cameraId=%1").arg(camera->getPhysicalId()));
+
+    bool done = false;
     do
     {
-        get<QByteArray>(lm("/ec2/cameraThumbnails?time=0&cameraId=%1").arg(camera->getPhysicalId()));
-        values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
-        thumbnailCalls2 = values["activity"]["thumbnails1m"].toDouble();
-    } while (thumbnailCalls1 == thumbnailCalls2);
-    ASSERT_GT(thumbnailCalls2, thumbnailCalls1);
+        auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+        thumbnailsRate = std::max(thumbnailsRate, values["activity"]["thumbnails1m"].toDouble());
+        pixelsRate = std::max(pixelsRate, values["load"]["decodingSpeed3s"].toDouble());
+        const double seconds = serverStartTimer.elapsedMs() / 1000.0;
+        expectedThumbnailsRate = kIterations / seconds;
+        expectedPixelsRate = kIterations / seconds * kTestDataPixels;
+        done = thumbnailsRate >= expectedThumbnailsRate && pixelsRate >= expectedPixelsRate;
+    } while (!done);
+
+    GTEST_ASSERT_GE(thumbnailsRate, expectedThumbnailsRate);
+    GTEST_ASSERT_GE(pixelsRate, expectedPixelsRate);
+
 
     nx::vms::server::metrics::setTimerMultiplier(1);
 }

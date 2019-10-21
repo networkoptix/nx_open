@@ -30,6 +30,7 @@ public:
     auto getFlat(const QString& api) { return nx::utils::flat_map(get<T>(api)); }
 
 public:
+    nx::utils::ElapsedTimer serverStartTimer;
     const QString id; //< For debug.
 };
 

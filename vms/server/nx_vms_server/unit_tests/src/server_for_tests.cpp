@@ -10,6 +10,7 @@ using namespace nx::test;
 
 ServerForTests::ServerForTests():
     id((
+        serverStartTimer.restart(),
         NX_CRITICAL(start()) /* skip critical result */,
         commonModule()->moduleGUID().toSimpleString()))
 {
