@@ -37,10 +37,10 @@ nx::network::server::ParserState MessageParser::parse(
 
     while (!input.isEmpty())
     {
-        if (!NX_ASSERT(m_cache.size() < m_bytesToCache))
+        if (!NX_ASSERT(m_cache.size() < (int) m_bytesToCache))
             return nx::network::server::ParserState::failed;
 
-        const auto bytesToCopy = std::min<int>(m_bytesToCache - m_cache.size(), input.size());
+        const auto bytesToCopy = std::min<std::size_t>(m_bytesToCache - m_cache.size(), input.size());
         QnByteArrayConstRef bufToParse;
         if (m_cache.isEmpty() && bytesToCopy == m_bytesToCache)
         {
@@ -56,7 +56,7 @@ nx::network::server::ParserState MessageParser::parse(
             *bytesProcessed += bytesToCopy;
             if (!validateCachedData())
                 return nx::network::server::ParserState::failed;
-            if (m_cache.size() < m_bytesToCache)
+            if (m_cache.size() < (int) m_bytesToCache)
                 return nx::network::server::ParserState::readingMessage;
             bufToParse = m_cache;
         }
@@ -69,8 +69,8 @@ nx::network::server::ParserState MessageParser::parse(
 
         m_cache.clear();
         if (result != server::ParserState::readingMessage ||
-            m_cachedContent == CachedContent::attributes &&
-                bytesParsed == m_bytesToCache)
+            (m_cachedContent == CachedContent::attributes &&
+                bytesParsed == m_bytesToCache))
         {
             // Parsing completed or failed. Anyway, current message cannot be continued.
             m_cachedContent = CachedContent::header;

@@ -20,7 +20,7 @@ class NX_NETWORK_API MessageParser:
     public nx::network::server::AbstractMessageParser<Message>
 {
 private:
-    static constexpr int kHeaderSize = 20;
+    static constexpr std::size_t kHeaderSize = 20;
 
     enum class State
     {
@@ -155,7 +155,7 @@ private:
     std::deque<char> m_tempBuffer;
 
     CachedContent m_cachedContent = CachedContent::header;
-    int m_bytesToCache = kHeaderSize;
+    std::size_t m_bytesToCache = kHeaderSize;
     nx::Buffer m_cache;
 };
 
