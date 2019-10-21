@@ -22,10 +22,10 @@ class NX_NETWORK_API MessageParser:
 private:
     static constexpr int kHeaderSize = 20;
 
-    enum
+    enum class State
     {
         // Header
-        HEADER_INITIAL_AND_TYPE,
+        HEADER_INITIAL_AND_TYPE = 0,
         HEADER_LENGTH,
         HEADER_MAGIC_ID,
         HEADER_TRANSACTION_ID,
@@ -42,7 +42,7 @@ private:
         // Other states
         MORE_VALUE,
         END_MESSAGE_INTEGRITY,
-        END_FINGERPRINT
+        END_FINGERPRINT,
     };
 
     /**
@@ -150,7 +150,7 @@ private:
     STUNAttr m_attribute;
     Message* m_outputMessage = nullptr;
     std::size_t m_leftMessageLength = 0;
-    int m_state = HEADER_INITIAL_AND_TYPE;
+    State m_state = State::HEADER_INITIAL_AND_TYPE;
     // This is for opaque usage
     std::deque<char> m_tempBuffer;
 

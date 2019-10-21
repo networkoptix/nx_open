@@ -90,7 +90,7 @@ nx::network::server::ParserState MessageParser::parse(
 
 nx::network::server::ParserState MessageParser::state() const
 {
-    return m_state == HEADER_INITIAL_AND_TYPE
+    return m_state == State::HEADER_INITIAL_AND_TYPE
         ? nx::network::server::ParserState::init
         : nx::network::server::ParserState::readingMessage;
 }
@@ -102,7 +102,7 @@ void MessageParser::reset()
 
     m_attribute = {};
     m_leftMessageLength = 0;
-    m_state = HEADER_INITIAL_AND_TYPE;
+    m_state = State::HEADER_INITIAL_AND_TYPE;
     m_tempBuffer.clear();
 
     m_cachedContent = CachedContent::header;
@@ -284,7 +284,7 @@ Attribute* MessageParser::parseValue()
 
 int MessageParser::parseHeaderInitialAndType(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == HEADER_INITIAL_AND_TYPE);
+    NX_ASSERT(m_state == State::HEADER_INITIAL_AND_TYPE);
     bool ok;
     std::bitset<16> value = buffer.NextUint16(&ok);
     if (!ok)
@@ -324,14 +324,14 @@ int MessageParser::parseHeaderInitialAndType(MessageParserBuffer& buffer)
         m_header.messageClass = 0;
         m_header.messageClass |= static_cast<int>(value[4]);
         m_header.messageClass |= static_cast<int>(value[8]) << 1;
-        m_state = HEADER_LENGTH;
+        m_state = State::HEADER_LENGTH;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseHeaderLength(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == HEADER_LENGTH);
+    NX_ASSERT(m_state == State::HEADER_LENGTH);
     bool ok;
     std::uint16_t val = buffer.NextUint16(&ok);
     if (!ok)
@@ -349,13 +349,13 @@ int MessageParser::parseHeaderLength(MessageParserBuffer& buffer)
         // is not zero zero. This is another way to tell if a packet is STUN or not
         return FAILED;
     }
-    m_state = HEADER_MAGIC_ID;
+    m_state = State::HEADER_MAGIC_ID;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseHeaderMagicCookie(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == HEADER_MAGIC_ID);
+    NX_ASSERT(m_state == State::HEADER_MAGIC_ID);
     bool ok;
     std::uint32_t magic_id;
     magic_id = buffer.NextUint32(&ok);
@@ -367,14 +367,14 @@ int MessageParser::parseHeaderMagicCookie(MessageParserBuffer& buffer)
         return FAILED;
     else
     {
-        m_state = HEADER_TRANSACTION_ID;
+        m_state = State::HEADER_TRANSACTION_ID;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseHeaderTransactionID(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == HEADER_TRANSACTION_ID);
+    NX_ASSERT(m_state == State::HEADER_TRANSACTION_ID);
     bool ok;
     buffer.readNextBytesToBuffer(m_header.transactionId.data(), m_header.transactionId.size(), &ok);
     if (!ok)
@@ -389,7 +389,7 @@ int MessageParser::parseHeaderTransactionID(MessageParserBuffer& buffer)
     m_outputMessage->header.method = static_cast<int>(m_header.method);
     m_outputMessage->header.transactionId = m_header.transactionId;
 
-    m_state = MORE_VALUE;
+    m_state = State::MORE_VALUE;
     return SECTION_FINISH;
 }
 
@@ -399,45 +399,45 @@ int MessageParser::parseMoreValue(MessageParserBuffer& buffer)
     // If after we finished transaction id, we find out that the length
     // of our body is zero, simply means we are done here since no attributes
     // are associated with our body.
-    NX_ASSERT(m_state == MORE_VALUE);
+    NX_ASSERT(m_state == State::MORE_VALUE);
     if (m_leftMessageLength == 0)
     {
         buffer.clear();
         m_attribute.clear();
-        m_state = HEADER_INITIAL_AND_TYPE;
+        m_state = State::HEADER_INITIAL_AND_TYPE;
         return FINISH;
     }
     else
     {
         m_attribute.clear();
-        m_state = ATTRIBUTE_TYPE;
+        m_state = State::ATTRIBUTE_TYPE;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseAttributeType(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == ATTRIBUTE_TYPE);
+    NX_ASSERT(m_state == State::ATTRIBUTE_TYPE);
     bool ok;
     m_attribute.type = buffer.NextUint16(&ok);
     if (!ok)
     {
         return IN_PROGRESS;
     }
-    m_state = ATTRIBUTE_LENGTH;
+    m_state = State::ATTRIBUTE_LENGTH;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseAttributeLength(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == ATTRIBUTE_LENGTH);
+    NX_ASSERT(m_state == State::ATTRIBUTE_LENGTH);
     bool ok;
     m_attribute.length = buffer.NextUint16(&ok);
     if (!ok)
     {
         return IN_PROGRESS;
     }
-    m_state = ATTRIBUTE_VALUE;
+    m_state = State::ATTRIBUTE_VALUE;
     return SECTION_FINISH;
 }
 
@@ -466,7 +466,7 @@ int MessageParser::parseAttributeValueNotAdd(MessageParserBuffer& buffer)
 
 int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
 {
-    NX_ASSERT(m_state == ATTRIBUTE_VALUE);
+    NX_ASSERT(m_state == State::ATTRIBUTE_VALUE);
     int ret = parseAttributeValueNotAdd(buffer);
     if (ret != SECTION_FINISH)
         return ret;
@@ -479,30 +479,30 @@ int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
     switch (attr->getType())
     {
         case attrs::fingerPrint:
-            m_state = END_FINGERPRINT;
+            m_state = State::END_FINGERPRINT;
             break;
         case attrs::messageIntegrity:
-            m_state = END_MESSAGE_INTEGRITY;
+            m_state = State::END_MESSAGE_INTEGRITY;
             break;
         default:
-            m_state = MORE_VALUE;
+            m_state = State::MORE_VALUE;
     }
     return SECTION_FINISH;
 }
 
 int MessageParser::parseAttributeFingerprintType(MessageParserBuffer& buffer)
 {
-    m_state = ATTRIBUTE_TYPE;
+    m_state = State::ATTRIBUTE_TYPE;
     int ret = parseAttributeType(buffer);
-    m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
+    m_state = State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
     return ret;
 }
 
 int MessageParser::parseAttributeFingerprintLength(MessageParserBuffer& buffer)
 {
-    m_state = ATTRIBUTE_LENGTH;
+    m_state = State::ATTRIBUTE_LENGTH;
     int ret = parseAttributeLength(buffer);
-    m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE;
+    m_state = State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE;
     return ret;
 }
 
@@ -518,11 +518,11 @@ int MessageParser::parseAttributeFingerprintValue(MessageParserBuffer& buffer)
         // our parser state converts to a END_FINGERPINT states
         if (m_attribute.type == attrs::fingerPrint)
         {
-            m_state = END_FINGERPRINT;
+            m_state = State::END_FINGERPRINT;
         }
         else
         {
-            m_state = MORE_VALUE;
+            m_state = State::MORE_VALUE;
         }
         return SECTION_FINISH;
     }
@@ -534,7 +534,7 @@ int MessageParser::parseEndWithFingerprint(MessageParserBuffer& /*buffer*/)
     // expected, we just return error that we cannot handle this message now
     if (m_leftMessageLength != 0)
         return FAILED;
-    m_state = HEADER_INITIAL_AND_TYPE;
+    m_state = State::HEADER_INITIAL_AND_TYPE;
     return FINISH;
 }
 
@@ -550,12 +550,12 @@ int MessageParser::parseEndMessageIntegrity(MessageParserBuffer& /*buffer*/)
 {
     if (m_leftMessageLength != 0)
     {
-        m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
+        m_state = State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
         return SECTION_FINISH;
     }
     else
     {
-        m_state = HEADER_INITIAL_AND_TYPE;
+        m_state = State::HEADER_INITIAL_AND_TYPE;
         return FINISH;
     }
 }
@@ -575,43 +575,43 @@ nx::network::server::ParserState MessageParser::parseInternal(
         int ret = 0;
         switch (m_state)
         {
-            case HEADER_INITIAL_AND_TYPE:
+            case State::HEADER_INITIAL_AND_TYPE:
                 ret = parseHeaderInitialAndType(buffer);
                 break;
-            case HEADER_LENGTH:
+            case State::HEADER_LENGTH:
                 ret = parseHeaderLength(buffer);
                 break;
-            case HEADER_MAGIC_ID:
+            case State::HEADER_MAGIC_ID:
                 ret = parseHeaderMagicCookie(buffer);
                 break;
-            case HEADER_TRANSACTION_ID:
+            case State::HEADER_TRANSACTION_ID:
                 ret = parseHeaderTransactionID(buffer);
                 break;
-            case ATTRIBUTE_TYPE:
+            case State::ATTRIBUTE_TYPE:
                 ret = parseAttributeType(buffer);
                 break;
-            case ATTRIBUTE_LENGTH:
+            case State::ATTRIBUTE_LENGTH:
                 ret = parseAttributeLength(buffer);
                 break;
-            case ATTRIBUTE_VALUE:
+            case State::ATTRIBUTE_VALUE:
                 ret = parseAttributeValue(buffer);
                 break;
-            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE:
+            case State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE:
                 ret = parseAttributeFingerprintType(buffer);
                 break;
-            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH:
+            case State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH:
                 ret = parseAttributeFingerprintLength(buffer);
                 break;
-            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE:
+            case State::ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE:
                 ret = parseAttributeFingerprintValue(buffer);
                 break;
-            case MORE_VALUE:
+            case State::MORE_VALUE:
                 ret = parseMoreValue(buffer);
                 break;
-            case END_FINGERPRINT:
+            case State::END_FINGERPRINT:
                 ret = parseEndWithFingerprint(buffer);
                 break;
-            case END_MESSAGE_INTEGRITY:
+            case State::END_MESSAGE_INTEGRITY:
                 ret = parseEndMessageIntegrity(buffer);
                 break;
             default:
