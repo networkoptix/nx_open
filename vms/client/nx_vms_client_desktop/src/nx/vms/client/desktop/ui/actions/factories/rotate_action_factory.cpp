@@ -6,6 +6,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/algorithm/same.h>
 #include <core/resource/layout_resource.h>
 
 namespace {
@@ -14,11 +15,6 @@ class ContextMenu
 {
     Q_DECLARE_TR_FUNCTIONS(ContextMenu)
 };
-
-qreal getRotation(QnLayoutItemIndex index)
-{
-    return index.layout()->getItem(index.uuid()).rotation;
-}
 
 } // namespace
 
@@ -39,21 +35,13 @@ ui::action::Factory::ActionList RotateActionFactory::newActions(
     if (items.isEmpty())
         return ActionList();
 
-    const qreal currentRotation =
-        [items]()
-        {
-            const qreal result = getRotation(items.first());
-            const auto predicate =
-                [result](auto index) { return !qFuzzyEquals(result, getRotation(index)); };
-            return std::any_of(items.begin() + 1, items.end(), predicate)
-                ? -1.0
-                : result;
-        }();
+    const auto getter = [](auto index) { return index.layout()->getItem(index.uuid()).rotation; };
+    const auto currentRotation = utils::algorithm::sameValue(items, getter, -1.0);
 
     const auto createRotateAction =
-        [this, parameters, currentRotation](const QString& text, qreal rotation)
+        [this, parameters, currentRotation, parent](const QString& text, qreal rotation)
         {
-            const auto action = new QAction(text);
+            const auto action = new QAction(text, parent);
             action->setCheckable(true);
             action->setChecked(qFuzzyEquals(currentRotation, rotation));
 

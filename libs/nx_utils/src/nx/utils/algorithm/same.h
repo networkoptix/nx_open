@@ -4,14 +4,14 @@ namespace nx {
 namespace utils {
 namespace algorithm {
 
-/** Test if predicate returns the same value for all elements. */
-template<class Iterator, class Predicate, class Elem> inline
-bool same(Iterator first, Iterator last, Predicate pred, Elem* data = nullptr)
+/** Test if getter returns the same value for all elements. */
+template<class Iterator, class Getter, class Elem> inline
+bool same(Iterator first, Iterator last, Getter getter, Elem* data = nullptr)
 {
     if (first == last)
         return true;
 
-    const auto firstValue = pred(*first);
+    const auto firstValue = getter(*first);
     if (data)
         *data = firstValue;
 
@@ -20,10 +20,27 @@ bool same(Iterator first, Iterator last, Predicate pred, Elem* data = nullptr)
         return true;
 
     for (; first != last; ++first)
-        if (pred(*first) != firstValue)
+        if (getter(*first) != firstValue)
             return false;
 
     return true;
+}
+
+// Returns value from getter if it is the same for all elements. Otherwise returns defaultValue.
+template<class Type, class Iterator, class Getter> inline
+Type sameValue(Iterator first, Iterator last, Getter getter, const Type& defaultValue)
+{
+    Type result;
+    return same(first, last, getter, &result)
+        ? result
+        : defaultValue;
+}
+
+// Returns value from getter if it is the same for all elements. Otherwise returns defaultValue.
+template<class Type, class Container, class Getter> inline
+Type sameValue(const Container& container, Getter getter, const Type& defaultValue)
+{
+    return sameValue(container.begin(), container.end(), getter, defaultValue);
 }
 
 //-------------------------------------------------------------------------------------------------
