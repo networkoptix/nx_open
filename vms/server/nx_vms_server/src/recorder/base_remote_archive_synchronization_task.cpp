@@ -140,7 +140,7 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
         [this, &result](const auto& iterator)
         {
             if (m_canceled)
-                return false;
+                return;
 
             const auto overlappedId = iterator->first;
             const auto& chunks = iterator->second;
