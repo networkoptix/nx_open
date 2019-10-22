@@ -1031,18 +1031,10 @@ def main(conf_file, ini_file, log_file):
         _test_api(api)
 
         storages = _get_storages(api)
-
-        report('Stopping server...')
-        vms.stop(exc=True)
-        report('Server stopped.')
-
+        _stop_vms(vms)
         _override_ini_config(vms, ini)
         _clear_storages(box, storages)
-
-        report('Starting Server...')
-        vms.start(exc=True)
-        vms = _obtain_restarted_vms(box, linux_distribution)
-        report('Server started successfully.')
+        vms = _restart_vms(box, linux_distribution, vms)
 
         _test_vms(api, box, box_platform, conf, ini, vms)
 
@@ -1051,6 +1043,20 @@ def main(conf_file, ini_file, log_file):
         vms.dismount_ini_dirs()
 
     return 0
+
+
+def _restart_vms(box, linux_distribution, vms):
+    report('Starting Server...')
+    vms.start(exc=True)
+    vms = _obtain_restarted_vms(box, linux_distribution)
+    report('Server started.')
+    return vms
+
+
+def _stop_vms(vms):
+    report('Stopping server...')
+    vms.stop(exc=True)
+    report('Server stopped.')
 
 
 def _clear_storages(box, storages: List[Storage]):
