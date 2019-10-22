@@ -28,10 +28,8 @@ protected:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
     virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* /*outValue*/,
-        const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/) override
-    {
-    }
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
@@ -48,6 +46,7 @@ private:
     nx::sdk::Uuid m_trackId = nx::sdk::UuidHelper::randomUuid();
     int m_frameIndex = 0; /**< Used for generating the detection in the right place. */
     int m_trackIndex = 0; /**< Used in the description of the events. */
+
     /** Used for binding object and event metadata to the particular video frame. */
     int64_t m_lastVideoFrameTimestampUs = 0;
 };

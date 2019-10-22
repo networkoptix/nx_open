@@ -26,14 +26,28 @@ public:
     using CreateEngine = std::function<IEngine*(Plugin* plugin)>;
 
     /**
-     * @param pluginManifest Plugin manifest to be returned from the manifest method.
-     * @param createEngine Functor for engine creation.
+     * Allows to use this class directly without inhering it.
+     *
+     * @deprecated Instead of using this constructor, create a subclass, override doObtainEngine()
+     *     and manifestString().
+     *
+     * @param pluginManifest Plugin manifest to be returned from manifest().
+     * @param createEngine Functor for Engine creation.
      */
     Plugin(std::string pluginManifest, CreateEngine createEngine);
 
     virtual ~Plugin() override;
 
     Ptr<IUtilityProvider> utilityProvider() const { return m_utilityProvider; }
+
+protected:
+    Plugin();
+
+    /**
+     * Override this method instead of doCreateEngine().
+     */
+    virtual Result<IEngine*> doObtainEngine();
+    virtual std::string manifestString() const;
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
@@ -46,9 +60,17 @@ protected:
     virtual void doCreateEngine(Result<IEngine*>* outResult) override;
 
 private:
+    void logLifeCycleEvent(const std::string& event) const;
+
+    void logCreation() const { logLifeCycleEvent("Created"); }
+    void logDestruction() const { logLifeCycleEvent("Destroyed"); }
+
+    void logError(const std::string& message) const;
+
+private:
     const std::string m_jsonManifest;
 
-    CreateEngine m_createEngine;
+    CreateEngine m_createEngineFunc;
     Ptr<IUtilityProvider> m_utilityProvider;
 };
 

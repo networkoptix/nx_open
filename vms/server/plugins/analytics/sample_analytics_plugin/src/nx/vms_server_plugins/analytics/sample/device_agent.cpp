@@ -93,6 +93,12 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true; //< There were no errors while filling the metadataPackets.
 }
 
+void DeviceAgent::doSetNeededMetadataTypes(
+    nx::sdk::Result<void>* /*outValue*/,
+    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 // private
 
