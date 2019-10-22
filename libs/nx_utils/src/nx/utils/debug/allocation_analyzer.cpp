@@ -14,7 +14,7 @@
 namespace nx::utils::debug {
 
 using AllocationsByCount =
-    std::map<int /*count*/, boost::stacktrace::stacktrace, std::greater<int>>;
+    std::multimap<int /*count*/, boost::stacktrace::stacktrace, std::greater<int>>;
 
 class InternalAllocationAnalyzer
 {
@@ -41,7 +41,7 @@ void InternalAllocationAnalyzer::recordObjectDestruction(void* ptr)
 {
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
 
-    auto it = m_ptrToStack.find(ptr);
+    const auto it = m_ptrToStack.find(ptr);
     if (it == m_ptrToStack.end())
         return;
     
@@ -61,8 +61,8 @@ AllocationsByCount InternalAllocationAnalyzer::getAllocationsByCount() const
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
 
     AllocationsByCount allocations;
-    for (auto& [stack, count]: m_allocationCountPerStack)
-        allocations[count] = stack;
+    for (const auto& [stack, count]: m_allocationCountPerStack)
+        allocations.emplace(count, stack);
 
     return allocations;
 }
@@ -98,7 +98,7 @@ std::string AllocationAnalyzer::generateReport() const
     std::ostringstream report;
     report << "=====================================================================" << std::endl;
     report << "ALLOCATION REPORT BEGIN" << std::endl;
-    for (auto& [count, stack]: allocations)
+    for (const auto& [count, stack]: allocations)
     {
         report << count << " allocations done by the following stack:"<< std::endl
             << stack << std::endl
