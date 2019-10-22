@@ -162,7 +162,7 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
-                    f'Command `{command_wrapped}` failed '
+                    f'Command {command_wrapped!r} failed '
                     f'with exit status {run.returncode}, '
                     f'stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
@@ -279,45 +279,41 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             #logging.info("Executing command: %r", res)
             return res
 
-        _SH_DEFAULT = object()
-
         def sh(self, command, timeout_s=None, su=False, exc=False,
                stdout=None, stderr=None, stdin=None):
-            opts = {
-                'stdin': subprocess.PIPE
-            }
-            if stdout != self._SH_DEFAULT:
-                opts['stdout'] = subprocess.PIPE
-            if stderr != self._SH_DEFAULT:
-                opts['stderr'] = subprocess.PIPE
+
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             log_remote_command(command_wrapped)
             actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
             try:
-                proc = subprocess.Popen(self.ssh_command(command_wrapped), **opts)
-                out, err = proc.communicate(stdin.encode('UTF-8') if stdin else b'',
-                    actual_timeout_s)
+                proc = subprocess.Popen(
+                    self.ssh_command(command_wrapped),
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = proc.communicate(
+                    stdin.encode('UTF-8') if stdin is not None else b'', actual_timeout_s)
             except subprocess.TimeoutExpired:
-                message = f'Timeout {actual_timeout_s} seconds expired'
+                message = (f'Unable to execute remote command via ssh: '
+                    f'timeout of {actual_timeout_s} seconds expired; ' +
+                    f'check boxHostnameOrIp in {repr(self.conf_file)}.')
+
                 if exc:
                     raise exceptions.BoxCommandError(message=message)
                 else:
                     return self.BoxConnectionResult(None, message, command=command_wrapped)
 
-            if stdout != self._SH_DEFAULT:
-                write_method = getattr(stdout, 'write', None)
-                if callable(write_method):
-                    stdout.write(out.decode('UTF-8'))
-            if stderr != self._SH_DEFAULT:
-                write_method = getattr(stderr, 'write', None)
-                if callable(write_method):
-                    stderr.write(err.decode('UTF-8'))
+            if stdout is not None:
+                stdout.write(out.decode('UTF-8'))
+            if stderr is not None:
+                stderr.write(err.decode('UTF-8'))
+            else:
+                if err:
+                    logging.debug('Remote command stderr:\n' + err.decode())
 
             log_remote_command_status(proc.returncode)
             
             if exc and proc.returncode != 0:
                 raise exceptions.BoxCommandError(
-                    f'Command `{command_wrapped}` failed '
+                    f'Command {command_wrapped!r} failed '
                     f'with exit status {proc.returncode}, '
                     f'stderr:\n    {err.decode("UTF-8")}'
                 )
