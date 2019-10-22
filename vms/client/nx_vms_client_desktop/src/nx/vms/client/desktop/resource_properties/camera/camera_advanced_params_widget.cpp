@@ -491,6 +491,8 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
     /* Show error if something was not correct. */
     if (status != 0) {
         // TODO: #GDM
+        setState(State::Init);
+        loadValues();
         return;
     }
 

@@ -19,6 +19,7 @@
 
 class VMaxStreamFetcherPtr;
 class QnPlVmax480Resource;
+class QnVmax480ResourceProxy;
 
 class QnVmax480DataConsumer
 {
@@ -36,21 +37,27 @@ public:
 
 class QnVMax480ConnectionProcessor;
 
-class VMaxStreamFetcher: public QnVmax480DataConsumer
+class VMaxStreamFetcher: public QnVmax480DataConsumer, public nx::vms::server::ServerModuleAware
 {
 public:
     bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0, bool keepAllChannels = false, bool checkPlaybackMask = false);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
-    static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive);
+    static VMaxStreamFetcher* getInstance(
+        const QByteArray& clientGroupID,
+        QnPlVmax480Resource* res,
+        bool isLive);
 
-    static void freeInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive);
+    static void freeInstance(
+        const QByteArray& clientGroupID,
+        QnPlVmax480Resource* res,
+        bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
     static void pleaseStopAll();
 
 public:
-    VMaxStreamFetcher(QnResource* dev, bool isLive);
+    VMaxStreamFetcher(QnMediaServerModule* serverModule, QString groupId, bool isLive);
     virtual ~VMaxStreamFetcher();
 
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) override;
@@ -90,7 +97,6 @@ private:
 private:
     static const int OPEN_ALL = 0xffff;
 
-    QWeakPointer<QnPlVmax480Resource> m_vmaxResource;
     typedef QMap<QnVmax480DataConsumer*, QnDataPacketQueue*> ConsumersMap;
 
     mutable QnMutex m_mutex;
@@ -121,6 +127,8 @@ private:
     qint64 m_lastConnectTimeUsec;
     bool m_eofReached;
     bool m_needStop;
+    QString m_groupId;
+    QnVmax480ResourceProxy* m_resourceProxy;
 };
 
 #endif //#ifdef ENABLE_VMAX

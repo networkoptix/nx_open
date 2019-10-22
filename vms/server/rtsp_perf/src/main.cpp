@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     QCoreApplication::setApplicationVersion("1.0");
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Rtsp perfomance test");
+    parser.setApplicationDescription("Rtsp performance test");
     parser.addHelpOption();
     parser.addVersionOption();
     QCommandLineOption serverOption(QStringList() << "s" << "server",

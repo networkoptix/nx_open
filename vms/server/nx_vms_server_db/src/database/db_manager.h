@@ -828,6 +828,7 @@ namespace detail
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
         bool encryptBusinessRules();
+        bool encryptStoragePasswords();
         bool moveAnalyticsStorageIdToProperty();
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();
