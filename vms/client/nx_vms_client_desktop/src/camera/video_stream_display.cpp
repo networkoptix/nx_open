@@ -402,6 +402,9 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 {
     if (!qnSettings->allowMtDecoding())
         return MultiThreadDecodePolicy::disabled;
+    if (qnSettings->forceMtDecoding())
+        return MultiThreadDecodePolicy::enabled;
+
     if (useMtDecoding)
         return MultiThreadDecodePolicy::enabled;
     return MultiThreadDecodePolicy::autoDetect;
