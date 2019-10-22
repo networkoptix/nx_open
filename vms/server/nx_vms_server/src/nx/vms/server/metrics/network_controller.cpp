@@ -29,8 +29,8 @@ std::set<QString> stringSetDifference(
 class InterfaceResource
 {
 public:
-    InterfaceResource(QNetworkInterface interface)
-        : m_interface(std::move(interface))
+    InterfaceResource(QNetworkInterface iface)
+        : m_interface(std::move(iface))
     {}
 
     QString name() const
@@ -39,10 +39,10 @@ public:
         return m_interface.name();
     }
 
-    void updateInterface(QNetworkInterface interface)
+    void updateInterface(QNetworkInterface iface)
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        m_interface = std::move(interface);
+        m_interface = std::move(iface);
     }
 
     QJsonArray addressesJson() const
