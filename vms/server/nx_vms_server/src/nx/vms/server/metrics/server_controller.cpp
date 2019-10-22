@@ -185,6 +185,11 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             [](const auto& r) { return Value(r->commonModule()->metrics()->tcpConnections().total()); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
+            "outgoingConnections",
+            [this](const auto& r)
+            { return Value(r->commonModule()->metrics()->tcpConnections().outgoing()); }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
             "logLevel",
             [](const auto&) { return Value(toString(nx::utils::log::mainLogger()->maxLevel())); }
         )

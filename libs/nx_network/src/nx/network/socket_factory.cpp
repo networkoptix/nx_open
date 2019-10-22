@@ -55,20 +55,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     if (createStreamSocketFunc)
         return createStreamSocketFunc(sslRequired, natTraversalSupport, ipVersion);
 
-    auto result = defaultStreamSocketFactoryFunc(
+    return defaultStreamSocketFactoryFunc(
+        sslRequired,
         natTraversalSupport,
-        s_enforcedStreamSocketType,
         ipVersion);
-
-    if (!result)
-        return std::unique_ptr<AbstractStreamSocket>();
-
-#ifdef ENABLE_SSL
-    if (sslRequired || s_isSslEnforced)
-        return createSslAdapter(std::move(result));
-#endif // ENABLE_SSL
-
-    return result;
 }
 
 std::unique_ptr<nx::network::AbstractEncryptedStreamSocket> SocketFactory::createSslAdapter(
@@ -288,35 +278,42 @@ std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 #endif
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryFunc(
+    bool sslRequired,
     NatTraversalSupport nttType,
-    SocketType forcedSocketType,
     boost::optional<int> _ipVersion)
 {
+    std::unique_ptr<AbstractStreamSocket> result;
     auto ipVersion = (bool) _ipVersion ? *_ipVersion : s_tcpClientIpVersion.load();
-    switch (forcedSocketType)
+    switch (s_enforcedStreamSocketType)
     {
         case SocketFactory::SocketType::cloud:
             switch (nttType)
             {
                 case NatTraversalSupport::enabled:
-                    return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
-
+                    result = std::make_unique<cloud::CloudStreamSocket>(ipVersion);
+                    break;
                 case NatTraversalSupport::disabled:
-                    return std::make_unique<TCPSocket>(ipVersion);
+                    result = std::make_unique<TCPSocket>(ipVersion);
+                    break;
             }
             break;
 
         case SocketFactory::SocketType::tcp:
-            return std::make_unique<TCPSocket>(ipVersion);
-
+            result = std::make_unique<TCPSocket>(ipVersion);
+            break;
         case SocketFactory::SocketType::udt:
-            return std::make_unique<UdtStreamSocket>(ipVersion);
-
+            result = std::make_unique<UdtStreamSocket>(ipVersion);
+            break;
         default:
             break;
     };
 
-    return nullptr;
+#ifdef ENABLE_SSL
+    if (result && (sslRequired || s_isSslEnforced))
+        return createSslAdapter(std::move(result));
+#endif // ENABLE_SSL
+
+    return result;
 }
 
 std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSocketFactoryFunc(

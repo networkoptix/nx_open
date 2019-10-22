@@ -164,6 +164,7 @@ public:
 
     QString metadataDatabaseDir() const;
     bool isStopping() const { return m_isStopping.load(); }
+    void initOutgoingSocketCounter();
 private:
     void registerResourceDataProviders();
     /**

@@ -36,6 +36,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
     static const std::string kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
     static const std::string kNoPlugins = "noPlugins";
+    static const std::string publicIPEnabled = "publicIPEnabled";
+    static const std::string onlineResourceDataEnabled = "onlineResourceDataEnabled";
     static const std::string serverStartedEventTimeoutMsName = "serverStartedEventTimeoutMs";
 
 } // namespace QnServer

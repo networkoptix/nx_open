@@ -4538,30 +4538,33 @@ void MediaServerProcess::loadResourceParamsData()
         param.value = loadDataFromFile(source); //< Default value.
     }
 
-    for (const auto& url: kUrlsToLoadResourceData)
+    if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        const auto internetValue = loadDataFromUrl(url);
-        QString internetVersion;
-        if (!internetValue.isEmpty())
+        for (const auto& url: kUrlsToLoadResourceData)
         {
-            const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
-            if (internetVersion > dataVersion)
+            const auto internetValue = loadDataFromUrl(url);
+            QString internetVersion;
+            if (!internetValue.isEmpty())
             {
-                if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
+                const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
+                if (internetVersion > dataVersion)
                 {
-                    param.value = internetValue;
-                    source = url;
-                    dataVersion = internetVersion;
-                    break;
+                    if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
+                    {
+                        param.value = internetValue;
+                        source = url;
+                        dataVersion = internetVersion;
+                        break;
+                    }
+                    else
+                    {
+                        NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                    }
                 }
                 else
                 {
-                    NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                    NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
                 }
-            }
-            else
-            {
-                NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
             }
         }
     }

@@ -93,6 +93,7 @@
 #include <nx/network/url/url_builder.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
+#include <nx/metrics/metrics_storage.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -143,6 +144,34 @@ public:
 
 };
 
+void QnMediaServerModule::initOutgoingSocketCounter()
+{
+    nx::network::SocketFactory::setCreateStreamSocketFunc(
+        [weakRef = this->commonModule()->metricsWeakRef()](
+            bool sslRequired,
+            nx::network::NatTraversalSupport natTraversalRequired,
+            boost::optional<int> ipVersion)
+        {
+            auto socket = nx::network::SocketFactory::defaultStreamSocketFactoryFunc(
+                sslRequired,
+                natTraversalRequired,
+                ipVersion);
+            if (!socket)
+                return socket;
+            if (auto ref = weakRef.lock())
+            {
+                ref->tcpConnections().outgoing()++;
+                socket->setBeforeDestroyCallback(
+                    [weakRef]()
+                    {
+                        if (auto ref = weakRef.lock())
+                            ref->tcpConnections().outgoing()--;
+                    });
+            }
+            return socket;
+        });
+}
+
 QnMediaServerModule::QnMediaServerModule(
     const nx::vms::server::CmdLineArguments* arguments,
     std::unique_ptr<MSSettings> serverSettings,
@@ -178,6 +207,8 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnVMax480Server());
 #endif
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
+    initOutgoingSocketCounter();
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
@@ -402,6 +433,7 @@ void QnMediaServerModule::stopLongRunnables()
 QnMediaServerModule::~QnMediaServerModule()
 {
     stop();
+    nx::network::SocketFactory::setCreateStreamSocketFunc(nullptr);
     m_context.reset();
     m_commonModule->resourcePool()->clear();
     clear();

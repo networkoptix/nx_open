@@ -61,7 +61,7 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["availability"]["uptimeS"], 1);
 
     // TODO: Mockup & check.
-    EXPECT_NE(startValues["info"]["publicIp"].toString(), "");
+    EXPECT_EQ(startValues["info"]["publicIp"].toString(), "");
     EXPECT_NE(startValues["info"]["os"].toString(), "");
     EXPECT_NE(startValues["info"]["osTime"].toString(), "");
     EXPECT_NE(startValues["info"]["vmsTime"].toString(), "");
@@ -299,6 +299,29 @@ TEST_F(MetricsServersApi, thumbnailAndDecodingSpeed)
 
 
     nx::vms::server::metrics::setTimerMultiplier(1);
+}
+
+TEST_F(MetricsServersApi, outgoingConnections)
+{
+    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    int connections1 = values["load"]["outgoingConnections"].toInt();
+
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> tmpData;
+    static const int kIterations = 10;
+    for (int i = 0; i < kIterations; ++i)
+        tmpData.emplace_back(nx::network::SocketFactory::createStreamSocket());
+
+    values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    int connections2 = values["load"]["outgoingConnections"].toInt();
+
+    tmpData.clear();
+    values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    int connections3 = values["load"]["outgoingConnections"].toInt();
+
+    int incomingConnections = values["load"]["incomingConnections"].toInt();
+
+    EXPECT_EQ(connections2, connections1 + kIterations);
+    EXPECT_EQ(connections1, connections3);
 }
 
 } // namespace nx::vms::server::test

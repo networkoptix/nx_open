@@ -199,6 +199,10 @@
                         "name": "Incoming Connections",
                         "display": "panel"
                     },
+                    "outgoingConnections": {
+                        "name": "Outgoing Connections",
+                        "display": "panel"
+                    },
                     "threads": {
                         "name": "Server threads",
                         "description": "The number of threads inside Server processes.",

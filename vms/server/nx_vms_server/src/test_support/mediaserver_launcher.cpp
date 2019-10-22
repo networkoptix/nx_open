@@ -33,6 +33,12 @@ MediaServerLauncher::MediaServerLauncher(
     if (disabledFeatures.testFlag(DisabledFeature::noPlugins))
         addSetting(QnServer::kNoPlugins, "1");
 
+    if (disabledFeatures.testFlag(DisabledFeature::noPublicIp))
+        addSetting(QnServer::publicIPEnabled, "0");
+
+    if (disabledFeatures.testFlag(DisabledFeature::noOnlineResourceData))
+        addSetting(QnServer::onlineResourceDataEnabled, "0");
+
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
 }
