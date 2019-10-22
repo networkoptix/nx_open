@@ -163,7 +163,7 @@ if platform.system() == 'Linux':
             if run.returncode != 0 and exc:
                 raise exceptions.BoxCommandError(
                     f'Command `{command_wrapped}` failed '
-                    f'with code {run.returncode}, '
+                    f'with exit status {run.returncode}, '
                     f'stderr:\n    {run.stderr.decode("UTF-8")}'
                 )
 
@@ -317,7 +317,9 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             
             if exc and proc.returncode != 0:
                 raise exceptions.BoxCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {proc.returncode}'
+                    f'Command `{command_wrapped}` failed '
+                    f'with exit status {proc.returncode}, '
+                    f'stderr:\n    {err.decode("UTF-8")}'
                 )
 
             return self.BoxConnectionResult(proc.returncode, command=command_wrapped)

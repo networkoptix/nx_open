@@ -92,7 +92,7 @@ class VmsScanner:
                 if len([v for k, v in storages.items() if v['point'] == self.ini_dir]) != 0:
                     self.device.sh(f'umount "{self.ini_dir}"', exc=True, su=True)
                 self.device.sh(
-                    'rm -r '
+                    'rm -rf '
                     f'"$(dirname "$(mktemp --dry-run)")"/tmp.*"{self._tmp_dir_suffix}" '
                     f'"{self.ini_dir}"',
                     exc=True, su=True)
