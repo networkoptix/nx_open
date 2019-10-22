@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/ui/actions/menu_factory.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_factories.h>
+#include <nx/vms/client/desktop/ui/actions/factories/rotate_action_factory.h>
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
 #include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -1175,33 +1176,12 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new CreateZoomWindowCondition())
             && !condition::tourIsRunning());
 
-    factory()
+    factory(RotateToAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
-        .text(ContextMenu::tr("Rotate to..."));
-
-    factory.beginSubMenu();
-    {
-        factory(Rotate0Action)
-            .flags(Scene | SingleTarget | MultiTarget)
-            .text(ContextMenu::tr("0 degrees"))
-            .condition(new RotateItemCondition());
-
-        factory(Rotate90Action)
-            .flags(Scene | SingleTarget | MultiTarget)
-            .text(ContextMenu::tr("90 degrees"))
-            .condition(new RotateItemCondition());
-
-        factory(Rotate180Action)
-            .flags(Scene | SingleTarget | MultiTarget)
-            .text(ContextMenu::tr("180 degrees"))
-            .condition(new RotateItemCondition());
-
-        factory(Rotate270Action)
-            .flags(Scene | SingleTarget | MultiTarget)
-            .text(ContextMenu::tr("270 degrees"))
-            .condition(new RotateItemCondition());
-    } factory.endSubMenu();
+        .text(ContextMenu::tr("Rotate to..."))
+        .condition(new RotateItemCondition())
+        .childFactory(new RotateActionFactory(manager));
 
     factory(RadassAction)
         .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
