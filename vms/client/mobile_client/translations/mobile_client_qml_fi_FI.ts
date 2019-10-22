@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Server has too old version. Please update it to the latest one</source>
-      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
+      <translation>Tällä palvelimella on liian vanha versio. Päivitä se uusimpaan versioon</translation>
     </message>
   </context>
   <context>

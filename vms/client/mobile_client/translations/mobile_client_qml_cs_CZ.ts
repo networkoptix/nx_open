@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Server has too old version. Please update it to the latest one</source>
-      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
+      <translation>Tento server má příliš starou verzi. Aktualizujte ho na nejnovější verzi</translation>
     </message>
   </context>
   <context>
@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Use server time</source>
-      <translation type="unfinished">Use server time</translation>
+      <translation>Použijte čas serverů</translation>
     </message>
   </context>
   <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Žádný živý stream</translation>
     </message>
   </context>
   <context>

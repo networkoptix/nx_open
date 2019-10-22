@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Server has too old version. Please update it to the latest one</source>
-      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
+      <translation>เซิร์ฟเวอร์นี้มีรุ่นที่เก่าเกินไป กรุณาปรับปรุงให้รุ่นล่าสุด</translation>
     </message>
   </context>
   <context>

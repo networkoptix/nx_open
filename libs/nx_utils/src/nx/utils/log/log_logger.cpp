@@ -26,7 +26,7 @@ Logger::Logger(
     :
     m_mutex(QnMutex::Recursive),
     m_filters(std::move(filters)),
-    m_defaultLevel(defaultLevel)
+    m_defaultLevel(Level::none)
 {
     if (writer)
         m_writers.push_back(std::move(writer));

@@ -144,7 +144,7 @@ Object
         property real interruptedPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
-
+        property var offlinePosition
         function savePosition()
         {
             lastPosition = currentPosition()
@@ -356,6 +356,19 @@ Object
             return;
 
         if (d.playing && !(mediaPlayer.playing || mediaPlayer.loading))
+        {
+            if (d.offlinePosition)
+            {
+                mediaPlayer.position = d.offlinePosition
+                d.offlinePosition = undefined
+            }
+
             mediaPlayer.play()
+        }
+    }
+
+    onCameraOfflineChanged:
+    {
+        d.offlinePosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
     }
 }

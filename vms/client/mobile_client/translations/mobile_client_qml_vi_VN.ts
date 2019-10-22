@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Server has too old version. Please update it to the latest one</source>
-      <translation type="unfinished">Server has too old version. Please update it to the latest one</translation>
+      <translation>Máy chủ này có phiên bản quá cũ. Vui lòng cập nhật lên phiên bản mới nhất</translation>
     </message>
   </context>
   <context>
