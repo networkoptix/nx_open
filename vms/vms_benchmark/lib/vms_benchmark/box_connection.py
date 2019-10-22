@@ -223,7 +223,6 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                     "-pw", password,
                     '-P', str(port),
                     f"{login}@{host}" if login else host,
-                    'sh'
                 ]
                 #self.ssh_command = [
                 #    'sshpass',
@@ -232,10 +231,9 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 #    "-o", "StrictHostKeyChecking=no",
                 #    f"-p{port}",
                 #    f"{login}@{host}" if login else host,
-                #    'sh'
                 #]
             else:
-                self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host, 'sh']
+                self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host]
 
             self.host_key = None
             self.ip: str = None
@@ -272,14 +270,12 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
             self.eth_speed = eth_speed.strip() if eth_speed else None
 
-        def ssh_command(self, command=None):
+        def ssh_command(self, command):
             res = self._ssh_command.copy()
             if self.host_key:
                 res.insert(2, '-hostkey')
                 res.insert(3, self.host_key)
-            if command:
-                escaped_command = '"' + command.replace('"', '\\"') + '"'
-                res += ['-c', escaped_command]
+            res += [command]
             #logging.info("Executing command: %r", res)
             return res
 
