@@ -7,38 +7,30 @@
 
 namespace nx::vms::server::metrics {
 
+class InterfaceResource;
+
 /**
  * Provides network interfaces from current PC.
  */
 class NetworkController:
     public ServerModuleAware,
-    public utils::metrics::ResourceControllerImpl<QNetworkInterface>
+    public utils::metrics::ResourceControllerImpl<std::shared_ptr<InterfaceResource>>
 {
 public:
     NetworkController(QnMediaServerModule* serverModule);
     void start() override;
 
-    struct InterfacesCompare
-    {
-        bool operator()(const QNetworkInterface& left, const QNetworkInterface& right) const
-        {
-            return left.name() < right.name();
-        }
-    };
-
 private:
     utils::metrics::ValueGroupProviders<Resource> makeProviders();
 
     QString interfaceIdFromName(const QString& name) const;
-    void updateInterfaces();
+    void updateInterfacesPool();
 
 private:
     const QString m_serverId;
 
     nx::utils::SharedGuardPtr m_timerGuard;
-    mutable nx::utils::Mutex m_mutex;
-
-    std::set<QNetworkInterface, InterfacesCompare> m_currentInterfaces;
+    std::map<QString, std::shared_ptr<InterfaceResource>> m_interfacesPool;
 };
 
 } // namespace nx::vms::server::metrics
