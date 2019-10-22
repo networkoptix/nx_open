@@ -17,9 +17,9 @@ def log_remote_command(command):
 
 def log_remote_command_status(status_code):
     if status_code == 0:
-        result_log_message = 'succeeded'
+        result_log_message = 'succeeded.'
     else:
-        result_log_message = f'failed with code {status_code}'
+        result_log_message = f'failed with exit status {status_code}.'
     logging.info(f'Remote command {result_log_message}')
 
 

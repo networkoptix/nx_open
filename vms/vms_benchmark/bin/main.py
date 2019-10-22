@@ -356,9 +356,12 @@ def box_tx_rx_errors(box):
     return tx_errors + rx_errors
 
 
-# TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
-def report(message, end='\n'):
-    print(message, end=end, flush=True)
+def _print(message):
+    print(message, flush=True)
+
+
+def report(message):
+    _print(message)
     if message.strip():
         logging.info(message.strip())
 
@@ -664,7 +667,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 try:
                     while time.time() - streaming_test_started_at_s < streaming_duration_mins * 60:
                         if stream_reader_process.poll() is not None:
-                            raise exceptions.RtspPerfError("Streaming unxpectedly ended.")
+                            raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
 
                         if not box_poller_thread.is_alive():
                             if (
@@ -899,15 +902,17 @@ def _obtain_box_platform(box, linux_distribution):
 
 def _check_time_diff(box, ini):
     box_time_output = box.eval('date +%s.%N')
+    if not box_time_output:
+        raise exceptions.BoxCommandError('Unable to get current box time using the `date` command.')
     try:
         box_time = float(box_time_output.strip())
     except ValueError:
-        raise exceptions.BoxStateError("Cannot parse output of the date command")
+        raise exceptions.BoxStateError("Cannot parse output of the `date` command.")
     host_time = time.time()
     logging.info(f"Time difference (box time minus host time): {box_time - host_time:.3f} s.")
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
-            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s.")
 
 
 def _obtain_running_vms(box, linux_distribution):
@@ -1008,10 +1013,9 @@ def _connect_to_box(conf, conf_file):
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
-    print(f"VMS Benchmark started; logging to {log_file_ref}.", flush=True)
-    print('', flush=True)
-    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
-    logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG,
+        format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    report(f"VMS Benchmark started; logging to {log_file_ref}.\n")
 
     conf, ini = load_configs(conf_file, ini_file)
 
@@ -1086,26 +1090,27 @@ def nx_format_exception(exception):
         return str(exception)
 
 
-def nx_print_exception(exception, recursive_level=0):
+def nx_print_exception(context_name, exception, recursive_level=0):
     string_indent = '  ' * recursive_level
+    prefix = (context_name + ': ') if context_name else ''
     if isinstance(exception, exceptions.VmsBenchmarkError):
-        print(f"{string_indent}{str(exception)}", file=sys.stderr, flush=True)
+        _print(f"{string_indent}{prefix}{str(exception)}")
         if isinstance(exception, exceptions.VmsBenchmarkIssue):
             for e in exception.sub_issues:
-                nx_print_exception(e, recursive_level=recursive_level + 2)
+                nx_print_exception('', e, recursive_level=recursive_level + 2)
         if exception.original_exception:
-            print(f'{string_indent}Caused by:', file=sys.stderr, flush=True)
+            _print(f'{string_indent}Caused by:')
             if isinstance(exception.original_exception, list):
                 for e in exception.original_exception:
-                    nx_print_exception(e, recursive_level=recursive_level + 2)
+                    nx_print_exception('', e, recursive_level=recursive_level + 2)
             else:
-                nx_print_exception(exception.original_exception, recursive_level=recursive_level + 2)
+                nx_print_exception('', exception.original_exception,
+                    recursive_level=recursive_level + 2)
     else:
-        print(
-            f'{string_indent}{nx_format_exception(exception)}'
+        _print(
+            f'{string_indent}{prefix}{nx_format_exception(exception)}'
             if recursive_level > 0
-            else f'{string_indent}ERROR: {nx_format_exception(exception)}',
-            file=sys.stderr, flush=True,
+            else f'{string_indent}ERROR: {nx_format_exception(exception)}'
         )
 
 
@@ -1114,28 +1119,24 @@ if __name__ == '__main__':
         try:
             sys.exit(main())
         except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
-            print(f'ISSUE: ', file=sys.stderr, end='', flush=True)
-            nx_print_exception(e)
-            print('', file=sys.stderr, flush=True)
-            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr, flush=True)
+            nx_print_exception('ISSUE', e)
+            _print('\nNOTE: Can be caused by network issues, or poor performance of the box or the host.')
             log_exception('ISSUE')
         except exceptions.VmsBenchmarkError as e:
-            print(f'ERROR: ', file=sys.stderr, end='', flush=True)
-            nx_print_exception(e)
+            nx_print_exception('ERROR', e)
             if log_file_ref:
-                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
+                _print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
             log_exception('ERROR')
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr, flush=True)
+            _print(f'UNEXPECTED ERROR: {e}')
             if log_file_ref:
-                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
+                _print(f'\nNOTE: Details may be available in {log_file_ref}.')
             log_exception('UNEXPECTED ERROR')
         finally:
             logging.info(f'VMS Benchmark finished at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}', file=sys.stderr, flush=True)
-        print(f'\nPlease send the complete output ' +
-            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
-            file=sys.stderr, flush=True)
+        _print(f'INTERNAL ERROR: {e}')
+        _print(f'\nPlease send the complete output ' +
+            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.')
 
     sys.exit(1)
