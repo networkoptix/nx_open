@@ -6,32 +6,32 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-binary_file = './testcamera'
-test_file_high_resolution = './test_file_high_resolution.ts'
-test_file_low_resolution = './test_file_low_resolution.ts'
-debug = False
+ini_testcamera_bin: str
+ini_test_file_high_resolution: str
+ini_test_file_low_resolution: str
+ini_testcamera_debug: bool
 
 
 @contextmanager
 def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     camera_args = [
-        binary_file,
+        ini_testcamera_bin,
         f"--local-interface={local_ip}",
         '--pts',
         f"--fps-primary", str(primary_fps),
         f"--fps-secondary", str(secondary_fps),
-        f"files=\"{test_file_high_resolution}\";secondary-files=\"{test_file_low_resolution}\";count={count}",
+        f"files=\"{ini_test_file_high_resolution}\";secondary-files=\"{ini_test_file_low_resolution}\";count={count}",
     ]
 
     opts = {}
 
-    if not debug:
+    if not ini_testcamera_debug:
         opts['stdout'] = subprocess.PIPE
         opts['stderr'] = subprocess.PIPE
 
     ld_library_path = None
     if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(ini_testcamera_bin)
         opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.

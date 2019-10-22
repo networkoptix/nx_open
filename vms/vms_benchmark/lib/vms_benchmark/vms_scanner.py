@@ -7,6 +7,8 @@ from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.config import ConfigParser
 from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError
 
+ini_ssh_service_command_timeout_s: int
+
 
 class VmsScanner:
     class Vms:
@@ -35,7 +37,7 @@ class VmsScanner:
                 if self.linux_distribution.with_systemd:
                     self.device.sh(
                         f'systemctl {command} {self.customization}-mediaserver',
-                        timeout=30,
+                        timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
                         stderr=None,
@@ -44,7 +46,7 @@ class VmsScanner:
                 else:
                     self.device.sh(
                         f'/etc/init.d/{self.customization}-mediaserver {command}',
-                        timeout=30,
+                        timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
                         stderr=None,

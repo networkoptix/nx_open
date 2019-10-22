@@ -2,6 +2,8 @@ from functools import reduce
 
 from vms_benchmark.utils import human_readable_size
 
+ini_ssh_get_proc_meminfo_timeout_s: int
+
 
 class BoxPlatform:
     def __init__(self, device, linux_distribution, ram_bytes, arch, cpu_count, cpu_features, storages_list):
@@ -37,7 +39,8 @@ class BoxPlatform:
         ):
             return None
 
-        meminfo = self.device.get_file_content('/proc/meminfo', timeout=10)
+        meminfo = self.device.get_file_content(
+            '/proc/meminfo', timeout_s=ini_ssh_get_proc_meminfo_timeout_s)
 
         if meminfo is None:
             return None

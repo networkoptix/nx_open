@@ -51,7 +51,7 @@ from vms_benchmark.box_connection import BoxConnection
 from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.vms_scanner import VmsScanner
 from vms_benchmark.server_api import ServerApi
-from vms_benchmark import test_camera_runner
+from vms_benchmark import test_camera_runner, vms_scanner, box_connection, box_platform
 from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
 from vms_benchmark import box_tests
@@ -219,19 +219,39 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 40,
         },
+        "sshCommandTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 5,
+        },
+        "sshServiceCommandTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 30,
+        },
+        "sshGetFileContentTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 30,
+        },
+        "sshGetProcMeminfoTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
-    if ini['testcameraBin']:
-        test_camera_runner.binary_file = ini['testcameraBin']
-    if ini['rtspPerfBin']:
-        stream_reader_runner.binary_file = ini['rtspPerfBin']
-    if ini['testFileHighResolution']:
-        test_camera_runner.test_file_high_resolution = ini['testFileHighResolution']
-    if ini['testFileLowResolution']:
-        test_camera_runner.test_file_low_resolution = ini['testFileLowResolution']
-    test_camera_runner.debug = ini['testcameraDebug']
+    test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
+    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
+    test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
+    test_camera_runner.ini_testcamera_debug = ini['testcameraDebug']
+    box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
+    box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
+    vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
+    box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
 
     if ini.ORIGINAL_OPTIONS is not None:
         report(f"Overriding default options via {ini_file}:")

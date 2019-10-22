@@ -7,6 +7,9 @@ from io import StringIO
 
 from vms_benchmark import exceptions
 
+ini_ssh_command_timeout_s: int
+ini_ssh_get_file_content_timeout_s: int
+
 
 def log_remote_command(command):
     logging.info(f'Executing remote command:\n    {command}')
@@ -117,7 +120,8 @@ if platform.system() == 'Linux':
             finally:
                 proc.terminate()
 
-        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
+        def sh(self, command, timeout_s=None,
+               su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
             log_remote_command(command_wrapped)
@@ -128,16 +132,18 @@ if platform.system() == 'Linux':
                 opts['input'] = stdin.encode('UTF-8')
 
             try:
+                actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
                 run = subprocess.run(
                     [*self.ssh_args, command_wrapped],
-                    timeout=timeout,
+                    timeout=actual_timeout_s,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     **opts
                 )
             except subprocess.TimeoutExpired:
-                message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
-                          f'check boxHostnameOrIp in {repr(self.conf_file)}.')
+                message = (f'Unable to execute remote command via ssh: '
+                    f'timeout of {actual_timeout_s} seconds expired; ' +
+                    f'check boxHostnameOrIp in {repr(self.conf_file)}.')
                 if exc:
                     raise exceptions.BoxCommandError(message=message)
                 else:
@@ -173,9 +179,9 @@ if platform.system() == 'Linux':
 
             return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=5, su=False, stderr=None, stdin=None):
+        def eval(self, cmd, timeout_s=None, su=False, stderr=None, stdin=None):
             out = StringIO()
-            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout_s=timeout_s)
 
             if res.return_code is None:
                 raise exceptions.BoxCommandError(res.message)
@@ -185,8 +191,10 @@ if platform.system() == 'Linux':
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, su=False, stderr=None, stdin=None, timeout=15):
-            return self.eval(f'cat "{path}"', su=su, stderr=stderr, stdin=stdin, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=None, stdin=None, timeout_s=None):
+            return self.eval(
+                f'cat "{path}"', su=su, stderr=stderr, stdin=stdin,
+                timeout_s=timeout_s or ini_ssh_get_file_content_timeout_s)
 
 elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
     class BoxConnection:
@@ -277,7 +285,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
         _SH_DEFAULT = object()
 
-        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr, stdin=None):
+        def sh(self, command, timeout_s=None, su=False, exc=False,
+               stdout=None, stderr=None, stdin=None):
             opts = {
                 'stdin': subprocess.PIPE
             }
@@ -287,11 +296,13 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 opts['stderr'] = subprocess.PIPE
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             log_remote_command(command_wrapped)
+            actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
             try:
                 proc = subprocess.Popen(self.ssh_command(command_wrapped), **opts)
-                out, err = proc.communicate(stdin.encode('UTF-8') if stdin else b'', timeout)
+                out, err = proc.communicate(stdin.encode('UTF-8') if stdin else b'',
+                    actual_timeout_s)
             except subprocess.TimeoutExpired:
-                message = f'Timeout {timeout} seconds expired'
+                message = f'Timeout {actual_timeout_s} seconds expired'
                 if exc:
                     raise exceptions.BoxCommandError(message=message)
                 else:
@@ -315,17 +326,19 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
             return self.BoxConnectionResult(proc.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=5, su=False, stderr=None, stdin=None):
+        def eval(self, cmd, timeout_s=None, su=False, stderr=None, stdin=None):
             out = StringIO()
-            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, stdin=stdin, timeout_s=timeout_s)
 
             if not res:
                 return None
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, su=False, stderr=sys.stderr, stdin=None, timeout=15):
-            return self.eval(f'cat "{path}"', su=su, stderr=stderr, stdin=stdin, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=sys.stderr, stdin=None, timeout_s=None):
+            return self.eval(
+                f'cat "{path}"', su=su, stderr=stderr, stdin=stdin,
+                timeout_s=timeout_s or ini_ssh_get_file_content_timeout_s)
 
 else:
     raise Exception(f"ERROR: OS {platform.system()} is unsupported.")
