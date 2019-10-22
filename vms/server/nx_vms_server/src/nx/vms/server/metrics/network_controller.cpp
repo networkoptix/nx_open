@@ -1,7 +1,9 @@
 #include "network_controller.h"
 
-#include <media_server/media_server_module.h>
 #include "helpers.h"
+
+#include <media_server/media_server_module.h>
+#include <QJsonArray>
 
 namespace nx::vms::server::metrics {
 
@@ -23,6 +25,22 @@ std::set<QNetworkInterface, NetworkController::InterfacesCompare> interfacesSetD
     return result;
 }
 
+QJsonArray interfacesAddresses(QNetworkInterface interface)
+{
+    QJsonArray result;
+    for (const QNetworkAddressEntry& address: interface.addressEntries())
+        result.append(address.ip().toString());
+    return result;
+}
+
+QString firstAddress(QNetworkInterface interface)
+{
+    const auto addresses = interface.addressEntries();
+    if (addresses.size() > 0)
+        return addresses.first().ip().toString();
+    return {};
+}
+
 } // namespace
 
 NetworkController::NetworkController(QnMediaServerModule* serverModule):
@@ -42,6 +60,9 @@ void NetworkController::start()
         [this]() { updateInterfaces(); });
 }
 
+// TODO: What about local interface wrapper with mutexes inside to avoid boilerplate?
+//       Or make resource just a simple string...
+//       Or implement something similar to resource (just sharedPtr to the QNetworkInterface?)
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
@@ -57,8 +78,38 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "server", [this](const auto&) { return Value(m_serverId); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ip", [](const auto&) { return Value(); }
-            ) // TODO: implement ip
+                "state",
+                [this](const auto& r)
+                {
+                    NX_MUTEX_LOCKER locker(&m_mutex);
+                    auto iface = m_currentInterfaces.find(r);
+                    if (iface == m_currentInterfaces.end())
+                        return Value();
+                    return Value(iface->flags().testFlag(QNetworkInterface::IsUp) ? "Up" : "Down");
+                }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "ipList",
+                [this](const auto& r)
+                {
+                    NX_MUTEX_LOCKER locker(&m_mutex);
+                    auto iface = m_currentInterfaces.find(r);
+                    if (iface == m_currentInterfaces.end())
+                        return Value();
+                    return Value(interfacesAddresses(*iface));
+                }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "firstIp",
+                [this](const auto& r)
+                {
+                    NX_MUTEX_LOCKER locker(&m_mutex);
+                    auto iface = m_currentInterfaces.find(r);
+                    if (iface == m_currentInterfaces.end())
+                        return Value();
+                    return Value(firstAddress(*iface));
+                }
+            )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "rates",
@@ -70,9 +121,6 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
             )
         )
     );
-
-    // TODO: add multiple ip list
-    // TODO: add state
 }
 
 QString NetworkController::interfaceIdFromName(const QString& name) const
@@ -90,15 +138,18 @@ void NetworkController::updateInterfaces()
         newInterfaces.insert(iface);
     }
 
-    const auto discoveredInterfaces = interfacesSetDifference(newInterfaces, m_currentInterfaces);
-    for (const auto& iface: discoveredInterfaces)
+    std::set<QNetworkInterface, InterfacesCompare> previousInterfaces;
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        previousInterfaces = std::move(m_currentInterfaces);
+        m_currentInterfaces = newInterfaces;
+    }
+
+    for (const auto& iface: interfacesSetDifference(newInterfaces, previousInterfaces))
         add(std::move(iface), interfaceIdFromName(iface.name()), utils::metrics::Scope::local);
 
-    const auto disappearedInterfaces = interfacesSetDifference(m_currentInterfaces, newInterfaces);
-    for (const auto& iface: disappearedInterfaces)
+    for (const auto& iface: interfacesSetDifference(previousInterfaces, newInterfaces))
         remove(interfaceIdFromName(iface.name()));
-
-    m_currentInterfaces = std::move(newInterfaces);
 }
 
 } // namespace nx::vms::server::metrics

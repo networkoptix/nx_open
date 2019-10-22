@@ -34,7 +34,9 @@ private:
 
 private:
     const QString m_serverId;
+
     nx::utils::SharedGuardPtr m_timerGuard;
+    mutable nx::utils::Mutex m_mutex;
 
     std::set<QNetworkInterface, InterfacesCompare> m_currentInterfaces;
 };
