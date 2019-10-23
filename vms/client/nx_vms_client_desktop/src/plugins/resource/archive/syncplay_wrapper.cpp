@@ -15,6 +15,7 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/guarded_callback.h>
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -625,10 +626,15 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         if (d->enabled) {
             if (allReady)
             {
-                executeDelayed(
-                    [ref = QPointer(this)]()
-                    { if (ref.data()) ref->jumpToLive(); },
-                    /*delay*/ 0, qApp->thread());
+                executeDelayed(nx::utils::guarded(
+                    this,
+                    [this, d]()
+                    {
+                        if (d->enabled)
+                            jumpToLive();
+                    }),
+                    /*delay*/ 0,
+                    qApp->thread());
             }
         }
         else {
