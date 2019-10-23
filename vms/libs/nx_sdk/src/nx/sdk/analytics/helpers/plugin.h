@@ -47,6 +47,7 @@ protected:
      * Override this method instead of doCreateEngine().
      */
     virtual Result<IEngine*> doObtainEngine();
+
     virtual std::string manifestString() const;
 
 //-------------------------------------------------------------------------------------------------
