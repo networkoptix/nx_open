@@ -189,34 +189,32 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
-    std::map<AdvancedParametersProvider*, QnCameraAdvancedParamValueList> valuesByProvider;
+    QnMutexLocker lock(&m_initMutex);
+    if (m_defaultAdvancedParametersProvider == nullptr
+        && m_advancedParametersProvidersByParameterId.empty())
     {
-        QnMutexLocker lock(&m_initMutex);
-        if (m_defaultAdvancedParametersProvider == nullptr
-            && m_advancedParametersProvidersByParameterId.empty())
-        {
-            // NOTE: It may sometimes occur if we are trying to set some parameters on the never
-            // initialised camera.
-            NX_VERBOSE(this, "Set advanced parameters from camera with no providers: %1", values);
-            return {};
-        }
+        // NOTE: It may sometimes occur if we are trying to set some parameters on the never
+        // initialised camera.
+        NX_VERBOSE(this, "Set advanced parameters from camera with no providers: %1", values);
+        return {};
+    }
 
-        for (const auto& value: values.toValueList())
+    std::map<AdvancedParametersProvider*, QnCameraAdvancedParamValueList> valuesByProvider;
+    for (const auto& value: values.toValueList())
+    {
+        const auto it = m_advancedParametersProvidersByParameterId.find(value.id);
+        if (it != m_advancedParametersProvidersByParameterId.end())
         {
-            const auto it = m_advancedParametersProvidersByParameterId.find(value.id);
-            if (it != m_advancedParametersProvidersByParameterId.end())
-            {
-                valuesByProvider[it->second].push_back(value);
-            }
-            else if (m_defaultAdvancedParametersProvider)
-            {
-                NX_WARNING(this, "Set undeclared advanced parameter: %1", value.id);
-                valuesByProvider[m_defaultAdvancedParametersProvider].push_back(value);
-            }
-            else
-            {
-                NX_WARNING(this, "No provider to set parameter: %1", value.id);
-            }
+            valuesByProvider[it->second].push_back(value);
+        }
+        else if (m_defaultAdvancedParametersProvider)
+        {
+            NX_WARNING(this, "Set undeclared advanced parameter: %1", value.id);
+            valuesByProvider[m_defaultAdvancedParametersProvider].push_back(value);
+        }
+        else
+        {
+            NX_WARNING(this, "No provider to set parameter: %1", value.id);
         }
     }
 
