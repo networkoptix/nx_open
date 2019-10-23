@@ -57,7 +57,7 @@ void Session::run(const QString& url, const Config& config, bool live)
             {
                 uint8_t* data = (uint8_t*)dataArrays[channel]->data() + kTcpPrefixLength;
                 int64_t size = dataArrays[channel]->size() - kTcpPrefixLength;
-                if (!processPacket(data, size, url.toUtf8().data()))
+                if (channel == 0 && !processPacket(data, size, url.toUtf8().data()))
                 {
                     failed = true;
                     ++failedCount;
