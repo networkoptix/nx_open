@@ -151,14 +151,30 @@ class BoxConnection:
 
         log_remote_command_status(run.returncode)
 
-        if run.returncode == 255:
-            if exc:
-                raise exceptions.BoxCommandError(message=run.stderr.decode('UTF-8').rstrip())
-            else:
-                return self.BoxConnectionResult(
-                    None,
-                    run.stderr.decode('UTF-8').rstrip(), command=command_wrapped
-                )
+        if self.ssh_args[0] == 'plink':
+            if run.returncode == 0:  # Yes, exit status is 0 if access has been denied.
+                if run.stderr.strip().lower() == 'access denied':
+                    raise exceptions.BoxCommandError("SSH auth failed, check credentials")
+            if run.returncode == 1:
+                if run.stderr.strip().lower() == 'fatal error: network error: connection timed out':
+                    raise exceptions.BoxCommandError(
+                        "Connection timed out, "
+                        "check boxHostnameOrIp configuration setting and "
+                        "make sure that the box address is accessible")
+                if run.stderr.strip().lower() == 'fatal error: network error: connection refused':
+                    raise exceptions.BoxCommandError(
+                        "Cannot connect via SSH, "
+                        "check that SSH service is running "
+                        "on port specified in boxSshPort setting (22 by default)")
+        else:
+            if run.returncode == 255:
+                if exc:
+                    raise exceptions.BoxCommandError(message=run.stderr.decode('UTF-8').rstrip())
+                else:
+                    return self.BoxConnectionResult(
+                        None,
+                        run.stderr.decode('UTF-8').rstrip(), command=command_wrapped
+                    )
 
         if run.returncode != 0 and exc:
             raise exceptions.BoxCommandError(
