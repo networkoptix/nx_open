@@ -1,11 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <chrono>
-
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/elapsed_timer.h>
@@ -21,18 +18,18 @@ class CachedValue
 {
 public:
     /**
-     *  @param valGenerationFunc This functor is called from get() and update() to get value, the
-     *      call to valGenerationFunc is synchronised by mutex.
+     *  @param valueGenerator This functor is called from get() and update() to get value, the
+     *      call to valueGenerator is synchronised by mutex.
      *  @param expirationTime CachedValue will automatically update value on get() or
      *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
-     *  @note valGenerationFunc is not called here!
+     *  @note valueGenerator is not called here!
      */
-    template<class FuncType>
+    template<class ValueGenerator>
     CachedValue(
-        FuncType&& valGenerationFunc,
+        ValueGenerator&& valueGenerator,
         std::chrono::milliseconds expirationTime = std::chrono::milliseconds(0))
     :
-        m_valGenerationFunc(std::forward<FuncType>(valGenerationFunc)),
+        m_valueGenerator(std::forward<ValueGenerator>(valueGenerator)),
         m_expirationTime(expirationTime)
     {
     }
@@ -49,9 +46,9 @@ public:
         }
 
         if (!m_value)
-            m_value = m_valGenerationFunc();
+            m_value = m_valueGenerator();
 
-        return m_value.get();
+        return *m_value;
     }
 
     void reset()
@@ -69,7 +66,7 @@ public:
     void update()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_value = m_valGenerationFunc();;
+        m_value = m_valueGenerator();;
         if (m_expirationTime != std::chrono::milliseconds(0))
             m_timer.restart();
     }
@@ -77,8 +74,8 @@ public:
 private:
     mutable nx::utils::Mutex m_mutex;
 
-    mutable boost::optional<ValueType> m_value;
-    std::function<ValueType()> m_valGenerationFunc;
+    mutable std::optional<ValueType> m_value;
+    std::function<ValueType()> m_valueGenerator;
 
     mutable ElapsedTimer m_timer;
     const std::chrono::milliseconds m_expirationTime;
