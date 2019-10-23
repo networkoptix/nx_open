@@ -68,7 +68,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         }
         if (bytesRead <= 0)
         {
-            printf("WARNING: Failed to read data from camera %s", url.toUtf8().data());
+            printf("WARNING: Camera %s: failed to read data\n", url.toUtf8().data());
             failed = true;
             ++failedCount;
             break;
@@ -88,10 +88,26 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
     {
         if (m_config.printTimestamps)
         {
-            printf("Camera %s timestamp %lld us\n", url,
-                (long long int) timestamp);
+            int64_t timestampDiff = timestamp - m_prevTimestampUs;
+            printf("Camera %s: timestamp %lld us, diff %lld us\n", url,
+                (long long int) timestamp,
+                (m_prevTimestampUs == -1) ? -1LL : timestampDiff);
+            m_prevTimestampUs = timestamp;
+            const auto diff = std::chrono::milliseconds((timestampDiff + 500) / 1000);
+            if (m_config.expectedTimestampDiff != std::chrono::milliseconds::zero()
+                && m_config.expectedTimestampDiff != diff
+                && m_prevTimestampUs == -1)
+            {
+                printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us is not %lld ms\n",
+                    url,
+                    (long long int) timestamp,
+                    (long long int) timestampDiff,
+                    (long long int) m_config.expectedTimestampDiff.count());
+            }
+
         }
         m_lastFrameTime = nowTime;
+
     }
     else
     {

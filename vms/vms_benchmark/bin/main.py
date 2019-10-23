@@ -559,7 +559,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                         raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
                     import re
-                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
+                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
                     if not match_res:
                         continue
 
@@ -692,7 +692,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                         line = stream_reader_process.stdout.readline().decode('UTF-8')
 
-                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
+                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
                         if not match_res:
                             continue
 
