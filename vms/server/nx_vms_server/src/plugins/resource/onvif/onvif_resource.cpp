@@ -386,7 +386,7 @@ private:
     RankMap createRankMap(const QString& profileNames)
     {
         RankMap result;
-        QStringList profileNameList = profileNames.split(L',');
+        QStringList profileNameList = profileNames.split(L',', QString::SkipEmptyParts);
         int rank = profileNameList.size(); // TODO: Move into 'for' when C++20 will be available.
         for (const auto& profileName: profileNameList)
             result[profileName] = --rank;
