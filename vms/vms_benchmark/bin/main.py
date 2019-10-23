@@ -1111,7 +1111,7 @@ def _do_report_exception(exception, recursive_level, prefix=''):
 
 
 def report_exception(context_name, exception, note=None):
-    prefix = (context_name + ': ') if context_name else ''
+    prefix = '\n' + context_name + ': '
     _do_report_exception(exception, recursive_level=0, prefix=prefix)
     if note:
         report(f'\nNOTE: {note}')
