@@ -49,9 +49,7 @@ const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId"
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_serverFlags(vms::api::SF_None),
-    m_panicModeCache(
-        std::bind(&QnMediaServerResource::calculatePanicMode, this),
-        &m_mutex )
+    m_panicModeCache(std::bind(&QnMediaServerResource::calculatePanicMode, this))
 {
     setTypeId(nx::vms::api::MediaServerData::kResourceTypeId);
     addFlags(Qn::server | Qn::remote);

@@ -16,7 +16,7 @@ namespace nx::utils {
  * Note: Singleshot.
  * Note: Thread-safe.
  */
-class EventLoopTimer: public QObject
+class NX_UTILS_API EventLoopTimer: public QObject
 {
 public:
     /**

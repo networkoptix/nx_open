@@ -127,17 +127,17 @@ namespace {
 GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* parent):
     nx::vms::server::PlatformMonitor(parent),
     m_cachedTotalCpuUsage(
-        [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalCpuUsage(); }, kCacheExpirationTime),
     m_cachedTotalRamUsage(
-        [this]() { return m_monitorBase->totalRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalRamUsageBytes(); }, kCacheExpirationTime),
     m_cachedThisProcessCpuUsage(
-        [this]() { return m_monitorBase->thisProcessCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->thisProcessCpuUsage(); }, kCacheExpirationTime),
     m_cachedThisProcessRamUsage(
-        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, kCacheExpirationTime),
     m_cachedTotalHddLoad(
-        [this]() { return m_monitorBase->totalHddLoad(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalHddLoad(); }, kCacheExpirationTime),
     m_cachedTotalNetworkLoad(
-        [this]() { return m_monitorBase->totalNetworkLoad(); }, &m_mutex, kCacheExpirationTime)
+        [this]() { return m_monitorBase->totalNetworkLoad(); }, kCacheExpirationTime)
 {
     if (!NX_ASSERT(base != nullptr))
         base = new StubMonitor();

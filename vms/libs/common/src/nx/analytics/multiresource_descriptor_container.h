@@ -36,8 +36,7 @@ public:
             [this](QnMediaServerResourcePtr server) { addServerContainer(server); },
             [this](QnMediaServerResourcePtr server) { removeServerContainer(server); }),
         m_cachedMergedDescriptors(
-            [this]() { return mergedDescriptorsInternal(); },
-            &m_mutex)
+            [this]() { return mergedDescriptorsInternal(); })
     {
     }
 
