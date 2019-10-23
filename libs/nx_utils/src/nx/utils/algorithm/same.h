@@ -40,7 +40,7 @@ Type sameValue(Iterator first, Iterator last, Getter getter, const Type& default
 template<class Type, class Container, class Getter> inline
 Type sameValue(const Container& container, Getter getter, const Type& defaultValue)
 {
-    return sameValue(container.begin(), container.end(), getter, defaultValue);
+    return sameValue(container.cbegin(), container.cend(), getter, defaultValue);
 }
 
 //-------------------------------------------------------------------------------------------------
