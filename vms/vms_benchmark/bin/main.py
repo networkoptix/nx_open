@@ -326,10 +326,10 @@ def get_cumulative_swap_bytes(box):
     except ValueError:
         return None
     try:
-        kilobytes_swapped = data['pgpgin']  # pswpin is the number of pages.
+        pages_swapped = data['pswpout']
     except KeyError:
         return None
-    return kilobytes_swapped * 1024
+    return pages_swapped * 4096  # All modern OSes operate with 4k pages.
 
 
 def box_uptime(box):
