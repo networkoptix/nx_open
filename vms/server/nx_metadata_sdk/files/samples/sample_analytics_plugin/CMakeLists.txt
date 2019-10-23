@@ -3,9 +3,7 @@
 cmake_minimum_required(VERSION 3.3.2)
 project(sample_analytics_plugin)
 
-set(metadataSdkVersion "4.0.0 R16")
-set(metadataSdkDir "" CACHE PATH
-    "Path to unpacked VMS Metadata SDK zip. Tested with version ${metadataSdkVersion}.")
+set(metadataSdkDir "" CACHE PATH "Path to unpacked VMS Metadata SDK zip.")
 
 if(metadataSdkDir STREQUAL "")
     message(FATAL_ERROR "metadataSdkDir cache variable is undefined.")
