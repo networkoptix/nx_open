@@ -14,7 +14,6 @@
 #include <core/resource/security_cam_resource.h>
 
 #include <nx/vms/client/desktop/ini.h>
-#include <utils/common/delayed.h>
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -623,12 +622,12 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         }
 
         if (d->enabled) {
-            if (allReady)
-            {
-                executeDelayed(
-                    [ref = QPointer(this)]()
-                    { if (ref.data()) ref->jumpToLive(); },
-                    /*delay*/ 0, qApp->thread());
+            if (allReady) {
+                bool callSync = QThread::currentThread() == qApp->thread();
+                if (callSync)
+                    jumpTo(DATETIME_NOW, 0);
+                else
+                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
             }
         }
         else {
