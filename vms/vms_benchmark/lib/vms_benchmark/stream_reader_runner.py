@@ -95,7 +95,7 @@ def stream_reader_running(
     try:
         proc = subprocess.Popen([str(arg) for arg in args], **opts)
     except Exception as exception:
-        raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
+        raise exceptions.RtspPerfError(f"Unable to start rtsp_perf: {str(exception)}")
 
     try:
         yield [proc, streams]

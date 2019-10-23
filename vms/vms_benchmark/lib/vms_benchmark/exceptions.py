@@ -18,7 +18,7 @@ class UnableToFetchDataFromBox(VmsBenchmarkError):
 
 class BoxFileContentError(VmsBenchmarkError):
     def __init__(self, path):
-        super(BoxFileContentError, self).__init__(f"File '{path}' has unexpected content")
+        super(BoxFileContentError, self).__init__(f"File {path!r} has unexpected content")
 
 
 class ServerError(VmsBenchmarkError):
