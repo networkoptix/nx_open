@@ -155,7 +155,7 @@ protected:
     void thenNoNewBackupFilesShouldBeCreated()
     {
         const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
-        ASSERT_EQ(m_backupFilesDataFound[0].timestamp, backupFilesData[0].timestamp);
+        ASSERT_TRUE(backupFilesData.isEmpty());
     }
 
     void thenNoBackupFilesShouldBeCreated()
@@ -281,19 +281,8 @@ TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
 }
 
-TEST_F(BackupDbIt, CreatedWhenNoBackupsForCurrentVersion)
+TEST_F(BackupDbIt, NotCreatedWhenNoPreviousDbFiles)
 {
-    whenServerLaunched();
-    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
-    whenServerStopped();
-}
-
-TEST_F(BackupDbIt, NotCreatedWhenThereAreBackupsForCurrentVersion)
-{
-    whenServerLaunched();
-    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
-    whenServerStopped();
-
     whenServerLaunched();
     thenNoNewBackupFilesShouldBeCreated();
 }

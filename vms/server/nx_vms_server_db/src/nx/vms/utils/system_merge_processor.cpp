@@ -359,9 +359,7 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Backing up the database");
 
-        if (!nx::vms::utils::backupDatabase(
-                m_backupDirectory,
-                m_commonModule->ec2Connection()))
+        if (!nx::vms::utils::backupDatabaseLive(m_backupDirectory, m_commonModule->ec2Connection()))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to backup database")
                 .arg(data.takeRemoteSettings));

@@ -215,6 +215,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 #include <nx/network/cloud/mediator_address_publisher.h>
+#include <nx/vms/utils/system_helpers.h>
 
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
@@ -4384,6 +4385,7 @@ void MediaServerProcess::startObjects()
                 std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
         }
     }
+
     m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
@@ -4720,12 +4722,16 @@ void MediaServerProcess::run()
         return;
     }
 
-    auto utils = nx::vms::server::Utils(serverModule.get());
-    if (utils.timeToMakeDbBackup())
+    const auto nxVersionFromDb =
+        ec2::detail::QnDbManager::currentSoftwareVersion(appServerConnectionUrl().toLocalFile());
+    const auto nxVersion = nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+    NX_ASSERT(!nxVersion.isNull());
+
+    if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
     {
-        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()),
-            ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
+        nx::vms::utils::backupDatabaseViaCopy(
+            ec2::detail::QnDbManager::ecsDbFileName(serverModule->settings().dataDir()),
+            nxVersionFromDb.build());
     }
 
     if (!connectToDatabase())
