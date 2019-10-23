@@ -2185,16 +2185,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             }
         }
 
-        if (thumbnailed)
-        {
-            if (NX_ASSERT(time > 0))
-            {
-                qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
-                if (widget->display()->archiveReader())
-                    widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
-            }
-        }
-
         if (hasTimeLabels)
         {
             widget->setOverlayVisible(true, false);
