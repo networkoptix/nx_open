@@ -420,6 +420,11 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     m_binaryMotionMask.clear();
 }
 
+void QnMediaResourceWidget::beforeDestroy()
+{
+    qnResourceRuntimeDataManager->disconnect(this);
+}
+
 void QnMediaResourceWidget::handleItemDataChanged(
     const QnUuid& id,
     Qn::ItemDataRole role,
