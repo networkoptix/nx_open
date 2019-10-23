@@ -65,7 +65,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_isStillImage(false),
     m_speed(1.0),
     m_prevSpeed(1.0),
-    m_pausedStart(false),
     m_streamDataFilter(StreamDataFilter::media),
     m_prevStreamDataFilter(StreamDataFilter::media),
     m_outOfPlaybackMask(false),
@@ -176,7 +175,7 @@ bool QnArchiveStreamReader::isMediaPaused() const
 {
     if(m_navDelegate)
         return m_navDelegate->isMediaPaused();
-    return m_singleShot || m_pausedStart;
+    return m_singleShot;
 }
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
@@ -378,8 +377,8 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
 
 void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
-    m_pausedStart = true;
-    m_singleQuantProcessed = true;
+    m_singleShot = true;
+    m_singleQuantProcessed = false;
     m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
     start();
 }
@@ -414,14 +413,6 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
         if (needToStop())
             return QnAbstractMediaDataPtr();
         m_delegate->seek(m_latPacketTime, true);
-    }
-
-    if (m_pausedStart)
-    {
-        m_pausedStart = false;
-        QnMutexLocker mutex( &m_jumpMtx );
-        while (m_singleShot && m_singleQuantProcessed && !needToStop())
-            m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
     // =================

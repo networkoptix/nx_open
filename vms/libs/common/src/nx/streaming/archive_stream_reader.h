@@ -188,7 +188,6 @@ private:
 
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     std::shared_ptr<MetadataMultiplexer> m_motionConnection[CL_MAX_CHANNELS];
-    bool m_pausedStart;
     nx::vms::api::StreamDataFilters m_streamDataFilter;
     nx::vms::api::StreamDataFilters m_prevStreamDataFilter;
     bool m_outOfPlaybackMask;
