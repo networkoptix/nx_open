@@ -248,7 +248,7 @@ protected:
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
-
+    void fixInputPortMonitoringSafe();
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 
