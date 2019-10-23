@@ -23,6 +23,7 @@ MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
 {
     m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");
     m_mediaServerLauncher.addSetting("p2pMode", GetParam().p2pMode);
+    m_mediaServerLauncher.addSetting("publicIPEnabled", 1);
 }
 
 MediaServerCloudIntegrationTest::~MediaServerCloudIntegrationTest()
