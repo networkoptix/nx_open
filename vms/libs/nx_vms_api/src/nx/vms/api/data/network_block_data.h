@@ -94,6 +94,8 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NetworkPortState::PoweringStatus);
 
 #define nx_vms_api_NetworkPortState_Fields \
+    (portNumber) \
+    (poweringMode) \
     (deviceId) \
     (devicePowerConsumptionWatts) \
     (devicePowerConsumptionLimitWatts) \
