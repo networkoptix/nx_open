@@ -72,6 +72,8 @@ namespace nx::vms::server {
     class UpdateManager;
 }
 
+namespace nx::vms::server::nvr { class IService; }
+
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
 
@@ -159,6 +161,7 @@ public:
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
     nx::vms::server::hls::SessionPool* hlsSessionPool() const;
     nx::vms::server::network::MulticastAddressRegistry* multicastAddressRegistry() const;
+    nx::vms::server::nvr::IService* nvrService() const;
 
     void initializeP2PDownloader();
 
@@ -168,7 +171,7 @@ public:
 private:
     void registerResourceDataProviders();
     /**
-     * Returns abosolute path to downloads directory.
+     * Returns absolute path to downloads directory.
      * It will create this directory if does not exist.
      */
     QDir downloadsDirectory() const;
@@ -223,6 +226,7 @@ private:
     nx::vms::server::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
+    std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects

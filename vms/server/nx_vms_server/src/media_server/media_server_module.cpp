@@ -27,6 +27,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <nx/vms/server/nvr/hanwha/service.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
@@ -201,6 +202,9 @@ QnMediaServerModule::QnMediaServerModule(
     }
 
     nx::vms::server::registerSerializers();
+
+    // TODO: #dmishin NVR service factory.
+    m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
@@ -727,6 +731,11 @@ nx::vms::server::network::MulticastAddressRegistry*
     QnMediaServerModule::multicastAddressRegistry() const
 {
     return m_multicastAddressRegistry;
+}
+
+nx::vms::server::nvr::IService* QnMediaServerModule::nvrService() const
+{
+    return m_nvrService.get();
 }
 
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
