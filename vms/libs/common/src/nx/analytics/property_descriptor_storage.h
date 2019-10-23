@@ -31,9 +31,7 @@ public:
         :
         m_resource(std::move(serverResource)),
         m_propertyName(std::move(propertyName)),
-        m_cachedContainer(
-            [this]() { return fetchInternal(); },
-            &m_mutex),
+        m_cachedContainer([this]() { return fetchInternal(); }),
         m_notifier(std::move(notifier)),
         m_helper(
             m_resource,

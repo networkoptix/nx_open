@@ -35,7 +35,7 @@ QString calculateHostAddress(const QString& url)
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_cachedHostAddress([this] {return calculateHostAddress(getUrl()); }, &m_mutex )
+    m_cachedHostAddress([this] {return calculateHostAddress(getUrl()); })
 {
     addFlags(Qn::network);
 }

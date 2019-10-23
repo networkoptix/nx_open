@@ -81,15 +81,15 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
     m_cachedUserEnabledAnalyticsEngines(
-        [this]() { return calculateUserEnabledAnalyticsEngines(); }, &m_cacheMutex),
+        [this]() { return calculateUserEnabledAnalyticsEngines(); }),
     m_cachedCompatibleAnalyticsEngines(
-        [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex),
+        [this]() { return calculateCompatibleAnalyticsEngines(); }),
     m_cachedDeviceAgentManifests(
-        [this]() { return fetchDeviceAgentManifests(); }, &m_cacheMutex),
+        [this]() { return fetchDeviceAgentManifests(); }),
     m_cachedSupportedEventTypes(
-        [this]() { return calculateSupportedEventTypes(); }, &m_cacheMutex),
+        [this]() { return calculateSupportedEventTypes(); }),
     m_cachedSupportedObjectTypes(
-        [this]() { return calculateSupportedObjectTypes(); }, &m_cacheMutex)
+        [this]() { return calculateSupportedObjectTypes(); })
 {
     connect(
         this,
