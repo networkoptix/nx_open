@@ -10,58 +10,59 @@ namespace nx::vms::utils::metrics::test {
 
 static const QByteArray kRules(R"json({
     "tests": {
-        "g1": {
-            "name": "group 1",
-            "values": {
-                "i": {
-                    "name": "int parameter",
-                    "description": "integer parameter",
-                    "display": "panel|table",
-                    "format": "KB"
-                },
-                "t": {
-                    "name": "text parameter",
-                    "display": "panel"
-                },
-                "c": {
-                    "calculate": "const hello"
-                },
-                "ip": {
-                    "name": "i plus",
-                    "display": "panel",
-                    "calculate": "add %i 1",
-                    "insert": "i",
-                    "alarms": [{
-                        "level": "warning",
-                        "condition": "greaterThan %i 100",
-                        "text": "i = %i (>100), ip = %ip"
-                    },{
-                        "level": "danger",
-                        "condition": "lessThan %i 0",
-                        "text": "i = %i (<0), ip = %ip"
-                    }]
+        "name": "Test Resources",
+        "resource": "Test",
+        "values": {
+            "g1": {
+                "name": "group 1",
+                "values": {
+                    "i": {
+                        "name": "int parameter",
+                        "description": "integer parameter",
+                        "display": "panel|table",
+                        "format": "KB"
+                    },
+                    "t": {
+                        "name": "text parameter",
+                        "display": "panel"
+                    },
+                    "c": {
+                        "calculate": "const hello"
+                    },
+                    "ip": {
+                        "name": "i plus",
+                        "display": "panel",
+                        "calculate": "add %i 1",
+                        "insert": "i",
+                        "alarms": [{
+                            "level": "warning",
+                            "condition": "greaterThan %i 100",
+                            "text": "i = %i (>100), ip = %ip"
+                        },{
+                            "level": "error",
+                            "condition": "lessThan %i 0",
+                            "text": "i = %i (<0), ip = %ip"
+                        }]
+                    }
                 }
-            }
-        },
-        "g2": {
-            "name": "group 2",
-            "values": {
-                "i": {
-                    "name": "int parameter",
-                    "description": "integer parameter",
-                    "display": "table",
-                    "alarms": [{
-                        "level": "warning",
-                        "condition": "greaterThan %i 30",
-                        "text": "i is %i (>30)"
-                    }]
-                },
-                "im": {
-                    "display": "table",
-                    "calculate": "sub %i 1"
-                },
-                "t": {
-                    "display": "table|panel"
+            },
+            "g2": {
+                "values": {
+                    "i": {
+                        "display": "table",
+                        "alarms": [{
+                            "level": "warning",
+                            "condition": "greaterThan %i 30",
+                            "text": "i is %i (>30)"
+                        }]
+                    },
+                    "im": {
+                        "display": "table",
+                        "calculate": "sub %i 1"
+                    },
+                    "t": {
+                        "display": "table|panel"
+                    }
                 }
             }
         }
@@ -100,10 +101,21 @@ public:
         auto systemManifest = m_systemController.manifest();
         EXPECT_EQ(systemManifest.size(), 1);
 
-        auto testManifest = systemManifest["tests"];
-        ASSERT_EQ(testManifest.size(), 2);
+        auto testManifest = systemManifest[0];
+        EXPECT_EQ(testManifest.id, "tests");
+        EXPECT_EQ(testManifest.name, includeRules ? "Test Resources" : "Tests");
+        EXPECT_EQ(testManifest.resource, includeRules ? "Test" : "");
+        ASSERT_EQ(testManifest.values.size(), 3);
 
-        const auto group1 = testManifest[0];
+        const auto group0 = testManifest.values[0];
+        EXPECT_EQ(group0.id, "_");
+        EXPECT_EQ(group0.name, "");
+        ASSERT_EQ(group0.values.size(), 1);
+        EXPECT_EQ(group0.values[0].id, "name");
+        EXPECT_EQ(group0.values[0].name, "Name");
+        EXPECT_EQ(group0.values[0].display, displayNone);
+
+        const auto group1 = testManifest.values[1];
         EXPECT_EQ(group1.id, "g1");
         EXPECT_EQ(group1.name, includeRules ? "group 1" : "G1");
         ASSERT_EQ(group1.values.size(), includeRules ? 4 : 2);
@@ -128,14 +140,14 @@ public:
         EXPECT_EQ(group1.values[b + 1].name, includeRules ? "text parameter" : "T");
         EXPECT_EQ(group1.values[b + 1].display, includeRules ? displayPanel : displayNone);
 
-        const auto group2 = testManifest[1];
+        const auto group2 = testManifest.values[2];
         EXPECT_EQ(group2.id, "g2");
-        EXPECT_EQ(group2.name, includeRules ? "group 2" : "G2");
+        EXPECT_EQ(group2.name, "G2");
         ASSERT_EQ(group2.values.size(), includeRules? 3 : 2);
 
         EXPECT_EQ(group2.values[0].id, "i");
-        EXPECT_EQ(group2.values[0].name, includeRules ? "int parameter" : "I");
-        EXPECT_EQ(group2.values[0].description, includeRules ? "integer parameter" : "");
+        EXPECT_EQ(group2.values[0].name, "I");
+        EXPECT_EQ(group2.values[0].description, "");
         EXPECT_EQ(group2.values[0].display, includeRules ? displayTable : displayNone);
         EXPECT_EQ(group2.values[1].id, "t");
         EXPECT_EQ(group2.values[1].name, "T");
@@ -161,8 +173,10 @@ public:
             ASSERT_EQ(testResources.size(), (scope == Scope::system) ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 2 : 1);
+            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 3 : 2);
             {
+                EXPECT_EQ(local1["_"]["name"], "TR0");
+
                 auto group1 = local1["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.001 KB") : api::metrics::Value(1));
@@ -190,8 +204,10 @@ public:
             }
 
             auto local2 = testResources["R2"];
-            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 2 : 1);
+            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 3 : 2);
             {
+                EXPECT_EQ(local2["_"]["name"], "TR2");
+
                 auto group1 = local2["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
@@ -291,21 +307,19 @@ public:
 
     void testAlarms(Scope scope)
     {
-        #define EXPECT_ALARM(ALARM, RESOURCE, PARAMETER, LEVEL, TEXT) \
-        { \
-            const auto& alarm = ALARM; \
-            EXPECT_EQ(alarm.label, "tests"); \
-            EXPECT_EQ(alarm.resource, RESOURCE); \
-            EXPECT_EQ(alarm.parameter, PARAMETER); \
-            EXPECT_EQ(alarm.level, api::metrics::AlarmLevel::LEVEL); \
-            EXPECT_EQ(alarm.text, TEXT); \
-        }
+        #define EXPECT_ALARM(RESOURCE, GROUP, PARAMETER, LEVEL, TEXT) \
+        do { \
+            EXPECT_EQ(alarms["tests"][RESOURCE][GROUP].size(), 1); \
+            EXPECT_EQ(alarms["tests"][RESOURCE][GROUP][PARAMETER].size(), 1); \
+            EXPECT_EQ(alarms["tests"][RESOURCE][GROUP][PARAMETER][0].level, api::metrics::AlarmLevel::LEVEL); \
+            EXPECT_EQ(alarms["tests"][RESOURCE][GROUP][PARAMETER][0].text, TEXT); \
+        } while(false)
 
         for (const auto& resource: m_resources)
             resource->setDefaults();
         {
             const auto alarms = m_systemController.alarms(scope);
-            ASSERT_EQ(alarms.size(), 0);
+            EXPECT_EQ(alarms.size(), 0);
         }
 
         m_resources[0]->update("i1", 150);
@@ -313,19 +327,20 @@ public:
         m_resources[1]->update("i2", 70);
         m_resources[2]->update("i1", -2);
         {
-            const auto alarms = m_systemController.alarms(scope);
-            ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 4 : 2);
+            auto alarms = m_systemController.alarms(scope);
+            EXPECT_EQ(alarms.size(), 1);
+            EXPECT_EQ(alarms["tests"].size(), (scope == Scope::system) ? 3 : 2);
 
-            EXPECT_ALARM(alarms[0], "R0", "g1.ip", warning, "i = 0.146 KB (>100), ip = 151");
+            EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.146 KB (>100), ip = 151");
             if (scope == Scope::system)
             {
-                EXPECT_ALARM(alarms[1], "R0", "g2.i", warning, "i is 50 (>30)");
-                EXPECT_ALARM(alarms[2], "R1", "g2.i", warning, "i is 70 (>30)");
-                EXPECT_ALARM(alarms[3], "R2", "g1.ip", danger, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
+                EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
             }
             else
             {
-                EXPECT_ALARM(alarms[1], "R2", "g1.ip", danger, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
             }
         }
 
@@ -333,10 +348,10 @@ public:
             resource->setDefaults();
         m_resources[2]->update("i2", 50);
         {
-            const auto alarms = m_systemController.alarms(scope);
+            auto alarms = m_systemController.alarms(scope);
             ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 1 : 0);
             if (scope == Scope::system)
-                EXPECT_ALARM(alarms[0], "R2", "g2.i", warning, "i is 50 (>30)");
+                EXPECT_ALARM("R2", "g2", "i", warning, "i is 50 (>30)");
         }
 
         #undef EXPECT_ALARM

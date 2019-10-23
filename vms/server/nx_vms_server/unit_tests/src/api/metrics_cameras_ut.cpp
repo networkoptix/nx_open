@@ -17,6 +17,8 @@ using namespace std::chrono;
 
 static const int kMinDays = 5;
 
+namespace {
+
 class DataProviderStub : public resource::test::LiveStreamProviderMock
 {
 public:
@@ -38,6 +40,8 @@ public:
     }
 };
 
+} // namespace
+
 class MetricsCamerasApi: public ::testing::Test
 {
 public:
@@ -49,6 +53,9 @@ public:
         nx::vms::server::metrics::setTimerMultiplier(100);
 
         launcher = std::make_unique<ServerForTests>();
+
+        auto storage = launcher->addStorage(lm("Storage 1"));
+        auto storageIndex = launcher->serverModule()->storageDbPool()->getStorageIndex(storage);
 
         auto resourcePool = launcher->serverModule()->resourcePool();
         // Some tests here add camera to VideoCameraPool manually.
@@ -81,32 +88,24 @@ public:
         static const qint64 kMsInMinute = 1000 * 60;
         static const qint64 kMsInHour = kMsInMinute * 60;
         static const qint64 kMsInDay = kMsInHour * 24;
-        nx::vms::server::Chunk chunk1;
-        chunk1.startTimeMs = currentTimeMs - kMsInDay * 2;
-        chunk1.durationMs = 45 * 1000;
-        chunk1.setFileSize(1000 * 1000);
-        catalog->addRecord(chunk1);
+        nx::vms::server::Chunk chunk;
+        chunk.startTimeMs = currentTimeMs - kMsInDay * 2;
+        chunk.durationMs = 45 * 1000;
+        chunk.setFileSize(1000 * 1000);
+        chunk.storageIndex = storageIndex;
+        catalog->addRecord(chunk);
 
         // Fill last 24 hours with 50% archive density.
         auto timeMs = currentTimeMs - kMsInDay + kMsInMinute;
         while (timeMs < currentTimeMs)
         {
-            nx::vms::server::Chunk chunk;
             chunk.startTimeMs = timeMs;
             chunk.durationMs = kMsInMinute;
+            chunk.storageIndex = storageIndex;
             chunk.setFileSize(1000 * 1000 * 60); //< Bitrate 8 Mbit.
             catalog->addRecord(chunk);
             timeMs += kMsInMinute * 2;
         }
-    }
-
-    static bool hasAlarm(const Alarms& alarms, const QString& value, const QnUuid& resource)
-    {
-        return std::any_of(alarms.begin(), alarms.end(),
-            [value, resource](const auto& alarm)
-            {
-                return alarm.parameter == value && alarm.resource == resource.toSimpleString();
-            });
     }
 
     static void TearDownTestCase()
@@ -136,25 +135,26 @@ public:
         liveParams.resolution = QSize(1920, 1080);
         dataProvider->setPrimaryStreamParams(liveParams);
 
+        const auto cameraId = m_camera->getId().toSimpleString();
         auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-        auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+        auto cameraData = systemValues["cameras"][cameraId];
         auto streamData = cameraData[streamPrefix];
         ASSERT_EQ(30, streamData["targetFps"].toInt());
         ASSERT_EQ("1920x1080", streamData["resolution"].toString());
 
-        auto alarms = launcher->get<Alarms>("/ec2/metrics/alarms");
+        auto alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
-            ASSERT_TRUE(hasAlarm(alarms, "secondaryStream.resolution", m_camera->getId()));
+            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::error);
 
             liveParams.resolution = QSize(1280, 720);
             dataProvider->setPrimaryStreamParams(liveParams);
-            alarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-            ASSERT_FALSE(hasAlarm(alarms, "secondaryStream.resolution", m_camera->getId()));
+            alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::none);
         }
 
-        ASSERT_FALSE(hasAlarm(alarms, lm("%1.fpsDeltaAvarage").args(streamPrefix), m_camera->getId()));
-        ASSERT_FALSE(hasAlarm(alarms, lm("%1.actualBitrateBps").args(streamPrefix), m_camera->getId()));
+        EXPECT_EQ(alarms[lm("cameras.%1.%2.fpsDeltaAvarage.0").args(cameraId, streamPrefix)].level, AlarmLevel::none);
+        EXPECT_EQ(alarms[lm("cameras.%1.%2.actualBitrateBps.0").args(cameraId, streamPrefix)].level, AlarmLevel::none);
 
         // Add some 'live' data to get actual bitrate.
         QnWritableCompressedVideoDataPtr video(new QnWritableCompressedVideoData());
@@ -191,9 +191,10 @@ std::unique_ptr<ServerForTests> MetricsCamerasApi::launcher;
 
 TEST_F(MetricsCamerasApi, infoGroup)
 {
+    const auto cameraId = m_camera->getId().toSimpleString();
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-    auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    EXPECT_EQ(6, cameraData.size());
+    auto cameraData = systemValues["cameras"][cameraId];
+    EXPECT_GE(4, cameraData.size());
     EXPECT_EQ(cameraData["_"]["name"], "CMock 2");
 
     auto infoData = cameraData["info"];
@@ -208,7 +209,7 @@ TEST_F(MetricsCamerasApi, infoGroup)
     m_camera->setLicenseUsed(true);
     systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
 
-    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    cameraData = systemValues["cameras"][cameraId];
     infoData = cameraData["info"];
     EXPECT_EQ(infoData["recording"], "Scheduled");
     m_camera->setLicenseUsed(false);
@@ -216,9 +217,10 @@ TEST_F(MetricsCamerasApi, infoGroup)
 
 TEST_F(MetricsCamerasApi, availabilityGroup)
 {
+    const auto cameraId = m_camera->getId().toSimpleString();
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    ASSERT_EQ(6, cameraData.size());
+    EXPECT_EQ(4, cameraData.size());
 
     int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
     ASSERT_EQ(1, offlineEvents);
@@ -231,17 +233,17 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     }
 
     systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    cameraData = systemValues["cameras"][cameraId];
     offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
     ASSERT_EQ(1 + kOfflineIterations, offlineEvents);
 
-    auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.offlineEvents", m_camera->getId()));
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.status", m_camera->getId()));
+    auto systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.offlineEvents.0"].level, AlarmLevel::warning);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.status.0"].level, AlarmLevel::error);
 
     m_camera->setStatus(Qn::Online);
-    systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    ASSERT_FALSE(hasAlarm(systemAlarms, "availability.status", m_camera->getId()));
+    systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.status.0"].level, AlarmLevel::none);
 
     auto eventConnector = launcher->serverModule()->eventConnector();
     QStringList macAddrList;
@@ -253,25 +255,48 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     timer.restart();
     do
     {
-        systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    } while (!hasAlarm(systemAlarms, "availability.ipConflicts3min", m_camera->getId())
+        systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    } while (systemAlarms.count("cameras." + cameraId + ".availability.ipConflicts3min.0") == 0
         && !timer.hasExpired(15s));
-    ASSERT_TRUE(hasAlarm(systemAlarms, "availability.ipConflicts3min", m_camera->getId()));
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.ipConflicts3min.0"].level, AlarmLevel::error);
 }
 
 TEST_F(MetricsCamerasApi, analyticsGroup)
 {
+    const auto cameraId = m_camera->getId().toSimpleString();
     m_camera->setLicenseUsed(true);
 
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-    auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    auto cameraData = systemValues["cameras"][cameraId];
     auto analyticsData = cameraData["storage"];
     EXPECT_EQ(analyticsData["recordingBitrateBps"], 1000000);
     EXPECT_EQ(analyticsData["archiveLengthS"], 24 * 3600 * 2);
     EXPECT_EQ(analyticsData["minArchiveLengthS"], 24 * 3600 * kMinDays);
 
-    auto systemAlarms = launcher->get<Alarms>("/ec2/metrics/alarms");
-    EXPECT_TRUE(hasAlarm(systemAlarms, "storage.minArchiveLengthS", m_camera->getId()));
+    auto systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::none);
+    ASSERT_FALSE(analyticsData["hasArchiveCleanup"].toBool());
+
+    auto catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+        m_camera->getUniqueId(), QnServer::LowQualityCatalog);
+    catalog->deleteFirstRecord(); //< This catalog is empty.
+
+    systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    analyticsData = cameraData["storage"];
+    ASSERT_FALSE(analyticsData["hasArchiveCleanup"].toBool());
+
+    catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
+        m_camera->getUniqueId(), QnServer::HiQualityCatalog);
+    catalog->deleteFirstRecord(); //< This catalog is non empty.
+
+    systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+    cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
+    analyticsData = cameraData["storage"];
+    ASSERT_TRUE(analyticsData["hasArchiveCleanup"].toBool());
+
+    systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::error);
 
     m_camera->setLicenseUsed(false);
 }

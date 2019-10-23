@@ -1,25 +1,25 @@
 #include "system_controller.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::utils::metrics {
 
 void SystemController::add(std::unique_ptr<ResourceController> resourceController)
 {
-    const auto label = resourceController->label();
-    const auto [it, isOk] = m_resourceControllers.emplace(label, std::move(resourceController));
-    NX_ASSERT(isOk, "Label duplicate: %1", label);
-    NX_DEBUG(this, "Added [%1] controller: %2", label, resourceController);
+    const auto duplicate = std::find_if(
+        m_resourceControllers.begin(), m_resourceControllers.end(),
+        [&resourceController](const auto& c) { return c->name() == resourceController->name(); });
+
+    NX_ASSERT(duplicate == m_resourceControllers.end(), "Label duplicate with %1", *duplicate);
+    m_resourceControllers.push_back(std::move(resourceController));
 }
 
 void SystemController::start()
 {
     NX_VERBOSE(this, "Starting with %1 resource controllers", m_resourceControllers.size());
-    for (const auto& [label, controller]: m_resourceControllers)
-    {
-        (void) label;
+    for (const auto& controller: m_resourceControllers)
         controller->start();
-    }
 }
 
 api::metrics::SystemManifest SystemController::manifest() const
@@ -29,8 +29,8 @@ api::metrics::SystemManifest SystemController::manifest() const
     if (!m_manifestCache)
     {
         m_manifestCache = std::make_unique<api::metrics::SystemManifest>();
-        for (const auto& [label, controller]: m_resourceControllers)
-            (*m_manifestCache)[label] = controller->manifest();
+        for (const auto& controller: m_resourceControllers)
+            m_manifestCache->push_back(controller->manifest());
     }
 
     NX_DEBUG(this, "Return manifest in %1", std::chrono::steady_clock::now() - start);
@@ -41,10 +41,10 @@ api::metrics::SystemValues SystemController::values(Scope requestScope, bool for
 {
     const auto start = std::chrono::steady_clock::now();
     api::metrics::SystemValues systemValues;
-    for (const auto& [label, controller]: m_resourceControllers)
+    for (const auto& controller: m_resourceControllers)
     {
         if (auto values = controller->values(requestScope, formatted); !values.empty())
-            systemValues[label] = std::move(values);
+            systemValues[controller->name()] = std::move(values);
     }
 
     const auto counts =
@@ -61,45 +61,41 @@ api::metrics::SystemValues SystemController::values(Scope requestScope, bool for
     return systemValues;
 }
 
-std::vector<api::metrics::Alarm> SystemController::alarms(Scope requestScope) const
+api::metrics::SystemAlarms SystemController::alarms(Scope requestScope) const
 {
-    const auto start = std::chrono::steady_clock::now();
-    std::vector<api::metrics::Alarm> allAlarms;
-    for (const auto& [label, controller]: m_resourceControllers)
+    api::metrics::SystemAlarms systemAlarms;
+    for (const auto& controller: m_resourceControllers)
     {
-        auto alarms = controller->alarms(requestScope);
-        for (auto& alarm: alarms)
-        {
-            (void) label; // TODO: Add label?
-            allAlarms.push_back(std::move(alarm));
-        }
+        if (auto alarms = controller->alarms(requestScope); !alarms.empty())
+            systemAlarms[controller->name()] = std::move(alarms);
     }
 
-    NX_DEBUG(this, "Return %1 %2 alarm(s) in %3",
-        allAlarms.size(), requestScope, std::chrono::steady_clock::now() - start);
-    return allAlarms;
+    NX_DEBUG(this, "Return %1 %2 alarmed resources", systemAlarms.size(), requestScope);
+    return systemAlarms;
 }
 
 api::metrics::SystemRules SystemController::rules() const
 {
     api::metrics::SystemRules rules;
-    for (const auto& [label, controller]: m_resourceControllers)
-        rules[label] = controller->rules();
+    for (const auto& controller: m_resourceControllers)
+        rules[controller->name()] = controller->rules();
 
     return rules;
 }
 
 void SystemController::setRules(api::metrics::SystemRules rules)
 {
-    for (auto& [label, resourceRules]: rules)
+    for (const auto& controller: m_resourceControllers)
     {
-        const auto it = m_resourceControllers.find(label);
-        if (!NX_ASSERT(it != m_resourceControllers.end(), "Unexpected rules: %1", label))
-            return;
+        const auto it = rules.find(controller->name());
+        if (it == rules.end())
+            continue;
 
-        it->second->setRules(std::move(resourceRules));
+        controller->setRules(std::move(it->second));
+        rules.erase(it);
     }
 
+    NX_ASSERT(rules.empty(), "Unused rules: %1", QJson::serialized<api::metrics::SystemRules>(rules));
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_manifestCache.reset();
 }

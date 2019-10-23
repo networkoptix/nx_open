@@ -25,13 +25,13 @@ void QnMediaStreamStatistics::onData(
 
     auto removeRange =
         [this](auto left, auto right)
-    {
-        if (left >= right)
-            return;
-        for (auto itr = left; itr != right; ++itr)
-            m_totalSizeBytes -= itr->size;
-        m_data.erase(left, right);
-    };
+        {
+            if (left >= right)
+                return;
+            for (auto itr = left; itr != right; ++itr)
+                m_totalSizeBytes -= itr->size;
+            m_data.erase(left, right);
+        };
 
     QnMutexLocker locker(&m_mutex);
     m_data.insert(toIterator(timestamp), Data{ timestamp, dataSize, isKeyFrame });

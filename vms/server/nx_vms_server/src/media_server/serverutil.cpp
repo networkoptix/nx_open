@@ -106,45 +106,12 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath,
-    const boost::optional<int>& buildNumber)
+bool Utils::backupDatabase()
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
-        std::move(connection), dbFilePath, buildNumber);
-}
-
-bool Utils::timeToMakeDbBackup() const
-{
-    const auto dataDir = serverModule()->settings().dataDir();
-    const auto backupDir = serverModule()->settings().backupDir();
-    if (!QFile::exists(ec2::detail::QnDbManager::ecsDbFileName(dataDir)))
-        return false; //< Nothing to make a copy of.
-
-    const auto currentVersion =
-        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
-
-    const auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
-    QList<nx::vms::utils::DbBackupFileData> thisVersionBackupFilesData;
-
-    std::copy_if(allBackupFilesData.cbegin(), allBackupFilesData.cend(),
-        std::back_inserter(thisVersionBackupFilesData),
-        [&currentVersion](const nx::vms::utils::DbBackupFileData& backupFileData)
-        {
-            return backupFileData.build == currentVersion.build();
-        });
-
-    if (thisVersionBackupFilesData.isEmpty())
-        return true; //< Backups for the current server version haven't been found, let's make one.
-
-    NX_ASSERT(!thisVersionBackupFilesData.isEmpty());
-    if (qnSyncTime->currentMSecsSinceEpoch() - thisVersionBackupFilesData.front().timestamp
-        > serverModule()->settings().dbBackupPeriodMS().count())
-    {
-        return true;
-    }
-
-    return false;
+    return nx::vms::utils::backupDatabaseLive(
+        serverModule()->settings().backupDir(),
+        std::move(connection));
 }
 
 boost::optional<int64_t> Utils::lastDbBackupTimestamp() const

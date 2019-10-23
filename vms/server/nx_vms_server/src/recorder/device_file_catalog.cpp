@@ -753,7 +753,7 @@ Chunk DeviceFileCatalog::deleteFirstRecord()
     storage = getMyStorageMan()->storageRoot(storageIndex);
     if (!storage || delFileName.isEmpty())
         return deletedChunk; //< Nothing to delete.
-
+    setHasArchiveRotated(true);
     serverModule()->fileDeletor()->deleteFile(delFileName, storage->getId());
     return deletedChunk;
 }

@@ -379,14 +379,14 @@ QString QnDbManager::ecsDbFileName(const QString& basePath)
     return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
 }
 
-int QnDbManager::currentBuildNumber(const QString& basePath)
+nx::utils::SoftwareVersion QnDbManager::currentSoftwareVersion(const QString &basePath)
 {
     const QString dbFileName = ecsDbFileName(basePath);
     if (!QFile(dbFileName).exists())
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: File %1 does not exist").arg(dbFileName));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
     const static QString buildNumberConnectionName = "GetBuildNumberDB";
@@ -396,7 +396,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: Failed to open db %1").arg(dbFileName));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
     auto dbCloseGuard = nx::utils::makeScopeGuard(
@@ -414,10 +414,10 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: Failed to prepare or execute query %1").arg(queryString));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
-    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString()).build();
+    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString());
 }
 
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
@@ -4668,6 +4668,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
 // dumpDatabase
 ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
+    if (!m_initialized)
+        return ErrorCode::ioError;
+
     QnWriteLocker lock(&m_mutex);
 
     if (!execSQLScript("vacuum;", m_sdb))
@@ -4681,6 +4684,7 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
     QFile f(m_sdb.databaseName());
     if (!f.open(QFile::ReadOnly))
         return ErrorCode::ioError;
+
     data.data = f.readAll();
 
     //TODO #ak add license db to backup
@@ -4706,6 +4710,9 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
 ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     DatabaseDumpToFileData& databaseDumpToFileData)
 {
+    if (!m_initialized)
+        return ErrorCode::ioError;
+
     QnWriteLocker lock(&m_mutex);
     m_tran->physicalCommitLazyData();
 

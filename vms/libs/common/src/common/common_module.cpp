@@ -546,6 +546,11 @@ nx::metrics::Storage* QnCommonModule::metrics() const
     return m_metrics.get();
 }
 
+std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
+{
+    return std::weak_ptr<nx::metrics::Storage>(m_metrics);
+}
+
 bool QnCommonModule::isStandAloneMode() const
 {
     return m_standaloneMode;

@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <transaction/message_bus_adapter.h>
 #include <transaction/transaction.h>
-#include <utils/common/rfc868_servers.h>
 #include <utils/common/delayed.h>
 
 #include <nx/network/http/http_client.h>
@@ -21,6 +20,9 @@ namespace vms {
 namespace time_sync {
 
 static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
+
+/** Requesting same server twice to greatly reduce chance of receiving corrupted time value. */
+static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com" };
 
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,

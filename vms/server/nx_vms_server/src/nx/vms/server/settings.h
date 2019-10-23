@@ -249,6 +249,9 @@ public:
     Option<int> publicIPEnabled{this, "publicIPEnabled", 1,
         "If true, allow server to discovery its public IP address. Default value is 'true'."
     };
+    Option<int> onlineResourceDataEnabled{ this, "onlineResourceDataEnabled", 1,
+        "If true, allow to update camera configuration file (resource_data.json) online."
+    };
     Option<QString> staticPublicIP{this, "staticPublicIP", "",
         "Set server public IP address manually. If it set server won't discovery it."
     };

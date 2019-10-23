@@ -159,6 +159,9 @@ public:
     int64_t occupiedSpace(int storageIndex = -1) const;
     std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
     std::chrono::milliseconds calendarDuration(int storageIndex = -1) const;
+
+    bool hasArchiveRotated() const { return m_hasArchiveRotated; }
+    void setHasArchiveRotated(bool value) { m_hasArchiveRotated = value; }
 private:
 
     bool csvMigrationCheckFile(const nx::vms::server::Chunk& chunk, QnStorageResourcePtr storage);
@@ -201,6 +204,7 @@ private:
     QnMutex m_IOMutex;
     const QnServer::StoragePool m_storagePool;
     mutable int64_t m_lastSyncTime;
+    std::atomic<bool> m_hasArchiveRotated = false;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

@@ -42,6 +42,7 @@ public:
     virtual std::chrono::milliseconds processUptime() const override;
     virtual std::chrono::milliseconds updatePeriod() const override;
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
+    virtual int thisProcessThreads() override;
 
 private:
     nx::vms::server::PlatformMonitor* m_monitorBase = nullptr;
@@ -70,6 +71,7 @@ public:
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
     virtual QString partitionByPath(const QString &) override { return {}; }
     virtual std::chrono::milliseconds processUptime() const override { return processUptime_; }
+    virtual int thisProcessThreads() override { return 1; }
 
 public:
     std::atomic<qreal> totalCpuUsage_{0};

@@ -97,8 +97,10 @@ struct Storage: ParameterSet
 {
     struct TcpConnections: ParameterSet
     {
+        NX_METRICS_ADD(std::atomic_int, outgoing,
+            "Total amount of opened outgoing TCP connections with any type");
         NX_METRICS_ADD(std::atomic_int, total,
-            "Total amount of opened TCP connections with any type");
+            "Total amount of opened incoming TCP connections with any type");
         NX_METRICS_ADD(std::atomic_int, rtsp,
             "Amount of opened RTSP connections");
         NX_METRICS_ADD(std::atomic_int, hls,

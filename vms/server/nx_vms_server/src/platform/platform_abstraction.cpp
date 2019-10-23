@@ -26,6 +26,8 @@ QnPlatformAbstraction::QnPlatformAbstraction(nx::vms::server::PlatformMonitor* m
 
     if (!monitor)
         monitor = new nx::vms::server::GlobalMonitor(new QnMonitorImpl(this), this);
+    else
+        monitor->setParent(this);
 
     m_monitor = monitor;
 }

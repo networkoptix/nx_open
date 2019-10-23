@@ -28,6 +28,8 @@ public:
 
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
 
+    virtual int thisProcessThreads() override;
+
 private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;

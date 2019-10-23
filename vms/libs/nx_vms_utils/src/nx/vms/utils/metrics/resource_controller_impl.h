@@ -22,6 +22,7 @@ public:
 protected:
     ResourceType* add(ResourceType resource, QString id, Scope scope);
     ResourceType* add(ResourceType resource, QnUuid id, Scope scope);
+    bool remove(QString id);
     bool remove(QnUuid id);
 
 private:
@@ -42,16 +43,20 @@ ResourceControllerImpl<ResourceType>::ResourceControllerImpl(
 template<typename ResourceType>
 api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() const
 {
-    auto manifest = m_provider->manifest();
-    for (const auto& [groupId, groupRules]: rules())
+    const auto resourceRules = rules();
+    api::metrics::ResourceManifest manifest{name(), resourceRules.name};
+    manifest.resource = resourceRules.resource;
+    manifest.values = m_provider->manifest();
+    for (const auto& [groupId, groupRules]: resourceRules.values)
     {
         const auto groupIt = std::find_if(
-            manifest.begin(), manifest.end(),
+            manifest.values.begin(), manifest.values.end(),
             [id = &groupId](const auto& g) { return g.id == *id; });
-        if (!NX_ASSERT(groupIt != manifest.end(), "Group not found: %1", groupId))
+        if (!NX_ASSERT(groupIt != manifest.values.end(), "Group not found: %1", groupId))
             continue;
 
-        groupIt->name = groupRules.name;
+        if (!groupRules.name.isEmpty())
+            groupIt->name = groupRules.name;
         for (const auto& [valueId, valueRule]: groupRules.values)
         {
             const auto existing = std::find_if(
@@ -100,9 +105,15 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
 }
 
 template<typename ResourceType>
+bool ResourceControllerImpl<ResourceType>::remove(QString id)
+{
+    return ResourceController::remove(id);
+}
+
+template<typename ResourceType>
 bool ResourceControllerImpl<ResourceType>::remove(QnUuid id)
 {
-    return ResourceController::remove(id.toSimpleString());
+    return remove(id.toSimpleString());
 }
 
 } // namespace nx::vms::utils::metrics

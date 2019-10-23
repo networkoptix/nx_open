@@ -860,6 +860,18 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     return result;
 }
 
+bool QnStorageManager::hasArchiveRotated(const QnVirtualCameraResourcePtr& camera) const
+{
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog[i].end() && itr.value()->hasArchiveRotated())
+            return true;
+    }
+    return false;
+}
+
 std::chrono::milliseconds QnStorageManager::archiveAge(
     const QnVirtualCameraResourcePtr& camera) const
 {
@@ -984,6 +996,8 @@ void QnStorageManager::scanMediaCatalog(
     for (const auto& chunk: newChunks)
         newCatalog->addChunk(chunk);
     replaceChunks(filter.scanPeriod, storage, newCatalog, cameraUuid, quality);
+    if (auto ownCatalog = getFileCatalogInternal(cameraUuid, quality))
+        ownCatalog->setHasArchiveRotated(false); //< Reset flag after rebuild archive.
 }
 
 void QnStorageManager::initDone()

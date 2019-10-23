@@ -215,6 +215,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 #include <nx/network/cloud/mediator_address_publisher.h>
+#include <nx/vms/utils/system_helpers.h>
 
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
@@ -2922,15 +2923,18 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()));
 
-    /**%apidoc GET /ec2/metrics/rules
-     * %return:object Metric rules, which are currently in use in the system. See metrics.md
-     * for details.
-     *
-     * %apidoc GET /ec2/metrics/manifest
+    /**%apidoc GET /ec2/metrics/manifest
      * %return:object Metrics parameter manifest. See metrics.md for details.
      *
      * %apidoc GET /ec2/metrics/values
      * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/alarms
+     * %return:object Metrics parameter alarms with parameter links. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
         m_metricsController.get(), serverModule()));
@@ -4541,30 +4545,33 @@ void MediaServerProcess::loadResourceParamsData()
         param.value = loadDataFromFile(source); //< Default value.
     }
 
-    for (const auto& url: kUrlsToLoadResourceData)
+    if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        const auto internetValue = loadDataFromUrl(url);
-        QString internetVersion;
-        if (!internetValue.isEmpty())
+        for (const auto& url: kUrlsToLoadResourceData)
         {
-            const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
-            if (internetVersion > dataVersion)
+            const auto internetValue = loadDataFromUrl(url);
+            QString internetVersion;
+            if (!internetValue.isEmpty())
             {
-                if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
+                const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
+                if (internetVersion > dataVersion)
                 {
-                    param.value = internetValue;
-                    source = url;
-                    dataVersion = internetVersion;
-                    break;
+                    if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
+                    {
+                        param.value = internetValue;
+                        source = url;
+                        dataVersion = internetVersion;
+                        break;
+                    }
+                    else
+                    {
+                        NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                    }
                 }
                 else
                 {
-                    NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                    NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
                 }
-            }
-            else
-            {
-                NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
             }
         }
     }
@@ -4603,14 +4610,15 @@ void MediaServerProcess::initMetricsController()
     m_metricsController->add(std::make_unique<server::metrics::ServerController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::CameraController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::StorageController>(serverModule()));
-    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(commonModule()->moduleGUID()));
+    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(serverModule()));
 
     QFile rulesFile(":/metrics_rules.json");
     const auto rulesJson = rulesFile.open(QIODevice::ReadOnly) ? rulesFile.readAll() : QByteArray();
     api::metrics::SystemRules rules;
     NX_CRITICAL(QJson::deserialize(rulesJson, &rules), rulesJson);
-    m_metricsController->setRules(std::move(rules));
 
+    m_metricsController->setRules(std::move(rules));
+    m_metricsController->manifest(); //< Cause manifest to cache for faster future use.
     m_metricsController->start();
 }
 
@@ -4717,12 +4725,16 @@ void MediaServerProcess::run()
         return;
     }
 
-    auto utils = nx::vms::server::Utils(serverModule.get());
-    if (utils.timeToMakeDbBackup())
+    const auto nxVersionFromDb =
+        ec2::detail::QnDbManager::currentSoftwareVersion(appServerConnectionUrl().toLocalFile());
+    const auto nxVersion = nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+    NX_ASSERT(!nxVersion.isNull());
+
+    if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
     {
-        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()),
-            ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
+        nx::vms::utils::backupDatabaseViaCopy(
+            ec2::detail::QnDbManager::ecsDbFileName(serverModule->settings().dataDir()),
+            nxVersionFromDb.build());
     }
 
     if (!connectToDatabase())

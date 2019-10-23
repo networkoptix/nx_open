@@ -3,8 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <api/test_api_requests.h>
-#include <nx/mediaserver/camera_mock.h>
 #include <core/resource/storage_resource.h>
+#include <nx/mediaserver/camera_mock.h>
+#include <nx/utils/std/algorithm.h>
 #include <rest/server/json_rest_result.h>
 
 namespace nx::vms::server::test {
@@ -23,18 +24,34 @@ public:
     /** Creates a storage resource */
     QnStorageResourcePtr addStorage(const QString& name);
 
+    template<typename T> T get(const QString& api);
+
     template<typename T>
-    T get(const QString& api)
-    {
-        using namespace nx::test;
-        QnJsonRestResult result;
-        [&](){ NX_TEST_API_GET(this, api, &result); }();
-        EXPECT_EQ(result.error, QnJsonRestResult::NoError);
-        return result.deserialized<T>();
-    }
+    auto getFlat(const QString& api) { return nx::utils::flat_map(get<T>(api)); }
 
 public:
+    nx::utils::ElapsedTimer serverStartTimer;
     const QString id; //< For debug.
 };
+
+template<typename T>
+inline T ServerForTests::get(const QString& api)
+{
+    using namespace nx::test;
+    QnJsonRestResult result;
+    [&]() { NX_TEST_API_GET(this, api, &result); }();
+    EXPECT_EQ(result.error, QnJsonRestResult::NoError);
+    return result.deserialized<T>();
+}
+
+template<>
+inline QByteArray ServerForTests::get<QByteArray>(const QString& api)
+{
+    using namespace nx::test;
+    QByteArray result;
+    [&]() { NX_TEST_API_GET(this, api, &result); }();
+    return result;
+}
+
 
 } // namespace nx::vms::server::test

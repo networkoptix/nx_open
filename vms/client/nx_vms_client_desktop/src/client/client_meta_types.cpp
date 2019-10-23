@@ -48,6 +48,7 @@
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
+#include <network/system_description.h>
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
@@ -143,6 +144,9 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<nx::update::Information>();
     qRegisterMetaType<nx::update::UpdateDeliveryInfo>();
     qRegisterMetaType<nx::update::UpdateContents>();
+
+    qRegisterMetaType<QnServerFields>();
+
 
     QMetaType::registerComparators<QnUuid>();
 

@@ -6,8 +6,6 @@
 #include <QtCore/QLibrary>
 #include <QtCore/QFile>
 
-#include "warnings.h"
-
 #if defined(Q_OS_WIN)
 #   define NOMINMAX
 #   include <Windows.h>

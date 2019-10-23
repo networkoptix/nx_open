@@ -105,6 +105,10 @@ public:
 
     static SocketFactory& instance();
 
+    static std::unique_ptr<AbstractStreamSocket> defaultStreamSocketFactoryFunc(
+        bool sslRequired,
+        nx::network::NatTraversalSupport nttType,
+        boost::optional<int> _ipVersion);
 private:
     std::unique_ptr<SocketFactoryImpl> m_impl;
 
@@ -120,11 +124,6 @@ private:
     static std::atomic<int> s_udpIpVersion;
     static std::atomic<int> s_tcpClientIpVersion;
     static std::atomic<int> s_tcpServerIpVersion;
-
-    static std::unique_ptr<AbstractStreamSocket> defaultStreamSocketFactoryFunc(
-        nx::network::NatTraversalSupport nttType,
-        SocketType forcedSocketType,
-        boost::optional<int> _ipVersion);
 
     static std::unique_ptr<AbstractStreamServerSocket> defaultStreamServerSocketFactoryFunc(
         nx::network::NatTraversalSupport nttType,
