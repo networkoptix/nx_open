@@ -92,7 +92,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
 {
     metadataPackets->push_back(generateObjectMetadataPacket().releasePtr());
 
-    return true; //< There were no errors while filling the metadataPackets.
+    return true; //< There were no errors while filling metadataPackets.
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
