@@ -452,13 +452,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
-        ram_available_bytes = box_platform.ram_available_bytes()
-        ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
-
-        ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
-        if ram_available_bytes and ram_available_bytes < ram_required_bytes:
-            raise exceptions.InsufficientResourcesError(
-                f"Not enough free RAM on the box for {test_camera_count} cameras.")
+        ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
 
         total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_camera_count)
         total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_camera_count)
@@ -780,8 +774,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                         'can be caused by network issues or Server issues.')
 
                 try:
-                    ram_available_bytes = box_platform.ram_available_bytes()
-                    ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
+                    ram_free_bytes = box_platform.obtain_ram_free_bytes()
                 except exceptions.VmsBenchmarkError as e:
                     issues.append(exceptions.UnableToFetchDataFromBox(
                         'Unable to fetch box RAM usage',
@@ -849,17 +842,27 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
     report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
 
 
+def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
+    ram_free_bytes = box_platform.obtain_ram_free_bytes()
+    ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
+
+    if ram_free_bytes < ram_required_bytes:
+        raise exceptions.InsufficientResourcesError(
+            f"Not enough free RAM on the box for {test_camera_count} cameras.")
+
+    return ram_free_bytes
+
+
 def _test_vms(api, box, box_platform, conf, ini, vms):
-    ram_free_bytes = box_platform.ram_available_bytes()
-    if ram_free_bytes is None:
-        ram_free_bytes = box_platform.ram_free_bytes()
-    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
+    ram_free_bytes = box_platform.obtain_ram_free_bytes()
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB "
+        f"of {to_megabytes(box_platform.ram_bytes)} MB")
     _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
         if cameras is not None:
             break
-        report(f"Attempt #{i}to get camera list")
+        report(f"Attempt #{i} to get camera list")
         time.sleep(i)
     if cameras is not None:
         for camera in cameras:
@@ -873,7 +876,7 @@ def _test_vms(api, box, box_platform, conf, ini, vms):
 
 
 def _obtain_box_platform(box, linux_distribution):
-    box_platform = BoxPlatform.gather(box, linux_distribution)
+    box_platform = BoxPlatform.create(box, linux_distribution)
 
     report(
         "\nBox properties detected:\n"
@@ -887,7 +890,8 @@ def _obtain_box_platform(box, linux_distribution):
         f"    Arch: {box_platform.arch}\n"
         f"    Number of CPUs: {box_platform.cpu_count}\n"
         f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
-        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
+        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB "
+        f"({to_megabytes(box_platform.obtain_ram_free_bytes())} MB free)\n"
         "    File systems:\n"
         + '\n'.join(
             f"        {storage['fs']} "
