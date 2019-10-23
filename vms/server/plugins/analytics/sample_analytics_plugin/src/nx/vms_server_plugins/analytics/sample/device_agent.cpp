@@ -39,7 +39,7 @@ std::string DeviceAgent::manifestString() const
 {
     // Tell the Server that the plugin can generate the events and objects of certain types.
     // Id values are strings and should be unique. Format of ids:
-    // `{vendor_id}.{plugin_id}.{event_id|object_id}`
+    // `{vendor_id}.{plugin_id}.{event_type_id/object_type_id}`.
     //
     // See the plugin manifest for the explanation of vendor_id and plugin_id.
     return /*suppress newline*/ 1 + R"json(
@@ -70,8 +70,10 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 
     auto eventMetadataPacket = generateEventMetadataPacket();
     if (eventMetadataPacket)
+    {
         // Send generated metadata packet to the Server.
         pushMetadataPacket(eventMetadataPacket.releasePtr());
+    }
 
     return true; //< There were no errors while processing the video frame.
 }
