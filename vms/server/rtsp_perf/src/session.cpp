@@ -79,33 +79,45 @@ void Session::run(const QString& url, const Config& config, bool live)
         delete data;
 }
 
+void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url)
+{
+    using namespace std::chrono;
+    if (m_config.maxTimestampDiff != milliseconds::zero() && diff > m_config.maxTimestampDiff)
+    {
+        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us more than %lld us\n",
+            url,
+            (long long int) timestampUs,
+            (long long int) diff.count(),
+            (long long int) m_config.maxTimestampDiff.count());
+    }
+    if (m_config.minTimestampDiff != milliseconds::zero() && diff < m_config.minTimestampDiff)
+    {
+        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us is less than %lld us\n",
+            url,
+            (long long int) timestampUs,
+            (long long int) diff.count(),
+            (long long int) m_config.minTimestampDiff.count());
+    }
+}
+
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    int64_t timestamp = parsePacketTimestamp(data, size);
+    int64_t timestampUs = parsePacketTimestamp(data, size);
 
     auto nowTime = std::chrono::system_clock::now();
-    if (timestamp != -1)
+    if (timestampUs != -1)
     {
         if (m_config.printTimestamps)
         {
-            int64_t timestampDiff = timestamp - m_prevTimestampUs;
+            int64_t timestampDiffUs = timestampUs - m_prevTimestampUs;
             printf("Camera %s: timestamp %lld us, diff %lld us\n", url,
-                (long long int) timestamp,
-                (m_prevTimestampUs == -1) ? -1LL : timestampDiff);
-            const auto diff = std::chrono::milliseconds((timestampDiff + 500) / 1000);
-            if (m_config.expectedTimestampDiff != std::chrono::milliseconds::zero()
-                && m_config.expectedTimestampDiff != diff
-                && m_prevTimestampUs != -1)
-            {
-                printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us is not %lld ms\n",
-                    url,
-                    (long long int) timestamp,
-                    (long long int) timestampDiff,
-                    (long long int) m_config.expectedTimestampDiff.count());
-            }
+                (long long int) timestampUs,
+                (m_prevTimestampUs == -1) ? -1LL : timestampDiffUs);
 
+            if (m_prevTimestampUs != -1)
+                checkDiff(std::chrono::microseconds(timestampDiffUs), timestampUs, url);
         }
-        m_prevTimestampUs = timestamp;
+        m_prevTimestampUs = timestampUs;
         m_lastFrameTime = nowTime;
 
     }

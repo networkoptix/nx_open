@@ -74,9 +74,12 @@ int main(int argc, char** argv)
     QCommandLineOption disableRestart(QStringList() << "disable-restart",
         "Start every RTSP session only once.");
     parser.addOption(disableRestart);
-    QCommandLineOption expectedTimestampDiffMs(QStringList() << "d" << "expected-timestamp-diff-ms",
-        "Expected timestamp diff, rounded to milliseconds.", "diff", "0");
-    parser.addOption(expectedTimestampDiffMs);
+    QCommandLineOption maxTimestampDiffUs(QStringList() << "max-timestamp-diff-us",
+        "Max timestamp diff in microseconds.", "max-diff", "0");
+    parser.addOption(maxTimestampDiffUs);
+    QCommandLineOption minTimestampDiffUs(QStringList() << "min-timestamp-diff-us",
+        "Min timestamp diff in microseconds.", "min-diff", "0");
+    parser.addOption(minTimestampDiffUs);
     parser.process(app);
 
 
@@ -93,8 +96,10 @@ int main(int argc, char** argv)
     config.sessionConfig.user = parser.value(userOption);
     config.sessionConfig.password = parser.value(passwordOption);
     config.sessionConfig.printTimestamps = parser.isSet(timestampsOption);
-    config.sessionConfig.expectedTimestampDiff =
-        std::chrono::milliseconds(parser.value(expectedTimestampDiffMs).toInt());
+    config.sessionConfig.maxTimestampDiff =
+        std::chrono::microseconds(parser.value(maxTimestampDiffUs).toInt());
+    config.sessionConfig.minTimestampDiff =
+        std::chrono::microseconds(parser.value(minTimestampDiffUs).toInt());
 
     if (parser.isSet(logLevelOption))
     {

@@ -15,7 +15,8 @@ public:
         QString password;
         bool printTimestamps = false;
         std::chrono::milliseconds timeout{5000};
-        std::chrono::milliseconds expectedTimestampDiff{0};
+        std::chrono::microseconds maxTimestampDiff{0};
+        std::chrono::microseconds minTimestampDiff{0};
     };
 public:
     void run(const QString& url, const Config& config, bool live);
@@ -27,6 +28,7 @@ public:
 private:
     bool processPacket(const uint8_t* data, int64_t size, const char* url);
     int64_t parsePacketTimestamp(const uint8_t* data, int64_t size);
+    void checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url);
 
 private:
     int64_t m_prevTimestampUs = -1;
