@@ -164,7 +164,7 @@ if platform.system() == 'Linux':
                 raise exceptions.BoxCommandError(
                     f'Command {command_wrapped!r} failed '
                     f'with exit status {run.returncode}, '
-                    f'stderr:\n    {run.stderr.decode("UTF-8")}'
+                    f'stderr:\n    ' + run.stderr.decode("UTF-8").strip('\n')
                 )
 
             if stdout:
@@ -175,7 +175,7 @@ if platform.system() == 'Linux':
                 stderr.flush()
             else:
                 if run.stderr:
-                    logging.debug('Remote command stderr:\n' + run.stderr.decode())
+                    logging.debug('Remote command stderr:\n    ' + run.stderr.decode().strip('\n'))
 
             return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 
@@ -307,7 +307,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 stderr.write(err.decode('UTF-8'))
             else:
                 if err:
-                    logging.debug('Remote command stderr:\n' + err.decode())
+                    logging.debug('Remote command stderr:\n    ' + err.decode().strip('\n'))
 
             log_remote_command_status(proc.returncode)
             
@@ -315,7 +315,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 raise exceptions.BoxCommandError(
                     f'Command {command_wrapped!r} failed '
                     f'with exit status {proc.returncode}, '
-                    f'stderr:\n    {err.decode("UTF-8")}'
+                    f'stderr:\n    ' + err.decode("UTF-8").strip('\n')
                 )
 
             return self.BoxConnectionResult(proc.returncode, command=command_wrapped)

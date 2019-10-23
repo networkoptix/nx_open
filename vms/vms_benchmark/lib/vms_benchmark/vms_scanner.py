@@ -97,7 +97,7 @@ class VmsScanner:
                     f'"{self.ini_dir}"',
                     exc=True, su=True)
             except Exception:
-                logging.exception("Exception while dismounting ini dirs")
+                logging.exception("Exception while dismounting ini dirs:")
 
         def override_ini_config(self, features):
             self.device.sh(f'install -m 755 -o {self.uid} -d "{self.ini_dir}"', exc=True, su=True)

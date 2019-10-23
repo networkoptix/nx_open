@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import datetime
 import itertools
 import logging
 import math
@@ -13,6 +12,8 @@ from typing import List, Tuple, Optional
 from vms_benchmark.camera import Camera
 
 # This block ensures that ^C interrupts are handled quietly.
+from vms_benchmark.exceptions import VmsBenchmarkError, VmsBenchmarkIssue
+
 try:
     def exit_handler(signum, _frame):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -266,10 +267,6 @@ def load_configs(conf_file, ini_file):
     return conf, ini
 
 
-def log_exception(context_name):
-    logging.exception(f'Exception yielding {context_name}')
-
-
 def box_combined_cpu_usage(box):
     cpu_usage_file = '/proc/loadavg'
     cpu_usage_reply = box.eval(f'cat {cpu_usage_file}')
@@ -356,14 +353,10 @@ def box_tx_rx_errors(box):
     return tx_errors + rx_errors
 
 
-def _print(message):
-    print(message, flush=True)
-
-
 def report(message):
-    _print(message)
+    print(message, flush=True)
     if message.strip():
-        logging.info(message.strip())
+        logging.info('[report] ' + message.strip('\n'))
 
 
 # Refers to the log file in the messages to the user. Filled after determining the log file path.
@@ -1046,8 +1039,6 @@ def main(conf_file, ini_file, log_file):
     finally:
         vms.dismount_ini_dirs()
 
-    return 0
-
 
 def _restart_vms(box, linux_distribution, vms):
     report('Starting Server...')
@@ -1086,7 +1077,7 @@ def _get_cameras_reliably(api):
     return cameras
 
 
-def nx_format_exception(exception):
+def _format_exception(exception):
     if isinstance(exception, ValueError):
         return f"Invalid value: {exception}"
     elif isinstance(exception, KeyError):
@@ -1100,53 +1091,55 @@ def nx_format_exception(exception):
         return str(exception)
 
 
-def nx_print_exception(context_name, exception, recursive_level=0):
-    string_indent = '  ' * recursive_level
-    prefix = (context_name + ': ') if context_name else ''
-    if isinstance(exception, exceptions.VmsBenchmarkError):
-        _print(f"{string_indent}{prefix}{str(exception)}")
-        if isinstance(exception, exceptions.VmsBenchmarkIssue):
-            for e in exception.sub_issues:
-                nx_print_exception('', e, recursive_level=recursive_level + 2)
+def _do_report_exception(exception, recursive_level, prefix=''):
+    indent = '    ' * recursive_level
+    if isinstance(exception, VmsBenchmarkError):
+        report(f"{indent}{prefix}{str(exception)}")
+        if isinstance(exception, VmsBenchmarkIssue):
+            for sub_issue in exception.sub_issues:
+                _do_report_exception(sub_issue, recursive_level=recursive_level + 1)
         if exception.original_exception:
-            _print(f'{string_indent}Caused by:')
+            report(f'{indent}Caused by:')
             if isinstance(exception.original_exception, list):
-                for e in exception.original_exception:
-                    nx_print_exception('', e, recursive_level=recursive_level + 2)
+                sub_exceptions = exception.original_exception
             else:
-                nx_print_exception('', exception.original_exception,
-                    recursive_level=recursive_level + 2)
+                sub_exceptions = [exception.original_exception]
+            for sub_exception in sub_exceptions:
+                _do_report_exception(sub_exception, recursive_level=recursive_level + 1)
     else:
-        _print(
-            f'{string_indent}{prefix}{nx_format_exception(exception)}'
-            if recursive_level > 0
-            else f'{string_indent}ERROR: {nx_format_exception(exception)}'
-        )
+        report(f'{indent}{prefix or "ERROR: "}{_format_exception(exception)}')
+
+
+def report_exception(context_name, exception, note=None):
+    prefix = (context_name + ': ') if context_name else ''
+    _do_report_exception(exception, recursive_level=0, prefix=prefix)
+    if note:
+        report(f'\nNOTE: {note}')
+    logging.exception(f'Exception yielding the above {context_name}:')
 
 
 if __name__ == '__main__':
     try:
         try:
-            sys.exit(main())
-        except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
-            nx_print_exception('ISSUE', e)
-            _print('\nNOTE: Can be caused by network issues, or poor performance of the box or the host.')
-            log_exception('ISSUE')
-        except exceptions.VmsBenchmarkError as e:
-            nx_print_exception('ERROR', e)
-            if log_file_ref:
-                _print(f'\nNOTE: Technical details may be available in {log_file_ref}.')
-            log_exception('ERROR')
+            main()
+            logging.info(f'VMS Benchmark finished successfully.')
+            sys.exit(0)
+        except (VmsBenchmarkIssue, urllib.error.HTTPError) as e:
+            report_exception('ISSUE', e,
+                'Can be caused by network issues, or poor performance of the box or the host.')
+        except VmsBenchmarkError as e:
+            report_exception('ERROR', e,
+                f'Technical details may be available in {log_file_ref}.' if log_file_ref else None)
         except Exception as e:
-            _print(f'UNEXPECTED ERROR: {e}')
-            if log_file_ref:
-                _print(f'\nNOTE: Details may be available in {log_file_ref}.')
-            log_exception('UNEXPECTED ERROR')
-        finally:
-            logging.info(f'VMS Benchmark finished at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
+            report_exception(f'UNEXPECTED ERROR', e,
+                f'Details may be available in {log_file_ref}.' if log_file_ref else None)
+
+        logging.info(f'VMS Benchmark finished with an exception.')
     except Exception as e:
-        _print(f'INTERNAL ERROR: {e}')
-        _print(f'\nPlease send the complete output ' +
-            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.')
+        sys.stderr.write(
+            f'INTERNAL ERROR: {e}\n'
+            f'\n'
+            f'Please send the console output ' +
+            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.\n')
 
     sys.exit(1)

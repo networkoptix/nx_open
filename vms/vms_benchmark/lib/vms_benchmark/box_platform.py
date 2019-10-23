@@ -68,7 +68,7 @@ class BoxPlatform:
         try:
             return self._get_proc_meminfo_value(meminfo, 'MemAvailable')
         except Exception:
-            logging.exception('Unable to get MemAvailable from /proc/meminfo')
+            logging.exception('Exception while getting MemAvailable from /proc/meminfo:')
             return None
 
     @staticmethod
