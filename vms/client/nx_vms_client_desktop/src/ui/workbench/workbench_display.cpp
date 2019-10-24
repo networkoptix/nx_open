@@ -568,12 +568,14 @@ void QnWorkbenchDisplay::initSceneView()
         executeDelayedParented(
             [this, updateViewScreens]()
             {
-                const auto window = mainWindowWidget()->windowHandle();
+                const auto mainWindowWidget = this->mainWindowWidget();
+                const auto window = mainWindowWidget ? mainWindowWidget->windowHandle() : nullptr;
+                if (!NX_ASSERT(window))
+                    return;
 
-                if (NX_ASSERT(window))
-                    connect(window, &QWindow::screenChanged, this, updateViewScreens);
-
+                connect(window, &QWindow::screenChanged, this, updateViewScreens);
                 updateViewScreens(window->screen());
+
             }, 1, this);
 
         const auto viewport = new QOpenGLWidget(m_view);
