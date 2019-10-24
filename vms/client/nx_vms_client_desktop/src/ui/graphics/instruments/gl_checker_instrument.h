@@ -12,6 +12,9 @@ public:
     QnGLCheckerInstrument(QObject* parent = nullptr);
     virtual ~QnGLCheckerInstrument() override;
 
+    // TODO: Move to separate class.
+    static void checkGLHardware();
+
 protected:
     virtual bool registeredNotify(QWidget *viewport) override;
     virtual void unregisteredNotify(QWidget *viewport) override;

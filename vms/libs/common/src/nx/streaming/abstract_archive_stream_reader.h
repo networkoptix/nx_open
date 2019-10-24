@@ -108,6 +108,7 @@ public:
      */
     virtual std::chrono::microseconds currentTime() const = 0;
 
+    virtual bool jumpToEx(qint64 mksec, qint64 skipTime, qint64* outJumpTime, bool useDelegate = true) = 0;
 protected:
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;

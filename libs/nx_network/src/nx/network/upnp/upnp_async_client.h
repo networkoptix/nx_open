@@ -46,9 +46,11 @@ public:
         std::chrono::milliseconds duration;
 
         MappingInfo(const HostAddress& inIp = HostAddress(),
-            quint16 inPort = 0, quint16 exPort = 0,
+            quint16 inPort = 0,
+            quint16 exPort = 0,
             Protocol prot = Protocol::TCP,
-            const QString& desc = QString(), quint64 dur = 0);
+            const QString& desc = QString(),
+            quint64 dur = 0);
 
         bool isValid() const;
         QString toString() const;

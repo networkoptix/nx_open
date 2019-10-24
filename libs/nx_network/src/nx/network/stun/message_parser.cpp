@@ -171,7 +171,8 @@ Attribute* MessageParser::parseErrorCode()
     // Checking for the reserved bits
     if (*reinterpret_cast<const std::uint16_t*>(m_attribute.value.constData()) != 0 || m_attribute.value.size() < 4)
         return NULL;
-    MessageParserBuffer buffer(m_attribute.value);
+    QnByteArrayConstRef refBuffer(m_attribute.value);
+    MessageParserBuffer buffer(refBuffer);
     bool ok;
     std::uint32_t val = buffer.NextUint32(&ok);
     NX_ASSERT(ok);

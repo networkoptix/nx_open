@@ -68,6 +68,14 @@ public:
 
     virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
 private:
+    enum class ChownMode
+    {
+        recursive,
+        nonRecursive
+    };
+
+    using PathAndMode = std::tuple<QString, ChownMode>;
+
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
@@ -82,8 +90,6 @@ private:
     ObjectTrackGroupDao m_trackGroupDao;
     bool m_stopped = false;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
-
-    bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 
@@ -113,7 +119,10 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
+    bool makePath(const QString& path);
+    bool changeOwner(const std::vector<PathAndMode>& pathAndModeList);
 
+    static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
     static QRect packRect(const QRectF& rectf);
     static QRectF unpackRect(const QRect& rect);
 };

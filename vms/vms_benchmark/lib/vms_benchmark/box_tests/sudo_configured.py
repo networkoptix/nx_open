@@ -1,4 +1,5 @@
 from io import StringIO
+
 from vms_benchmark.box_tests import BoxTestResult
 
 

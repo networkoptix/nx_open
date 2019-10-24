@@ -55,14 +55,9 @@ public:
 	/**
      * \returns                         Actual \class OpenGLInfo setting.
      */
-	const OpenGLInfo& openGLInfo() const;
+	static OpenGLInfo openGLInfo();
 
     QOpenGLWidget* glWidget() const;
-
-    /**
-     * \returns                         Returns last (cached) \class OpenGLInfo setting (might be empty).
-     */
-	static OpenGLInfo openGLCachedInfo();
 
     /**
      * \returns                         Set of features supported by the current OpenGL context. Estimated BEFORE context initializing.

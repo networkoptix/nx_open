@@ -18,7 +18,8 @@ device (it may be ARM or x64) with Linux called "box" here.
 
 The following prerequisites should be assured before running the tool:
 
-* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, and 4G RAM.
+* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, 8 GB RAM, 1 GB
+    free disk space.
 * Host PC OS: Ubuntu 18.04 or Windows 10.
     * The tool may work with other OS versions, but it is not officially supported.
     * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not

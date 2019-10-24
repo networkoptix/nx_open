@@ -42,7 +42,7 @@ static const QString kNewEnabled("NewEnabled");
 static const QString kNewPortMappingDescription("NewPortMappingDescription");
 static const QString kNewLeaseDuration("NewLeaseDuration");
 
-// TODO: move parsers to separate file
+// TODO: Move parsers to separate file.
 class UpnpMessageHandler:
     public QXmlDefaultHandler
 {
@@ -141,7 +141,8 @@ public:
 };
 
 void fetchMappingsRecursive(
-    AsyncClient* client, const nx::utils::Url& url,
+    AsyncClient* client,
+    const nx::utils::Url& url,
     const std::function<void(AsyncClient::MappingList)>& callback,
     std::shared_ptr<AsyncClient::MappingList> collected,
     AsyncClient::MappingInfo newMap)
@@ -155,9 +156,9 @@ void fetchMappingsRecursive(
     collected->push_back(std::move(newMap));
     client->getMapping(url, collected->size(),
         [client, url, callback, collected](AsyncClient::MappingInfo nextMap)
-    {
-        fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
-    });
+        {
+            fetchMappingsRecursive(client, url, callback, collected, std::move(nextMap));
+        });
 }
 
 } // namespace

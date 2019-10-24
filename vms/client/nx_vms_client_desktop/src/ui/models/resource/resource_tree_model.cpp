@@ -217,7 +217,11 @@ QnResourceTreeModel::QnResourceTreeModel(
         {
             const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
             if (resource->hasFlags(Qn::server) && !isAdmin)
+            {
+                for (const auto& serverNode: m_nodesByResource.value(resource))
+                    serverNode->update();
                 updateSystemHasManyServers();
+            }
         });
 
     rebuildTree();
@@ -287,6 +291,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResou
         pos = m_resourceNodeByResource.insert(resource, node);
         m_nodesByResource[resource].push_back(node);
         m_allNodes.append(node);
+
+        if (resource->hasFlags(Qn::server))
+        {
+            connect(node, &QnResourceTreeModelNode::childrenCountChanged, this,
+                [this]() { updateSystemHasManyServers(); });
+        }
     }
     return *pos;
 }
@@ -1264,7 +1274,17 @@ void QnResourceTreeModel::updateSystemHasManyServers()
         servers = servers.filtered(
             [this](const QnMediaServerResourcePtr& server)
             {
-                return resourceAccessProvider()->hasAccess(accessController()->user(), server);
+                const auto accessibleVia =
+                    resourceAccessProvider()->accessibleVia(accessController()->user(), server);
+
+                const bool isDirectlyShared =
+                    accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
+
+                const auto serverNodes = m_nodesByResource.value(server);
+                bool nodeHasChildren = std::any_of(serverNodes.cbegin(), serverNodes.cend(),
+                    [](const auto& node) { return node->children().count() > 0; });
+
+                return isDirectlyShared || nodeHasChildren;
             });
     }
 

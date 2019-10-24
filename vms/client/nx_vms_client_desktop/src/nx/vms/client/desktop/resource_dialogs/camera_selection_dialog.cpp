@@ -24,7 +24,6 @@ using namespace nx::vms::client::desktop;
 using namespace node_view;
 using namespace details;
 
-
 struct Data
 {
     QHash<QnUuid, QnVirtualCameraResourcePtr> allCameras;
@@ -88,89 +87,119 @@ Data createCamerasData(
 
 NodePtr createServerNode(
     const QnUuid& serverId,
-    QnResourcePool* pool,
-    const NodeList& children)
+    bool showExtraInfo,
+    const NodeList& children,
+    QnResourcePool* pool)
 {
-    auto serverResource = pool->getResourceById(serverId);
-    const bool showExtraInfo = qnSettings->extraInfoInTree() == Qn::RI_FullInfo;
-    const auto extraInfoText =
-        showExtraInfo ? QnResourceDisplayInfo(serverResource).extraInfo() : QString();
+    NodePtr result;
+    if (auto server = pool->getResourceById(serverId))
+    {
+        const auto camerasCount = std::accumulate(children.cbegin(), children.cend(), 0,
+            [](int count, const NodePtr& node)
+            {
+                return count + std::max(1, node->childrenCount());
+            });
+        QString extraText;
+        if (showExtraInfo)
+            extraText = QnResourceDisplayInfo(server).extraInfo();
+        extraText = lit("%1 - %2").arg(
+            extraText, CameraSelectionDialog::tr("%n cameras", nullptr, camerasCount)).trimmed();
 
-    const auto camerasCount = std::accumulate(children.cbegin(), children.cend(), 0,
-        [](int count, const NodePtr& node)
-        {
-            return count + (node->childrenCount() > 0 ? node->childrenCount() : 1);
-        });
-
-    const auto extraText = lit("%1 - %2").arg(extraInfoText,
-        CameraSelectionDialog::tr("%n cameras", nullptr, camerasCount)).trimmed();
-
-    return createResourceNode(serverResource, extraText, true);
+        result = createResourceNode(server, extraText, true);
+        if (result)
+            result->addChildren(children);
+    }
+    return result;
 }
 
-NodePtr createCameraNodes(
-    const Data& data,
+QnVirtualCameraResourcePtr getGroupResource(const QString& groupId, QnResourcePool* resourcePool)
+{
+    auto groupResources = resourcePool->getResourcesBySharedId(groupId);
+    if (!groupResources.isEmpty())
+        return groupResources.first().dynamicCast<QnVirtualCameraResource>();
+    return QnVirtualCameraResourcePtr();
+}
+
+NodePtr createCameraNode(
+    const QnUuid& cameraId,
+    bool showExtraInfo,
+    bool isInvalidCamera,
+    const QnResourcePool* pool)
+{
+    if (auto resource = pool->getResourceById(cameraId))
+    {
+        QString extraText;
+        if (showExtraInfo)
+            extraText = QnResourceDisplayInfo(resource).extraInfo();
+        const auto cameraNode = createResourceNode(resource, extraText, true);
+        if (isInvalidCamera)
+            setNodeValidState(cameraNode, false);
+        return cameraNode;
+    }
+    return NodePtr();
+}
+
+NodeList createCameraNodes(
+    const QnUuidSet& camerasIds,
+    bool showExtraInfo,
     bool showInvalidCameras,
+    const Data& data,
+    const QnResourcePool* pool)
+{
+    NodeList result;
+    for (const auto& cameraId: camerasIds)
+    {
+        const bool isInvalidCamera = data.invalidCameras.contains(cameraId);
+        if (showInvalidCameras || !isInvalidCamera)
+        {
+            if (auto cameraNode = createCameraNode(cameraId, showExtraInfo, isInvalidCamera, pool))
+                result.append(cameraNode);
+        }
+    }
+    return result;
+}
+
+NodePtr createCamerasTree(
+    bool showInvalidCameras,
+    const Data& data,
     QnResourcePool* pool)
 {
     const NodePtr root = ViewNode::create();
     const bool showExtraInfo = qnSettings->extraInfoInTree() == Qn::RI_FullInfo;
 
-    const auto createCameraNode =
-        [pool, showExtraInfo](const QnUuid& cameraId, bool isInvalidCamera) -> NodePtr
-        {
-            auto resource = pool->getResourceById(cameraId);
-            const QString extraText =
-                showExtraInfo ? QnResourceDisplayInfo(resource).extraInfo() : QString();
-            const auto cameraNode = createResourceNode(resource, extraText, true);
-            if (isInvalidCamera)
-                setNodeValidState(cameraNode, false);
-            return cameraNode;
-        };
-
-    for (auto serverId: data.serverIds)
+    for (const auto& serverId: data.serverIds)
     {
-        NodeList children;
-
+        NodeList serverChildren;
         if (data.cameraGroupsByServerId.contains(serverId))
         {
-            QSet<QString> groupIds = data.cameraGroupsByServerId.value(serverId);
-            for (const QString& groupId: groupIds)
+            for (const auto& groupId: data.cameraGroupsByServerId.value(serverId))
             {
-                NodeList groupChildren;
-                for (const auto cameraId: data.singleCamerasByGroupId.value(groupId))
+                if (auto groupResource = getGroupResource(groupId, pool))
                 {
-                    auto isInvalidCamera = data.invalidCameras.contains(cameraId);
-                    if (showInvalidCameras || !isInvalidCamera)
-                        groupChildren.append(createCameraNode(cameraId, isInvalidCamera));
+                    QString groupExtraText = showExtraInfo ?
+                        QnResourceDisplayInfo(groupResource).extraInfo() : QString();
+                    const auto groupNode = createGroupNode(groupResource, groupExtraText, true);
+
+                    const auto groupChildrenIds = data.singleCamerasByGroupId.value(groupId);
+                    NodeList groupChildren = createCameraNodes(
+                        groupChildrenIds, showExtraInfo, showInvalidCameras, data, pool);
+                    groupNode->addChildren(groupChildren);
+
+                    if (groupNode->childrenCount())
+                        serverChildren.append(groupNode);
                 }
-
-                auto groupResource =
-                    data.allCameras.value(pool->getResourcesBySharedId(groupId).first()->getId());
-                QString groupExtraText =
-                    showExtraInfo ? QnResourceDisplayInfo(groupResource).extraInfo() : QString();
-                const auto groupNode = createGroupNode(groupResource, groupExtraText, true);
-                groupNode->addChildren(groupChildren);
-
-                if (groupNode->childrenCount())
-                    children.append(groupNode);
             }
         }
 
-        auto singleCameraIds = data.singleCamerasByServerId.value(serverId);
-        for (const auto cameraId: singleCameraIds)
-        {
-            auto isInvalidCamera = data.invalidCameras.contains(cameraId);
-            if (showInvalidCameras || !isInvalidCamera)
-                children.append(createCameraNode(cameraId, isInvalidCamera));
-        }
+        const auto singleCameraIds = data.singleCamerasByServerId.value(serverId);
+        serverChildren.append(
+            createCameraNodes(singleCameraIds, showExtraInfo, showInvalidCameras, data, pool));
 
-        if (children.isEmpty())
+        if (serverChildren.isEmpty())
             continue;
 
-        const NodePtr serverNode = createServerNode(serverId, pool, children);
-        serverNode->addChildren(children);
-        root->addChild(serverNode);
+        if (auto serverNode = createServerNode(serverId, showExtraInfo, serverChildren, pool))
+            root->addChild(serverNode);
     }
 
     return root;
@@ -261,7 +290,7 @@ void CameraSelectionDialog::Private::reloadViewData()
     if (view->state().rootNode)
         view->applyPatch(NodeViewStatePatch::clearNodeView());
 
-    const auto root = createCameraNodes(data, showInvalidCameras, q->resourcePool());
+    const auto root = createCamerasTree(showInvalidCameras, data, q->resourcePool());
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));
     view->setLeafResourcesSelected(selectedCameras, true);
 

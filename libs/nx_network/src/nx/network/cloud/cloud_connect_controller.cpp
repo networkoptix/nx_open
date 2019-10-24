@@ -14,6 +14,7 @@
 #include "mediator_connector.h"
 #include "tunnel/connector_factory.h"
 #include "tunnel/outgoing_tunnel_pool.h"
+#include "speed_test/uplink_speed_reporter.h"
 
 namespace nx {
 namespace network {
@@ -28,6 +29,7 @@ struct CloudConnectControllerImpl
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
+    speed_test::UplinkSpeedReporter uplinkSpeedReporter;
 
     CloudConnectControllerImpl(
         const QString& customCloudHost,
@@ -40,7 +42,8 @@ struct CloudConnectControllerImpl
         mediatorConnector(cloudHost.toStdString()),
         addressPublisher(
             mediatorConnector.systemConnection(),
-            &mediatorConnector)
+            &mediatorConnector),
+        uplinkSpeedReporter(&mediatorConnector)
     {
     }
 

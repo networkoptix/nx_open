@@ -34,6 +34,7 @@ function(set_cloud_hosts)
         endforeach()
     else()
         message(STATUS "Using the provided cloud host ${customCloudHost}")
+        set(cloudHost ${customCloudHost})
     endif()
 
     nx_expose_variables_to_parent_scope(cloudHost compatibleCloudHosts)

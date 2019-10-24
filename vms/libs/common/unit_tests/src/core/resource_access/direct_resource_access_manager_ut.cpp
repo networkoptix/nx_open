@@ -850,7 +850,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkServerAsViewer)
 
     auto server = addServer();
 
-    Qn::Permissions desired = Qn::ReadPermission;
+    Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
     Qn::Permissions forbidden = Qn::FullServerPermissions;
     forbidden &= ~desired;
 
@@ -901,7 +901,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkStoragesAsCustom)
     Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission;
 
     /* We do have access to server. */
-    checkPermissions(server, Qn::ReadPermission, 0);
+    checkPermissions(server, Qn::ReadPermission | Qn::ViewContentPermission, 0);
 
     /* But no access to its storages. */
     checkPermissions(storage, desired, forbidden);

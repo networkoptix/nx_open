@@ -8707,11 +8707,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中選擇單個用戶, 然後顯示本地佈局到&quot;</translation>
+      <translation>在 &quot;列表中選擇單個用戶, 然後顯示本機佈局到&quot;</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>本地佈局僅對其擁有者顯示。</translation>
+      <translation>本機佈局僅對其擁有者顯示。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -9196,15 +9196,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation>與所選伺服器上的本地時間同步</translation>
+      <translation>與所選伺服器上的本機時間同步</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>不同步。每個伺服器都使用自己的本地時間。</translation>
+      <translation>不同步。每個伺服器都使用自己的本機時間。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation>等同於伺服器本地時間</translation>
+      <translation>等同於伺服器本機時間</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>

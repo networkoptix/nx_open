@@ -149,7 +149,8 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>();
         mediaPacket->setCodecType(stream->codecpar->codec_id);
         mediaPacket->setTimestamp(packetTimestamp(packet));
-        mediaPacket->setChannelNumber(0);
+        mediaPacket->setChannelNumber(
+            packetDataType(packet) == nxcip::DataPacketType::dptAudio ? 1 : 0);
         mediaPacket->setFlags(packetFlags(packet));
         mediaPacket->setType(packetDataType(packet));
         mediaPacket->setData(dataPointer, dataSize);

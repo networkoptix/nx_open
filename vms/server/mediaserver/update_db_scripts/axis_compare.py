@@ -54,10 +54,10 @@ for i in range(len(get_list)):
     site_list.update(upd)
 
 
-xml_path = '/appserver2/static-resources/resources/camera_types/axis.xml'
-old_db_path = '/appserver2/static-resources/02_insert_all_vendors.sql'
-f1_path = os.path.abspath(os.getcwd() + '/..' + '/..' + xml_path)
-f2_path = os.path.abspath(os.getcwd() + '/..' + '/..' + old_db_path)
+xml_path = '/server/nx_vms_server_db/static-resources/resources/camera_types/axis.xml'
+old_db_path = '/server/nx_vms_server_db/static-resources/02_insert_all_vendors.sql'
+f1_path = os.path.abspath(os.getcwd() + '/..' + '/..' + '/..' + xml_path)
+f2_path = os.path.abspath(os.getcwd() + '/..' + '/..' + '/..' + old_db_path)
 f1 = open(f1_path, 'r')
 f2 = open(f2_path, 'r')
 cur_list_draft = set(re.findall('AXIS\w\d\d\d+', f1.read()) + 

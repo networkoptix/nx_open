@@ -3,6 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include "vmax480_chunk_reader.h"
+#include "vmax480_resource.h"
 #include "utils/common/synctime.h"
 #include "vmax480_stream_fetcher.h"
 #include "core/resource/network_resource.h"
@@ -12,40 +13,40 @@ static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
 static const QByteArray GROUP_ID("{C30B7CCB-D64E-4f72-9417-A7F3CA133F69}");
 
-QnVMax480ChunkReader::QnVMax480ChunkReader(const QnResourcePtr& res):
+QnVMax480ChunkReader::QnVMax480ChunkReader(QnPlVmax480Resource* vmaxResource):
     QnLongRunnable(),
     m_waitingAnswer(false),
     m_state(State_Started),
     m_firstRange(true),
     m_streamFetcher(0),
-    m_res(res.data()),
+    m_vmaxResource(vmaxResource),
     m_gotAllData(false)
 {
-    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
+    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_vmaxResource, false);
 }
 
 QnVMax480ChunkReader::~QnVMax480ChunkReader()
 {
     stop();
-    m_streamFetcher->freeInstance(GROUP_ID, m_res, false);
+    m_streamFetcher->freeInstance(GROUP_ID, m_vmaxResource, false);
 }
 
 void QnVMax480ChunkReader::run()
 {
     //saveSysThreadID();
     bool registered = false;
-    while (!needToStop() && !registered && !m_res->commonModule()->isNeedToStop())
+    while (!needToStop() && !registered && !m_vmaxResource->commonModule()->isNeedToStop())
     {
         registered = m_streamFetcher->registerConsumer(this);
         if (!registered)
             msleep(200);
     }
 
-    while (!needToStop() && !m_res->commonModule()->isNeedToStop())
+    while (!needToStop() && !m_vmaxResource->commonModule()->isNeedToStop())
     {
-        Qn::ResourceStatus status = m_res->getStatus();
+        Qn::ResourceStatus status = m_vmaxResource->getStatus();
 
-        if (m_res->hasFlags(Qn::foreigner))
+        if (m_vmaxResource->hasFlags(Qn::foreigner))
             break;
 
         if (status == Qn::Offline || status == Qn::Unauthorized)
@@ -76,9 +77,9 @@ void QnVMax480ChunkReader::run()
                 m_waitingAnswer = false;
 
                 m_streamFetcher->unregisterConsumer(this);
-                m_streamFetcher->freeInstance(GROUP_ID, m_res, false);
+                m_streamFetcher->freeInstance(GROUP_ID, m_vmaxResource, false);
 
-                m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
+                m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_vmaxResource, false);
                 m_streamFetcher->registerConsumer(this);
             }
             msleep(1);

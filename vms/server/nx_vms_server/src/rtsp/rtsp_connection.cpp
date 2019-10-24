@@ -780,8 +780,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
                     continue; // if audio is not found do not report error. just skip track
             }
         }
+
         if (encoder == 0)
-            return nx::network::http::StatusCode::unsupportedMediaType;
+            return nx::network::http::StatusCode::serviceUnavailable;
 
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());

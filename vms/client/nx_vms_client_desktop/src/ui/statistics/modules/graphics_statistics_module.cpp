@@ -70,19 +70,19 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
     const auto glVersionMetric = QnFunctorMetric::create(
         []()
         {
-            return QnGlFunctions::openGLCachedInfo().version;
+            return QnGlFunctions::openGLInfo().version;
         });
 
     const auto glRendererMetric = QnFunctorMetric::create(
         []()
         {
-            return QnGlFunctions::openGLCachedInfo().renderer;
+            return QnGlFunctions::openGLInfo().renderer;
         });
 
     const auto glVendorMetric = QnFunctorMetric::create(
         []()
         {
-            return QnGlFunctions::openGLCachedInfo().vendor;
+            return QnGlFunctions::openGLInfo().vendor;
         });
 
     m_metrics->addMetric(lit("avg_tabs_cnt"), avgTabsCount);

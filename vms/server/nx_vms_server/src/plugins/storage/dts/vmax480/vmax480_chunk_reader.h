@@ -13,7 +13,7 @@ class QnVMax480ChunkReader: public  QnLongRunnable, public QnVmax480DataConsumer
 {
     Q_OBJECT;
 public:
-    QnVMax480ChunkReader(const QnResourcePtr& res);
+    QnVMax480ChunkReader(QnPlVmax480Resource* vmaxResource);
     virtual ~QnVMax480ChunkReader();
 
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) override;
@@ -42,7 +42,7 @@ private:
     QnTimePeriod m_archiveRange;
     QElapsedTimer m_waitTimer;
     VMaxStreamFetcher* m_streamFetcher;
-    QnResource* m_res;
+    QnPlVmax480Resource* m_vmaxResource;
     bool m_gotAllData;
 };
 

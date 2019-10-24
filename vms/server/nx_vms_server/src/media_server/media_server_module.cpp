@@ -27,6 +27,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource_proxy.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
@@ -209,6 +210,10 @@ QnMediaServerModule::QnMediaServerModule(
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 
     initOutgoingSocketCounter();
+
+#ifdef ENABLE_VMAX
+    store(new QnVmax480ResourceProxy(commonModule()));
+#endif
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
