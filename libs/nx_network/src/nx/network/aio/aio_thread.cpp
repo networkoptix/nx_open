@@ -157,9 +157,10 @@ void AioThread::cancelPostedCalls(Pollable* const sock)
 size_t AioThread::socketsHandled() const
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
+
     return m_pollSet->size()
-        + m_taskQueue->newReadMonitorTaskCount
-        + m_taskQueue->newWriteMonitorTaskCount;
+        + m_taskQueue->newReadMonitorTaskCount()
+        + m_taskQueue->newWriteMonitorTaskCount();
 }
 
 bool AioThread::isSocketBeingMonitored(Pollable* sock) const
@@ -299,11 +300,9 @@ void AioThread::startMonitoringInternal(
         timeout,
         nullptr,
         std::move(socketAddedToPollHandler)));
-    if (eventToWatch == aio::etRead)
-        ++m_taskQueue->newReadMonitorTaskCount;
-    else if (eventToWatch == aio::etWrite)
-        ++m_taskQueue->newWriteMonitorTaskCount;
-    if (currentThreadSystemId() != systemThreadId())  //< If eventTriggered is lower on stack, socket will be added to pollset before next poll call.
+
+    // If eventTriggered is down the stack, socket will be added to pollset before next poll call.
+    if (currentThreadSystemId() != systemThreadId())
         m_pollSet->interrupt();
 }
 

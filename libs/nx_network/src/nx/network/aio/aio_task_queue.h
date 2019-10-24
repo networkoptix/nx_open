@@ -169,8 +169,6 @@ class NX_NETWORK_API AioTaskQueue
 public:
     // TODO: #ak Leave a single mutex in this class.
 
-    unsigned int newReadMonitorTaskCount = 0;
-    unsigned int newWriteMonitorTaskCount = 0;
     /**
      * Used to make AIOThread public API thread-safe (to serialize access to internal structures).
      * TODO: #ak Move this mutex to private section or to the AIOThread class.
@@ -186,12 +184,13 @@ public:
 
     void addTask(SocketAddRemoveTask task);
 
+    std::size_t newReadMonitorTaskCount() const;
+    std::size_t newWriteMonitorTaskCount() const;
+
     bool taskExists(
         Pollable* const sock,
         aio::EventType eventType,
         TaskType taskType) const;
-
-    void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
 
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
@@ -237,8 +236,6 @@ public:
 
     qint64 nextPeriodicEventClock() const;
 
-    void waitCurrentEventProcessingCompletion();
-
     std::size_t periodicTasksCount() const;
 
     void clear();
@@ -258,6 +255,8 @@ private:
     mutable QnMutex m_socketEventProcessingMutex;
     nx::utils::math::AbnormalValueDetector<
         std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
+    std::atomic<std::size_t> m_newReadMonitorTaskCount = 0;
+    std::atomic<std::size_t> m_newWriteMonitorTaskCount = 0;
 
     void addSocketToPollset(
         Pollable* socket,

@@ -32,6 +32,24 @@ qint64 AioTaskQueue::getMonotonicTime() const
 void AioTaskQueue::addTask(SocketAddRemoveTask task)
 {
     m_pollSetModificationQueue.push_back(std::move(task));
+
+    if (task.type == TaskType::tAdding)
+    {
+        if (task.eventType == aio::etRead)
+            ++m_newReadMonitorTaskCount;
+        else if (task.eventType == aio::etWrite)
+            ++m_newWriteMonitorTaskCount;
+    }
+}
+
+std::size_t AioTaskQueue::newReadMonitorTaskCount() const
+{
+    return m_newReadMonitorTaskCount;
+}
+
+std::size_t AioTaskQueue::newWriteMonitorTaskCount() const
+{
+    return m_newWriteMonitorTaskCount;
 }
 
 bool AioTaskQueue::taskExists(
@@ -45,13 +63,6 @@ bool AioTaskQueue::taskExists(
             return true;
     }
     return false;
-}
-
-void AioTaskQueue::postAsyncCall(
-    Pollable* const pollable,
-    nx::utils::MoveOnlyFunc<void()> func)
-{
-    addTask(PostAsyncCallTask(pollable, std::move(func)));
 }
 
 void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
@@ -76,9 +87,9 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
             case TaskType::tAdding:
             {
                 if (task.eventType == aio::etRead)
-                    --newReadMonitorTaskCount;
+                    --m_newReadMonitorTaskCount;
                 else if (task.eventType == aio::etWrite)
-                    --newWriteMonitorTaskCount;
+                    --m_newWriteMonitorTaskCount;
                 addSocketToPollset(
                     task.socket,
                     task.eventType,
@@ -550,11 +561,6 @@ qint64 AioTaskQueue::nextPeriodicEventClock() const
     return m_periodicTasksByClock.empty()
         ? 0
         : m_periodicTasksByClock.cbegin()->first;
-}
-
-void AioTaskQueue::waitCurrentEventProcessingCompletion()
-{
-    QnMutexLocker lock(&m_socketEventProcessingMutex);
 }
 
 std::size_t AioTaskQueue::periodicTasksCount() const
