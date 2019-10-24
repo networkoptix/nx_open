@@ -1,9 +1,9 @@
 #pragma once
 
-#include <functional>
 #include <optional>
 #include <chrono>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/elapsed_timer.h>
 
@@ -77,7 +77,7 @@ private:
     mutable nx::utils::Mutex m_mutex;
 
     mutable std::optional<ValueType> m_value;
-    std::function<ValueType()> m_valueGenerator;
+    MoveOnlyFunc<ValueType()> m_valueGenerator;
 
     mutable ElapsedTimer m_timer;
     const std::chrono::milliseconds m_expirationTime;
