@@ -41,7 +41,7 @@ private:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
 protected:
-    QnGraphicsWebView* m_webView;
-    nx::vms::client::desktop::GraphicsWebEngineView* m_webEngineView;
+    QnGraphicsWebView* m_webView = nullptr;
+    nx::vms::client::desktop::GraphicsWebEngineView* m_webEngineView = nullptr;
     QHash<QWebEnginePage::WebAction, QString> m_webActionText;
 };

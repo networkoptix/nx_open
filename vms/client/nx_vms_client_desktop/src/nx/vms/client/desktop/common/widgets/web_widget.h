@@ -26,8 +26,8 @@ public:
     void reset();
 
 private:
-    QWebView* m_webView;
-    WebEngineView* m_webEngineView;
+    QWebView* m_webView = nullptr;
+    WebEngineView* m_webEngineView = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

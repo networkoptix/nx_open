@@ -132,25 +132,37 @@ QString speedToText(qint64 bytesRead, qint64 elapsedMs)
 
 } // namespace
 
-WebDownloader::WebDownloader(QObject* parent,
+WebDownloader::WebDownloader(
+    QObject* parent,
     std::shared_ptr<QNetworkAccessManager> networkManager,
     QNetworkReply* reply,
     std::unique_ptr<QFile> file,
-    const QFileInfo& fileInfo):
+    const QFileInfo& fileInfo)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent), m_networkManager(networkManager), m_reply(reply),
-    m_file(std::move(file)), m_fileInfo(fileInfo), m_item(nullptr)
+    QnWorkbenchContextAware(parent),
+    m_networkManager(networkManager),
+    m_reply(reply),
+    m_file(std::move(file)),
+    m_fileInfo(fileInfo),
+    m_item(nullptr)
 {
     m_reply->setParent(this);
     startDownload();
 }
 
-WebDownloader::WebDownloader(QObject* parent,
+WebDownloader::WebDownloader(
+    QObject* parent,
     const QFileInfo& fileInfo,
-    QObject* item):
+    QObject* item)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent), m_networkManager(nullptr), m_reply(nullptr),
-    m_file(nullptr), m_fileInfo(fileInfo), m_item(item)
+    QnWorkbenchContextAware(parent),
+    m_networkManager(nullptr),
+    m_reply(nullptr),
+    m_file(nullptr),
+    m_fileInfo(fileInfo),
+    m_item(item)
 {
     startDownload();
 }

@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 /**
  * Shows QML on scene using interface similar to QQuickWidget.
  */
-class GraphicsQmlView : public QGraphicsWidget
+class GraphicsQmlView: public QGraphicsWidget
 {
     Q_OBJECT
 

@@ -16,7 +16,7 @@ enum WebViewPageStatus
 
 namespace nx::vms::client::desktop {
 
-class GraphicsWebEngineView : public GraphicsQmlView
+class GraphicsWebEngineView: public GraphicsQmlView
 {
     Q_OBJECT
 
@@ -75,8 +75,8 @@ private slots:
     void onLoadProgressChanged();
 
 private:
-    WebViewPageStatus m_status;
-    bool m_canGoBack;
+    WebViewPageStatus m_status = kPageInitialLoadInProgress;
+    bool m_canGoBack = false;
     RootReadyCallback m_rootReadyCallback;
 };
 

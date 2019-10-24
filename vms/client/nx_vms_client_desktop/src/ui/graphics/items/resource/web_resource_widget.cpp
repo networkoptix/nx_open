@@ -19,10 +19,12 @@
 
 using namespace nx::vms::client::desktop;
 
-QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
-    : base_type(context, item, parent)
-    , m_webView(nullptr)
-    , m_webEngineView(nullptr)
+QnWebResourceWidget::QnWebResourceWidget(
+    QnWorkbenchContext *context,
+    QnWorkbenchItem *item,
+    QGraphicsItem *parent)
+    :
+    base_type(context, item, parent)
 {
     if (ini().useWebEngine)
     {
@@ -124,7 +126,7 @@ void QnWebResourceWidget::setupOverlays()
                     buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
                 });
 
-            // Should force HUD to update details text with new URL
+            // Should force HUD to update details text with new URL.
             connect(m_webView, &QnGraphicsWebView::loadStarted, this,
                 [this]()
                 {
@@ -181,7 +183,7 @@ void QnWebResourceWidget::setupOverlays()
 
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
-    switch(m_webView ? m_webView->status() : m_webEngineView->status())
+    switch (m_webView ? m_webView->status() : m_webEngineView->status())
     {
     case kPageLoadFailed:
         return Qn::OfflineOverlay;
@@ -218,7 +220,7 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
     {
         if (event->type() == QEvent::GraphicsSceneMousePress)
         {
-            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent *>(event);
+            auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             mousePressEvent(mouseEvent);
             if (object == m_webEngineView && mouseEvent->button() == Qt::RightButton)
                 return true;
@@ -256,7 +258,7 @@ bool QnWebResourceWidget::isWebActionEnabled(QWebEnginePage::WebAction action)
         return false;
 
     // TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
-    switch(action)
+    switch (action)
     {
         case QWebEnginePage::Back:
             return webEngineView->property("canGoBack").toBool();
@@ -285,7 +287,7 @@ QString QnWebResourceWidget::webActionText(QWebEnginePage::WebAction action)
 // TODO: Reimplement using WebEngineView.action() after upgrade to Qt 5.12
 void QnWebResourceWidget::initWebActionText()
 {
-    static const std::vector<QWebEnginePage::WebAction> actions = {
+    static const auto actions = {
         QWebEnginePage::Back,
         QWebEnginePage::Forward,
         QWebEnginePage::Stop,

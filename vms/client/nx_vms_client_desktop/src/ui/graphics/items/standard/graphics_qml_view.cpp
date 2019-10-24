@@ -27,7 +27,7 @@
 
 namespace {
 
-const std::chrono::milliseconds kResizeTimeout(200);
+const auto kResizeTimeout = std::chrono::milliseconds(200);
 
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
@@ -55,15 +55,15 @@ QWidget* findWindowWidgetOf(QWidget* widget)
 
 Qt::WindowState resolveWindowState(Qt::WindowStates states)
 {
-    // No more than one of these 3 can be set
-    if (states & Qt::WindowMinimized)
+    // No more than one of these 3 can be set.
+    if (states.testFlag(Qt::WindowMinimized))
         return Qt::WindowMinimized;
-    if (states & Qt::WindowMaximized)
+    if (states.testFlag(Qt::WindowMaximized))
         return Qt::WindowMaximized;
-    if (states & Qt::WindowFullScreen)
+    if (states.testFlag(Qt::WindowFullScreen))
         return Qt::WindowFullScreen;
 
-    // No state means "windowed" - we ignore Qt::WindowActive
+    // No state means "windowed" - we ignore Qt::WindowActive.
     return Qt::WindowNoState;
 }
 
@@ -92,26 +92,28 @@ void remapInputMethodQueryEvent(QObject* object, QInputMethodQueryEvent* e)
     }
 }
 
-} // anonymous namespace
+} // namespace
 
 namespace nx::vms::client::desktop {
 
-class RenderControl : public QQuickRenderControl
+class RenderControl: public QQuickRenderControl
 {
     using base_type = QQuickRenderControl;
 
 public:
-    RenderControl(GraphicsQmlView* parent)
-        : QQuickRenderControl(parent), m_graphicsQmlView(parent), m_monitoredWidget(nullptr) {}
+    RenderControl(GraphicsQmlView* parent):
+        QQuickRenderControl(parent),
+        m_graphicsQmlView(parent)
+    {}
 
-    ~RenderControl();
+    virtual ~RenderControl() override;
 
     virtual QWindow* renderWindow(QPoint* offset) override;
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override
     {
-        switch(event->type())
+        switch (event->type())
         {
             case QEvent::Show:
             case QEvent::Move:
@@ -137,7 +139,7 @@ protected:
 
 private:
     GraphicsQmlView* m_graphicsQmlView;
-    QWidget* m_monitoredWidget;
+    QWidget* m_monitoredWidget = nullptr;
 };
 
 RenderControl::~RenderControl()
@@ -204,8 +206,8 @@ struct GraphicsQmlView::Private
     void scheduleUpdateSizes();
 };
 
-GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
-    : QGraphicsWidget(parent, wFlags), d(new Private(this))
+GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
+    QGraphicsWidget(parent, wFlags), d(new Private(this))
 {
     d->m_renderControl.reset(new RenderControl(this));
     connect(d->m_renderControl.data(), &QQuickRenderControl::renderRequested, this,
@@ -244,7 +246,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
     connect(d->m_qmlComponent.data(), &QQmlComponent::statusChanged, this,
         [this](QQmlComponent::Status status)
         {
-            switch(status)
+            switch (status)
             {
                 case QQmlComponent::Null:
                     emit statusChanged(QQuickWidget::Null);
@@ -266,7 +268,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags)
                     emit statusChanged(QQuickWidget::Loading);
                     return;
                 case QQmlComponent::Error:
-                    for (const auto& error : errors())
+                    for (const auto& error: errors())
                         NX_ERROR(this, "QML Error: %1", error.toString());
                     emit statusChanged(QQuickWidget::Error);
                     return;
@@ -515,7 +517,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     d->ensureFbo();
 
-    if(glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
+    if (glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
     {
         d->m_renderControl->polishItems();
         d->m_renderControl->sync();

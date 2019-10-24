@@ -27,21 +27,21 @@ class WebEnginePage: public QWebEnginePage
     using base_type = QWebEnginePage;
 
 public:
-
-    WebEnginePage(QWebEngineProfile* profile, QObject* parent, const WebEngineView& view)
-        : QWebEnginePage(profile, parent), m_view(view)
+    WebEnginePage(QWebEngineProfile* profile, QObject* parent, const WebEngineView& view):
+        QWebEnginePage(profile, parent),
+        m_view(view)
     {
         init();
     }
 
-    WebEnginePage(QObject* parent, const WebEngineView& view)
-        : QWebEnginePage(parent), m_view(view)
+    WebEnginePage(QObject* parent, const WebEngineView& view):
+        QWebEnginePage(parent),
+        m_view(view)
     {
         init();
     }
 
 protected:
-
     virtual bool certificateError(const QWebEngineCertificateError& certificateError) override
     {
         if (m_view.hasIgnoreSslErrors())
@@ -52,9 +52,12 @@ protected:
         return base_type::certificateError(certificateError);
     }
 
-    virtual bool acceptNavigationRequest(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame) override
+    virtual bool acceptNavigationRequest(
+        const QUrl& url,
+        NavigationType type,
+        bool isMainFrame) override
     {
-        if (m_view.isRedirectLinksToDesktop() && type == QWebEnginePage::NavigationTypeLinkClicked)
+        if (m_view.isRedirectLinksToDesktop() && type == NavigationTypeLinkClicked)
         {
             QDesktopServices::openUrl(url);
             return false;
@@ -63,7 +66,6 @@ protected:
     }
 
 private:
-
     void init()
     {
         action(QWebEnginePage::ViewSource)->setVisible(false);
@@ -75,9 +77,9 @@ private:
 
 } // namespace
 
-WebEngineView::WebEngineView(QWidget* parent)
-    : base_type(parent)
-    , d(new Private())
+WebEngineView::WebEngineView(QWidget* parent):
+    base_type(parent),
+    d(new Private())
 {
     setPage(new WebEnginePage(this, *this));
 }

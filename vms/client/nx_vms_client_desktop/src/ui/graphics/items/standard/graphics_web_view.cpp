@@ -38,10 +38,8 @@ namespace nx::vms::client::desktop {
 
 const QUrl GraphicsWebEngineView::kQmlSourceUrl("qrc:/qml/Nx/Controls/WebEngineView.qml");
 
-GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *parent)
-    : GraphicsQmlView(parent)
-    , m_status(kPageInitialLoadInProgress)
-    , m_canGoBack(false)
+GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *parent):
+    GraphicsQmlView(parent)
 {
     setProperty(Qn::NoHandScrollOver, true);
 
@@ -136,21 +134,30 @@ void GraphicsWebEngineView::addToJavaScriptWindowObject(const QString& name, QOb
 
 void GraphicsWebEngineView::setViewStatus(int status)
 {
-    switch(status)
+    // Should be mapped to non-public QQuickWebEngineView::LoadStatus.
+    enum WebEngineViewLoadStatus
     {
-        case 0: // WebEngineView.LoadStartedStatus
+        LoadStartedStatus,
+        LoadStoppedStatus,
+        LoadSucceededStatus,
+        LoadFailedStatus
+    };
+
+    switch (status)
+    {
+        case LoadStartedStatus:
             setStatus(kPageInitialLoadInProgress);
             emit loadStarted();
             break;
-        case 1: // WebEngineView.LoadStoppedStatus
+        case LoadStoppedStatus:
             setStatus(kPageLoaded);
             emit loadFinished(true);
             break;
-        case 2: // WebEngineView.LoadSucceededStatus
+        case LoadSucceededStatus:
             setStatus(kPageLoaded);
             emit loadFinished(true);
             break;
-        case 3: // WebEngineView.LoadFailedStatus
+        case LoadFailedStatus:
         default:
             setStatus(kPageLoadFailed);
             emit loadFinished(false);

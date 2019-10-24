@@ -22,10 +22,9 @@ using namespace nx::vms::client::desktop;
 
 QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
     QnSetupWizardDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , m_webView(nullptr)
-    , m_quickWidget(nullptr)
+    :
+    QObject(parent),
+    q_ptr(parent)
 {
     Q_Q(QnSetupWizardDialog);
 
@@ -133,9 +132,9 @@ void QnSetupWizardDialogPrivate::cancel()
 
     /* Remove 'accept' connection. */
     if (m_webView)
-        disconnect(m_webView->page(), nullptr, q, nullptr);
+        m_webView->page()->disconnect(q);
     else if (QQuickItem* webView = m_quickWidget->rootObject())
-        disconnect(webView, nullptr, q, nullptr);
+        webView->disconnect(q);
 
     /* Security fix to make sure we will never try to login further. */
     loginInfo = LoginInfo();

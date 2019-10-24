@@ -17,9 +17,7 @@
 namespace nx::vms::client::desktop {
 
 WebWidget::WebWidget(QWidget* parent, bool useActionsForLinks):
-    base_type(parent),
-    m_webView(nullptr),
-    m_webEngineView(nullptr)
+    base_type(parent)
 {
     QWidget* view = nullptr;
     if (ini().useWebEngine)

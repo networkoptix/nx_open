@@ -42,8 +42,8 @@ public:
 
 #define LoginInfo_Fields (cloudEmail)(cloudPassword)(localLogin)(localPassword)(savePassword)
 
-    QWebView* m_webView;
-    QQuickWidget* m_quickWidget;
+    QWebView* m_webView = nullptr;
+    QQuickWidget* m_quickWidget = nullptr;
     QUrl url;
     LoginInfo loginInfo;
 };
