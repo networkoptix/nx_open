@@ -7,8 +7,8 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
-#include <QtWebEngine>
-#include <QWebEngineSettings>
+#include <QtWebEngine/QtWebEngine>
+#include <QtWebEngineWidgets/QWebEngineSettings>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QSurfaceFormat>
 

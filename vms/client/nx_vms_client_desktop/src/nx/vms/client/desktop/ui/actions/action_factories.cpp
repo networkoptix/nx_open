@@ -4,8 +4,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 #include <QtWebKitWidgets/QWebPage>
-#include <QWebEnginePage>
-#include <QQuickItem>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtQuick/QQuickItem>
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>

@@ -1,24 +1,26 @@
 #include "graphics_qml_view.h"
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QQmlComponent>
-#include <QQmlEngine>
-#include <QQuickRenderControl>
-#include <QQuickWindow>
-#include <QQuickItem>
-#include <QOffscreenSurface>
-#include <QOpenGLFramebufferObject>
-#include <QOpenGLContext>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
+#include <QtWidgets/QOpenGLWidget>
+
+#include <QtQml/QQmlComponent>
+#include <QtQml/QQmlEngine>
+
+#include <QtQuick/QQuickRenderControl>
+#include <QtQuick/QQuickWindow>
+#include <QtQuick/QQuickItem>
+
+#include <QtGui/QOffscreenSurface>
+#include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions_1_5>
-#include <QOpenGLFunctions>
-#include <QOpenGLWidget>
+#include <QtGui/QOpenGLFunctions>
 
-#include <QGraphicsSceneHoverEvent>
-#include <QApplication>
-#include <QTimer>
-
-#include <QtMath>
+#include <QtCore/QTimer>
+#include <QtCore/QtMath>
 
 #include <client_core/client_core_module.h>
 #include <ui/workaround/gl_native_painting.h>

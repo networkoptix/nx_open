@@ -2,8 +2,8 @@
 
 #include <chrono>
 
-#include <QWebEngineView>
-#include <QWebEngineProfile>
+#include <QtWebEngineWidgets/QWebEngineView>
+#include <QtWebEngineWidgets/QWebEngineProfile>
 
 namespace nx::vms::client::desktop {
 

@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
-#include <QWidget>
-#include <QGraphicsWidget>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <ui/style/nx_style.h>
 

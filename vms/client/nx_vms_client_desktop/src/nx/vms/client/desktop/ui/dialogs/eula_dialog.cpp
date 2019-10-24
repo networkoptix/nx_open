@@ -8,7 +8,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>

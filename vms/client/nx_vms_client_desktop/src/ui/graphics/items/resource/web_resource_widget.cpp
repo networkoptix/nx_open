@@ -1,8 +1,8 @@
 #include "web_resource_widget.h"
 
-#include <QMetaObject>
-#include <QQuickItem>
-#include <QAction>
+#include <QtCore/QMetaObject>
+#include <QtQuick/QQuickItem>
+#include <QtWidgets/QAction>
 
 #include <core/resource/resource.h>
 

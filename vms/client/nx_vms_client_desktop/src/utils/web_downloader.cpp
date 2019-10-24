@@ -1,11 +1,11 @@
 #include "web_downloader.h"
 #include "reply_read_timeout.h"
 
-#include <QDir>
-#include <QAction>
-#include <QFile>
-#include <QTimer>
-#include <QWebEngineDownloadItem>
+#include <QtCore/QDir>
+#include <QtWidgets/QAction>
+#include <QtCore/QFile>
+#include <QtCore/QTimer>
+#include <QtWebEngineWidgets/QWebEngineDownloadItem>
 
 #include <platform/environment.h>
 

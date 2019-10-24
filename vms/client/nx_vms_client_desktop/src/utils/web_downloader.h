@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QFile>
-#include <QFileInfo>
-#include <QElapsedTimer>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QElapsedTimer>
 #include <QtNetwork/QNetworkReply>
 
 #include <nx/utils/uuid.h>

@@ -2,7 +2,7 @@
 
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QWebView>
-#include <QWebFrame>
+#include <QtWebKitWidgets/QWebFrame>
 #include <QtWidgets/QLabel>
 
 #include <ui/style/webview_style.h>

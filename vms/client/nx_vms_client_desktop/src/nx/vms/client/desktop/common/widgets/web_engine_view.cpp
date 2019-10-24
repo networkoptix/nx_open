@@ -1,14 +1,14 @@
 #include "web_engine_view.h"
 
-#include <QDesktopServices>
-#include <QWebEngineView>
-#include <QWebEngineContextMenuData>
-#include <QContextMenuEvent>
-#include <QWebEngineScript>
-#include <QWebEngineScriptCollection>
-#include <QMenu>
-#include <QTimer>
-#include <QEventLoop>
+#include <QtCore/QTimer>
+#include <QtCore/QEventLoop>
+#include <QtGui/QDesktopServices>
+#include <QtGui/QContextMenuEvent>
+#include <QtWidgets/QMenu>
+#include <QtWebEngineWidgets/QWebEngineView>
+#include <QtWebEngineWidgets/QWebEngineContextMenuData>
+#include <QtWebEngineWidgets/QWebEngineScript>
+#include <QtWebEngineWidgets/QWebEngineScriptCollection>
 
 using namespace nx::vms::client::desktop;
 

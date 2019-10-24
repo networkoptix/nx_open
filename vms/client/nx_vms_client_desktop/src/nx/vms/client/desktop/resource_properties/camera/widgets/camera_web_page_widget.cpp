@@ -11,8 +11,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
-#include <QWebEnginePage>
-#include <QWebEngineCookieStore>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineCore/QWebEngineCookieStore>
 
 #include <common/common_module.h>
 #include <ui/widgets/common/web_page.h>

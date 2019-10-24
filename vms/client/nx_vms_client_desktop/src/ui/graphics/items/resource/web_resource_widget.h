@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEnginePage>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>

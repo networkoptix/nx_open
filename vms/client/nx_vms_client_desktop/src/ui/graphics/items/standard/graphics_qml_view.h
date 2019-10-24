@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QGraphicsWidget>
-#include <QQuickWidget>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtQuickWidgets/QQuickWidget>
 
 class QQmlEngine;
 class QQuickWindow;

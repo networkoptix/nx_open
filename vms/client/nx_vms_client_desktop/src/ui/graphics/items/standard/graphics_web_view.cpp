@@ -3,7 +3,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWebKit/QWebHistory>
-#include <QQuickItem>
+#include <QtQuick/QQuickItem>
 
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/style/webview_style.h>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QTimer>
-#include <QNetworkReply>
+#include <QtCore/QTimer>
+#include <QtNetwork/QNetworkReply>
 
 namespace nx::vms::client::desktop {
 namespace utils {

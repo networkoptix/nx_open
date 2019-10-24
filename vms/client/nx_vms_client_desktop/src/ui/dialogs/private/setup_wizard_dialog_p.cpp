@@ -4,7 +4,7 @@
 
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebFrame>
-#include <QQuickItem>
+#include <QtQuick/QQuickItem>
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/common/web_page.h>
