@@ -465,8 +465,10 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
 
-        total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_camera_count)
-        total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_camera_count)
+        total_live_stream_count = math.ceil(
+            conf['liveStreamsPerCameraRatio'] * test_camera_count)
+        total_archive_stream_count = math.ceil(
+            conf['archiveStreamsPerCameraRatio'] * test_camera_count)
         report(
             f"Load test #{test_number}: "
             f"{test_camera_count} virtual camera(s), "
@@ -486,13 +488,16 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
 
-            def wait_test_cameras_discovered(timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
+            def wait_test_cameras_discovered(
+                timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
+
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
                     if test_camera_context.poll() is not None:
                         raise exceptions.TestCameraError(
-                            f'Test Camera process exited unexpectedly with code {test_camera_context.returncode}')
+                            f'Test Camera process exited unexpectedly with code '
+                            f'{test_camera_context.returncode}')
 
                     cameras = api.get_test_cameras()
 
@@ -527,7 +532,8 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                         raise exceptions.TestCameraError(
                             f"Failed enabling recording on camera {camera.id}.")
             except Exception as e:
-                raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
+                raise exceptions.TestCameraError(
+                    f"Not all virtual cameras were discovered or went live.", e) from e
 
             report(
                 f"    Waiting for the archives to be ready for streaming "
@@ -582,7 +588,8 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                     stream_id = rtsp_url_params['vms_benchmark_stream_id']
 
                     if stream_id not in streams_started_flags:
-                        raise exceptions.RtspPerfError(f'Cannot open video streams: unexpected stream id.')
+                        raise exceptions.RtspPerfError(
+                            f'Cannot open video streams: unexpected stream id.')
 
                     streams_started_flags[stream_id] = True
 
@@ -689,7 +696,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                                 issues.append(
                                     exceptions.TestCameraStreamingIssue(
                                         (
-                                            'Unexpected error during acquiring VMS Server CPU usage. ' +
+                                            'Unexpected error during acquiring VMS Server CPU usage. '
                                             'Can be caused by network issues or Server issues.'
                                         ),
                                         original_exception=box_poller_thread_exceptions_collector
@@ -777,16 +784,16 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                 if not streaming_ended_expectedly:
                     raise exceptions.TestCameraStreamingIssue(
-                        'Streaming video from the Server FAILED: ' +
-                        'the stream has unexpectedly finished; ' +
+                        'Streaming video from the Server FAILED: '
+                        'the stream has unexpectedly finished; '
                         'can be caused by network issues or Server issues.',
                         original_exception=issues
                     )
 
                 if time.time() - timestamp_s > 5:
                     raise exceptions.TestCameraStreamingIssue(
-                        'Streaming video from the Server FAILED: ' +
-                        'the stream has hung; ' +
+                        'Streaming video from the Server FAILED: '
+                        'the stream has hung; '
                         'can be caused by network issues or Server issues.')
 
                 try:
@@ -835,7 +842,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 max_allowed_lag_seconds = 5
                 if max_lag_s > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
-                        'Streaming video from the Server FAILED: ' +
+                        'Streaming video from the Server FAILED: '
                         f'the video lag {max_lag_s:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
@@ -995,8 +1002,8 @@ def _connect_to_box(conf, conf_file):
 
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
-                "sshpass is not on PATH" +
-                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
+                "sshpass is not on PATH"
+                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)."
                 f"Details for the error: {res.formatted_message()}"
             )
     box = BoxConnection(
@@ -1015,8 +1022,8 @@ def _connect_to_box(conf, conf_file):
 
         if not res.success:
             raise exceptions.SshHostKeyObtainingFailed(
-                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
-                'without typing a password.\n' +
+                'Sudo is not configured properly, check that user is root or can run `sudo true` '
+                'without typing a password.\n'
                 f"Details of the error: {res.formatted_message()}"
             )
     return box

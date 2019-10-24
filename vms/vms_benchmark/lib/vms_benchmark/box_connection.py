@@ -137,7 +137,7 @@ class BoxConnection:
                     raise exceptions.BoxCommandError(
                         "Cannot connect via SSH, "
                         "check that SSH service is running "
-                        "on port specified in boxSshPort setting (22 by default)")
+                        "on port specified in boxSshPort .conf setting (22 by default)")
         else:
             if run.returncode == 255:
                 if exc:
