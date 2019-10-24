@@ -33,7 +33,7 @@ public:
 
 public slots:
     void setSource(const QUrl& url);
-    void updateGeometry();
+    void updateWindowGeometry();
 
 signals:
     void statusChanged(QQuickWidget::Status status);

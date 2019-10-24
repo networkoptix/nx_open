@@ -54,7 +54,8 @@ QnWebResourceWidget::QnWebResourceWidget(
     else
     {
         addOverlayWidget(m_webEngineView, webParams);
-        connect(this, &QGraphicsWidget::geometryChanged, m_webEngineView, &GraphicsQmlView::updateGeometry);
+        connect(this, &QGraphicsWidget::geometryChanged,
+            m_webEngineView, &GraphicsQmlView::updateWindowGeometry);
     }
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);

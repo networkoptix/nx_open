@@ -310,7 +310,7 @@ void GraphicsQmlView::Private::scheduleUpdateSizes()
     m_resizeTimer->start();
 }
 
-void GraphicsQmlView::updateGeometry()
+void GraphicsQmlView::updateWindowGeometry()
 {
     d->scheduleUpdateSizes();
 }
