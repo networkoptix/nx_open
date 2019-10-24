@@ -652,7 +652,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                                     f"{frame_drops_per_type['live']} (live), "
                                     f"{frame_drops_per_type['archive']} (archive), "
                                     f"max stream lag: "
-                                    f"{max_lag_s['live']:.3f} s (live),"
+                                    f"{max_lag_s['live']:.3f} s (live), "
                                     f"{max_lag_s['archive']:.3f} s (archive).")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
