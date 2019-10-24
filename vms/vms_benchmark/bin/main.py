@@ -240,12 +240,23 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 10,
         },
+        "rtspPerfPrintStderr": {
+            "optional": True,
+            "type": 'boolean',
+            "default": False,
+        },
+        "rtspPerfLinesOutputFile": {
+            "optional": True,
+            "type": 'string',
+            "default": '',
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    stream_reader_runner.ini_rtsp_perf_print_stderr = ini['rtspPerfPrintStderr']
     test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
     test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
     test_camera_runner.ini_testcamera_debug = ini['testcameraDebug']
@@ -444,6 +455,13 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
     if swapped_before_bytes is None:
         report("Cannot obtain swap information.")
 
+    ini_rtsp_perf_lines_output_file = ini["rtspPerfLinesOutputFile"]
+    if ini_rtsp_perf_lines_output_file:
+        rtsp_perf_lines_output_file = open(ini_rtsp_perf_lines_output_file, "w")
+        report(f'INI: Going to log rtsp_perf stdout lines to {ini_rtsp_perf_lines_output_file}')
+    else:
+        rtsp_perf_lines_output_file = None
+
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
 
@@ -540,13 +558,16 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                     if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
-                    line = stream_reader_process.stdout.readline().decode('UTF-8')
+                    line = stream_reader_process.stdout.readline().decode('UTF-8').strip('\n')
+                    if rtsp_perf_lines_output_file:
+                        rtsp_perf_lines_output_file.write(line.strip() + '\n')
+
                     warning_prefix = 'WARNING: '
                     if line.startswith(warning_prefix):
                         raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
                     import re
-                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
+                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
                     if not match_res:
                         continue
 
@@ -677,9 +698,11 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                             streaming_ended_expectedly = True
                             break
 
-                        line = stream_reader_process.stdout.readline().decode('UTF-8')
+                        line = stream_reader_process.stdout.readline().decode('UTF-8').strip('\n')
+                        if rtsp_perf_lines_output_file:
+                            rtsp_perf_lines_output_file.write(line.strip() + '\n')
 
-                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
+                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
                         if not match_res:
                             continue
 

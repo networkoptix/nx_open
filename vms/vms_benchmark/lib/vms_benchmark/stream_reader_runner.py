@@ -6,8 +6,8 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-ini_rtsp_perf_bin = './testcamera/rtsp_perf'
-debug = False
+ini_rtsp_perf_bin: str
+ini_rtsp_perf_print_stderr: bool
 
 
 @contextmanager
@@ -76,7 +76,7 @@ def stream_reader_running(
         'stdout': subprocess.PIPE,
     }
 
-    if not debug:
+    if not ini_rtsp_perf_print_stderr:
         opts['stderr'] = subprocess.PIPE
 
     ld_library_path = None
