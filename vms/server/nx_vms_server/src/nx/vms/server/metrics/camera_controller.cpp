@@ -4,6 +4,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/text/archive_duration.h>
+#include <core/resource/media_server_resource.h>
 
 #include "helpers.h"
 
@@ -68,7 +69,7 @@ auto makeInfoProviders()
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
             "server",
-            [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+            [](const auto& r) { return Value(r->getParentServer()->getName()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "type",
@@ -205,7 +206,7 @@ auto makeStorageProviders()
             }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "hasArchiveCleanup",
+            "hasArchiveRotated",
             [](const auto& r) { return Value(r->hasArchiveRotated()); }
         )
     );

@@ -3,6 +3,7 @@
 #include "helpers.h"
 
 #include <media_server/media_server_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <QJsonArray>
 
 namespace nx::vms::server::metrics {
@@ -103,7 +104,12 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "server", [this](const auto&) { return Value(m_serverId); }
+                "server",
+                [this](const auto& r)
+                {
+                    const auto server = resourcePool()->getResourceById(QnUuid(m_serverId));
+                    return Value(server->getName());
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "state", [this](const auto& r) { return r->state(); }

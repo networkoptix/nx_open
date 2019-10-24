@@ -500,7 +500,7 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "and %isArchiveTooSmall %hasArchiveCleanup",
+                                "condition": "and %isArchiveTooSmall %hasArchiveRotated",
                                 "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
                             }
                         ]
