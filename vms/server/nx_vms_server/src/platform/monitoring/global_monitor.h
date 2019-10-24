@@ -38,7 +38,6 @@ public:
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
-    virtual QString partitionByPath(const QString &path) override;
     virtual std::chrono::milliseconds processUptime() const override;
     virtual std::chrono::milliseconds updatePeriod() const override;
     virtual void setServerModule(QnMediaServerModule* serverModule) override;
@@ -69,7 +68,6 @@ public:
     virtual QList<HddLoad> totalHddLoad() override { return {}; }
     virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
-    virtual QString partitionByPath(const QString &) override { return {}; }
     virtual std::chrono::milliseconds processUptime() const override { return processUptime_; }
     virtual int thisProcessThreads() override { return 1; }
 

@@ -224,11 +224,6 @@ QList<nx::vms::server::PlatformMonitor::PartitionSpace> GlobalMonitor::totalPart
     return m_monitorBase->totalPartitionSpaceInfo();
 }
 
-QString GlobalMonitor::partitionByPath(const QString &path) {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_monitorBase->partitionByPath(path);
-}
-
 int GlobalMonitor::thisProcessThreads()
 {
     return m_monitorBase->thisProcessThreads();
