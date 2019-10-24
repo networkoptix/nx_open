@@ -154,6 +154,7 @@ public:
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
         ALLOW_MT_DECODING,
+        FORCE_MT_DECODING,
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
@@ -260,7 +261,12 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
+
+        // Disable mt decoding if false, enable auto select if true
         QN_DECLARE_R_PROPERTY(bool,                         allowMtDecoding,                                    ALLOW_MT_DECODING,          true)
+
+        // Always force MT decoding if true
+        QN_DECLARE_R_PROPERTY(bool,                         forceMtDecoding,                                    FORCE_MT_DECODING,          true)
 
         QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
     QN_END_PROPERTY_STORAGE()

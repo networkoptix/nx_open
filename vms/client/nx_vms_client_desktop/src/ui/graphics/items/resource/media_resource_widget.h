@@ -79,6 +79,11 @@ public:
     virtual ~QnMediaResourceWidget();
 
     /**
+     * Disconnect all data changes handlers to avoid unneeded processing while saving layout state.
+     */
+    void beforeDestroy();
+
+    /**
      * @return Resource associated with this widget.
      */
     const QnMediaResourcePtr& resource() const;

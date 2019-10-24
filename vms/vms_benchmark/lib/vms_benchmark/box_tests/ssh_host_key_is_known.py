@@ -24,7 +24,7 @@ class SshHostKeyIsKnown:
                     reason, error_messages)
                 raise SshHostKeyObtainingFailed("Unable to obtain ssh host key of the box.")
 
-            host_key = 'unneeded'
+            host_key = None
 
             if error_messages and error_messages[-1] == 'Connection abandoned.':
                 if len(error_messages) < 2:
@@ -41,4 +41,4 @@ class SshHostKeyIsKnown:
 
             return host_key
         else:
-            return 'unneeded'
+            return None

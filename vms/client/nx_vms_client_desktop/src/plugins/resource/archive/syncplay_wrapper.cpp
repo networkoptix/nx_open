@@ -14,7 +14,6 @@
 #include <core/resource/security_cam_resource.h>
 
 #include <nx/vms/client/desktop/ini.h>
-#include <utils/common/delayed.h>
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -69,6 +68,7 @@ public:
 
     QList<ReaderInfo> readers;
     mutable QnMutex timeMutex;
+    mutable QnMutex readerListMutex;
 
     bool blockSetSpeedSignal;
     qint64 lastJumpTime;
@@ -206,16 +206,16 @@ void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    QnMutexLocker lock( &d->timeMutex );
-    setJumpTime(skipTime ? skipTime : mksec);
-    bool rez = false;
-    foreach(const ReaderInfo& info, d->readers)
+    QnMutexLocker lock(&d->readerListMutex);
     {
-        if (!info.reader->isEnabled())
-            continue;
-        info.reader->setNavDelegate(0);
-        rez |= info.reader->jumpTo(mksec, skipTime);
-        info.reader->setNavDelegate(this);
+        QnMutexLocker lock(&d->timeMutex);
+        setJumpTime(skipTime ? skipTime : mksec);
+    }
+    bool rez = false;
+    for(const ReaderInfo& info: d->readers)
+    {
+        if (info.reader->isEnabled())
+            rez |= info.reader->jumpToEx(mksec, skipTime, nullptr, /*useDelegate*/ false);
     }
     return rez;
 }
@@ -284,7 +284,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
 
     qint64 currentTime = getDisplayedTime();
 
-    QnMutexLocker lock( &d->timeMutex );
+    QnMutexLocker lock1(&d->readerListMutex);
+    QnMutexLocker lock2(&d->timeMutex);
 
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     //reader->setEnabled(d->enabled);
@@ -507,7 +508,8 @@ void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveStreamReader
 void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    QnMutexLocker lock( &d->timeMutex );
+    QnMutexLocker lock1(&d->readerListMutex);
+    QnMutexLocker lock2(&d->timeMutex);
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
         if (i->reader->getArchiveDelegate() == value)
@@ -623,12 +625,13 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         }
 
         if (d->enabled) {
-            if (allReady)
-            {
-                executeDelayed(
-                    [ref = QPointer(this)]()
-                    { if (ref.data()) ref->jumpToLive(); },
-                    /*delay*/ 0, qApp->thread());
+            if (allReady) {
+                bool callSync = QThread::currentThread() == qApp->thread();
+                lock.unlock();
+                if (callSync)
+                    jumpTo(DATETIME_NOW, 0);
+                else
+                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
             }
         }
         else {
@@ -785,7 +788,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
 void QnArchiveSyncPlayWrapper::disableSync()
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    QnMutexLocker lock( &d->timeMutex );
+    QnMutexLocker lock1(&d->readerListMutex);
+    QnMutexLocker lock2(&d->timeMutex);
     if (!d->enabled)
         return;
     d->enabled = false;
@@ -803,7 +807,8 @@ void QnArchiveSyncPlayWrapper::disableSync()
 void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    QnMutexLocker lock( &d->timeMutex );
+    QnMutexLocker lock1(&d->readerListMutex);
+    QnMutexLocker lock2(&d->timeMutex);
     if (d->enabled)
         return;
     d->enabled = true;

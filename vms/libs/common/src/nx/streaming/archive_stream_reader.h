@@ -47,7 +47,7 @@ public:
     virtual void directJumpToNonKeyFrame(qint64 mksec) override;
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
-    bool jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime);
+    virtual bool jumpToEx(qint64 mksec, qint64 skipTime, qint64* outJumpTime, bool useDelegate = true) override;
 
     virtual void setSkipFramesToTime(qint64 skipTime) override;
     virtual void nextFrame() override;
@@ -188,7 +188,6 @@ private:
 
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     std::shared_ptr<MetadataMultiplexer> m_motionConnection[CL_MAX_CHANNELS];
-    bool m_pausedStart;
     nx::vms::api::StreamDataFilters m_streamDataFilter;
     nx::vms::api::StreamDataFilters m_prevStreamDataFilter;
     bool m_outOfPlaybackMask;

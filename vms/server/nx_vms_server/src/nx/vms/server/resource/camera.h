@@ -265,6 +265,7 @@ private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
     QSharedPointer<QnLiveStreamProvider> findReader(nx::vms::api::StreamIndex streamIndex);
+    void fixInputPortMonitoringSafe();
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 

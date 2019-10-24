@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.156",
+    "version": "1.0.1.160",
     "data": [
         {
             "keys": [
@@ -917,7 +917,7 @@
                 "ds-7716ni-i4/16p|network video recorder",
                 "2d|eli-sip-eb21-4r",
                 "dahua|ipc-hdbw13a0e",
-                "hangzhou hikvision digital technology co., ltd|ds-7616ni-i2",
+                "hangzhou hikvision digital technology co., ltd|ds-7616*",
                 "zkd408a|embedded net dvr",
                 "zkd608a|embedded net dvr",
                 "mam-6me1012mta|encoder2",
@@ -935,7 +935,7 @@
                 "ds-7204hghi-f1/n|embedded net dvr",
                 "zkd408b|embedded net dvr",
                 "dahua|dhi-nvr4416-16p-4ks2",
-                "hangzhou hikvision digital technology co., ltd|ds-8632ni-st",
+                "hangzhou hikvision digital technology co., ltd|ds-8632*",
                 "dnr708|general",
                 "onvif|hq-thd0802a-h",
                 "dahua|dhi-nvr5232-8p-4ks2",
@@ -944,7 +944,27 @@
                 "dahua|dh-xvr7216a-4kl-x",
                 "lnr632|general",
                 "dahua|x21a3e",
-                "lnr616|general"
+                "lnr616|general",
+                "dh-nvr616dr-64-4k|private",
+                "dvtel|en-216",
+                "hdcvi_1008_-_gerao_2|intelbras",
+                "hdcvi_1032|intelbras",
+                "dw-enhd16|acm",
+                "dw-enhd16|dv",
+                "dw-enhd16|vlr-enc-16",
+                "moxa inc.|vport 364a-t",
+                "onvif|d-hktvi5mp908",
+                "ds-7716ni-sp/16|embedded net dvr",
+                "dahua|dhi-nvs0404hdc",
+                "ds-7216hghi-sh/a|embedded net dvr",
+                "onvif_encoder|vlr-enc-16",
+                "axis|p7304",
+                "ds-7204huhi-k1/p|thuis",
+                "os103t|onvif",
+                "dahua|nvr5216-8p-i",
+                "hangzhou hikvision digital technology co., ltd|ds-7116*",
+                "rvi-r16ma|rvi_dvr",
+                "scw|nvr-imp32"
             ],
             "analogEncoder": true
         },
@@ -2186,7 +2206,8 @@
             "keys": [
                 "Dahua*|*",
                 "Honewell|H4W4PER2",
-                "Honeywell*|H4W4PER2"
+                "Honeywell*|H4W4PER2",
+                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest"
             ],
             "trustToVideoSourceSize": false
         },
@@ -3265,7 +3286,13 @@
             "dahua|ipc-pdb4830-b360",
             "hikvision|ds-2cd6984g0-ihs",
             "20c-h4a-4mh-360|20c-h4a-4mh-360*",
-            "avigilon|20c-h4a-4mh-360*"
+            "avigilon|20c-h4a-4mh-360*",
+            "dahua|dh-ipc-hdbw4231fn-e2-m",
+            "wv-x8570|panasonic_wv-x8570",
+            "onvif|hnc6d24-izs",
+            "dahua|psdw5631s-b360",
+            "onvif|cmip7553w4-sz",
+            "cellinx|nbm2-h6"
             ],
             "canShareLicenseGroup": true
         },

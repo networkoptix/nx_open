@@ -7,6 +7,8 @@ from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.config import ConfigParser
 from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError
 
+ini_ssh_service_command_timeout_s: int
+
 
 class VmsScanner:
     class Vms:
@@ -35,7 +37,7 @@ class VmsScanner:
                 if self.linux_distribution.with_systemd:
                     self.device.sh(
                         f'systemctl {command} {self.customization}-mediaserver',
-                        timeout=30,
+                        timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
                         stderr=None,
@@ -44,7 +46,7 @@ class VmsScanner:
                 else:
                     self.device.sh(
                         f'/etc/init.d/{self.customization}-mediaserver {command}',
-                        timeout=30,
+                        timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
                         stderr=None,
@@ -90,12 +92,12 @@ class VmsScanner:
                 if len([v for k, v in storages.items() if v['point'] == self.ini_dir]) != 0:
                     self.device.sh(f'umount "{self.ini_dir}"', exc=True, su=True)
                 self.device.sh(
-                    'rm -r '
+                    'rm -rf '
                     f'"$(dirname "$(mktemp --dry-run)")"/tmp.*"{self._tmp_dir_suffix}" '
                     f'"{self.ini_dir}"',
                     exc=True, su=True)
             except Exception:
-                logging.exception("Exception while dismounting ini dirs")
+                logging.exception("Exception while dismounting ini dirs:")
 
         def override_ini_config(self, features):
             self.device.sh(f'install -m 755 -o {self.uid} -d "{self.ini_dir}"', exc=True, su=True)

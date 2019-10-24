@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import datetime
 import itertools
 import logging
 import math
@@ -13,6 +12,8 @@ from typing import List, Tuple, Optional
 from vms_benchmark.camera import Camera
 
 # This block ensures that ^C interrupts are handled quietly.
+from vms_benchmark.exceptions import VmsBenchmarkError, VmsBenchmarkIssue
+
 try:
     def exit_handler(signum, _frame):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -51,7 +52,7 @@ from vms_benchmark.box_connection import BoxConnection
 from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.vms_scanner import VmsScanner
 from vms_benchmark.server_api import ServerApi
-from vms_benchmark import test_camera_runner
+from vms_benchmark import test_camera_runner, vms_scanner, box_connection, box_platform
 from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
 from vms_benchmark import box_tests
@@ -219,19 +220,39 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 40,
         },
+        "sshCommandTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 5,
+        },
+        "sshServiceCommandTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 30,
+        },
+        "sshGetFileContentTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 30,
+        },
+        "sshGetProcMeminfoTimeoutS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
-    if ini['testcameraBin']:
-        test_camera_runner.binary_file = ini['testcameraBin']
-    if ini['rtspPerfBin']:
-        stream_reader_runner.binary_file = ini['rtspPerfBin']
-    if ini['testFileHighResolution']:
-        test_camera_runner.test_file_high_resolution = ini['testFileHighResolution']
-    if ini['testFileLowResolution']:
-        test_camera_runner.test_file_low_resolution = ini['testFileLowResolution']
-    test_camera_runner.debug = ini['testcameraDebug']
+    test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
+    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
+    test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
+    test_camera_runner.ini_testcamera_debug = ini['testcameraDebug']
+    box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
+    box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
+    vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
+    box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
 
     if ini.ORIGINAL_OPTIONS is not None:
         report(f"Overriding default options via {ini_file}:")
@@ -244,10 +265,6 @@ def load_configs(conf_file, ini_file):
         report(f"    {k}={v}")
 
     return conf, ini
-
-
-def log_exception(context_name):
-    logging.exception(f'Exception yielding {context_name}')
 
 
 def box_combined_cpu_usage(box):
@@ -306,10 +323,10 @@ def get_cumulative_swap_bytes(box):
     except ValueError:
         return None
     try:
-        kilobytes_swapped = data['pgpgin']  # pswpin is the number of pages.
+        pages_swapped = data['pswpout']
     except KeyError:
         return None
-    return kilobytes_swapped * 1024
+    return pages_swapped * 4096  # All modern OSes operate with 4k pages.
 
 
 def box_uptime(box):
@@ -336,11 +353,10 @@ def box_tx_rx_errors(box):
     return tx_errors + rx_errors
 
 
-# TODO: #alevenkov: Make a better solution; fix multiple lines in log when using end=''.
-def report(message, end='\n'):
-    print(message, end=end, flush=True)
+def report(message):
+    print(message, flush=True)
     if message.strip():
-        logging.info(message.strip())
+        logging.info('[report] ' + message.strip('\n'))
 
 
 # Refers to the log file in the messages to the user. Filled after determining the log file path.
@@ -429,13 +445,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
-        ram_available_bytes = box_platform.ram_available_bytes()
-        ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
-
-        ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
-        if ram_available_bytes and ram_available_bytes < ram_required_bytes:
-            raise exceptions.InsufficientResourcesError(
-                f"Not enough free RAM on the box for {test_camera_count} cameras.")
+        ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
 
         total_live_stream_count = math.ceil(conf['liveStreamsPerCameraRatio'] * test_camera_count)
         total_archive_stream_count = math.ceil(conf['archiveStreamsPerCameraRatio'] * test_camera_count)
@@ -536,7 +546,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                         raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
                     import re
-                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
+                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
                     if not match_res:
                         continue
 
@@ -644,7 +654,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 try:
                     while time.time() - streaming_test_started_at_s < streaming_duration_mins * 60:
                         if stream_reader_process.poll() is not None:
-                            raise exceptions.RtspPerfError("Streaming unxpectedly ended.")
+                            raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
 
                         if not box_poller_thread.is_alive():
                             if (
@@ -669,7 +679,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                         line = stream_reader_process.stdout.readline().decode('UTF-8')
 
-                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us$', line.strip())
+                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line.strip())
                         if not match_res:
                             continue
 
@@ -757,8 +767,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                         'can be caused by network issues or Server issues.')
 
                 try:
-                    ram_available_bytes = box_platform.ram_available_bytes()
-                    ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
+                    ram_free_bytes = box_platform.obtain_ram_free_bytes()
                 except exceptions.VmsBenchmarkError as e:
                     issues.append(exceptions.UnableToFetchDataFromBox(
                         'Unable to fetch box RAM usage',
@@ -826,17 +835,27 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
     report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
 
 
+def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
+    ram_free_bytes = box_platform.obtain_ram_free_bytes()
+    ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
+
+    if ram_free_bytes < ram_required_bytes:
+        raise exceptions.InsufficientResourcesError(
+            f"Not enough free RAM on the box for {test_camera_count} cameras.")
+
+    return ram_free_bytes
+
+
 def _test_vms(api, box, box_platform, conf, ini, vms):
-    ram_free_bytes = box_platform.ram_available_bytes()
-    if ram_free_bytes is None:
-        ram_free_bytes = box_platform.ram_free_bytes()
-    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
+    ram_free_bytes = box_platform.obtain_ram_free_bytes()
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB "
+        f"of {to_megabytes(box_platform.ram_bytes)} MB")
     _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
         if cameras is not None:
             break
-        report(f"Attempt #{i}to get camera list")
+        report(f"Attempt #{i} to get camera list")
         time.sleep(i)
     if cameras is not None:
         for camera in cameras:
@@ -850,7 +869,7 @@ def _test_vms(api, box, box_platform, conf, ini, vms):
 
 
 def _obtain_box_platform(box, linux_distribution):
-    box_platform = BoxPlatform.gather(box, linux_distribution)
+    box_platform = BoxPlatform.create(box, linux_distribution)
 
     report(
         "\nBox properties detected:\n"
@@ -864,7 +883,8 @@ def _obtain_box_platform(box, linux_distribution):
         f"    Arch: {box_platform.arch}\n"
         f"    Number of CPUs: {box_platform.cpu_count}\n"
         f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
-        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)\n"
+        f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB "
+        f"({to_megabytes(box_platform.obtain_ram_free_bytes())} MB free)\n"
         "    File systems:\n"
         + '\n'.join(
             f"        {storage['fs']} "
@@ -879,15 +899,17 @@ def _obtain_box_platform(box, linux_distribution):
 
 def _check_time_diff(box, ini):
     box_time_output = box.eval('date +%s.%N')
+    if not box_time_output:
+        raise exceptions.BoxCommandError('Unable to get current box time using the `date` command.')
     try:
         box_time = float(box_time_output.strip())
     except ValueError:
-        raise exceptions.BoxStateError("Cannot parse output of the date command")
+        raise exceptions.BoxStateError("Cannot parse output of the `date` command.")
     host_time = time.time()
     logging.info(f"Time difference (box time minus host time): {box_time - host_time:.3f} s.")
     if abs(box_time - host_time) > ini['timeDiffThresholdSeconds']:
         raise exceptions.BoxStateError(
-            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s")
+            f"The box time differs from the host time by more than {ini['timeDiffThresholdSeconds']} s.")
 
 
 def _obtain_running_vms(box, linux_distribution):
@@ -961,7 +983,9 @@ def _connect_to_box(conf, conf_file):
         port=conf['boxSshPort'],
         conf_file=conf_file
     )
-    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    if host_key is not None:
+        box.supply_host_key(host_key)
     box.obtain_connection_info()
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
@@ -988,10 +1012,9 @@ def _connect_to_box(conf, conf_file):
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
-    print(f"VMS Benchmark started; logging to {log_file_ref}.", flush=True)
-    print('', flush=True)
-    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG)
-    logging.info(f'VMS Benchmark started at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG,
+        format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    report(f"VMS Benchmark started; logging to {log_file_ref}.\n")
 
     conf, ini = load_configs(conf_file, ini_file)
 
@@ -1007,18 +1030,10 @@ def main(conf_file, ini_file, log_file):
         _test_api(api)
 
         storages = _get_storages(api)
-
-        report('Stopping server...')
-        vms.stop(exc=True)
-        report('Server stopped.')
-
+        _stop_vms(vms)
         _override_ini_config(vms, ini)
         _clear_storages(box, storages)
-
-        report('Starting Server...')
-        vms.start(exc=True)
-        vms = _obtain_restarted_vms(box, linux_distribution)
-        report('Server started successfully.')
+        vms = _restart_vms(box, linux_distribution, vms)
 
         _test_vms(api, box, box_platform, conf, ini, vms)
 
@@ -1026,7 +1041,19 @@ def main(conf_file, ini_file, log_file):
     finally:
         vms.dismount_ini_dirs()
 
-    return 0
+
+def _restart_vms(box, linux_distribution, vms):
+    report('Starting Server...')
+    vms.start(exc=True)
+    vms = _obtain_restarted_vms(box, linux_distribution)
+    report('Server started.')
+    return vms
+
+
+def _stop_vms(vms):
+    report('Stopping server...')
+    vms.stop(exc=True)
+    report('Server stopped.')
 
 
 def _clear_storages(box, storages: List[Storage]):
@@ -1052,7 +1079,7 @@ def _get_cameras_reliably(api):
     return cameras
 
 
-def nx_format_exception(exception):
+def _format_exception(exception):
     if isinstance(exception, ValueError):
         return f"Invalid value: {exception}"
     elif isinstance(exception, KeyError):
@@ -1066,56 +1093,55 @@ def nx_format_exception(exception):
         return str(exception)
 
 
-def nx_print_exception(exception, recursive_level=0):
-    string_indent = '  ' * recursive_level
-    if isinstance(exception, exceptions.VmsBenchmarkError):
-        print(f"{string_indent}{str(exception)}", file=sys.stderr, flush=True)
-        if isinstance(exception, exceptions.VmsBenchmarkIssue):
-            for e in exception.sub_issues:
-                nx_print_exception(e, recursive_level=recursive_level + 2)
+def _do_report_exception(exception, recursive_level, prefix=''):
+    indent = '    ' * recursive_level
+    if isinstance(exception, VmsBenchmarkError):
+        report(f"{indent}{prefix}{str(exception)}")
+        if isinstance(exception, VmsBenchmarkIssue):
+            for sub_issue in exception.sub_issues:
+                _do_report_exception(sub_issue, recursive_level=recursive_level + 1)
         if exception.original_exception:
-            print(f'{string_indent}Caused by:', file=sys.stderr, flush=True)
+            report(f'{indent}Caused by:')
             if isinstance(exception.original_exception, list):
-                for e in exception.original_exception:
-                    nx_print_exception(e, recursive_level=recursive_level + 2)
+                sub_exceptions = exception.original_exception
             else:
-                nx_print_exception(exception.original_exception, recursive_level=recursive_level + 2)
+                sub_exceptions = [exception.original_exception]
+            for sub_exception in sub_exceptions:
+                _do_report_exception(sub_exception, recursive_level=recursive_level + 1)
     else:
-        print(
-            f'{string_indent}{nx_format_exception(exception)}'
-            if recursive_level > 0
-            else f'{string_indent}ERROR: {nx_format_exception(exception)}',
-            file=sys.stderr, flush=True,
-        )
+        report(f'{indent}{prefix or "ERROR: "}{_format_exception(exception)}')
+
+
+def report_exception(context_name, exception, note=None):
+    prefix = '\n' + context_name + ': '
+    _do_report_exception(exception, recursive_level=0, prefix=prefix)
+    if note:
+        report(f'\nNOTE: {note}')
+    logging.exception(f'Exception yielding the above {context_name}:')
 
 
 if __name__ == '__main__':
     try:
         try:
-            sys.exit(main())
-        except (exceptions.VmsBenchmarkIssue, urllib.error.HTTPError) as e:
-            print(f'ISSUE: ', file=sys.stderr, end='', flush=True)
-            nx_print_exception(e)
-            print('', file=sys.stderr, flush=True)
-            print('NOTE: Can be caused by network issues, or poor performance of the box or the host.', file=sys.stderr, flush=True)
-            log_exception('ISSUE')
-        except exceptions.VmsBenchmarkError as e:
-            print(f'ERROR: ', file=sys.stderr, end='', flush=True)
-            nx_print_exception(e)
-            if log_file_ref:
-                print(f'\nNOTE: Technical details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
-            log_exception('ERROR')
+            main()
+            logging.info(f'VMS Benchmark finished successfully.')
+            sys.exit(0)
+        except (VmsBenchmarkIssue, urllib.error.HTTPError) as e:
+            report_exception('ISSUE', e,
+                'Can be caused by network issues, or poor performance of the box or the host.')
+        except VmsBenchmarkError as e:
+            report_exception('ERROR', e,
+                f'Technical details may be available in {log_file_ref}.' if log_file_ref else None)
         except Exception as e:
-            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr, flush=True)
-            if log_file_ref:
-                print(f'\nNOTE: Details may be available in {log_file_ref}.', file=sys.stderr, flush=True)
-            log_exception('UNEXPECTED ERROR')
-        finally:
-            logging.info(f'VMS Benchmark finished at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}.')
+            report_exception(f'UNEXPECTED ERROR', e,
+                f'Details may be available in {log_file_ref}.' if log_file_ref else None)
+
+        logging.info(f'VMS Benchmark finished with an exception.')
     except Exception as e:
-        print(f'INTERNAL ERROR: {e}', file=sys.stderr, flush=True)
-        print(f'\nPlease send the complete output ' +
-            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.',
-            file=sys.stderr, flush=True)
+        sys.stderr.write(
+            f'INTERNAL ERROR: {e}\n'
+            f'\n'
+            f'Please send the console output ' +
+            (f'and {log_file_ref} ' if log_file_ref else '') + 'to the support team.\n')
 
     sys.exit(1)

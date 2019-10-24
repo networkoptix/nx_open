@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-binary_file = './testcamera/rtsp_perf'
+ini_rtsp_perf_bin = './testcamera/rtsp_perf'
 debug = False
 
 
@@ -21,7 +21,7 @@ def stream_reader_running(
     vms_port
 ):
     args = [
-        binary_file,
+        ini_rtsp_perf_bin,
         '-u',
         user,
         '-p',
@@ -81,7 +81,7 @@ def stream_reader_running(
 
     ld_library_path = None
     if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(ini_rtsp_perf_bin)
         opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.
@@ -95,7 +95,7 @@ def stream_reader_running(
     try:
         proc = subprocess.Popen([str(arg) for arg in args], **opts)
     except Exception as exception:
-        raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
+        raise exceptions.RtspPerfError(f"Unable to start rtsp_perf: {str(exception)}")
 
     try:
         yield [proc, streams]

@@ -4,12 +4,17 @@
 
 #include <set>
 #include <map>
+#include <memory>
+
+#include <QtCore/QString>
+#include <QtNetwork/QAuthenticator>
 
 #include <utils/common/connective.h>
 #include <common/common_globals.h>
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnVmax480ResourceProxy: public Connective<QObject>, public QnCommonModuleAware
 {

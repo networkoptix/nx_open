@@ -20,6 +20,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
 #include <nx/vms/server/resource/multicast_parameters.h>
+#include <utils/common/delayed.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -39,11 +40,19 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]()
-    {
-        QnMutexLocker lk(&m_initMutex);
-        fixInputPortMonitoring();
-    });
+    connect(this, &QnResource::initializedChanged,
+        [this]()
+        {
+            const auto weakRef = toSharedPointer(this).toWeakRef();
+            executeDelayed(
+                [weakRef, this]()
+                {
+                    if (const auto device = weakRef.toStrongRef())
+                        this->fixInputPortMonitoringSafe();
+                },
+                /*delay*/ 0,
+                this->serverModule()->thread());
+        });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -436,6 +445,11 @@ void Camera::initializationDone()
     base_type::initializationDone();
 
     // TODO: Find out is it's ever required, monitoring resource state change should be enough!
+    fixInputPortMonitoringSafe();
+}
+
+void Camera::fixInputPortMonitoringSafe()
+{
     QnMutexLocker lk(&m_initMutex);
     fixInputPortMonitoring();
 }

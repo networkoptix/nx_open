@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include <QtCore/QPointer>
 #include <QtGui/QPixmap>
 #include <QtGui/QIcon>
 #include <QtGui/QOpenGLBuffer>
@@ -139,10 +140,13 @@ private:
 
     using TexturePtr = QSharedPointer<QOpenGLTexture>;
     using TextureHash = QHash<StateFlags, TexturePtr>;
+    using TexturesForRemove = std::vector<TextureHash>;
 
     bool safeBindTexture(StateFlags flags);
 
     TextureHash m_textures;
+    TexturesForRemove m_texturesForRemove;
+    QPointer<QOpenGLWidget> m_glWidget;
 
     std::array<QPixmap, MaxState + 1> m_pixmaps;
 
