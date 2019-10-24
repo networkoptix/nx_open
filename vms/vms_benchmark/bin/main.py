@@ -250,6 +250,11 @@ def load_configs(conf_file, ini_file):
             "type": 'string',
             "default": '',
         },
+        "archiveReadingPosS": {
+            "optional": True,
+            "type": 'integer',
+            "default": 15,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -540,6 +545,9 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 f"({ini['sleepBeforeCheckingArchiveSeconds']} s)...")
             time.sleep(ini['sleepBeforeCheckingArchiveSeconds'])
 
+            archive_start_time_ms = api.get_archive_start_time_ms(cameras[0].id)
+            archive_read_pos_ms_utc = archive_start_time_ms + ini['archiveReadingPosS'] * 1000
+
             report('    Streaming test...')
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
@@ -550,6 +558,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 password=conf['vmsPassword'],
                 box_ip=box.ip,
                 vms_port=vms.port,
+                archive_read_pos_ms_utc=archive_read_pos_ms_utc,
             )
             with stream_reader_context_manager as stream_reader_context:
                 stream_reader_process = stream_reader_context[0]

@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import sys
 import urllib.request
 from collections import namedtuple
 from typing import List
@@ -281,3 +282,44 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    def get_archive_start_time_ms(self, camera_id: str) -> int:
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}"
+            f"/ec2/recordedTimePeriods?cameraId={camera_id}")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = self.get_request(request)
+
+        result = self.Response(response.code)
+
+        if not (200 <= response.code < 300):
+            raise exceptions.ServerApiError(
+                "Unable to request recorded periods from the Server: "
+                f"/ec2/recordedTimePeriods returned HTTP code {response.code}.")
+
+        try:  # Any json deserialization errors and missing json object keys will be caught.
+            result.payload = json.loads(response.body)
+            error_code = result.payload['error']
+            error_string = result.payload['errorString']
+            if int(error_code) != 0:
+                raise exceptions.ServerApiError(  # Will be caught below in this method.
+                    f'API method reported error {error_code}: {error_string}')
+            reply: list = result.payload['reply']
+            min_start_time_ms = sys.maxsize
+            for server in reply:
+                periods: list = server['periods']
+                for period in periods:
+                    start_time_ms = int(period['startTimeMs'])
+                    if start_time_ms < min_start_time_ms:
+                        min_start_time_ms = start_time_ms
+            if min_start_time_ms == sys.maxsize:
+                raise exceptions.ServerApiError(  # Will be caught below in this method.
+                    f'No recorded periods returned.')
+
+            logging.info(f'Archive start time for camera {camera_id}: {min_start_time_ms} ms.')
+            return min_start_time_ms
+        except Exception:
+            logging.exception('Exception while parsing the response of /ec2/recordedTimePeriods:')
+            raise exceptions.ServerApiError(
+                "Unable to request recorded periods from the Server: "
+                f"Invalid response of /ec2/recordedTimePeriods.")

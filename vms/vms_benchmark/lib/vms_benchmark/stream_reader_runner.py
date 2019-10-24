@@ -18,7 +18,8 @@ def stream_reader_running(
     user,
     password,
     box_ip,
-    vms_port
+    vms_port,
+    archive_read_pos_ms_utc: int,
 ):
     args = [
         ini_rtsp_perf_bin,
@@ -54,7 +55,7 @@ def stream_reader_running(
         }
 
         if opts.get('type', 'live') == 'archive':
-            params['pos'] = 0
+            params['pos'] = archive_read_pos_ms_utc
 
         params['stream'] = 0  # Request primary stream.
 
