@@ -10,18 +10,6 @@ ini_ssh_command_timeout_s: int
 ini_ssh_get_file_content_timeout_s: int
 
 
-def log_remote_command(command):
-    logging.info(f'Executing remote command:\n    {command}')
-
-
-def log_remote_command_status(status_code):
-    if status_code == 0:
-        result_log_message = 'succeeded.'
-    else:
-        result_log_message = f'failed with exit status {status_code}.'
-    logging.info(f'Remote command {result_log_message}')
-
-
 class BoxConnection:
     class BoxConnectionResult:
         def __init__(self, return_code, message=None, command=None):
@@ -55,6 +43,7 @@ class BoxConnection:
                 *(('-pw', password) if password else ()),
                 '-batch',
             ]
+        logging.info("SSH command:\n    " + '\n    '.join(self.ssh_args))
         self.ip = None
         self.local_ip = None
         self.is_root = False
@@ -64,6 +53,7 @@ class BoxConnection:
     def supply_host_key(self, host_key):
         assert self.ssh_args[0] == 'plink'  # ssh: StrictHostKeyChecking=no
         self.ssh_args += ['-hostkey', host_key]
+        logging.info("SSH command:\n    " + '\n    '.join(self.ssh_args))
 
     def obtain_connection_info(self):
         ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
@@ -97,7 +87,11 @@ class BoxConnection:
            su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
         command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
-        log_remote_command(command_wrapped)
+        logging.info(
+            f"Executing remote command:\n"
+            f"    {command_wrapped}\n"
+            f"    stdin:\n"
+            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'NO'}")
 
         opts = {}
 
@@ -122,7 +116,12 @@ class BoxConnection:
             else:
                 return self.BoxConnectionResult(None, message, command=command_wrapped)
 
-        log_remote_command_status(run.returncode)
+        logging.info(
+            f"Remote command finished with exit status {run.returncode}\n"
+            f"    stdout:\n"
+            f"        {'        '.join(run.stdout.decode(errors='backslashreplace').splitlines(keepends=True))}\n"
+            f"    stderr:\n"
+            f"        {'        '.join(run.stderr.decode(errors='backslashreplace').splitlines(keepends=True))}")
 
         if self.ssh_args[0] == 'plink':
             if run.returncode == 0:  # Yes, exit status is 0 if access has been denied.
@@ -149,22 +148,12 @@ class BoxConnection:
                         run.stderr.decode('UTF-8').rstrip(), command=command_wrapped
                     )
 
-        if run.returncode != 0 and exc:
-            raise exceptions.BoxCommandError(
-                f'Command {command_wrapped!r} failed '
-                f'with exit status {run.returncode}, '
-                f'stderr:\n    ' + run.stderr.decode("UTF-8").strip('\n')
-            )
-
         if stdout:
             stdout.write(run.stdout.decode())
             stdout.flush()
         if stderr:
             stderr.write(run.stderr.decode())
             stderr.flush()
-        else:
-            if run.stderr:
-                logging.debug('Remote command stderr:\n    ' + run.stderr.decode().strip('\n'))
 
         return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 
