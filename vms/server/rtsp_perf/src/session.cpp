@@ -10,6 +10,15 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/random_qt_device.h>
 
+
+const char* streamTypeToString(uint16_t flags)
+{
+    auto mediaFlags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
+    if (mediaFlags.testFlag(QnAbstractMediaData::MediaFlags_LowQuality))
+        return "low quality";
+    return "high quility";
+}
+
 void Session::run(const QString& url, const Config& config, bool live)
 {
     static const int kTcpPrefixLength = 4;
@@ -102,22 +111,22 @@ void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, con
 
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    int64_t timestampUs = parsePacketTimestamp(data, size);
-
     auto nowTime = std::chrono::system_clock::now();
-    if (timestampUs != -1)
+    Packet packet;
+    if (parsePacket(data, size, packet))
     {
         if (m_config.printTimestamps)
         {
-            int64_t timestampDiffUs = timestampUs - m_prevTimestampUs;
-            printf("Camera %s: timestamp %lld us, diff %lld us\n", url,
-                (long long int) timestampUs,
-                (m_prevTimestampUs == -1) ? -1LL : timestampDiffUs);
+            int64_t timestampDiffUs = packet.timestampUs - m_prevTimestampUs;
+            printf("Camera %s: timestamp %lld us, diff %lld us, stream type %s\n", url,
+                (long long int) packet.timestampUs,
+                (m_prevTimestampUs == -1) ? -1LL : timestampDiffUs,
+                streamTypeToString(packet.flags));
 
             if (m_prevTimestampUs != -1)
-                checkDiff(std::chrono::microseconds(timestampDiffUs), timestampUs, url);
+                checkDiff(std::chrono::microseconds(timestampDiffUs), packet.timestampUs, url);
         }
-        m_prevTimestampUs = timestampUs;
+        m_prevTimestampUs = packet.timestampUs;
         m_lastFrameTime = nowTime;
 
     }
@@ -134,7 +143,7 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
     return true;
 }
 
-int64_t Session::parsePacketTimestamp(const uint8_t* data, int64_t size)
+bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet)
 {
     using namespace nx::streaming::rtp;
     static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
@@ -143,14 +152,14 @@ int64_t Session::parsePacketTimestamp(const uint8_t* data, int64_t size)
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
     {
         NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
-        return -1;
+        return false;
     }
 
     const quint8* payload = data + RtpHeader::kSize;
     size -= RtpHeader::kSize;
     // Odd numbers - codec context, even numbers - data. Ignore context
     if ((qFromBigEndian(rtpHeader->ssrc) & 0x01) != 0)
-        return -1;
+        return false;
 
     if (rtpHeader->padding)
         size -= qFromBigEndian(rtpHeader->padding);
@@ -158,16 +167,17 @@ int64_t Session::parsePacketTimestamp(const uint8_t* data, int64_t size)
     if (m_newPacket)
     {
         if (size < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
-            return -1;
+            return false;
 
         const QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType)*(payload++);
-        const quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
-        const int64_t timestamp = qFromBigEndian(rtpHeader->timestamp) +
-            (qint64(timestampHigh) << 32);
+        const uint32_t timestampHigh = qFromBigEndian(*(uint32_t*) payload);
+        packet.timestampUs = qFromBigEndian(rtpHeader->timestamp) + (int64_t(timestampHigh) << 32);
+        payload += 5;
+        packet.flags = (payload[0] << 8) + payload[1];
         if (dataType == QnAbstractMediaData::VIDEO)
-            return timestamp;
+            return true;
     }
     m_newPacket = rtpHeader->marker;
-    return -1;
+    return false;
 }
 

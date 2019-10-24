@@ -26,8 +26,14 @@ public:
     std::thread worker;
 
 private:
+    struct Packet
+    {
+        int64_t timestampUs = -1;
+        uint16_t flags = 0;
+    };
+private:
     bool processPacket(const uint8_t* data, int64_t size, const char* url);
-    int64_t parsePacketTimestamp(const uint8_t* data, int64_t size);
+    bool parsePacket(const uint8_t* data, int64_t size, Packet& packet);
     void checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url);
 
 private:
