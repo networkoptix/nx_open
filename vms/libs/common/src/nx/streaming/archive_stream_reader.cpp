@@ -1202,12 +1202,12 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
-    return jumpTo(mksec, skipTime, nullptr);
+    return jumpToEx(mksec, skipTime, nullptr);
 }
 
-bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime)
+bool QnArchiveStreamReader::jumpToEx(qint64 mksec, qint64 skipTime, qint64* outJumpTime, bool useDelegate)
 {
-    if (m_navDelegate) {
+    if (useDelegate && m_navDelegate) {
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
