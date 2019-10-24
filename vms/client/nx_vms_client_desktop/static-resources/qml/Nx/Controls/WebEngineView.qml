@@ -22,7 +22,7 @@ WebEngineView
             worldId: WebEngineScript.MainWorld
             injectionPoint: WebEngineScript.DocumentReady
             name: "NxObjectInjectorScript"
-            sourceUrl: "qrc:///qml/Nx/Controls/nxwebengineinject" + (enablePromises ? "_promises.js" : ".js")
+            sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject" + (enablePromises ? "_promises.js" : ".js")
         }
     ]
 

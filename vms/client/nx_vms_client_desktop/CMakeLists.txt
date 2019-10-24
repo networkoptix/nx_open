@@ -31,6 +31,10 @@ endif()
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+# Place Roboto font into resources so it can be loaded by Qt WebEngine.
+set(client_font_roboto_regular ${roboto_fonts_directory}/bin/fonts/Roboto-Regular.ttf)
+set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
+
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
@@ -47,6 +51,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
         "${nov_file_launcher_executable}"
+        "${client_font_roboto_regular}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp

@@ -36,7 +36,7 @@ namespace
 
 namespace nx::vms::client::desktop {
 
-const QUrl GraphicsWebEngineView::kQmlSourceUrl("qrc:/qml/Nx/Controls/NxWebEngineView.qml");
+const QUrl GraphicsWebEngineView::kQmlSourceUrl("qrc:/qml/Nx/Controls/WebEngineView.qml");
 
 GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *parent)
     : GraphicsQmlView(parent)
