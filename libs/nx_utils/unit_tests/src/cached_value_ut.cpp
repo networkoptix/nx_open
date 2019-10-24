@@ -7,6 +7,8 @@
 
 namespace nx::utils::test {
 
+using namespace std::chrono_literals;
+
 class SpecialFunctionsCatcher
 {
 public:
@@ -82,8 +84,7 @@ static void expectSpecialFunctionCalls(
         EXPECT_CALL(catcherMock, copyAssign()).Times(copyAssignCount);
 }
 
-// TODO: test for an accuracy of timer resetting and expiary logic in a whole.
-TEST(CachedValue, base)
+TEST(CachedValue, Base)
 {
      int returnValue = 0;
      CachedValue<int> value([&returnValue](){ return returnValue; });
@@ -101,7 +102,7 @@ TEST(CachedValue, base)
      ASSERT_EQ(value.get(), 2);
 }
 
-TEST(CachedValue, constructionAndCopy)
+TEST(CachedValue, ConstructionAndCopy)
 {
     ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMocks[6];
     auto guard = nx::utils::makeScopeGuard(
@@ -126,7 +127,72 @@ TEST(CachedValue, constructionAndCopy)
     value.reset();
 }
 
-TEST(CachedValue, concurrency)
+TEST(CachedValue, ExpirationTime)
+{
+    constexpr std::chrono::milliseconds expiryTime(8);
+    ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMocks[8];
+    auto guard = nx::utils::makeScopeGuard(
+        [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
+
+    expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
+    CachedValue<SomeType> value([]() { return SomeType(); }, expiryTime);
+    value.get();
+
+    // Nothing should happen before any call to CachedValue.
+    expectSpecialFunctionCalls(catcherMocks[1], 0, 0, 0, 0);
+    std::this_thread::sleep_for(expiryTime + 1ms);
+
+    // New value should be generated after timeout.
+    expectSpecialFunctionCalls(catcherMocks[2], 1, -1, 1, 0);
+    value.get();
+
+    // No new value generated before timeout.
+    expectSpecialFunctionCalls(catcherMocks[3], 0, -1, 1, 0);
+    std::this_thread::sleep_for(expiryTime / 2);
+    value.get();
+
+    // Update should reset timeout and update value.
+    expectSpecialFunctionCalls(catcherMocks[4], 1, -1, 0, 0);
+    value.update();
+
+    // Make sure previous timeout didn't fire.
+    expectSpecialFunctionCalls(catcherMocks[5], 0, -1, 1, 0);
+    std::this_thread::sleep_for(expiryTime / 2 + 1ms);
+    value.get();
+
+    // Make sure value regenerated after timeout by update.
+    expectSpecialFunctionCalls(catcherMocks[6], 1, -1, 1, 0);
+    std::this_thread::sleep_for(expiryTime / 2 + 1ms);
+    value.get();
+
+    expectSpecialFunctionCalls(catcherMocks[7], 0, 1, 0, 0);
+    value.reset();
+}
+
+TEST(CachedValue, LongTimeOfValueGeneration)
+{
+    constexpr std::chrono::milliseconds expiryTime(2);
+    ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMocks[8];
+    auto guard = nx::utils::makeScopeGuard(
+        [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
+
+    expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
+    CachedValue<SomeType> value(
+        [expiryTime]()
+        {
+            std::this_thread::sleep_for(expiryTime + 1ms);
+            return SomeType();
+        }, expiryTime);
+    value.update();
+    value.get();
+
+    expectSpecialFunctionCalls(catcherMocks[1], 1, -1, 2, 0);
+    std::this_thread::sleep_for(expiryTime + 1ms);
+    value.get();
+    value.get();
+}
+
+TEST(CachedValue, Concurrency)
 {
     ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMock;
     auto guard = nx::utils::makeScopeGuard(
@@ -136,7 +202,7 @@ TEST(CachedValue, concurrency)
     CachedValue<SomeType> value(
         []()
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(7));
             return SomeType();
         });
     std::thread t1([&value](){ value.get(); });;

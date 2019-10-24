@@ -42,11 +42,13 @@ public:
             && m_timer.hasExpired(m_expirationTime))
         {
             resetThreadUnsafe();
-            m_timer.restart();
         }
 
         if (!m_value)
+        {
             m_value = m_valueGenerator();
+            m_timer.restart();
+        }
 
         return *m_value;
     }
