@@ -40,18 +40,17 @@ Camera::Camera(QnMediaServerModule* serverModule):
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
     connect(this, &QnResource::initializedChanged,
-        [this](const QnResourcePtr& device)
+        [this]()
         {
+            const auto weakRef = toSharedPointer(this).toWeakRef();
             executeDelayed(
-                    [device, this]()
-                    {
-                        if (device->hasFlags(Qn::removed))
-                            return;
-
-                        fixInputPortMonitoringSafe();
-                    },
-                    /*delay*/ 0,
-                    this->serverModule()->thread());
+                [weakRef, this]()
+                {
+                    if (const auto device = weakRef.toStrongRef())
+                        this->fixInputPortMonitoringSafe();
+                },
+                /*delay*/ 0,
+                this->serverModule()->thread());
         });
 
     const auto updateIoCache =
