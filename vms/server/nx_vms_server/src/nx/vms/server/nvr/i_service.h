@@ -4,6 +4,7 @@
 #include <nx/vms/server/nvr/i_network_block_manager.h>
 #include <nx/vms/server/nvr/i_io_manager.h>
 #include <nx/vms/server/nvr/i_led_manager.h>
+#include <core/resource_management/resource_searcher.h>
 
 namespace nx::vms::server::nvr {
 
@@ -19,6 +20,8 @@ public:
     virtual IIoManager* ioManager() = 0;
 
     virtual ILedManager* ledManager() = 0;
+
+    virtual QnAbstractResourceSearcher* searcher() = 0;
 };
 
 } // namespace nx::vms::server::nvr

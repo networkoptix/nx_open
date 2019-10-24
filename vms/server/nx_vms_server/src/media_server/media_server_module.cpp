@@ -204,13 +204,13 @@ QnMediaServerModule::QnMediaServerModule(
     nx::vms::server::registerSerializers();
 
     // TODO: #dmishin NVR service factory.
-    m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+    m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>(this);
 
     initOutgoingSocketCounter();
 

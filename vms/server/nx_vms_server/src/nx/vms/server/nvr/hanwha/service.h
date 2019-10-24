@@ -3,13 +3,14 @@
 #include <memory>
 
 #include <nx/vms/server/nvr/i_service.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-class Service: public IService
+class Service: public IService, public nx::vms::server::ServerModuleAware
 {
 public:
-    Service();
+    Service(QnMediaServerModule* serverModule);
 
     virtual IBuzzerManager* buzzerManager() override;
 
@@ -19,11 +20,14 @@ public:
 
     virtual ILedManager* ledManager() override;
 
+    virtual QnAbstractResourceSearcher* searcher() override;
+
 private:
     std::unique_ptr<IBuzzerManager> m_buzzerManager;
     std::unique_ptr<INetworkBlockManager> m_networkBlockManager;
     std::unique_ptr<IIoManager> m_ioManager;
     std::unique_ptr<ILedManager> m_ledManager;
+    std::unique_ptr<QnAbstractResourceSearcher> m_searcher;
 };
 
 } // namespace nx::vms::server::hanwha_nvr

@@ -34,6 +34,8 @@
     #include <plugins/resource/hanwha/hanwha_resource_searcher.h>
 #endif
 
+#include <nx/vms/server/nvr/i_service.h>
+
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
 #include "media_server_module.h"
@@ -56,6 +58,13 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
 void QnMediaServerResourceSearchers::initialize()
 {
     const auto commonModule = serverModule()->commonModule();
+
+    const auto nvrService = serverModule()->nvrService();
+    if (nvrService)
+    {
+        if (QnAbstractResourceSearcher* const localNvrSearcher = nvrService->searcher())
+            registerSearcher(localNvrSearcher);
+    }
 
     // NOTE: Plugins have higher priority than built-in drivers.
     registerSearcher(new ThirdPartyResourceSearcher(serverModule()));
