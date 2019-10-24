@@ -16,7 +16,7 @@ const char* streamTypeToString(uint16_t flags)
     auto mediaFlags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
     if (mediaFlags.testFlag(QnAbstractMediaData::MediaFlags_LowQuality))
         return "low quality";
-    return "high quility";
+    return "high quality";
 }
 
 void Session::run(const QString& url, const Config& config, bool live)
@@ -30,7 +30,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         std::uniform_int_distribution<> dis(60, 3600);
         position = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000ll;
     }
-    NX_INFO(this, "Start test rtps session: %1 %2",
+    NX_INFO(this, "Start test rtsp session: %1 %2",
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
 
