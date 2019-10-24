@@ -91,7 +91,7 @@ class BoxConnection:
             f"Executing remote command:\n"
             f"    {command_wrapped}\n"
             f"    stdin:\n"
-            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'NO'}")
+            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'N/A'}")
 
         opts = {}
 

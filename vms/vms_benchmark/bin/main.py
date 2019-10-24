@@ -470,7 +470,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
         total_archive_stream_count = math.ceil(
             conf['archiveStreamsPerCameraRatio'] * test_camera_count)
         report(
-            f"Load test #{test_number}: "
+            f"\nLoad test #{test_number}: "
             f"{test_camera_count} virtual camera(s), "
             f"{total_live_stream_count} live stream(s), "
             f"{total_archive_stream_count} archive stream(s)...")

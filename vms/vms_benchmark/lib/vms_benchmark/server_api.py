@@ -38,7 +38,8 @@ class ServerApi:
 
     @staticmethod
     def post_request(request, data):
-        logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n    with data\n    {data}")
+        logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n"
+            f"    with data\n    {data}")
         response = urllib.request.urlopen(request, data=data)
         return ServerApi._read_response(response)
 
