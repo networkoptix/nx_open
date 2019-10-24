@@ -148,12 +148,21 @@ bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet)
     using namespace nx::streaming::rtp;
     static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 
+    if (size < sizeof(RtpHeader))
+    {
+        NX_WARNING(this, "Got too short RTP packet. Ignored.");
+        return false;
+    }
+
     const RtpHeader* rtpHeader = (RtpHeader*) data;
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
     {
         NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
         return false;
     }
+
+    const bool isNewPacket = m_newPacket;
+    m_newPacket = rtpHeader->marker;
 
     const quint8* payload = data + RtpHeader::kSize;
     size -= RtpHeader::kSize;
@@ -164,7 +173,7 @@ bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet)
     if (rtpHeader->padding)
         size -= qFromBigEndian(rtpHeader->padding);
 
-    if (m_newPacket)
+    if (isNewPacket)
     {
         if (size < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
             return false;
@@ -177,7 +186,6 @@ bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet)
         if (dataType == QnAbstractMediaData::VIDEO)
             return true;
     }
-    m_newPacket = rtpHeader->marker;
     return false;
 }
 
