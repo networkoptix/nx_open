@@ -40,12 +40,18 @@ Camera::Camera(QnMediaServerModule* serverModule):
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
     connect(this, &QnResource::initializedChanged,
-        [this]()
+        [this](const QnResourcePtr& device)
         {
             executeDelayed(
-                std::bind(&Camera::fixInputPortMonitoringSafe, this),
-                /*delay*/ 0,
-                this->serverModule()->thread());
+                    [device, this]()
+                    {
+                        if (device->hasFlags(Qn::removed))
+                            return;
+
+                        fixInputPortMonitoringSafe();
+                    },
+                    /*delay*/ 0,
+                    this->serverModule()->thread());
         });
 
     const auto updateIoCache =
