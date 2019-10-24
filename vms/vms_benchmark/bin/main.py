@@ -488,7 +488,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
         )
-        max_lag_s = 0
+        max_lag_s = {'live': 0, 'archive': 0}
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
 
@@ -651,7 +651,9 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                                     f"dropped frames: "
                                     f"{frame_drops_per_type['live']} (live), "
                                     f"{frame_drops_per_type['archive']} (archive), "
-                                    f"max stream lag: {max_lag_s:.3f} s.")
+                                    f"max stream lag: "
+                                    f"{max_lag_s['live']:.3f} s (live),"
+                                    f"{max_lag_s['archive']:.3f} s (archive).")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
@@ -742,13 +744,13 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                         if pts_stream_id not in first_timestamps_s:
                             first_timestamps_s[pts_stream_id] = timestamp_s
-                        elif stream_type == 'live':
+                        else:
                             frame_interval_s = 1.0 / float(ini['testFileFps'])
                             this_frame_offset_s = frames.get(pts_stream_id, 0) * frame_interval_s
                             expected_frame_time_s = first_timestamps_s[pts_stream_id] + this_frame_offset_s
                             this_frame_lag_s = timestamp_s - expected_frame_time_s
                             lags[pts_stream_id] = max(lags.get(pts_stream_id, 0), this_frame_lag_s)
-                            max_lag_s = max(max_lag_s, this_frame_lag_s)
+                            max_lag_s[stream_type] = max(max_lag_s[stream_type], this_frame_lag_s)
 
                         pts_diff_deviation_factor_max = 0.03
                         frame_interval_us = 1000000.0 / float(ini['testFileFps'])
@@ -855,10 +857,10 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                     issues.append(e)
 
                 max_allowed_lag_seconds = 5
-                if max_lag_s > max_allowed_lag_seconds:
+                if max_lag_s[stream_type] > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: '
-                        f'the video lag {max_lag_s:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
+                        f'the video lag {max_lag_s[stream_type]:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
