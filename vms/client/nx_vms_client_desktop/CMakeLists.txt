@@ -33,7 +33,7 @@ file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js
 
 # Place Roboto font into resources so it can be loaded by Qt WebEngine.
 set(client_font_roboto_regular ${roboto_fonts_directory}/bin/fonts/Roboto-Regular.ttf)
-set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
+set_source_files_properties(${client_font_roboto_regular} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
 
 set(library_type)
 if(WINDOWS)

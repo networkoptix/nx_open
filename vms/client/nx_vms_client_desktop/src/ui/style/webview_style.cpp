@@ -63,7 +63,7 @@ QString generateCssStyle()
     const auto styleBase = QString::fromLatin1(R"css(
     @font-face {
         font-family: 'Roboto';
-        src: url('qrc:/fonts/Roboto-Regular.ttf') format('truetype');
+        src: url('qrc:///fonts/Roboto-Regular.ttf') format('truetype');
         font-style: normal;
     }
     * {
