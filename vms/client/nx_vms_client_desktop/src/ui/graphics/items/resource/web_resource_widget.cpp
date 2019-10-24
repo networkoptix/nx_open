@@ -142,7 +142,7 @@ void QnWebResourceWidget::setupOverlays()
                     buttonsBar->setButtonsEnabled(Qn::BackButton, m_webEngineView->canGoBack());
                 });
 
-            // Should force HUD to update details text with new URL
+            // Should force HUD to update details text with new URL.
             connect(m_webEngineView, &GraphicsWebEngineView::loadStarted, this,
                 [this]()
                 {
@@ -156,7 +156,7 @@ void QnWebResourceWidget::setupOverlays()
             [this]()
             {
                 // We can't use QnGraphicsWebView::reload because if it was an
-                // error previously, reload does not work
+                // error previously, reload does not work.
 
                 if (m_webView)
                     m_webView->setPageUrl(m_webView->url());
@@ -167,14 +167,14 @@ void QnWebResourceWidget::setupOverlays()
     }
 
     {
-        // Right buttons bar setup
+        // Right buttons bar setup.
         auto fullscreenButton= createStatisticAwareButton(lit("web_widget_fullscreen"));
         fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
         fullscreenButton->setToolTip(tr("Fullscreen mode"));
         connect(fullscreenButton, &QnImageButtonWidget::clicked, this,
             [this]()
             {
-                // Toggles fullscreen item mode
+                // Toggles fullscreen item mode.
                 const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
                 workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
             });
