@@ -37,60 +37,33 @@ class BoxConnection:
 
     def __init__(self, host, port, login, password, conf_file):
         self.host = host
-        self.port = port
-        self.login = login
-        self.password = password
         self.conf_file = conf_file
+        target = f"{login}@{host}" if login else host
         if platform.system() == 'Linux':
-            if password:
-                self.ssh_command = 'sshpass'
-                self.ssh_args = [
-                    'sshpass',
-                    "-p", password,
-                    "ssh",
-                    "-o", "StrictHostKeyChecking=no",
-                    "-o", "PubkeyAuthentication=no",
-                    "-o", "PasswordAuthentication=yes",
-                    "-T",
-                    f"-p{port}",
-                    f"{login}@{host}" if login else host,
-                ]
-            else:
-                self.ssh_command = 'ssh'
-                self.ssh_args = [
-                    'ssh',
-                    f"-p{port}",
-                    f"{login}@{host}" if login else host,
-                    "-o", "StrictHostKeyChecking=no",
-                    "-o", "BatchMode=yes",
-                    "-o", "PubkeyAuthentication=yes",
-                    "-o", "PasswordAuthentication=no",
-                    ]
+            self.ssh_args = [
+                *(('sshpass', '-p', password) if password else ()),
+                'ssh',
+                target, '-p', str(port),
+                '-o', 'PubkeyAuthentication=' + ('no' if password else 'yes'),
+                '-o', 'PasswordAuthentication=' + ('yes' if password else 'no'),
+                '-o', 'StrictHostKeyChecking=no',
+            ]
         else:
-            if password:
-                self.ssh_args = [
-                    'plink',
-                    '-batch',
-                    "-pw", password,
-                    '-P', str(port),
-                    f"{login}@{host}" if login else host,
-                ]
-                #self.ssh_command = [
-                #    'sshpass',
-                #    "-p", password,
-                #    "ssh",
-                #    "-o", "StrictHostKeyChecking=no",
-                #    f"-p{port}",
-                #    f"{login}@{host}" if login else host,
-                #]
-            else:
-                self.ssh_args = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host]
-        self.host_key = None
+            self.ssh_args = [
+                'plink',
+                target, '-P', str(port),
+                *(('-pw', password) if password else ()),
+                '-batch',
+            ]
         self.ip = None
         self.local_ip = None
         self.is_root = False
         self.eth_name = None
         self.eth_speed = None
+
+    def supply_host_key(self, host_key):
+        assert self.ssh_args[0] == 'plink'  # ssh: StrictHostKeyChecking=no
+        self.ssh_args += ['-hostkey', host_key]
 
     def obtain_connection_info(self):
         ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
@@ -134,7 +107,7 @@ class BoxConnection:
         try:
             actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
             run = subprocess.run(
-                [*self.ssh_args, *(('-hostkey', self.host_key) if self.host_key else ()), command_wrapped],
+                [*self.ssh_args, command_wrapped],
                 timeout=actual_timeout_s,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

@@ -983,7 +983,9 @@ def _connect_to_box(conf, conf_file):
         port=conf['boxSshPort'],
         conf_file=conf_file
     )
-    box.host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    if host_key is not None:
+        box.supply_host_key(host_key)
     box.obtain_connection_info()
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
