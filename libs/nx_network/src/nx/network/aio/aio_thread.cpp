@@ -110,25 +110,23 @@ void AioThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> f
         functor();
         return;
     }
+
     // Otherwise posting functor.
     post(sock, std::move(functor));
 }
 
 void AioThread::cancelPostedCalls(Pollable* const sock)
 {
-    QnMutexLocker lock(&m_taskQueue->mutex);
-
     const bool inAIOThread = currentThreadSystemId() == systemThreadId();
     if (inAIOThread)
     {
         // Removing postedCall tasks and posted calls.
         auto postedCallsToRemove = m_taskQueue->cancelPostedCalls(
-            lock,
             sock->impl()->socketSequence);
-        lock.unlock();
-        // Removing postedCallsToRemove with mutex unlocked since there can be indirect calls to this.
         return;
     }
+
+    QnMutexLocker lock(&m_taskQueue->mutex);
 
     // Posting cancellation task
     m_taskQueue->addTask(
