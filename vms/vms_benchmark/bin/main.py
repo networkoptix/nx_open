@@ -193,7 +193,7 @@ def load_configs(conf_file, ini_file):
         "minimumArchiveFreeSpacePerCameraSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 180,
+            "default": 240,
         },
         "timeDiffThresholdSeconds": {
             "optional": True,
@@ -208,7 +208,7 @@ def load_configs(conf_file, ini_file):
         "sleepBeforeCheckingArchiveSeconds": {
             "optional": True,
             "type": 'integer',
-            "default": 90,
+            "default": 100,
         },
         "maxAllowedNetworkErrors": {
             "optional": True,
