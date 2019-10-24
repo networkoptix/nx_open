@@ -45,15 +45,15 @@ public:
 
 private:
     nx::vms::server::PlatformMonitor* m_monitorBase = nullptr;
-    mutable QnMutex m_mutex;
     nx::utils::ElapsedTimer m_uptimeTimer;
 
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
     nx::utils::CachedValue<qreal> m_cachedThisProcessCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
-    nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
-    nx::utils::CachedValue<QList<nx::vms::server::PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
+    nx::utils::CachedValue<QList<PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
+    nx::utils::CachedValue<QList<PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
+    nx::utils::CachedValue<QList<PlatformMonitor::PartitionSpace>> m_cachedTotalPartitionSpaceInfo;
 };
 
 class StubMonitor: public nx::vms::server::PlatformMonitor

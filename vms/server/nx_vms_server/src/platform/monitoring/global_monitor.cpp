@@ -13,7 +13,6 @@
 #endif
 
 #include <iostream>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/scope_guard.h>
@@ -137,7 +136,9 @@ GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* pa
     m_cachedTotalHddLoad(
         [this]() { return m_monitorBase->totalHddLoad(); }, kCacheExpirationTime),
     m_cachedTotalNetworkLoad(
-        [this]() { return m_monitorBase->totalNetworkLoad(); }, kCacheExpirationTime)
+        [this]() { return m_monitorBase->totalNetworkLoad(); }, kCacheExpirationTime),
+    m_cachedTotalPartitionSpaceInfo(
+        [this]() { return m_monitorBase->totalPartitionSpaceInfo(); }, kCacheExpirationTime)
 {
     if (!NX_ASSERT(base != nullptr))
         base = new StubMonitor();
@@ -220,8 +221,7 @@ QList<nx::vms::server::PlatformMonitor::NetworkLoad> GlobalMonitor::totalNetwork
 
 QList<nx::vms::server::PlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_monitorBase->totalPartitionSpaceInfo();
+    return m_cachedTotalPartitionSpaceInfo.get();
 }
 
 int GlobalMonitor::thisProcessThreads()
