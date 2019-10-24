@@ -488,7 +488,6 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
         )
-        frame_drops_sum = 0
         max_lag_s = 0
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
@@ -619,7 +618,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 last_ptses = {}
                 first_timestamps_s = {}
                 frames = {}
-                frame_drops = {}
+                frame_drops_per_type = {'live': 0, 'archive': 0}
                 lags = {}
                 streaming_ended_expectedly = False
                 issues = []
@@ -649,7 +648,9 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                                 report(
                                     f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
                                     f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
-                                    f"dropped frames: {frame_drops_sum}, "
+                                    f"dropped frames: "
+                                    f"{frame_drops_per_type['live']} (live), "
+                                    f"{frame_drops_per_type['archive']} (archive), "
                                     f"max stream lag: {max_lag_s:.3f} s.")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
@@ -737,9 +738,11 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
 
                         timestamp_s = time.time()
 
+                        stream_type = streams[pts_stream_id]['type']
+
                         if pts_stream_id not in first_timestamps_s:
                             first_timestamps_s[pts_stream_id] = timestamp_s
-                        elif streams[pts_stream_id]['type'] == 'live':
+                        elif stream_type == 'live':
                             frame_interval_s = 1.0 / float(ini['testFileFps'])
                             this_frame_offset_s = frames.get(pts_stream_id, 0) * frame_interval_s
                             expected_frame_time_s = first_timestamps_s[pts_stream_id] + this_frame_offset_s
@@ -766,10 +769,10 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                                 pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
                                 pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
                             ):
-                                frame_drops[pts_stream_id] = frame_drops.get(pts_stream_id, 0) + 1
-                                frame_drops_sum += 1
+                                frame_drops_per_type[stream_type] += 1
                                 logging.info(
-                                    f'Detected frame drop on camera {streams[pts_stream_id]["camera_id"]}: '
+                                    f'Detected frame drop on {type} stream '
+                                    f'from camera {streams[pts_stream_id]["camera_id"]}: '
                                     f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
                                     f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
                                 )
@@ -824,7 +827,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                 report(
                     f"    Streaming test statistics:\n"
-                    f"        Frame drops: {sum(frame_drops.values())} (expected 0)\n"
+                    f"        Frame drops: {sum(frame_drops_per_type.values())} (expected 0)\n"
                     + (
                         f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
                         if tx_rx_errors_collector[0] is not None else '')
@@ -840,8 +843,11 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                     + f"        Streaming test duration: {streaming_test_duration_s} s"
                 )
 
-                if frame_drops_sum > 0:
-                    issues.append(exceptions.VmsBenchmarkIssue(f'{frame_drops_sum} frame drops detected.'))
+                for stream_type in 'live', 'archive':
+                    if frame_drops_per_type[stream_type] > 0:
+                        issues.append(exceptions.VmsBenchmarkIssue(
+                            f'{frame_drops_per_type[stream_type]} frame drops detected '
+                            f'in {stream_type} stream.'))
 
                 try:
                     report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
