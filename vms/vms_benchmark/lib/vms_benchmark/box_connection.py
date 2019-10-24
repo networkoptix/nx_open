@@ -93,11 +93,6 @@ class BoxConnection:
             f"    stdin:\n"
             f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'N/A'}")
 
-        opts = {}
-
-        if stdin:
-            opts['input'] = stdin.encode('UTF-8')
-
         try:
             actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
             run = subprocess.run(
@@ -105,7 +100,7 @@ class BoxConnection:
                 timeout=actual_timeout_s,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                **opts
+                input=stdin.encode() if stdin else None,
             )
         except subprocess.TimeoutExpired:
             message = (f'Unable to execute remote command via ssh: '
