@@ -965,7 +965,7 @@ void Player::setPosition(qint64 value)
     if (d->archiveReader)
     {
         qint64 usecResult = 0;
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &usecResult);
+        d->archiveReader->jumpToEx(msecToUsec(value), msecToUsec(value), &usecResult);
         d->positionMs = d->lastSeekTimeMs = value = usecToMsec(usecResult);
     }
 

@@ -47,7 +47,7 @@ public:
     virtual void directJumpToNonKeyFrame(qint64 mksec) override;
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
-    bool jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime);
+    virtual bool jumpToEx(qint64 mksec, qint64 skipTime, qint64* outJumpTime, bool useDelegate = true) override;
 
     virtual void setSkipFramesToTime(qint64 skipTime) override;
     virtual void nextFrame() override;
