@@ -201,6 +201,9 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
         pts,
         m_lastMediaTime[channel],
         &m_unloopingPeriodStartUs);
+
+    NX_VERBOSE(this, "Unlooped PTS %1 to %2", pts, media->timestamp);
+
     m_lastMediaTime[channel] = pts;
 }
 

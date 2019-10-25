@@ -74,6 +74,9 @@ QnConstAbstractMediaDataPtr QnRtspFfmpegEncoder::transcodeVideoPacket(QnConstAbs
 
 void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
+    NX_VERBOSE(this, "Received media data: timestamp %1, dataType %2",
+        media->timestamp, media->dataType);
+
     if (m_videoTranscoder && media->dataType == QnAbstractMediaData::VIDEO)
         media = transcodeVideoPacket(media);
     if (!media)
@@ -144,7 +147,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     // difference codecContext). Max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel
     // used 2 ssrc: for data and for CodecContext.
 
-    if (m_curDataBuffer == m_media->data())
+    const bool isFirstPacketForFrame = m_curDataBuffer == m_media->data();
+    if (isFirstPacketForFrame)
     {
         // send data with RTP headers
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
@@ -181,6 +185,12 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     nx::streaming::rtp::RtpHeader* rtpHeader =
         (nx::streaming::rtp::RtpHeader*)(sendBuffer.data() + dataStartIndex);
     rtpHeader->marker = m_eofReached;
+
+    NX_VERBOSE(this, "Made RTP packet: isFirst %1, timestamp %2, sequence %3",
+        isFirstPacketForFrame ? "true" : "false",
+        m_media->timestamp,
+        qFromBigEndian(rtpHeader->sequence));
+
     return true;
 }
 
