@@ -1,0 +1,123 @@
+import QtQuick 2.10
+import QtQuick.Shapes 1.11
+import nx.vms.client.core 1.0
+
+Figure
+{
+    id: line
+
+    property point p1
+    property point p2
+
+    QtObject
+    {
+        id: d
+
+        property bool created: false
+        property bool creating: pointArea.active
+    }
+
+    PointGrip
+    {
+        id: grip1
+        visible: d.created || d.creating
+        enabled: d.created
+        color: line.color
+
+        PropertiesSync
+        {
+            Property { target: grip1; property: "x" }
+            Property
+            {
+                target: line
+                property: "p1"
+                mapFrom: function(p) { return absoluteX(p.x) }
+                mapTo: function(x, old) { return Qt.point(relativeX(x), old.y) }
+            }
+            Component.onCompleted: start(relativeX(p1.x))
+        }
+        PropertiesSync
+        {
+            Property { target: grip1; property: "y" }
+            Property
+            {
+                target: line
+                property: "p1"
+                mapFrom: function(p) { return absoluteY(p.y) }
+                mapTo: function(y, old) { return Qt.point(old.x, relativeY(y)) }
+            }
+            Component.onCompleted: start(relativeY(p1.y))
+        }
+    }
+
+    PointGrip
+    {
+        id: grip2
+        visible: d.created || d.creating
+        enabled: d.created
+        color: line.color
+
+        PropertiesSync
+        {
+            Property { target: grip2; property: "x" }
+            Property
+            {
+                target: line
+                property: "p2"
+                mapFrom: function(p) { return absoluteX(p.x) }
+                mapTo: function(x, old) { return Qt.point(relativeX(x), old.y) }
+            }
+            Component.onCompleted: start(relativeX(p2.x))
+        }
+        PropertiesSync
+        {
+            Property { target: grip2; property: "y" }
+            Property
+            {
+                target: line
+                property: "p2"
+                mapFrom: function(p) { return absoluteY(p.y) }
+                mapTo: function(y, old) { return Qt.point(old.x, relativeY(y)) }
+            }
+            Component.onCompleted: start(relativeY(p2.y))
+        }
+    }
+
+    Shape
+    {
+        anchors.fill: parent
+        layer.enabled: true
+        layer.samples: 4
+
+        visible: d.created || d.creating
+
+        ShapePath
+        {
+            strokeWidth: 2
+            strokeColor: line.color
+
+            startX: grip1.x
+            startY: grip1.y
+
+            PathLine
+            {
+                x: grip2.x
+                y: grip2.y
+            }
+        }
+    }
+
+    BoundTwoPointArea
+    {
+        id: pointArea
+
+        anchors.fill: parent
+        onFinished: d.created = true
+    }
+
+    function startCreation()
+    {
+        d.created = false
+        pointArea.start()
+    }
+}

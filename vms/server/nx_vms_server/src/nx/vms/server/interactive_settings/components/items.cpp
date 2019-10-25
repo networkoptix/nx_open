@@ -247,6 +247,33 @@ Button::Button(QObject* parent):
 }
 
 //-------------------------------------------------------------------------------------------------
+// ROI components.
+
+LineFigure::LineFigure(QObject* parent):
+    ValueItem(QStringLiteral("LineFigure"), parent)
+{
+}
+
+PolygonFigure::PolygonFigure(QObject* parent):
+    ValueItem(QStringLiteral("BoxFigure"), parent)
+{
+}
+
+void PolygonFigure::setMaxPoints(int maxPoints)
+{
+    if (m_maxPoints == maxPoints)
+        return;
+
+    m_maxPoints = maxPoints;
+    emit maxPointsChanged();
+}
+
+BoxFigure::BoxFigure(QObject* parent):
+    ValueItem(QStringLiteral("PolygonFigure"), parent)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 // Items factory.
 
 namespace {

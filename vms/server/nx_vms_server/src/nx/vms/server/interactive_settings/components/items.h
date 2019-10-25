@@ -311,6 +311,40 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
+// ROI components.
+
+class LineFigure: public ValueItem
+{
+public:
+    LineFigure(QObject* parent = nullptr);
+};
+
+class BoxFigure: public ValueItem
+{
+public:
+    BoxFigure(QObject* parent = nullptr);
+};
+
+class PolygonFigure: public ValueItem
+{
+public:
+    PolygonFigure(QObject* parent = nullptr);
+
+    int maxPoints() const
+    {
+        return m_maxPoints;
+    }
+
+    void setMaxPoints(int maxPoints);
+
+signals:
+    void maxPointsChanged();
+
+private:
+    int m_maxPoints = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 // Items factory.
 
 class Factory

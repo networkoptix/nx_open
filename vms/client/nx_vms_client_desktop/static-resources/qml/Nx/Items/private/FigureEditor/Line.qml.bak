@@ -1,0 +1,123 @@
+import QtQuick 2.10
+import QtQuick.Shapes 1.11
+import nx.vms.client.core 1.0
+
+Figure
+{
+    id: line
+
+    property point p1
+    property point p2
+
+    QtObject
+    {
+        id: d
+
+        readonly property point realP1: absolutePoint(p1)
+        readonly property point realP2: absolutePoint(p2)
+
+        property bool created: false
+        property bool creating: pointArea.active
+    }
+
+    PointGrip
+    {
+        id: grip1
+        visible: d.created || d.creating
+        enabled: d.created
+        color: line.color
+
+        Binding
+        {
+            target: grip1
+            property: "x"
+            value: d.realP1.x
+            when: !grip1.dragging
+        }
+        Binding
+        {
+            target: grip1
+            property: "y"
+            value: d.realP1.y
+            when: !grip1.dragging
+        }
+
+        onDraggingChanged:
+        {
+            if (!dragging)
+                p1 = relativePoint(x, y)
+        }
+    }
+
+    PointGrip
+    {
+        id: grip2
+        visible: d.created || d.creating
+        enabled: d.created
+        color: line.color
+
+        Binding
+        {
+            target: grip2
+            property: "x"
+            value: d.realP2.x
+            when: !grip2.dragging
+        }
+        Binding
+        {
+            target: grip2
+            property: "y"
+            value: d.realP2.y
+            when: !grip2.dragging
+        }
+
+        onDraggingChanged:
+        {
+            if (!dragging)
+                p2 = relativePoint(x, y)
+        }
+    }
+
+    PropertiesSync
+    {
+        Property { target: grip1; property: "x" }
+    }
+
+    Shape
+    {
+        anchors.fill: parent
+        layer.enabled: true
+        layer.samples: 4
+
+        visible: grip1.visible && grip2.visible
+
+        ShapePath
+        {
+            strokeWidth: 2
+            strokeColor: line.color
+
+            startX: grip1.x
+            startY: grip1.y
+
+            PathLine
+            {
+                x: grip2.x
+                y: grip2.y
+            }
+        }
+    }
+
+    BoundTwoPointArea
+    {
+        id: pointArea
+
+        anchors.fill: parent
+        onFinished: d.created = true
+    }
+
+    function startCreation()
+    {
+        d.created = false
+        pointArea.start()
+    }
+}
