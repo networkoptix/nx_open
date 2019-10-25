@@ -18,6 +18,8 @@ public:
 
     virtual QnResourcePtr createResource(
         const QnUuid& resourceTypeId, const QnResourceParams& params) override;
+
+    virtual bool isVirtualResource() const override;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

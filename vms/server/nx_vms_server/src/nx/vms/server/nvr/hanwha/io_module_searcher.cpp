@@ -69,4 +69,10 @@ QnResourcePtr IoModuleSearcher::createResource(
     return result;
 }
 
+bool IoModuleSearcher::isVirtualResource() const
+{
+    // NVR IO-module should be discovered even if auto discovery is disabled.
+    return true;
+}
+
 } // namespace nx::vms::server::nvr::hanwha
