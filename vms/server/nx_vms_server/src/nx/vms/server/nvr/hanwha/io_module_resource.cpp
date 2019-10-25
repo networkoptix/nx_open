@@ -50,6 +50,7 @@ IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
 CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
 {
     setIoPortDescriptions(portDescriptions(), /*needMerge*/ false);
+    setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
     setFlags(flags() | Qn::io_module);
 
     saveProperties();
