@@ -54,7 +54,7 @@ void AioThread::startMonitoring(
         }
     }
 
-    QnMutexLocker lock(&m_taskQueue->mutex);
+    QnMutexLocker lock(&m_mutex);
 
     if (sock->impl()->monitoredEvents[eventToWatch].isUsed)
     {
@@ -85,7 +85,7 @@ void AioThread::stopMonitoring(
     Pollable* const sock,
     aio::EventType eventType)
 {
-    QnMutexLocker lock(&m_taskQueue->mutex);
+    QnMutexLocker lock(&m_mutex);
 
     if (sock->impl()->monitoredEvents[eventType].isUsed)
     {
@@ -99,7 +99,7 @@ void AioThread::stopMonitoring(
 
 void AioThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
 {
-    QnMutexLocker lock(&m_taskQueue->mutex);
+    QnMutexLocker lock(&m_mutex);
     post(lock, sock, std::move(functor));
 }
 
@@ -126,7 +126,7 @@ void AioThread::cancelPostedCalls(Pollable* const sock)
         return;
     }
 
-    QnMutexLocker lock(&m_taskQueue->mutex);
+    QnMutexLocker lock(&m_mutex);
 
     // Posting cancellation task
     m_taskQueue->addTask(
@@ -154,7 +154,7 @@ void AioThread::cancelPostedCalls(Pollable* const sock)
 
 size_t AioThread::socketsHandled() const
 {
-    QnMutexLocker lock(&m_taskQueue->mutex);
+    QnMutexLocker lock(&m_mutex);
 
     return m_pollSet->size()
         + m_taskQueue->newReadMonitorTaskCount()
@@ -190,15 +190,21 @@ void AioThread::run()
         //  to be able to atomically add "cancel posted call" task and check for tasks to complete
         m_processingPostedCalls = 1;
 
-        m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
+        }
 
         //making calls posted with post and dispatch
         m_taskQueue->processPostedCalls();
 
         m_processingPostedCalls = 0;
 
-        //processing tasks that have been added from within processPostedCalls() call
-        m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
+        {
+            QnMutexLocker lock(&m_mutex);
+            //processing tasks that have been added from within processPostedCalls() call
+            m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
+        }
 
         qint64 curClock = m_taskQueue->getMonotonicTime();
         const auto nextPeriodicEventClock = m_taskQueue->nextPeriodicEventClock();
@@ -233,7 +239,10 @@ void AioThread::run()
             }
         }
 
-        m_taskQueue->processScheduledRemoveSocketTasks();
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_taskQueue->processScheduledRemoveSocketTasks();
+        }
 
         if (triggeredSocketCount > 0)
             m_taskQueue->processSocketEvents(curClock);

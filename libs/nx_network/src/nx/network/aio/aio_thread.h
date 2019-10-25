@@ -99,6 +99,8 @@ private:
     std::unique_ptr<AbstractPollSet> m_pollSet;
     std::unique_ptr<detail::AioTaskQueue> m_taskQueue;
     std::atomic<int> m_processingPostedCalls{0};
+    // TODO: #ak This mutex seem to be redundant after introduction of detail::AioTaskQueue.
+    mutable QnMutex m_mutex;
 
     bool getSocketTimeout(
         Pollable* const sock,

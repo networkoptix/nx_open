@@ -25,6 +25,8 @@ AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
 
 void AioTaskQueue::addTask(SocketAddRemoveTask task)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_pollSetModificationQueue.push_back(std::move(task));
 
     if (task.type == TaskType::tAdding)
@@ -41,12 +43,14 @@ bool AioTaskQueue::taskExists(
     aio::EventType eventType,
     TaskType taskType) const
 {
-    for (const auto& task : m_pollSetModificationQueue)
-    {
-        if (task.socket == socket && task.eventType == eventType && task.type == taskType)
-            return true;
-    }
-    return false;
+    QnMutexLocker lock(&m_mutex);
+
+    return std::any_of(
+        m_pollSetModificationQueue.begin(), m_pollSetModificationQueue.end(),
+        [socket, eventType, taskType](const auto& task)
+        {
+            return task.socket == socket && task.eventType == eventType && task.type == taskType;
+        });
 }
 
 bool AioTaskQueue::removeReverseTask(
@@ -56,6 +60,12 @@ bool AioTaskQueue::removeReverseTask(
     AIOEventHandler* const eventHandler,
     std::chrono::milliseconds newTimeout)
 {
+    // NOTE: Freeing tasks with no mutex lock since user handler destruction may produce
+    // a recursive call to this object.
+    std::deque<SocketAddRemoveTask> toRemove;
+
+    QnMutexLocker lock(&m_mutex);
+
     for (auto it = m_pollSetModificationQueue.begin();
         it != m_pollSetModificationQueue.end();
         ++it)
@@ -70,10 +80,12 @@ bool AioTaskQueue::removeReverseTask(
             if (eventHandler != it->eventHandler)
                 continue;   //event handler changed, cannot ignore task
                             //cancelling remove task
+
             NX_ASSERT(sock->impl()->monitoredEvents[eventType].aioHelperData);
             sock->impl()->monitoredEvents[eventType].aioHelperData->timeout = newTimeout;
             sock->impl()->monitoredEvents[eventType].aioHelperData->markedForRemoval.store(0);
 
+            toRemove.push_back(std::move(*it));
             m_pollSetModificationQueue.erase(it);
             return true;
         }
@@ -84,7 +96,9 @@ bool AioTaskQueue::removeReverseTask(
             const TaskType foundTaskType = it->type;
 
             //cancelling adding socket
+            toRemove.push_back(std::move(*it));
             it = m_pollSetModificationQueue.erase(it);
+
             //removing futher tChangingTimeout tasks
             for (;
                 it != m_pollSetModificationQueue.end();
@@ -93,6 +107,7 @@ bool AioTaskQueue::removeReverseTask(
                 if (it->socket == sock && it->eventType == eventType)
                 {
                     NX_ASSERT(it->type == TaskType::tChangingTimeout);
+                    toRemove.push_back(std::move(*it));
                     it = m_pollSetModificationQueue.erase(it);
                 }
                 else
@@ -106,8 +121,6 @@ bool AioTaskQueue::removeReverseTask(
             else
                 return false;   //foundTaskEventType == TaskType::tChangingTimeout
         }
-
-        continue;
     }
 
     return false;
@@ -125,7 +138,7 @@ std::size_t AioTaskQueue::newWriteMonitorTaskCount() const
 
 qint64 AioTaskQueue::nextPeriodicEventClock() const
 {
-    QnMutexLocker lock(&m_socketEventProcessingMutex);
+    QnMutexLocker lock(&m_mutex);
 
     return m_periodicTasksByClock.empty()
         ? 0
@@ -134,13 +147,14 @@ qint64 AioTaskQueue::nextPeriodicEventClock() const
 
 std::size_t AioTaskQueue::periodicTasksCount() const
 {
-    QnMutexLocker lock(&m_socketEventProcessingMutex);
+    QnMutexLocker lock(&m_mutex);
+
     return m_periodicTasksByClock.size();
 }
 
 void AioTaskQueue::clear()
 {
-    QnMutexLocker lock(&mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto postedCalls = std::exchange(m_postedCalls, {});
     auto pollSetModificationQueue = std::exchange(m_pollSetModificationQueue, {});
@@ -148,12 +162,12 @@ void AioTaskQueue::clear()
 
     lock.unlock();
 
-    // Freeing everything without mutex locked.
+    // Freeing everything without lock.
 }
 
 bool AioTaskQueue::empty() const
 {
-    QnMutexLocker lock(&mutex);
+    QnMutexLocker lock(&m_mutex);
 
     return m_postedCalls.empty()
         && m_pollSetModificationQueue.empty()
@@ -162,8 +176,11 @@ bool AioTaskQueue::empty() const
 
 void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
 {
-    std::vector<SocketAddRemoveTask> elementsToRemove;
-    QnMutexLocker lk(&mutex);
+    // Removing these tasks after releasing mutex to avoid some recursive locks when
+    // removing user handlers.
+    std::vector<SocketAddRemoveTask> totalElementsToRemove;
+
+    QnMutexLocker lock(&m_mutex);
 
     for (typename std::deque<SocketAddRemoveTask>::iterator
         it = m_pollSetModificationQueue.begin();
@@ -177,114 +194,55 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
             continue;
         }
 
+        std::vector<SocketAddRemoveTask> elementsToRemove;
+
         switch (task.type)
         {
             case TaskType::tAdding:
-            {
-                if (task.eventType == aio::etRead)
-                    --m_newReadMonitorTaskCount;
-                else if (task.eventType == aio::etWrite)
-                    --m_newWriteMonitorTaskCount;
-                addSocketToPollset(
-                    task.socket,
-                    task.eventType,
-                    task.timeout,
-                    task.eventHandler);
+                processAddTask(lock, task);
                 break;
-            }
 
             case TaskType::tChangingTimeout:
-            {
-                const auto& handlingData =
-                    task.socket->impl()->monitoredEvents[task.eventType].aioHelperData;
-                // NOTE: We are in aio thread currently.
-                if (task.timeout > std::chrono::milliseconds::zero())
-                {
-                    // Adding/updating periodic task.
-                    if (handlingData->timeout > std::chrono::milliseconds::zero())
-                    {
-                        // Updating existing task.
-                        const auto newClock = getMonotonicTime() + task.timeout.count();
-                        if (handlingData->nextTimeoutClock == 0)
-                        {
-                            handlingData->updatedPeriodicTaskClock = newClock;
-                        }
-                        else
-                        {
-                            // Replacing timer record in m_periodicTasksByClock.
-                            for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
-                                it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
-                                ++it)
-                            {
-                                if (it->second.socket == task.socket)
-                                {
-                                    m_periodicTasksByClock.erase(it);
-                                    addPeriodicTaskNonSafe(
-                                        newClock, handlingData, task.socket, task.eventType);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        addPeriodicTask(
-                            getMonotonicTime() + task.timeout.count(),
-                            handlingData,
-                            task.socket,
-                            task.eventType);
-                    }
-                }
-                else if (handlingData->timeout > std::chrono::milliseconds::zero())  //&& timeout == 0
-                {
-                    // Cancelling existing periodic task (there must be one).
-                    handlingData->updatedPeriodicTaskClock = -1;
-                }
-                handlingData->timeout = task.timeout;
+                processChangeTimeoutTask(lock, task);
                 break;
-            }
 
             case TaskType::tRemoving:
-                removeSocketFromPollSet(task.socket, task.eventType);
+                processRemoveTask(lock, task);
                 break;
 
             case TaskType::tCallFunc:
-            {
-                NX_ASSERT(task.postHandler);
-                NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
-                m_postedCalls.push_back(std::move(task));
-                // This task differs from every else in a way that it is not processed here,
-                // just moved to another container.
-                // TODO #ak Is it really needed to move to another container?
-                it = m_pollSetModificationQueue.erase(it);
-                continue;
-            }
+                processCallFuncTask(lock, task);
+                break;
 
             case TaskType::tCancelPostedCalls:
-            {
-                auto postedCallsToRemove = cancelPostedCalls(lk, task.socketSequence);
-                if (elementsToRemove.empty())
-                {
-                    elementsToRemove = std::move(postedCallsToRemove);
-                }
-                else
-                {
-                    elementsToRemove.reserve(elementsToRemove.size() + postedCallsToRemove.size());
-                    std::move(
-                        postedCallsToRemove.begin(),
-                        postedCallsToRemove.end(),
-                        std::back_inserter(elementsToRemove));
-                }
+                elementsToRemove = processCancelPostedCallTask(lock, task);
                 break;
-            }
 
             default:
                 NX_ASSERT(false);
         }
+
+        if (!elementsToRemove.empty())
+        {
+            if (totalElementsToRemove.empty())
+            {
+                totalElementsToRemove = std::move(elementsToRemove);
+            }
+            else
+            {
+                totalElementsToRemove.reserve(totalElementsToRemove.size() + elementsToRemove.size());
+                std::move(
+                    elementsToRemove.begin(),
+                    elementsToRemove.end(),
+                    std::back_inserter(totalElementsToRemove));
+            }
+        }
+
         if (task.taskCompletionEvent)
             task.taskCompletionEvent->store(1, std::memory_order_relaxed);
         if (task.taskCompletionHandler)
             task.taskCompletionHandler();
+
         it = m_pollSetModificationQueue.erase(it);
     }
 }
@@ -319,7 +277,6 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         // Copying shared_ptr here because socket can be removed in eventTriggered call.
         auto handlingData = socket->impl()->monitoredEvents[handlerToInvokeType].aioHelperData;
 
-        QnMutexLocker lk(&m_socketEventProcessingMutex);
         ++handlingData->beingProcessed;
         auto beingProcessedScopedGuard =
             nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
@@ -336,8 +293,8 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         if (handlingData->timeout > std::chrono::milliseconds::zero())
             handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout.count();
 
-        //NOTE: element, this iterator points to, could be removed in eventTriggered call,
-        //but it is still safe to increment this iterator
+        // NOTE: element, this iterator points to, could be removed in eventTriggered call,
+        // but it is still safe to increment this iterator
     }
 }
 
@@ -347,20 +304,12 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
 
     for (;;)
     {
-        QnMutexLocker lk(&m_socketEventProcessingMutex);
+        auto periodicTaskData = takeNextExpiredPeriodicTask(curClock);
+        if (!periodicTaskData)
+            break;
 
-        PeriodicTaskData periodicTaskData;
-        {
-            //taking task from queue
-            auto it = m_periodicTasksByClock.begin();
-            if (it == m_periodicTasksByClock.end() || it->first > curClock)
-                break;
-            periodicTaskData = it->second;
-            m_periodicTasksByClock.erase(it);
-        }
-
-        // There is no need to lock mutex since data is removed in this thread only.
-        auto handlingData = periodicTaskData.data; // TODO: #ak do we really need to copy shared_ptr here?
+        // TODO: #ak do we really need to copy shared_ptr here?
+        auto handlingData = periodicTaskData->data;
         handlingData->nextTimeoutClock = 0;
 
         ++handlingData->beingProcessed;
@@ -372,15 +321,17 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
 
         if (handlingData->updatedPeriodicTaskClock > 0)
         {
-            //not processing task, but updating...
+            //not processing task, but updating.
             if (handlingData->updatedPeriodicTaskClock > curClock)
             {
                 //adding new task with updated clock
-                addPeriodicTaskNonSafe(
+                QnMutexLocker lock(&m_mutex);
+                addPeriodicTask(
+                    lock,
                     handlingData->updatedPeriodicTaskClock,
                     handlingData,
-                    periodicTaskData.socket,
-                    periodicTaskData.eventType);
+                    periodicTaskData->socket,
+                    periodicTaskData->eventType);
                 handlingData->updatedPeriodicTaskClock = 0;
                 continue;
             }
@@ -395,24 +346,26 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
             continue;
         }
 
-        if (periodicTaskData.socket)    //periodic event, associated with socket (e.g., socket operation timeout)
+        if (periodicTaskData->socket)    //periodic event, associated with socket (e.g., socket operation timeout)
         {
             //NOTE socket is allowed to be removed in eventTriggered
             callAndReportAbnormalProcessingTime(
                 [&]()
-            {
-                handlingData->eventHandler->eventTriggered(
-                    periodicTaskData.socket,
-                    static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut));
-            },
+                {
+                    handlingData->eventHandler->eventTriggered(
+                        periodicTaskData->socket,
+                        static_cast<aio::EventType>(periodicTaskData->eventType | aio::etTimedOut));
+                },
                 "timer");
 
             //adding periodic task with same timeout
-            addPeriodicTaskNonSafe(
+            QnMutexLocker lock(&m_mutex);
+            addPeriodicTask(
+                lock,
                 curClock + handlingData->timeout.count(),
                 handlingData,
-                periodicTaskData.socket,
-                periodicTaskData.eventType);
+                periodicTaskData->socket,
+                periodicTaskData->eventType);
             ++tasksProcessedCount;
         }
         //else
@@ -424,6 +377,8 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
 
 void AioTaskQueue::processPostedCalls()
 {
+    QnMutexLocker lock(&m_mutex);
+
     while (!m_postedCalls.empty())
     {
         auto postHandler = std::move(m_postedCalls.begin()->postHandler);
@@ -431,9 +386,17 @@ void AioTaskQueue::processPostedCalls()
             m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
 
+        // NOTE: User handler may cancel some calls, so m_postedCalls may change.
+        // But, new calls cannot be added there (they are added via m_pollSetModificationQueue).
+
+        QnMutexUnlocker unlock(&lock);
+
         callAndReportAbnormalProcessingTime(
             [&]() { postHandler(); },
             "post");
+
+        // Destroying user callback with no lock since it can produce recursive call to this object.
+        postHandler = nullptr;
     }
 }
 
@@ -441,27 +404,23 @@ void AioTaskQueue::removeSocketFromPollSet(
     Pollable* sock,
     aio::EventType eventType)
 {
-    auto& handlingData = sock->impl()->monitoredEvents[eventType].aioHelperData;
-    if (handlingData)
-    {
-        if (handlingData->nextTimeoutClock != 0)
-            cancelPeriodicTask(handlingData.get(), eventType);
+    QnMutexLocker lock(&m_mutex);
 
-        handlingData = nullptr;
-    }
-    if (eventType == aio::etRead || eventType == aio::etWrite)
-        m_pollSet->remove(sock, eventType);
+    removeSocketFromPollSet(lock, sock, eventType);
 }
 
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     SocketSequenceType socketSequence)
 {
-    QnMutexLocker lock(&mutex);
+    QnMutexLocker lock(&m_mutex);
+
     return cancelPostedCalls(lock, socketSequence);
 }
 
 std::size_t AioTaskQueue::postedCallCount() const
 {
+    QnMutexLocker lock(&m_mutex);
+
     return m_postedCalls.size();
 }
 
@@ -474,7 +433,100 @@ qint64 AioTaskQueue::getMonotonicTime()
 //-------------------------------------------------------------------------------------------------
 // private section.
 
+void AioTaskQueue::processAddTask(
+    const QnMutexLockerBase& lock,
+    SocketAddRemoveTask& task)
+{
+    if (task.eventType == aio::etRead)
+        --m_newReadMonitorTaskCount;
+    else if (task.eventType == aio::etWrite)
+        --m_newWriteMonitorTaskCount;
+
+    addSocketToPollset(
+        lock,
+        task.socket,
+        task.eventType,
+        task.timeout,
+        task.eventHandler);
+}
+
+void AioTaskQueue::processChangeTimeoutTask(
+    const QnMutexLockerBase& lock,
+    SocketAddRemoveTask& task)
+{
+    const auto& handlingData =
+        task.socket->impl()->monitoredEvents[task.eventType].aioHelperData;
+    // NOTE: We are in aio thread currently.
+    if (task.timeout > std::chrono::milliseconds::zero())
+    {
+        // Adding/updating periodic task.
+        if (handlingData->timeout > std::chrono::milliseconds::zero())
+        {
+            // Updating existing task.
+            const auto newClock = getMonotonicTime() + task.timeout.count();
+            if (handlingData->nextTimeoutClock == 0)
+            {
+                handlingData->updatedPeriodicTaskClock = newClock;
+            }
+            else
+            {
+                replacePeriodicTask(
+                    lock,
+                    handlingData,
+                    newClock,
+                    task.socket,
+                    task.eventType);
+            }
+        }
+        else
+        {
+            addPeriodicTask(
+                lock,
+                getMonotonicTime() + task.timeout.count(),
+                handlingData,
+                task.socket,
+                task.eventType);
+        }
+    }
+    else if (handlingData->timeout > std::chrono::milliseconds::zero())  //&& timeout == 0
+    {
+        // Cancelling existing periodic task (there must be one).
+        handlingData->updatedPeriodicTaskClock = -1;
+    }
+    handlingData->timeout = task.timeout;
+}
+
+void AioTaskQueue::processRemoveTask(
+    const QnMutexLockerBase& lock,
+    SocketAddRemoveTask& task)
+{
+    removeSocketFromPollSet(lock, task.socket, task.eventType);
+}
+
+void AioTaskQueue::processCallFuncTask(
+    const QnMutexLockerBase& /*lock*/,
+    SocketAddRemoveTask& task)
+{
+    NX_ASSERT(task.postHandler);
+    NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
+    m_postedCalls.push_back(std::move(task));
+
+    // This task differs from every else in a way that it is not processed here,
+    // just moved to another container.
+    // TODO #ak Is it really needed to move to another container?
+}
+
+std::vector<SocketAddRemoveTask> AioTaskQueue::processCancelPostedCallTask(
+    const QnMutexLockerBase& lock,
+    SocketAddRemoveTask& task)
+{
+    return cancelPostedCalls(lock, task.socketSequence);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void AioTaskQueue::addSocketToPollset(
+    const QnMutexLockerBase& lock,
     Pollable* socket,
     aio::EventType eventType,
     std::chrono::milliseconds timeout,
@@ -508,25 +560,38 @@ void AioTaskQueue::addSocketToPollset(
         // Adding periodic task associated with socket.
         handlingData->timeout = timeout;
         addPeriodicTask(
+            lock,
             getMonotonicTime() + timeout.count(),
             handlingData,
             socket,
             eventType);
     }
+
     socket->impl()->monitoredEvents[eventType].aioHelperData = std::move(handlingData);
 }
 
-void AioTaskQueue::addPeriodicTask(
-    const qint64 taskClock,
-    const std::shared_ptr<AioEventHandlingData>& handlingData,
-    Pollable* _socket,
+void AioTaskQueue::removeSocketFromPollSet(
+    const QnMutexLockerBase& lock,
+    Pollable* sock,
     aio::EventType eventType)
 {
-    QnMutexLocker lk(&m_socketEventProcessingMutex);
-    addPeriodicTaskNonSafe(taskClock, handlingData, _socket, eventType);
+    auto& handlingData = sock->impl()->monitoredEvents[eventType].aioHelperData;
+    if (handlingData)
+    {
+        if (handlingData->nextTimeoutClock != 0)
+            cancelPeriodicTask(lock, handlingData.get(), eventType);
+
+        handlingData = nullptr;
+    }
+
+    if (eventType == aio::etRead || eventType == aio::etWrite)
+        m_pollSet->remove(sock, eventType);
 }
 
-void AioTaskQueue::addPeriodicTaskNonSafe(
+//-------------------------------------------------------------------------------------------------
+
+void AioTaskQueue::addPeriodicTask(
+    const QnMutexLockerBase& /*lock*/,
     const qint64 taskClock,
     const std::shared_ptr<AioEventHandlingData>& handlingData,
     Pollable* _socket,
@@ -537,6 +602,61 @@ void AioTaskQueue::addPeriodicTaskNonSafe(
         taskClock,
         PeriodicTaskData(handlingData, _socket, eventType));
 }
+
+std::optional<PeriodicTaskData> AioTaskQueue::takeNextExpiredPeriodicTask(qint64 curClock)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    // Taking task from queue.
+    auto it = m_periodicTasksByClock.begin();
+    if (it == m_periodicTasksByClock.end() || it->first > curClock)
+        return std::nullopt;
+
+    auto periodicTaskData = std::move(it->second);
+    m_periodicTasksByClock.erase(it);
+
+    return periodicTaskData;
+}
+
+void AioTaskQueue::replacePeriodicTask(
+    const QnMutexLockerBase& lock,
+    const std::shared_ptr<AioEventHandlingData>& handlingData,
+    qint64 newClock,
+    Pollable* socket,
+    aio::EventType eventType)
+{
+    for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
+        it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
+        ++it)
+    {
+        if (it->second.socket == socket)
+        {
+            m_periodicTasksByClock.erase(it);
+            addPeriodicTask(
+                lock, newClock, handlingData, socket, eventType);
+            break;
+        }
+    }
+}
+
+void AioTaskQueue::cancelPeriodicTask(
+    const QnMutexLockerBase& /*lock*/,
+    AioEventHandlingData* handlingData,
+    aio::EventType eventType)
+{
+    for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
+        it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
+        ++it)
+    {
+        if (it->second.data.get() == handlingData && it->second.eventType == eventType)
+        {
+            m_periodicTasksByClock.erase(it);
+            return;
+        }
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
 
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     const QnMutexLockerBase& /*lock*/,
@@ -576,22 +696,6 @@ std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
         m_postedCalls.end());
 
     return elementsToRemove;
-}
-
-void AioTaskQueue::cancelPeriodicTask(
-    AioEventHandlingData* handlingData,
-    aio::EventType eventType)
-{
-    for (auto it = m_periodicTasksByClock.lower_bound(handlingData->nextTimeoutClock);
-        it != m_periodicTasksByClock.end() && it->first == handlingData->nextTimeoutClock;
-        ++it)
-    {
-        if (it->second.data.get() == handlingData && it->second.eventType == eventType)
-        {
-            m_periodicTasksByClock.erase(it);
-            return;
-        }
-    }
 }
 
 template<typename Func>
