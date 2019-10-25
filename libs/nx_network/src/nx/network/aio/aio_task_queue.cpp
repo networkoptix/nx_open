@@ -591,7 +591,7 @@ void AioTaskQueue::removeSocketFromPollSet(
 //-------------------------------------------------------------------------------------------------
 
 void AioTaskQueue::addPeriodicTask(
-    const QnMutexLockerBase& lock,
+    const QnMutexLockerBase& /*lock*/,
     const qint64 taskClock,
     const std::shared_ptr<AioEventHandlingData>& handlingData,
     Pollable* _socket,
