@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
     StatusChangeReason
-    Permission UserRole ConnectionResult
+    Permission UserRole ConnectionResult LicenseType
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
@@ -449,6 +449,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         LC_Count
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(LicenseType);
 
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
@@ -784,7 +785,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::MediaStreamEvent)
+    (Qn::MediaStreamEvent)(Qn::LicenseType)
     ,
     (metatype)(lexical)
 )

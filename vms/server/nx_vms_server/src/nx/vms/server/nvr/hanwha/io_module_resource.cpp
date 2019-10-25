@@ -4,6 +4,8 @@
 
 #include <utils/common/synctime.h>
 
+#include <nx/fusion/serialization/lexical.h>
+
 namespace nx::vms::server::nvr::hanwha {
 
 static const QString kInputIdPrefix("DI");
@@ -50,9 +52,12 @@ IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
 
 CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
 {
+    setFlags(flags() | Qn::io_module);
     setIoPortDescriptions(portDescriptions(), /*needMerge*/ false);
     setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
-    setFlags(flags() | Qn::io_module);
+    setProperty(
+        ResourcePropertyKey::kForcedLicenseType,
+        QnLexical::serialized(Qn::LicenseType::LC_Free));
 
     saveProperties();
 

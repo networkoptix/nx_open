@@ -164,7 +164,8 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kDeviceType)
+            else if (key == ResourcePropertyKey::kDeviceType
+                || key == ResourcePropertyKey::kForcedLicenseType)
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
@@ -347,6 +348,13 @@ bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataPro
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 {
+    Qn::LicenseType forcedLicenseType = Qn::LicenseType::LC_Invalid;
+    if (QnLexical::deserialize(
+        getProperty(ResourcePropertyKey::kForcedLicenseType), &forcedLicenseType))
+    {
+        return forcedLicenseType;
+    }
+
     if (isIOModule())
         return Qn::LC_IO;
 
