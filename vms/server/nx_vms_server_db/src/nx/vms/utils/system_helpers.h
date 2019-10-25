@@ -27,11 +27,7 @@ bool backupDatabaseLive(
     const QString& backupDir,
     const ec2::AbstractECConnectionPtr& connection);
 
-/**
- * Should be used when database file has not been opened yet.
- */
-bool backupDatabaseViaCopy(const QString& dbFilePath, int buildNumber);
-
+QString backupDbFileName(const QString& backupDir, int buildNumber);
 QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
 
 /* Newest files come first */

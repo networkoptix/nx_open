@@ -57,8 +57,6 @@
 #include <system_log/system_event_log_reader.h>
 #include <nx/vms/utils/metrics/system_controller.h>
 
-#include <nx/utils/timer_manager.h>
-
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
@@ -77,6 +75,7 @@ class LocalConnectionFactory;
 } // namespace ec2
 
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
+namespace nx::utils { class EventLoopTimer; }
 
 void restartServer(int restartTimeout);
 
@@ -114,7 +113,7 @@ public:
     }
 
     nx::vms::server::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
-    QnMediaServerResourcePtr thisServer() const { return m_mediaServer; };
+    QnMediaServerResourcePtr thisServer() const { return m_mediaServer; }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -259,6 +258,8 @@ private:
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
     void initMetricsController();
+    void onBackupDbTimer();
+    std::chrono::milliseconds calculateDbBackupTimeout() const;
 
 private:
     int m_argc = 0;
@@ -279,7 +280,7 @@ private:
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
-    std::unique_ptr<QTimer> m_createDbBackupTimer;
+    std::unique_ptr<nx::utils::EventLoopTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
     QString m_oldAnalyticsStoragePath;

@@ -78,7 +78,7 @@ protected:
             [this]() { return m_invocations.size() == GetParam().restartCount + 2; });
 
         lock.unlock();
-        // Waiting for some time to ensure no unexpected handler invocations have been produced.
+        // Waiting for some time to ensure no unexpected handler invocations have been made.
         std::this_thread::sleep_for(
             std::min(10ms, GetParam().timeout * static_cast<int>(GetParam().restartCount + 1)));
 

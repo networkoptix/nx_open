@@ -200,6 +200,7 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
+#include <nx/utils/event_loop_timer.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
@@ -3747,7 +3748,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     auto safeDisconnect =
-        [this](QObject* src, QObject* dst)
+        [](QObject* src, QObject* dst)
         {
             if (src && dst)
                 src->disconnect(dst);
@@ -4143,21 +4144,7 @@ void MediaServerProcess::connectSignals()
             }
         });
 
-    m_createDbBackupTimer = std::make_unique<QTimer>();
-    connect(
-        m_createDbBackupTimer.get(),
-        &QTimer::timeout,
-        [firstRun = true, this]() mutable
-        {
-            auto utils = nx::vms::server::Utils(serverModule());
-            utils.backupDatabase();
-            if (firstRun)
-            {
-                m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
-                firstRun = false;
-            }
-        });
-
+    m_createDbBackupTimer.reset(new nx::utils::EventLoopTimer);
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -4359,6 +4346,29 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
     }
 }
 
+void MediaServerProcess::onBackupDbTimer()
+{
+    Utils(serverModule()).backupDatabase();
+    m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
+}
+
+std::chrono::milliseconds MediaServerProcess::calculateDbBackupTimeout() const
+{
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+
+    const auto lastBackupTimestamp = Utils(serverModule()).lastDbBackupTimestamp();
+    if (!lastBackupTimestamp)
+        return 0ms;
+
+    const auto periodFromSettings = serverModule()->settings().dbBackupPeriodMS().count();
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+    if (*lastBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        return milliseconds(*lastBackupTimestamp - nowMs + periodFromSettings);
+
+    return milliseconds(std::max<int64_t>(*lastBackupTimestamp + periodFromSettings - nowMs, 0LL));
+}
+
 void MediaServerProcess::startObjects()
 {
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
@@ -4366,30 +4376,7 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
-
-    int64_t initialBackupDbPeriodMs;
-    const auto lastDbBackupTimestamp =
-        nx::vms::server::Utils(serverModule()).lastDbBackupTimestamp();
-
-    if (!lastDbBackupTimestamp)
-    {
-        initialBackupDbPeriodMs = 0; //< If no backup files so far, let's create one now.
-    }
-    else
-    {
-        const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
-        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
-        {
-            initialBackupDbPeriodMs = dbBackupPeriodMS;
-        }
-        else
-        {
-            initialBackupDbPeriodMs =
-                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
-        }
-    }
-    m_createDbBackupTimer->start(initialBackupDbPeriodMs);
+    m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 
@@ -4731,11 +4718,7 @@ void MediaServerProcess::run()
     NX_ASSERT(!nxVersion.isNull());
 
     if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
-    {
-        nx::vms::utils::backupDatabaseViaCopy(
-            ec2::detail::QnDbManager::ecsDbFileName(serverModule->settings().dataDir()),
-            nxVersionFromDb.build());
-    }
+        nx::vms::server::Utils(serverModule.get()).backupDatabaseViaCopy(nxVersionFromDb.build());
 
     if (!connectToDatabase())
         return;
