@@ -100,16 +100,18 @@ public:
     {
         if (const auto& module = m_serverModule.lock())
             return module->commonModule();
-        else
-            return nullptr;
+
+        NX_ASSERT(false, "No common module!");
+        return nullptr;
     }
 
     QnMediaServerModule* serverModule() const
     {
         if (const auto& module = m_serverModule.lock())
             return module.get();
-        else
-            return nullptr;
+
+        NX_ASSERT(false, "No server module!");
+        return nullptr;
     }
 
     nx::vms::server::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
