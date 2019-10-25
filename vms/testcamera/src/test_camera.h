@@ -16,7 +16,6 @@ class QnCommonModule;
 class QnTestCamera
 {
 public:
-
     QnTestCamera(quint32 num, bool includePts);
 
     QByteArray getMac() const;
@@ -33,10 +32,17 @@ public:
         QnCommonModule* commonModule);
 
     bool isEnabled();
+
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, nx::network::AbstractStreamSocket* socket, int fps);
+    bool doStreamingFile(
+        QList<QnCompressedVideoDataPtr> data,
+        nx::network::AbstractStreamSocket* socket,
+        int fps,
+        bool isSecondary);
+
     void makeOfflineFlood();
     int sendAll(nx::network::AbstractStreamSocket* socket, const void* data, int size);
+
 private:
     quint32 m_num;
     const bool m_includePts;
@@ -50,6 +56,7 @@ private:
     QTime m_offlineTimer;
     QTime m_checkTimer;
     int m_offlineDuration;
+    std::unique_ptr<QFile> m_logFramesFile;
 };
 
 class QnFileCache
