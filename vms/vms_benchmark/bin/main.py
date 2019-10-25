@@ -486,9 +486,9 @@ def _rtsp_perf_frames(stdout, output_file_path):
         yield stream_id, pts
 
 
-def _run_load_test(api, box, box_platform, conf, ini, vms):
+def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('')
-    report('Starting load test...')
+    report('Starting load tests...')
     load_test_started_at_s = time.time()
 
     swapped_before_bytes = get_cumulative_swap_bytes(box)
@@ -870,7 +870,9 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
             raise exceptions.BoxStateError(
                 f"More than {ini['swapThresholdMegabytes']} MB swapped at the box during the tests: {swapped_str}.")
 
-    report(f'Load test finished successfully; duration: {int(time.time() - load_test_started_at_s)} s.')
+    report(
+        f'\nLoad tests finished successfully; '
+        f'duration: {int(time.time() - load_test_started_at_s)} s.')
 
 
 def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
@@ -903,7 +905,7 @@ def _test_vms(api, box, box_platform, conf, ini, vms):
                 )
     else:
         raise exceptions.ServerApiError(message="Unable to get camera list.")
-    _run_load_test(api, box, box_platform, conf, ini, vms)
+    _run_load_tests(api, box, box_platform, conf, ini, vms)
 
 
 def _obtain_box_platform(box, linux_distribution):
