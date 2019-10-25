@@ -3,6 +3,7 @@
 #include <atomic>
 #include <deque>
 #include <memory>
+#include <optional>
 
 #include <nx/utils/math/abnormal_value_detector.h>
 #include <nx/utils/thread/mutex.h>
@@ -167,27 +168,13 @@ public:
 class NX_NETWORK_API AioTaskQueue
 {
 public:
-    // TODO: #ak Leave a single mutex in this class.
-
-    /**
-     * Used to make AIOThread public API thread-safe (to serialize access to internal structures).
-     * TODO: #ak Move this mutex to private section or to the AIOThread class.
-     */
-    mutable QnMutex mutex;
-
     AioTaskQueue(AbstractPollSet* pollSet);
 
     //---------------------------------------------------------------------------------------------
     // Methods that are called within any thread.
 
-    /**
-     * NOTE: Requires mutex locked.
-     */
     void addTask(SocketAddRemoveTask task);
 
-    /**
-     * NOTE: Requires mutex locked.
-     */
     bool taskExists(
         Pollable* const sock,
         aio::EventType eventType,
@@ -199,7 +186,6 @@ public:
      * "add socket to pollset" task. And vice versa.
      * @return true if reverse task has been cancelled and socket
      *   is already in desired state, no futher processing is needed.
-     * NOTE: Requires mutex locked.
      */
     bool removeReverseTask(
         Pollable* const sock,
@@ -236,7 +222,7 @@ public:
     void processPostedCalls();
 
     /**
-     * TODO: Review mutex requirements.
+     * TODO: Review publicMutex requirements.
      */
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
 
@@ -268,37 +254,74 @@ private:
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;
     // TODO: #ak Get rid of map here to avoid undesired allocations.
     std::multimap<qint64, PeriodicTaskData> m_periodicTasksByClock;
-    mutable QnMutex m_socketEventProcessingMutex;
+    mutable QnMutex m_mutex;
     nx::utils::math::AbnormalValueDetector<
         std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
     std::atomic<std::size_t> m_newReadMonitorTaskCount = 0;
     std::atomic<std::size_t> m_newWriteMonitorTaskCount = 0;
 
+    void processAddTask(
+        const QnMutexLockerBase& lock,
+        SocketAddRemoveTask& task);
+
+    void processChangeTimeoutTask(
+        const QnMutexLockerBase& lock,
+        SocketAddRemoveTask& task);
+
+    void processRemoveTask(
+        const QnMutexLockerBase& lock,
+        SocketAddRemoveTask& task);
+
+    void processCallFuncTask(
+        const QnMutexLockerBase& lock,
+        SocketAddRemoveTask& task);
+
+    std::vector<SocketAddRemoveTask> processCancelPostedCallTask(
+        const QnMutexLockerBase& lock,
+        SocketAddRemoveTask& task);
+
+    //---------------------------------------------------------------------------------------------
+
     void addSocketToPollset(
+        const QnMutexLockerBase& lock,
         Pollable* socket,
         aio::EventType eventType,
         std::chrono::milliseconds timeout,
         AIOEventHandler* eventHandler);
 
+    void removeSocketFromPollSet(
+        const QnMutexLockerBase& lock,
+        Pollable* sock,
+        aio::EventType eventType);
+
+    //---------------------------------------------------------------------------------------------
+
     void addPeriodicTask(
+        const QnMutexLockerBase& lock,
         const qint64 taskClock,
         const std::shared_ptr<AioEventHandlingData>& handlingData,
         Pollable* _socket,
         aio::EventType eventType);
 
-    void addPeriodicTaskNonSafe(
-        const qint64 taskClock,
+    std::optional<PeriodicTaskData> takeNextExpiredPeriodicTask(qint64 curClock);
+
+    void replacePeriodicTask(
+        const QnMutexLockerBase& lock,
         const std::shared_ptr<AioEventHandlingData>& handlingData,
-        Pollable* _socket,
+        qint64 newClock,
+        Pollable* socket,
         aio::EventType eventType);
+
+    void cancelPeriodicTask(
+        const QnMutexLockerBase& /*lock*/,
+        AioEventHandlingData* eventHandlingData,
+        aio::EventType eventType);
+
+    //---------------------------------------------------------------------------------------------
 
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
-
-    void cancelPeriodicTask(
-        AioEventHandlingData* eventHandlingData,
-        aio::EventType eventType);
 
     template<typename Func>
     void callAndReportAbnormalProcessingTime(Func func, const char* description);
