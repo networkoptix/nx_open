@@ -634,7 +634,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 first_timestamps_s = {}
                 frames = {}
                 frame_drops_per_type = {'live': 0, 'archive': 0}
-                lags = {}
                 streaming_ended_expectedly = False
                 issues = []
                 cpu_usage_max_collector = [None]
@@ -732,7 +731,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             this_frame_offset_s = frames.get(pts_stream_id, 0) * frame_interval_s
                             expected_frame_time_s = first_timestamps_s[pts_stream_id] + this_frame_offset_s
                             this_frame_lag_s = timestamp_s - expected_frame_time_s
-                            lags[pts_stream_id] = max(lags.get(pts_stream_id, 0), this_frame_lag_s)
                             max_lag_s[stream_type] = max(max_lag_s[stream_type], this_frame_lag_s)
 
                         pts_diff_deviation_factor_max = 0.03
