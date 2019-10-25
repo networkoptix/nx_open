@@ -24,12 +24,11 @@ public:
      *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
      *  @note valueGenerator is not called here!
      */
-    template<class ValueGenerator>
     CachedValue(
-        ValueGenerator&& valueGenerator,
+        MoveOnlyFunc<ValueType()> valueGenerator,
         std::chrono::milliseconds expirationTime = std::chrono::milliseconds(0))
     :
-        m_valueGenerator(std::forward<ValueGenerator>(valueGenerator)),
+        m_valueGenerator(std::move(valueGenerator)),
         m_expirationTime(expirationTime)
     {
     }
