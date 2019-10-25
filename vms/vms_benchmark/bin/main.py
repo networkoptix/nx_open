@@ -451,6 +451,41 @@ def _get_storages(api) -> List[Storage]:
         'Unable to get Server Storages via REST HTTP: not all Storages are initialized.')
 
 
+def _rtsp_perf_frames(stdout, output_file_path):
+    if output_file_path:
+        output_file = open(output_file_path, "w")
+        report(f'INI: Going to log rtsp_perf stdout lines to {output_file_path}')
+    else:
+        output_file = None
+
+    while True:
+        line = stdout.readline().decode('UTF-8').strip('\n')
+
+        if output_file:
+            output_file.write(line.strip() + '\n')
+
+        warning_prefix = 'WARNING: '
+        if line.startswith(warning_prefix):
+            raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
+
+        import re
+        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
+        if not match_res:
+            continue
+
+        rtsp_url_params = dict(
+            [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
+            for param_pair in [
+                param_pair_str.split('=')
+                for param_pair_str in match_res.group(2).split('&')
+            ]
+        )
+
+        stream_id = rtsp_url_params['vms_benchmark_stream_id']
+        pts = int(match_res.group(3))
+        yield stream_id, pts
+
+
 def _run_load_test(api, box, box_platform, conf, ini, vms):
     report('')
     report('Starting load test...')
@@ -459,13 +494,6 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
     swapped_before_bytes = get_cumulative_swap_bytes(box)
     if swapped_before_bytes is None:
         report("Cannot obtain swap information.")
-
-    ini_rtsp_perf_lines_output_file = ini["rtspPerfLinesOutputFile"]
-    if ini_rtsp_perf_lines_output_file:
-        rtsp_perf_lines_output_file = open(ini_rtsp_perf_lines_output_file, "w")
-        report(f'INI: Going to log rtsp_perf stdout lines to {ini_rtsp_perf_lines_output_file}')
-    else:
-        rtsp_perf_lines_output_file = None
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
         ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
@@ -561,6 +589,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
             )
             with stream_reader_context_manager as stream_reader_context:
                 stream_reader_process = stream_reader_context[0]
+                rtsp_perf_frames = _rtsp_perf_frames(stream_reader_process.stdout, ini["rtspPerfLinesOutputFile"])
                 streams = stream_reader_context[1]
 
                 started = False
@@ -572,28 +601,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                     if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
 
-                    line = stream_reader_process.stdout.readline().decode('UTF-8').strip('\n')
-                    if rtsp_perf_lines_output_file:
-                        rtsp_perf_lines_output_file.write(line.strip() + '\n')
-
-                    warning_prefix = 'WARNING: '
-                    if line.startswith(warning_prefix):
-                        raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
-
-                    import re
-                    match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
-                    if not match_res:
-                        continue
-
-                    rtsp_url_params = dict(
-                        [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
-                        for param_pair in [
-                            param_pair_str.split('=')
-                            for param_pair_str in match_res.group(2).split('&')
-                        ]
-                    )
-
-                    stream_id = rtsp_url_params['vms_benchmark_stream_id']
+                    stream_id, _ = next(rtsp_perf_frames)
 
                     if stream_id not in streams_started_flags:
                         raise exceptions.RtspPerfError(
@@ -717,24 +725,7 @@ def _run_load_test(api, box, box_platform, conf, ini, vms):
                             streaming_ended_expectedly = True
                             break
 
-                        line = stream_reader_process.stdout.readline().decode('UTF-8').strip('\n')
-                        if rtsp_perf_lines_output_file:
-                            rtsp_perf_lines_output_file.write(line.strip() + '\n')
-
-                        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
-                        if not match_res:
-                            continue
-
-                        rtsp_url_params = dict(
-                            [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
-                            for param_pair in [
-                                param_pair_str.split('=')
-                                for param_pair_str in match_res.group(2).split('&')
-                            ]
-                        )
-                        pts = int(match_res.group(3))
-
-                        pts_stream_id = rtsp_url_params['vms_benchmark_stream_id']
+                        pts_stream_id, pts = next(rtsp_perf_frames)
 
                         frames[pts_stream_id] = frames.get(pts_stream_id, 0) + 1
 
