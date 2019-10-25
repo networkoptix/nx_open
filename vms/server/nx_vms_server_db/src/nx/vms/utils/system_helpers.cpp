@@ -22,6 +22,10 @@
 #include <utils/common/util.h>
 #include <nx/system_commands.h>
 
+#if defined (Q_OS_MACOS) && !defined (_GNU_SOURCE)
+    #define _GNU_SOURCE
+#endif
+
 #include <boost/stacktrace.hpp>
 
 namespace nx {
