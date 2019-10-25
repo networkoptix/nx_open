@@ -641,16 +641,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 cpu_usage_avg_collector = []
                 tx_rx_errors_collector = [None]
 
-                box_poller_thread_stop_event = threading.Event()
-                box_poller_thread_exceptions_collector = []
+                stop_event = threading.Event()
+                exception_collector = []
 
-                def box_poller(
-                        stop_event,
-                        exception_collector,
-                        cpu_usage_max_collector,
-                        cpu_usage_avg_collector,
-                        tx_rx_errors_collector
-                ):
+                def box_poller():
                     prev_uptime, prev_idle_time_s = None, None
                     try:
                         while not stop_event.isSet():
@@ -693,16 +687,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         exception_collector.append(e)
                         return
 
-                box_poller_thread = threading.Thread(
-                    target=box_poller,
-                    args=(
-                        box_poller_thread_stop_event,
-                        box_poller_thread_exceptions_collector,
-                        cpu_usage_max_collector,
-                        cpu_usage_avg_collector,
-                        tx_rx_errors_collector,
-                    )
-                )
+                box_poller_thread = threading.Thread(target=box_poller)
 
                 box_poller_thread.start()
 
@@ -713,12 +698,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         if not box_poller_thread.is_alive():
                             if (
-                                len(box_poller_thread_exceptions_collector) > 0 and
+                                len(exception_collector) > 0 and
                                     isinstance(
-                                        box_poller_thread_exceptions_collector[0], exceptions.VmsBenchmarkIssue
+                                        exception_collector[0], exceptions.VmsBenchmarkIssue
                                     )
                             ):
-                                issues.append(box_poller_thread_exceptions_collector[0])
+                                issues.append(exception_collector[0])
                             else:
                                 issues.append(
                                     exceptions.TestCameraStreamingIssue(
@@ -726,7 +711,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                             'Unexpected error during acquiring VMS Server CPU usage. '
                                             'Can be caused by network issues or Server issues.'
                                         ),
-                                        original_exception=box_poller_thread_exceptions_collector
+                                        original_exception=(exception_collector)
                                     )
                                 )
                             streaming_ended_expectedly = True
@@ -786,7 +771,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         last_ptses[pts_stream_id] = pts
                 finally:
-                    box_poller_thread_stop_event.set()
+                    stop_event.set()
 
                 cpu_usage_max = cpu_usage_max_collector[0]
 
