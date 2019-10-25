@@ -11,12 +11,12 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/system_commands.h>
 #include <utils/common/synctime.h>
+#include <nx/utils/app_info.h>
 
 #include <api/test_api_requests.h>
 #include <test_support/utils.h>
 
 namespace nx::test {
-
 
 class BackupDbUt: public ::testing::Test
 {
@@ -144,12 +144,14 @@ protected:
         m_server->stop();
     }
 
-    void thenBackupFilesShouldBeCreated(int backupFilesCount)
+    QList<nx::vms::utils::DbBackupFileData> thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
         do
         {
             m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
         } while (m_backupFilesDataFound.size() != backupFilesCount);
+
+        return m_backupFilesDataFound;
     }
 
     void thenNoNewBackupFilesShouldBeCreated()
@@ -281,10 +283,17 @@ TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
 }
 
-TEST_F(BackupDbIt, NotCreatedWhenNoPreviousDbFiles)
+TEST_F(BackupDbIt, NewServer)
 {
     whenServerLaunched();
-    thenNoNewBackupFilesShouldBeCreated();
+    const auto backupFiles = thenBackupFilesShouldBeCreated(1);
+    const auto fileInfo = QFileInfo(backupFiles[0].fullPath);
+    ASSERT_TRUE(fileInfo.exists());
+    const auto splits = fileInfo.fileName().split("_");
+    ASSERT_EQ(3, splits.size());
+    ASSERT_EQ(
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build(),
+        splits[1].toInt());
 }
 
 TEST_F(BackupDbIt, FilesRotated)
