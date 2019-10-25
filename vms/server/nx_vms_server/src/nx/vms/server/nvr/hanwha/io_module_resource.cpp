@@ -45,6 +45,7 @@ static QnIOPortDataList portDescriptions()
 IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule)
 {
+    setCameraCapability(Qn::CameraCapability::ServerBoundCapability, true);
 }
 
 CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
