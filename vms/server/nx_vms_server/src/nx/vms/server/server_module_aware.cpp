@@ -8,6 +8,7 @@ namespace vms::server {
 ServerModuleAware::ServerModuleAware(QnMediaServerModule* serverModule):
     m_serverModule(serverModule)
 {
+    NX_CRITICAL(m_serverModule != nullptr);
 }
 
 ServerModuleAware::ServerModuleAware(QObject* parent)

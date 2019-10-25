@@ -499,7 +499,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     storage->fillID();
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const nx::vms::server::PlatformMonitor::PartitionSpace& part)
     { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
@@ -545,7 +545,7 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
     using namespace nx::vms::server::fs::media_paths;
 
     auto mediaPathList = get(FilterConfig::createDefault(
-        m_platform.get(), includeNonHdd, &serverModule()->settings()));
+        serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -602,7 +602,7 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
 
 QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePtr mServer)
 {
-    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
 
     QMap<QnUuid, QnStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
@@ -695,7 +695,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         const auto unmountedStorages =
             nx::mserver_aux::getUnmountedStorages(
-                m_platform.get(),
+                serverModule()->platform(),
                 m_mediaServer->getStorages(),
                 &serverModule()->settings());
         for (const auto& storageResource: unmountedStorages)
@@ -889,17 +889,17 @@ static const std::chrono::minutes kSystemUsageDumpTimeout(30);
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
-    if (!m_platform->monitor())
+    if (!serverModule()->platform()->monitor())
         return;
 
     if (!serverModule()->settings().noMonitorStatistics())
-        m_platform->monitor()->logStatistics();
+        serverModule()->platform()->monitor()->logStatistics();
 
     // TODO: #muskov
     //  - Add some more fields that might be interesting.
     //  - Make and use JSON serializable struct rather than just a string.
     QStringList networkIfList;
-    for (const auto& iface: m_platform->monitor()->totalNetworkLoad())
+    for (const auto& iface: serverModule()->platform()->monitor()->totalNetworkLoad())
     {
         if (iface.type != nx::vms::server::PlatformMonitor::LoopbackInterface)
         {
@@ -1006,9 +1006,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
         m_cmdLineArguments.rwConfigFilePath);
 
     addCommandLineParametersFromConfig(settings.get());
-
-    m_platform.reset(new QnPlatformAbstraction());
-    m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     const QString raidEventLogName = system_log::ini().logName;
     const QString raidEventProviderName = system_log::ini().providerName;
@@ -4658,6 +4655,8 @@ void MediaServerProcess::run()
 
     m_serverModule = serverModule;
 
+    m_platform.reset(new QnPlatformAbstraction());
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
     m_platform->monitor()->setServerModule(serverModule.get());
     serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
