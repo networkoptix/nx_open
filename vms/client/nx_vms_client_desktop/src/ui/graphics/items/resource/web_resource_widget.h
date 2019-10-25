@@ -1,13 +1,13 @@
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtWebEngineWidgets/QWebEnginePage>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 
-class QnGraphicsWebView;
 
-class QnWebResourceWidget : public QnResourceWidget
+class QnWebResourceWidget: public QnResourceWidget
 {
     Q_OBJECT
 
@@ -17,8 +17,6 @@ public:
     virtual ~QnWebResourceWidget();
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
-
-    QWebPage* page() const;
 
     void triggerWebAction(QWebEnginePage::WebAction action);
     bool isWebActionEnabled(QWebEnginePage::WebAction action);
@@ -41,7 +39,6 @@ private:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
 protected:
-    QnGraphicsWebView* m_webView = nullptr;
-    nx::vms::client::desktop::GraphicsWebEngineView* m_webEngineView = nullptr;
+    nx::vms::client::desktop::GraphicsWebEngineView* const m_webEngineView;
     QHash<QWebEnginePage::WebAction, QString> m_webActionText;
 };

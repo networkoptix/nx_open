@@ -15,7 +15,6 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/ini.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -24,66 +23,42 @@ QnWebResourceWidget::QnWebResourceWidget(
     QnWorkbenchItem *item,
     QGraphicsItem *parent)
     :
-    base_type(context, item, parent)
+    base_type(context, item, parent),
+    m_webEngineView(new GraphicsWebEngineView(resource()->getUrl(), this))
 {
-    if (ini().useWebEngine)
-    {
-        m_webEngineView = new GraphicsWebEngineView(resource()->getUrl());
-        initWebActionText();
-    }
-    else
-    {
-        m_webView = new QnGraphicsWebView(resource()->getUrl());
-    }
-
     setOption(AlwaysShowName, true);
 
-    if (m_webView)
-        m_webView->installEventFilter(this);
-    else
-        m_webEngineView->installEventFilter(this);
+    m_webEngineView->installEventFilter(this);
 
     const auto iconButton = titleBar()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
-    const auto webParams = detail::OverlayParams(Visible
-        , false, true, BaseLayer, contentMargins);
-    if (m_webView)
-    {
-        addOverlayWidget(m_webView, webParams);
-    }
-    else
-    {
-        addOverlayWidget(m_webEngineView, webParams);
-        connect(this, &QGraphicsWidget::geometryChanged,
-            m_webEngineView, &GraphicsQmlView::updateWindowGeometry);
-    }
+    const auto webParams = detail::OverlayParams(Visible, false, true, BaseLayer, contentMargins);
+
+    addOverlayWidget(m_webEngineView, webParams);
+    connect(this, &QGraphicsWidget::geometryChanged,
+        m_webEngineView, &GraphicsQmlView::updateWindowGeometry);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     updateTitleText();
     updateInfoText();
     updateDetailsText();
 
-    const auto updateStatusesHandler = [this]()
+    const auto updateStatusesHandler =
+        [this]()
         {
-            const auto status = m_webView ? m_webView->status() : m_webEngineView->status();
+            const auto status = m_webEngineView->status();
             const auto resourceStatus = (status == kPageLoadFailed ? Qn::Offline : Qn::Online);
             resource()->setStatus(resourceStatus);
 
             updateStatusOverlay(true);
         };
 
-    if (m_webView)
-        connect(m_webView, &QnGraphicsWebView::statusChanged, this, updateStatusesHandler);
-    else
-        connect(m_webEngineView, &GraphicsWebEngineView::statusChanged, this, updateStatusesHandler);
+    connect(m_webEngineView, &GraphicsWebEngineView::statusChanged, this, updateStatusesHandler);
 
     connect(resource(), &QnResource::urlChanged, this,
         [this]()
         {
-            if (m_webView)
-                m_webView->setUrl(resource()->getUrl());
-            else
-                m_webEngineView->setUrl(resource()->getUrl());
+            m_webEngineView->setUrl(resource()->getUrl());
         });
 
     setupOverlays();
@@ -93,10 +68,7 @@ QnWebResourceWidget::QnWebResourceWidget(
 QnWebResourceWidget::~QnWebResourceWidget()
 {
     /* statusChanged will be emitted during the destruction process. */
-    if (m_webView)
-        disconnect(m_webView, nullptr, this, nullptr);
-    else
-        disconnect(m_webEngineView, nullptr, this, nullptr);
+    m_webEngineView->disconnect(this);
 }
 
 int QnWebResourceWidget::helpTopicAt(const QPointF& /*pos*/) const
@@ -112,56 +84,32 @@ void QnWebResourceWidget::setupOverlays()
 
         auto backButton = createStatisticAwareButton(lit("web_widget_back"));
         backButton->setIcon(qnSkin->icon("item/back.png"));
-        if (m_webView)
-            connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnGraphicsWebView::back);
-        else
-            connect(backButton, &QnImageButtonWidget::clicked, m_webEngineView, &GraphicsWebEngineView::back);
+        connect(backButton, &QnImageButtonWidget::clicked, m_webEngineView, &GraphicsWebEngineView::back);
         buttonsBar->addButton(Qn::BackButton, backButton);
         buttonsBar->setButtonsEnabled(Qn::BackButton, false);
 
-        if (m_webView)
-        {
-            connect(m_webView, &QnGraphicsWebView::canGoBackChanged, this,
-                [this, buttonsBar, backButton]()
-                {
-                    buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
-                });
+        connect(m_webEngineView, &GraphicsWebEngineView::canGoBackChanged, this,
+            [this, buttonsBar]()
+            {
+                buttonsBar->setButtonsEnabled(Qn::BackButton, m_webEngineView->canGoBack());
+            });
 
-            // Should force HUD to update details text with new URL.
-            connect(m_webView, &QnGraphicsWebView::loadStarted, this,
-                [this]()
-                {
-                    this->updateDetailsText();
-                });
-        }
-        else
-        {
-            connect(m_webEngineView, &GraphicsWebEngineView::canGoBackChanged, this,
-                [this, buttonsBar, backButton]()
-                {
-                    buttonsBar->setButtonsEnabled(Qn::BackButton, m_webEngineView->canGoBack());
-                });
-
-            // Should force HUD to update details text with new URL.
-            connect(m_webEngineView, &GraphicsWebEngineView::loadStarted, this,
-                [this]()
-                {
-                    this->updateDetailsText();
-                });
-        }
+        // Should force HUD to update details text with new URL.
+        connect(m_webEngineView, &GraphicsWebEngineView::loadStarted, this,
+            [this]()
+            {
+                this->updateDetailsText();
+            });
 
         auto reloadButton = createStatisticAwareButton(lit("web_widget_reload"));
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
         connect(reloadButton, &QnImageButtonWidget::clicked, this,
             [this]()
             {
-                // We can't use QnGraphicsWebView::reload because if it was an
+                // We can't use WebEngineView::reload because if it was an
                 // error previously, reload does not work.
 
-                if (m_webView)
-                    m_webView->setPageUrl(m_webView->url());
-                else
-                    m_webEngineView->setPageUrl(m_webEngineView->url());
+                m_webEngineView->setPageUrl(m_webEngineView->url());
             });
         buttonsBar->addButton(Qn::ReloadPageButton, reloadButton);
     }
@@ -184,7 +132,7 @@ void QnWebResourceWidget::setupOverlays()
 
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
-    switch (m_webView ? m_webView->status() : m_webEngineView->status())
+    switch (m_webEngineView->status())
     {
     case kPageLoadFailed:
         return Qn::OfflineOverlay;
@@ -217,13 +165,13 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
 
 bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == m_webEngineView || object == m_webView)
+    if (object == m_webEngineView)
     {
         if (event->type() == QEvent::GraphicsSceneMousePress)
         {
             auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             mousePressEvent(mouseEvent);
-            if (object == m_webEngineView && mouseEvent->button() == Qt::RightButton)
+            if (mouseEvent->button() == Qt::RightButton)
                 return true;
         }
         else if (event->type() == QEvent::GraphicsSceneContextMenu)
@@ -233,26 +181,14 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
-QWebPage* QnWebResourceWidget::page() const
-{
-    if (m_webView)
-        return m_webView->page();
-    return nullptr;
-}
-
 void QnWebResourceWidget::triggerWebAction(QWebEnginePage::WebAction action)
 {
-    if (!m_webEngineView)
-        return;
     if (QQuickItem* webEngineView = m_webEngineView->rootObject())
         QMetaObject::invokeMethod(webEngineView, "triggerAction", Q_ARG(QVariant, action));
 }
 
 bool QnWebResourceWidget::isWebActionEnabled(QWebEnginePage::WebAction action)
 {
-    if (!m_webEngineView)
-        return false;
-
     QQuickItem* webEngineView = m_webEngineView->rootObject();
 
     if (!webEngineView)
@@ -318,10 +254,10 @@ Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, 
 
 QString QnWebResourceWidget::calculateDetailsText() const
 {
-    NX_ASSERT(m_webView || m_webEngineView);
+    NX_ASSERT(m_webEngineView);
     static constexpr int kMaxUrlDisplayLength = 96;
     // Truncating URL if it is too long to display properly
     // I could strip query part from URL, but some sites, like youtibe will be stripped too much
-    QString details = m_webView ? m_webView->url().toString() : m_webEngineView->url().toString();
-    return nx::utils::elideString(details, kMaxUrlDisplayLength);;
+    QString details = m_webEngineView->url().toString();
+    return nx::utils::elideString(details, kMaxUrlDisplayLength);
 }

@@ -1,8 +1,6 @@
 #include "workbench_update_watcher.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QDesktopServices>
-#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
@@ -36,8 +34,6 @@
 #include <nx/update/update_information.h>
 #include <nx/update/update_check.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <nx/vms/client/desktop/ini.h>
 
 #include "server_update_tool.h"
 #include "update_verification.h"
@@ -302,48 +298,28 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
         </html>
         )").arg(cssStyle, htmlBody);
 
-    QWidget* webWidget = nullptr;
-    if (ini().useWebEngine)
-    {
-        auto view = new WebEngineView(&messageBox);
-        webWidget = view;
-        // Setting up a policy for link redirection. We should not open release notes right here.
-        view->setRedirectLinksToDesktop(true);
-        view->setUseActionsForLinks(true);
-        view->insertActions(nullptr, {view->pageAction(QWebEnginePage::CopyLinkToClipboard)});
-        view->page()->setBackgroundColor(Qt::transparent);
-        NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-        view->setHtml(html, QUrl("qrc://"));
+    auto view = new WebEngineView(&messageBox);
+    // Setting up a policy for link redirection. We should not open release notes right here.
+    view->setRedirectLinksToDesktop(true);
+    view->setUseActionsForLinks(true);
+    view->insertActions(nullptr, {view->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+    view->page()->setBackgroundColor(Qt::transparent);
+    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+    view->setHtml(html, QUrl("qrc://"));
 
-        // Synchronously wait for page to load in order to match QWebView behavior.
-        static const std::chrono::milliseconds kLoadTimeout(3000);
-        view->waitLoadFinished(kLoadTimeout);
-    }
-    else
-    {
-        auto view = new QWebView(&messageBox);
-        webWidget = view;
-        NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-        view->setHtml(html);
-        // Setting up a policy for link redirection. We should not open release notes right here.
-        auto page = view->page();
-        page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-        connect(page, &QWebPage::linkClicked, this,
-            [](const QUrl& url)
-            {
-                QDesktopServices::openUrl(url);
-            });
-    }
+    // Synchronously wait for page to load in order to match QWebView behavior.
+    static const std::chrono::milliseconds kLoadTimeout(3000);
+    view->waitLoadFinished(kLoadTimeout);
 
-    // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
-    webWidget->setFixedWidth(360);
+    // We should manually adjust WebEngineView size to make it look good.
+    view->setFixedWidth(360);
     if (description.isEmpty())
-        webWidget->setFixedHeight(20);
+        view->setFixedHeight(20);
     else
-        webWidget->setFixedHeight(320);
-    webWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+        view->setFixedHeight(320);
+    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
-    messageBox.addCustomWidget(webWidget, QnMessageBox::Layout::AfterMainLabel);
+    messageBox.addCustomWidget(view, QnMessageBox::Layout::AfterMainLabel);
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
 

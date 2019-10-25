@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
+#include <QtQuickWidgets/QQuickWidget>
 
 #include <client/client_runtime_settings.h>
 
@@ -52,7 +53,7 @@ QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
             d->load(urlLineEdit->text());
         });
 #endif
-    layout->addWidget(d->webWidget());
+    layout->addWidget(d->m_quickWidget);
     setFixedSize(kSetupWizardSize);
 
     setHelpTopic(this, Qn::Setup_Wizard_Help);

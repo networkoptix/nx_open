@@ -33,30 +33,8 @@ using namespace nx::vms::client::desktop::utils;
 
 namespace {
 
-static const qint64 kDownloadBufferSize = 64 * 1024;
 static const qint64 kQuietStopTimeoutMs = 10000;
 static const auto kDataReadTimeout = std::chrono::milliseconds(60000);
-
-QString getSuggestedFileName(const QNetworkReply* reply)
-{
-    const QString urlStr = reply->url().toString();
-    QString nameFromUrl = urlStr.mid(urlStr.lastIndexOf('/') + 1);
-    int paramsIndex = nameFromUrl.indexOf('?');
-    if (paramsIndex != -1)
-        nameFromUrl = nameFromUrl.left(paramsIndex);
-
-    if (!reply->rawHeaderList().contains("Content-Disposition"))
-        return nameFromUrl;
-
-    static const QRegularExpression re(
-        "filename\\*?=['\"]?(?:UTF-\\d['\"]*)?([^;\\r\\n\"']*)['\"]?;?");
-
-    const QRegularExpressionMatch match = re.match(reply->rawHeader("Content-Disposition"));
-    if (!match.hasMatch())
-        return nameFromUrl;
-
-    return match.captured(1);
-}
 
 QString getUniqueFilePath(const QString& path)
 {
@@ -134,34 +112,12 @@ QString speedToText(qint64 bytesRead, qint64 elapsedMs)
 
 WebDownloader::WebDownloader(
     QObject* parent,
-    std::shared_ptr<QNetworkAccessManager> networkManager,
-    QNetworkReply* reply,
-    std::unique_ptr<QFile> file,
-    const QFileInfo& fileInfo)
-    :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_networkManager(networkManager),
-    m_reply(reply),
-    m_file(std::move(file)),
-    m_fileInfo(fileInfo),
-    m_item(nullptr)
-{
-    m_reply->setParent(this);
-    startDownload();
-}
-
-WebDownloader::WebDownloader(
-    QObject* parent,
-    const QFileInfo& fileInfo,
+    const QString& filePath,
     QObject* item)
     :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_networkManager(nullptr),
-    m_reply(nullptr),
-    m_file(nullptr),
-    m_fileInfo(fileInfo),
+    m_fileInfo(filePath),
     m_item(item)
 {
     startDownload();
@@ -189,61 +145,26 @@ WebDownloader::~WebDownloader()
         QMetaObject::invokeMethod(m_item, "cancel");
         return;
     }
-
-    if (!m_file)
-        return;
-
-    // Cleanup incomplete files.
-    if (m_file->isOpen())
-        m_file->close();
-
-    m_file->remove();
 }
 
 bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
 {
     const auto suggestedName = QFileInfo(item->property("path").toString()).fileName();
 
-    std::unique_ptr<QFile> file;
-    QFileInfo fileInfo;
-
     ContextHelper contextHelper(context);
 
-    if (!selectFile(suggestedName, contextHelper.windowWidget(), file, fileInfo))
+    QString path = selectFile(suggestedName, contextHelper.windowWidget());
+    if (path.isEmpty())
         return false;
 
-    file->close();
-    file->remove();
+    item->setProperty("path", path);
 
-    item->setProperty("path", fileInfo.absoluteFilePath());
-
-    new WebDownloader(context->instance<WorkbenchProgressManager>(), fileInfo, item);
+    new WebDownloader(context->instance<WorkbenchProgressManager>(), path, item);
 
     return true;
 }
 
-bool WebDownloader::download(
-    std::shared_ptr<QNetworkAccessManager> manager, QNetworkReply* reply, QObject* parent)
-{
-    // Avoid blocking event loop for writing long chunks.
-    reply->setReadBufferSize(kDownloadBufferSize);
-
-    const auto suggestedName = getSuggestedFileName(reply);
-
-    std::unique_ptr<QFile> file;
-    QFileInfo fileInfo;
-
-    ContextHelper contextHelper(parent);
-
-    if (!selectFile(suggestedName, contextHelper.windowWidget(), file, fileInfo))
-        return false;
-
-    new WebDownloader(contextHelper.context()->instance<WorkbenchProgressManager>(), manager, reply, std::move(file), fileInfo);
-
-    return true;
-}
-
-bool WebDownloader::selectFile(const QString& suggestedName, QWidget* widget, std::unique_ptr<QFile>& file, QFileInfo& fileInfo)
+QString WebDownloader::selectFile(const QString& suggestedName, QWidget* widget)
 {
     auto lastDir = qnSettings->lastDownloadDir();
     if (lastDir.isEmpty() || !QDir(lastDir).exists())
@@ -254,6 +175,7 @@ bool WebDownloader::selectFile(const QString& suggestedName, QWidget* widget, st
     // Loop until we have a writable file path.
     while (true)
     {
+        // Request file path from the user.
         QnCustomFileDialog saveDialog(widget,
             tr("Save File As..."),
             filePath,
@@ -262,25 +184,34 @@ bool WebDownloader::selectFile(const QString& suggestedName, QWidget* widget, st
         saveDialog.setAcceptMode(QFileDialog::AcceptSave);
 
         if (!saveDialog.exec())
-            return false;
+            return QString();
 
         filePath = saveDialog.selectedFile();
 
         if (filePath.isEmpty())
-            return false;
+            return QString();
 
-        fileInfo = QFileInfo(filePath);
-        file = std::make_unique<QFile>();
-        file->setFileName(fileInfo.absoluteFilePath());
+        // Check if its writable.
+        const auto fileInfo = QFileInfo(filePath);
+        filePath = fileInfo.absoluteFilePath();
+
+        auto file = std::make_unique<QFile>();
+        file->setFileName(filePath);
         if (file->open(QIODevice::WriteOnly))
-            break; // Break from the loop if we got a writable file.
+        {
+            file->close();
+            file->remove();
+            qnSettings->setLastDownloadDir(fileInfo.absolutePath());
+            return filePath;
+        }
 
+        // Unable to write to selected file - show error message.
         QnMessageBox messageBox(widget);
         messageBox.setIcon(QnMessageBoxIcon::Critical);
         if (fileInfo.exists())
         {
             messageBox.setText(tr("Failed to overwrite file"));
-            messageBox.setInformativeText(QDir::toNativeSeparators(fileInfo.absoluteFilePath()));
+            messageBox.setInformativeText(QDir::toNativeSeparators(filePath));
         }
         else
         {
@@ -293,9 +224,8 @@ bool WebDownloader::selectFile(const QString& suggestedName, QWidget* widget, st
         messageBox.exec();
     }
 
-    qnSettings->setLastDownloadDir(fileInfo.absolutePath());
-
-    return true;
+    NX_ASSERT(false, "Unreachable");
+    return QString();
 }
 
 void WebDownloader::startDownload()
@@ -306,9 +236,12 @@ void WebDownloader::startDownload()
     setState(State::Downloading);
 
     auto action = CommandActionPtr(new CommandAction(tr("Open Containing Folder")));
-    connect(action.data(), &QAction::triggered, this, [this]() {
-        QnEnvironment::showInGraphicalShell(m_fileInfo.absoluteFilePath());
-    });
+    connect(action.data(), &QAction::triggered, this,
+        [this]()
+        {
+            QnEnvironment::showInGraphicalShell(m_fileInfo.absoluteFilePath());
+        });
+
     progressManager->setAction(m_activityId, action);
 
     connect(progressManager,
@@ -363,34 +296,10 @@ void WebDownloader::startDownload()
             cancel();
         });
 
-    if (m_item)
-    {
-        connect(m_item, SIGNAL(receivedBytesChanged()), this, SLOT(onReceivedBytesChanged()));
-        connect(m_item, SIGNAL(stateChanged()), this, SLOT(onStateChanged()));
-        DownloadItemReadTimeout::set(m_item, kDataReadTimeout);
-        QMetaObject::invokeMethod(m_item, "accept");
-        return;
-    }
-
-    if (!m_reply)
-        return;
-
-    connect(m_reply, &QNetworkReply::readyRead, this, &WebDownloader::writeAvailableData);
-    connect(m_reply, &QNetworkReply::downloadProgress, this, &WebDownloader::onDownloadProgress);
-    connect(m_reply, &QNetworkReply::finished, this, &WebDownloader::onReplyFinished);
-
-    ReplyReadTimeout::set(m_reply, kDataReadTimeout);
-
-    // If we missed readyRead or finished signals while save dialog event loop was running...
-    if (m_reply->isRunning())
-        writeAvailableData();
-
-    if (m_reply->isFinished())
-    {
-        if (m_reply->error() == QNetworkReply::NoError)
-            writeAvailableData();
-        onReplyFinished();
-    }
+    connect(m_item, SIGNAL(receivedBytesChanged()), this, SLOT(onReceivedBytesChanged()));
+    connect(m_item, SIGNAL(stateChanged()), this, SLOT(onStateChanged()));
+    DownloadItemReadTimeout::set(m_item, kDataReadTimeout);
+    QMetaObject::invokeMethod(m_item, "accept");
 }
 
 void WebDownloader::cancel()
@@ -416,12 +325,6 @@ void WebDownloader::cancel()
             return;
     }
     m_cancelRequested = true;
-
-    if (m_file)
-    {
-        m_file->remove();
-        m_reply->abort();
-    }
 
     this->deleteLater();
 }
@@ -459,16 +362,6 @@ void WebDownloader::setState(State state)
         default:
             NX_ASSERT(false && "Invalid state change");
             break;
-    }
-}
-
-void WebDownloader::writeAvailableData()
-{
-    const auto data = m_reply->readAll();
-    if (m_file->write(data) != data.size())
-    {
-        m_hasWriteError = true;
-        m_reply->abort();
     }
 }
 
@@ -516,27 +409,4 @@ void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
 
     progressManager->setProgress(m_activityId, static_cast<qreal>(bytesRead) / bytesTotal);
     progressManager->setProgressFormat(m_activityId, QString("%1, %p%").arg(speed));
-}
-
-void WebDownloader::onReplyFinished()
-{
-    const bool success = m_reply->error() == QNetworkReply::NoError && !m_hasWriteError;
-
-    if (success)
-    {
-        setState(State::Completed);
-    }
-    else
-    {
-        // Show failed notification only if there was no cancel request from the user.
-        // If the user manually canceled the downloading process then silently remove the informer.
-        if (!m_cancelRequested)
-            setState(State::Failed);
-    }
-
-    if (m_file->isOpen())
-        m_file->close();
-
-    if (!success)
-        m_file->remove();
 }

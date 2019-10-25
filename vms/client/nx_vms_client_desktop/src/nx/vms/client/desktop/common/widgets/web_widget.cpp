@@ -1,8 +1,5 @@
 #include "web_widget.h"
 
-#include <QtNetwork/QNetworkReply>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWebKitWidgets/QWebFrame>
 #include <QtWidgets/QLabel>
 
 #include <ui/style/webview_style.h>
@@ -16,43 +13,13 @@
 
 namespace nx::vms::client::desktop {
 
-WebWidget::WebWidget(QWidget* parent, bool useActionsForLinks):
+WebWidget::WebWidget(QWidget* parent):
     base_type(parent)
 {
-    QWidget* view = nullptr;
-    if (ini().useWebEngine)
-    {
-        m_webEngineView = new WebEngineView(this);
-        m_webEngineView->setUseActionsForLinks(true);
-        view = m_webEngineView;
-    }
-    else
-    {
-        m_webView = new QWebView(this);
-        view = m_webView;
+    m_webEngineView = new WebEngineView(this);
 
-        if (useActionsForLinks)
-        {
-            installEventHandler(m_webView, QEvent::ContextMenu, this,
-            [this](QObject* watched, QEvent* event)
-            {
-                NX_ASSERT(watched == m_webView && event->type() == QEvent::ContextMenu);
-                const auto frame = m_webView->page()->mainFrame();
-                if (!frame)
-                    return;
-
-                const auto menuEvent = static_cast<QContextMenuEvent*>(event);
-                const auto hitTest = frame->hitTestContent(menuEvent->pos());
-
-                m_webView->setContextMenuPolicy(hitTest.linkUrl().isEmpty()
-                    ? Qt::DefaultContextMenu
-                    : Qt::ActionsContextMenu); //< Special context menu for links.
-            });
-        }
-    }
-
-    NxUi::setupWebViewStyle(view);
-    anchorWidgetToParent(view);
+    NxUi::setupWebViewStyle(m_webEngineView);
+    anchorWidgetToParent(m_webEngineView);
 
     static constexpr int kDotRadius = 8;
     auto busyIndicator = new BusyIndicatorWidget(parent);
@@ -67,34 +34,19 @@ WebWidget::WebWidget(QWidget* parent, bool useActionsForLinks):
     errorLabel->setForegroundRole(QPalette::WindowText);
     anchorWidgetToParent(errorLabel);
 
-    if (m_webView)
-    {
-        connect(m_webView, &QWebView::loadStarted, busyIndicator, &QWidget::show);
-        connect(m_webView, &QWebView::loadFinished, busyIndicator, &QWidget::hide);
-        connect(m_webView, &QWebView::loadStarted, errorLabel, &QWidget::hide);
-        connect(m_webView, &QWebView::loadFinished, errorLabel, &QWidget::setHidden);
-    }
-    else
-    {
-        connect(m_webEngineView, &QWebEngineView::loadStarted, busyIndicator, &QWidget::show);
-        connect(m_webEngineView, &QWebEngineView::loadFinished, busyIndicator, &QWidget::hide);
-        connect(m_webEngineView, &QWebEngineView::loadStarted, errorLabel, &QWidget::hide);
-        connect(m_webEngineView, &QWebEngineView::loadFinished, this,
-            [this, errorLabel](bool ok)
-            {
-                static const QUrl kEmptyPage("about:blank");
-                errorLabel->setVisible(m_webEngineView->url() == kEmptyPage);
-                if (ok)
-                    return;
-                // Replicate QWebKit behavior.
-                m_webEngineView->load(kEmptyPage);
-            });
-    }
-}
-
-QWebView* WebWidget::view() const
-{
-    return m_webView;
+    connect(m_webEngineView, &QWebEngineView::loadStarted, busyIndicator, &QWidget::show);
+    connect(m_webEngineView, &QWebEngineView::loadFinished, busyIndicator, &QWidget::hide);
+    connect(m_webEngineView, &QWebEngineView::loadStarted, errorLabel, &QWidget::hide);
+    connect(m_webEngineView, &QWebEngineView::loadFinished, this,
+        [this, errorLabel](bool ok)
+        {
+            static const QUrl kEmptyPage("about:blank");
+            errorLabel->setVisible(m_webEngineView->url() == kEmptyPage);
+            if (ok)
+                return;
+            // Replicate QWebKit behavior.
+            m_webEngineView->load(kEmptyPage);
+        });
 }
 
 WebEngineView* WebWidget::webEngineView() const
@@ -104,35 +56,14 @@ WebEngineView* WebWidget::webEngineView() const
 
 void WebWidget::load(const QUrl& url)
 {
-    if (m_webView)
-        m_webView->load(url);
-    else
-        m_webEngineView->load(url);
-}
-
-void WebWidget::load(const QNetworkRequest& request)
-{
-    if (m_webView)
-        m_webView->load(request);
-    else
-        m_webEngineView->load(request.url());
+    m_webEngineView->load(url);
 }
 
 void WebWidget::reset()
 {
-    if (m_webView)
-    {
-        m_webView->triggerPageAction(QWebPage::Stop);
-        m_webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
-        m_webView->setContent({});
-    }
-    else
-    {
-        m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
-        //FIXME: There is no analog for StopScheduledPageRefresh
-        m_webEngineView->setContent({});
-    }
-
+    m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
+    //FIXME: There is no analog for StopScheduledPageRefresh
+    m_webEngineView->setContent({});
 }
 
 } // namespace nx::vms::client::desktop

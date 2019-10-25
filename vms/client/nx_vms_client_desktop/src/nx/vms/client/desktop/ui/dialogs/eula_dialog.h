@@ -8,8 +8,6 @@ namespace Ui { class EulaDialog; }
 
 namespace nx::vms::client::desktop {
 
-class WebEngineView;
-
 class EulaDialog: public QnDialog
 {
     Q_OBJECT
@@ -37,7 +35,6 @@ private:
 
 private:
     nx::utils::ImplPtr<Ui::EulaDialog> ui;
-    WebEngineView* m_webEngineView;
 };
 
 } // namespace nx::vms::client::desktop

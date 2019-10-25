@@ -87,11 +87,6 @@ struct Ini: nx::kit::IniConfig
         "Forces the compatibility mode dialog to appear when connecting to the system.");
     NX_INI_FLAG(0, allowOsScreenSaver,
         "Allows the OS to enable a screensaver when the user is not active.");
-    NX_INI_FLAG(0, enableWebKitDeveloperExtras,
-        "Enables WebKit developer tools such as Inspector.\n"
-        "\n"
-        "The tools will become available in built-in browser windows. ATTENTION: Activation\n"
-        "of this setting may result in unstable behavior of the built-in browser.");
     NX_INI_FLAG(1, enableWebKitPlugins,
         "Enables WebKit NPAPI plugins (Flash, Java, etc.).");
     NX_INI_FLAG(1, modalServerSetupWizard,
@@ -204,7 +199,6 @@ struct Ini: nx::kit::IniConfig
         "Send analytics time period requests only when these periods are visible.");
     NX_INI_STRING("", updateFeedUrl,
         "Overrides URL update server. Leave empty value to use built-in path.");
-    NX_INI_FLAG(0, useWebEngine, "Use Chromium-based web engine.");
 };
 
 inline Ini& ini()

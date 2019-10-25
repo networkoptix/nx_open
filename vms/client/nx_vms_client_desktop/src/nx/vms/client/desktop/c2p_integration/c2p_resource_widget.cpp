@@ -1,8 +1,5 @@
 #include "c2p_resource_widget.h"
 
-#include <QtWebKitWidgets/QWebFrame>
-#include <QtWebKitWidgets/QWebPage>
-
 #include <api/helpers/camera_id_helper.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -50,28 +47,12 @@ C2pResourceWidget::C2pResourceWidget(
     :
     base_type(context, item, parent)
 {
-    if (m_webView)
-    {
-        QWebFrame* frame = m_webView->page()->mainFrame();
-        connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this,
-            [this, frame]()
-            {
-                frame->addToJavaScriptWindowObject(lit("external"), this);
-            });
-
-        NxUi::setupWebViewStyle(m_webView, NxUi::WebViewStyle::c2p);
-
-        m_webView->page()->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
-    }
-    else
-    {
-        NxUi::setupWebViewStyle(m_webEngineView, NxUi::WebViewStyle::c2p);
-        m_webEngineView->whenRootReady(
-            [this]()
-            {
-                m_webEngineView->addToJavaScriptWindowObject("external", this);
-            });
-    }
+    NxUi::setupWebViewStyle(m_webEngineView, NxUi::WebViewStyle::c2p);
+    m_webEngineView->whenRootReady(
+        [this]()
+        {
+            m_webEngineView->addToJavaScriptWindowObject("external", this);
+        });
 }
 
 void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec)

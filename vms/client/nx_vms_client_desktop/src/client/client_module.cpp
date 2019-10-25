@@ -6,7 +6,6 @@
 #include <QtCore/QFileInfo>
 
 #include <QtWidgets/QApplication>
-#include <QtWebKit/QWebSettings>
 #include <QtWebEngine/QtWebEngine>
 #include <QtWebEngineWidgets/QWebEngineSettings>
 #include <QtQml/QQmlEngine>
@@ -240,20 +239,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initSkin();
     initLocalResources();
     initSurfaceFormat();
-
-    // WebKit initialization must occur only once per application run. Actual for ActiveX module.
-    static bool isWebKitInitialized = false;
-    if (!isWebKitInitialized)
-    {
-        const auto settings = QWebSettings::globalSettings();
-        settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
-        settings->enablePersistentStorage();
-
-        if (ini().enableWebKitDeveloperExtras)
-            settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-
-        isWebKitInitialized = true;
-    }
 
     qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
     QtWebEngine::initialize();

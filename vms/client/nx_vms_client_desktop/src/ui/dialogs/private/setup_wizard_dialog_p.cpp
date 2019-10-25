@@ -3,17 +3,14 @@
 #include <ui/dialogs/setup_wizard_dialog.h>
 
 #include <QtGui/QDesktopServices>
-#include <QtWebKitWidgets/QWebFrame>
 #include <QtQuick/QQuickItem>
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/widgets/common/web_page.h>
 
 #include <nx/utils/log/log.h>
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/vms/client/desktop/ini.h>
 #include <client_core/client_core_module.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSetupWizardDialogPrivate::LoginInfo, (json), LoginInfo_Fields);
@@ -24,70 +21,37 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
     QnSetupWizardDialog *parent)
     :
     QObject(parent),
-    q_ptr(parent)
+    q_ptr(parent),
+    m_quickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent))
 {
     Q_Q(QnSetupWizardDialog);
 
     static const QString exportedName("setupDialog");
 
-    if (ini().useWebEngine)
-    {
-        m_quickWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent);
-        connect(m_quickWidget, &QQuickWidget::statusChanged,
-            this, [this, q](QQuickWidget::Status status){
-                if (status != QQuickWidget::Ready)
-                    return;
+    connect(m_quickWidget, &QQuickWidget::statusChanged,
+        this, [this, q](QQuickWidget::Status status){
+            if (status != QQuickWidget::Ready)
+                return;
 
-                QQuickItem* webView = m_quickWidget->rootObject();
-                if (!webView)
-                    return;
+            QQuickItem* webView = m_quickWidget->rootObject();
+            if (!webView)
+                return;
 
-                connect(webView, SIGNAL(windowCloseRequested()), q, SLOT(accept()));
+            connect(webView, SIGNAL(windowCloseRequested()), q, SLOT(accept()));
 
-                // Workaround for webadmin JS code which expects synchronous slot calls.
-                static constexpr bool enablePromises = true;
-                GraphicsWebEngineView::registerObject(webView, exportedName, this, enablePromises);
-            });
+            // Workaround for webadmin JS code which expects synchronous slot calls.
+            static constexpr bool enablePromises = true;
+            GraphicsWebEngineView::registerObject(webView, exportedName, this, enablePromises);
+        });
 
-        m_quickWidget->setClearColor(parent->palette().window().color());
-        m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_quickWidget->setClearColor(parent->palette().window().color());
+    m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-        m_quickWidget->setSource(GraphicsWebEngineView::kQmlSourceUrl);
-    }
-    else
-    {
-        m_webView = new QWebView(parent);
-        QnWebPage* page = new QnWebPage(m_webView);
-        m_webView->setPage(page);
-
-        QWebFrame *frame = page->mainFrame();
-
-        connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
-            this, [this, frame]()
-            {
-                frame->addToJavaScriptWindowObject(exportedName, this);
-            });
-
-        connect(page, &QWebPage::windowCloseRequested, q, &QnSetupWizardDialog::accept);
-    }
-}
-
-QWidget* QnSetupWizardDialogPrivate::webWidget()
-{
-    if (m_webView)
-        return m_webView;
-
-    return m_quickWidget;
+    m_quickWidget->setSource(GraphicsWebEngineView::kQmlSourceUrl);
 }
 
 void QnSetupWizardDialogPrivate::load(const QUrl& url)
 {
-    if (m_webView)
-    {
-        m_webView->load(url);
-        return;
-    }
-
     const auto setUrlFunc =
         [this, url](QQuickWidget::Status status)
         {
@@ -131,9 +95,7 @@ void QnSetupWizardDialogPrivate::cancel()
     Q_Q(QnSetupWizardDialog);
 
     /* Remove 'accept' connection. */
-    if (m_webView)
-        m_webView->page()->disconnect(q);
-    else if (QQuickItem* webView = m_quickWidget->rootObject())
+    if (QQuickItem* webView = m_quickWidget->rootObject())
         webView->disconnect(q);
 
     /* Security fix to make sure we will never try to login further. */

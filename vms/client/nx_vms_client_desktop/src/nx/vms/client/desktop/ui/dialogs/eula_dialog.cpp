@@ -20,7 +20,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 
 namespace nx::vms::client::desktop {
@@ -37,24 +36,11 @@ EulaDialog::EulaDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    if (ini().useWebEngine)
-    {
-        m_webEngineView = new WebEngineView(this);
-        m_webEngineView->setRedirectLinksToDesktop(true);
-        m_webEngineView->setUseActionsForLinks(true);
-        m_webEngineView->insertActions(nullptr,
-            {m_webEngineView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
-        m_webEngineView->setSizePolicy(ui->eulaView->sizePolicy());
-        m_webEngineView->page()->setBackgroundColor(Qt::transparent);
-        auto previous = ui->verticalLayout->replaceWidget(ui->eulaView, m_webEngineView);
-        delete previous;
-
-        ui->eulaView = nullptr;
-    }
-    else
-    {
-        m_webEngineView = nullptr;
-    }
+    ui->eulaView->setRedirectLinksToDesktop(true);
+    ui->eulaView->setUseActionsForLinks(true);
+    ui->eulaView->insertActions(nullptr,
+        {ui->eulaView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+    ui->eulaView->page()->setBackgroundColor(Qt::transparent);
 
     ui->iconLabel->setPixmap(
         QnSkin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
@@ -82,10 +68,7 @@ EulaDialog::EulaDialog(QWidget* parent):
 
     setAccentStyle(ui->accept);
 
-    if (m_webEngineView)
-        NxUi::setupWebViewStyle(m_webEngineView, NxUi::WebViewStyle::eula);
-    else
-        NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
+    NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
 }
 
 EulaDialog::~EulaDialog()
@@ -112,10 +95,7 @@ void EulaDialog::setEulaHtml(const QString& html)
         lit("<head>"),
         lit("<head><style>%1</style>").arg(eulaHtmlStyle));
 
-    if (m_webEngineView)
-        m_webEngineView->setHtml(eulaText, QUrl("qrc://"));
-    else
-        ui->eulaView->setHtml(eulaText);
+    ui->eulaView->setHtml(eulaText, QUrl("qrc://"));
 
     // We do not want to copy embedded style to clipboard.
     QTextDocument doc;

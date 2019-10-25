@@ -10,8 +10,6 @@
 #include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWebEngineWidgets/QWebEngineView>
 
-#include <QtWebKitWidgets/QWebView>
-
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
@@ -28,7 +26,6 @@
 #include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/style/webview_style.h>
-#include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/widgets/main_window.h>
 
@@ -63,57 +60,6 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
-
-class QnWebViewDialog: public QDialog
-{
-    using base_type = QDialog;
-
-public:
-    QnWebViewDialog(QWidget* parent = nullptr):
-        base_type(parent, Qt::Window),
-        m_page(new QnWebPage(this)),
-        m_webView(new QWebView(this)),
-        m_urlLineEdit(new QLineEdit(this))
-    {
-        m_webView->setPage(m_page);
-
-        NxUi::setupWebViewStyle(m_webView);
-
-        QVBoxLayout *layout = new QVBoxLayout(this);
-        layout->setContentsMargins(QMargins());
-        layout->addWidget(m_urlLineEdit);
-        layout->addWidget(m_webView);
-        connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
-            [this]
-            {
-                m_webView->load(m_urlLineEdit->text());
-            });
-
-        auto paletteWidget = new PaletteWidget(this);
-        paletteWidget->setDisplayPalette(m_webView->palette());
-        layout->addWidget(paletteWidget);
-        connect(paletteWidget, &PaletteWidget::paletteChanged, this,
-            [this, paletteWidget]
-            {
-                m_webView->setPalette(paletteWidget->displayPalette());
-            });
-
-        }
-
-    QString url() const { return m_urlLineEdit->text(); }
-
-    void setUrl(const QString& value)
-    {
-        m_urlLineEdit->setText(value);
-        m_webView->load(QUrl::fromUserInput(value));
-    }
-
-private:
-    QnWebPage* const m_page;
-    QWebView* const m_webView;
-    QLineEdit* const m_urlLineEdit;
-};
-
 
 class WebEngineViewDialog: public QDialog
 {
@@ -201,14 +147,6 @@ public:
             [this]()
             {
                 const auto dialog = new InteractiveSettingsTestDialog(this);
-                dialog->show();
-            });
-
-        addButton("Web View",
-            [this]()
-            {
-                auto dialog(new QnWebViewDialog(this));
-                //dialog->setUrl("http://localhost:7001");
                 dialog->show();
             });
 
