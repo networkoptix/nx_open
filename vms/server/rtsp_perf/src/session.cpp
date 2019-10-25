@@ -10,13 +10,22 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/random_qt_device.h>
 
-
-const char* streamTypeToString(uint16_t flags)
+/**
+ * Print the message to stdout, intended to be parsed by programs calling this tool.
+ *
+ * ATTENTION: The format of such messages should be changed responsibly, revising their usages.
+ */
+static void report(const QString& message)
 {
-    auto mediaFlags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
+    printf("%s\n", message.toUtf8().constData());
+}
+
+static const char* streamTypeToString(uint16_t flags)
+{
+    const auto mediaFlags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
     if (mediaFlags.testFlag(QnAbstractMediaData::MediaFlags_LowQuality))
-        return "low quality";
-    return "high quality";
+        return "secondary";
+    return "primary";
 }
 
 void Session::run(const QString& url, const Config& config, bool live)
@@ -77,7 +86,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         }
         if (bytesRead <= 0)
         {
-            printf("WARNING: Camera %s: failed to read data\n", url.toUtf8().data());
+            report(lm("WARNING: Camera %1: Failed to read data.").args(url));
             failed = true;
             ++failedCount;
             break;
@@ -90,38 +99,34 @@ void Session::run(const QString& url, const Config& config, bool live)
 
 void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url)
 {
-    using namespace std::chrono;
-    if (m_config.maxTimestampDiff != milliseconds::zero() && diff > m_config.maxTimestampDiff)
+    constexpr auto kZeroUs = std::chrono::microseconds::zero();
+    const char* violationCaption = nullptr;
+    if (m_config.maxTimestampDiff != kZeroUs && diff > m_config.maxTimestampDiff)
+        violationCaption = "more";
+    else if (m_config.minTimestampDiff != kZeroUs && diff < m_config.minTimestampDiff)
+        violationCaption = "less";
+
+    if (violationCaption)
     {
-        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us more than %lld us\n",
-            url,
-            (long long int) timestampUs,
-            (long long int) diff.count(),
-            (long long int) m_config.maxTimestampDiff.count());
-    }
-    if (m_config.minTimestampDiff != milliseconds::zero() && diff < m_config.minTimestampDiff)
-    {
-        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us is less than %lld us\n",
-            url,
-            (long long int) timestampUs,
-            (long long int) diff.count(),
-            (long long int) m_config.minTimestampDiff.count());
+        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is %4 than %5 us.").args(
+            url, timestampUs, diff.count(), violationCaption, m_config.maxTimestampDiff.count()));
     }
 }
 
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    auto nowTime = std::chrono::system_clock::now();
+    const auto nowTime = std::chrono::system_clock::now();
     Packet packet;
-    if (parsePacket(data, size, packet))
+    if (parsePacket(data, size, packet, url))
     {
         if (m_config.printTimestamps)
         {
-            int64_t timestampDiffUs = packet.timestampUs - m_prevTimestampUs;
-            printf("Camera %s: timestamp %lld us, diff %lld us, stream type %s\n", url,
-                (long long int) packet.timestampUs,
-                (m_prevTimestampUs == -1) ? -1LL : timestampDiffUs,
-                streamTypeToString(packet.flags));
+            const int64_t timestampDiffUs = packet.timestampUs - m_prevTimestampUs;
+            report(lm("Camera %1: Frame timestamp %2 us, diff %3 us, stream %4.").args(
+                url,
+                packet.timestampUs,
+                (m_prevTimestampUs == -1) ? -1 : timestampDiffUs,
+                streamTypeToString(packet.flags)));
 
             if (m_prevTimestampUs != -1)
                 checkDiff(std::chrono::microseconds(timestampDiffUs), packet.timestampUs, url);
@@ -135,31 +140,39 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
         if (timeFromLastFrame > m_config.timeout)
         {
-            printf("WARNING: camera %s, video frame was not received for %lfsec\n",
-                url, timeFromLastFrame.count());
+            report(lm("WARNING: Camera %1: Video frame was not received for %2 s.")
+                .args(url, timeFromLastFrame.count()));
             return false;
         }
     }
     return true;
 }
 
-bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet)
+bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet, const char* url)
 {
     using namespace nx::streaming::rtp;
     static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 
     if (size < sizeof(RtpHeader))
     {
-        NX_WARNING(this, "Got too short RTP packet. Ignored.");
+        NX_WARNING(this, "Camera %1: Got too short RTP packet. Ignored.", url);
         return false;
     }
 
     const RtpHeader* rtpHeader = (RtpHeader*) data;
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
     {
-        NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
+        NX_WARNING(this, "Camera %1: Got malformed RTP packet header. Ignored.", url);
         return false;
     }
+
+    const uint16_t sequence = qFromBigEndian(rtpHeader->sequence);
+    if (sequence != (uint16_t) (m_prevSequence + 1))
+    {
+        NX_WARNING(this, "Camera %1: Unexpected RTP packet sequence number: %2 instead of %3.",
+            url, sequence, m_prevSequence);
+    }
+    m_prevSequence = sequence;
 
     const bool isNewPacket = m_newPacket;
     m_newPacket = rtpHeader->marker;
