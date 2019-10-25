@@ -56,6 +56,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
         FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
         MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
+        ServerBoundCapability               = 0x100000, //< Camera is bound to a particular server.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
