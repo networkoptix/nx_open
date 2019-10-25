@@ -35,6 +35,7 @@ public:
     int maxConnections;
     bool ddosWarned;
     SystemError::ErrorCode lastError;
+    bool isStopped;
 
     static QByteArray defaultPage;
     static QString pathIgnorePrefix;
@@ -45,7 +46,8 @@ public:
         useSSL(false),
         maxConnections(0),
         ddosWarned(false),
-        lastError(SystemError::noError)
+        lastError(SystemError::noError),
+        isStopped(false)
     {
     }
 };
@@ -112,6 +114,13 @@ QnTcpListener::~QnTcpListener()
     stop();
     destroyServerSocket();
     delete d_ptr;
+}
+
+void QnTcpListener::stop()
+{
+    Q_D(QnTcpListener);
+    d->isStopped = true;
+    QnLongRunnable::stop();
 }
 
 static const int kSocketAcceptTimeoutMs = 250;
@@ -385,6 +394,11 @@ void QnTcpListener::run()
 void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
     Q_D(QnTcpListener);
+    {
+        QnMutexLocker lock(&d->connectionMtx);
+        if (d->isStopped)
+            return;
+    }
 
     if (d->connections.size() > d->maxConnections)
     {
