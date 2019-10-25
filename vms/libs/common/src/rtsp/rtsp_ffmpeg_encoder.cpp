@@ -103,7 +103,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
-    if (!m_media)
+    if (m_eofReached || !m_media)
         return false;
 
     bool hasDataContext = !m_codecCtxData.isEmpty();
@@ -132,7 +132,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     flags |= m_additionFlags;
 
     int cseq = m_media->opaque;
-
     bool isLive = m_media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (isLive) {
         cseq = m_liveMarker;
@@ -144,11 +143,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     // One video channel may has several subchannels (video combined with frames from
     // difference codecContext). Max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel
     // used 2 ssrc: for data and for CodecContext.
-
-    const char* dataEnd = m_media->data() + m_media->dataSize();
-    int dataRest = dataEnd - m_curDataBuffer;
-    if (m_eofReached)
-        return false; // no more data to send
 
     if (m_curDataBuffer == m_media->data())
     {
@@ -178,7 +172,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         }
     }
 
-    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), dataRest);
+    const char* const dataEnd = m_media->data() + m_media->dataSize();
+    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), int(dataEnd - m_curDataBuffer));
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
 
