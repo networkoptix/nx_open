@@ -29,10 +29,10 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
     // Do nothing.
 }
 
-void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
+void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
 {
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
-    m_videoTranscoder->setResolution(dstVideSize);
+    m_videoTranscoder->setResolution(dstVideoSize);
 }
 
 void QnRtspFfmpegEncoder::init()
