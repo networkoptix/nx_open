@@ -223,6 +223,11 @@ int GlobalMonitor::thisProcessThreads()
     return m_monitorBase->thisProcessThreads();
 }
 
+void GlobalMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
+{
+    return m_monitorBase->setRootFileSystem(rootFs);
+}
+
 std::chrono::milliseconds GlobalMonitor::processUptime() const
 {
     return m_uptimeTimer.elapsed();
