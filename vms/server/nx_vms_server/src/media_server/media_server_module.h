@@ -151,7 +151,6 @@ public:
     nx::vms::server::camera::ErrorProcessor* cameraErrorProcessor() const;
     QnMediaServerResourceSearchers* resourceSearchers() const;
     QnPlatformAbstraction* platform() const;
-    void setPlatform(QnPlatformAbstraction* platform);
     QnServerConnector* serverConnector () const;
     QnResourceStatusWatcher* statusWatcher() const;
     QnMdnsListener* mdnsListener() const;

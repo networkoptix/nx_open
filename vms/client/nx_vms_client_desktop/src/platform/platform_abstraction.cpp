@@ -5,6 +5,20 @@
 #include <utils/common/warnings.h>
 
 #if defined(Q_OS_WIN)
+#   include <platform/notification/notifier_win.h>
+#   define QnNotifierImpl QnWindowsNotifier
+#elif defined(Q_OS_LINUX)
+#   include <platform/notification/generic_notifier.h>
+#   define QnNotifierImpl QnGenericNotifier
+#elif defined(Q_OS_MACX)
+#   include <notification/generic_notifier.h>
+#   define QnNotifierImpl QnGenericNotifier
+#else
+#   include <platform/notification/generic_notifier.h>
+#   define QnNotifierImpl QnGenericNotifier
+#endif
+
+#if defined(Q_OS_WIN)
 #   include "images/images_win.h"
 #   define QnImagesImpl QnWindowsImages
 
@@ -30,6 +44,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
+    m_notifier = new QnNotifierImpl(this);
     m_images = new QnImagesImpl(this);
     m_shortcuts = new QnShortcutsImpl(this);
 }

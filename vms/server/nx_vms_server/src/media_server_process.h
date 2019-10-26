@@ -13,8 +13,6 @@
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
-#include "platform/monitoring/global_monitor.h"
-#include <platform/platform_abstraction.h>
 
 #include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
@@ -25,7 +23,6 @@
 #include <media_server/media_server_module.h>
 
 #include "health/system_health.h"
-#include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 
@@ -274,7 +271,6 @@ private:
     mutable QnMutex m_stopMutex;
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QSet<QnUuid> m_updateUserRequests;
-    std::unique_ptr<QnPlatformAbstraction> m_platform;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;

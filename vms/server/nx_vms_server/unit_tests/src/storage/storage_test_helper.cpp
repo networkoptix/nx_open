@@ -12,8 +12,7 @@ namespace ut {
 namespace utils {
 
 FileStorageTestHelper::FileStorageTestHelper():
-    m_serverModule(new QnMediaServerModule()),
-    m_platformAbstraction(new QnPlatformAbstraction())
+    m_serverModule(new QnMediaServerModule())
 {
     m_serverModule->commonModule()->setModuleGUID(QnUuid::createUuid());
 }

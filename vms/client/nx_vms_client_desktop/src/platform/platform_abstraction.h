@@ -16,20 +16,17 @@ class QnPlatformAbstraction:
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(QObject *parent = 0);
+    QnPlatformAbstraction(QObject *parent = nullptr);
     virtual ~QnPlatformAbstraction();
 
-    QnPlatformImages *images() const {
-        return m_images;
-    }
-
-    QnPlatformShortcuts *shortcuts() const {
-        return m_shortcuts;
-    }
+    QnPlatformNotifier *notifier() const { return m_notifier; }
+    QnPlatformImages *images() const { return m_images; }
+    QnPlatformShortcuts *shortcuts() const { return m_shortcuts; }
 
 private:
-    QnPlatformImages *m_images;
-    QnPlatformShortcuts *m_shortcuts;
+    QnPlatformNotifier *m_notifier = nullptr;
+    QnPlatformImages *m_images = nullptr;
+    QnPlatformShortcuts *m_shortcuts = nullptr;
 };
 
 #undef  qnPlatform

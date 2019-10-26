@@ -27,7 +27,7 @@ public:
      * \param parent                    Parent of this object.
      * \param updatePeriodMs            statistics update period. It's disabled if 0.
      */
-    GlobalMonitor(nx::vms::server::PlatformMonitor *base, QObject *parent);
+    GlobalMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> base);
     virtual ~GlobalMonitor();
 
     virtual void logStatistics() override;
@@ -40,11 +40,10 @@ public:
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual std::chrono::milliseconds processUptime() const override;
     virtual std::chrono::milliseconds updatePeriod() const override;
-    virtual void setServerModule(QnMediaServerModule* serverModule) override;
     virtual int thisProcessThreads() override;
 
 private:
-    nx::vms::server::PlatformMonitor* m_monitorBase = nullptr;
+    std::unique_ptr<nx::vms::server::PlatformMonitor> m_monitorBase = nullptr;
     nx::utils::ElapsedTimer m_uptimeTimer;
 
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
@@ -59,7 +58,7 @@ private:
 class StubMonitor: public nx::vms::server::PlatformMonitor
 {
 public:
-    StubMonitor(QObject *parent = NULL): nx::vms::server::PlatformMonitor(parent) {}
+    StubMonitor(): nx::vms::server::PlatformMonitor() {}
 
     virtual qreal totalCpuUsage() override { return totalCpuUsage_; }
     virtual quint64 totalRamUsageBytes() override { return totalRamUsageBytes_; }

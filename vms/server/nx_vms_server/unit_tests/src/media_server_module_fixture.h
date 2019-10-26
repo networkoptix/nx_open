@@ -24,6 +24,5 @@ protected:
 
 private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;
-    QnPlatformAbstraction m_platform;
     const QString m_confFilePath;
 };

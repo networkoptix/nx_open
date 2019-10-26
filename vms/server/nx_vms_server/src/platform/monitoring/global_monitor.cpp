@@ -123,8 +123,8 @@ namespace {
 
 } // namespace
 
-GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* parent):
-    nx::vms::server::PlatformMonitor(parent),
+GlobalMonitor::GlobalMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> base):
+    nx::vms::server::PlatformMonitor(),
     m_cachedTotalCpuUsage(
         [this]() { return m_monitorBase->totalCpuUsage(); }, kCacheExpirationTime),
     m_cachedTotalRamUsage(
@@ -140,19 +140,13 @@ GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* pa
     m_cachedTotalPartitionSpaceInfo(
         [this]() { return m_monitorBase->totalPartitionSpaceInfo(); }, kCacheExpirationTime)
 {
-    if (!NX_ASSERT(base != nullptr))
-        base = new StubMonitor();
+    NX_ASSERT(base);
 
-    if (base->thread() != thread()) {
-        NX_ASSERT(false, "Cannot use a base monitor that lives in another thread.");
-        qnDeleteLater(base);
-        base = new StubMonitor();
-    }
+    NX_ASSERT(base->thread() == thread(), "Cannot use a base monitor that lives in another thread.");
 
     m_uptimeTimer.restart();
 
-    base->setParent(this);
-    m_monitorBase = base;
+    m_monitorBase = std::move(base);
 }
 
 GlobalMonitor::~GlobalMonitor() {
@@ -232,11 +226,6 @@ int GlobalMonitor::thisProcessThreads()
 std::chrono::milliseconds GlobalMonitor::processUptime() const
 {
     return m_uptimeTimer.elapsed();
-}
-
-void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
-{
-    m_monitorBase->setServerModule(serverModule);
 }
 
 qreal ramUsageToPercentages(quint64 bytes)

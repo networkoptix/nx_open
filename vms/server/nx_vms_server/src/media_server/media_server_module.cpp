@@ -178,6 +178,9 @@ QnMediaServerModule::QnMediaServerModule(
     std::unique_ptr<MSSettings> serverSettings,
     QObject* /*parent*/)
 {
+    m_platform = store(new QnPlatformAbstraction(this));
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
+
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)
     {
@@ -690,13 +693,8 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
-    NX_CRITICAL(m_platform != nullptr);
+    NX_CRITICAL(m_platform);
     return m_platform;
-}
-
-void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
-{
-    m_platform = platform;
 }
 
 QnServerConnector* QnMediaServerModule::serverConnector() const

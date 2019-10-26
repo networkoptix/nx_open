@@ -420,7 +420,6 @@ class MediaDbTest:
 public:
     MediaDbTest()
     {
-        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
     }
 
     virtual void SetUp() override
@@ -437,8 +436,6 @@ public:
         auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
         ASSERT_TRUE(result);
     }
-
-    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
 
     std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
     QnFileStorageResourcePtr storage;

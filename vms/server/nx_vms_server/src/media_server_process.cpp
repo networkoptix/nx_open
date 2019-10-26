@@ -4655,10 +4655,6 @@ void MediaServerProcess::run()
 
     m_serverModule = serverModule;
 
-    m_platform.reset(new QnPlatformAbstraction());
-    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
-    m_platform->monitor()->setServerModule(serverModule.get());
-    serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
 

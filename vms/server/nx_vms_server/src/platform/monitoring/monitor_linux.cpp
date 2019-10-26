@@ -12,8 +12,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 
 #include <time.h>
 #include <signal.h>
@@ -379,8 +377,8 @@ private:
 // -------------------------------------------------------------------------- //
 // QnLinuxMonitor
 // -------------------------------------------------------------------------- //
-QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
-    base_type(parent),
+QnLinuxMonitor::QnLinuxMonitor():
+    base_type(),
     d_ptr(new QnLinuxMonitorPrivate())
 {
     d_ptr->q_ptr = this;

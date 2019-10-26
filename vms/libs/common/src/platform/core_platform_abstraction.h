@@ -8,18 +8,11 @@
 class QnCorePlatformAbstraction: public QObject {
     Q_OBJECT
 public:
-    QnCorePlatformAbstraction(QObject *parent = NULL);
+    QnCorePlatformAbstraction(QObject *parent = nullptr);
     virtual ~QnCorePlatformAbstraction();
-
-    QnPlatformNotifier *notifier() const {
-        return m_notifier;
-    }
 
     QnPlatformProcess *process(QProcess *source = NULL) const;
 
 private:
-    QnPlatformNotifier *m_notifier;
     QnPlatformProcess *m_process;
 };
-
-#define qnPlatform (QnCorePlatformAbstraction::instance())

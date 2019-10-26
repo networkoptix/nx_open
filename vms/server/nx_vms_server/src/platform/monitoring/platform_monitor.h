@@ -132,7 +132,7 @@ public:
         qint64 bytesPerSecMax;
     };
 
-    PlatformMonitor(QObject *parent = NULL): QObject(parent) {}
+    PlatformMonitor(): QObject() {}
     virtual ~PlatformMonitor() {}
 
     virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
