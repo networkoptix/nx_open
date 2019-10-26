@@ -14,16 +14,6 @@
 #include "recording/time_period.h"
 #include <common/common_module_aware.h>
 
-namespace nx {
-namespace vms::server {
-namespace test {
-
-class AuditManagerTest;
-
-} // namespace test
-} // namespace mediaserver
-} // namespace nx
-
 class QnAuditManager
 {
 public:
