@@ -23,12 +23,12 @@ void QnPlatformAbstraction::setCustomMonitor(std::unique_ptr<nx::vms::server::Pl
     m_monitor = std::move(monitor);
 }
 
-QnPlatformAbstraction::QnPlatformAbstraction(QnMediaServerModule* serverModule): 
+QnPlatformAbstraction::QnPlatformAbstraction(nx::vms::server::RootFileSystem* rootFs):
     base_type()
 {
     if (!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
     m_monitor.reset(new nx::vms::server::GlobalMonitor(std::make_unique<QnMonitorImpl>()));
-    m_monitor->setServerModule(serverModule);
+    m_monitor->setRootFileSystem(rootFs);
 }

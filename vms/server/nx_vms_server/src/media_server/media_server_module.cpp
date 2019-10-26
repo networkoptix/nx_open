@@ -178,9 +178,6 @@ QnMediaServerModule::QnMediaServerModule(
     std::unique_ptr<MSSettings> serverSettings,
     QObject* /*parent*/)
 {
-    m_platform = store(new QnPlatformAbstraction(this));
-    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
-
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)
     {
@@ -203,6 +200,14 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->configFilePath,
             arguments->rwConfigFilePath));
     }
+
+    const bool isRootToolEnabled = !settings().ignoreRootTool();
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
+        isRootToolEnabled,
+        qApp->applicationFilePath());
+
+    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get()));
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
 
     nx::vms::server::registerSerializers();
 
@@ -287,11 +292,6 @@ QnMediaServerModule::QnMediaServerModule(
             "backupStorageManager"
 
         ));
-
-    const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled,
-        qApp->applicationFilePath());
 
     if (QnAppInfo::isNx1())
     {

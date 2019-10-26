@@ -616,10 +616,10 @@ QList<PlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
     return result;
 }
 
-void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
+void QnLinuxMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
 {
     d_ptr->partitionsInfoProvider.reset(
-        new nx::vms::server::fs::PartitionsInformationProvider(serverModule->rootFileSystem()));
+        new nx::vms::server::fs::PartitionsInformationProvider(rootFs));
 }
 
 int QnLinuxMonitor::thisProcessThreads()

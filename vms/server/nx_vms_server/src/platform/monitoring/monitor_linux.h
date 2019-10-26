@@ -19,7 +19,7 @@ public:
     virtual QList<nx::vms::server::PlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
-    virtual void setServerModule(QnMediaServerModule* serverModule) override;
+    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* rootFs) override;
 
     virtual int thisProcessThreads() override;
 

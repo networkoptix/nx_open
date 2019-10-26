@@ -9,7 +9,7 @@
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-class QnMediaServerModule;
+namespace nx::vms::server { class RootFileSystem; }
 
 namespace nx::vms::server {
 
@@ -135,7 +135,7 @@ public:
     PlatformMonitor(): QObject() {}
     virtual ~PlatformMonitor() {}
 
-    virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
+    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* /*rootFs*/) {}
     virtual void logStatistics() {}
 
     /**
