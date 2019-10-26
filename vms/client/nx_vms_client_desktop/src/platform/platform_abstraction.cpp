@@ -11,7 +11,7 @@
 #   include <platform/notification/generic_notifier.h>
 #   define QnNotifierImpl QnGenericNotifier
 #elif defined(Q_OS_MACX)
-#   include <notification/generic_notifier.h>
+#   include <platform/notification/generic_notifier.h>
 #   define QnNotifierImpl QnGenericNotifier
 #else
 #   include <platform/notification/generic_notifier.h>
