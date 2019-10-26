@@ -8,9 +8,9 @@ namespace nx::test {
 
 using namespace ::rest;
 
-constexpr size_t kRequestsMultiplier(100);
+constexpr size_t kRequestsMultiplier(10);
 constexpr std::chrono::seconds kTimeout(10);
-constexpr std::chrono::seconds kClientPoolTimeouts(3);
+constexpr std::chrono::seconds kClientPoolTimeouts(1);
 
 class HandleKeeper
 {
