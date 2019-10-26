@@ -10,7 +10,7 @@ using namespace ::rest;
 
 constexpr size_t kRequestsMultiplier(100);
 constexpr std::chrono::seconds kTimeout(10);
-constexpr std::chrono::milliseconds kClientPoolTimeouts(100);
+constexpr std::chrono::seconds kClientPoolTimeouts(3);
 
 class HandleKeeper
 {
