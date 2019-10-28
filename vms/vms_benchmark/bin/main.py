@@ -754,6 +754,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         frame_interval_us = 1000000.0 / float(ini['testFileFps'])
                         pts_diff_expected = frame_interval_us
                         pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
+                        # TODO: Fix - this value is not understandable for the user.
                         pts_diff_max = frame_interval_us * (1.0 + pts_diff_deviation_factor_max)
 
                         # The value is negative because the first PTS of new loop is less than last PTS of the previous
