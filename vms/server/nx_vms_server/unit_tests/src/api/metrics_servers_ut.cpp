@@ -87,7 +87,8 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["activity"]["plugins"], api::metrics::Value());
 
     auto startAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    startAlarms = nx::utils::filter_if(startAlarms, [](auto i) { return !i.first.contains(".load.logLevel."); });
+    startAlarms = nx::utils::filter_if(
+        startAlarms, [](auto k, auto /*v*/) { return !k.contains(".load.logLevel."); });
     EXPECT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
     systemMonitor->totalCpuUsage_ = 0.95;
@@ -107,7 +108,8 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_DOUBLE(runValues["load"]["serverRamUsageP"], 6.0 / 8);
 
     auto runAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    runAlarms = nx::utils::filter_if(runAlarms, [](auto i) { return !i.first.contains(".load.logLevel."); });
+    runAlarms = nx::utils::filter_if(
+        runAlarms, [](auto k, auto /*v*/) { return !k.contains(".load.logLevel."); });
     ASSERT_EQ(runAlarms.size(), 2) << QJson::serialized(runAlarms).data();
     EXPECT_EQ(runAlarms["servers." + id + ".load.cpuUsageP.0"].level, api::metrics::AlarmLevel::warning);
     EXPECT_EQ(runAlarms["servers." + id + ".load.ramUsageP.0"].level, api::metrics::AlarmLevel::warning);
