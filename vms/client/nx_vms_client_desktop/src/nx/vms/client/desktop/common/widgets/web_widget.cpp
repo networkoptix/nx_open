@@ -62,7 +62,7 @@ void WebWidget::load(const QUrl& url)
 
 void WebWidget::reset()
 {
-    static auto kBlankPageLoadTimeout = std::chrono::milliseconds(1000);
+    static const auto kBlankPageLoadTimeout = std::chrono::milliseconds(1000);
 
     m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
     //FIXME: There is no analog for StopScheduledPageRefresh
