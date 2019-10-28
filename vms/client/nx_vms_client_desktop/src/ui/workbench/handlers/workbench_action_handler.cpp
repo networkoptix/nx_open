@@ -362,10 +362,14 @@ ActionHandler::ActionHandler(QObject *parent) :
             setCurrentLayoutCellSpacing(Qn::CellSpacing::Large);
         });
 
-    connect(action(action::Rotate0Action), &QAction::triggered, this, [this] { rotateItems(0); });
-    connect(action(action::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
-    connect(action(action::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
-    connect(action(action::Rotate270Action), &QAction::triggered, this, [this] { rotateItems(270); });
+    connect(action(action::RotateToAction), &QAction::triggered, this,
+        [this]
+        {
+            const auto params = menu()->currentParameters(sender());
+            const auto rotation = params.argument(Qn::ItemRotationRole, 0.0);
+            rotateItems(rotation);
+        });
+
     connect(action(action::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(action::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
     connect(action(action::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));

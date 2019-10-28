@@ -11,12 +11,12 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/system_commands.h>
 #include <utils/common/synctime.h>
+#include <nx/utils/app_info.h>
 
 #include <api/test_api_requests.h>
 #include <test_support/utils.h>
 
 namespace nx::test {
-
 
 class BackupDbUt: public ::testing::Test
 {
@@ -126,9 +126,8 @@ protected:
 
     virtual void SetUp() override
     {
-        m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
+        m_server = std::make_unique<MediaServerLauncher>();
         m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-        m_server->addSetting("dataDir", *m_dirResource.getDirName());
     }
 
     void whenServerLaunched()
@@ -144,12 +143,14 @@ protected:
         m_server->stop();
     }
 
-    void thenBackupFilesShouldBeCreated(int backupFilesCount)
+    QList<nx::vms::utils::DbBackupFileData> thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
         do
         {
             m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
         } while (m_backupFilesDataFound.size() != backupFilesCount);
+
+        return m_backupFilesDataFound;
     }
 
     void thenNoNewBackupFilesShouldBeCreated()
@@ -233,13 +234,40 @@ protected:
         m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
     }
 
+    nx::utils::SoftwareVersion whenBuildChangedInDb()
+    {
+        const QString connectionName("tmp");
+        auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+        db.setDatabaseName(closeDirPath(m_server->dataDir()) + "ecs.sqlite");
+        [&]() { ASSERT_TRUE(db.open()); }();
+
+        const auto currentVersion = getCurrentVersion(db);
+        const auto updatedVersion = nx::utils::SoftwareVersion(
+            currentVersion.major(),
+            currentVersion.minor(),
+            currentVersion.bugfix(),
+            currentVersion.build() + 1);
+
+        writeVersion(db, updatedVersion);
+
+        db.close();
+        db = QSqlDatabase();
+        QSqlDatabase::removeDatabase(connectionName);
+
+        return updatedVersion;
+    }
+
+    void whenAllBackupFilesDeleted()
+    {
+        QDir(closeDirPath(m_server->dataDir()) + "backup").removeRecursively();
+    }
+
 private:
     LauncherPtr m_server;
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
     QList<QString> m_backupFilesCreated;
     QString m_backupDir;
     QString m_dataDir;
-    nx::ut::utils::WorkDirResource m_dirResource;
     int64_t m_serverStartTime = 0;
 
     void waitForAllBackupFilesToBeCreated()
@@ -253,7 +281,37 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
+
+    static nx::utils::SoftwareVersion getCurrentVersion(const QSqlDatabase& db)
+    {
+        QSqlQuery selectQuery(db);
+        [&]()
+        {
+            ASSERT_TRUE(selectQuery.prepare("SELECT * FROM misc_data"));
+            ASSERT_TRUE(selectQuery.exec());
+            ASSERT_TRUE(selectQuery.next());
+        }();
+
+        return nx::utils::SoftwareVersion(selectQuery.value(0).toString());
+    }
+
+    static void writeVersion(const QSqlDatabase& db, const nx::utils::SoftwareVersion& version)
+    {
+        QSqlQuery updateQuery(db);
+        ASSERT_TRUE(updateQuery.prepare("UPDATE misc_data SET data = ? WHERE key = 'VERSION'"));
+        updateQuery.addBindValue(version.toString());
+        ASSERT_TRUE(updateQuery.exec());
+    }
 };
+
+static void checkBackupFile(const QString& path, const nx::utils::SoftwareVersion& expectedVersion)
+{
+    QFileInfo fileInfo(path);
+    ASSERT_TRUE(fileInfo.exists());
+    const auto splits = fileInfo.fileName().split("_");
+    ASSERT_EQ(3, splits.size());
+    ASSERT_EQ(expectedVersion.build(), splits[1].toInt());
+}
 
 TEST_F(BackupDbUt, allBackupFilesData_correctnessCheck)
 {
@@ -281,10 +339,23 @@ TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
 }
 
-TEST_F(BackupDbIt, NotCreatedWhenNoPreviousDbFiles)
+TEST_F(BackupDbIt, NewServer)
 {
     whenServerLaunched();
-    thenNoNewBackupFilesShouldBeCreated();
+    checkBackupFile(
+        thenBackupFilesShouldBeCreated(1)[0].fullPath,
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()));
+}
+
+TEST_F(BackupDbIt, ServerUpgraded)
+{
+    whenServerLaunched();
+    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+    whenServerStopped();
+    whenAllBackupFilesDeleted();
+    const auto replacedVersion = whenBuildChangedInDb();
+    whenServerLaunched();
+    checkBackupFile(thenBackupFilesShouldBeCreated(1)[0].fullPath, replacedVersion);
 }
 
 TEST_F(BackupDbIt, FilesRotated)

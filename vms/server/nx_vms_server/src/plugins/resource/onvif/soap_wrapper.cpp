@@ -138,6 +138,9 @@ NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
 NX_DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
 NX_DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetStreamUri,
+    _onvifMedia2__GetStreamUri, _onvifMedia2__GetStreamUriResponse)
+
 // ------------------------------------------------------------------------------------------------
 // DeviceSoapWrapper
 // ------------------------------------------------------------------------------------------------

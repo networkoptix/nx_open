@@ -189,12 +189,8 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 {
     Q_D(ProxyConnectionProcessor);
     d->dstSocket.reset();
-    if (route.reverseConnect) {
-        const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        d->dstSocket = std::move(d->reverseConnectionManager->getProxySocket(
-            target,
-            d->connectTimeout));
-    }
+    if (route.reverseConnect)
+        d->dstSocket = d->reverseConnectionManager->connect(route, d->connectTimeout).get();
 
     if (!d->dstSocket)
     {

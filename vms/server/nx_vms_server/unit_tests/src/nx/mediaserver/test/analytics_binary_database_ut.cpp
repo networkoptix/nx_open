@@ -31,6 +31,12 @@ class AnalyticsArchive: public MediaServerModuleFixture
   public:
       AnalyticsArchive(): MediaServerModuleFixture()
       {
+      }
+
+      virtual void SetUp() override
+      {
+          MediaServerModuleFixture::SetUp();
+
           m_camera.reset(new resource::test::CameraMock(&serverModule()));
           m_camera->setPhysicalId("analytics binary archive test");
           m_dataProviderStub.reset(new QnAbstractStreamDataProvider(m_camera));

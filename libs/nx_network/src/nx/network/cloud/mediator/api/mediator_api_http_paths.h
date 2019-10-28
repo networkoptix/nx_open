@@ -13,6 +13,8 @@ NX_NETWORK_API extern const char* const kServerSessionsPath;
 
 NX_NETWORK_API extern const char* const kStatisticsMetricsPath;
 
+NX_NETWORK_API extern const char* const kConnectionSpeedUplinkPath;
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

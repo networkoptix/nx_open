@@ -28,6 +28,8 @@ namespace cloud {
 NX_NETWORK_API extern const char* const kCloudDbModuleName;
 NX_NETWORK_API extern const char* const kConnectionMediatorModuleName;
 NX_NETWORK_API extern const char* const kNotificationModuleName;
+NX_NETWORK_API extern const char* const kSpeedTestModuleName;
+
 static constexpr std::chrono::seconds kHttpRequestTimeout = std::chrono::seconds(10);
 
 class CloudInstanceSelectionAttributeNameset:
@@ -48,7 +50,8 @@ public:
         hpmUrl,
         hpmTcpUrl,
         hpmUdpUrl,
-        notificationModuleUrl
+        notificationModuleUrl,
+        speedTestModuleUrl,
     };
 
     CloudInstanceSelectionAttributeNameset();

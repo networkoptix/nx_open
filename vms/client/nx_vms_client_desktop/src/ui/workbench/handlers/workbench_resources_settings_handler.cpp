@@ -137,19 +137,17 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     user->setRawPermissions(GlobalPermission::liveViewerPermissions);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
+    if (m_userSettingsDialog)
+        m_userSettingsDialog->close();
+
     const auto params = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(params, mainWindowWidget());
 
-    if (!m_userSettingsDialog)
-        m_userSettingsDialog = new QnUserSettingsDialog(parent);
-    else
-        DialogUtils::setDialogParent(m_userSettingsDialog, parent);
-
-    m_userSettingsDialog->setUser(user);
-    m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
-    m_userSettingsDialog->forcedUpdate();
-
-    m_userSettingsDialog->exec();
+    const QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(parent));
+    dialog->setUser(user);
+    dialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
+    dialog->forcedUpdate();
+    dialog->exec();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()

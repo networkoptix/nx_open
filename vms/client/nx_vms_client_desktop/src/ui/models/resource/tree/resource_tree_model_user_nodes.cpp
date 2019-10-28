@@ -257,6 +257,15 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
     if (subject.user() && subject.user()->userRole() == Qn::UserRole::customUserRole)
         return false;
 
+    if (media->hasFlags(Qn::server))
+    {
+        const auto accessibleVia = resourceAccessProvider()->accessibleVia(subject, media);
+        const bool isDirectlyShared =
+            accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
+
+        return isDirectlyShared;
+    }
+
     return resourceAccessProvider()->hasAccess(subject, media);
 }
 

@@ -12,11 +12,13 @@ void LibContext::setName(const char* name)
 {
     NX_KIT_ASSERT(name);
     NX_KIT_ASSERT(name[0] != '\0');
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_name = name;
 }
 
 void LibContext::setRefCountableRegistry(IRefCountableRegistry* refCountableRegistry)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_refCountableRegistry.reset(refCountableRegistry);
 }
 

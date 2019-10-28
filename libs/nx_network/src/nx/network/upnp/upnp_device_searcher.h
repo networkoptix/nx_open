@@ -47,8 +47,8 @@ public:
  * NOTE: sends discover packets from all local network interfaces
  * NOTE: Handlers are iterated in order they were registered
  * NOTE: Class methods are thread-safe with the only exception:
- *   saveDiscoveredDevicesSnapshot() and processDiscoveredDevices() calls
- *   MUST be serialized by calling entity.
+ *     saveDiscoveredDevicesSnapshot() and processDiscoveredDevices() calls
+ *     MUST be serialized by calling entity.
  * NOTE: this class is single-tone
  */
 class NX_NETWORK_API DeviceSearcher:
@@ -83,8 +83,8 @@ public:
 
     /**
      *  If handler is not added for deviceType, nothing is done
-     *  NOTE: if deviceType is empty, handler will be unregistred for ALL device types
-     *        even if they were registred by separate calls with certain types
+     *  NOTE: if deviceType is empty, handler will be unregistered for ALL device types
+     *      even if they were registered by separate calls with certain types
      */
     void unregisterHandler(SearchHandler* handler, const QString& deviceType = QString());
 
@@ -96,9 +96,9 @@ public:
     /**
      * Passes discovered devices info snapshot to registered handlers.
      * If some handlers processes packet (UPNPSearchHandler::processPacket returns true),
-     *   then packet is removed and not passed to other handlers.
+     *     then packet is removed and not passed to other handlers.
      * @param handlerToUse If NULL, all handlers are used, otherwise packets are passed to
-     *   handlerToUse only.
+     *     handlerToUse only.
      */
     void processDiscoveredDevices(SearchHandler* handlerToUse = NULL);
     int cacheTimeout() const;
@@ -180,13 +180,11 @@ private:
     void processDeviceXml(const DiscoveredDeviceInfo& devInfo,
         const QByteArray& foundDeviceDescription);
     QHostAddress findBestIface(const HostAddress& host);
-    /**
-     * NOTE: MUST be called with m_mutex locked. Also, returned item MUST be used under same lock
-     */
+
+    /* NOTE: MUST be called with m_mutex locked. Returned item MUST be used under the same lock. */
     const UPNPDescriptionCacheItem* findDevDescriptionInCache(const QByteArray& uuid);
-    /**
-     * NOTE: MUST be called with m_mutex locked
-     */
+
+    /* NOTE: MUST be called with m_mutex locked. */
     void updateItemInCache(DiscoveredDeviceInfo devInfo);
 
     void processPacket(DiscoveredDeviceInfo info);

@@ -1,8 +1,42 @@
+import logging
 from functools import reduce
+from typing import Dict
+
+from vms_benchmark.exceptions import BoxFileContentError, UnableToFetchDataFromBox
 from vms_benchmark.utils import human_readable_size
+
+ini_ssh_get_proc_meminfo_timeout_s: int
 
 
 class BoxPlatform:
+    @staticmethod
+    def _parse_proc_meminfo(device) -> Dict:
+        meminfo = device.get_file_content('/proc/meminfo')
+        if meminfo is None:
+            raise BoxFileContentError('/proc/meminfo')
+
+        return dict(
+            (part.strip() for part in line.split(':'))
+            for line in meminfo.split('\n') if ':' in line
+        )
+
+    @staticmethod
+    def _get_proc_meminfo_value(meminfo: Dict, param: str) -> int:
+        try:
+            value_str = meminfo[param]
+        except KeyError:
+            raise UnableToFetchDataFromBox(
+                f"Unable to read param {param!r} from /proc/meminfo at the box.")
+        if not value_str:
+            raise UnableToFetchDataFromBox(
+                f"Empty value of param {param!r} in /proc/meminfo at the box.")
+
+        try:
+            return int(human_readable_size.human2bytes(value_str))
+        except Exception:
+            raise UnableToFetchDataFromBox(
+                f"Incorrect value of param {param!r} in /proc/meminfo at the box: {value_str!r}.")
+
     def __init__(self, device, linux_distribution, ram_bytes, arch, cpu_count, cpu_features, storages_list):
         self.device = device
         self.ram_bytes = ram_bytes
@@ -12,21 +46,16 @@ class BoxPlatform:
         self.storages_list = storages_list
         self.linux_distribution = linux_distribution
 
-    def ram_free_bytes(self):
-        meminfo = self.device.get_file_content('/proc/meminfo')
+    def obtain_ram_free_bytes(self):
+        meminfo = BoxPlatform._parse_proc_meminfo(self.device)
 
-        if meminfo is None:
-            return None
+        ram_available_bytes = self._ram_available_bytes(meminfo)
+        if ram_available_bytes:
+            return ram_available_bytes
 
-        meminfo_parsed = dict(
-            (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
-        )
+        return self._get_proc_meminfo_value(meminfo, 'MemFree');
 
-        ram_free_bytes = int(human_readable_size.human2bytes(meminfo_parsed['MemFree']))
-
-        return ram_free_bytes
-
-    def ram_available_bytes(self):
+    def _ram_available_bytes(self, meminfo: Dict):
         if (
             self.linux_distribution.kernel_version[0] < 3 or
             (
@@ -36,18 +65,11 @@ class BoxPlatform:
         ):
             return None
 
-        meminfo = self.device.get_file_content('/proc/meminfo', timeout=10)
-
-        if meminfo is None:
+        try:
+            return self._get_proc_meminfo_value(meminfo, 'MemAvailable')
+        except Exception:
+            logging.exception('Exception while getting MemAvailable from /proc/meminfo:')
             return None
-
-        meminfo_parsed = dict(
-            (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
-        )
-
-        ram_available = int(human_readable_size.human2bytes(meminfo_parsed['MemAvailable']))
-
-        return ram_available
 
     @staticmethod
     def get_storages_map(device):
@@ -87,45 +109,38 @@ class BoxPlatform:
         return storages_map
 
     @staticmethod
-    def gather(device, linux_distribution):
+    def create(device, linux_distribution):
         # Detect memory capacity:
-        meminfo = device.get_file_content('/proc/meminfo')
+        meminfo = BoxPlatform._parse_proc_meminfo(device)
+        mem_total = BoxPlatform._get_proc_meminfo_value(meminfo, 'MemTotal')
 
-        if meminfo is None:
-            return None
-
-        meminfo_parsed = dict(
-            (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
-        )
-
-        ram_bytes = human_readable_size.human2bytes(meminfo_parsed['MemTotal'])
-
-        # Detect architecture:
+        # Detect architecture.
         arch = device.eval('uname -m')
 
-        # Obtain detailed CPU information:
+        # Obtain detailed CPU information.
         cpuinfo = device.get_file_content('/proc/cpuinfo')
-
         if cpuinfo is None:
-            return None
+            raise BoxFileContentError('/proc/cpuinfo')
 
         cpuinfo_parsed = dict(
-            (part.strip() for part in line.split(':')) for line in cpuinfo.split('\n') if ':' in line
+            (part.strip() for part in line.split(':'))
+            for line in cpuinfo.split('\n') if ':' in line
         )
 
         cpu_features = []
-
         if arch in ['aarch64', 'armv7l']:
-            cpu_features_raw = cpuinfo_parsed['Features'].split()
-
+            try:
+                cpu_features_raw = cpuinfo_parsed['Features'].split()
+            except ValueError:
+                raise UnableToFetchDataFromBox(
+                    "Unable to parse 'Features' from /proc/cpuinfo at the box.")
             if 'neon' in cpu_features_raw:
                 cpu_features.append('NEON')
 
         # Obtain storages
         storages_map = BoxPlatform.get_storages_map(device)
-
         if not storages_map:
-            return None
+            raise UnableToFetchDataFromBox("Unable to get mounted storages at the box.")
 
         fs_filters = [
             'ext2',
@@ -146,7 +161,7 @@ class BoxPlatform:
         df_data = device.eval('df -B1')
 
         if not df_data:
-            return None
+            raise UnableToFetchDataFromBox("Unable to get storage free space at the box.")
 
         def construct_df_description(line):
             components = line.split()
@@ -172,7 +187,7 @@ class BoxPlatform:
 
         return BoxPlatform(
             device=device,
-            ram_bytes=ram_bytes,
+            ram_bytes=mem_total,
             arch=arch,
             cpu_count=len([line for line in cpuinfo.splitlines() if line.startswith('processor')]),
             cpu_features=cpu_features,

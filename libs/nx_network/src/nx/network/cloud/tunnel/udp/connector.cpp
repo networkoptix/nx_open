@@ -150,10 +150,10 @@ void TunnelConnector::onUdtConnectionEstablished(
 
     if (errorCode != SystemError::noError)
     {
-        NX_DEBUG(this, lm("cross-nat %1. Failed to establish UDT cross-nat to %2. %3")
-            .arg(m_connectSessionId)
-            .arg(rendezvousConnector->remoteAddress().toString())
-            .arg(SystemError::toString(errorCode)));
+        NX_DEBUG(this, "cross-nat %1. Failed to establish UDT cross-nat to %2. %3",
+            m_connectSessionId,
+            rendezvousConnector->remoteAddress(),
+            SystemError::toString(errorCode));
 
         if (!m_rendezvousConnectors.empty())
             return; //waiting for other connectors to complete

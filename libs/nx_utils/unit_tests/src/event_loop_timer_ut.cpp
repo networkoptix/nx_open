@@ -41,6 +41,18 @@ protected:
 
     virtual void TearDown() override
     {
+        std::promise<void> stopPromise;
+        auto stopFuture = stopPromise.get_future();
+        QTimer::singleShot(
+            0ms,
+            &m_thread,
+            [this, &stopPromise]()
+            {
+                m_timer.reset();
+                stopPromise.set_value();
+            });
+
+        stopFuture.wait();
         m_thread.quit();
         m_thread.wait();
     }
@@ -66,7 +78,7 @@ protected:
             [this]() { return m_invocations.size() == GetParam().restartCount + 2; });
 
         lock.unlock();
-        // Waiting for some time to ensure no unexpected handler invocations have been produced.
+        // Waiting for some time to ensure no unexpected handler invocations have been made.
         std::this_thread::sleep_for(
             std::min(10ms, GetParam().timeout * static_cast<int>(GetParam().restartCount + 1)));
 
@@ -74,11 +86,7 @@ protected:
         ASSERT_EQ(GetParam().restartCount + 2, m_invocations.size());
 
         for (size_t i = 0; i < m_invocations.size() - 1; ++i)
-        {
-            ASSERT_TRUE(
-                m_invocations[i + 1] - m_invocations[i] < std::max(5ms, GetParam().timeout) * 3);
             ASSERT_TRUE(m_invocations[i + 1] - m_invocations[i] >= GetParam().timeout);
-        }
     }
 
     void whenTimerRestarted()

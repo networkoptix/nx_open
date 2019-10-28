@@ -13,7 +13,6 @@
 #endif
 
 #include <iostream>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/scope_guard.h>
@@ -124,37 +123,51 @@ namespace {
 
 } // namespace
 
-GlobalMonitor::GlobalMonitor(nx::vms::server::PlatformMonitor* base, QObject* parent):
-    nx::vms::server::PlatformMonitor(parent),
+GlobalMonitor::GlobalMonitor(
+    std::unique_ptr<nx::vms::server::PlatformMonitor> base,
+    nx::utils::TimerManager* timerManager)
+    :
+    nx::vms::server::PlatformMonitor(),
     m_cachedTotalCpuUsage(
-        [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalCpuUsage(); }),
     m_cachedTotalRamUsage(
-        [this]() { return m_monitorBase->totalRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalRamUsageBytes(); }, kCacheExpirationTime),
     m_cachedThisProcessCpuUsage(
-        [this]() { return m_monitorBase->thisProcessCpuUsage(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->thisProcessCpuUsage(); }),
     m_cachedThisProcessRamUsage(
-        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, kCacheExpirationTime),
     m_cachedTotalHddLoad(
-        [this]() { return m_monitorBase->totalHddLoad(); }, &m_mutex, kCacheExpirationTime),
+        [this]() { return m_monitorBase->totalHddLoad(); }),
     m_cachedTotalNetworkLoad(
-        [this]() { return m_monitorBase->totalNetworkLoad(); }, &m_mutex, kCacheExpirationTime)
+        [this]() { return m_monitorBase->totalNetworkLoad(); }),
+    m_cachedTotalPartitionSpaceInfo(
+        [this]() { return m_monitorBase->totalPartitionSpaceInfo(); }, kCacheExpirationTime)
 {
-    if (!NX_ASSERT(base != nullptr))
-        base = new StubMonitor();
-
-    if (base->thread() != thread()) {
-        NX_ASSERT(false, "Cannot use a base monitor that lives in another thread.");
-        qnDeleteLater(base);
-        base = new StubMonitor();
-    }
+    NX_ASSERT(base);
+    NX_ASSERT(base->thread() == thread(), "Cannot use a base monitor that lives in another thread.");
+    NX_CRITICAL(timerManager);
 
     m_uptimeTimer.restart();
 
-    base->setParent(this);
-    m_monitorBase = base;
+    // NOTE: We should update some of the cached values with fixed period because their
+    // implementation performs calculations which depends on time passed between the calls.
+    const auto timerId = timerManager->addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            m_cachedTotalCpuUsage.update();
+            m_cachedThisProcessCpuUsage.update();
+            m_cachedTotalHddLoad.update();
+            m_cachedTotalNetworkLoad.update();
+        },
+        kCacheExpirationTime,
+        /*firstShotDelay*/ 0ms);
+    m_timerGuard = {timerManager, timerId};
+
+    m_monitorBase = std::move(base);
 }
 
-GlobalMonitor::~GlobalMonitor() {
+GlobalMonitor::~GlobalMonitor()
+{
 }
 
 void GlobalMonitor::logStatistics()
@@ -220,13 +233,7 @@ QList<nx::vms::server::PlatformMonitor::NetworkLoad> GlobalMonitor::totalNetwork
 
 QList<nx::vms::server::PlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_monitorBase->totalPartitionSpaceInfo();
-}
-
-QString GlobalMonitor::partitionByPath(const QString &path) {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_monitorBase->partitionByPath(path);
+    return m_cachedTotalPartitionSpaceInfo.get();
 }
 
 int GlobalMonitor::thisProcessThreads()
@@ -234,14 +241,14 @@ int GlobalMonitor::thisProcessThreads()
     return m_monitorBase->thisProcessThreads();
 }
 
+void GlobalMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
+{
+    return m_monitorBase->setRootFileSystem(rootFs);
+}
+
 std::chrono::milliseconds GlobalMonitor::processUptime() const
 {
     return m_uptimeTimer.elapsed();
-}
-
-void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
-{
-    m_monitorBase->setServerModule(serverModule);
 }
 
 qreal ramUsageToPercentages(quint64 bytes)

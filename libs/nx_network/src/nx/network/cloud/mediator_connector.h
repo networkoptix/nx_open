@@ -9,6 +9,7 @@
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_delegate.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
@@ -96,12 +97,20 @@ public:
 
     virtual std::optional<MediatorAddress> address() const override;
 
+    void subsribeToSystemCredentialsSet(
+        nx::utils::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
+        nx::utils::SubscriptionId* outId);
+
+    void unsubscribeFromSystemCredentialsSet(nx::utils::SubscriptionId id);
+
     static void setStunClientSettings(
         network::stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
     mutable QnMutex m_mutex;
     std::optional<SystemCredentials> m_credentials;
+    nx::utils::Subscription<std::optional<SystemCredentials>> m_credentialsSetEvent;
+
 
     std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
     std::shared_ptr<MediatorStunClient> m_stunClient;

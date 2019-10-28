@@ -1,12 +1,9 @@
 #pragma once
 
-#include <functional>
+#include <optional>
 #include <chrono>
 
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
-
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/elapsed_timer.h>
 
@@ -21,50 +18,43 @@ class CachedValue
 {
 public:
     /**
-     *  @param valGenerationFunc This functor is called from get() and update() with no
-     *      synchronization. So it should be synchronized by itself (if it is required).
+     *  @param valueGenerator This functor is called from get() and update() to get value, the
+     *      call to valueGenerator is synchronised by mutex.
      *  @param expirationTime CachedValue will automatically update value on get() or
      *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
-     *  @note valGenerationFunc is not called here!
+     *  @note valueGenerator is not called here!
      */
-    template<class FuncType>
     CachedValue(
-        FuncType&& valGenerationFunc,
-        QnMutex* const mutex,
+        MoveOnlyFunc<ValueType()> valueGenerator,
         std::chrono::milliseconds expirationTime = std::chrono::milliseconds(0))
     :
-        m_valGenerationFunc(std::forward<FuncType>(valGenerationFunc)),
-        m_mutex(mutex),
+        m_valueGenerator(std::move(valueGenerator)),
         m_expirationTime(expirationTime)
     {
     }
 
     ValueType get() const
     {
-        QnMutexLocker lk(m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
 
         if (m_expirationTime != std::chrono::milliseconds(0)
             && m_timer.hasExpired(m_expirationTime))
         {
             resetThreadUnsafe();
-            m_timer.restart();
         }
 
         if (!m_value)
         {
-            lk.unlock();
-            const ValueType newVal = m_valGenerationFunc();
-            lk.relock();
-            if (!m_value)
-                m_value = newVal;
+            m_value = m_valueGenerator();
+            m_timer.restart();
         }
 
-        return m_value.get();
+        return *m_value;
     }
 
     void reset()
     {
-        QnMutexLocker lk(m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         resetThreadUnsafe();
     }
 
@@ -76,17 +66,17 @@ public:
 
     void update()
     {
-        const ValueType newValue = m_valGenerationFunc();
-        QnMutexLocker lk (m_mutex);
-        m_value = newValue;
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_value = m_valueGenerator();;
         if (m_expirationTime != std::chrono::milliseconds(0))
             m_timer.restart();
     }
 
 private:
-    mutable boost::optional<ValueType> m_value;
-    std::function<ValueType()> m_valGenerationFunc;
-    QnMutex* const m_mutex;
+    mutable nx::utils::Mutex m_mutex;
+
+    mutable std::optional<ValueType> m_value;
+    MoveOnlyFunc<ValueType()> m_valueGenerator;
 
     mutable ElapsedTimer m_timer;
     const std::chrono::milliseconds m_expirationTime;

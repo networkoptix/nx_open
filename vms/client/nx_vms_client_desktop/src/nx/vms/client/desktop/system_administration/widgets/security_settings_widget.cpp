@@ -2,16 +2,15 @@
 #include "ui_security_settings_widget.h"
 
 #include <api/global_settings.h>
-
 #include <common/common_module.h>
-#include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
-
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/ini.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
 
 namespace nx::vms::client::desktop {
 
@@ -30,6 +29,8 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     ui->limitSessionLengthHint->setHint(
         tr("Users will be automatically logged out if their session exceeds the specified duration."));
+
+    ui->videoTrafficEncryptionHint->setHint(tr("Only client-server video traffic can be encrypted"));
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
         [this]
@@ -127,7 +128,7 @@ void SecuritySettingsWidget::at_forceTrafficEncryptionCheckBoxClicked(bool value
             emit forceVideoTrafficEncryptionChanged(false);
         ui->forceVideoTrafficEncryptionCheckBox->setChecked(false);
     }
-    ui->forceVideoTrafficEncryptionCheckBox->setEnabled(value);
+    ui->forceVideoTrafficEncryptionWidget->setEnabled(value);
 }
 
 void SecuritySettingsWidget::loadDataToUi()
@@ -137,7 +138,7 @@ void SecuritySettingsWidget::loadDataToUi()
     ui->forceTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isTrafficEncriptionForced());
     ui->forceVideoTrafficEncryptionCheckBox->setChecked(
         qnGlobalSettings->isVideoTrafficEncriptionForced());
-    ui->forceVideoTrafficEncryptionCheckBox->setEnabled(
+    ui->forceVideoTrafficEncryptionWidget->setEnabled(
         qnGlobalSettings->isTrafficEncriptionForced());
 
     m_watermarkSettings = qnGlobalSettings->watermarkSettings();

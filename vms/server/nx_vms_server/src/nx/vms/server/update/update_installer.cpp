@@ -146,6 +146,7 @@ void UpdateInstaller::install(const QnAuthSession& authInfo)
         auto authRecord = auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
         authRecord.addParam("version", m_version.toLatin1());
         auditManager()->addAuditRecord(authRecord);
+        auditManager()->flushRecords();
     }
 
     QString installerPath = QDir(workDir()).absoluteFilePath(m_executable);

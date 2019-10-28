@@ -4,6 +4,12 @@
 
 namespace nx::vms::client::desktop {
 
+enum class ModificationSource
+{
+    local,
+    remote
+};
+
 template<class T>
 struct NX_VMS_CLIENT_DESKTOP_API UserEditable
 {

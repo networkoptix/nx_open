@@ -201,6 +201,7 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
+#include <nx/utils/event_loop_timer.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
@@ -295,6 +296,8 @@
 
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
+
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <nx/vms/server/metrics/camera_controller.h>
 #include <nx/vms/server/metrics/network_controller.h>
@@ -499,7 +502,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     storage->fillID();
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const nx::vms::server::PlatformMonitor::PartitionSpace& part)
     { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
@@ -545,7 +548,7 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
     using namespace nx::vms::server::fs::media_paths;
 
     auto mediaPathList = get(FilterConfig::createDefault(
-        m_platform.get(), includeNonHdd, &serverModule()->settings()));
+        serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -602,7 +605,7 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
 
 QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePtr mServer)
 {
-    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
 
     QMap<QnUuid, QnStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
@@ -664,11 +667,11 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        NX_VERBOSE(this, "Init storages begin");
+        NX_VERBOSE(this, "[Storages init] Init storages begin");
         const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
-                NX_VERBOSE(this, "Init storages end");
+                NX_VERBOSE(this, "[Storages init] Init storages end");
                 m_initStoragesAsyncPromise->set_value();
             });
 
@@ -680,7 +683,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
             QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
-            NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
+            NX_DEBUG(this, lm("[Storages init] Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -688,14 +691,14 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_DEBUG(this, lm("Existing storage: %1, spaceLimit = %2")
+            NX_DEBUG(this, lm("[Storages init] Existing storage: %1, spaceLimit = %2")
                 .args(storage.url, storage.spaceLimit));
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
         const auto unmountedStorages =
             nx::mserver_aux::getUnmountedStorages(
-                m_platform.get(),
+                serverModule()->platform(),
                 m_mediaServer->getStorages(),
                 &serverModule()->settings());
         for (const auto& storageResource: unmountedStorages)
@@ -727,10 +730,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                 storagesToRemove.append(smallStorage);
         }
 
-        NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
+        NX_DEBUG(this, lm("[Storages init] Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
         {
-            NX_DEBUG(this, lm("Storage to remove: %2, id: %3").args(
+            NX_DEBUG(this, lm("[Storages init] Storage to remove: %2, id: %3").args(
                 storage->getUrl(), storage->getId()));
         }
 
@@ -740,21 +743,25 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-                qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
+                qWarning() << "[Storages init] Failed to remove deprecated storage on startup. Postpone removing to the next start...";
             commonModule()->resourcePool()->removeResources(storagesToRemove);
         }
 
         QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
         modifiedStorages.append(updateStorages(m_mediaServer));
+
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
+        NX_DEBUG(this, "[Storages init] Updated storages saved and update resource signal sent");
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
             &MediaServerProcess::at_serverPropertyChanged);
 
         if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
             initializeAnalyticsEvents();
+
+        NX_DEBUG(this, "[Storages init] Analytics storage DB initialized");
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
@@ -885,17 +892,17 @@ static const std::chrono::minutes kSystemUsageDumpTimeout(30);
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
-    if (!m_platform->monitor())
+    if (!serverModule()->platform()->monitor())
         return;
 
     if (!serverModule()->settings().noMonitorStatistics())
-        m_platform->monitor()->logStatistics();
+        serverModule()->platform()->monitor()->logStatistics();
 
     // TODO: #muskov
     //  - Add some more fields that might be interesting.
     //  - Make and use JSON serializable struct rather than just a string.
     QStringList networkIfList;
-    for (const auto& iface: m_platform->monitor()->totalNetworkLoad())
+    for (const auto& iface: serverModule()->platform()->monitor()->totalNetworkLoad())
     {
         if (iface.type != nx::vms::server::PlatformMonitor::LoopbackInterface)
         {
@@ -1002,9 +1009,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
         m_cmdLineArguments.rwConfigFilePath);
 
     addCommandLineParametersFromConfig(settings.get());
-
-    m_platform.reset(new QnPlatformAbstraction());
-    m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     const QString raidEventLogName = system_log::ini().logName;
     const QString raidEventProviderName = system_log::ini().providerName;
@@ -2960,7 +2964,7 @@ void MediaServerProcess::registerRestHandlers(
      * for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
-        m_metricsController.get(), serverModule()));
+        m_metricsController.get(), serverModule(), m_ec2ConnectionFactory->serverConnector()));
 }
 
 void MediaServerProcess::registerRestHandler(
@@ -3770,7 +3774,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     auto safeDisconnect =
-        [this](QObject* src, QObject* dst)
+        [](QObject* src, QObject* dst)
         {
             if (src && dst)
                 src->disconnect(dst);
@@ -4166,21 +4170,7 @@ void MediaServerProcess::connectSignals()
             }
         });
 
-    m_createDbBackupTimer = std::make_unique<QTimer>();
-    connect(
-        m_createDbBackupTimer.get(),
-        &QTimer::timeout,
-        [firstRun = true, this]() mutable
-        {
-            auto utils = nx::vms::server::Utils(serverModule());
-            utils.backupDatabase();
-            if (firstRun)
-            {
-                m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
-                firstRun = false;
-            }
-        });
-
+    m_createDbBackupTimer.reset(new nx::utils::EventLoopTimer);
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -4382,6 +4372,29 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
     }
 }
 
+void MediaServerProcess::onBackupDbTimer()
+{
+    Utils(serverModule()).backupDatabase();
+    m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
+}
+
+std::chrono::milliseconds MediaServerProcess::calculateDbBackupTimeout() const
+{
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+
+    const auto lastBackupTimestamp = Utils(serverModule()).lastDbBackupTimestamp();
+    if (!lastBackupTimestamp)
+        return 0ms;
+
+    const auto periodFromSettings = serverModule()->settings().dbBackupPeriodMS().count();
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+    if (*lastBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        return milliseconds(*lastBackupTimestamp - nowMs + periodFromSettings);
+
+    return milliseconds(std::max<int64_t>(*lastBackupTimestamp + periodFromSettings - nowMs, 0LL));
+}
+
 void MediaServerProcess::startObjects()
 {
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
@@ -4389,31 +4402,7 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
-
-    int64_t initialBackupDbPeriodMs;
-    const auto lastDbBackupTimestamp =
-        nx::vms::server::Utils(serverModule()).lastDbBackupTimestamp();
-
-    if (!lastDbBackupTimestamp)
-    {
-        initialBackupDbPeriodMs = 0; //< If no backup files so far, let's create one now.
-    }
-    else
-    {
-        const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
-        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
-        {
-            initialBackupDbPeriodMs = dbBackupPeriodMS;
-        }
-        else
-        {
-            initialBackupDbPeriodMs =
-                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
-        }
-    }
-
-    m_createDbBackupTimer->start(initialBackupDbPeriodMs);
+    m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 
@@ -4695,8 +4684,6 @@ void MediaServerProcess::run()
 
     m_serverModule = serverModule;
 
-    m_platform->monitor()->setServerModule(serverModule.get());
-    serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
 
@@ -4755,11 +4742,7 @@ void MediaServerProcess::run()
     NX_ASSERT(!nxVersion.isNull());
 
     if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
-    {
-        nx::vms::utils::backupDatabaseViaCopy(
-            ec2::detail::QnDbManager::ecsDbFileName(serverModule->settings().dataDir()),
-            nxVersionFromDb.build());
-    }
+        nx::vms::server::Utils(serverModule.get()).backupDatabaseViaCopy(nxVersionFromDb.build());
 
     if (!connectToDatabase())
         return;

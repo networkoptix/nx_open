@@ -389,8 +389,8 @@ private:
 // -------------------------------------------------------------------------- //
 // QnSysDependentMonitor
 // -------------------------------------------------------------------------- //
-QnWindowsMonitor::QnWindowsMonitor(QObject *parent):
-    base_type(parent),
+QnWindowsMonitor::QnWindowsMonitor():
+    base_type(),
     d_ptr(new QnWindowsMonitorPrivate())
 {
     d_ptr->q_ptr = this;

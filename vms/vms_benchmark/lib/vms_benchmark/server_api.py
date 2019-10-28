@@ -1,15 +1,15 @@
-import urllib.request
-from collections import namedtuple
-from urllib.parse import urlencode
-from urllib.error import URLError
 import base64
 import json
 import logging
+import urllib.request
+from collections import namedtuple
+from typing import List
+from urllib.error import URLError
+from urllib.parse import urlencode
 
 from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
-
 
 Response = namedtuple('Response', ['code', 'body'])
 
@@ -84,6 +84,17 @@ class ServerApi:
 
             return result.payload['reply']
 
+    def get_server_id(self):
+        module_information = self.get_module_information()
+
+        if module_information is None:
+            raise exceptions.ServerApiError(message="Unable to get module information.")
+
+        server_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
+        server_id = server_id_raw[1:-1] if server_id_raw[0] == '{' and server_id_raw[-1] == '}' else server_id_raw
+
+        return server_id
+
     def check_authentication(self):
         try:
             request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
@@ -125,7 +136,7 @@ class ServerApi:
 
         return None
 
-    def get_test_cameras(self):
+    def get_test_cameras(self) -> List[Camera]:
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))

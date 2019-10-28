@@ -45,7 +45,7 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>將伺服器從系統中脫離</h3>
-                        <p>此操作將會把伺服器從系統中脫離但仍保存資料庫、本地使用者和設定.
+                        <p>此操作將會把伺服器從系統中脫離但仍保存資料庫、本機使用者和設定.
                             影像資料將保持完好. <b>雲端上的使用者將被刪除.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中脫離</button></p>
                     </div>
@@ -57,7 +57,7 @@
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)</h3>
-                            <p>如果本系統是本地系統 (未連接到雲) 這將只改變管理者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
+                            <p>如果本系統是本機系統 (未連接到雲) 這將只改變管理者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
                                 否則這將只變更還原密碼.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>

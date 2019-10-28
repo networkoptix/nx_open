@@ -208,6 +208,8 @@ namespace ResourceDataKey
     static const QString kMulticastIsSupported("multicastIsSupported");
     static const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
 
+    static const QString kFixWrongUri("fixWrongUri");
+    static const QString kAlternativeSecondStreamSorter("alternativeSecondStreamSorter");
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

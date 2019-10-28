@@ -42,6 +42,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/system_commands.h>
 #include <api/resource_property_adaptor.h>
 
 #include <QtCore/QJsonDocument>
@@ -112,6 +113,31 @@ bool Utils::backupDatabase()
     return nx::vms::utils::backupDatabaseLive(
         serverModule()->settings().backupDir(),
         std::move(connection));
+}
+
+bool Utils::backupDatabaseViaCopy(int buildNumber)
+{
+    const auto backupDir = serverModule()->settings().backupDir();
+    const auto dbFilePath = ec2::detail::QnDbManager::ecsDbFileName(serverModule()->settings().dataDir());
+
+    if (!QDir(backupDir).exists() && !QDir().mkpath(backupDir))
+    {
+        NX_ERROR(this, "Failed to create DB backup path %1", backupDir);
+        return false;
+    }
+
+    const QString fileName = nx::vms::utils::backupDbFileName(backupDir, buildNumber);
+    if (!QFile::copy(dbFilePath, fileName))
+    {
+        NX_ERROR(this, "Failed to copy DB file %1 to %2", dbFilePath, fileName);
+        return false;
+    }
+
+    nx::vms::utils::deleteOldBackupFilesIfNeeded(
+        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+
+    NX_INFO(this, "Successfully created DB backup %1", fileName);
+    return true;
 }
 
 boost::optional<int64_t> Utils::lastDbBackupTimestamp() const

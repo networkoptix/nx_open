@@ -101,6 +101,9 @@ public:
 
     bool isPrimary() const;
 
+signals:
+    void childrenCountChanged(int count);
+
 protected:
     QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QnUuid& uuid);
 

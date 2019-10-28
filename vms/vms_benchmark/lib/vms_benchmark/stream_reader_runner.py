@@ -6,45 +6,42 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-binary_file = './testcamera/rtsp_perf'
+ini_rtsp_perf_bin = './testcamera/rtsp_perf'
 debug = False
 
 
 @contextmanager
 def stream_reader_running(
     camera_ids,
-    streams_per_camera,
-    archive_streams_count,
+    total_live_stream_count: int,
+    total_archive_stream_count: int,
     user,
     password,
     box_ip,
     vms_port
 ):
-    camera_ids = list(camera_ids)
-
-    archive_streams_list = []
-
-    for i in range(archive_streams_count):
-        archive_streams_list.append(camera_ids[i % len(camera_ids)])
-
     args = [
-        binary_file,
+        ini_rtsp_perf_bin,
         '-u',
         user,
         '-p',
         password,
         '--timestamps',
+        '--disable-restart',
     ]
 
     streams = {}
 
+    def make_number_of_ids(count):
+        return (camera_ids[i % len(camera_ids)] for i in range(count))
+
     for camera_id, opts in (
         [
             [camera_id, {"type": 'live'}]
-            for camera_id in camera_ids*streams_per_camera
+            for camera_id in make_number_of_ids(total_live_stream_count)
         ] + [
             [camera_id, {"type": 'archive'}]
-            for camera_id in archive_streams_list
+            for camera_id in make_number_of_ids(total_archive_stream_count)
         ]
     ):
         import uuid
@@ -59,6 +56,8 @@ def stream_reader_running(
         if opts.get('type', 'live') == 'archive':
             params['pos'] = 0
 
+        params['stream'] = 0
+
         url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
         args.append('--url')
@@ -69,6 +68,7 @@ def stream_reader_running(
             "type": opts.get('type', 'live')
         }
 
+    # E.g. if 3 URLs are passed to rtsp_perf and --count is 5, it may open streams 1, 1, 2, 2, 3.
     args.append('--count')
     args.append(len(streams.items()))
 
@@ -81,7 +81,7 @@ def stream_reader_running(
 
     ld_library_path = None
     if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(ini_rtsp_perf_bin)
         opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.
@@ -95,7 +95,7 @@ def stream_reader_running(
     try:
         proc = subprocess.Popen([str(arg) for arg in args], **opts)
     except Exception as exception:
-        raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
+        raise exceptions.RtspPerfError(f"Unable to start rtsp_perf: {str(exception)}")
 
     try:
         yield [proc, streams]

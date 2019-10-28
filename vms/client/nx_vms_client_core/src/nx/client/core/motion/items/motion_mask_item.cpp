@@ -11,6 +11,7 @@
 #include <QtQuick/private/qquickwindow_p.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/custom_runnable.h>
 
 namespace nx::vms::client::core {
 
@@ -34,7 +35,7 @@ public:
     }
 
 private:
-    QSGTexture* m_texture = nullptr;
+    QPointer<QSGTexture> m_texture = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -97,7 +98,7 @@ public:
 
 public:
     QByteArray mask = QByteArray(kMotionMaskSizeBytes, 0);
-    QScopedPointer<QSGTexture, QScopedPointerDeleteLater> texture;
+    QSharedPointer<QSGTexture> texture;
     bool textureDirty = true;
     MotionMaskItemTextureProvider* provider = nullptr;
 };
@@ -184,7 +185,19 @@ void MotionMaskItem::releaseResources()
         QQuickWindowQObjectCleanupJob::schedule(window(), d->provider);
         d->provider = nullptr;
     }
+
+    if (d->texture)
+    {
+        const auto quickWindow = window();
+        const auto clearTexture = [texture = std::move(d->texture)]() mutable { texture.reset(); };
+        quickWindow->scheduleRenderJob(
+            new nx::utils::thread::CustomRunnable(clearTexture),
+            QQuickWindow::AfterSynchronizingStage);
+        quickWindow->update();
+    }
 }
+
+
 
 void MotionMaskItem::registerQmlType()
 {

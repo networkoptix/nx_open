@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include "vmax480_tcp_server.h"
+#include "vmax480_resource_proxy.h"
 #include "utils/common/sleep.h"
 #include "core/resource/network_resource.h"
 #include "vmax480_resource.h"
@@ -25,7 +26,12 @@ void VMaxStreamFetcher::initPacketTime()
     m_emptyPacketTime = 0;
 }
 
-VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
+VMaxStreamFetcher::VMaxStreamFetcher(
+    QnMediaServerModule* serverModule,
+    QString groupId,
+    bool isLive)
+    :
+    nx::vms::server::ServerModuleAware(serverModule),
     m_vMaxProxy(0),
     m_vmaxConnection(0),
     m_isLive(isLive),
@@ -37,9 +43,10 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_keepAllChannels(false),
     m_lastConnectTimeUsec(0),
-    m_needStop(false)
+    m_needStop(false),
+    m_groupId(std::move(groupId)),
+    m_resourceProxy(serverModule->findInstance<QnVmax480ResourceProxy>())
 {
-    m_vmaxResource = dev->toSharedPointer().dynamicCast<QnPlVmax480Resource>();
     initPacketTime();
 }
 
@@ -143,12 +150,8 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
 
 bool VMaxStreamFetcher::vmaxConnect()
 {
-    auto resource = m_vmaxResource.toStrongRef();
-    if (!resource)
-        return false;
+    QnVMax480Server* vmax480Server = serverModule()->findInstance<QnVMax480Server>();
 
-    QnVMax480Server* vmax480Server =
-        resource->serverModule()->findInstance<QnVMax480Server>();
     if (!vmax480Server)
         return false;
 
@@ -180,9 +183,9 @@ bool VMaxStreamFetcher::vmaxConnect()
 
         if (m_vmaxConnection) {
             m_vmaxConnection->vMaxConnect(
-                resource->getUrl(),
+                m_resourceProxy->url(m_groupId),
                 getCurrentChannelMask(),
-                resource->getAuth(),
+                m_resourceProxy->auth(m_groupId),
                 m_isLive);
             return true;
         }
@@ -210,11 +213,8 @@ void VMaxStreamFetcher::vmaxDisconnect()
         m_vMaxProxy = 0;
     }
 
-    if (const auto resource = m_vmaxResource.toStrongRef())
-    {
-        if (auto vmax480Server = resource->serverModule()->findInstance<QnVMax480Server>())
-            vmax480Server->unregisterProvider(this);
-    }
+    if (auto vmax480Server = serverModule()->findInstance<QnVMax480Server>())
+        vmax480Server->unregisterProvider(this);
 
     m_lastSeekPos = AV_NOPTS_VALUE;
     m_eofReached = false;
@@ -222,11 +222,7 @@ void VMaxStreamFetcher::vmaxDisconnect()
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
-    auto resource = m_vmaxResource.toStrongRef();
-    if (!resource)
-        return;
-
-    resource->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
+    m_resourceProxy->setArchiveRange(m_groupId, startDateTime * 1000000ll, endDateTime * 1000000ll);
 
     QnMutexLocker lock( &m_mutex );
     for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
@@ -488,24 +484,34 @@ void VMaxStreamFetcher::notInUse()
     m_usageCount--;
 }
 
-VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive)
+VMaxStreamFetcher* VMaxStreamFetcher::getInstance(
+    const QByteArray& clientGroupID,
+    QnPlVmax480Resource* vmaxResource,
+    bool isLive)
 {
-    QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
+    QByteArray vmaxIP = QUrl(vmaxResource->getUrl()).host().toUtf8();
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
     QnMutexLocker lock( &m_instMutex );
     VMaxStreamFetcher* result = m_instances.value(key);
-    if (result == 0) {
-        result = new VMaxStreamFetcher(res, isLive);
+    if (result == 0)
+    {
+        result = new VMaxStreamFetcher(
+            vmaxResource->serverModule(),
+            vmaxResource->getGroupId(),
+            isLive);
         m_instances.insert(key, result);
     }
     result->inUse();
     return result;
 }
 
-void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive)
+void VMaxStreamFetcher::freeInstance(
+    const QByteArray& clientGroupID,
+    QnPlVmax480Resource* vmaxResource,
+    bool isLive)
 {
-    QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
+    QByteArray vmaxIP = QUrl(vmaxResource->getUrl()).host().toUtf8();
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
     VMaxStreamFetcher* result = 0;

@@ -544,8 +544,14 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 else
                 {
                     qint64 frameDistance = data->timestamp - m_prevTimestamp;
-                    if (frameDistance > 0 && frameDistance < 50000)
-                        setMultiThreadDecoding(true); // high fps and high resolution
+                    if (frameDistance > 0)
+                    {
+                        const double fps = 1000000.0 / frameDistance;
+                        qint64 megapixels = m_context->width * m_context->height * fps;
+                        static const qint64 kThreshold = 1920*2 * 1080*2 * 20; //< 4k, 20fps
+                        if (megapixels >= kThreshold)
+                            setMultiThreadDecoding(true); // high fps and high resolution
+                    }
                 }
             }
             m_prevTimestamp = data->timestamp;
@@ -714,6 +720,7 @@ void QnFfmpegVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy va
 {
     if (m_mtDecodingPolicy != value)
     {
+        NX_VERBOSE(this, lm("Use multithread decoding policy %1").arg((int) value));
         m_mtDecodingPolicy = value;
         setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
     }

@@ -28,6 +28,8 @@ public:
     virtual void at_connectionOpened(const QnAuthSession& session) override {}
     virtual void at_connectionClosed(const QnAuthSession& session) override {}
 
+    virtual void flushRecords() override {}
+
 private:
     std::atomic<int> m_internalIdCounter{0};
 };

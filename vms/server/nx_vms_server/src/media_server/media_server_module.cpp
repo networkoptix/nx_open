@@ -28,6 +28,7 @@
 #include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <nx/vms/server/nvr/hanwha/service.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource_proxy.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
@@ -201,6 +202,16 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
+    const bool isRootToolEnabled = !settings().ignoreRootTool();
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
+        isRootToolEnabled,
+        qApp->applicationFilePath());
+
+    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get(), timerManager()));
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
+
     nx::vms::server::registerSerializers();
 
     // TODO: #dmishin NVR service factory.
@@ -209,10 +220,13 @@ QnMediaServerModule::QnMediaServerModule(
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
     m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>(this);
 
     initOutgoingSocketCounter();
+
+#ifdef ENABLE_VMAX
+    store(new QnVmax480ResourceProxy(commonModule()));
+#endif
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
@@ -284,11 +298,6 @@ QnMediaServerModule::QnMediaServerModule(
 
         ));
 
-    const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled,
-        qApp->applicationFilePath());
-
     if (QnAppInfo::isNx1())
     {
         m_settings->mutableSettings()->setBootedFromSdCard(
@@ -300,7 +309,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_pluginManager = store(new PluginManager(this));
 
 
-    if (!mutableSettings()->noPlugins())
+    if (!settings().noPlugins())
         m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
@@ -689,12 +698,8 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
+    NX_CRITICAL(m_platform);
     return m_platform;
-}
-
-void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
-{
-    m_platform = platform;
 }
 
 QnServerConnector* QnMediaServerModule::serverConnector() const

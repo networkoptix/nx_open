@@ -73,7 +73,7 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     for(const auto& camera: cameras)
     {
         urls.emplace_back(
-            QString(m_config.useSsl ? "rtsps://" : "rtsp://") + server + "/" + camera.id.toString());
+            QString(m_config.useSsl ? "rtsps://" : "rtsp://") + server + "/" + camera.id.toString() + "?stream=0");
     }
     return true;
 }
@@ -82,7 +82,7 @@ void RtspPerf::startSessionsThread(const std::vector<QString>& urls)
 {
     while (true)
     {
-        for (int i = 0; i < (int)m_sessions.size(); ++i)
+        for (int i = 0; i < (int) m_sessions.size(); ++i)
         {
             if (!m_sessions[i].failed)
                 continue;

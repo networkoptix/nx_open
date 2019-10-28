@@ -256,11 +256,11 @@ static std::string systemTempDir()
 /** Create directory, issuing a fatal error on failure. */
 static void createDir(const std::string& dir)
 {
-#if defined(_WIN32)
-    const int resultCode = _mkdir(dir.c_str());
-#else
+    #if defined(_WIN32)
+        const int resultCode = _mkdir(dir.c_str());
+    #else
         const int resultCode = mkdir(dir.c_str(), /*octal*/ 0777);
-#endif
+    #endif
     if (resultCode != 0)
         fatalError("Unable to create dir: [%s]", dir.c_str());
 }

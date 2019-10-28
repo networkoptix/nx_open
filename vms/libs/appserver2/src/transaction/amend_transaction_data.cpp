@@ -17,9 +17,11 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/url.h>
 
 namespace ec2 {
 
@@ -41,6 +43,24 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     }
 
     return false;
+}
+
+bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* /*accessManager*/,
+    nx::vms::api::StorageData* storageData)
+{
+    nx::utils::Url url(storageData->url);
+    if (url.password().isEmpty())
+        return false;
+
+	if (accessData == Qn::kSystemAccess)
+        url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC((url.password())));
+    else
+        url.setPassword(kHiddenPasswordFiller);
+
+    storageData->url = url.toString();
+    return true;
 }
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
@@ -68,47 +88,10 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
-    nx::vms::api::EventRuleDataList* ruleList)
-{
-    bool result = false;
-    for (auto& rule: *ruleList)
-        result |= amendOutputDataIfNeeded(accessData, accessManager, &rule);
-
-    return result;
-}
-
-
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamWithRefData* paramData)
 {
     return amendOutputDataIfNeeded(
         accessData, accessManager, static_cast<nx::vms::api::ResourceParamData*>(paramData));
-}
-
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
-    std::vector<nx::vms::api::ResourceParamData>* paramDataList)
-{
-    bool result = false;
-    for (auto& paramData : *paramDataList)
-        result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData);
-
-    return result;
-}
-
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
-    std::vector<nx::vms::api::ResourceParamWithRefData>* paramWithRefDataList)
-{
-    bool result = false;
-    for (auto& paramData : *paramWithRefDataList)
-    {
-        result |= amendOutputDataIfNeeded(
-            accessData, accessManager, static_cast<nx::vms::api::ResourceParamData*>(&paramData));
-    }
-
-    return result;
 }
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
@@ -125,17 +108,6 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     nx::vms::api::CameraDataEx* paramData)
 {
     return amendOutputDataIfNeeded(accessData, accessManager, &paramData->addParams);
-}
-
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
-    nx::vms::api::CameraDataExList* paramDataList)
-{
-    bool result = false;
-    for (auto& paramData: *paramDataList)
-        result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData);
-
-    return result;
 }
 
 } // namespace ec2

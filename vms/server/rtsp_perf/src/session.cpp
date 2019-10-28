@@ -57,7 +57,7 @@ void Session::run(const QString& url, const Config& config, bool live)
             {
                 uint8_t* data = (uint8_t*)dataArrays[channel]->data() + kTcpPrefixLength;
                 int64_t size = dataArrays[channel]->size() - kTcpPrefixLength;
-                if (!processPacket(data, size, url.toUtf8().data()))
+                if (channel == 0 && !processPacket(data, size, url.toUtf8().data()))
                 {
                     failed = true;
                     ++failedCount;
@@ -68,7 +68,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         }
         if (bytesRead <= 0)
         {
-            printf("WARNING: Failed to read data from camera %s", url.toUtf8().data());
+            printf("WARNING: Camera %s: failed to read data\n", url.toUtf8().data());
             failed = true;
             ++failedCount;
             break;
@@ -79,19 +79,47 @@ void Session::run(const QString& url, const Config& config, bool live)
         delete data;
 }
 
+void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url)
+{
+    using namespace std::chrono;
+    if (m_config.maxTimestampDiff != milliseconds::zero() && diff > m_config.maxTimestampDiff)
+    {
+        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us more than %lld us\n",
+            url,
+            (long long int) timestampUs,
+            (long long int) diff.count(),
+            (long long int) m_config.maxTimestampDiff.count());
+    }
+    if (m_config.minTimestampDiff != milliseconds::zero() && diff < m_config.minTimestampDiff)
+    {
+        printf("WARNING: Camera %s: frame timestamp %lld us: diff %lld us is less than %lld us\n",
+            url,
+            (long long int) timestampUs,
+            (long long int) diff.count(),
+            (long long int) m_config.minTimestampDiff.count());
+    }
+}
+
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    int64_t timestamp = parsePacketTimestamp(data, size);
+    int64_t timestampUs = parsePacketTimestamp(data, size);
 
     auto nowTime = std::chrono::system_clock::now();
-    if (timestamp != -1)
+    if (timestampUs != -1)
     {
         if (m_config.printTimestamps)
         {
-            printf("Camera %s timestamp %lld us\n", url,
-                (long long int) timestamp);
+            int64_t timestampDiffUs = timestampUs - m_prevTimestampUs;
+            printf("Camera %s: timestamp %lld us, diff %lld us\n", url,
+                (long long int) timestampUs,
+                (m_prevTimestampUs == -1) ? -1LL : timestampDiffUs);
+
+            if (m_prevTimestampUs != -1)
+                checkDiff(std::chrono::microseconds(timestampDiffUs), timestampUs, url);
         }
+        m_prevTimestampUs = timestampUs;
         m_lastFrameTime = nowTime;
+
     }
     else
     {

@@ -8,6 +8,9 @@ syntax: glob
 .DS_Store
 *.swp
 CMakeLists.txt.user*
+.vim*
+.ccls*
+compile_commands.json
 
 # Precompiled files.
 *.pyc

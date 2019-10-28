@@ -54,7 +54,7 @@ public:
         start();
     }
 
-    virtual ~TransactionExecutor()
+    virtual ~TransactionExecutor() override
     {
         stop();
     }
@@ -223,10 +223,29 @@ inline void fixRequestDataIfNeeded(nx::vms::api::EventRuleData* const paramData)
     }
 }
 
+inline void fixRequestDataIfNeeded(nx::vms::api::StorageData* const paramData)
+{
+    nx::utils::Url url = paramData->url;
+    if (url.password().isEmpty())
+        return;
+
+    url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+    paramData->url = url.toString();
+}
+
 template <typename T>
 auto amendTranIfNeeded(const QnTransaction<T>& tran)
 {
     return tran;
+}
+
+template<typename Data>
+auto doAmend(const QnTransaction<Data>& original)
+{
+    auto result = original;
+    fixRequestDataIfNeeded(&result.params);
+
+    return result;
 }
 
 inline QnTransaction<nx::vms::api::UserData> amendTranIfNeeded(
@@ -241,13 +260,16 @@ inline QnTransaction<nx::vms::api::UserData> amendTranIfNeeded(
     return resultTran;
 }
 
+inline QnTransaction<nx::vms::api::StorageData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::StorageData>& originalTran)
+{
+    return doAmend(originalTran);
+}
+
 inline QnTransaction<nx::vms::api::ResourceParamData> amendTranIfNeeded(
     const QnTransaction<nx::vms::api::ResourceParamData>& originalTran)
 {
-    auto resultTran = originalTran;
-    fixRequestDataIfNeeded(&resultTran.params);
-
-    return resultTran;
+    return doAmend(originalTran);
 }
 
 inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
@@ -262,10 +284,7 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
 inline QnTransaction<nx::vms::api::EventRuleData> amendTranIfNeeded(
     const QnTransaction<nx::vms::api::EventRuleData>& originalTran)
 {
-    auto resultTran = originalTran;
-    fixRequestDataIfNeeded(static_cast<nx::vms::api::EventRuleData* const>(&resultTran.params));
-
-    return resultTran;
+    return doAmend(originalTran);
 }
 
 class ServerQueryProcessor

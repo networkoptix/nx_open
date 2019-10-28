@@ -350,92 +350,168 @@ int QnPlOnvifResource::VideoEncoderCapabilities::restrictFrameRate(
 
 namespace {
 
-using VideoEncoderCapabilitiesComparator = std::function<bool(
-    const QnPlOnvifResource::VideoEncoderCapabilities&,
-    const QnPlOnvifResource::VideoEncoderCapabilities&)>;
+// This namespace contains some stuff for sorting VideoEncoderCapabilities to choose Encoders for
+// primary and secondary streams.
 
-bool VideoEncoderCapabilitiesGreaterThan(
-    const QnPlOnvifResource::VideoEncoderCapabilities &s1,
-    const QnPlOnvifResource::VideoEncoderCapabilities &s2)
+int maxSquare(const QList<QSize>& resolutions)
 {
-    int square1Max = 0;
-    QSize max1Res;
-    for (int i = 0; i < s1.resolutions.size(); ++i)
+    int result = 0;
+    for (const auto& resolution: resolutions)
     {
-        int newMax = s1.resolutions[i].width() * s1.resolutions[i].height();
-        if (newMax > square1Max)
-        {
-            square1Max = newMax;
-            max1Res = s1.resolutions[i];
-        }
+        const int currentSquare = resolution.width() * resolution.height();
+        if (result < currentSquare)
+            result = currentSquare;
+    }
+    return result;
+}
+
+class RankStreamCapabilitiesSorter
+{
+public:
+    RankStreamCapabilitiesSorter(const QString& profileNames):
+        m_profileRankMap(createRankMap(profileNames))
+    {
     }
 
-    int square2Max = 0;
-    QSize max2Res;
-    for (int i = 0; i < s2.resolutions.size(); ++i)
+    int rank(const QString& profileName) const
     {
-        int newMax = s2.resolutions[i].width() * s2.resolutions[i].height();
-        if (newMax > square2Max)
-        {
-            square2Max = newMax;
-            max2Res = s2.resolutions[i];
-        }
+        auto it = m_profileRankMap.find(profileName);
+        const int result = (it != m_profileRankMap.end()) ? it.value() : -1;
+        return result;
     }
 
-    if (square1Max != square2Max)
-        return square1Max > square2Max;
+private:
+    using RankMap = QMap<QString, int>;
 
-    // For equal resolutions the rule is: H265 > H264 > JPEG.
-    if (s1.encoding != s2.encoding)
-        return s1.encoding > s2.encoding;
+    RankMap createRankMap(const QString& profileNames)
+    {
+        RankMap result;
+        QStringList profileNameList = profileNames.split(L',', QString::SkipEmptyParts);
+        int rank = profileNameList.size(); // TODO: Move into 'for' when C++20 will be available.
+        for (const auto& profileName: profileNameList)
+            result[profileName] = --rank;
+        return result;
+    }
 
-    if (!s1.isUsedInProfiles && s2.isUsedInProfiles)
+private:
+    const RankMap m_profileRankMap;
+};
+
+// Sorting rules for selecting primary stream video encoder.
+class PrimaryStreamCapabilitiesSorter: private RankStreamCapabilitiesSorter
+{
+public:
+    PrimaryStreamCapabilitiesSorter(const QString& profileNames = QString()):
+        RankStreamCapabilitiesSorter(profileNames)
+    {
+    }
+
+    bool operator()(
+        const QnPlOnvifResource::VideoEncoderCapabilities &lhs,
+        const QnPlOnvifResource::VideoEncoderCapabilities &rhs) const
+    {
+        // 0. Higher rank in resource_data.json - better (makes sense if sorter is initialized with
+        // profileNames).
+        if (const int r1 = rank(lhs.currentProfile), r2 = rank(rhs.currentProfile); r1 != r2)
+            return r1 > r2;
+
+        // 1. Bigger resolution - better.
+        if (const int s1 = maxSquare(lhs.resolutions), s2 = maxSquare(rhs.resolutions); s1 != s2)
+            return s1 > s2;
+
+        // 2. H265 > H264 > JPEG.
+        if (lhs.encoding != rhs.encoding)
+            return lhs.encoding > rhs.encoding;
+
+        // 3. Used profile > unused profile
+        if (lhs.isUsedInProfiles != rhs.isUsedInProfiles)
+            return lhs.isUsedInProfiles > rhs.isUsedInProfiles;
+
+        // 4. Less name - better.
+        if (lhs.videoEncoderToken != rhs.videoEncoderToken)
+            return !(lhs.videoEncoderToken >= rhs.videoEncoderToken);
+
         return false;
-    else if (s1.isUsedInProfiles && !s2.isUsedInProfiles)
-        return true;
+    }
+};
 
-    return s1.videoEncoderToken < s2.videoEncoderToken; // sort by name
-}
-
-bool compareByProfiles(
-    const QnPlOnvifResource::VideoEncoderCapabilities &s1,
-    const QnPlOnvifResource::VideoEncoderCapabilities &s2,
-    const QMap<QString, int>& profilePriorities)
+// Sorting rules for selecting secondary stream video encoder.
+class SecondaryStreamCapabilitiesSorter: private RankStreamCapabilitiesSorter
 {
-    auto firstPriority = profilePriorities.contains(s1.currentProfile)
-        ? profilePriorities[s1.currentProfile]
-        : -1;
-
-    auto secondPriority = profilePriorities.contains(s2.currentProfile)
-        ? profilePriorities[s2.currentProfile]
-        : -1;
-
-    if (firstPriority != secondPriority)
-        return firstPriority > secondPriority;
-
-    return VideoEncoderCapabilitiesGreaterThan(s1, s2);
-}
-
-VideoEncoderCapabilitiesComparator createComparator(const QString& profiles)
-{
-    if (!profiles.isEmpty())
+public:
+    SecondaryStreamCapabilitiesSorter(const QString& profileNames = QString()) :
+        RankStreamCapabilitiesSorter(profileNames)
     {
-        QStringList profileList = profiles.split(L',');
-        QMap<QString, int> profilePriorities;
-        for (auto i = 0; i < profileList.size(); ++i)
-            profilePriorities[profileList[i]] = profileList.size() - i;
-
-        return
-            [profilePriorities](
-                const QnPlOnvifResource::VideoEncoderCapabilities &s1,
-                const QnPlOnvifResource::VideoEncoderCapabilities &s2) -> bool
-            {
-                return compareByProfiles(s1, s2, profilePriorities);
-            };
     }
 
-    return VideoEncoderCapabilitiesGreaterThan;
-}
+    bool operator()(
+        const QnPlOnvifResource::VideoEncoderCapabilities &lhs,
+        const QnPlOnvifResource::VideoEncoderCapabilities &rhs) const
+    {
+        // 0. Higher rank in resource_data.json - better (makes sense if sorter is initialized with
+        // profileNames).
+        if (const int r1 = rank(lhs.currentProfile), r2 = rank(rhs.currentProfile); r1 != r2)
+            return r1 > r2;
+
+        // 1. H265 > H264 > JPEG.
+        if (lhs.encoding != rhs.encoding)
+            return lhs.encoding > rhs.encoding;
+
+        // 2. Bigger resolution - better.
+        if (const int s1 = maxSquare(lhs.resolutions), s2 = maxSquare(rhs.resolutions); s1 != s2)
+            return s1 > s2;
+
+        // 3. Used profile > unused profile
+        if (lhs.isUsedInProfiles != rhs.isUsedInProfiles)
+            return lhs.isUsedInProfiles > rhs.isUsedInProfiles;
+
+        // 4. Less name - better.
+        if (lhs.videoEncoderToken != rhs.videoEncoderToken)
+            return !(lhs.videoEncoderToken >= rhs.videoEncoderToken);
+
+        return false;
+    }
+};
+
+// Special variant of sorting rules for selecting secondary stream video encoder.
+// VideoEncoder token is more important than encoding and resolution.
+class SecondaryStreamTokenCapabilitiesSorter : private RankStreamCapabilitiesSorter
+{
+public:
+    SecondaryStreamTokenCapabilitiesSorter(const QString& profileNames = QString()) :
+        RankStreamCapabilitiesSorter(profileNames)
+    {
+    }
+
+    bool operator()(
+        const QnPlOnvifResource::VideoEncoderCapabilities &lhs,
+        const QnPlOnvifResource::VideoEncoderCapabilities &rhs) const
+    {
+        // 0. Higher rank in resource_data.json - better (makes sense if sorter is initialized with
+        // profileNames).
+        if (const int r1 = rank(lhs.currentProfile), r2 = rank(rhs.currentProfile); r1 != r2)
+            return r1 > r2;
+
+        // 1. Less name - better.
+        if (lhs.videoEncoderToken != rhs.videoEncoderToken)
+            return !(lhs.videoEncoderToken >= rhs.videoEncoderToken);
+
+        // 2. H265 > H264 > JPEG.
+        if (lhs.encoding != rhs.encoding)
+            return lhs.encoding > rhs.encoding;
+
+        // 3. Bigger resolution - better.
+        if (const int s1 = maxSquare(lhs.resolutions), s2 = maxSquare(rhs.resolutions); s1 != s2)
+            return s1 > s2;
+
+        // 4. Used profile > unused profile
+        if (lhs.isUsedInProfiles != rhs.isUsedInProfiles)
+            return lhs.isUsedInProfiles > rhs.isUsedInProfiles;
+
+        return false;
+    }
+};
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -2576,8 +2652,24 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     if (profileNameLists.size() > channel)
         channelProfileNameList = profileNameLists[channel];
 
-    auto comparator = createComparator(channelProfileNameList);
-    std::sort(optionsList.begin(), optionsList.end(), comparator);
+    const auto bestOptions = std::min_element(optionsList.begin(), optionsList.end(),
+        PrimaryStreamCapabilitiesSorter(channelProfileNameList));
+    const int bestOptionsIndex = std::distance(optionsList.begin(), bestOptions);
+    optionsList.move(bestOptionsIndex, 0);
+
+    const bool isDahua = getVendor().toLower() == "dahua";
+    const bool useAlternativeSorter =
+        resourceData().value<bool>(ResourceDataKey::kAlternativeSecondStreamSorter);
+    if (isDahua || useAlternativeSorter)
+    {
+        std::stable_sort(std::next(optionsList.begin()), optionsList.end(),
+            SecondaryStreamTokenCapabilitiesSorter(channelProfileNameList));
+    }
+    else
+    {
+        std::stable_sort(std::next(optionsList.begin()), optionsList.end(),
+            SecondaryStreamCapabilitiesSorter(channelProfileNameList));
+    }
 
     if (optionsList[0].frameRateMax > 0)
         setMaxFps(optionsList[0].frameRateMax);

@@ -389,9 +389,8 @@ private:
             return;
         }
 
-        const auto storageIndex = m_owner->storageDbPool()->getStorageIndex(storage);
-        NX_CRITICAL(storageIndex != -1);
-        const auto catalogsToScan = m_owner->catalogsToScan(storageIndex);
+        m_owner->emptyCatalogsForNotExistingFolders(storage);
+        const auto catalogsToScan = m_owner->catalogsToScan(storage);
 
         m_totalCatalogs += catalogsToScan.size();
         if (m_totalCatalogs == 0)
@@ -667,11 +666,13 @@ public:
     }
     virtual void run() override
     {
+        NX_DEBUG(this, "Starting to test storages");
         for (const auto& storage: storagesToTest())
             m_owner->updateMountedStatus(storage);
 
         for (const auto& storage : storagesToTest())
         {
+            NX_DEBUG(this, "Testing storage %1", storage->getUrl());
             if (needToStop())
                 return;
 
@@ -686,6 +687,8 @@ public:
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
                     m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
+
+            NX_DEBUG(this, "Testing storage %1 done", storage->getUrl());
         }
 
         m_owner->testStoragesDone();
@@ -800,16 +803,47 @@ int64_t QnStorageManager::nxOccupiedSpace(const QnStorageResourcePtr& storage) c
     return occupiedSpace(storageIndex);
 }
 
-QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(int storageIndex)
+void QnStorageManager::emptyCatalogsForNotExistingFolders(const QnStorageResourcePtr& storage)
+{
+    for (const auto quality: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
+    {
+        const auto cameraIds = getAllCameraIdsUnderLock(quality);
+        const auto qualityPath =
+            closeDirPath(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(quality));
+
+        for (const auto& cameraId: cameraIds)
+        {
+            if (!storage->isDirExists(qualityPath + cameraId))
+            {
+                const auto emptyCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+                    serverModule(), cameraId, quality, m_role));
+
+                replaceChunks(
+                    QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()),
+                    storage, emptyCatalog, cameraId, quality);
+            }
+        }
+    }
+}
+
+QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(const QnStorageResourcePtr &storage)
 {
     QMap<DeviceFileCatalogPtr, qint64> result;
-    NX_MUTEX_LOCKER lock(&m_mutexCatalog);
+    for (const auto quality: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
+    {
+        const auto qualityPath =
+            closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(quality);
 
-    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::LowQualityCatalog])
-        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+        for (const auto& fileInfo: storage->getFileList(qualityPath))
+        {
+            if (!fileInfo.isDir())
+                continue;
 
-    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::HiQualityCatalog])
-        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+            const auto catalog = getFileCatalog(fileInfo.fileName(), quality);
+            result.insert(
+                catalog, catalog->lastChunkStartTime(storageDbPool()->getStorageIndex(storage)));
+        }
+    }
 
     return result;
 }

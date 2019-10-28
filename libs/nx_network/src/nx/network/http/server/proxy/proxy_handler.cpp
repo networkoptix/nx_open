@@ -86,9 +86,9 @@ void AbstractProxyHandler::onConnected(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3. %4")
-            .args(targetAddress, m_request.requestLine.url, m_sslConnectionRequired,
-                SystemError::toString(errorCode)));
+        NX_DEBUG(this, "Failed to establish connection to %1 (path %2) with SSL=%3. %4",
+            targetAddress, m_request.requestLine.url, m_sslConnectionRequired,
+            SystemError::toString(errorCode));
 
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,

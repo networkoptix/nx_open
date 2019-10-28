@@ -103,6 +103,11 @@ public:
      * Returns none if no backup file has been found.
      */
     boost::optional<int64_t> lastDbBackupTimestamp() const;
+
+    /**
+     * Should be used when database file has not been opened yet.
+     */
+    bool backupDatabaseViaCopy(int buildNumber);
 };
 
 } // namespace vms::server

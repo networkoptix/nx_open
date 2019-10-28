@@ -133,7 +133,7 @@ nx_force_include(nx_vms_server
 nx_add_vendor_macros(nx_vms_server)
 
 if(LINUX)
-    target_link_libraries(nx_vms_server PRIVATE ldap lber)
+    target_link_libraries(nx_vms_server PRIVATE ldap lber dl)
 endif()
 
 if(WINDOWS)

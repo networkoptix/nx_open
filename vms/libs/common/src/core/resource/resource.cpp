@@ -704,9 +704,9 @@ void QnResource::reinitAsync()
         }
 
         m_lastInitTime = getUsecTimer();
-        setStatus(Qn::Offline);
     }
 
+    setStatus(Qn::Offline);
     if (const auto pool = resourcePool())
         pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }

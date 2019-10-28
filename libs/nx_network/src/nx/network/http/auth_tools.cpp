@@ -211,6 +211,20 @@ static BufferType fieldOrEmpty(
     return iter != inputParams.end() ? iter->second : BufferType();
 }
 
+static bool isQopTypeSupported(const BufferType& qopAttributeValue)
+{
+    if (qopAttributeValue.isEmpty())
+        return true;
+
+    for (const auto& qopOption: qopAttributeValue.split(','))
+    {
+        if (qopOption.trimmed().toLower() == "auth")
+            return true;
+    }
+
+    return false;
+}
+
 static bool calcDigestResponse(
     const QByteArray& method,
     const StringType& userName,
@@ -228,9 +242,8 @@ static bool calcDigestResponse(
     const auto realm = fieldOrEmpty(inputParams, "realm");
     const auto qop = fieldOrEmpty(inputParams, "qop");
 
-    // TODO #ak qop can have value "auth,auth-int". That should be supported
-    if (qop.indexOf("auth-int") != -1)
-        return false; //< qop=auth-int is not supported
+    if (!isQopTypeSupported(qop))
+        return false;
 
     const BufferType& ha1 = predefinedHa1
         ? predefinedHa1.get()
