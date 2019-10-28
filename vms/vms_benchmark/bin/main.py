@@ -123,6 +123,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 3 * 60,
         },
+        "archiveDeletingTimeoutSeconds": {
+            "optional": True,
+            "type": "integer",
+            "default": 60,
+        },
     }
 
     conf = ConfigParser(conf_file, conf_option_descriptions)
@@ -1105,7 +1110,7 @@ def _clear_storages(box, storages: List[Storage]):
             f"'{storage.url}/hi_quality' "
             f"'{storage.url}/low_quality' "
             f"'{storage.url}/'*_media.nxdb",
-            su=True, exc=True)
+            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, exc=True)
     report('Server video archives deleted.')
 
 
