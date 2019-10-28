@@ -844,7 +844,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 )
 
                 for stream_type in 'live', 'archive':
-                    if frame_drops_per_type[stream_type] > 0:
+                    if frame_drops_per_type[stream_type] > ini['maxAllowedFrameDrops']:
                         issues.append(exceptions.VmsBenchmarkIssue(
                             f'{frame_drops_per_type[stream_type]} frame drops detected '
                             f'in {stream_type} stream.'))
@@ -1079,7 +1079,7 @@ def main(conf_file, ini_file, log_file):
         storages = _get_storages(api)
         _stop_vms(vms)
         _override_ini_config(vms, ini)
-        _clear_storages(box, storages)
+        _clear_storages(box, storages, conf)
         vms = _restart_vms(box, linux_distribution, vms)
 
         _test_vms(api, box, box_platform, conf, ini, vms)
@@ -1103,7 +1103,8 @@ def _stop_vms(vms):
     report('Server stopped.')
 
 
-def _clear_storages(box, storages: List[Storage]):
+def _clear_storages(box, storages: List[Storage], conf):
+    report('Deleting Server video archives...')
     for storage in storages:
         box.sh(
             f"rm -rf "
