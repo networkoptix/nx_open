@@ -327,6 +327,8 @@ public:
 
 class PolygonFigure: public ValueItem
 {
+    Q_OBJECT
+
 public:
     PolygonFigure(QObject* parent = nullptr);
 
