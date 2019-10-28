@@ -13,15 +13,14 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     {
         NX_CRITICAL(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
-        NX_CRITICAL(m_buffer,
-            lm("Failed to allocate buffer (size: %1, align: %2)").args(bufferSize, align));
+        NX_CRITICAL(m_buffer, "Failed to allocate buffer (size: %1, align: %2)", bufferSize, align);
     }
 }
 
 bool QnMediaCyclicBuffer::resize(size_type size)
 {
     value_type* buffer = (value_type*)qMallocAligned(size, m_align);
-    NX_ASSERT(buffer, lm("Failed to allocate buffer (size: %1, align: %2)").args(size, m_align));
+    NX_ASSERT(buffer, "Failed to allocate buffer (size: %1, align: %2)", size, m_align);
 
     if (buffer != nullptr)
     {
