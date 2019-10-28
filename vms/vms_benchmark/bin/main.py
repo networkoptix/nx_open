@@ -75,57 +75,57 @@ def to_percentage(share_0_1):
 def load_configs(conf_file, ini_file):
     conf_option_descriptions = {
         "boxHostnameOrIp": {
-            "type": 'string',
+            "type": "str",
         },
         "boxLogin": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
         },
         "boxPassword": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
         },
         "boxSshPort": {
             "optional": True,
-            "type": 'integer',
-            "range": [0, 65535],
+            "type": "int",
+            "range": [1, 65535],
             "default": 22,
         },
         "vmsUser": {
             "optional": False,
-            "type": "string",
+            "type": "str",
         },
         "vmsPassword": {
             "optional": False,
-            "type": "string",
+            "type": "str",
         },
         "virtualCameraCount": {
             "optional": False,
-            "type": "integers",
+            "type": "intList"
         },
         "liveStreamsPerCameraRatio": {
             "optional": True,
-            "type": 'float',
+            "type": "float",
             "default": 1.0,
         },
         "archiveStreamsPerCameraRatio": {
             "optional": True,
-            "type": 'float',
+            "type": "float",
             "default": 0.2,
         },
         "streamingTestDurationMinutes": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 4 * 60,
         },
         "cameraDiscoveryTimeoutSeconds": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 3 * 60,
         },
         "archiveDeletingTimeoutSeconds": {
             "optional": True,
-            "type": "integer",
+            "type": "int",
             "default": 60,
         },
     }
@@ -135,52 +135,52 @@ def load_configs(conf_file, ini_file):
     ini_option_descriptions = {
         "testcameraBin": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": './testcamera/testcamera'
         },
         "rtspPerfBin": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": './testcamera/rtsp_perf'
         },
         "testFileHighResolution": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": './high.ts'
         },
         "testFileHighDurationMs": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 10000
         },
         "testFileLowResolution": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": './low.ts'
         },
         "testFileFps": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 30
         },
         "testStreamFpsHigh": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 30
         },
         "testStreamFpsLow": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 7
         },
         "testcameraDebug": {
             "optional": True,
-            "type": 'boolean',
+            "type": "bool",
             "default": False
         },
         "testcameraLocalInterface": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": ''
         },
         "cpuUsageThreshold": {
@@ -190,12 +190,12 @@ def load_configs(conf_file, ini_file):
         },
         "archiveBitratePerCameraMbps": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 10,
         },
         "minimumArchiveFreeSpacePerCameraSeconds": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 240,
         },
         "timeDiffThresholdSeconds": {
@@ -205,62 +205,62 @@ def load_configs(conf_file, ini_file):
         },
         "swapThresholdMegabytes": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 0,
         },
         "sleepBeforeCheckingArchiveSeconds": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 100,
         },
         "maxAllowedNetworkErrors": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 0,
         },
         "maxAllowedFrameDrops": {
             "optional": True,
-            "type": "integer",
+            "type": "int",
             "default": 0,
         },
         "ramPerCameraMegabytes": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 40,
         },
         "sshCommandTimeoutS": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 5,
         },
         "sshServiceCommandTimeoutS": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 30,
         },
         "sshGetFileContentTimeoutS": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 30,
         },
         "sshGetProcMeminfoTimeoutS": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 10,
         },
         "rtspPerfPrintStderr": {
             "optional": True,
-            "type": 'boolean',
+            "type": "bool",
             "default": False,
         },
         "rtspPerfLinesOutputFile": {
             "optional": True,
-            "type": 'string',
+            "type": "str",
             "default": '',
         },
         "archiveReadingPosS": {
             "optional": True,
-            "type": 'integer',
+            "type": "int",
             "default": 15,
         },
     }
@@ -278,14 +278,14 @@ def load_configs(conf_file, ini_file):
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
     box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
 
-    if ini.ORIGINAL_OPTIONS is not None:
-        report(f"\nOverriding default options via {ini_file}:")
-        for k, v in ini.ORIGINAL_OPTIONS.items():
+    if ini.OPTIONS_FROM_FILE is not None:
+        report(f"\nOverriding default options via {ini_file!r}:")
+        for k, v in ini.OPTIONS_FROM_FILE.items():
             report(f"    {k}={v}")
 
-    report(f"\nConfiguration defined in {conf_file}:")
+    report(f"\nConfiguration defined in {conf_file!r}:")
     for k, v in conf.options.items():
-        report(f"    {k}={v}")
+        report(f"    {k}={v!r}")
 
     return conf, ini
 
