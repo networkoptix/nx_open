@@ -39,8 +39,6 @@ struct CameraWebPageWidget::Private
 {
     Private(CameraWebPageWidget* parent);
 
-    class WebPage;
-
     WebWidget* const webWidget;
 
     CameraSettingsDialogState::Credentials credentials;
