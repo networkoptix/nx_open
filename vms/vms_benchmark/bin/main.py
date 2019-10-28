@@ -772,7 +772,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             ):
                                 frame_drops_per_type[stream_type] += 1
                                 logging.info(
-                                    f'Detected frame drop on {type} stream '
+                                    f'Detected frame drop on {stream_type} stream '
                                     f'from camera {streams[pts_stream_id]["camera_id"]}: '
                                     f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
                                     f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
