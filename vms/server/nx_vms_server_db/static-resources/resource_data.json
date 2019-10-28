@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.160",
+    "version": "1.0.1.162",
     "data": [
         {
             "keys": [
@@ -2495,7 +2495,7 @@
 
         },
         {
-            "keys":["neutral|DSC-TVC-0200"],
+            "keys":["neutral|DSC-TVC-0200", "entropix|DSC-TVC-0200"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
