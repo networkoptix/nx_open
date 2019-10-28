@@ -447,7 +447,7 @@ def _get_storages(api) -> List[Storage]:
             reply = api.get_storage_spaces()
         except Exception as e:
             raise exceptions.ServerApiError(
-                'Unable to get Server Storages via REST HTTP: request failed',
+                'Unable to get Server Storages via REST HTTP: request failed.',
                 original_exception=e)
         if reply is None:
             raise exceptions.ServerApiError(
