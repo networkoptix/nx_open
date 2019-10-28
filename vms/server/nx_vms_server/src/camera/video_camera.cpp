@@ -512,7 +512,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
     for (auto& lastKeyFramesForChannel: m_lastKeyFrames)
         lastKeyFramesForChannel.clear();
 
-    NX_DEBUG(this, "Gop keeper cleared");
+    NX_DEBUG(this, "Gop keeper cleared fo camera: %1", m_resource);
     m_dataQueue.clear();
     m_nextMinTryTime = 0;
 }
