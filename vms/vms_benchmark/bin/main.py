@@ -493,6 +493,60 @@ def _rtsp_perf_frames(stdout, output_file_path):
         yield stream_id, pts
 
 
+class _StreamTypeStats:
+    def __init__(self, type, fps, duration):
+        self._type = type
+        self._fps = fps
+        self._duration = duration
+        self.frame_drops = 0
+        self.max_lag_s = 0
+        self._frames = {}
+        self._first_timestamps_s = {}
+        self._last_ptses = {}
+
+    def update_with_new_frame(self, camera_id, pts_stream_id, pts, timestamp_s):
+        self._frames[pts_stream_id] = self._frames.get(pts_stream_id, 0) + 1
+
+        if pts_stream_id not in self._first_timestamps_s:
+            self._first_timestamps_s[pts_stream_id] = timestamp_s
+        else:
+            frame_interval_s = 1.0 / float(self._fps)
+            this_frame_offset_s = self._frames.get(pts_stream_id, 0) * frame_interval_s
+            expected_frame_time_s = self._first_timestamps_s[pts_stream_id] + this_frame_offset_s
+            this_frame_lag_s = timestamp_s - expected_frame_time_s
+            self.max_lag_s = max(self.max_lag_s, this_frame_lag_s)
+
+        pts_diff_deviation_factor_max = 0.03
+        frame_interval_us = 1000000.0 / float(self._fps)
+        pts_diff_expected = frame_interval_us
+        pts_diff = (pts - self._last_ptses[pts_stream_id]) if pts_stream_id in self._last_ptses else None
+        # TODO: Fix - this value is not understandable for the user.
+        pts_diff_max = frame_interval_us * (1.0 + pts_diff_deviation_factor_max)
+
+        # The value is negative because the first PTS of new loop is less than last PTS of the previous
+        # loop.
+        pts_diff_expected_new_loop = -float(self._duration)
+
+        if pts_diff is not None:
+            pts_diff_deviation_factor = lambda diff_expected: abs(
+                (diff_expected - pts_diff) / diff_expected
+            )
+
+            if (
+                    pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
+                    pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
+            ):
+                self.frame_drops += 1
+                logging.info(
+                    f'Detected frame drop on {self._type} stream '
+                    f'from camera {camera_id}: '
+                    f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
+                    f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
+                )
+
+        self._last_ptses[pts_stream_id] = pts
+
+
 def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('')
     report('Starting load tests...')
@@ -523,7 +577,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
             primary_fps=ini['testStreamFpsHigh'],
             secondary_fps=ini['testStreamFpsLow'],
         )
-        max_lag_s = {'live': 0, 'archive': 0}
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
 
@@ -630,10 +683,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 streaming_duration_mins = conf['streamingTestDurationMinutes']
                 streaming_test_started_at_s = time.time()
 
-                last_ptses = {}
-                first_timestamps_s = {}
-                frames = {}
-                frame_drops_per_type = {'live': 0, 'archive': 0}
+                stream_stats = {
+                    'live': _StreamTypeStats('live',ini['testFileFps'], ini['testFileHighDurationMs']),
+                    'archive': _StreamTypeStats('archive', ini['testFileFps'], ini['testFileHighDurationMs']),
+                }
                 streaming_ended_expectedly = False
                 issues = []
                 cpu_usage_max_collector = [None]
@@ -657,11 +710,11 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                     f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
                                     f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
                                     f"dropped frames: "
-                                    f"{frame_drops_per_type['live']} (live), "
-                                    f"{frame_drops_per_type['archive']} (archive), "
+                                    f"{stream_stats['live'].frame_drops} (live), "
+                                    f"{stream_stats['archive'].frame_drops} (archive), "
                                     f"max stream lag: "
-                                    f"{max_lag_s['live']:.3f} s (live), "
-                                    f"{max_lag_s['archive']:.3f} s (archive).")
+                                    f"{stream_stats['live'].max_lag_s:.3f} s (live), "
+                                    f"{stream_stats['archive'].max_lag_s:.3f} s (archive).")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
@@ -717,57 +770,16 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             break
 
                         pts_stream_id, pts = next(rtsp_perf_frames)
-
-                        frames[pts_stream_id] = frames.get(pts_stream_id, 0) + 1
-
                         timestamp_s = time.time()
-
                         stream_type = streams[pts_stream_id]['type']
-
-                        if pts_stream_id not in first_timestamps_s:
-                            first_timestamps_s[pts_stream_id] = timestamp_s
-                        else:
-                            frame_interval_s = 1.0 / float(ini['testFileFps'])
-                            this_frame_offset_s = frames.get(pts_stream_id, 0) * frame_interval_s
-                            expected_frame_time_s = first_timestamps_s[pts_stream_id] + this_frame_offset_s
-                            this_frame_lag_s = timestamp_s - expected_frame_time_s
-                            max_lag_s[stream_type] = max(max_lag_s[stream_type], this_frame_lag_s)
-
-                        pts_diff_deviation_factor_max = 0.03
-                        frame_interval_us = 1000000.0 / float(ini['testFileFps'])
-                        pts_diff_expected = frame_interval_us
-                        pts_diff = (pts - last_ptses[pts_stream_id]) if pts_stream_id in last_ptses else None
-                        # TODO: Fix - this value is not understandable for the user.
-                        pts_diff_max = frame_interval_us * (1.0 + pts_diff_deviation_factor_max)
-
-                        # The value is negative because the first PTS of new loop is less than last PTS of the previous
-                        # loop.
-                        pts_diff_expected_new_loop = -float(ini['testFileHighDurationMs'])
-
-                        if pts_diff is not None:
-                            pts_diff_deviation_factor = lambda diff_expected: abs(
-                                (diff_expected - pts_diff) / diff_expected
-                            )
-
-                            if (
-                                pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
-                                pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
-                            ):
-                                frame_drops_per_type[stream_type] += 1
-                                logging.info(
-                                    f'Detected frame drop on {stream_type} stream '
-                                    f'from camera {streams[pts_stream_id]["camera_id"]}: '
-                                    f'diff {pts_diff} us (max {math.ceil(pts_diff_max)} us), '
-                                    f'PTS {pts} us, now {math.ceil(timestamp_s * 1000000)} us'
-                                )
+                        camera_id = streams[pts_stream_id]["camera_id"]
+                        stream_stats[stream_type].update_with_new_frame(camera_id, pts_stream_id, pts, timestamp_s)
 
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
                             report(
                                 f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) finished.")
                             break
-
-                        last_ptses[pts_stream_id] = pts
                 finally:
                     stop_event.set()
 
@@ -811,8 +823,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                 report(
                     f"    Streaming test statistics:\n"
-                    f"        Frame drops in live stream: {frame_drops_per_type['live']} (expected 0)\n"
-                    f"        Frame drops in archive stream: {frame_drops_per_type['archive']} (expected 0)\n"
+                    f"        Frame drops in live stream: {stream_stats['live'].frame_drops} (expected 0)\n"
+                    f"        Frame drops in archive stream: {stream_stats['archive'].frame_drops} (expected 0)\n"
                     + (
                         f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
                         if tx_rx_errors_collector[0] is not None else '')
@@ -829,9 +841,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 )
 
                 for stream_type in 'live', 'archive':
-                    if frame_drops_per_type[stream_type] > ini['maxAllowedFrameDrops']:
+                    if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
                         issues.append(exceptions.VmsBenchmarkIssue(
-                            f'{frame_drops_per_type[stream_type]} frame drops detected '
+                            f'{stream_stats[stream_type].frame_drops} frame drops detected '
                             f'in {stream_type} stream.'))
 
                 try:
@@ -840,10 +852,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     issues.append(e)
 
                 max_allowed_lag_seconds = 5
-                if max_lag_s[stream_type] > max_allowed_lag_seconds:
+                if stream_stats[stream_type].max_lag_s > max_allowed_lag_seconds:
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: '
-                        f'the video lag {max_lag_s[stream_type]:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
+                        f'the video lag {stream_stats[stream_type].max_lag_s:.3f} seconds is more than {max_allowed_lag_seconds} seconds.'
                     ))
 
                 if len(issues) > 0:
