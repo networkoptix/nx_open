@@ -42,7 +42,7 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
         [this, stackedWidget](const QString& text)
         {
             const auto viewModel = qobject_cast<SortModel*>(ui->resourcesTree->model());
-            viewModel->setFilter(text, SortModel::LeafNodeFilterScope);
+            viewModel->setFilterString(text);
             const auto page = viewModel->rowCount(QModelIndex())
                 ? ui->resourcesPage
                 : ui->notificationPage;
