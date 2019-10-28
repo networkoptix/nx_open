@@ -2,7 +2,7 @@
 
 #include <nx/vms/server/nvr/i_buzzer_manager.h>
 #include <nx/vms/server/nvr/i_network_block_manager.h>
-#include <nx/vms/server/nvr/i_io_manager.h>
+#include <nx/vms/server/nvr/i_io_controller.h>
 #include <nx/vms/server/nvr/i_led_controller.h>
 #include <core/resource_management/resource_searcher.h>
 
@@ -28,7 +28,7 @@ public:
 
     virtual INetworkBlockManager* networkBlockManager() = 0;
 
-    virtual IIoManager* ioManager() = 0;
+    virtual IIoController* ioController() = 0;
 
     virtual ILedController* ledController() = 0;
 

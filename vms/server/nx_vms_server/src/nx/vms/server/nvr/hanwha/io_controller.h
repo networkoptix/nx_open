@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/vms/server/nvr/i_io_manager.h>
+#include <nx/vms/server/nvr/i_io_controller.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-class IoManager: public IIoManager
+class IoController: public IIoController
 {
 public:
 };

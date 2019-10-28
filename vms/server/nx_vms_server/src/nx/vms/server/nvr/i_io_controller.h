@@ -2,10 +2,10 @@
 
 namespace nx::vms::server::nvr {
 
-class IIoManager
+class IIoController
 {
 public:
-    virtual ~IIoManager() = default;
+    virtual ~IIoController() = default;
 
     // TODO: #dmishin declare interface.
 };
