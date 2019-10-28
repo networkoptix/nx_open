@@ -4,6 +4,7 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 
 #include <nx/sdk/helpers/i_ref_countable_registry.h>
 
@@ -53,6 +54,7 @@ public:
 private:
     std::string m_name = "unnamed_lib_context";
     std::unique_ptr<IRefCountableRegistry> m_refCountableRegistry;
+    std::mutex m_mutex;
 };
 
 //-------------------------------------------------------------------------------------------------
