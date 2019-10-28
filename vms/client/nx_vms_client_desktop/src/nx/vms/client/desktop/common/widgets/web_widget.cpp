@@ -1,6 +1,7 @@
 #include "web_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QAction>
 
 #include <ui/style/webview_style.h>
 
@@ -61,9 +62,14 @@ void WebWidget::load(const QUrl& url)
 
 void WebWidget::reset()
 {
+    static auto kBlankPageLoadTimeout = std::chrono::milliseconds(1000);
+
     m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
     //FIXME: There is no analog for StopScheduledPageRefresh
-    m_webEngineView->setContent({});
+
+    // Synchronously load blank page to replicate QWebView behavior.
+    m_webEngineView->load(QUrl());
+    m_webEngineView->waitLoadFinished(kBlankPageLoadTimeout);
 }
 
 } // namespace nx::vms::client::desktop
