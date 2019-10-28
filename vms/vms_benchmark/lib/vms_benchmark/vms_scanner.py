@@ -175,7 +175,7 @@ class VmsScanner:
                 except Exception:
                     # TODO: #alevenkov: Rewrite properly.
                     import time
-                    time.sleep(100)
+                    time.sleep(0.1)
                     try:
                         [tmp_file_fd, tmp_file_path] = tempfile.mkstemp()
                     except:
