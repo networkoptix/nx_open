@@ -57,6 +57,8 @@ Item
         {
             color = figureJson.color
             points = figureJson.points
+            if (!points)
+                points = []
         }
         else
         {
