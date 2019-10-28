@@ -386,27 +386,27 @@ def report(message):
 log_file_ref = None
 
 
+def _wait_for_api(api, timeout=60):
+    started_at = time.time()
+
+    while True:
+        resp = api.ping()
+
+        if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
+            break
+
+        if time.time() - started_at > timeout:
+            return False
+
+        time.sleep(0.5)
+
+    time.sleep(5)
+    return True
+
+
 def _test_api(api):
     logging.info('Starting REST API basic test...')
-
-    def wait_for_api(timeout=60):
-        started_at = time.time()
-
-        while True:
-            resp = api.ping()
-
-            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
-                break
-
-            if time.time() - started_at > timeout:
-                return False
-
-            time.sleep(0.5)
-
-        time.sleep(5)
-        return True
-
-    if not wait_for_api():
+    if not _wait_for_api(api):
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
     report('\nREST API basic test is OK.')
     logging.info('Starting REST API authentication test...')
@@ -1077,7 +1077,7 @@ def main(conf_file, ini_file, log_file):
         _stop_vms(vms)
         _override_ini_config(vms, ini)
         _clear_storages(box, storages, conf)
-        vms = _restart_vms(box, linux_distribution, vms)
+        vms = _restart_vms(api, box, linux_distribution, vms)
 
         _test_vms(api, box, box_platform, conf, ini, vms)
 
@@ -1086,10 +1086,11 @@ def main(conf_file, ini_file, log_file):
         vms.dismount_ini_dirs()
 
 
-def _restart_vms(box, linux_distribution, vms):
+def _restart_vms(api, box, linux_distribution, vms):
     report('Starting Server...')
     vms.start(exc=True)
     vms = _obtain_restarted_vms(box, linux_distribution)
+    _wait_for_api(api)
     report('Server started.')
     return vms
 
