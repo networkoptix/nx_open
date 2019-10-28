@@ -137,7 +137,8 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connec
         commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
     if (m_serverConnector)
-        return m_serverConnector->connectTo(route, sslRequired, maxRtt);
+        return m_serverConnector->connect(route, maxRtt, sslRequired).get();
+
     return base_type::connectToRemoteHost(route, sslRequired);
 }
 
