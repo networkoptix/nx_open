@@ -22,6 +22,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/videowall/utils.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -30,7 +31,6 @@
 
 #include <utils/common/warnings.h>
 #include <nx/utils/collection.h>
-#include <utils/screen_utils.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -121,7 +121,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     int pcVisualIdx = idx + 1;
     QString base = tr("PC %1").arg(pcVisualIdx);
 
-    auto screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps).toList();
+    auto screens = screensCoveredByItem(m_items.first(), m_videowall).toList();
     std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return base;
@@ -230,7 +230,7 @@ void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid& resourceId, const 
     update();
 }
 
-void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& /*videoWall*/,
+void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
     const QnVideoWallItem& item,
     const QnVideoWallItem& oldItem)
 {
@@ -250,8 +250,7 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
 
     NX_ASSERT(*existing == oldItem);
 
-    if (nx::gui::Screens::coveredBy(existing->screenSnaps)
-        != nx::gui::Screens::coveredBy(item.screenSnaps))
+    if (screensCoveredByItem(*existing, videoWall) != screensCoveredByItem(item, videoWall))
     {
         // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
@@ -297,7 +296,7 @@ void QnVideowallScreenWidget::updateItems()
         QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_items.first().pcUuid);
 
         QRect totalDesktopGeometry;
-        QSet<int> screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps);
+        QSet<int> screens = screensCoveredByItem(m_items.first(), m_videowall);
         for (const auto& screen: pc.screens)
         {
             if (screens.contains(screen.index))
