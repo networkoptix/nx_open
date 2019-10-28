@@ -154,7 +154,6 @@ GlobalMonitor::GlobalMonitor(
     const auto timerId = timerManager->addNonStopTimer(
         [this](nx::utils::TimerId)
         {
-            NX_VERBOSE(this, "ZORZ");
             m_cachedTotalCpuUsage.update();
             m_cachedThisProcessCpuUsage.update();
             m_cachedTotalHddLoad.update();
