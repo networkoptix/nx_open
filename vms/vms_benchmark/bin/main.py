@@ -269,12 +269,11 @@ def load_configs(conf_file, ini_file):
     box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
 
     if ini.ORIGINAL_OPTIONS is not None:
-        report(f"Overriding default options via {ini_file}:")
+        report(f"\nOverriding default options via {ini_file}:")
         for k, v in ini.ORIGINAL_OPTIONS.items():
             report(f"    {k}={v}")
-    report('')
 
-    report(f"Configuration defined in {conf_file}:")
+    report(f"\nConfiguration defined in {conf_file}:")
     for k, v in conf.options.items():
         report(f"    {k}={v}")
 
@@ -1052,7 +1051,7 @@ def main(conf_file, ini_file, log_file):
     log_file_ref = repr(log_file)
     logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG,
         format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    report(f"VMS Benchmark started; logging to {log_file_ref}.\n")
+    report(f"VMS Benchmark started; logging to {log_file_ref}.")
 
     conf, ini = load_configs(conf_file, ini_file)
 
