@@ -13,10 +13,9 @@ TEST(MoveOnlyFunc, common)
     {
         nx::utils::MoveOnlyFunc< void() > handler;
         boost::optional< nx::utils::promise< bool > > promise;
-        int y = nx::utils::random::number();
         {
             promise = nx::utils::promise< bool >();
-            handler = [&, y]() { promise->set_value(true); };
+            handler = [&]() { promise->set_value(true); };
         }
 
         handler();
