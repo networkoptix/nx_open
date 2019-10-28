@@ -322,6 +322,10 @@ void Factory::registerTypes()
     registerType<DoubleSpinBox>("DoubleSpinBox");
     registerType<CheckBox>("CheckBox");
     registerType<Button>("Button");
+
+    registerType<LineFigure>("LineFigure");
+    registerType<BoxFigure>("BoxFigure");
+    registerType<PolygonFigure>("PolygonFigure");
 }
 
 Item* Factory::createItem(const QString& type, QObject* parent)
