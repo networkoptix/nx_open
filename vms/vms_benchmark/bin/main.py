@@ -92,14 +92,12 @@ def load_configs(conf_file, ini_file):
             "default": 22,
         },
         "vmsUser": {
-            "optional": True,
+            "optional": False,
             "type": "string",
-            "default": "admin",
         },
         "vmsPassword": {
-            "optional": True,
+            "optional": False,
             "type": "string",
-            "default": "admin",
         },
         "virtualCameraCount": {
             "optional": False,
