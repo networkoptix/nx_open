@@ -26,7 +26,7 @@ public:
         http::Server* httpServer);
 
     void listen();
-    void stopAcceptingNewRequests();
+    void stop();
 
     const std::vector<network::SocketAddress>& udpEndpoints() const;
     const std::vector<network::SocketAddress>& tcpEndpoints() const;
@@ -47,6 +47,7 @@ private:
 
     void initializeHttpTunnelling(http::Server* httpServer);
     bool bind();
+    void stopAcceptingNewRequests();
 };
 
 } // namespace hpm

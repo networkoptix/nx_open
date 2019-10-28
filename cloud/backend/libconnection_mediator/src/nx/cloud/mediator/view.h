@@ -23,6 +23,7 @@ public:
     View(
         const conf::Settings& settings,
         Controller* controller);
+    ~View();
 
     void start();
     void stop();

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <nx/utils/system_error.h>
-
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/connection_server/server_statistics.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/system_error.h>
 
 #include "message.h"
 #include "message_parser.h"
@@ -58,12 +58,20 @@ public:
 
     const std::unique_ptr<AbstractDatagramSocket>& socket();
 
+    void waitUntilAllRequestsCompleted();
+
     virtual nx::network::server::Statistics statistics() const override;
 
 private:
     PipelineType m_messagePipeline;
     bool m_boundToLocalAddress;
     const MessageDispatcher* m_dispatcher;
+
+    /**
+     * Using shared_ptr since some usages may remove server before completion
+     * of every running request.
+     */
+    std::shared_ptr<nx::utils::Counter> m_activeRequestCounter;
 
     virtual void stopWhileInAioThread() override;
 

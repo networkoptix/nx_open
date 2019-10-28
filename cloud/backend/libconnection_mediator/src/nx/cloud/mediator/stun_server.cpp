@@ -49,12 +49,15 @@ void StunServer::listen()
         .args(containerString(m_tcpEndpoints), containerString(m_udpEndpoints)));
 }
 
-void StunServer::stopAcceptingNewRequests()
+void StunServer::stop()
 {
-    m_tcpStunServer->pleaseStopSync();
+    stopAcceptingNewRequests();
 
     if (m_udpStunServer)
-        m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
+    {
+        m_udpStunServer->forEachListener(
+            [](auto listener) { listener->waitUntilAllRequestsCompleted(); });
+    }
 }
 
 const std::vector<network::SocketAddress>& StunServer::udpEndpoints() const
@@ -132,6 +135,14 @@ bool StunServer::bind()
     }
 
     return true;
+}
+
+void StunServer::stopAcceptingNewRequests()
+{
+    m_tcpStunServer->pleaseStopSync();
+
+    if (m_udpStunServer)
+        m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
 } // namespace hpm

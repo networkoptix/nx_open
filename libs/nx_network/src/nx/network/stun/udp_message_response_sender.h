@@ -1,9 +1,12 @@
 #pragma once
 
 #include <functional>
+#include <memory>
+
+#include <nx/network/socket_common.h>
+#include <nx/utils/counter.h>
 
 #include "abstract_server_connection.h"
-#include "nx/network/socket_common.h"
 
 namespace nx {
 namespace network {
@@ -20,6 +23,7 @@ class UDPMessageResponseSender:
 public:
     UDPMessageResponseSender(
         UdpServer* udpServer,
+        std::shared_ptr<nx::utils::Counter> activeRequestCounter,
         SocketAddress sourceAddress);
     virtual ~UDPMessageResponseSender() = default;
 
@@ -39,7 +43,9 @@ public:
 
 private:
     UdpServer* m_udpServer;
+    std::shared_ptr<nx::utils::Counter> m_activeRequestCounter;
     SocketAddress m_sourceAddress;
+    nx::utils::Counter::ScopedIncrement m_scopedIncrement;
 };
 
 } // namespace stun

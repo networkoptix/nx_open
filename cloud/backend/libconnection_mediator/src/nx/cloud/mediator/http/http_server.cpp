@@ -59,9 +59,11 @@ void Server::listen()
         .container(m_multiAddressHttpServer.sslEndpoints()));
 }
 
-void Server::stopAcceptingNewRequests()
+void Server::stop()
 {
-    m_multiAddressHttpServer.pleaseStopSync();
+    stopAcceptingNewRequests();
+
+    m_httpMessageDispatcher.waitUntilAllRequestsCompleted();
 }
 
 nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
@@ -93,6 +95,14 @@ void Server::registerStatisticsApiHandlers(const stats::Provider& provider)
         network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsMetricsPath).c_str(),
         nx::network::http::Method::get,
         std::bind(&stats::Provider::getAllStatistics, &provider));
+}
+
+void Server::stopAcceptingNewRequests()
+{
+    m_multiAddressHttpServer.pleaseStopSync();
+
+    m_multiAddressHttpServer.forEachListener(
+        [](auto listener) { listener->closeAllConnections(); });
 }
 
 void Server::loadSslCertificate()

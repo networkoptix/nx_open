@@ -5,6 +5,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/connection_server/message_dispatcher.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "abstract_http_request_handler.h"
@@ -37,6 +38,11 @@ const std::pair<const QString, Value>* findByMaxPrefix(
 class AbstractMessageDispatcher
 {
 public:
+    AbstractMessageDispatcher():
+        m_runningRequestCounter(std::make_shared<nx::utils::Counter>())
+    {
+    }
+
     virtual ~AbstractMessageDispatcher() = default;
 
     /**
@@ -64,10 +70,12 @@ public:
         const auto handlerPtr = handler.get();
         return handlerPtr->processRequest(
             connection, std::move(request), std::move(authInfo),
-            [handler = std::move(handler), completionFunc = std::move(completionFunc)](
-                nx::network::http::Message message,
-                std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
-                ConnectionEvents connectionEvents) mutable
+            [handler = std::move(handler), completionFunc = std::move(completionFunc),
+                scopedIncrement = m_runningRequestCounter->getScopedIncrement(),
+                counter = m_runningRequestCounter](
+                    nx::network::http::Message message,
+                    std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
+                    ConnectionEvents connectionEvents) mutable
             {
                 completionFunc(
                     std::move(message),
@@ -78,11 +86,24 @@ public:
             });
     }
 
+    void waitUntilAllRequestsCompleted()
+    {
+        m_runningRequestCounter->wait();
+    }
+
 protected:
     virtual void applyModRewrite(nx::utils::Url* url) const = 0;
+
     virtual std::unique_ptr<AbstractHttpRequestHandler> getHandler(
         const StringType& method,
         const QString& path) const = 0;
+
+private:
+    /**
+     * Using shared_ptr here since some disaptcher usages may destroy the dispatcher
+     * before all requests have completed. This was find before introduction of this counter.
+     */
+    std::shared_ptr<nx::utils::Counter> m_runningRequestCounter;
 };
 
 template<template<typename> class PathMatcherType>

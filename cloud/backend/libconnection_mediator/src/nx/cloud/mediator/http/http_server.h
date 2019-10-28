@@ -36,7 +36,7 @@ public:
         HolePunchingProcessor* holePunchingProcessor);
 
     void listen();
-    void stopAcceptingNewRequests();
+    void stop();
 
     nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
     std::vector<network::SocketAddress> endpoints() const;
@@ -68,6 +68,8 @@ private:
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
     std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
     network::maintenance::Server m_maintenanceServer;
+
+    void stopAcceptingNewRequests();
 
     void loadSslCertificate();
 

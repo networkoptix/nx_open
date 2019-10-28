@@ -21,6 +21,7 @@ class Controller
 {
 public:
     Controller(const conf::Settings& settings);
+    ~Controller();
 
     MediaserverEndpointTester& mediaserverEndpointTester();
 
@@ -44,8 +45,6 @@ public:
     nx::geo_ip::AbstractResolver& geoIpResolver();
 
     bool doMandatoryInitialization();
-
-    void stop();
 
 private:
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;

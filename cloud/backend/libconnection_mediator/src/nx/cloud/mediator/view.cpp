@@ -8,7 +8,6 @@
 namespace nx {
 namespace hpm {
 
-
 View::View(
     const conf::Settings& settings,
     Controller* controller)
@@ -28,6 +27,11 @@ View::View(
     registerStunApiHandlers(controller);
 }
 
+View::~View()
+{
+    stop();
+}
+
 void View::start()
 {
     m_httpServer.listen();
@@ -36,8 +40,9 @@ void View::start()
 
 void View::stop()
 {
-    m_stunServer.stopAcceptingNewRequests();
-    m_httpServer.stopAcceptingNewRequests();
+    m_stunServer.stop();
+
+    m_httpServer.stop();
 }
 
 const http::Server& View::httpServer() const

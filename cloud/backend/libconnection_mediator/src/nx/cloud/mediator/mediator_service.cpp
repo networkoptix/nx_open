@@ -80,27 +80,27 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initializating controller"));
 
-    Controller controller(settings);
-    while (!controller.doMandatoryInitialization())
+    auto controller = std::make_unique<Controller>(settings);
+    while (!controller->doMandatoryInitialization())
     {
         NX_INFO(this, lm("Retrying controller initialization after delay"));
         std::this_thread::sleep_for(settings.listeningPeerDb().connectionRetryDelay);
     }
-    m_controller = &controller;
+    m_controller = controller.get();
 
     NX_INFO(this, lm("Initializating view"));
 
-    View view(settings, &controller);
-    m_view = &view;
+    auto view = std::make_unique<View>(settings, controller.get());
+    m_view = view.get();
 
     stats::Provider statisticsProvider(
-        controller.statisticsManager(),
-        view.httpServer().server(),
-        view.stunServer().statisticsProvider(),
+        controller->statisticsManager(),
+        view->httpServer().server(),
+        view->stunServer().statisticsProvider(),
         stats::geo_ip::StatisticsProvider(
-            &controller.geoIpResolver(),
-            &controller.listeningPeerPool()));
-    view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
+            &controller->geoIpResolver(),
+            &controller->listeningPeerPool()));
+    view->httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
     NX_INFO(this, lm("Initializating view"));
 
@@ -113,7 +113,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Starting view"));
 
-    view.start();
+    view->start();
 
     NX_INFO(this, lm("Initialization completed. Running..."));
 
@@ -121,8 +121,8 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     const int result = runMainLoop();
 
-    view.stop();
-    controller.stop();
+    view.reset();
+    controller.reset();
 
     NX_INFO(this, lm("%1 is stopped")
         .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));

@@ -8,10 +8,13 @@ namespace stun {
 
 UDPMessageResponseSender::UDPMessageResponseSender(
     UdpServer* udpServer,
+    std::shared_ptr<nx::utils::Counter> activeRequestCounter,
     SocketAddress sourceAddress)
 :
     m_udpServer(udpServer),
-    m_sourceAddress(std::move(sourceAddress))
+    m_activeRequestCounter(std::move(activeRequestCounter)),
+    m_sourceAddress(std::move(sourceAddress)),
+    m_scopedIncrement(m_activeRequestCounter->getScopedIncrement())
 {
 }
 

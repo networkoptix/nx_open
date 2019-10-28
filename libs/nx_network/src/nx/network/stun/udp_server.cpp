@@ -15,7 +15,8 @@ namespace stun {
 UdpServer::UdpServer(const MessageDispatcher* dispatcher):
     m_messagePipeline(this),
     m_boundToLocalAddress(false),
-    m_dispatcher(dispatcher)
+    m_dispatcher(dispatcher),
+    m_activeRequestCounter(std::make_shared<nx::utils::Counter>())
 {
     bindToAioThread(getAioThread());
 }
@@ -80,6 +81,11 @@ const std::unique_ptr<AbstractDatagramSocket>& UdpServer::socket()
     return m_messagePipeline.socket();
 }
 
+void UdpServer::waitUntilAllRequestsCompleted()
+{
+    m_activeRequestCounter->wait();
+}
+
 nx::network::server::Statistics UdpServer::statistics() const
 {
     // TODO: #ak
@@ -94,7 +100,8 @@ void UdpServer::stopWhileInAioThread()
 void UdpServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
     m_dispatcher->dispatchRequest(
-        std::make_shared<UDPMessageResponseSender>(this, std::move(sourceAddress)),
+        std::make_shared<UDPMessageResponseSender>(
+            this, m_activeRequestCounter, std::move(sourceAddress)),
         std::move(mesage));
 }
 

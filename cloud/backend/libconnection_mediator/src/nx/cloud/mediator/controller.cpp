@@ -42,6 +42,12 @@ Controller::Controller(const conf::Settings& settings):
         NX_INFO(this, lit("STUN Server is running without cloud (debug mode)"));
 }
 
+Controller::~Controller()
+{
+    m_cloudConnectProcessor.stop();
+    m_listeningPeerDb.stop();
+}
+
 MediaserverEndpointTester& Controller::mediaserverEndpointTester()
 {
     return m_mediaserverEndpointTester;
@@ -105,12 +111,6 @@ nx::geo_ip::AbstractResolver& Controller::geoIpResolver()
 bool Controller::doMandatoryInitialization()
 {
     return m_listeningPeerDb.initialize();
-}
-
-void Controller::stop()
-{
-    m_cloudConnectProcessor.stop();
-    m_listeningPeerDb.stop();
 }
 
 } // namespace hpm
