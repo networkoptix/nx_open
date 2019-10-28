@@ -8,8 +8,8 @@ LabeledItem
 {
     id: control
 
-    property string value: ""
-    property string defaultValue: ""
+    property var value: ""
+    property var defaultValue: ""
     property int maxPoints: -1
 
     property string figureType: ""
@@ -70,7 +70,7 @@ LabeledItem
                 {
                     dialogLoader.active = true
                     var dialog = dialogLoader.item
-                    dialog.deserializeFigure(getJsonValue())
+                    dialog.deserializeFigure(value)
                     dialog.show()
                 }
             }
@@ -99,31 +99,20 @@ LabeledItem
 
                 onAccepted:
                 {
-                    value = JSON.stringify(serializeFigure())
+                    value = serializeFigure()
                 }
             }
         }
     }
 
-    function getJsonValue()
-    {
-        try
-        {
-            return JSON.parse(value)
-        }
-        catch (e)
-        {
-            if (value)
-                console.warn(e.message)
-            return null
-        }
-    }
-
     onValueChanged:
     {
-        var obj = getJsonValue()
-        if (obj)
+        var obj = null
+        if (value)
+        {
+            obj = JSON.parse(JSON.stringify(value))
             obj.type = figureType
+        }
         preview.figure = obj
     }
 }
