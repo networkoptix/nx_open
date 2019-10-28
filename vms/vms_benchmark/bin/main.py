@@ -811,7 +811,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                 report(
                     f"    Streaming test statistics:\n"
-                    f"        Frame drops: {sum(frame_drops_per_type.values())} (expected 0)\n"
+                    f"        Frame drops in live stream: {frame_drops_per_type['live']} (expected 0)\n"
+                    f"        Frame drops in archive stream: {frame_drops_per_type['archive']} (expected 0)\n"
                     + (
                         f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
                         if tx_rx_errors_collector[0] is not None else '')
