@@ -77,6 +77,8 @@
 #include <nx/vms/rules/action_parameters_processing.h>
 #include <nx/utils/app_info.h>
 
+#include <nx/vms/server/nvr/i_service.h>
+
 namespace {
 
 static const QString tpProductLogo(lit("logo"));
@@ -382,7 +384,43 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractActionPtr& action)
 {
-    // TODO: #dmishin implement.
+    using namespace std::chrono;
+
+    nvr::IService* const nvrService = serverModule()->nvrService();
+    if (!nvrService)
+    {
+        NX_WARNING(this,
+            "Got an NVR buzzer action but the Server doesn't provide the NVR service");
+        return false;
+    }
+
+    nvr::IBuzzerManager* const buzzerController = nvrService->buzzerManager();
+    if (!buzzerController)
+    {
+        NX_WARNING(this,
+            "Got an NVR buzzer action but the Server doesn't provid the buzzer controller");
+    }
+
+    if (const auto durationMs = action->getParams().durationMs; durationMs > 0)
+    {
+        NX_DEBUG(this, "Enabling the NVR buzzer for %1ms", durationMs);
+        buzzerController->enable(milliseconds(durationMs));
+    }
+    else
+    {
+        // TODO: #dmishin make sure the event is prolonged.
+        if (action->getToggleState() == vms::api::EventState::active)
+        {
+            NX_DEBUG(this, "Enabling the NVR buzzer");
+            buzzerController->enable(/* infinite duration */ milliseconds::zero());
+        }
+        else if (action->getToggleState() == vms::api::EventState::inactive)
+        {
+            NX_DEBUG(this, "Disabling the NVR buzzer");
+            buzzerController->disable();
+        }
+    }
+
     return true;
 }
 
