@@ -9,9 +9,8 @@ class QnSigarMonitorPrivate;
 
 class QnSigarMonitor: public nx::vms::server::PlatformMonitor
 {
-    Q_OBJECT
 public:
-    QnSigarMonitor(QObject *parent = NULL);
+    QnSigarMonitor();
     virtual ~QnSigarMonitor();
 
     virtual qreal totalCpuUsage() override;

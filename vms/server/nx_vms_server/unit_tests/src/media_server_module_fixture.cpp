@@ -33,8 +33,6 @@ void MediaServerModuleFixture::SetUp()
 
     const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
     m_serverModule->commonModule()->setModuleGUID(moduleGuid);
-    m_serverModule->setPlatform(&m_platform);
-    m_serverModule->platform()->monitor()->setServerModule(m_serverModule.get());
 }
 
 void MediaServerModuleFixture::TearDown()

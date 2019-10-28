@@ -18,6 +18,12 @@ class MotionArchive: public MediaServerModuleFixture
   public:
       MotionArchive(): MediaServerModuleFixture()
       {
+      }
+
+      virtual void SetUp() override
+      {
+          MediaServerModuleFixture::SetUp();
+
           m_camera.reset(new resource::test::CameraMock(&serverModule()));
           m_camera->setPhysicalId("motion archive test");
           m_dataProviderStub.reset(new QnAbstractStreamDataProvider(m_camera));

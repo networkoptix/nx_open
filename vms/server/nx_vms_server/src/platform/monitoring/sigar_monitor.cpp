@@ -228,8 +228,8 @@ private:
 // -------------------------------------------------------------------------- //
 // QnSigarMonitor
 // -------------------------------------------------------------------------- //
-QnSigarMonitor::QnSigarMonitor(QObject *parent):
-    PlatformMonitor(parent),
+QnSigarMonitor::QnSigarMonitor():
+    PlatformMonitor(),
     d_ptr(new QnSigarMonitorPrivate())
 {
     Q_D(QnSigarMonitor);

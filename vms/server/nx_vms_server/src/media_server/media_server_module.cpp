@@ -201,6 +201,14 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    const bool isRootToolEnabled = !settings().ignoreRootTool();
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
+        isRootToolEnabled,
+        qApp->applicationFilePath());
+
+    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get()));
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
+
     nx::vms::server::registerSerializers();
 
 #ifdef ENABLE_VMAX
@@ -285,11 +293,6 @@ QnMediaServerModule::QnMediaServerModule(
 
         ));
 
-    const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled,
-        qApp->applicationFilePath());
-
     if (QnAppInfo::isNx1())
     {
         m_settings->mutableSettings()->setBootedFromSdCard(
@@ -301,7 +304,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_pluginManager = store(new PluginManager(this));
 
 
-    if (!mutableSettings()->noPlugins())
+    if (!settings().noPlugins())
         m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
@@ -690,12 +693,8 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
+    NX_CRITICAL(m_platform);
     return m_platform;
-}
-
-void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
-{
-    m_platform = platform;
 }
 
 QnServerConnector* QnMediaServerModule::serverConnector() const

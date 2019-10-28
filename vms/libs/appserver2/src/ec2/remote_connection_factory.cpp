@@ -135,7 +135,7 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     }
 
     const auto info = QString::fromUtf8(QJson::serialized(clientInfo));
-    NX_DEBUG(this, "%1 to %2 with %3", Q_FUNC_INFO, addr, info);
+    NX_DEBUG(this, "Establishing connection to remote server (%2) with %3", addr, info);
 
     auto func =
         [this, reqId, addr, handler](

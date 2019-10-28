@@ -19,6 +19,7 @@ public:
     virtual void pleaseReopenStream() override {}
     virtual bool isCameraControlDisabled() const override { return false;  }
     virtual void updateSoftwareMotion() override {}
+    virtual void stop() override;
 };
 
 } // namespace test

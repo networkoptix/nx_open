@@ -22,6 +22,12 @@
 #include <utils/common/util.h>
 #include <nx/system_commands.h>
 
+#if defined (Q_OS_MACOS) && !defined (_GNU_SOURCE)
+    #define _GNU_SOURCE
+#endif
+
+#include <boost/stacktrace.hpp>
+
 namespace nx {
 namespace vms {
 namespace utils {
@@ -29,7 +35,7 @@ namespace utils {
 struct VmsUtilsFunctionsTag{};
 static const auto& kLogTag = typeid(VmsUtilsFunctionsTag);
 
-static QString backupDbFileName(const QString& backupDir, int buildNumber)
+QString backupDbFileName(const QString& backupDir, int buildNumber)
 {
     return QString("%1_%2_%3.db")
         .arg(closeDirPath(backupDir) + "ecs")
@@ -60,32 +66,6 @@ bool backupDatabaseLive(
 
     deleteOldBackupFilesIfNeeded(
         backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
-
-    NX_INFO(kLogTag, "Successfully created DB backup %1", fileName);
-    return true;
-}
-
-bool backupDatabaseViaCopy(const QString& dbFilePath, int buildNumber)
-{
-    QFileInfo fileInfo(dbFilePath);
-    const auto backupDir = fileInfo.absoluteDir();
-    const auto backupDirPath = backupDir.canonicalPath();
-
-    if (!backupDir.exists() && !QDir().mkpath(backupDirPath))
-    {
-        NX_ERROR(kLogTag, "Failed to create DB backup path %1", backupDirPath);
-        return false;
-    }
-
-    const QString fileName = backupDbFileName(backupDirPath, buildNumber);
-    if (!QFile::copy(dbFilePath, fileName))
-    {
-        NX_ERROR(kLogTag, "Failed to copy DB file %1 to %2", dbFilePath, fileName);
-        return false;
-    }
-
-    deleteOldBackupFilesIfNeeded(
-        backupDirPath, nx::SystemCommands().freeSpace(backupDirPath.toStdString()));
 
     NX_INFO(kLogTag, "Successfully created DB backup %1", fileName);
     return true;

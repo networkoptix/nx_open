@@ -55,7 +55,6 @@ private:
 
 private:
     nx::utils::CachedValue<api::analytics::EngineManifest> m_cachedManifest;
-    mutable QnMutex m_cacheMutex;
 };
 
 } // namespace nx::vms::common

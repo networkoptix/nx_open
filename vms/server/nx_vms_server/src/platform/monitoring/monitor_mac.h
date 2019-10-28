@@ -1,5 +1,4 @@
-#ifndef QN_MAC_MONITOR_H
-#define QN_MAC_MONITOR_H
+#pragma once
 
 #include "sigar_monitor.h"
 
@@ -8,8 +7,6 @@ class QnMacMonitor: public QnSigarMonitor {
     typedef QnSigarMonitor base_type;
 
 public:
-    QnMacMonitor(QObject *parent = NULL);
+    QnMacMonitor();
     virtual ~QnMacMonitor();
 };
-
-#endif // QN_MAC_MONITOR_H

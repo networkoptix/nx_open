@@ -9,7 +9,7 @@
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-class QnMediaServerModule;
+namespace nx::vms::server { class RootFileSystem; }
 
 namespace nx::vms::server {
 
@@ -132,10 +132,10 @@ public:
         qint64 bytesPerSecMax;
     };
 
-    PlatformMonitor(QObject *parent = NULL): QObject(parent) {}
+    PlatformMonitor(): QObject() {}
     virtual ~PlatformMonitor() {}
 
-    virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
+    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* /*rootFs*/) {}
     virtual void logStatistics() {}
 
     /**
@@ -190,15 +190,6 @@ public:
      * @returns A list of partition space entries for all partitions of the given types on this PC.
      */
     QList<PartitionSpace> totalPartitionSpaceInfo(PartitionTypes types);
-
-    /**
-     * @brief Get partition name by path to some folder located on this partition. Used to get
-     *     partition by path to the storage.
-     * @param path Platform-specific path to target folder.
-     * @returns Platform-specific string describing this logical partition, suitable to be shown
-     *     to the user.
-     */
-    virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
 
     /** @returns Update period of values, in milliseconds. */
     virtual std::chrono::milliseconds updatePeriod() const { return std::chrono::milliseconds(0); }

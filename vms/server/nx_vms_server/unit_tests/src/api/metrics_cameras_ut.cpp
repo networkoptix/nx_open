@@ -9,6 +9,7 @@
 #include <recorder/storage_manager.h>
 #include <server_for_tests.h>
 #include <utils/common/synctime.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx::vms::server::test {
 
@@ -198,7 +199,7 @@ TEST_F(MetricsCamerasApi, infoGroup)
     EXPECT_EQ(cameraData["_"]["name"], "CMock 2");
 
     auto infoData = cameraData["info"];
-    EXPECT_EQ(infoData["server"], launcher->commonModule()->moduleGUID().toSimpleString());
+    EXPECT_EQ(infoData["server"], launcher->commonModule()->currentServer()->getName());
     EXPECT_EQ(infoData["type"], "Camera");
     EXPECT_EQ(infoData["ip"], "192.168.0.2");
     EXPECT_EQ(infoData["model"], "Model_2");
@@ -293,7 +294,7 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
     analyticsData = cameraData["storage"];
-    ASSERT_TRUE(analyticsData["hasArchiveCleanup"].toBool());
+    ASSERT_TRUE(analyticsData["hasArchiveRotated"].toBool());
 
     systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
     EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::error);

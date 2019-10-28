@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/data_structures/map_helper.h>
 #include <core/resource/resource.h>
@@ -75,7 +74,6 @@ private:
     const QnResourcePtr m_resource;
     const QString m_propertyName;
 
-    mutable QnMutex m_mutex;
     mutable nx::utils::CachedValue<Container> m_cachedContainer;
 
     NotifyWhenUpdated m_notifier;

@@ -304,7 +304,7 @@ private:
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
     void updateMountedStatus(const QnStorageResourcePtr& storage);
-    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(int storageIndex);
+    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(const QnStorageResourcePtr& storage);
     void scanMediaCatalog(
         const QnStorageResourcePtr& storage,
         const DeviceFileCatalogPtr& catalog,
@@ -315,6 +315,8 @@ private:
         const QnStorageResourcePtr& storage,
         const QString& cameraPath,
         nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
+
+    void emptyCatalogsForNotExistingFolders(const QnStorageResourcePtr& storage);
 
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;

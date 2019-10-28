@@ -5,9 +5,9 @@
 
 namespace nx::vms::server::test {
 
-TEST(PlatformMonitor, threadCount)
+TEST(GlobalMonitor, threadCount)
 {
-    QnPlatformAbstraction platform;
+    QnPlatformAbstraction platform(/*rootFs*/ nullptr);
     static const int kThreadsToCreate = 10;
 
     std::vector<std::thread> threads;
