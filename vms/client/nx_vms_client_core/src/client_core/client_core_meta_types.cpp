@@ -24,6 +24,7 @@
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
+#include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/client/core/media/media_player.h>
 #include <nx/client/core/resource/resource_helper.h>
 #include <nx/client/core/resource/media_resource_helper.h>
@@ -108,6 +109,7 @@ void initializeMetaTypes()
     MediaPlayerMotionProvider::registerQmlType();
     MotionMaskItem::registerQmlType();
     PropertiesSync::registerQmlTypes();
+    PathUtil::registerQmlType();
 
     /* NxMediaPlayer should not be used.
     It is here only to allow assignments of MediaPlayer to properties of this type. */
