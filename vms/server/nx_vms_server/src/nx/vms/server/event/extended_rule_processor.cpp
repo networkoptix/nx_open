@@ -394,7 +394,7 @@ bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractAction
         return false;
     }
 
-    nvr::IBuzzerManager* const buzzerController = nvrService->buzzerManager();
+    nvr::IBuzzerController* const buzzerController = nvrService->buzzerController();
     if (!buzzerController)
     {
         NX_WARNING(this,

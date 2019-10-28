@@ -3,14 +3,14 @@
 #include <nx/vms/server/nvr/hanwha/io_controller.h>
 #include <nx/vms/server/nvr/hanwha/led_controller.h>
 #include <nx/vms/server/nvr/hanwha/network_block_controller.h>
-#include <nx/vms/server/nvr/hanwha/buzzer_manager.h>
+#include <nx/vms/server/nvr/hanwha/buzzer_controller.h>
 #include <nx/vms/server/nvr/hanwha/io_module_searcher.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
 Service::Service(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule),
-    m_buzzerManager(std::make_unique<BuzzerManager>()),
+    m_buzzerController(std::make_unique<BuzzerController>()),
     m_networkBlockController(std::make_unique<NetworkBlockController>()),
     m_ioController(std::make_unique<IoController>()),
     m_ledController(std::make_unique<LedController>()),
@@ -18,9 +18,9 @@ Service::Service(QnMediaServerModule* serverModule):
 {
 }
 
-IBuzzerManager* Service::buzzerManager()
+IBuzzerController* Service::buzzerController()
 {
-    return m_buzzerManager.get();
+    return m_buzzerController.get();
 }
 
 INetworkBlockController* Service::networkBlockController()

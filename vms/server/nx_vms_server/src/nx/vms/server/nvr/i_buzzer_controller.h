@@ -4,10 +4,10 @@
 
 namespace nx::vms::server::nvr {
 
-class IBuzzerManager
+class IBuzzerController
 {
 public:
-    virtual ~IBuzzerManager() = default;
+    virtual ~IBuzzerController() = default;
 
     /**
      * If duration is equal to zero then the buzzer should be activated until it is explicitly

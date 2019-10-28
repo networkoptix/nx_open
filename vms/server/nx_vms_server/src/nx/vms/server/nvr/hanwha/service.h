@@ -12,7 +12,7 @@ class Service: public IService, public nx::vms::server::ServerModuleAware
 public:
     Service(QnMediaServerModule* serverModule);
 
-    virtual IBuzzerManager* buzzerManager() override;
+    virtual IBuzzerController* buzzerController() override;
 
     virtual INetworkBlockController* networkBlockController() override;
 
@@ -25,7 +25,7 @@ public:
     virtual IService::Capabilities capabilities() const override;
 
 private:
-    std::unique_ptr<IBuzzerManager> m_buzzerManager;
+    std::unique_ptr<IBuzzerController> m_buzzerController;
     std::unique_ptr<INetworkBlockController> m_networkBlockController;
     std::unique_ptr<IIoController> m_ioController;
     std::unique_ptr<ILedController> m_ledController;

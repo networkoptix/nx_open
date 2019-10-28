@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/vms/server/nvr/i_buzzer_manager.h>
+#include <nx/vms/server/nvr/i_buzzer_controller.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-class BuzzerManager: public IBuzzerManager
+class BuzzerController: public IBuzzerController
 {
 public:
     virtual bool enable(std::chrono::milliseconds duration) override;

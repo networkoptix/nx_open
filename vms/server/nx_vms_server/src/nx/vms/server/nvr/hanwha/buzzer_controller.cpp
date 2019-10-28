@@ -1,14 +1,14 @@
-#include "buzzer_manager.h"
+#include "buzzer_controller.h"
 
 namespace nx::vms::server::nvr::hanwha {
 
-bool BuzzerManager::enable(std::chrono::milliseconds duration)
+bool BuzzerController::enable(std::chrono::milliseconds duration)
 {
     // TODO: #dmishin implement.
     return false;
 }
 
-bool BuzzerManager::disable()
+bool BuzzerController::disable()
 {
     // TODO: #dmishin implement.
     return false;
