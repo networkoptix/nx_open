@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/vms/server/nvr/i_led_manager.h>
+#include <nx/vms/server/nvr/i_led_controller.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-class LedManager: public ILedManager
+class LedController: public ILedController
 {
 public:
     virtual std::vector<LedDescriptor> ledDescriptors() const override;

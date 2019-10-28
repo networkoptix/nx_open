@@ -1,26 +1,26 @@
-#include "led_manager.h"
+#include "led_controller.h"
 
 namespace nx::vms::server::nvr::hanwha {
 
-std::vector<ILedManager::LedDescriptor> LedManager::ledDescriptors() const
+std::vector<ILedController::LedDescriptor> LedController::ledDescriptors() const
 {
     // TODO: #dmishin implement.
     return {};
 }
 
-std::vector<ILedManager::LedState> LedManager::ledStates() const
+std::vector<ILedController::LedState> LedController::ledStates() const
 {
     // TODO: #dmishin implement.
     return {};
 }
 
-bool LedManager::enable(const QString& ledId)
+bool LedController::enable(const QString& ledId)
 {
     // TODO: #dmishin implement.
     return false;
 }
 
-bool LedManager::disable(const QString& ledId)
+bool LedController::disable(const QString& ledId)
 {
     // TODO: #dmishin implement.
     return false;

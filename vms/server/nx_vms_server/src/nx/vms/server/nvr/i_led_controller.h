@@ -2,7 +2,7 @@
 
 namespace nx::vms::server::nvr {
 
-class ILedManager
+class ILedController
 {
 
 public:
@@ -19,7 +19,7 @@ public:
     };
 
 public:
-    virtual ~ILedManager() = default;
+    virtual ~ILedController() = default;
 
     virtual std::vector<LedDescriptor> ledDescriptors() const = 0;
 
