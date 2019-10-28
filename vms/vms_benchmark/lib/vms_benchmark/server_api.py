@@ -182,18 +182,6 @@ class ServerApi:
 
         return None
 
-    def get_storages(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getStorages")
-        credentials = f"{self.user}:{self.password}"
-        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = self.get_request(request)
-
-        if 200 <= response.code < 300:
-            return json.loads(response.body)
-
-        return None
-
     def get_storage_spaces(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/storageSpace")
         credentials = f"{self.user}:{self.password}"
