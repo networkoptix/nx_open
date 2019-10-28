@@ -57,7 +57,7 @@ void Session::run(const QString& url, const Config& config, bool live)
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)
     {
-        NX_ERROR(this, "Failed to open rtsp stream: %1", result.toString(nullptr));
+        report(lm("Failed to open rtsp stream: %1").args(nullptr));
         failed = true;
         ++failedCount;
         return;
@@ -100,16 +100,15 @@ void Session::run(const QString& url, const Config& config, bool live)
 void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, const char* url)
 {
     constexpr auto kZeroUs = std::chrono::microseconds::zero();
-    const char* violationCaption = nullptr;
     if (m_config.maxTimestampDiff != kZeroUs && diff > m_config.maxTimestampDiff)
-        violationCaption = "more";
-    else if (m_config.minTimestampDiff != kZeroUs && diff < m_config.minTimestampDiff)
-        violationCaption = "less";
-
-    if (violationCaption)
     {
-        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is %4 than %5 us.").args(
-            url, timestampUs, diff.count(), violationCaption, m_config.maxTimestampDiff.count()));
+        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is more than %4 us.")
+            .args(url, timestampUs, diff.count(), m_config.maxTimestampDiff.count()));
+    }
+    else if (m_config.minTimestampDiff != kZeroUs && diff < m_config.minTimestampDiff)
+    {
+        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is less than %4 us.")
+            .args(url, timestampUs, diff.count(), m_config.minTimestampDiff.count()));
     }
 }
 
