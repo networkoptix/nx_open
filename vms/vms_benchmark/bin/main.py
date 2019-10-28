@@ -263,6 +263,11 @@ def load_configs(conf_file, ini_file):
             "type": "int",
             "default": 15,
         },
+        "apiReadinessTimeoutSeconds": {
+            "optional": True,
+            "type": "int",
+            "default": 30,
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
@@ -386,7 +391,7 @@ def report(message):
 log_file_ref = None
 
 
-def _wait_for_api(api, timeout=60):
+def _wait_for_api(api, ini):
     started_at = time.time()
 
     while True:
@@ -395,18 +400,16 @@ def _wait_for_api(api, timeout=60):
         if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
             break
 
-        if time.time() - started_at > timeout:
+        if time.time() - started_at > ini['apiReadinessTimeoutSeconds']:
             return False
 
-        time.sleep(0.5)
-
-    time.sleep(5)
+        time.sleep(1)
     return True
 
 
-def _test_api(api):
+def _test_api(api, ini):
     logging.info('Starting REST API basic test...')
-    if not _wait_for_api(api):
+    if not _wait_for_api(api, ini):
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
     report('\nREST API basic test is OK.')
     logging.info('Starting REST API authentication test...')
@@ -1071,13 +1074,13 @@ def main(conf_file, ini_file, log_file):
     vms.dismount_ini_dirs()
     try:
         api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
-        _test_api(api)
+        _test_api(api, ini)
 
         storages = _get_storages(api)
         _stop_vms(vms)
         _override_ini_config(vms, ini)
         _clear_storages(box, storages, conf)
-        vms = _restart_vms(api, box, linux_distribution, vms)
+        vms = _restart_vms(api, box, linux_distribution, vms, ini)
 
         _test_vms(api, box, box_platform, conf, ini, vms)
 
@@ -1086,11 +1089,11 @@ def main(conf_file, ini_file, log_file):
         vms.dismount_ini_dirs()
 
 
-def _restart_vms(api, box, linux_distribution, vms):
+def _restart_vms(api, box, linux_distribution, vms, ini):
     report('Starting Server...')
     vms.start(exc=True)
     vms = _obtain_restarted_vms(box, linux_distribution)
-    _wait_for_api(api)
+    _wait_for_api(api, ini)
     report('Server started.')
     return vms
 
