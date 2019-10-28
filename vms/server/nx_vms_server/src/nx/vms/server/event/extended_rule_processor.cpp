@@ -303,6 +303,8 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
                 result = executePlaySoundAction(action);
+            case ActionType::buzzerAction:
+                result = executeBuzzerAction(action);
             default:
                 break;
         }
@@ -376,6 +378,12 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
     return true;
 
+}
+
+bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractActionPtr& action)
+{
+    // TODO: #dmishin implement.
+    return true;
 }
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)

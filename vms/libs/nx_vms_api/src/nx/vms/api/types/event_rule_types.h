@@ -252,6 +252,14 @@ enum ActionType
     * - layoutResourceId - Uuid of layout to be opened
     */
     openLayoutAction = 19,
+
+    /**
+     * Enable a buzzer on an NVR.
+     * Parameters:
+     * - serverIds (may be taken from event parameters),
+     * - durationMs (optional)
+     */
+    buzzerAction = 20,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

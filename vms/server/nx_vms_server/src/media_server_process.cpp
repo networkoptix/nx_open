@@ -1974,6 +1974,7 @@ void MediaServerProcess::registerRestHandlers(
      *             %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *             %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *             %value ExecHttpRequestAction Send HTTP request as an action.
+     *             %value BuzzerAction Enable an NVR buzzer
      *         %param:object reply[].actionParams JSON object with action parameters. Only fields
      *             that are applicable to the particular action are used.
      *             %param:uuid reply[].actionParams.actionResourceId Additional parameter for event
@@ -2763,6 +2764,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *     %value ExecHttpRequestAction Send HTTP request as an action.
+     *     %value BuzzerAction Enable an NVR buzzer
      * %param[opt]:enum EventState
      *     %value inactive Event has been finished (for prolonged events).
      *     %value active Event has been started (for prolonged events).

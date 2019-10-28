@@ -61,6 +61,7 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::openLayoutAction:        return tr("Open layout");
         case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
         case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
+        case ActionType::buzzerAction:            return tr("Buzzer");
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -73,7 +74,6 @@ QString StringsHelper::actionName(ActionType value) const
                 resourcePool(),
                 tr("Device recording"),
                 tr("Camera recording"));
-
         default:
             break;
     }
