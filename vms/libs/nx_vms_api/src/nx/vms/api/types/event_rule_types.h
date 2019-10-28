@@ -119,6 +119,12 @@ enum EventType
     /** Plugin events. */
     pluginDiagnosticEvent = 14,
 
+    /** Hanwha PoE NVR PoE over budget event. */
+    poeOverBudgetEvent = 15,
+
+    /** Hanwha PoE NVR FAN error event. */
+    fanErrorEvent = 16,
+
     /** System health message. */
     systemHealthEvent = 500,
 
