@@ -101,7 +101,7 @@ protected:
 private:
     /**
      * Using shared_ptr here since some disaptcher usages may destroy the dispatcher
-     * before all requests have completed. This was find before introduction of this counter.
+     * before all requests have completed. This was fine before introduction of this counter.
      */
     std::shared_ptr<nx::utils::Counter> m_runningRequestCounter;
 };
