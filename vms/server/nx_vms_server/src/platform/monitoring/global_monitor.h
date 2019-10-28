@@ -21,12 +21,6 @@ class GlobalMonitor: public nx::vms::server::PlatformMonitor
 public:
     static const std::chrono::milliseconds kCacheExpirationTime;
 
-    /**
-     * \param base                      Base platform monitor to get actual data from.
-     *                                  Global monitor claims ownership of this object.
-     * \param parent                    Parent of this object.
-     * \param updatePeriodMs            statistics update period. It's disabled if 0.
-     */
     GlobalMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> base);
     virtual ~GlobalMonitor();
 

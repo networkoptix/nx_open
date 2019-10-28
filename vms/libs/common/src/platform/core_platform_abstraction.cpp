@@ -36,14 +36,16 @@ QnCorePlatformAbstraction::~QnCorePlatformAbstraction()
 }
 
 QnPlatformProcess *QnCorePlatformAbstraction::process(QProcess *source) const {
-    if(source == NULL)
+    if (source == nullptr)
         return m_process;
 
-    static const char *qn_platformProcessPropertyName = "_qn_platformProcess";
-    QnPlatformProcess *result = source->property(qn_platformProcessPropertyName).value<QnPlatformProcess *>();
-    if(!result) {
+    static const char* qn_platformProcessPropertyName = "_qn_platformProcess";
+    QnPlatformProcess* result =
+        source->property(qn_platformProcessPropertyName).value<QnPlatformProcess *>();
+    if (!result) {
         result = new QnProcessImpl(source, source);
-        source->setProperty(qn_platformProcessPropertyName, QVariant::fromValue<QnPlatformProcess *>(result));
+        source->setProperty(qn_platformProcessPropertyName,
+            QVariant::fromValue<QnPlatformProcess *>(result));
     }
 
     return result;
