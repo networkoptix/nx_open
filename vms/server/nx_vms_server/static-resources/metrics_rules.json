@@ -425,14 +425,7 @@
                     "actualBitrateBps": {
                         "name": "Bitrate",
                         "display": "panel",
-                        "format": "KBps",
-                        "alarms": [
-                            {
-                                "level": "error",
-                                "condition": "equal %actualBitrateBps 0",
-                                "text": "Actual bitrate is 0 KBps"
-                            }
-                        ]
+                        "format": "KBps"
                     }
                 }
             },
@@ -464,14 +457,7 @@
                     "actualBitrateBps": {
                         "name": "Bitrate",
                         "display": "panel",
-                        "format": "KBps",
-                        "alarms": [
-                            {
-                                "level": "error",
-                                "condition": "equal %actualBitrateBps 0",
-                                "text": "Actual bitrate is 0 KBps"
-                            }
-                        ]
+                        "format": "KBps"
                     }
                 }
             },
