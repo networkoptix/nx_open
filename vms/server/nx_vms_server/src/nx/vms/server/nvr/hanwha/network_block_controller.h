@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/vms/server/nvr/i_network_block_manager.h>
+#include <nx/vms/server/nvr/i_network_block_controller.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-class NetworkBlockManager: public INetworkBlockManager
+class NetworkBlockController: public INetworkBlockController
 {
 public:
     virtual nx::vms::api::NetworkBlockData state() const override;

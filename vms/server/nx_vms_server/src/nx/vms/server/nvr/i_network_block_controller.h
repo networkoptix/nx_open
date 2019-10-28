@@ -4,12 +4,12 @@
 
 namespace nx::vms::server::nvr {
 
-class INetworkBlockManager
+class INetworkBlockController
 {
 public:
     using PoweringModeByPort = std::map<int, nx::vms::api::NetworkPortState::PoweringMode>;
 public:
-    virtual ~INetworkBlockManager() = default;
+    virtual ~INetworkBlockController() = default;
 
     virtual nx::vms::api::NetworkBlockData state() const = 0;
 

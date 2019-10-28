@@ -14,7 +14,7 @@ public:
 
     virtual IBuzzerManager* buzzerManager() override;
 
-    virtual INetworkBlockManager* networkBlockManager() override;
+    virtual INetworkBlockController* networkBlockController() override;
 
     virtual IIoController* ioController() override;
 
@@ -26,7 +26,7 @@ public:
 
 private:
     std::unique_ptr<IBuzzerManager> m_buzzerManager;
-    std::unique_ptr<INetworkBlockManager> m_networkBlockManager;
+    std::unique_ptr<INetworkBlockController> m_networkBlockController;
     std::unique_ptr<IIoController> m_ioController;
     std::unique_ptr<ILedController> m_ledController;
     std::unique_ptr<QnAbstractResourceSearcher> m_searcher;

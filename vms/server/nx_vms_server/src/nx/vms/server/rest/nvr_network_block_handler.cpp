@@ -7,13 +7,13 @@ namespace nx::vms::server::rest {
 
 using namespace nx::vms::server::nvr;
 
-INetworkBlockManager* networkBlockManager(QnMediaServerModule* serverModule)
+INetworkBlockController* networkBlockController(QnMediaServerModule* serverModule)
 {
     auto nvrService = serverModule->nvrService();
     if (!nvrService)
         return nullptr;
 
-    return nvrService->networkBlockManager();
+    return nvrService->networkBlockController();
 }
 
 NvrNetworkBlockHandler::NvrNetworkBlockHandler(QnMediaServerModule* serverModule):
@@ -23,7 +23,7 @@ NvrNetworkBlockHandler::NvrNetworkBlockHandler(QnMediaServerModule* serverModule
 
 JsonRestResponse NvrNetworkBlockHandler::executeGet(const JsonRestRequest& request)
 {
-    if (const INetworkBlockManager* const manager = networkBlockManager(serverModule()))
+    if (const INetworkBlockController* const manager = networkBlockController(serverModule()))
         return manager->state();
 
     return nx::network::http::StatusCode::notImplemented;
@@ -32,11 +32,11 @@ JsonRestResponse NvrNetworkBlockHandler::executeGet(const JsonRestRequest& reque
 JsonRestResponse NvrNetworkBlockHandler::executePost(
     const JsonRestRequest& request, const QByteArray& body)
 {
-    INetworkBlockManager::PoweringModeByPort poweringModeByPort;
+    INetworkBlockController::PoweringModeByPort poweringModeByPort;
     if (!QJson::deserialize(body, &poweringModeByPort))
         return nx::network::http::StatusCode::badRequest;
 
-    if (INetworkBlockManager* const manager = networkBlockManager(serverModule()))
+    if (INetworkBlockController* const manager = networkBlockController(serverModule()))
     {
         if (manager->setPortPoweringModes(poweringModeByPort))
             return manager->state();

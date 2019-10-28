@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/vms/server/nvr/i_buzzer_manager.h>
-#include <nx/vms/server/nvr/i_network_block_manager.h>
+#include <nx/vms/server/nvr/i_network_block_controller.h>
 #include <nx/vms/server/nvr/i_io_controller.h>
 #include <nx/vms/server/nvr/i_led_controller.h>
 #include <core/resource_management/resource_searcher.h>
@@ -26,7 +26,7 @@ public:
 
     virtual IBuzzerManager* buzzerManager() = 0;
 
-    virtual INetworkBlockManager* networkBlockManager() = 0;
+    virtual INetworkBlockController* networkBlockController() = 0;
 
     virtual IIoController* ioController() = 0;
 

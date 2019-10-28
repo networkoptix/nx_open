@@ -1,4 +1,4 @@
-#include "network_block_manager.h"
+#include "network_block_controller.h"
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -26,12 +26,12 @@ nx::vms::api::NetworkBlockData makeFakeData()
     return result;
 }
 
-nx::vms::api::NetworkBlockData NetworkBlockManager::state() const
+nx::vms::api::NetworkBlockData NetworkBlockController::state() const
 {
     return makeFakeData();
 }
 
-bool NetworkBlockManager::setPortPoweringModes(const PoweringModeByPort& poweringModeByPort)
+bool NetworkBlockController::setPortPoweringModes(const PoweringModeByPort& poweringModeByPort)
 {
     // TODO: #dmishin implement.
     return false;
