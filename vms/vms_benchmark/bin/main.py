@@ -213,6 +213,11 @@ def load_configs(conf_file, ini_file):
             "type": 'integer',
             "default": 0,
         },
+        "maxAllowedFrameDrops": {
+            "optional": True,
+            "type": "integer",
+            "default": 0,
+        },
         "ramPerCameraMegabytes": {
             "optional": True,
             "type": 'integer',
