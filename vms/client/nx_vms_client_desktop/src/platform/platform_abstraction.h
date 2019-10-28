@@ -1,5 +1,4 @@
-#ifndef CLIENT_PLATFORM_ABSTRACTION_H
-#define CLIENT_PLATFORM_ABSTRACTION_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -7,6 +6,7 @@
 #include <platform/core_platform_abstraction.h>
 #include <platform/images/platform_images.h>
 #include <platform/shortcuts/platform_shortcuts.h>
+#include "notification/platform_notifier.h"
 
 class QnPlatformAbstraction:
     public QnCorePlatformAbstraction,
@@ -29,7 +29,4 @@ private:
     QnPlatformShortcuts *m_shortcuts = nullptr;
 };
 
-#undef  qnPlatform
 #define qnPlatform QnPlatformAbstraction::instance()
-
-#endif // CLIENT_PLATFORM_ABSTRACTION_H
