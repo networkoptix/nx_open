@@ -11,6 +11,17 @@ namespace nx::vms::server::nvr {
 class IService
 {
 public:
+    enum class Capability
+    {
+        poeManagement = 1 << 0,
+        fanMonitoring = 1 << 1,
+        buzzer = 1 << 2,
+        leds = 1 << 3,
+    };
+
+    Q_DECLARE_FLAGS(Capabilities, Capability);
+
+public:
     virtual ~IService() = default;
 
     virtual IBuzzerManager* buzzerManager() = 0;
@@ -22,6 +33,8 @@ public:
     virtual ILedManager* ledManager() = 0;
 
     virtual QnAbstractResourceSearcher* searcher() = 0;
+
+    virtual Capabilities capabilities() const = 0;
 };
 
 } // namespace nx::vms::server::nvr

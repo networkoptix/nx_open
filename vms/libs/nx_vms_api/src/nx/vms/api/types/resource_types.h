@@ -103,6 +103,15 @@ enum ServerFlag
     SF_HasLiteClient = 0x400,
     SF_P2pSyncDone = 0x1000000, //< For UT purpose only
     SF_RequiresEdgeLicense = 0x2000000, //< Remove when we are sure EDGE only licenses are gone.
+
+    // Server can provide information about built-in PoE block.
+    SF_HasPoeManagementCapability = 0x4000000,
+
+    // Server can provide information about internal fan and its state.
+    SF_HasFanMonitoringCapability = 0x8000000,
+
+    // Server has a buzzer that can produce sound.
+    SF_HasBuzzer = 0x10000000
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)

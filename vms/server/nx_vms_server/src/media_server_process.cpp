@@ -3233,6 +3233,17 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     if (!m_ipDiscovery->publicIP().isNull())
         serverFlags |= nx::vms::api::SF_HasPublicIP;
 
+    if (const nvr::IService* const nvrService = serverModule()->nvrService())
+    {
+        const nvr::IService::Capabilities capabilities = nvrService->capabilities();
+        if (capabilities.testFlag(nvr::IService::Capability::buzzer))
+            serverFlags |= nx::vms::api::SF_HasBuzzer;
+        if (capabilities.testFlag(nvr::IService::Capability::poeManagement))
+            serverFlags |= nx::vms::api::SF_HasPoeManagementCapability;
+        if (capabilities.testFlag(nvr::IService::Capability::fanMonitoring))
+            serverFlags |= nx::vms::api::SF_HasFanMonitoringCapability;
+    }
+
     return serverFlags;
 }
 

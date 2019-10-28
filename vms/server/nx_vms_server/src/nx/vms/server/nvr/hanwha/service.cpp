@@ -43,4 +43,14 @@ QnAbstractResourceSearcher* Service::searcher()
     return m_searcher.get();
 }
 
+IService::Capabilities Service::capabilities() const
+{
+    using Capability = IService::Capability;
+    return Capabilities({
+        Capability::poeManagement,
+        Capability::fanMonitoring,
+        Capability::leds,
+        Capability::buzzer});
+}
+
 } // namespace nx::vms::server::nvr::hanwha

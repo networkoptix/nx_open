@@ -22,6 +22,8 @@ public:
 
     virtual QnAbstractResourceSearcher* searcher() override;
 
+    virtual IService::Capabilities capabilities() const override;
+
 private:
     std::unique_ptr<IBuzzerManager> m_buzzerManager;
     std::unique_ptr<INetworkBlockManager> m_networkBlockManager;
