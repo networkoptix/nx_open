@@ -1,7 +1,7 @@
 import QtQuick 2.10
-import QtQuick.Shapes 1.11
 import QtQml 2.3
 import nx.vms.client.core 1.0
+import Nx 1.0
 
 import "../figure_utils.js" as F
 
@@ -34,7 +34,6 @@ Figure
         item: mouseArea
         closed: true
 
-        onEnabledChanged: pathInstantiator.updateShape()
         enabled: false
     }
 
@@ -51,72 +50,60 @@ Figure
         id: dragInstrument
         pointMakerInstrument: pointMakerInstrument
         pathHoverInstrument: hoverInstrument
-        forcefullyHovered: shape.contains(Qt.point(mouseArea.mouseX, mouseArea.mouseY))
+        forcefullyHovered: pathUtil.contains(
+            Qt.point(F.relX(mouseArea.mouseX, mouseArea), F.relY(mouseArea.mouseY, mouseArea)))
         item: mouseArea
         target: figure
     }
 
+    PathUtil
+    {
+        id: pathUtil
+    }
+
+    Connections
+    {
+        target: pointMakerInstrument.model
+        onDataChanged: refresh()
+        onRowsInserted: refresh()
+        onRowsRemoved: refresh()
+        onModelReset: refresh()
+    }
+
     property PointGrip lastHoveredGrip: null
 
-    Shape
+    Canvas
     {
-        id: shape
+        id: canvas
 
         anchors.fill: parent
-//        layer.enabled: true
-//        layer.samples: 4
-        containsMode: Shape.FillContains
 
-        ShapePath
+        onPaint:
         {
-            id: shapePath
+            const points = pointMakerInstrument.getPoints()
 
-            strokeWidth: 2
-            strokeColor: figure.color
-            fillColor: pointMakerInstrument.enabled
-               ? "transparent"
-               : Qt.rgba(strokeColor.r, strokeColor.g, strokeColor.b, 0.3)
-            fillRule: ShapePath.WindingFill
+            var ctx = getContext("2d")
+            ctx.reset()
 
-            startX: pointMakerInstrument.startX
-            startY: pointMakerInstrument.startY
-        }
-    }
+            if (points.length < 3)
+                return
 
-    PathLine
-    {
-        id: lastLine
-        x: pointMakerInstrument.startX
-        y: pointMakerInstrument.startY
-    }
+            ctx.strokeStyle = color
+            ctx.fillStyle = ColorTheme.transparent(color, 0.3)
+            ctx.fillRule = Qt.WindingFill
+            ctx.lineWidth = 2
 
-    Instantiator
-    {
-        id: pathInstantiator
+            ctx.moveTo(points[0].x, points[0].y)
+            for (var i = 0; i < points.length; ++i)
+                ctx.lineTo(points[i].x, points[i].y)
+            ctx.lineTo(points[0].x, points[0].y)
 
-        model: pointMakerInstrument.model
-
-        PathLine
-        {
-            x: F.absX(model.x, figure)
-            y: F.absY(model.y, figure)
+            ctx.fill()
+            ctx.stroke()
         }
 
-        onObjectAdded: updateShape()
-        onObjectRemoved: updateShape()
-
-        function updateShape()
-        {
-            var elements = []
-
-            for (var i = 1; i < count; ++i)
-                elements.push(objectAt(i))
-
-            if (!pointMakerInstrument.enabled)
-                elements.push(lastLine)
-
-            shapePath.pathElements = elements
-        }
+        onWidthChanged: requestPaint()
+        onHeightChanged: requestPaint()
     }
 
     Repeater
@@ -212,6 +199,12 @@ Figure
         }
 
         onMoved: pointMakerInstrument.setPoint(pointIndex, Qt.point(x, y))
+    }
+
+    function refresh()
+    {
+        pathUtil.points = pointMakerInstrument.getRelativePoints()
+        canvas.requestPaint()
     }
 
     function startCreation()

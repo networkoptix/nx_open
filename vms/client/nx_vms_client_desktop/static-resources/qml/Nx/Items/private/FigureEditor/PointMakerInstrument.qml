@@ -222,7 +222,7 @@ Instrument
         for (var i = 0; i < pointsModel.count; ++i)
         {
             const p = pointsModel.get(i)
-            result.push({"x": p.x, "y": p.y})
+            result.push(Qt.point(p.x, p.y))
         }
 
         return result
