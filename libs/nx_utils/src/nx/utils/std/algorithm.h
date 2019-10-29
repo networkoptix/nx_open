@@ -244,7 +244,7 @@ auto flat_map(std::map<Key, std::vector<T>> values, Key delimeter = ".")
         for (int i = 0; i < vector.size(); ++i)
             result[key + delimeter + QString::number(i)] = std::move(vector[i]);
     }
-    return flat_map(result, delimeter);
+    return flat_map(std::move(result), delimeter);
 }
 
 template<typename Key, typename T>
@@ -256,7 +256,7 @@ auto flat_map(std::map<Key, std::map<Key, T>> values, Key delimeter = ".")
         for (auto& [subKey, value]: subValues)
             result[key + delimeter + subKey] = std::move(value);
     }
-    return flat_map(result, delimeter);
+    return flat_map(std::move(result), delimeter);
 }
 
 namespace detail {
