@@ -9,7 +9,7 @@ class LedController: public ILedController
 public:
     virtual std::vector<LedDescriptor> ledDescriptors() const override;
 
-    virtual std::vector<LedState> ledStates() const override;
+    virtual std::map<LedId, LedState> ledStates() const override;
 
     virtual bool enable(const QString& ledId) override;
 
