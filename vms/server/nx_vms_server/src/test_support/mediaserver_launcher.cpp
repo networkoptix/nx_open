@@ -39,6 +39,9 @@ MediaServerLauncher::MediaServerLauncher(
     if (disabledFeatures.testFlag(DisabledFeature::noOnlineResourceData))
         addSetting(QnServer::onlineResourceDataEnabled, "0");
 
+    if (disabledFeatures.testFlag(DisabledFeature::noOutgoingConnectionsMetric))
+        addSetting("noOutgoingConnectionsMetric", "1");
+
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
 }

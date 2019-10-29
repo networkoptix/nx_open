@@ -27,7 +27,8 @@ public:
         noPlugins  = 1 << 3,
         noPublicIp  = 1 << 4,
         noOnlineResourceData = 1 << 5,
-        count = 1 << 6,
+        noOutgoingConnectionsMetric = 1<< 6,
+        count = 1 << 7,
         all = count - 1
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)

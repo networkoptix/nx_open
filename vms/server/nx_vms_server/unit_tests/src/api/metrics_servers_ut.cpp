@@ -33,7 +33,9 @@ public:
         hardware.physicalCores = 4;
     }
 
-    MetricsServersApi()
+    MetricsServersApi():
+        ServerForTests(DisabledFeature(
+        (int)DisabledFeature::all & ~DisabledFeature::noOutgoingConnectionsMetric))
     {
         serverModule()->platform()->setCustomMonitor(std::make_unique<StubMonitor>());
     }
