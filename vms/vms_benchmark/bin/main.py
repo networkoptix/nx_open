@@ -710,15 +710,17 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 idle_time_delta_per_core_s = idle_time_delta_total_s / box_platform.cpu_count
                                 uptime_delta_s = uptime - prev_uptime
                                 cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
+                                live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
+                                archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
                                 report(
                                     f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
                                     f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
                                     f"dropped frames: "
                                     f"{stream_stats['live'].frame_drops} (live), "
                                     f"{stream_stats['archive'].frame_drops} (archive), "
-                                    f"max stream lag: "
-                                    f"{stream_stats['live'].worst_lag_us:.3f} s (live), "
-                                    f"{stream_stats['archive'].worst_lag_us:.3f} s (archive).")
+                                    f"worst stream lag: "
+                                    f"{live_worst_lag_s:.3f} s (live), "
+                                    f"{archive_worst_lag_s:.3f} s (archive).")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
@@ -848,7 +850,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
                         issues.append(exceptions.VmsBenchmarkIssue(
                             f'{stream_stats[stream_type].frame_drops} frame drops detected '
-                            f'in {stream_type} stream.'))
+                            f'in {stream_type} streams.'))
 
                 try:
                     report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
@@ -856,9 +858,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     issues.append(e)
 
                 if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
+                    worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
                     issues.append(exceptions.TestCameraStreamingIssue(
                         'Streaming video from the Server FAILED: '
-                        f'the stream lagged by {stream_stats[stream_type].worst_lag_us / 1_000_000:.3f} seconds.'
+                        f'{stream_type} streams lagged by {worst_lag_s :.3f} seconds.'
                     ))
 
                 if len(issues) > 0:
