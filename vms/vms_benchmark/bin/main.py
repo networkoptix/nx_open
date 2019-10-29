@@ -550,8 +550,9 @@ class _StreamTypeStats:
             self._first_pts_us_by_stream_id[pts_stream_id] = pts_us
             return
         relative_pts_us = pts_us - self._first_pts_us_by_stream_id[pts_stream_id]
-        expected_relative_pts_us = current_timestamp_us - self._first_timestamp_us_by_stream_id[pts_stream_id]
-        lag_us = expected_relative_pts_us - relative_pts_us  # Positive lag - the stream is delayed.
+        expected_relative_pts_us = (
+            current_timestamp_us - self._first_timestamp_us_by_stream_id[pts_stream_id])
+        lag_us = expected_relative_pts_us - relative_pts_us  # Positive lag: the stream is delayed.
         if abs(lag_us) > abs(self.worst_lag_us):
             self.worst_lag_us = lag_us
 
@@ -620,7 +621,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     "    Waiting for virtual camera discovery and going live "
                     f"(timeout is {discovering_timeout_seconds} s)..."
                 )
-                res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_seconds, online_duration=3)
+                res, cameras = wait_test_cameras_discovered(
+                    timeout=discovering_timeout_seconds, online_duration=3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
@@ -658,7 +660,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
             )
             with stream_reader_context_manager as stream_reader_context:
                 stream_reader_process = stream_reader_context[0]
-                rtsp_perf_frames = _rtsp_perf_frames(stream_reader_process.stdout, ini["rtspPerfLinesOutputFile"])
+                rtsp_perf_frames = _rtsp_perf_frames(
+                    stream_reader_process.stdout, ini["rtspPerfLinesOutputFile"])
                 streams = stream_reader_context[1]
 
                 started = False
@@ -668,7 +671,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 while time.time() - stream_opening_started_at_s < 25:
                     if stream_reader_process.poll() is not None:
-                        raise exceptions.RtspPerfError("Can't open streams or streaming unexpectedly ended.")
+                        raise exceptions.RtspPerfError(
+                            "Can't open streams or streaming unexpectedly ended.")
 
                     stream_id, _ = next(rtsp_perf_frames)
 
@@ -784,7 +788,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         timestamp_s = time.time()
                         stream_type = streams[pts_stream_id]['type']
                         camera_id = streams[pts_stream_id]["camera_id"]
-                        stream_stats[stream_type].update_with_new_frame(camera_id, pts_stream_id, pts_us, timestamp_s)
+                        stream_stats[stream_type].update_with_new_frame(
+                            camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
