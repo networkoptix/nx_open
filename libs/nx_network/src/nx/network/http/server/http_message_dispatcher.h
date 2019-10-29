@@ -67,11 +67,14 @@ public:
         if (!handler)
             return false;
 
+        // NOTE: Cannot capture scoped increment in lambda since the capture variable
+        // destruction order is unspecified.
+        m_runningRequestCounter->increment();
+
         const auto handlerPtr = handler.get();
         return handlerPtr->processRequest(
             connection, std::move(request), std::move(authInfo),
             [handler = std::move(handler), completionFunc = std::move(completionFunc),
-                scopedIncrement = m_runningRequestCounter->getScopedIncrement(),
                 counter = m_runningRequestCounter](
                     nx::network::http::Message message,
                     std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
@@ -83,6 +86,7 @@ public:
                     std::move(connectionEvents));
 
                 handler.reset();
+                counter->decrement();
             });
     }
 
