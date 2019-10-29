@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from vms_benchmark import exceptions
 
 ini_rtsp_perf_bin: str
-ini_rtsp_perf_print_stderr: bool
+ini_rtsp_perf_stderr_file: str
 
 
 @contextmanager
@@ -63,12 +63,12 @@ def stream_reader_running(
     args.append('--count')
     args.append(len(streams.items()))
 
-    opts = {
-        'stdout': subprocess.PIPE,
-    }
-
-    if not ini_rtsp_perf_print_stderr:
-        opts['stderr'] = subprocess.PIPE
+    opts = {'stdout': subprocess.PIPE}
+    if not ini_rtsp_perf_stderr_file:
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_rtsp_perf_stderr_file, 'wb')
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':

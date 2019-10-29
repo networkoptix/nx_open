@@ -173,10 +173,10 @@ def load_configs(conf_file, ini_file):
             "type": "int",
             "default": 7
         },
-        "testcameraDebug": {
+        "testcameraOutputFile": {
             "optional": True,
-            "type": "bool",
-            "default": False
+            "type": "str",
+            "default": ''
         },
         "testcameraLocalInterface": {
             "optional": True,
@@ -278,16 +278,21 @@ def load_configs(conf_file, ini_file):
             "type": "int",
             "default": 2000,
         },
+        "rtspPerfStderrFile": {
+            "optional": True,
+            "type": "str",
+            "default": '',
+        },
     }
 
     ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
-    stream_reader_runner.ini_rtsp_perf_print_stderr = ini['rtspPerfPrintStderr']
+    stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
     test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
-    test_camera_runner.ini_testcamera_debug = ini['testcameraDebug']
+    test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
