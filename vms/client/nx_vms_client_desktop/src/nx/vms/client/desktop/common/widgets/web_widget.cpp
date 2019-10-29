@@ -1,7 +1,6 @@
 #include "web_widget.h"
 
 #include <QtWidgets/QLabel>
-#include <QAction>
 
 #include <ui/style/webview_style.h>
 
