@@ -18,8 +18,8 @@ public:
     virtual void start() = 0;
     virtual api::metrics::ResourceManifest manifest() const = 0;
 
-    api::metrics::ResourceGroupValues values(Scope requestScope, bool formatted) const;
-    api::metrics::ResourceGroupAlarms alarms(Scope requestScope) const;
+    api::metrics::ResourceGroupValues values(Scope requestScope, bool formatted);
+    api::metrics::ResourceGroupAlarms alarms(Scope requestScope);
 
     api::metrics::ResourceRules rules() const;
     void setRules(api::metrics::ResourceRules rules);
@@ -27,6 +27,10 @@ public:
 protected:
     void add(std::unique_ptr<ResourceMonitor> monitor);
     bool remove(const QString& id);
+
+    // NOTE: Called before any synchronisation
+    virtual void beforeValues(Scope, bool) {}
+    virtual void beforeAlarms(Scope) {}
 
 private:
     const QString m_name;

@@ -12,8 +12,7 @@ namespace nx::vms::server::metrics {
 
 namespace {
 
-// TODO: change to 1 minute
-constexpr std::chrono::seconds kInterfacesPollingPeriod(10);
+constexpr std::chrono::seconds kInterfacesCacheExpiration(7);
 
 } // namespace
 
@@ -76,10 +75,6 @@ NetworkController::NetworkController(QnMediaServerModule* serverModule):
 void NetworkController::start()
 {
     updateInterfacesPool();
-    m_timerGuard = makeTimer(
-        serverModule()->timerManager(),
-        kInterfacesPollingPeriod,
-        [this]() { updateInterfacesPool(); });
 }
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
@@ -134,6 +129,16 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
     );
 }
 
+void NetworkController::beforeValues(utils::metrics::Scope, bool)
+{
+    updateInterfacesPool();
+}
+
+void NetworkController::beforeAlarms(utils::metrics::Scope)
+{
+    updateInterfacesPool();
+}
+
 QString NetworkController::interfaceIdFromName(const QString& name) const
 {
     return m_serverId + "_" + name;
@@ -141,11 +146,18 @@ QString NetworkController::interfaceIdFromName(const QString& name) const
 
 void NetworkController::updateInterfacesPool()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_lastInterfacesUpdate.hasExpired(kInterfacesCacheExpiration))
+        return;
+
+    NX_VERBOSE(this, "Updating network interfaces info");
     const auto newInterfacesList = nx::utils::filter_if(QNetworkInterface::allInterfaces(),
         [](const auto& iface){ return !iface.flags().testFlag(QNetworkInterface::IsLoopBack); });
 
     removeDisappearedInterfaces(newInterfacesList);
     addOrUpdateInterfaces(std::move(newInterfacesList));
+
+    m_lastInterfacesUpdate.restart();
 }
 
 void NetworkController::removeDisappearedInterfaces(const QList<QNetworkInterface>& newIfaces)
@@ -182,6 +194,3 @@ void NetworkController::addOrUpdateInterfaces(QList<QNetworkInterface> newIfaces
 }
 
 } // namespace nx::vms::server::metrics
-
-
-
