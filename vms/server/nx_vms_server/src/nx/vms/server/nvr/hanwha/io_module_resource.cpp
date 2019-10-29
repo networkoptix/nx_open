@@ -90,6 +90,7 @@ bool IoModuleResource::setIoPortDescriptions(QnIOPortDataList portDescriptors, b
 {
     {
         QnMutexLocker lock(&m_mutex);
+        m_portDescriptorsById.clear();
         for (const QnIOPortData& descriptor: portDescriptors)
             m_portDescriptorsById.emplace(descriptor.id, descriptor);
     }
