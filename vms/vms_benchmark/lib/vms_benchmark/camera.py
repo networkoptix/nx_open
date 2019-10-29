@@ -25,7 +25,7 @@ class Camera:
                 "fps": highStreamFps,
                 "recordingType": "RT_Always",
             }
-            for day_of_week in range(0, 7)
+            for day_of_week in range(1, 8)
         ]
 
         if enable:
