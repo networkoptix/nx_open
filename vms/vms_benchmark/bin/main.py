@@ -370,16 +370,21 @@ def get_cumulative_swap_bytes(box):
     return pages_swapped * 4096  # All modern OSes operate with 4k pages.
 
 
-def box_uptime(box):
-    uptime_content = box.eval('cat /proc/uptime')
+class _BoxCpuTimes:
+    def __init__(self, box: BoxConnection, cpu_cores):
+        content = box.eval('cat /proc/uptime')
+        if content is None:
+            raise exceptions.BoxFileContentError('/proc/uptime')
+        components = content.split()
+        try:
+            self.uptime_s = float(components[0])
+            idle_time_s = float(components[1])
+        except ValueError:
+            raise exceptions.BoxFileContentError('/proc/uptime')
+        self.busy_time_s = self.uptime_s - idle_time_s / cpu_cores
 
-    if uptime_content is None:
-        raise exceptions.BoxFileContentError('/proc/uptime')
-
-    uptime_components = uptime_content.split()
-    uptime_s, idle_time_s = [float(v) for v in uptime_components[0:2]]
-
-    return uptime_s, idle_time_s
+    def cpu_usage(self, prev: '_BoxCpuTimes'):
+        return (self.busy_time_s - prev.busy_time_s) / (self.uptime_s - prev.uptime_s)
 
 
 def box_tx_rx_errors(box):
@@ -709,15 +714,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 exception_collector = []
 
                 def box_poller():
-                    prev_uptime, prev_idle_time_s = None, None
+                    prev_cpu_times = None
                     try:
                         while not stop_event.isSet():
-                            uptime, idle_time_s = box_uptime(box)
-                            if prev_idle_time_s is not None and prev_uptime is not None:
-                                idle_time_delta_total_s = idle_time_s - prev_idle_time_s
-                                idle_time_delta_per_core_s = idle_time_delta_total_s / box_platform.cpu_count
-                                uptime_delta_s = uptime - prev_uptime
-                                cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
+                            cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
+                            if prev_cpu_times is not None:
+                                cpu_usage_last_minute = cpu_times.cpu_usage(prev_cpu_times)
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
@@ -726,7 +728,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                                 storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
                                 monitoring_results.append((cpu_usage_last_minute, storage_failure_event_count))
-                            prev_uptime, prev_idle_time_s = uptime, idle_time_s
+                            prev_cpu_times = cpu_times
 
                             tx_rx_errors = box_tx_rx_errors(box)
 
