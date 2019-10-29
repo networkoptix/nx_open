@@ -337,9 +337,7 @@ def report_server_storage_failures(api, streaming_started_at):
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
     report(f"        Storage failures: {storage_failure_event_count}")
-
-    if storage_failure_event_count > 0:
-        raise exceptions.StorageFailuresIssue(storage_failure_event_count)
+    return storage_failure_event_count
 
 
 def _check_storages(api, ini, camera_count):
@@ -705,6 +703,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 cpu_usage_max_collector = [None]
                 cpu_usage_avg_collector = []
                 tx_rx_errors_collector = [None]
+                monitoring_results = []
 
                 stop_event = threading.Event()
                 exception_collector = []
@@ -719,27 +718,14 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 idle_time_delta_per_core_s = idle_time_delta_total_s / box_platform.cpu_count
                                 uptime_delta_s = uptime - prev_uptime
                                 cpu_usage_last_minute = 1.0 - idle_time_delta_per_core_s / uptime_delta_s
-                                live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
-                                archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
-                                report(
-                                    f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
-                                    f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
-                                    f"dropped frames: "
-                                    f"{stream_stats['live'].frame_drops} (live), "
-                                    f"{stream_stats['archive'].frame_drops} (archive), "
-                                    f"worst stream lag: "
-                                    f"{live_worst_lag_s:.3f} s (live), "
-                                    f"{archive_worst_lag_s:.3f} s (archive).")
                                 if not cpu_usage_max_collector[0] is None:
                                     cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
                                 else:
                                     cpu_usage_max_collector[0] = cpu_usage_last_minute
                                 cpu_usage_avg_collector.append(cpu_usage_last_minute)
-                                if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                                    raise exceptions.CpuUsageThresholdExceededIssue(
-                                        cpu_usage_last_minute,
-                                        ini['cpuUsageThreshold']
-                                    )
+
+                                storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
+                                monitoring_results.append((cpu_usage_last_minute, storage_failure_event_count))
                             prev_uptime, prev_idle_time_s = uptime, idle_time_s
 
                             tx_rx_errors = box_tx_rx_errors(box)
@@ -790,6 +776,44 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         camera_id = streams[pts_stream_id]["camera_id"]
                         stream_stats[stream_type].update_with_new_frame(
                             camera_id, pts_stream_id, pts_us, timestamp_s)
+
+                        try:
+                             [cpu_usage_last_minute, storage_failure_event_count] = monitoring_results.pop()
+                        except LookupError:
+                            continue
+
+                        live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
+                        archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
+                        report(
+                            f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
+                            f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
+                            f"dropped frames: "
+                            f"{stream_stats['live'].frame_drops} (live), "
+                            f"{stream_stats['archive'].frame_drops} (archive), "
+                            f"worst stream lag: "
+                            f"{live_worst_lag_s:.3f} s (live), "
+                            f"{archive_worst_lag_s:.3f} s (archive).")
+
+                        if cpu_usage_last_minute > ini['cpuUsageThreshold']:
+                            issues.append(exceptions.CpuUsageThresholdExceededIssue(
+                                cpu_usage_last_minute,
+                                ini['cpuUsageThreshold']
+                            ))
+
+                        if storage_failure_event_count > 0:
+                            issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
+
+                        for stream_type in 'live', 'archive':
+                            if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
+                                issues.append(exceptions.VmsBenchmarkIssue(
+                                    f'{stream_stats[stream_type].frame_drops} frame drops detected '
+                                    f'in {stream_type} streams.'))
+
+                        if issues:
+                            streaming_ended_expectedly = True
+                            report(
+                                f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) aborted because of issues.")
+                            break
 
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
@@ -855,17 +879,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if ram_free_bytes is not None else '')
                     + f"        Streaming test duration: {streaming_test_duration_s} s"
                 )
-
-                for stream_type in 'live', 'archive':
-                    if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
-                        issues.append(exceptions.VmsBenchmarkIssue(
-                            f'{stream_stats[stream_type].frame_drops} frame drops detected '
-                            f'in {stream_type} streams.'))
-
-                try:
-                    report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
-                except exceptions.VmsBenchmarkIssue as e:
-                    issues.append(e)
 
                 if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
                     worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
