@@ -11,9 +11,8 @@ public:
 
     virtual std::map<LedId, LedState> ledStates() const override;
 
-    virtual bool enable(const QString& ledId) override;
+    virtual bool setState(const LedId& ledId, LedState state) override;
 
-    virtual bool disable(const QString& ledId) override;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

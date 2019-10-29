@@ -14,13 +14,7 @@ std::map<ILedController::LedId, ILedController::LedState> LedController::ledStat
     return {};
 }
 
-bool LedController::enable(const QString& ledId)
-{
-    // TODO: #dmishin implement.
-    return false;
-}
-
-bool LedController::disable(const QString& ledId)
+bool LedController::setState(const LedId& ledId, LedState state)
 {
     // TODO: #dmishin implement.
     return false;
