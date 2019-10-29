@@ -121,7 +121,7 @@ auto makeAvailabilityProviders()
 auto makeStreamProviders(StreamIndex streamIndex)
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "resolution",
             [streamIndex](const auto& r)
             {
@@ -130,7 +130,7 @@ auto makeStreamProviders(StreamIndex streamIndex)
                 return Value();
             }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "targetFps",
             [streamIndex](const auto& r)
             {
