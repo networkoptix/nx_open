@@ -131,7 +131,7 @@ TEST_F(MetricsServersApi, twoServers)
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
         EXPECT_EQ(serverValues["servers"].size(), 1);
-        EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
+        EXPECT_GT(serverValues["servers"][mainServerId]["info"].size(), 4);
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(serverValues["cameras"].size(), 0);
@@ -183,7 +183,7 @@ TEST_F(MetricsServersApi, twoServers)
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
         EXPECT_EQ(serverValues["servers"].size(), 1);
-        EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
+        EXPECT_GT(serverValues["servers"][mainServerId]["info"].size(), 4);
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
