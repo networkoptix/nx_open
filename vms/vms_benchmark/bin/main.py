@@ -592,7 +592,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 while time.time() - started_at < timeout:
                     if test_camera_context.poll() is not None:
                         raise exceptions.TestCameraError(
-                            f'Test Camera process exited unexpectedly with code '
+                            f'Virtual camera (testcamera) process exited unexpectedly with code '
                             f'{test_camera_context.returncode}')
 
                     cameras = api.get_test_cameras()
