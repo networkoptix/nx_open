@@ -384,7 +384,10 @@ class _BoxCpuTimes:
         self.busy_time_s = self.uptime_s - idle_time_s / cpu_cores
 
     def cpu_usage(self, prev: '_BoxCpuTimes'):
-        return (self.busy_time_s - prev.busy_time_s) / (self.uptime_s - prev.uptime_s)
+        value = (self.busy_time_s - prev.busy_time_s) / (self.uptime_s - prev.uptime_s)
+        if value > 1:
+            return 1
+        return value
 
 
 def box_tx_rx_errors(box):
