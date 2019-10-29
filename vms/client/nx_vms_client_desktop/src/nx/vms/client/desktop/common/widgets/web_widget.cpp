@@ -13,9 +13,9 @@
 
 namespace {
 
-using namespace std::chrono_literals;
+using namespace std::chrono;
 
-constexpr std::chrono::milliseconds kBlankPageLoadTimeout = 1s;
+constexpr milliseconds kBlankPageLoadTimeout = 1s;
 
 } // namespace
 
