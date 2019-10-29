@@ -76,6 +76,8 @@ Window
 
             LinearPaletteColorPicker
             {
+                id: palette
+
                 anchors.verticalCenter: parent.verticalCenter
 
                 colors: [
@@ -144,5 +146,7 @@ Window
     function deserializeFigure(json)
     {
         editor.deserialize(json)
+        if (!editor.hasFigure)
+            editor.color = palette.colors[Math.floor(Math.random() * palette.colors.length)]
     }
 }
