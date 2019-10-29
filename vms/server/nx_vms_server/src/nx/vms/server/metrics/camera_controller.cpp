@@ -126,7 +126,7 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "resolution",
             [streamIndex](const auto& r)
             {
-                if (auto p = r->targetParams(streamIndex))
+                if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
                     return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
                 return Value();
             }
