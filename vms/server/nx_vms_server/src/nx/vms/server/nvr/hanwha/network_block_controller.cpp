@@ -31,6 +31,22 @@ nx::vms::api::NetworkBlockData NetworkBlockController::state() const
     return makeFakeData();
 }
 
+QnUuid NetworkBlockController::registerStateChangeHandler(StateChangeHandler stateChangeHandler)
+{
+    const QnUuid id = QnUuid::createUuid();
+
+    QnMutexLocker lock(&m_handlerMutex);
+    m_handlers.emplace(id, std::move(stateChangeHandler));
+
+    return id;
+}
+
+void NetworkBlockController::unregisterStateChangeHandler(QnUuid handlerId)
+{
+    QnMutexLocker lock(&m_handlerMutex);
+    m_handlers.erase(handlerId);
+}
+
 bool NetworkBlockController::setPortPoweringModes(const PoweringModeByPort& poweringModeByPort)
 {
     // TODO: #dmishin implement.
