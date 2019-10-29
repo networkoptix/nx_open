@@ -30,6 +30,7 @@ Item
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
+            settingsView.resourceId = store.resourceId()
             var engineId = store.currentAnalyticsEngineId()
 
             if (engineId === currentEngineId)

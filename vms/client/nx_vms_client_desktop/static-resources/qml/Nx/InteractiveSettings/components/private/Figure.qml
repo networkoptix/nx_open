@@ -96,6 +96,7 @@ LabeledItem
             {
                 figureType: control.figureType
                 maxPolygonPoints: maxPoints
+                resourceId: settingsView.resourceId
 
                 onAccepted:
                 {

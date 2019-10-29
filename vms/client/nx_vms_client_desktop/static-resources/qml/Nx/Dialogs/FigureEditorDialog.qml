@@ -18,6 +18,8 @@ Window
     property alias figureType: editor.figureType
     property int maxPolygonPoints: -1
 
+    property alias resourceId: editor.resourceId
+
     Item
     {
         width: parent.width

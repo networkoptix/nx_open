@@ -357,7 +357,13 @@ void CameraSettingsDialogStore::generateLogicalId()
 void CameraSettingsDialogStore::resetExpertSettings()
 {
     d->executeAction(
-        [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+                [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+}
+
+QnUuid CameraSettingsDialogStore::resourceId() const
+{
+    return d->state.isSingleCamera()
+        ? QnUuid::fromStringSafe(d->state.singleCameraProperties.id) : QnUuid();
 }
 
 QVariantList CameraSettingsDialogStore::analyticsEngines() const
