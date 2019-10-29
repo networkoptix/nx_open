@@ -11,7 +11,9 @@ if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()
 
-nx_add_target(nx_utils LIBRARY ${library_type} WERROR NO_MOC
+nx_add_target(nx_utils LIBRARY ${library_type}
+    WERROR_IF NOT WINDOWS
+    NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
         ${ios_sources}
