@@ -1,9 +1,22 @@
 #include "platform_monitor.h"
 
+#include <nx/utils/std/algorithm.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 
 namespace nx::vms::server {
+
+std::optional<PlatformMonitor::NetworkLoad> PlatformMonitor::networkInterfaceLoad(
+    const QString& interfaceName)
+{
+    auto totalLoad = totalNetworkLoad();
+    auto interfaceLoad = nx::utils::find_if(totalLoad,
+        [interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
+    if (interfaceLoad == nullptr)
+        return {};
+
+    return *interfaceLoad;
+}
 
 QList<PlatformMonitor::NetworkLoad> PlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types)
 {

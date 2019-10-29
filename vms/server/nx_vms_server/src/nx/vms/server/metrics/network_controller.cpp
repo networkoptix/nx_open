@@ -6,6 +6,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
+#include <platform/platform_abstraction.h>
 
 namespace nx::vms::server::metrics {
 
@@ -83,6 +84,7 @@ void NetworkController::start()
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
+    auto platform = serverModule()->platform()->monitor();
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
@@ -113,10 +115,20 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "rates",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "inBps", [](const auto&) { return Value(0); } // TODO: Implement.
+                "inBps",
+                [platform](const auto& r)
+                {
+                    const auto load = platform->networkInterfaceLoad(r->name());
+                    return load ? Value(load->bytesPerSecIn) : Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "outBps", [](const auto&) { return Value(0); } // TODO: Implement.
+                "outBps",
+                [platform](const auto& r)
+                {
+                    const auto load = platform->networkInterfaceLoad(r->name());
+                    return load ? Value(load->bytesPerSecOut) : Value();
+                }
             )
         )
     );
