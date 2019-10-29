@@ -195,14 +195,14 @@ void remove_if(std::map<Key, Value>& container, UnaryPredicate predicate)
 }
 
 template<typename Container, typename UnaryPredicate>
-Container filter_if(Container values, UnaryPredicate filter)
+Container copy_if(Container values, UnaryPredicate filter)
 {
     remove_if(values, [&filter](const auto& v) { return !filter(v); });
     return values;
 }
 
 template<typename Key, typename Value, typename UnaryPredicate>
-std::map<Key, Value> filter_if(std::map<Key, Value> values, UnaryPredicate filter)
+std::map<Key, Value> copy_if(std::map<Key, Value> values, UnaryPredicate filter)
 {
     remove_if(values, [&filter](const auto& k, const auto& v) { return !filter(k, v); });
     return values;
@@ -244,7 +244,7 @@ auto flat_map(std::map<Key, std::vector<T>> values, Key delimeter = ".")
         for (int i = 0; i < vector.size(); ++i)
             result[key + delimeter + QString::number(i)] = std::move(vector[i]);
     }
-    return flat_map(result, delimeter);
+    return flat_map(std::move(result), delimeter);
 }
 
 template<typename Key, typename T>
@@ -256,7 +256,7 @@ auto flat_map(std::map<Key, std::map<Key, T>> values, Key delimeter = ".")
         for (auto& [subKey, value]: subValues)
             result[key + delimeter + subKey] = std::move(value);
     }
-    return flat_map(result, delimeter);
+    return flat_map(std::move(result), delimeter);
 }
 
 namespace detail {

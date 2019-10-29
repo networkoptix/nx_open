@@ -705,6 +705,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         nx::vms::api::MetadataStorageChangePolicy::keep,
         this);
 
+    m_specificFeaturesAdaptor = new QnJsonResourcePropertyAdaptor<std::map<QString, int>>(
+        kNameSpecificFeatures,
+        {},
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -929,6 +934,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
+        << m_specificFeaturesAdaptor
     ;
 
     return result;
@@ -1785,4 +1791,14 @@ nx::vms::api::MetadataStorageChangePolicy QnGlobalSettings::metadataStorageChang
 void QnGlobalSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value)
 {
     m_metadataStorageChangePolicyAdaptor->setValue(value);
+}
+
+std::map<QString, int> QnGlobalSettings::specificFeatures() const
+{
+    return m_specificFeaturesAdaptor->value();
+}
+
+void QnGlobalSettings::setSpecificFeatures(std::map<QString, int> value)
+{
+    m_specificFeaturesAdaptor->setValue(value);
 }

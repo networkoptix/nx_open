@@ -425,6 +425,10 @@ public:
         "How many discovery loops should pass before mark missed camera offline"
         };
 
+    Option<bool> noOutgoingConnectionsMetric{ this, "noOutgoingConnectionsMetric", false,
+        "Disable metric 'outgoingConnections'. Used for test purpose only."
+    };
+
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
     static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;

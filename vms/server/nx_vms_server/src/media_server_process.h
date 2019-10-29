@@ -259,6 +259,7 @@ private:
     void initMetricsController();
     void onBackupDbTimer();
     std::chrono::milliseconds calculateDbBackupTimeout() const;
+    void updateSpecificFeatures() const;
 
 private:
     int m_argc = 0;
