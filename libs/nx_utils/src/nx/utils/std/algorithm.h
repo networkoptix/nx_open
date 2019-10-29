@@ -195,14 +195,14 @@ void remove_if(std::map<Key, Value>& container, UnaryPredicate predicate)
 }
 
 template<typename Container, typename UnaryPredicate>
-Container filter_if(Container values, UnaryPredicate filter)
+Container copy_if(Container values, UnaryPredicate filter)
 {
     remove_if(values, [&filter](const auto& v) { return !filter(v); });
     return values;
 }
 
 template<typename Key, typename Value, typename UnaryPredicate>
-std::map<Key, Value> filter_if(std::map<Key, Value> values, UnaryPredicate filter)
+std::map<Key, Value> copy_if(std::map<Key, Value> values, UnaryPredicate filter)
 {
     remove_if(values, [&filter](const auto& k, const auto& v) { return !filter(k, v); });
     return values;

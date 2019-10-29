@@ -154,7 +154,7 @@ void NetworkController::updateInterfacesPool()
         return;
 
     NX_VERBOSE(this, "Updating network interfaces info");
-    const auto newInterfacesList = nx::utils::filter_if(QNetworkInterface::allInterfaces(),
+    const auto newInterfacesList = nx::utils::copy_if(QNetworkInterface::allInterfaces(),
         [](const auto& iface){ return !iface.flags().testFlag(QNetworkInterface::IsLoopBack); });
 
     removeDisappearedInterfaces(newInterfacesList);
