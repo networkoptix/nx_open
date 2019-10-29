@@ -147,6 +147,9 @@ public:
 
 void QnMediaServerModule::initOutgoingSocketCounter()
 {
+    if (m_settings->settings().noOutgoingConnectionsMetric())
+        return;
+
     nx::network::SocketFactory::setCreateStreamSocketFunc(
         [weakRef = this->commonModule()->metricsWeakRef()](
             bool sslRequired,
@@ -201,12 +204,14 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
     const bool isRootToolEnabled = !settings().ignoreRootTool();
     m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get()));
+    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get(), timerManager()));
     m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
 
     nx::vms::server::registerSerializers();
@@ -215,7 +220,6 @@ QnMediaServerModule::QnMediaServerModule(
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 
     initOutgoingSocketCounter();
 

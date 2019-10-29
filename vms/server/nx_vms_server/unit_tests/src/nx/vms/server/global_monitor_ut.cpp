@@ -2,12 +2,15 @@
 
 #include <thread>
 #include <platform/platform_abstraction.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx::vms::server::test {
 
 TEST(GlobalMonitor, threadCount)
 {
-    QnPlatformAbstraction platform(/*rootFs*/ nullptr);
+    nx::utils::TimerManager timerManager;
+    timerManager.stop(); //< Don't create one more thread async.
+    QnPlatformAbstraction platform(/*rootFs*/ nullptr, &timerManager);
     static const int kThreadsToCreate = 10;
 
     std::vector<std::thread> threads;

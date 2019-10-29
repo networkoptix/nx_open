@@ -30,7 +30,6 @@ CameraController::CameraController(QnMediaServerModule* serverModule):
 
 void CameraController::start()
 {
-    const auto currentServerId = serverModule()->commonModule()->moduleGUID();
     const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
         resourcePool, &QnResourcePool::resourceAdded,
@@ -122,16 +121,16 @@ auto makeAvailabilityProviders()
 auto makeStreamProviders(StreamIndex streamIndex)
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "resolution",
             [streamIndex](const auto& r)
             {
-                if (auto p = r->targetParams(streamIndex))
+                if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
                     return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
                 return Value();
             }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "targetFps",
             [streamIndex](const auto& r)
             {

@@ -384,8 +384,8 @@ QnLinuxMonitor::QnLinuxMonitor():
     d_ptr->q_ptr = this;
 }
 
-QnLinuxMonitor::~QnLinuxMonitor() {
-    return;
+QnLinuxMonitor::~QnLinuxMonitor()
+{
 }
 
 qreal QnLinuxMonitor::totalCpuUsage()

@@ -9,6 +9,15 @@
 #include "nx/vms/discovery/manager.h"
 #include <common/common_module.h>
 
+QString QnRoute::toString() const
+{
+    return lm("%1 (%2 %3)").args(
+        id,
+        gatewayId.isNull() ? QString("direct") : (
+            gatewayId.toString() + "+" + QString::number(distance)),
+        reverseConnect ? QString("reverse") : addr.toString());
+}
+
 QnRouter::QnRouter(
     QObject* parent,
     nx::vms::discovery::Manager* moduleManager)

@@ -176,6 +176,11 @@ public:
     virtual int thisProcessThreads() = 0;
 
     /**
+     * @return Network load entry for the specified network interface on this PC.
+     */
+    std::optional<NetworkLoad> networkInterfaceLoad(const QString& interfaceName);
+
+    /**
      * @returns A list of network load entries for all network interfaces of the given types on
      * this PC.
      */

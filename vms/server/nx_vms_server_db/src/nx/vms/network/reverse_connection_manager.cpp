@@ -14,49 +14,56 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/url/url_builder.h>
 
-namespace {
-
-static const int kProxyKeepAliveIntervalMs = 40 * 1000;
-static const int kProxyConnectionsToRequest = 3;
+static const size_t kProxyConnectionsToRequest = 3;
 static const std::chrono::seconds kReverseConnectionTimeout(10);
-static const std::chrono::minutes kPreperedSocketTimeout(1);
+static const std::chrono::minutes kPreparedSocketTimeout(1);
 static const QByteArray kReverseConnectionListenerPath("/proxy-reverse");
 
-} // namespace
-
-namespace nx {
-namespace vms {
-namespace network {
+namespace nx::vms::network {
 
 ReverseConnectionManager::ReverseConnectionManager(QnHttpConnectionListener* tcpListener):
-    QnCommonModuleAware(tcpListener->commonModule()),
+    AbstractServerConnector(tcpListener->commonModule()),
     m_tcpListener(tcpListener)
 {
-    tcpListener->addHandler<ReverseConnectionListener>("HTTP", kReverseConnectionListenerPath.mid(1), this);
+    tcpListener->addHandler<ReverseConnectionListener>(
+        "HTTP", kReverseConnectionListenerPath.mid(1), this);
 }
 
 void ReverseConnectionManager::startReceivingNotifications(ec2::AbstractECConnection* connection)
 {
-    connect(
+    QObject::connect(
         connection, &ec2::AbstractECConnection::reverseConnectionRequested,
-        this, &ReverseConnectionManager::at_reverseConnectionRequested);
+        this, &ReverseConnectionManager::onReverseConnectionRequest);
 }
 
 ReverseConnectionManager::~ReverseConnectionManager()
 {
-    decltype (m_runningHttpClients) httpClients;
-    decltype (m_preparedSockets) preparedSockets;
+    this->disconnect();
+
+    decltype (m_outgoingClients) outgoingClients;
+    decltype (m_incomingConnections) incomingConnections;
     {
         QnMutexLocker lock(&m_mutex);
-        std::swap(httpClients, m_runningHttpClients);
-        std::swap(preparedSockets, m_preparedSockets);
+        std::swap(outgoingClients, m_outgoingClients);
+        std::swap(incomingConnections, m_incomingConnections);
     }
-    for (const auto& client: httpClients)
+
+    for (const auto& client: outgoingClients)
         client->pleaseStopSync();
-    preparedSockets.clear();
+
+    for (auto& [id, peer]: incomingConnections)
+    {
+        peer.promiseTimer.pleaseStopSync();
+
+        for (auto& connection: peer.connections)
+            connection->pleaseStopSync();
+
+        for (auto& promise: peer.promises)
+            promise.second.set_value(nullptr);
+    }
 }
 
-void ReverseConnectionManager::at_reverseConnectionRequested(
+void ReverseConnectionManager::onReverseConnectionRequest(
     const nx::vms::api::ReverseConnectionData& data)
 {
     QnMutexLocker lock(&m_mutex);
@@ -104,172 +111,215 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
         httpClient->doConnect(
             url,
             kReverseConnectionListenerPath,
-            std::bind(&ReverseConnectionManager::onHttpClientDone, this, httpClient.get()));
+            std::bind(&ReverseConnectionManager::onOutgoingConnectDone, this, httpClient.get()));
 
-        m_runningHttpClients.insert(std::move(httpClient));
+        m_outgoingClients.insert(std::move(httpClient));
     }
 }
 
-void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* httpClient)
+void ReverseConnectionManager::onOutgoingConnectDone(nx::network::http::AsyncClient* httpClient)
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto itr = m_runningHttpClients.begin(); itr != m_runningHttpClients.end(); ++itr)
+    for (auto itr = m_outgoingClients.begin(); itr != m_outgoingClients.end(); ++itr)
     {
         if (httpClient == itr->get())
         {
             nx::network::http::AsyncClient::State state = httpClient->state();
-            if (state == nx::network::http::AsyncClient::State::sFailed)
+            if (state == nx::network::http::AsyncClient::State::sFailed || !httpClient->response())
             {
-                NX_WARNING(this, "Failed to establish reverse connection to the target server: %1",
-                    httpClient->url());
+                    NX_WARNING(this, "Outgoing system error from %1: %2",
+                        httpClient->url(), httpClient->lastSysErrorCode());
+            }
+            else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
+            {
+                NX_WARNING(this, "Outgoing HTTP error from %1: %2",
+                    httpClient->url(), httpClient->response()->statusLine.statusCode);
             }
             else
             {
-                if (!httpClient->response())
-                {
-                    NX_WARNING(this,
-                        "Failed to establish reverse connection to the target server=%1. No HTTP response", httpClient->url());
-                }
-                else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
-                {
-                    NX_WARNING(this,
-                        "Failed to establish reverse connection to the target server=%1. HTTP error code %2",
-                        httpClient->url(), httpClient->response()->statusLine.statusCode);
-                }
-                else
-                {
-                    auto socket = httpClient->takeSocket();
-                    socket->setRecvTimeout(kReverseConnectionTimeout);
-                    socket->setNonBlockingMode(false);
-                    m_tcpListener->processNewConnection(std::move(socket));
-                }
+                NX_VERBOSE(this, "Save successful outgoing connection to %1 into listener",
+                    httpClient->url());
+
+                auto socket = httpClient->takeSocket();
+                socket->setRecvTimeout(kReverseConnectionTimeout);
+                socket->setNonBlockingMode(false);
+                m_tcpListener->processNewConnection(std::move(socket));
             }
-            m_runningHttpClients.erase(itr);
+            m_outgoingClients.erase(itr);
             break;
         }
     }
 }
 
-ReverseConnectionManager::SocketData
-    ReverseConnectionManager::getPreparedSocketUnsafe(const QnUuid& guid)
-{
-    auto& socketPool = m_preparedSockets[guid];
-    if (!socketPool.sockets.empty())
-    {
-        auto result = std::move(socketPool.sockets.front());
-        socketPool.sockets.pop_front();
-        return result;
-    }
-    return SocketData();
-}
-
-std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::getProxySocket(
-    const QnUuid& guid, std::chrono::milliseconds timeout)
-{
-    NX_DEBUG(this, lit("Reverse connection to %1 is requested").arg(guid.toString()));
-
-    auto doSocketRequest = [&](int socketCount)
-    {
-        ec2::QnTransaction<nx::vms::api::ReverseConnectionData> tran(
-            ec2::ApiCommand::openReverseConnection,
-            commonModule()->moduleGUID());
-        tran.params.targetServer = commonModule()->moduleGUID();
-        tran.params.socketCount = socketCount;
-        commonModule()->ec2Connection()->messageBus()->sendTransaction(tran, guid);
-    };
-
-    QnMutexLocker lock(&m_mutex);
-    nx::utils::ElapsedTimer timer;
-    timer.restart();
-    while (!timer.hasExpired(kReverseConnectionTimeout))
-    {
-        auto socketData = getPreparedSocketUnsafe(guid);
-        if (socketData.socket)
-        {
-            lock.unlock();
-            socketData.socket->cancelIOSync(nx::network::aio::etRead);
-            return std::move(socketData.socket);
-        }
-        auto& socketPool = m_preparedSockets[guid];
-        if (socketPool.requested == 0 || socketPool.timer.hasExpired(kReverseConnectionTimeout))
-        {
-            doSocketRequest(kProxyConnectionsToRequest);
-            socketPool.requested = kProxyConnectionsToRequest;
-            socketPool.timer.restart();
-        }
-        m_proxyCondition.wait(&m_mutex, std::chrono::milliseconds(kReverseConnectionTimeout).count());
-    }
-    NX_WARNING(this, lit("Can't establish proxy connection to the remote host %1"), guid);
-    return std::unique_ptr<nx::network::AbstractStreamSocket>();
-}
-
-bool ReverseConnectionManager::addIncomingTcpConnection(
-    const QString& guid, std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+bool ReverseConnectionManager::saveIncomingConnection(const QnUuid& peerId, Connection connection)
 {
     QnMutexLocker lock(&m_mutex);
-    auto socketPool = m_preparedSockets.find(QnUuid(guid));
-    if (socketPool == m_preparedSockets.end() || socketPool->second.requested == 0)
+    const auto peer = m_incomingConnections.find(peerId);
+    if (peer == m_incomingConnections.end() || peer->second.requested == 0)
     {
-        NX_WARNING(this, lit("Reverse connection was not requested from %1").arg(guid));
+        NX_WARNING(this, "Incoming connection was not requested from %1", peerId);
         return false;
     }
 
-    --socketPool->second.requested;
+    peer->second.requested -= 1;
+    connection->setNonBlockingMode(true);
+    if (!peer->second.promises.empty())
+    {
+        // TODO: configure timeout?
+        peer->second.promises.begin()->second.set_value(std::move(connection));
+        peer->second.promises.erase(peer->second.promises.begin());
+        NX_VERBOSE(this, "Incoming connection from %1 is taken by promise (%2 still wating)",
+            peerId, peer->second.promises.size());
+        return true;
+    }
 
-    using namespace std::placeholders;
-    socket->setNonBlockingMode(true);
-    socket->setRecvTimeout(kPreperedSocketTimeout);
+    const auto connectionPtr = connection.get();
+    peer->second.connections.push_back(std::move(connection));
+    auto buffer = std::make_unique<QByteArray>();
+    buffer->reserve(1);
+    const auto bufferRawPtr = buffer.get();
+    connectionPtr->setRecvTimeout(kPreparedSocketTimeout);
+    connectionPtr->readSomeAsync(
+        bufferRawPtr,
+        [this, peerId, peer = &peer->second, connectionPtr, buffer = std::move(buffer)](
+            SystemError::ErrorCode code, size_t /*size*/)
+        {
+            QnMutexLocker lock(&m_mutex);
+            const auto it = std::find_if(peer->connections.begin(), peer->connections.end(),
+                [&connectionPtr](const auto& c) { return c.get() == connectionPtr; });
+            if (it == peer->connections.end())
+                return; // Currently connection is being taken by client request.
 
-    SocketData data;
-    data.socket = std::move(socket);
-    data.socket->readSomeAsync(data.tmpReadBuffer.get(),
-        std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), data.socket.get(), _1, _2));
+            peer->connections.erase(it);
+            NX_VERBOSE(this, "Incoming connection from %1 is closed: %2",
+                peerId, SystemError::toString(code));
+        });
 
-    socketPool->second.sockets.push_back(std::move(data));
-
-    NX_DEBUG(this, lit(
-        "Got new reverse connection from %1, there is (are) %2 avaliable and %3 requested")
-        .arg(guid).arg(socketPool->second.sockets.size()));
-
-    m_proxyCondition.wakeAll();
+    NX_VERBOSE(this, "Incoming connection from %1 is saved (%2 total)",
+        peerId, peer->second.connections.size());
     return true;
 }
 
-void ReverseConnectionManager::at_socketReadTimeout(
-    const QnUuid& serverId,
-    nx::network::AbstractStreamSocket* socket,
-    SystemError::ErrorCode /*errorCode*/,
-    size_t /*bytesRead*/)
-{
-    QnMutexLocker lock(&m_mutex);
-    auto& preparedData = m_preparedSockets[serverId];
-    preparedData.sockets.erase(std::remove_if(
-        preparedData.sockets.begin(), preparedData.sockets.end(),
-        [socket](const SocketData& data)
-        {
-            return data.socket.get() == socket;
-        }), preparedData.sockets.end());
-
-    m_proxyCondition.wakeAll();
-}
-
-std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::connectTo(
+cf::future<ReverseConnectionManager::Connection> ReverseConnectionManager::connect(
     const QnRoute& route,
-    bool sslRequired,
-    std::chrono::milliseconds timeout)
+    std::chrono::milliseconds timeout,
+    bool sslRequired)
 {
+    NX_VERBOSE(this, "Connecting to %1...", route);
     if (route.reverseConnect)
-    {
-        const auto serverId = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        return getProxySocket(serverId, timeout);
-    }
+        return reverseConnectTo(route.gatewayId.isNull() ? route.id : route.gatewayId, timeout);
 
     auto socket = nx::network::SocketFactory::createStreamSocket(sslRequired);
-    if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
-        return socket;
-    return std::unique_ptr<nx::network::AbstractStreamSocket>();
+    socket->setSendTimeout(timeout);
+    socket->setRecvTimeout(timeout);
+    socket->setNonBlockingMode(true);
+
+    cf::promise<std::unique_ptr<nx::network::AbstractStreamSocket>> promise;
+    auto future = promise.get_future();
+    socket.get()->connectAsync(
+        route.addr,
+        [this, route, socket = std::move(socket), promise = std::move(promise)](
+            SystemError::ErrorCode code) mutable
+        {
+            NX_VERBOSE(this, "Connected directly to %1", route);
+            if (code == SystemError::noError)
+                return promise.set_value(std::move(socket));
+
+            NX_VERBOSE(this, "Unable to connect to %1: %2", route, SystemError::toString(code));
+            socket.reset();
+            promise.set_value(nullptr);
+        });
+
+    return future;
 }
 
-} // namespace network
-} // namespace vms
-} // namespace nx
+cf::future<ReverseConnectionManager::Connection> ReverseConnectionManager::reverseConnectTo(
+    const QnUuid& peerId, std::chrono::milliseconds timeout)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto& peer = m_incomingConnections[peerId];
+    if (!peer.connections.empty())
+    {
+        auto connection = std::move(peer.connections.front());
+        peer.connections.pop_front();
+        NX_VERBOSE(this, "Saved connection from %1 is taken (%2 left)",
+            peerId, peer.connections.size());
+
+        lock.unlock();
+        connection->cancelIOSync(nx::network::aio::EventType::etNone);
+        return cf::make_ready_future(std::move(connection));
+    }
+
+    cf::promise<std::unique_ptr<nx::network::AbstractStreamSocket>> promise;
+    auto future = promise.get_future();
+    const auto promiseIterator = peer.promises.emplace(
+        std::chrono::steady_clock::now() + timeout, std::move(promise));
+
+    if (promiseIterator == peer.promises.begin())
+        restartPromiseTimer(peerId, &peer, timeout);
+
+    requestReverseConnections(peerId, &peer);
+    return future;
+}
+
+void ReverseConnectionManager::restartPromiseTimer(
+    const QnUuid& peerId, IncomingConnections* peer, std::chrono::milliseconds timeout)
+{
+    peer->promiseTimer.dispatch(
+        [this, peer, peerId, timeout]()
+        {
+            peer->promiseTimer.start(
+                timeout,
+                [this, peer, peerId]()
+                {
+                    const auto now = std::chrono::steady_clock::now();
+                    QnMutexLocker lock(&m_mutex);
+                    while (!peer->promises.empty() && peer->promises.begin()->first <= now)
+                    {
+                        NX_VERBOSE(this, "Notify expired promise for %1", peerId);
+                        peer->promises.begin()->second.set_value(nullptr);
+                        peer->promises.erase(peer->promises.begin());
+                    }
+
+                    if (!peer->promises.empty())
+                    {
+                        const auto tileLeft = peer->promises.begin()->first - now;
+                        restartPromiseTimer(
+                            peerId, peer, std::chrono::ceil<std::chrono::milliseconds>(tileLeft));
+                    }
+                });
+        });
+}
+
+void ReverseConnectionManager::requestReverseConnections(
+    const QnUuid& peerId, IncomingConnections* peer)
+{
+    if (peer->requested && peer->requestTimer.hasExpired(kReverseConnectionTimeout))
+    {
+        NX_WARNING(this, "%1 requested connection from %2 were never satisfied",
+            peer->requested, peerId);
+        peer->requested = 0;
+    }
+
+    if (peer->requested > peer->promises.size())
+    {
+        NX_VERBOSE(this, "Still waiting for %1 connections from %2", peer->requested, peerId);
+        return;
+    }
+
+    api::ReverseConnectionData request;
+    request.targetServer = commonModule()->moduleGUID();
+    request.socketCount = (int) std::max(
+        peer->promises.size() - peer->requested, kProxyConnectionsToRequest);
+
+    ec2::QnTransaction<nx::vms::api::ReverseConnectionData> transaction(
+        ec2::ApiCommand::openReverseConnection, request.targetServer, request);
+
+    NX_DEBUG(this, "Requesting %1 connections from %2", request.socketCount, peerId);
+    commonModule()->ec2Connection()->messageBus()->sendTransaction(transaction, peerId);
+
+    peer->requested += (size_t) request.socketCount;
+    peer->requestTimer.restart();
+}
+
+} // namespace nx::vms::network

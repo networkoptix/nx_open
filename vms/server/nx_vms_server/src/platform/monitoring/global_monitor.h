@@ -2,6 +2,7 @@
 
 #include "platform_monitor.h"
 
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/value_cache.h>
 
@@ -21,13 +22,9 @@ class GlobalMonitor: public nx::vms::server::PlatformMonitor
 public:
     static const std::chrono::milliseconds kCacheExpirationTime;
 
-    /**
-     * \param base                      Base platform monitor to get actual data from.
-     *                                  Global monitor claims ownership of this object.
-     * \param parent                    Parent of this object.
-     * \param updatePeriodMs            statistics update period. It's disabled if 0.
-     */
-    GlobalMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> base);
+    GlobalMonitor(
+        std::unique_ptr<nx::vms::server::PlatformMonitor> base,
+        nx::utils::TimerManager* timerManager);
     virtual ~GlobalMonitor();
 
     virtual void logStatistics() override;
@@ -42,9 +39,9 @@ public:
     virtual std::chrono::milliseconds updatePeriod() const override;
     virtual int thisProcessThreads() override;
     virtual void setRootFileSystem(nx::vms::server::RootFileSystem* rootFs) override;
+
 private:
     std::unique_ptr<nx::vms::server::PlatformMonitor> m_monitorBase = nullptr;
-    nx::utils::ElapsedTimer m_uptimeTimer;
 
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
@@ -53,6 +50,9 @@ private:
     nx::utils::CachedValue<QList<PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
     nx::utils::CachedValue<QList<PlatformMonitor::PartitionSpace>> m_cachedTotalPartitionSpaceInfo;
+
+    nx::utils::ElapsedTimer m_uptimeTimer;
+    nx::utils::TimerManager::TimerGuard m_timerGuard;
 };
 
 class StubMonitor: public nx::vms::server::PlatformMonitor

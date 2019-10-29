@@ -13,7 +13,7 @@ namespace nx::vms::server::test {
 class ServerForTests: public MediaServerLauncher
 {
 public:
-    ServerForTests();
+    ServerForTests(DisabledFeature disabledFeatures = DisabledFeature::all);
 
     /** Creates a server, merged to this server. */
     std::unique_ptr<ServerForTests> addServer();

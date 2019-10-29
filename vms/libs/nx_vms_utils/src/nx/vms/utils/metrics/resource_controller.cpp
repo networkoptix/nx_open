@@ -4,8 +4,10 @@
 
 namespace nx::vms::utils::metrics {
 
-api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope, bool formatted) const
+api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope, bool formatted)
 {
+    beforeValues(requestScope, formatted);
+
     NX_MUTEX_LOCKER lock(&m_mutex);
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [id, monitor]: m_monitors)
@@ -17,8 +19,10 @@ api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope,
     return groupValues;
 }
 
-api::metrics::ResourceGroupAlarms ResourceController::alarms(Scope requestScope) const
+api::metrics::ResourceGroupAlarms ResourceController::alarms(Scope requestScope)
 {
+    beforeAlarms(requestScope);
+
     NX_MUTEX_LOCKER lock(&m_mutex);
     api::metrics::ResourceGroupAlarms groupAlarms;
     for (const auto& [id, monitor]: m_monitors)

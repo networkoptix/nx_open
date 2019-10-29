@@ -32,6 +32,15 @@ public:
 
         vms::api::StorageDataList storages;
         vms::api::StorageData storage;
+
+        // Storage pool init storages async. Disable it because 'addStorage'
+        // do it manually in synchronous mode.
+        auto resourcePool = launcher->serverModule()->resourcePool();
+        launcher->serverModule()->normalStorageManager()->disconnect(resourcePool);
+        launcher->serverModule()->backupStorageManager()->disconnect(resourcePool);
+        resourcePool->disconnect(launcher->serverModule()->normalStorageManager());
+        resourcePool->disconnect(launcher->serverModule()->backupStorageManager());
+
         for (int i = 0; i < 2; ++i)
             launcher->addStorage(lm("Storage %1").arg(i));
     }
@@ -161,6 +170,7 @@ TEST_F(MetricsStoragesApi, activity)
     do
     {
         auto file = std::unique_ptr<QIODevice>(storage->open("test1.mkv", QIODevice::WriteOnly));
+        ASSERT_TRUE(file);
         std::vector<char> data(1024 * 128);
         for (int i = 0; i < 8; ++i)
             file->write(&data[0], data.size());

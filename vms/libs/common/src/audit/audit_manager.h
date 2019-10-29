@@ -39,7 +39,4 @@ public:
 
     virtual void at_connectionOpened(const QnAuthSession& session) = 0;
     virtual void at_connectionClosed(const QnAuthSession& session) = 0;
-
-    virtual void flushRecords() = 0;
-
 };

@@ -22,7 +22,8 @@ public:
 protected:
     ResourceType* add(ResourceType resource, QString id, Scope scope);
     ResourceType* add(ResourceType resource, QnUuid id, Scope scope);
-    bool remove(QString id);
+
+    using ResourceController::remove;
     bool remove(QnUuid id);
 
 private:
@@ -102,12 +103,6 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
     ResourceType resource, QnUuid id, Scope scope)
 {
     return add(std::move(resource), id.toSimpleString(), scope);
-}
-
-template<typename ResourceType>
-bool ResourceControllerImpl<ResourceType>::remove(QString id)
-{
-    return ResourceController::remove(id);
 }
 
 template<typename ResourceType>

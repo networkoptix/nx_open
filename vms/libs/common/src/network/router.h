@@ -20,6 +20,7 @@ struct QnRoute
 
     QnRoute(): reverseConnect(false), distance(0) {}
     bool isValid() const { return !addr.isNull(); }
+    QString toString() const;
 };
 
 class QnRouter: public QObject, public /*mixin*/ QnCommonModuleAware

@@ -24,10 +24,17 @@ void ReverseConnectionListener::run()
     Q_D(QnTCPConnectionProcessor);
 
     parseRequest();
-    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
-    auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
-    m_reverseConnectionManager->addIncomingTcpConnection(guid, takeSocket());
+    QnUuid id(nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME));
+    if (id.isNull())
+    {
+        return sendResponse(
+            nx::network::http::StatusCode::badRequest,
+            "Should contain UUID in header " + Qn::PROXY_SENDER_HEADER_NAME);
+    }
+
+    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
+    m_reverseConnectionManager->saveIncomingConnection(id, takeSocket());
 }
 
 } // namespace network
