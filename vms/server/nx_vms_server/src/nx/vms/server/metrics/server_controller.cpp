@@ -210,15 +210,15 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             "os",
             [](const auto& r) { return Value(r->getProperty(ResourcePropertyKey::Server::kSystemRuntime)); }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "osTime",
             [](const auto&) { return Value(dateTimeToString(QDateTime::currentDateTime())); }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTime",
             [](const auto&) { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTimeChanged",
             [this](const auto&) { return Value(getMetric(Metrics::timeChanged)); },
             timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
@@ -227,7 +227,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             "cpu",
             [](const auto& r) { return Value(r->getProperty(ResourcePropertyKey::Server::kCpuModelName)); }
         ),
-        utils::metrics::makeSystemValueProvider<Resource>(
+        utils::metrics::makeLocalValueProvider<Resource>(
             "cpuCores",
             [this](const auto&) { return Value(HardwareInformation::instance().physicalCores); }
         ),
