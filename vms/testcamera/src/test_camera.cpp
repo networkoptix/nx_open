@@ -19,6 +19,10 @@ namespace {
     static const unsigned int kSendTimeoutMs = 1000;
 }
 
+QnMutex QnTestCamera::s_logFramesFileMutex;
+
+std::unique_ptr<QFile> QnTestCamera::s_logFramesFile;
+
 QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(
     const QString& fileName,
     QnCommonModule* commonModule)
@@ -87,18 +91,21 @@ QnTestCamera::QnTestCamera(quint32 num, bool includePts): m_num(num), m_includeP
     m_offlineDuration = 0;
     m_checkTimer.restart();
 
-    const QString logFramesFile = testCameraIni().logFramesFile;
-    if (!logFramesFile.isEmpty())
     {
-        m_logFramesFile.reset(new QFile(logFramesFile));
-        if (!m_logFramesFile->open(QIODevice::WriteOnly))
+        QnMutexLocker lock(&s_logFramesFileMutex);
+        const QString logFramesFile = testCameraIni().logFramesFile;
+        if (!logFramesFile.isEmpty() && !s_logFramesFile)
         {
-            qWarning() << "Unable to open file for logging frames:" << logFramesFile;
-            m_logFramesFile.reset();
-        }
-        else
-        {
-            qDebug() << "Logging frames to" << logFramesFile;
+            s_logFramesFile.reset(new QFile(logFramesFile));
+            if (!s_logFramesFile->open(QIODevice::WriteOnly))
+            {
+                qWarning() << "Unable to open file for logging frames:" << logFramesFile;
+                s_logFramesFile.reset();
+            }
+            else
+            {
+                qDebug() << "Logging frames to" << logFramesFile;
+            }
         }
     }
 }
@@ -213,17 +220,19 @@ bool QnTestCamera::doStreamingFile(
             if (!sendAll(socket, &ptsBigEndian, sizeof(ptsBigEndian)))
                 return false;
 
-            if (m_logFramesFile)
             {
-                const QString message = lm("Camera %1: stream %2, PTS %3, dataSize %4\n").args(
-                    m_num,
-                    isSecondary ? "secondary" : "primary",
-                    video->timestamp,
-                    video->dataSize());
+                QnMutexLocker lock(&s_logFramesFileMutex);
+                if (s_logFramesFile)
+                {
+                    const QString message = lm("Camera %1: stream %2, PTS %3, dataSize %4\n").args(
+                        m_num,
+                        isSecondary ? "secondary" : "primary",
+                        video->timestamp,
+                        video->dataSize());
 
-                if (m_logFramesFile->write(message.toUtf8()) <= 0)
-                    qDebug() << "Unable to log the frame to" << m_logFramesFile->fileName();
-                m_logFramesFile->flush();
+                    if (s_logFramesFile->write(message.toUtf8()) <= 0)
+                        qDebug() << "Unable to log the frame to" << s_logFramesFile->fileName();
+                }
             }
         }
 

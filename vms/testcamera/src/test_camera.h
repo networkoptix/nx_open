@@ -6,9 +6,11 @@
 #include <QMap>
 #include <QFile>
 #include <QtCore/QMutex>
+
 #include <nx/network/socket.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
+#include <nx/utils/thread/mutex.h>
 
 
 class QnCommonModule;
@@ -56,7 +58,9 @@ private:
     QTime m_offlineTimer;
     QTime m_checkTimer;
     int m_offlineDuration;
-    std::unique_ptr<QFile> m_logFramesFile;
+
+    static QnMutex s_logFramesFileMutex;
+    static std::unique_ptr<QFile> s_logFramesFile;
 };
 
 class QnFileCache
