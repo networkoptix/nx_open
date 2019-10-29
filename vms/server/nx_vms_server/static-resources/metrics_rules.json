@@ -597,13 +597,13 @@
                     "state": {
                         "display": "table|panel"
                     },
-                    "ipList": {
-                        "name": "Other IP addresses",
-                        "display": "panel"
-                    },
                     "firstIp": {
                         "name": "IP",
                         "display": "table|panel"
+                    },
+                    "ipList": {
+                        "name": "Other IP addresses",
+                        "display": "panel"
                     }
                 }
             },

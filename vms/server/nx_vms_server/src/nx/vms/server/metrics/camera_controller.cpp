@@ -30,7 +30,6 @@ CameraController::CameraController(QnMediaServerModule* serverModule):
 
 void CameraController::start()
 {
-    const auto currentServerId = serverModule()->commonModule()->moduleGUID();
     const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
         resourcePool, &QnResourcePool::resourceAdded,
