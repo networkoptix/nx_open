@@ -117,6 +117,9 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
 
 utils::metrics::ValueProviders<ServerController::Resource> ServerController::makeLoadProviders()
 {
+    // NOTE: Some of the values from platformMonitor here are not instant ones, but an avarage
+    // calculated on a small interval.
+
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeLocalValueProvider<Resource>(
             "cpuUsageP",

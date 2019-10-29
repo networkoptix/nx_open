@@ -79,6 +79,8 @@ void NetworkController::start()
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
+    // NOTE: The values in 'rates' group are not instant ones, but an avarage calculated on a small
+    // interval.
     auto platform = serverModule()->platform()->monitor();
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
