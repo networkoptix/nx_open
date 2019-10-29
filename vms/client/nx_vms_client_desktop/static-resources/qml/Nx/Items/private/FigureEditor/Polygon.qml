@@ -85,20 +85,25 @@ Figure
             var ctx = getContext("2d")
             ctx.reset()
 
-            if (points.length < 3)
+            if (points.length < 2)
                 return
 
             ctx.strokeStyle = color
             ctx.fillStyle = ColorTheme.transparent(color, 0.3)
             ctx.fillRule = Qt.WindingFill
             ctx.lineWidth = 2
+            ctx.lineJoin = "bevel"
 
             ctx.moveTo(points[0].x, points[0].y)
             for (var i = 0; i < points.length; ++i)
                 ctx.lineTo(points[i].x, points[i].y)
-            ctx.lineTo(points[0].x, points[0].y)
 
-            ctx.fill()
+            if (points.length > 2 && !pointMakerInstrument.enabled)
+            {
+                ctx.lineTo(points[0].x, points[0].y)
+                ctx.fill()
+            }
+
             ctx.stroke()
         }
 
@@ -200,6 +205,8 @@ Figure
 
         onMoved: pointMakerInstrument.setPoint(pointIndex, Qt.point(x, y))
     }
+
+    onColorChanged: canvas.requestPaint()
 
     function refresh()
     {
