@@ -81,7 +81,6 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
 {
     // NOTE: The values in 'rates' group are not instant ones, but an avarage calculated on a small
     // interval.
-    auto platform = serverModule()->platform()->monitor();
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
@@ -113,16 +112,18 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
             "rates",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "inBps",
-                [platform](const auto& r)
+                [this](const auto& r)
                 {
+                    auto platform = serverModule()->platform()->monitor();
                     const auto load = platform->networkInterfaceLoad(r->name());
                     return load ? Value(load->bytesPerSecIn) : Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "outBps",
-                [platform](const auto& r)
+                [this](const auto& r)
                 {
+                    auto platform = serverModule()->platform()->monitor();
                     const auto load = platform->networkInterfaceLoad(r->name());
                     return load ? Value(load->bytesPerSecOut) : Value();
                 }
