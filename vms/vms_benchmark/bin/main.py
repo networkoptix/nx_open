@@ -64,228 +64,58 @@ import click
 import threading
 
 
-def to_megabytes(bytes_count):
-    return bytes_count // (1024 * 1024)
+conf_definition = {
+    "boxHostnameOrIp": {"type": "str"},
+    "boxLogin": {"type": "str", "default": ""},
+    "boxPassword": {"type": "str", "default": ""},
+    "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
+    "vmsUser": {"type": "str"},
+    "vmsPassword": {"type": "str"},
+    "virtualCameraCount": {"type": "intList", "range": [1, 999]},
+    "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
+    "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
+    "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
+    "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
+    "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
+}
 
 
-def to_percentage(share_0_1):
-    return round(share_0_1 * 100)
+ini_definition = {
+    "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
+    "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
+    "testFileHighResolution": {"type": "str", "default": "./high.ts"},
+    "testFileHighDurationMs": {"type": "int", "range": [1, None], "default": 10000},
+    "testFileLowResolution": {"type": "str", "default": "./low.ts"},
+    "testFileFps": {"type": "int", "range": [1, 999], "default": 30},
+    "testStreamFpsHigh": {"type": "int", "range": [1, 999], "default": 30},
+    "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
+    "testcameraOutputFile": {"type": "str", "default": ""},
+    "testcameraLocalInterface": {"type": "str", "default": ""},
+    "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
+    "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
+    "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
+    "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
+    "swapThresholdMegabytes": {"type": "int", "range": [0, None], "default": 0},
+    "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
+    "maxAllowedNetworkErrors": {"type": "int", "range": [0, None], "default": 0},
+    "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
+    "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
+    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 5},
+    "sshServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "sshGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "sshGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
+    "rtspPerfLinesOutputFile": {"type": "str", "default": ""},
+    "rtspPerfStderrFile": {"type": "str", "default": ""},
+    "archiveReadingPosS": {"type": "int", "range": [0, None], "default": 15},
+    "apiReadinessTimeoutSeconds": {"type": "int", "range": [1, None], "default": 30},
+    "worstAllowedStreamLagUs": {"type": "int", "range": [0, None], "default": 5_000_000},
+    "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
+}
 
 
 def load_configs(conf_file, ini_file):
-    conf_option_descriptions = {
-        "boxHostnameOrIp": {
-            "type": "str",
-        },
-        "boxLogin": {
-            "optional": True,
-            "type": "str",
-        },
-        "boxPassword": {
-            "optional": True,
-            "type": "str",
-        },
-        "boxSshPort": {
-            "optional": True,
-            "type": "int",
-            "range": [1, 65535],
-            "default": 22,
-        },
-        "vmsUser": {
-            "optional": False,
-            "type": "str",
-        },
-        "vmsPassword": {
-            "optional": False,
-            "type": "str",
-        },
-        "virtualCameraCount": {
-            "optional": False,
-            "type": "intList"
-        },
-        "liveStreamsPerCameraRatio": {
-            "optional": True,
-            "type": "float",
-            "default": 1.0,
-        },
-        "archiveStreamsPerCameraRatio": {
-            "optional": True,
-            "type": "float",
-            "default": 0.2,
-        },
-        "streamingTestDurationMinutes": {
-            "optional": True,
-            "type": "int",
-            "default": 4 * 60,
-        },
-        "cameraDiscoveryTimeoutSeconds": {
-            "optional": True,
-            "type": "int",
-            "default": 3 * 60,
-        },
-        "archiveDeletingTimeoutSeconds": {
-            "optional": True,
-            "type": "int",
-            "default": 60,
-        },
-    }
-
-    conf = ConfigParser(conf_file, conf_option_descriptions)
-
-    ini_option_descriptions = {
-        "testcameraBin": {
-            "optional": True,
-            "type": "str",
-            "default": './testcamera/testcamera'
-        },
-        "rtspPerfBin": {
-            "optional": True,
-            "type": "str",
-            "default": './testcamera/rtsp_perf'
-        },
-        "testFileHighResolution": {
-            "optional": True,
-            "type": "str",
-            "default": './high.ts'
-        },
-        "testFileHighDurationMs": {
-            "optional": True,
-            "type": "int",
-            "default": 10000
-        },
-        "testFileLowResolution": {
-            "optional": True,
-            "type": "str",
-            "default": './low.ts'
-        },
-        "testFileFps": {
-            "optional": True,
-            "type": "int",
-            "default": 30
-        },
-        "testStreamFpsHigh": {
-            "optional": True,
-            "type": "int",
-            "default": 30
-        },
-        "testStreamFpsLow": {
-            "optional": True,
-            "type": "int",
-            "default": 7
-        },
-        "testcameraOutputFile": {
-            "optional": True,
-            "type": "str",
-            "default": ''
-        },
-        "testcameraLocalInterface": {
-            "optional": True,
-            "type": "str",
-            "default": ''
-        },
-        "cpuUsageThreshold": {
-            "optional": True,
-            "type": 'float',
-            "default": 0.5
-        },
-        "archiveBitratePerCameraMbps": {
-            "optional": True,
-            "type": "int",
-            "default": 10,
-        },
-        "minimumArchiveFreeSpacePerCameraSeconds": {
-            "optional": True,
-            "type": "int",
-            "default": 240,
-        },
-        "timeDiffThresholdSeconds": {
-            "optional": True,
-            "type": 'float',
-            "default": 180
-        },
-        "swapThresholdMegabytes": {
-            "optional": True,
-            "type": "int",
-            "default": 0,
-        },
-        "sleepBeforeCheckingArchiveSeconds": {
-            "optional": True,
-            "type": "int",
-            "default": 100,
-        },
-        "maxAllowedNetworkErrors": {
-            "optional": True,
-            "type": "int",
-            "default": 0,
-        },
-        "maxAllowedFrameDrops": {
-            "optional": True,
-            "type": "int",
-            "default": 0,
-        },
-        "ramPerCameraMegabytes": {
-            "optional": True,
-            "type": "int",
-            "default": 40,
-        },
-        "sshCommandTimeoutS": {
-            "optional": True,
-            "type": "int",
-            "default": 5,
-        },
-        "sshServiceCommandTimeoutS": {
-            "optional": True,
-            "type": "int",
-            "default": 30,
-        },
-        "sshGetFileContentTimeoutS": {
-            "optional": True,
-            "type": "int",
-            "default": 30,
-        },
-        "sshGetProcMeminfoTimeoutS": {
-            "optional": True,
-            "type": "int",
-            "default": 10,
-        },
-        "rtspPerfPrintStderr": {
-            "optional": True,
-            "type": "bool",
-            "default": False,
-        },
-        "rtspPerfLinesOutputFile": {
-            "optional": True,
-            "type": "str",
-            "default": '',
-        },
-        "archiveReadingPosS": {
-            "optional": True,
-            "type": "int",
-            "default": 15,
-        },
-        "apiReadinessTimeoutSeconds": {
-            "optional": True,
-            "type": "int",
-            "default": 30,
-        },
-        "worstAllowedStreamLagUs": {
-            "optional": True,
-            "type": "int",
-            "default": 5_000_000,
-        },
-        "maxAllowedPtsDiffDeviationUs": {
-            "optional": True,
-            "type": "int",
-            "default": 2000,
-        },
-        "rtspPerfStderrFile": {
-            "optional": True,
-            "type": "str",
-            "default": '',
-        },
-    }
-
-    ini = ConfigParser(ini_file, ini_option_descriptions, is_file_optional=True)
+    conf = ConfigParser(conf_file, conf_definition)
+    ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
@@ -308,6 +138,14 @@ def load_configs(conf_file, ini_file):
         report(f"    {k}={v!r}")
 
     return conf, ini
+
+
+def to_megabytes(bytes_count):
+    return bytes_count // (1024 * 1024)
+
+
+def to_percentage(share_0_1):
+    return round(share_0_1 * 100)
 
 
 def box_combined_cpu_usage(box):

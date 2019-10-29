@@ -1,4 +1,4 @@
-import typing
+from typing import Optional, List, Dict
 
 from vms_benchmark import exceptions
 
@@ -19,15 +19,26 @@ class InvalidConfigOption(exceptions.VmsBenchmarkError):
     pass
 
 
-class ConfigOptionValueError(exceptions.VmsBenchmarkError):
-    def __init__(self, conf_file, name, value, original_exception=None):
-        super(ConfigOptionValueError, self).__init__(
-            f"Error in file {conf_file}: Invalid value {repr(value)} of option '{name}'."
-        )
-        self.original_exception = original_exception
+class InvalidConfigDefinition(Exception):
+    pass
 
 
 class ConfigParser:
+    @staticmethod
+    def _validate_option_definition(name: str, option_definition: dict, filename: str):
+        if 'type' not in option_definition:
+            raise InvalidConfigDefinition(
+                f'Missing "type" key in option {name!r} definition for {filename!r}.')
+        type_ = option_definition['type']
+
+        if type_ not in ['str', 'int', 'bool', 'float', 'intList']:
+            raise InvalidConfigDefinition(
+                f'Invalid type {type!r} in option {name!r} definition for {filename!r}.')
+
+        if type_ not in ['int', 'intList', 'float'] and 'range' in option_definition:
+            raise InvalidConfigDefinition(
+                f'Range specified for {type!r} option {name!r} definition for {filename!r}.')
+
     @staticmethod
     def _process_env_vars(string):
         import re
@@ -36,7 +47,7 @@ class ConfigParser:
             lambda match: environ.get(match.group(1), ''), string)
 
     @staticmethod
-    def _load_file(filename, is_file_optional) -> typing.Optional[dict]:
+    def _load_file(filename, is_file_optional) -> Optional[dict]:
         try:
             file = open(filename)
         except FileNotFoundError:
@@ -73,82 +84,89 @@ class ConfigParser:
     def __init__(self, filename, definition=None, is_file_optional=False):
         assert definition or not is_file_optional
 
-        options = ConfigParser._load_file(filename, is_file_optional)
-        if options is None:
-            self.options = dict()
-            self.OPTIONS_FROM_FILE = None
-        else:
-            self.options = options
-            self.OPTIONS_FROM_FILE = self.options.copy()
+        self.OPTIONS_FROM_FILE = ConfigParser._load_file(filename, is_file_optional)
+        self.options = self.OPTIONS_FROM_FILE.copy() if self.OPTIONS_FROM_FILE else {}
 
         if definition:
-            for name, _ in (
-                    (k, v) for (k, v) in definition.items() if v.get('optional', False) is False):
-                if name not in self.options.keys():
-                    raise ConfigOptionNotFound(
-                        f"Mandatory option '{name}' is not defined in {filename!r}.")
+            ConfigParser._set_option_values_using_definition(self.options, filename, definition)
 
-            for name, option_def in definition.items():
-                try:
-                    self._process_option(filename, name, option_def)
-                except InvalidConfigOption:
-                    raise
-                except Exception as e:
-                    raise ConfigOptionValueError(filename, name, self.options[name], e)
+    @staticmethod
+    def _set_option_values_using_definition(options: dict, filename, definition: dict) -> None:
+        for name in options:
+            if name not in definition:
+                raise InvalidConfigOption(f"Unexpected option {name!r} in {filename!r}.")
 
-            for name, value in self.options.items():
-                if name not in definition.keys():
-                    raise InvalidConfigOption(f"Unexpected option '{name}' in {filename!r}.")
-
-    def _process_option(self, filename, name, option_def: dict):
-        if 'default' in option_def:
-            self.options[name] = self.options.get(
-                name, option_def['default'])
-
-        if name not in self.options:
-            return
-
-        if option_def['type'] == "int":
-            self.options[name] = int(self.options[name])
-        elif option_def['type'] == "float":
-            self.options[name] = float(self.options[name])
-        elif option_def['type'] == "bool":
-            if self.options[name] in (True, 'true', 'True', 'yes', 'Yes', '1'):
-                value = True
-            elif self.options[name] in (False, 'false', 'False', 'no', 'No', '0'):
-                value = False
+        for name, option_definition in definition.items():
+            ConfigParser._validate_option_definition(name, option_definition, filename)
+            value = options.get(name, None)
+            if value:
+                range_ = option_definition.get('range', None)
+                options[name] = ConfigParser._option_value(
+                    value, filename, name, option_definition['type'], range_)
             else:
-                raise Exception(
-                    'Expected one of: true, yes, 1, false, no, 0 (case-insensitive).')
-            self.options[name] = value
-        elif option_def['type'] == 'intList':
-            value = self.options[name]
-            if not isinstance(value, list):
-                # Parse integer list from string into list. Brackets are optional.
-                if value.startswith('[') and value.endswith(']'):
-                    value_list_str = value[1:-1]
-                else:
-                    value_list_str = value
-                value_list = (
-                    [item.strip() for item in value_list_str.strip().split(',')])
-                if len(value_list) == 0 or (
-                    len(value_list) == 1 and value_list[0] == ''):
-                    raise Exception('List of integers is empty.')
-                self.options[name] = [int(item.strip()) for item in value_list]
-        elif option_def['type'] == "str":
-            value = self.options[name]
-            if ((value.startswith('"') and value.endswith('"'))
-                or (value.startswith("'") and value.endswith("'"))):
-                value = value[1:-1]
-            self.options[name] = value
-            if not ('default' in option_def) and not value:
-                raise InvalidConfigOption(
-                    f"Empty value is not allowed for option '{name}' in {filename!r}.")
-        else:
+                if 'default' not in option_definition:
+                    raise ConfigOptionNotFound(
+                        f"Mandatory option {name!r} is not defined in {filename!r}.")
+                options[name] = option_definition['default']
+
+    @staticmethod
+    def _option_value(value, filename, name: str, type_: str, range_: Optional[list]):
+        try:
+            if type_ == "int":
+                return ConfigParser._check_range(int(value), range_)
+            if type_ == "float":
+                return ConfigParser._check_range(float(value), range_)
+            if type_ == "bool":
+                return ConfigParser._bool_value(value)
+            if type_ == 'intList':
+                return ConfigParser._int_list_value(value, range_)
+            if type_ == "str":
+                return ConfigParser._str_value(value)
+        except ValueError as e:
             raise InvalidConfigOption(
-                f"Unexpected type {option_def['type']!r} "
-                f"in '{name}' option "
-                f"in the definition for {filename!r}.")
+                f"Invalid option {name!r} value {value!r} in {filename!r}: {e}")
+        raise InvalidConfigDefinition(
+            f"Unexpected type {type_!r} in option {name!r} in the definition for {filename!r}.")
+
+    @staticmethod
+    def _check_range(value, range_: Optional[list]):
+        if range_ is not None:
+            if range_[0] is not None and value < range_[0]:
+                raise ValueError(f"Must not be less than {range_[0]}.")
+            elif range_[1] and value > range_[1]:
+                raise ValueError(f"Must not be greater than {range_[1]}.")
+        return value
+
+    @staticmethod
+    def _bool_value(value: str) -> bool:
+        if value in ('true', 'True', 'yes', 'Yes', '1'):
+            return True
+        if value in ('false', 'False', 'no', 'No', '0'):
+            return False
+        raise ValueError(
+            'Expected one of: true, yes, 1, false, no, 0 (case-insensitive).')
+
+    @staticmethod
+    def _int_list_value(value: str, range_: Optional[list]) -> List[int]:
+        if value.startswith('[') and value.endswith(']'):
+            value_list_str = value[1:-1]
+        else:
+            value_list_str = value
+
+        value_list = [item.strip() for item in value_list_str.strip().split(',')]
+        if len(value_list) == 0 or (len(value_list) == 1 and value_list[0] == ''):
+            raise ValueError('The list of integers is empty.')
+        result = []
+        for item in value_list:
+            result.append(ConfigParser._check_range(int(item), range_))
+        return result
+
+    @staticmethod
+    def _str_value(value: str) -> str:
+        if ((value.startswith('"') and value.endswith('"'))
+                or (value.startswith("'") and value.endswith("'"))):
+            return value[1:-1]
+        return value
 
     def __getitem__(self, item):
         return self.options[item]
