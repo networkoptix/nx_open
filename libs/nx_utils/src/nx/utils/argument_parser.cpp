@@ -49,7 +49,7 @@ void ArgumentParser::parse(int argc, const char* argv[])
                 if (sepPos == nullptr)
                     m_args.emplace(QString::fromUtf8(arg+2), QString()); //no value
                 else
-                    m_args.emplace(QString::fromUtf8(arg+2, sepPos-(arg+2)), QString::fromUtf8(sepPos+1));
+                    m_args.emplace(QString::fromUtf8(arg+2, (int) (sepPos-(arg+2))), QString::fromUtf8(sepPos+1));
             }
             else
             {
