@@ -295,7 +295,7 @@ public:
      *      be edited by client. TODO: This should be fixed by using different properties!
      * @return true Merge has happend, false otherwise.
      */
-    bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
+    virtual bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
 
     /**
      * @param type Filters ports by type, does not filter if Qn::PT_Unknown.

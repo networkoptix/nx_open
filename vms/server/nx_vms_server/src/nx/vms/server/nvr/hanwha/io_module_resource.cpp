@@ -2,46 +2,34 @@
 
 #include <nx/vms/server/nvr/hanwha/common.h>
 
-#include <utils/common/synctime.h>
-
 #include <nx/fusion/serialization/lexical.h>
+#include <media_server/media_server_module.h>
+#include <nx/vms/server/nvr/i_service.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-static const QString kInputIdPrefix("DI");
-static const QString kOutputIdPrefix("DO");
-
-static constexpr int kInputCount = 4;
-static constexpr int kOutputCount = 2;
-
-static QnIOPortDataList portDescriptions()
+static IIoController* getIoController(QnMediaServerModule* serverModule)
 {
-    QnIOPortDataList result;
-    for (int i = 0; i < kInputCount; ++i)
-    {
-        QnIOPortData inputPort;
-        inputPort.id = kInputIdPrefix + QString::number(i);
-        inputPort.inputName = lm("Alarm Input %1").args(i + 1);
-        inputPort.portType = Qn::IOPortType::PT_Input;
-        inputPort.supportedPortTypes = Qn::IOPortType::PT_Input;
-        inputPort.iDefaultState = Qn::IODefaultState::IO_GroundedCircuit;
+    nvr::IService* const nvrService = serverModule->nvrService();
+    if (!NX_ASSERT(nvrService))
+        return nullptr;
 
-        result.push_back(std::move(inputPort));
+    nvr::IIoController* ioController = nvrService->ioController();
+    NX_ASSERT(ioController);
+    return ioController;
+}
+
+static bool verifyPortState(
+    const QnIOStateData& desiredPortState,
+    const QnIOStateDataList& currentPortStates)
+{
+    for (const auto& portState: currentPortStates)
+    {
+        if (desiredPortState.id == portState.id)
+            return desiredPortState.isActive == portState.isActive;
     }
 
-    for (int i = 0; i < kOutputCount; ++i)
-    {
-        QnIOPortData outputPort;
-        outputPort.id = kOutputIdPrefix + QString::number(i);
-        outputPort.outputName = lm("Alarm Output %1").args(i + 1);
-        outputPort.portType = Qn::IOPortType::PT_Output;
-        outputPort.supportedPortTypes = Qn::IOPortType::PT_Output;
-        outputPort.iDefaultState = Qn::IODefaultState::IO_GroundedCircuit;
-
-        result.push_back(std::move(outputPort));
-    }
-
-    return result;
+    return false;
 }
 
 IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
@@ -53,11 +41,14 @@ IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
 CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
 {
     setFlags(flags() | Qn::io_module);
-    setIoPortDescriptions(portDescriptions(), /*needMerge*/ false);
     setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
     setProperty(
         ResourcePropertyKey::kForcedLicenseType,
         QnLexical::serialized(Qn::LicenseType::LC_Free));
+
+    const nvr::IIoController* const ioController = getIoController(serverModule());
+    if (ioController)
+        setIoPortDescriptions(ioController->portDesriptiors(), /*needMerge*/ false);
 
     saveProperties();
 
@@ -71,46 +62,104 @@ QString IoModuleResource::getDriverName() const
 
 QnIOStateDataList IoModuleResource::ioPortStates() const
 {
-    // TODO: #dmsihin this is fake implementation! Don't forget to replace with the proper one.
-    QnIOStateDataList result;
-    for (int i = 0; i < kInputCount; ++i)
-    {
-        QnIOStateData inputState;
-        inputState.id = kInputIdPrefix + QString::number(i);
-        inputState.isActive = false;
-        inputState.timestamp = qnSyncTime->currentMSecsSinceEpoch();
+    const nvr::IIoController* const ioController = getIoController(serverModule());
+    if (ioController)
+        return ioController->portStates();
 
-        result.push_back(std::move(inputState));
-    }
-
-    for (int i = 0; i < kOutputCount; ++i)
-    {
-        QnIOStateData outputState;
-        outputState.id = kOutputIdPrefix + QString::number(i);
-        outputState.isActive = false;
-        outputState.timestamp = qnSyncTime->currentMSecsSinceEpoch();
-
-        result.push_back(std::move(outputState));
-    }
-
-    return result;
+    return {};
 }
 
 bool IoModuleResource::setOutputPortState(
     const QString& outputId, bool isActive, unsigned int autoResetTimeoutMs)
 {
-    // TODO: #dmishin implement.
-    return false;
+    nvr::IIoController* const ioController = getIoController(serverModule());
+    if (!ioController)
+        return false;
+
+    QnIOStateData state;
+    state.id = outputId;
+    state.isActive = isActive;
+
+    const QnIOStateDataList updatedStates =
+        ioController->setOutputPortStates({state}, std::chrono::milliseconds(autoResetTimeoutMs));
+
+    return verifyPortState(state, updatedStates);
+}
+
+bool IoModuleResource::setIoPortDescriptions(QnIOPortDataList portDescriptors, bool needMerge)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const QnIOPortData& descriptor: portDescriptors)
+            m_portDescriptorsById.emplace(descriptor.id, descriptor);
+    }
+
+    return base_type::setIoPortDescriptions(portDescriptors, needMerge);
 }
 
 void IoModuleResource::startInputPortStatesMonitoring()
 {
-    // TODO: #dmishin implement.
+    nvr::IIoController* const ioController = getIoController(serverModule());
+    if (!ioController)
+        return;
+
+    m_handlerId = ioController->registerStateChangeHandler(
+        [this](const QnIOStateDataList& state) { handleStateChange(state); });
 }
 
 void IoModuleResource::stopInputPortStatesMonitoring()
 {
-    // TODO: #dmishin implement.
+    if (m_handlerId.isNull())
+        return;
+
+    nvr::IIoController* const ioController = getIoController(serverModule());
+    if (!ioController)
+        return;
+
+    ioController->unregisterStateChangeHandler(m_handlerId);
+}
+
+std::optional<QnIOPortData> IoModuleResource::portDescriptor(const QString& portId) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (const auto it = m_portDescriptorsById.find(portId); it != m_portDescriptorsById.cend())
+        return it->second;
+
+    return std::nullopt;
+}
+
+void IoModuleResource::handleStateChange(const QnIOStateDataList& state)
+{
+    for (const QnIOStateData& portState: state)
+    {
+        const auto descriptor = portDescriptor(portState.id);
+        if (!NX_ASSERT(descriptor))
+            continue;
+
+        switch (descriptor->portType)
+        {
+            case Qn::IOPortType::PT_Input:
+            {
+                emit inputPortStateChanged(
+                    toSharedPointer(this),
+                    portState.id,
+                    portState.isActive,
+                    portState.timestamp);
+                break;
+            }
+            case Qn::IOPortType::PT_Output:
+            {
+                emit outputPortStateChanged(
+                    toSharedPointer(this),
+                    portState.id,
+                    portState.isActive,
+                    portState.timestamp);
+                break;
+            }
+            default:
+                NX_ASSERT(false, "Only the 'input' and 'output' port types are supported");
+        }
+    }
 }
 
 } // namespace nx::vms::server::nvr::hanwha
