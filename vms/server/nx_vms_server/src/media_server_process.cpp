@@ -4850,6 +4850,8 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+
+    updateSpecificFeatures();
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -5080,4 +5082,45 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(
         filter,
         nx::network::http::AuthMethod::noAuth);
+}
+
+void MediaServerProcess::updateSpecificFeatures() const
+{
+    static const QString kSpecificFeaturesFileName("specific_features.txt");
+    QDir directory(QCoreApplication::applicationDirPath());
+    for (int level = 0; !directory.exists(kSpecificFeaturesFileName); ++level)
+    {
+        if (level > 3 || !directory.cdUp())
+        {
+            NX_WARNING(this, "Unable to find %1", kSpecificFeaturesFileName);
+            return;
+        }
+    }
+
+    QFile file(directory.filePath(kSpecificFeaturesFileName));
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        NX_WARNING(this, "Unable to open %1", file.fileName());
+        return;
+    }
+
+    std::map<QString, int> values;
+    for (const auto& line: file.readAll().split('\n'))
+    {
+        const auto parts = line.split('=');
+        if (parts.size() == 2)
+            values[parts[0].trimmed()] = parts[1].toInt();
+        else
+            NX_WARNING(this, "Syntax error in %1 on line: %2", file.fileName(), line);
+    }
+
+    if (values.empty())
+    {
+        NX_WARNING(this, "File %1 does not contain any valid values", file.fileName());
+        return;
+    }
+
+    NX_INFO(this, "Update %1 to %2", file.fileName(), QJson::serialized(values));
+    serverModule()->globalSettings()->setSpecificFeatures(values);
+    serverModule()->globalSettings()->synchronizeNow();
 }

@@ -86,6 +86,7 @@ const QString kNameLastMergeSlaveId(lit("lastMergeSlaveId"));
 const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
+const QString kNameSpecificFeatures(lit("specificFeatures"));
 
 const QString ldapUri(lit("ldapUri"));
 const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -382,6 +383,8 @@ public:
     nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
     void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
 
+    std::map<QString, int> specificFeatures() const;
+    void setSpecificFeatures(std::map<QString, int> value);
 
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
@@ -546,6 +549,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
