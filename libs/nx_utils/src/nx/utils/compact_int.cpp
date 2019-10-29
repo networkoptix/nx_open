@@ -35,7 +35,7 @@ int serialize(
 {
     constexpr int kAverageSerializedNumberSize = 5;
 
-    buf->reserve(buf->size() + numbers.size() * kAverageSerializedNumberSize);
+    buf->reserve(buf->size() + (int) numbers.size() * kAverageSerializedNumberSize);
 
     return (int) std::accumulate(numbers.begin(), numbers.end(), 0,
         [buf](long long bytesWritten, long long value)

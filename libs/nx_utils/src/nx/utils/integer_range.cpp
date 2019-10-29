@@ -68,9 +68,9 @@ IntegerRange IntegerRange::operator-(qint64 delta) const
 
 IntegerRange IntegerRange::intersected(const IntegerRange& other) const
 {
-    const int first = qMax(m_first, other.m_first);
-    const int last = qMin(m_last, other.m_last);
-    return IntegerRange(first, qMax(last - first + 1, 0));
+    const auto first = qMax(m_first, other.m_first);
+    const auto last = qMin(m_last, other.m_last);
+    return IntegerRange(first, qMax<qint64>(last - first + 1, 0));
 }
 
 IntegerRange IntegerRange::operator&(const IntegerRange& other) const

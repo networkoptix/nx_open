@@ -35,7 +35,7 @@ QString fromCFStringToQString(CFStringRef str)
     if (length == 0)
         return QString();
 
-    QString string(length, Qt::Uninitialized);
+    QString string((int) length, Qt::Uninitialized);
     CFStringGetCharacters(str, CFRangeMake(0, length), reinterpret_cast<UniChar *>
         (const_cast<QChar *>(string.unicode())));
     return string;
@@ -146,7 +146,7 @@ QString symLinkTarget(const QString& linkPath)
     #if defined(Q_OS_UNIX)
         char target[PATH_MAX + 1];
         const auto path = QFile::encodeName(linkPath);
-        int len = readlink(path, target, PATH_MAX);
+        auto len = readlink(path, target, PATH_MAX);
         if (len <= 0)
             return QString();
         target[len] = '\0';

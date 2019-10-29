@@ -656,7 +656,7 @@ static int doFormatJsonString(const char* srcPtr, const char* srcEnd, char* dstP
         if (dstPtrBase && isDelimBefore)
             *dstPtr++ = *srcPtr;
     }
-    return dstPtr - dstPtrBase;
+    return (int) (dstPtr - dstPtrBase);
 }
 
 QByteArray formatJsonString(const QByteArray& data)

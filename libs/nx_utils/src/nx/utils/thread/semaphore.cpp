@@ -133,7 +133,7 @@ bool QnSemaphore::tryAcquire(int n, int timeout)
         QElapsedTimer timer;
         timer.start();
         while (n > d->avail) {
-            int elapsed = timer.elapsed();
+            auto elapsed = timer.elapsed();
             if (elapsed > timeout
                 || !d->cond.wait(locker.mutex(), timeout - elapsed))
                 return false;

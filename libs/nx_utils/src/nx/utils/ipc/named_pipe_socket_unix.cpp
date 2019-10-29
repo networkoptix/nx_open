@@ -114,7 +114,7 @@ SystemError::ErrorCode NamedPipeSocket::read(
                     continue;
                 return errCode;
             }
-            *bytesRead = numberOfBytesRead;
+            *bytesRead = (unsigned int) numberOfBytesRead;
             return SystemError::noError;
         }
         else

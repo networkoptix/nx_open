@@ -17,7 +17,7 @@ bool StreeFixture::prepareTree(
     const char* xmlDataStr,
     int parseFlags)
 {
-    auto xmlData = QByteArray::fromRawData(xmlDataStr, std::strlen(xmlDataStr));
+    auto xmlData = QByteArray::fromRawData(xmlDataStr, (int) std::strlen(xmlDataStr));
     QBuffer xmlDataSource(&xmlData);
     m_streeRoot = StreeManager::loadStree(
         &xmlDataSource,

@@ -58,7 +58,7 @@ int QnByteArrayConstRef::indexOf(char sep) const
     const value_type* sepPos = static_cast<const value_type*>(memchr(constData(), sep, size()));
     if (sepPos == NULL)
         return -1;
-    return sepPos - constData();
+    return (int) (sepPos - constData());
 }
 
 bool QnByteArrayConstRef::startsWith(const_pointer str, size_type len) const
@@ -187,12 +187,12 @@ const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[](size_type
 
 QnByteArrayConstRef::operator QByteArray() const
 {
-    return m_src ? m_src->mid(m_offset, (int)m_count) : QByteArray();
+    return m_src ? m_src->mid((int) m_offset, (int) m_count) : QByteArray();
 }
 
 QByteArray QnByteArrayConstRef::toByteArrayWithRawData() const
 {
-    return QByteArray::fromRawData(constData(), m_count);
+    return QByteArray::fromRawData(constData(), (int) m_count);
 }
 
 //-------------------------------------------------------------------------------------------------

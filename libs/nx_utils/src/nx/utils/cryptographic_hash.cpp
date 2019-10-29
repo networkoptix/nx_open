@@ -121,10 +121,10 @@ bool QnCryptographicHash::addData(QIODevice* device) {
         return false;
 
     char buffer[1024];
-    int length;
+    qint64 length;
 
     while ((length = device->read(buffer, sizeof(buffer))) > 0)
-        addData(buffer, length);
+        addData(buffer, (int) length);
 
     return device->atEnd();
 }

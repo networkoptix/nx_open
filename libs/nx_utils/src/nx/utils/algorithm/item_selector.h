@@ -170,7 +170,7 @@ void ItemSelector<ItemKey>::popupItem(
     const auto timePassed = duration_cast<milliseconds>(
         currentTime - item->lastUpdateTime);
 
-    const int distance = (timePassed / m_popupTimePerWeightUnit) / item->weight;
+    const auto distance = (timePassed / m_popupTimePerWeightUnit) / item->weight;
 
     if (item->currentDepth > distance)
     {

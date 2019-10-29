@@ -29,7 +29,7 @@ PendingOperation::PendingOperation(const Callback& callback, int intervalMs, QOb
 PendingOperation::PendingOperation(
     const Callback& callback, std::chrono::milliseconds interval, QObject* parent)
     :
-    PendingOperation(callback, interval.count(), parent)
+    PendingOperation(callback, (int) interval.count(), parent)
 {
 }
 
@@ -95,7 +95,7 @@ std::chrono::milliseconds PendingOperation::interval() const
 
 void PendingOperation::setInterval(std::chrono::milliseconds value)
 {
-    setIntervalMs(value.count());
+    setIntervalMs((int) value.count());
 }
 
 void PendingOperation::setCallback(const Callback& callback)

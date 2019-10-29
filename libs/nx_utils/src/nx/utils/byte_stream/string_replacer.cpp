@@ -14,7 +14,7 @@ int StringReplacer::write(const void* data, size_t count)
 {
     auto replaced = m_replacer.process(std::string(static_cast<const char*>(data), count));
     m_outputStream->write(replaced.data(), replaced.size());
-    return count;
+    return (int) count;
 }
 
 } // namespace nx::utils::bstream

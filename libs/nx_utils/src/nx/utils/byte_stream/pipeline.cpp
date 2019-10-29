@@ -108,7 +108,7 @@ int OutputConverterToInputAdapter::read(void* data, size_t count)
 int OutputConverterToInputAdapter::write(const void* data, size_t size)
 {
     m_convertedData.append(static_cast<const char*>(data), size);
-    return size;
+    return (int) size;
 }
 
 int OutputConverterToInputAdapter::readCachedData(void* data, size_t count)
@@ -117,7 +117,7 @@ int OutputConverterToInputAdapter::readCachedData(void* data, size_t count)
     memcpy(data, m_convertedData.data(), bytesToCopy);
     m_convertedData.erase(0, bytesToCopy);
 
-    return bytesToCopy;
+    return (int) bytesToCopy;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -189,9 +189,9 @@ int Pipe::write(const void* data, size_t count)
     if ((m_maxSize > 0) && ((std::size_t)m_buffer.size() >= m_maxSize))
         return StreamIoError::wouldBlock;
 
-    m_buffer.append(static_cast<const char*>(data), count);
+    m_buffer.append(static_cast<const char*>(data), (int) count);
     m_totalBytesThrough += count;
-    return count;
+    return (int) count;
 }
 
 int Pipe::read(void* data, size_t count)
@@ -203,9 +203,9 @@ int Pipe::read(void* data, size_t count)
 
     const auto bytesToRead = std::min<size_t>(count, m_buffer.size());
     memcpy(data, m_buffer.data(), bytesToRead);
-    m_buffer.remove(0, bytesToRead);
+    m_buffer.remove(0, (int) bytesToRead);
     m_totalBytesThrough += bytesToRead;
-    return bytesToRead;
+    return (int) bytesToRead;
 }
 
 QByteArray Pipe::readAll()
@@ -258,7 +258,7 @@ int RandomDataSource::read(void* data, size_t count)
             random::number<std::size_t>(m_readSizeRange.first, m_readSizeRange.second));
     char* charData = static_cast<char*>(data);
     std::generate(charData, charData + bytesToRead, rand);
-    return bytesToRead;
+    return (int) bytesToRead;
 }
 
 } // namespace pipeline
