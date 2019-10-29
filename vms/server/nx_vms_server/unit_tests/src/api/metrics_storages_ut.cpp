@@ -36,10 +36,6 @@ public:
         // Storage pool init storages async. Disable it because 'addStorage'
         // do it manually in synchronous mode.
         auto resourcePool = launcher->serverModule()->resourcePool();
-        launcher->serverModule()->normalStorageManager()->disconnect(resourcePool);
-        launcher->serverModule()->backupStorageManager()->disconnect(resourcePool);
-        resourcePool->disconnect(launcher->serverModule()->normalStorageManager());
-        resourcePool->disconnect(launcher->serverModule()->backupStorageManager());
 
         for (int i = 0; i < 2; ++i)
             launcher->addStorage(lm("Storage %1").arg(i));
