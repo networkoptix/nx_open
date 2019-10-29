@@ -179,9 +179,9 @@ std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
 	int result = 0;
 #if defined(_WIN32)
 	result = _stat64(filePath.c_str(), &buf);
-#elif defined(NX_UTILS_FILESYSTEM_FILEWATCHER_IOS)
+#elif defined(__APPLE__)
 	result = stat(filePath.c_str(), &buf);
-#else // linux, mac
+#else
 	result = stat64(filePath.c_str(), &buf);
 #endif // defined(_WIN32)
 
@@ -201,3 +201,4 @@ bool FileWatcher::metadataEqual(const Stat& a, const Stat& b)
 }
 
 } // namespace nx::utils::file_system
+

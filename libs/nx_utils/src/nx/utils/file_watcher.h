@@ -63,7 +63,7 @@ private:
 #if defined(_WIN32)
 	// MSVC complains about undefined struct when "using Stat = struct _stat64;"
 	struct Stat: public _stat64 {};
-#elif defined(NX_UTILS_FILESYSTEM_FILEWATCHER_IOS)
+#elif defined(__APPLE__)
 	using Stat = struct stat;
 #else // linux
 	using Stat = struct stat64;
@@ -119,3 +119,4 @@ private:
 };
 
 } // namespace nx::utils
+

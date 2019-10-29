@@ -129,7 +129,7 @@ QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt 
     return "$6$" + salt + "$" + hash;
 }
 
-bool setRootPasswordDigest( const QByteArray& userName, const QByteArray& digest )
+bool setRootPasswordDigest( const QByteArray& userName, [[maybe_unused]] const QByteArray& digest )
 {
     if( userName.isEmpty() )
         return false;

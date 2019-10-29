@@ -37,7 +37,7 @@ public:
     virtual void update(const char *data, int length) override { MD4_Update(&ctx, data, length); }
     virtual void final(unsigned char *result) override { MD4_Final(result, &ctx); }
     virtual int size() const override { return MD4_DIGEST_LENGTH; }
-    virtual QnCryptographicHashPrivate *clone() const { return new QnMd4CryptographicHashPrivate(*this); }
+    virtual QnCryptographicHashPrivate *clone() const override { return new QnMd4CryptographicHashPrivate(*this); }
 
 private:
     MD4_CTX ctx;
@@ -49,7 +49,7 @@ public:
     virtual void update(const char *data, int length) override { MD5_Update(&ctx, data, length); }
     virtual void final(unsigned char *result) override { MD5_Final(result, &ctx); }
     virtual int size() const override { return MD5_DIGEST_LENGTH; }
-    virtual QnCryptographicHashPrivate *clone() const { return new QnMd5CryptographicHashPrivate(*this); }
+    virtual QnCryptographicHashPrivate *clone() const override { return new QnMd5CryptographicHashPrivate(*this); }
 
 private:
     MD5_CTX ctx;
@@ -61,7 +61,7 @@ public:
     virtual void update(const char *data, int length) override { SHA1_Update(&ctx, data, length); }
     virtual void final(unsigned char *result) override { SHA1_Final(result, &ctx); }
     virtual int size() const override { return SHA_DIGEST_LENGTH; }
-    virtual QnCryptographicHashPrivate *clone() const { return new QnSha1CryptographicHashPrivate(*this); }
+    virtual QnCryptographicHashPrivate *clone() const override { return new QnSha1CryptographicHashPrivate(*this); }
 
 private:
     SHA_CTX ctx;
