@@ -11,6 +11,14 @@
 
 #include <utils/common/event_processors.h>
 
+namespace {
+
+using namespace std::chrono_literals;
+
+constexpr std::chrono::milliseconds kBlankPageLoadTimeout = 1s;
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 WebWidget::WebWidget(QWidget* parent):
@@ -61,8 +69,6 @@ void WebWidget::load(const QUrl& url)
 
 void WebWidget::reset()
 {
-    static const auto kBlankPageLoadTimeout = std::chrono::milliseconds(1000);
-
     m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
     //FIXME: There is no analog for StopScheduledPageRefresh
 
