@@ -402,14 +402,14 @@ class _BoxPoller:
         self._thread.start()
 
     def _count_storage_failures(self):
-        report(f"    Requesting potential failure events from the Server...")
+        logging.info("Requesting potential failure events from the Server...")
         log_events = self._api.get_events(self._start_timestamp_ms)
         storage_failure_event_count = sum(
             event['aggregationCount']
             for event in log_events
             if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
         )
-        report(f"        Storage failures: {storage_failure_event_count}")
+        logging.info(f"Storage failures: {storage_failure_event_count}")
         return storage_failure_event_count
 
     def _target(self):
