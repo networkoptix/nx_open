@@ -166,18 +166,6 @@ def box_combined_cpu_usage(box):
     return result
 
 
-def report_server_storage_failures(api, streaming_started_at):
-    report(f"    Requesting potential failure events from the Server...")
-    log_events = api.get_events(streaming_started_at)
-    storage_failure_event_count = sum(
-        event['aggregationCount']
-        for event in log_events
-        if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
-    )
-    report(f"        Storage failures: {storage_failure_event_count}")
-    return storage_failure_event_count
-
-
 def _check_storages(api, ini, camera_count):
     space_for_recordings_bytes = (
         camera_count
@@ -401,6 +389,60 @@ class _StreamTypeStats:
             self.worst_lag_us = lag_us
 
 
+class _BoxPoller:
+    def __init__(self, api, box, cpu_cores):
+        self._api = api
+        self._box = box
+        self._cpu_cores = cpu_cores
+        self._results = []
+        self.stop_event = threading.Event()
+        self.exception = None
+        self._start_timestamp_ms = round(time.time() * 1000)
+        self._thread = threading.Thread(target=self._target)
+        self._thread.start()
+
+    def _count_storage_failures(self):
+        report(f"    Requesting potential failure events from the Server...")
+        log_events = self._api.get_events(self._start_timestamp_ms)
+        storage_failure_event_count = sum(
+            event['aggregationCount']
+            for event in log_events
+            if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
+        )
+        report(f"        Storage failures: {storage_failure_event_count}")
+        return storage_failure_event_count
+
+    def _target(self):
+        try:
+            while not self.stop_event.isSet():
+                self.stop_event.wait(60)
+                cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
+                storage_failure_event_count = self._count_storage_failures()
+                tx_rx_errors = box_tx_rx_errors(self._box)
+                self._results.append((cpu_times, storage_failure_event_count, tx_rx_errors))
+        except Exception as e:
+            self.exception = e
+
+    def please_stop(self):
+        self.stop_event.set()
+
+    def is_alive(self):
+        return self._thread.is_alive()
+
+    def get_issues(self):
+        if self.exception is None:
+            return []
+        if isinstance(self.exception, exceptions.VmsBenchmarkIssue):
+            return [self.exception]
+        return [exceptions.TestCameraStreamingIssue(
+            'Unexpected error during acquiring VMS Server CPU usage. '
+            'Can be caused by network issues or Server issues.',
+            original_exception=self.exception)]
+
+    def get_results(self):
+        return self._results.pop()
+
+
 def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('')
     report('Starting load tests...')
@@ -549,50 +591,15 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
                 first_tx_rx_errors = last_tx_rx_errors = box_tx_rx_errors(box)
                 cpu_usage_max = 0
-                monitoring_results = []
-
-                stop_event = threading.Event()
-                exception_collector = []
-
-                def box_poller():
-                    try:
-                        while not stop_event.isSet():
-                            stop_event.wait(60)
-                            cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
-                            storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
-                            tx_rx_errors = box_tx_rx_errors(box)
-                            monitoring_results.append((cpu_times, storage_failure_event_count, tx_rx_errors))
-                    except Exception as e:
-                        exception_collector.append(e)
-                        return
-
-                box_poller_thread = threading.Thread(target=box_poller)
-
-                box_poller_thread.start()
+                box_poller = _BoxPoller(api, box, box_platform.cpu_count)
 
                 try:
                     while True:
                         if stream_reader_process.poll() is not None:
                             raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
 
-                        if not box_poller_thread.is_alive():
-                            if (
-                                len(exception_collector) > 0 and
-                                    isinstance(
-                                        exception_collector[0], exceptions.VmsBenchmarkIssue
-                                    )
-                            ):
-                                issues.append(exception_collector[0])
-                            else:
-                                issues.append(
-                                    exceptions.TestCameraStreamingIssue(
-                                        (
-                                            'Unexpected error during acquiring VMS Server CPU usage. '
-                                            'Can be caused by network issues or Server issues.'
-                                        ),
-                                        original_exception=(exception_collector)
-                                    )
-                                )
+                        if not box_poller.is_alive():
+                            issues.extend(box_poller.get_issues())
                             streaming_ended_expectedly = True
                             break
 
@@ -604,7 +611,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count, tx_rx_errors] = monitoring_results.pop()
+                             [cpu_times, storage_failure_event_count, tx_rx_errors] = box_poller.get_results()
                         except LookupError:
                             continue
                         cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -651,7 +658,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) finished.")
                             break
                 finally:
-                    stop_event.set()
+                    box_poller.please_stop()
 
                 if last_cpu_times is not first_cpu_times:
                     cpu_usage_avg = last_cpu_times.cpu_usage(first_cpu_times)
