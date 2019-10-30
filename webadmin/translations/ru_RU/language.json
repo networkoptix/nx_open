@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} web-интерфейс"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "пауза",
-            "help": "help | show commands",
-            "collapse all servers": "свернуть все серверы",
-            "collapse server": "collapse server + [server name]",
-            "play": "воспроизвести",
-            "clear search": "очистить поиск",
-            "live": "go to live | show me live",
-            "expand all servers": "развернуть все серверы",
-            "stop listening": "прекратить прослушивание",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Система не в сети",
         "cameraLinks": {
-            "copyToClipboard": "копировать в буфер",
             "highStream": "Выс. кач-во",
-            "copyDefaultText": "копировать",
-            "unknown": "Неизвестный",
             "lowStream": "Низ. кач-во",
             "transcoding": "Перекодирование",
+            "unknown": "Неизвестный",
+            "copyToClipboard": "копировать в буфер",
+            "copyDefaultText": "копировать",
             "copyActiveText": "скопировано в буфер обмена"
         },
-        "searchCamPlaceholder": "Поиск",
+        "systemOffline": "Система не в сети",
         "cameraStates": {
-            "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
-            "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
-            "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+            "offline": "Не в сети",
+            "error": "Ошибка",
             "unauthorized": "Требуется аутентификация",
-            "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium.",
-            "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+            "noData": "Нет данных",
+            "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+            "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео.",
             "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
             "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-            "error": "Ошибка",
-            "offline": "Не в сети",
-            "noData": "Нет данных",
-            "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео."
+            "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
+            "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+            "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+            "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
+        },
+        "searchCamPlaceholder": "Поиск",
+        "resolution": {
+            "auto": "Авто",
+            "high": "Высокая",
+            "low": "Низкая"
         },
         "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
-        "resolution": {
-            "high": "Высокая",
-            "auto": "Авто",
-            "low": "Низкая"
+        "voiceCommands": {
+            "play": "воспроизвести",
+            "pause": "пауза",
+            "live": "go to live | show me live",
+            "view": "view + [camera name]",
+            "search": "find + [text for searchbar]",
+            "clear search": "очистить поиск",
+            "expand server": "expand server + [server name]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "развернуть все серверы",
+            "collapse all servers": "свернуть все серверы",
+            "stop listening": "прекратить прослушивание",
+            "help": "help | show commands"
         }
     }
 }

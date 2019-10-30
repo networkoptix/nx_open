@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} web-käyttöliittymä"
     },
     "common": {
-        "voiceCommands": {
-            "search": "etsi + [hakupalkin teksti]",
-            "pause": "tauko",
-            "help": "apua | näytä komennot",
-            "collapse all servers": "kokoa kaikki palvelimet",
-            "collapse server": "pienennä palvelin + [palvelimen nimi]",
-            "play": "toista",
-            "clear search": "tyhjennä haku",
-            "live": "siirry reaaliaikaiseen | näytä minulle reaaliaikainen kuva",
-            "expand all servers": "laajenna kaikki palvelimet",
-            "stop listening": "lopeta kuuntelu",
-            "expand server": "laajenna palvelin + [palvelimen nimi]",
-            "view": "näkymä + [kameran nimi]"
-        },
-        "systemOffline": "Järjestelmä offline-tilassa",
         "cameraLinks": {
-            "copyToClipboard": "kopioi leikepöydälle",
             "highStream": "Korkea streami",
-            "copyDefaultText": "kopio",
-            "unknown": "Tuntematon",
             "lowStream": "Matala streami",
             "transcoding": "Transkoodaus",
+            "unknown": "Tuntematon",
+            "copyToClipboard": "kopioi leikepöydälle",
+            "copyDefaultText": "kopio",
             "copyActiveText": "kopioitu leikepöydälle"
         },
-        "searchCamPlaceholder": "Etsi",
+        "systemOffline": "Järjestelmä offline-tilassa",
         "cameraStates": {
-            "noFormat": "Tämä selain ei tue videon toistoa tästä kamerasta.",
-            "ieWin10": "Käytä Microsoft Edgen tai Google Chromen selaimia.",
-            "iosVideoTooLarge": "iOS ei tue videota, joka on suurempi kuin fullHD (2MP: 1920x1080).",
+            "offline": "Offline-tilassa",
+            "error": "Virhe",
             "unauthorized": "Tunnistus vaaditaan",
-            "ubuntuNX": "Tämä selain ei tue ARM-pohjaisia palvelimia. Käytä sen sijaan Chromium-selainta.",
-            "ieNoWebm": "Asenna <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM-koodekki</a> Internet Exploreriin.",
+            "noData": "Ei dataa",
+            "iosVideoTooLarge": "iOS ei tue videota, joka on suurempi kuin fullHD (2MP: 1920x1080).",
+            "flashRequired": "Siirry<a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> videoiden toistamiseen.",
             "flashOrWebmRequired": "Ota <a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> tai<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM koodekin</a> videon toistamiseen Internet Explorer.",
             "noArmSupport": "Tämä selain tai laite ei tue videotoistoa ARM-pohjaisista palvelimista.",
-            "error": "Virhe",
-            "offline": "Offline-tilassa",
-            "noData": "Ei dataa",
-            "flashRequired": "Siirry<a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> videoiden toistamiseen."
+            "noFormat": "Tämä selain ei tue videon toistoa tästä kamerasta.",
+            "ieNoWebm": "Asenna <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM-koodekki</a> Internet Exploreriin.",
+            "ieWin10": "Käytä Microsoft Edgen tai Google Chromen selaimia.",
+            "ubuntuNX": "Tämä selain ei tue ARM-pohjaisia palvelimia. Käytä sen sijaan Chromium-selainta."
+        },
+        "searchCamPlaceholder": "Etsi",
+        "resolution": {
+            "auto": "Automaattinen",
+            "high": "Korkea",
+            "low": "Matala"
         },
         "chromeCastWarning": "Chromecast on resursseja kuormittava ja saattaa aiheuttaa ongelmia palvelimellasi.",
-        "resolution": {
-            "high": "Korkea",
-            "auto": "Automaattinen",
-            "low": "Matala"
+        "voiceCommands": {
+            "play": "toista",
+            "pause": "tauko",
+            "live": "siirry reaaliaikaiseen | näytä minulle reaaliaikainen kuva",
+            "view": "näkymä + [kameran nimi]",
+            "search": "etsi + [hakupalkin teksti]",
+            "clear search": "tyhjennä haku",
+            "expand server": "laajenna palvelin + [palvelimen nimi]",
+            "collapse server": "pienennä palvelin + [palvelimen nimi]",
+            "expand all servers": "laajenna kaikki palvelimet",
+            "collapse all servers": "kokoa kaikki palvelimet",
+            "stop listening": "lopeta kuuntelu",
+            "help": "apua | näytä komennot"
         }
     }
 }

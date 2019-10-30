@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} interfaz web"
     },
     "common": {
-        "voiceCommands": {
-            "search": "encontrar + [texto para la barra de búsqueda]",
-            "pause": "pausa",
-            "help": "ayuda | mostrar comandos",
-            "collapse all servers": "colapsar todos los servidores",
-            "collapse server": "colapsar servidor + [nombre del servidor]",
-            "play": "reproducir",
-            "clear search": "borrar búsqueda",
-            "live": "ir a vista en vivo | muéstrame vista en vivo",
-            "expand all servers": "expandir todos los servidores",
-            "stop listening": "detener escucha",
-            "expand server": "expandir servidor + [nombre del servidor]",
-            "view": "vista + [nombre de la cámara]"
-        },
-        "systemOffline": "Sistema está desconectado",
         "cameraLinks": {
-            "copyToClipboard": "copiar a portapapeles",
             "highStream": "Corriente de alta",
-            "copyDefaultText": "copiar",
-            "unknown": "Uesconocido",
             "lowStream": "Corriente de baja",
             "transcoding": "Transcodificación",
+            "unknown": "Uesconocido",
+            "copyToClipboard": "copiar a portapapeles",
+            "copyDefaultText": "copiar",
             "copyActiveText": "copiado al portapapeles"
         },
-        "searchCamPlaceholder": "Búsqueda",
+        "systemOffline": "Sistema está desconectado",
         "cameraStates": {
-            "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
-            "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
-            "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+            "offline": "Desconectado",
+            "error": "Error",
             "unauthorized": "Autenticación necesaria",
-            "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar.",
-            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+            "noData": "No hay datos",
+            "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+            "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos.",
             "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
             "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
-            "error": "Error",
-            "offline": "Desconectado",
-            "noData": "No hay datos",
-            "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos."
+            "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
+            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+            "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
+            "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar."
+        },
+        "searchCamPlaceholder": "Búsqueda",
+        "resolution": {
+            "auto": "Auto",
+            "high": "Elevado",
+            "low": "Bajo"
         },
         "chromeCastWarning": "Chromecast consume muchos recursos y puede causar problemas en tu servidor.",
-        "resolution": {
-            "high": "Elevado",
-            "auto": "Auto",
-            "low": "Bajo"
+        "voiceCommands": {
+            "play": "reproducir",
+            "pause": "pausa",
+            "live": "ir a vista en vivo | muéstrame vista en vivo",
+            "view": "vista + [nombre de la cámara]",
+            "search": "encontrar + [texto para la barra de búsqueda]",
+            "clear search": "borrar búsqueda",
+            "expand server": "expandir servidor + [nombre del servidor]",
+            "collapse server": "colapsar servidor + [nombre del servidor]",
+            "expand all servers": "expandir todos los servidores",
+            "collapse all servers": "colapsar todos los servidores",
+            "stop listening": "detener escucha",
+            "help": "ayuda | mostrar comandos"
         }
     }
 }
