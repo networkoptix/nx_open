@@ -22,8 +22,22 @@ api::metrics::ValueGroup ValueGroupMonitor::values(Scope requiredScope, bool for
         if (requiredScope == Scope::local && monitor->scope() == Scope::system)
             continue;
 
-        if (auto value = formatted ? monitor->formattedValue() : monitor->value(); !value.isNull())
-            values[id] = std::move(value);
+        try
+        {
+            // TODO: After adding exceptions everywherem null value should be considered as
+            // completely expected case when the value should not be shown.
+            auto value = formatted ? monitor->formattedValue() : monitor->value();
+            if (!value.isNull())
+                values[id] = std::move(value);
+            else
+                NX_DEBUG(this, "Failed to get value %1: unknown reason", *monitor);
+        }
+        // TODO: Add wrapping helpers which will be used in controllers, something like:
+        //  metrics_unexpected_error, metrics_expected, etc.
+        catch (const std::exception &e)
+        {
+            NX_DEBUG(this, "Failed to get value %1: %2", *monitor, e.what());
+        }
     }
 
     return values;
