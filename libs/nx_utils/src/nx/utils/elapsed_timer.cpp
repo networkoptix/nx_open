@@ -46,7 +46,8 @@ bool ElapsedTimer::isValid() const
 
 milliseconds ElapsedTimer::elapsed() const
 {
-    NX_CRITICAL(isValid());
+    if (!NX_ASSERT(isValid()))
+        return 0ms;
     return duration_cast<milliseconds>(nx::utils::monotonicTime() - *m_lastRestartTime);
 }
 
