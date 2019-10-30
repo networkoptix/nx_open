@@ -61,6 +61,7 @@ from vms_benchmark import host_tests
 from vms_benchmark import exceptions
 
 import urllib
+import urllib.error
 import click
 import threading
 
