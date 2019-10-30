@@ -9,6 +9,7 @@
 #include <memory>
 #include <sstream>
 #include <tuple>
+#include <chrono>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -18,6 +19,8 @@ namespace nx {
 namespace axis {
 
 namespace {
+
+using namespace std::chrono_literals;
 
 template<class T>
 struct ServiceGuard
@@ -50,6 +53,13 @@ private:
     http_da_info info;
 };
 
+struct SoapTimeouts
+{
+    std::chrono::seconds connectTimeout = 5s;
+    std::chrono::seconds receiveTimeout = 5s;
+    std::chrono::seconds sendTimeout = 5s;
+};
+
 template<class Service, class Request, class Response>
 bool makeSoapRequest(
     Service& service,
@@ -57,7 +67,8 @@ bool makeSoapRequest(
     Request& request,
     Response& response,
     const char* user,
-    const char* password)
+    const char* password,
+    SoapTimeouts timeouts = SoapTimeouts{})
 {
     static const int kAuthenticationError = 401;
 
@@ -66,6 +77,11 @@ bool makeSoapRequest(
 
     // Plugin deregistering actions and memory deallocation run in ServiceGuard destructor.
     soap_register_plugin(service.soap, http_da);
+
+    service.soap->recv_timeout = std::chrono::seconds(timeouts.receiveTimeout).count();
+    service.soap->send_timeout = std::chrono::seconds(timeouts.sendTimeout).count();
+    service.soap->connect_timeout = std::chrono::seconds(timeouts.connectTimeout).count();
+
     if ((service.*method)(&request, response) == kAuthenticationError)
     {
         // One more try with advanced authentication.
