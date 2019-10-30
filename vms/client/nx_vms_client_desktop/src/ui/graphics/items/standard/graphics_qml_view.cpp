@@ -188,7 +188,7 @@ QWindow* RenderControl::renderWindow(QPoint* offset)
 struct GraphicsQmlView::Private
 {
     GraphicsQmlView* m_view;
-    bool m_initialized;
+    bool m_initialized = false;
     QScopedPointer<QQuickWindow> m_quickWindow;
     QScopedPointer<QQuickItem> m_rootItem;
     QScopedPointer<RenderControl> m_renderControl;
