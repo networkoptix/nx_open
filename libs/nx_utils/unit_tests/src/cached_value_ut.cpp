@@ -20,7 +20,7 @@ public:
     virtual void copyAssign() = 0;
 };
 
-class SpecialFunctionsNullCatcher : public SpecialFunctionsCatcher
+class SpecialFunctionsNullCatcher: public SpecialFunctionsCatcher
 {
 public:
     virtual void construct() override {}
@@ -36,10 +36,10 @@ public:
     static SpecialFunctionsCatcher* m_catcher;
 
 public:
-    SomeType(int value) : m_value(value)  { m_catcher->construct(); }
+    SomeType(int value): m_value(value)  { m_catcher->construct(); }
     ~SomeType() { m_catcher->destruct(); }
 
-    SomeType(const SomeType& other) : m_value(other.m_value) { m_catcher->copyConstruct(); }
+    SomeType(const SomeType& other): m_value(other.m_value) { m_catcher->copyConstruct(); }
     SomeType& operator=(const SomeType& other)
     {
         m_value = other.m_value;
@@ -56,7 +56,7 @@ public:
 SpecialFunctionsNullCatcher SomeType::m_defaultCatcher;
 SpecialFunctionsCatcher* SomeType::m_catcher = &SomeType::m_defaultCatcher;
 
-class SpecialFunctionsCatcherMock : public SpecialFunctionsCatcher
+class SpecialFunctionsCatcherMock: public SpecialFunctionsCatcher
 {
 public:
     MOCK_METHOD0(construct, void());
