@@ -66,7 +66,7 @@ void ValueGroupMonitor::setRules(
     for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>());
+            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>(id));
 
         NX_ASSERT(m_valueMonitors.count(id) || skipOnMissingArgument, "Unknown id in rules: %1", id);
     }

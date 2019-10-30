@@ -16,6 +16,7 @@ public:
         {
             monitors[id] = std::make_unique<ValueHistoryMonitor<TestResource>>(
                 Scope::local,
+                id,
                 resource,
                 m_getters[id] = [id](const auto& r) { return r.current(id); },
                 m_watches[id] = [id](const auto& r, auto change) { return r.monitor(id, std::move(change)); });

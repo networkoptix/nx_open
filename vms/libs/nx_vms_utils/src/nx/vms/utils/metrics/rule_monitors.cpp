@@ -347,8 +347,8 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
         };
 }
 
-ExtraValueMonitor::ExtraValueMonitor(ValueGeneratorResult formula):
-    ValueMonitor(formula.scope),
+ExtraValueMonitor::ExtraValueMonitor(QString name, ValueGeneratorResult formula):
+    ValueMonitor(formula.scope, std::move(name)),
     m_generator(std::move(formula.generator))
 {
 }

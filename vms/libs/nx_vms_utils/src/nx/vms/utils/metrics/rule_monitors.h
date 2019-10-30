@@ -25,7 +25,7 @@ NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonit
 class NX_VMS_UTILS_API ExtraValueMonitor: public ValueMonitor
 {
 public:
-    ExtraValueMonitor(ValueGeneratorResult formula = {});
+    ExtraValueMonitor(QString name, ValueGeneratorResult formula = {});
     void setGenerator(ValueGenerator generator);
 
     api::metrics::Value value() const override;
