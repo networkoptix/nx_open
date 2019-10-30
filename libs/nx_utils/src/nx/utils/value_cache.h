@@ -58,18 +58,19 @@ public:
         resetThreadUnsafe();
     }
 
-    void resetThreadUnsafe() const
-    {
-        m_timer.invalidate();
-        m_value.reset();
-    }
-
     void update()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_value = m_valueGenerator();
         if (m_expirationTime != std::chrono::milliseconds(0))
             m_timer.restart();
+    }
+
+private:
+    void resetThreadUnsafe() const
+    {
+        m_timer.invalidate();
+        m_value.reset();
     }
 
 private:
