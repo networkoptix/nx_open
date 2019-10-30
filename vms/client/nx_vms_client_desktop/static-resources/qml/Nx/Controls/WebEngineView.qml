@@ -34,6 +34,8 @@ WebEngineView
 
     signal loadingStatusChanged(int status)
     onLoadingChanged: loadingStatusChanged(loadRequest.status)
+    onJavaScriptDialogRequested: workbench.requestJavaScriptDialog(request)
+    onAuthenticationDialogRequested: workbench.requestAuthenticationDialog(request)
     profile.onDownloadRequested: workbench.requestDownload(download)
     onContextMenuRequested: function(request) { request.accepted = true }
 

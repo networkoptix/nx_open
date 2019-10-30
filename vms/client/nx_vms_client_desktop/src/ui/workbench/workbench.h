@@ -168,6 +168,18 @@ public:
      */
     Q_INVOKABLE void requestDownload(QObject* item);
 
+    /**
+     * Requests showing an alert, a confirmation, or a prompt dialog from within JavaScript
+     * to the user.
+     */
+    Q_INVOKABLE void requestJavaScriptDialog(QObject* request);
+
+    /**
+     * Request a dialog for providing authentication credentials required by proxies or
+     * HTTP servers.
+     */
+    Q_INVOKABLE void requestAuthenticationDialog(QObject* request);
+
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);
 

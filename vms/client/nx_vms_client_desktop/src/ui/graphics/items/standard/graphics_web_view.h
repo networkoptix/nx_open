@@ -51,6 +51,10 @@ public:
     static void registerObject(
         QQuickItem* webView, const QString& name, QObject* object, bool enablePromises = false);
 
+    static void requestJavaScriptDialog(QObject* request, QWidget* parent);
+
+    static void requestAuthenticationDialog(QObject* request, QWidget* parent);
+
 public slots:
     void back();
 

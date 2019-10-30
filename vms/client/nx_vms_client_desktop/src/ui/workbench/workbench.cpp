@@ -18,6 +18,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -534,4 +535,14 @@ bool QnWorkbench::isInLayoutChangeProcess() const
 void QnWorkbench::requestDownload(QObject* item)
 {
     utils::WebDownloader::download(item, context());
+}
+
+void QnWorkbench::requestJavaScriptDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestJavaScriptDialog(request, context()->mainWindowWidget());
+}
+
+void QnWorkbench::requestAuthenticationDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestAuthenticationDialog(request, context()->mainWindowWidget());
 }

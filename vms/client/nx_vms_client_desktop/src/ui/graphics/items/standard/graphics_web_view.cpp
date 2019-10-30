@@ -1,9 +1,13 @@
 #include "graphics_web_view.h"
 
 #include <QtQuick/QQuickItem>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QLineEdit>
 
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/style/webview_style.h>
+#include <ui/dialogs/common/password_dialog.h>
 
 namespace
 {
@@ -231,6 +235,85 @@ void GraphicsWebEngineView::setStatus(WebViewPageStatus value)
 
     m_status = value;
     emit statusChanged();
+}
+
+void GraphicsWebEngineView::requestJavaScriptDialog(QObject* request, QWidget* parent)
+{
+    // Should be mapped to non-public QQuickWebEngineJavaScriptDialogRequest::DialogType.
+    enum JavaScriptDialogRequestDialogType
+    {
+        DialogTypeAlert,
+        DialogTypeConfirm,
+        DialogTypePrompt,
+        DialogTypeBeforeUnload
+    };
+
+    // Prevent showing the default dialog.
+    request->setProperty("accepted", true);
+
+    // Show dialogs similar to QWebEnginePage default behavior.
+    switch (request->property("type").toInt())
+    {
+        case DialogTypeAlert:
+            QMessageBox::information(
+                parent,
+                request->property("title").toString(),
+                request->property("message").toString());
+            QMetaObject::invokeMethod(request, "dialogAccept");
+            return;
+        case DialogTypeConfirm:
+        case DialogTypeBeforeUnload:
+        {
+            const auto button = QMessageBox::information(
+                parent,
+                request->property("title").toString(),
+                request->property("message").toString(),
+                QMessageBox::Ok | QMessageBox::Cancel);
+
+            if (button == QMessageBox::Ok)
+                QMetaObject::invokeMethod(request, "dialogAccept");
+            else
+                QMetaObject::invokeMethod(request, "dialogReject");
+            return;
+        }
+        case DialogTypePrompt:
+        {
+            bool ok;
+            const QString text = QInputDialog::getText(
+                parent,
+                request->property("title").toString(),
+                request->property("message").toString(),
+                QLineEdit::Normal,
+                request->property("defaultText").toString(),
+                &ok);
+
+            if (ok)
+                QMetaObject::invokeMethod(request, "dialogAccept", Q_ARG(QString, text));
+            else
+                QMetaObject::invokeMethod(request, "dialogReject");
+            return;
+        }
+    }
+}
+
+void GraphicsWebEngineView::requestAuthenticationDialog(QObject* request, QWidget* parent)
+{
+    // Prevent showing the default dialog.
+    request->setProperty("accepted", true);
+
+    PasswordDialog dialog(parent);
+    dialog.setCaption(request->property("url").toString());
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const QString user = dialog.username();
+        const QString password = dialog.password();
+        QMetaObject::invokeMethod(request, "dialogAccept", Q_ARG(QString, user), Q_ARG(QString, password));
+    }
+    else
+    {
+        QMetaObject::invokeMethod(request, "dialogReject");
+    }
 }
 
 } // namespace nx::vms::client::desktop
