@@ -53,7 +53,7 @@ milliseconds ElapsedTimer::elapsed() const
 
 int64_t ElapsedTimer::elapsedMs() const
 {
-    return elapsed().count();
+    return duration_cast<milliseconds>(elapsed()).count();
 }
 
 } // namespace utils
