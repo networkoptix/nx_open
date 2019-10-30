@@ -316,6 +316,14 @@ _rtsp_perf_frame_regex = re.compile(
     r'.+'
     r'timestamp (?P<timestamp>\d+) us')
 
+_rtsp_perf_summary_regex = re.compile(
+    r'.+'
+    r'Total bitrate (?P<bitrate>\d+\.\d+) MBit/s, '
+    r'working sessions (?P<working>\d+), '
+    r'failed (?P<failed>\d+), '
+    r'bytes read (?P<bytes>\d+)'
+)
+
 
 def _rtsp_perf_frames(stdout, output_file_path):
     if output_file_path:
@@ -337,6 +345,11 @@ def _rtsp_perf_frames(stdout, output_file_path):
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
             yield match_res.group('stream_id'), int(match_res.group('timestamp'))
+
+        match_res = _rtsp_perf_summary_regex.match(line)
+        if match_res is not None:
+            if int(match_res.group('failed')) > 0:
+                raise exceptions.RtspPerfError("Streaming error: Some RTSP sessions failed")
 
         logging.info(f"Unrecognized line from rtsp_perf: {line}")
 
