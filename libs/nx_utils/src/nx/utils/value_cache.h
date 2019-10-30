@@ -26,7 +26,7 @@ public:
      */
     CachedValue(
         MoveOnlyFunc<ValueType()> valueGenerator,
-        std::chrono::milliseconds expirationTime = std::chrono::milliseconds(0))
+        std::chrono::milliseconds expirationTime = std::chrono::milliseconds::zero())
     :
         m_valueGenerator(std::move(valueGenerator)),
         m_expirationTime(expirationTime)
@@ -36,14 +36,11 @@ public:
     ValueType get() const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
+        bool shouldGenerateValue = !m_value.has_value()
+            || (m_expirationTime != std::chrono::milliseconds::zero()
+            && m_timer.hasExpired(m_expirationTime));
 
-        if (m_expirationTime != std::chrono::milliseconds(0)
-            && m_timer.hasExpired(m_expirationTime))
-        {
-            resetThreadUnsafe();
-        }
-
-        if (!m_value)
+        if (shouldGenerateValue)
         {
             m_value = m_valueGenerator();
             m_timer.restart();
@@ -55,22 +52,14 @@ public:
     void reset()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        resetThreadUnsafe();
+        m_value.reset();
     }
 
     void update()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_value = m_valueGenerator();
-        if (m_expirationTime != std::chrono::milliseconds(0))
-            m_timer.restart();
-    }
-
-private:
-    void resetThreadUnsafe() const
-    {
-        m_timer.invalidate();
-        m_value.reset();
+        m_timer.restart();
     }
 
 private:
