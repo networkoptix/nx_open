@@ -8,6 +8,7 @@
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/style/webview_style.h>
 #include <ui/dialogs/common/password_dialog.h>
+#include <utils/web_downloader.h>
 
 namespace
 {
@@ -314,6 +315,56 @@ void GraphicsWebEngineView::requestAuthenticationDialog(QObject* request, QWidge
     {
         QMetaObject::invokeMethod(request, "dialogReject");
     }
+}
+
+void GraphicsWebEngineView::requestFileDialog(QObject* request, QWidget* parent)
+{
+    // Should be mapped to non-public QQuickWebEngineFileDialogRequest::FileMode.
+    enum FileDialogRequestFileMode
+    {
+        FileModeOpen,
+        FileModeOpenMultiple,
+        FileModeUploadFolder,
+        FileModeSave
+    };
+
+    // Prevent showing the default dialog.
+    request->setProperty("accepted", true);
+
+    QStringList files;
+    QString str;
+
+    static constexpr auto kDefaultFileName = "defaultFileName";
+
+    // Show dialogs similar to QWebEnginePage default behavior.
+    switch (request->property("mode").toInt())
+    {
+        case FileModeOpenMultiple:
+            files = QFileDialog::getOpenFileNames(parent, QString());
+            break;
+        case FileModeUploadFolder:
+            str = QFileDialog::getExistingDirectory(parent, tr("Select folder to upload"));
+            if (!str.isNull())
+                files << str;
+            break;
+        case FileModeSave:
+            str = utils::WebDownloader::selectFile(request->property(kDefaultFileName).toString(),
+                parent);
+            if (!str.isNull())
+                files << str;
+            break;
+        case FileModeOpen:
+            str = QFileDialog::getOpenFileName(parent, QString(),
+                request->property(kDefaultFileName).toString());
+            if (!str.isNull())
+                files << str;
+            break;
+    }
+
+    if (!files.isEmpty())
+        QMetaObject::invokeMethod(request, "dialogAccept", Q_ARG(QStringList, files));
+    else
+        QMetaObject::invokeMethod(request, "dialogReject");
 }
 
 } // namespace nx::vms::client::desktop

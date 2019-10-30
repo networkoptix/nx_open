@@ -35,11 +35,11 @@ public:
     // Handle download from QWebEngine-based browser.
     static bool download(QObject* item, QnWorkbenchContext* context);
 
+    static QString selectFile(const QString& suggestedName, QWidget* widget);
+
 private:
     void startDownload();
     void setState(State state);
-
-    static QString selectFile(const QString& suggestedName, QWidget* widget);
 
 private slots:
     void cancel();

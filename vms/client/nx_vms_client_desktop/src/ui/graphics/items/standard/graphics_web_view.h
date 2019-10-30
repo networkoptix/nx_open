@@ -55,6 +55,8 @@ public:
 
     static void requestAuthenticationDialog(QObject* request, QWidget* parent);
 
+    static void requestFileDialog(QObject* request, QWidget* parent);
+
 public slots:
     void back();
 

@@ -175,10 +175,15 @@ public:
     Q_INVOKABLE void requestJavaScriptDialog(QObject* request);
 
     /**
-     * Request a dialog for providing authentication credentials required by proxies or
+     * Requests a dialog for providing authentication credentials required by proxies or
      * HTTP servers.
      */
     Q_INVOKABLE void requestAuthenticationDialog(QObject* request);
+
+    /**
+     * Requests a dialog for letting the user choose a (new or existing) file or directory.
+     */
+    Q_INVOKABLE void requestFileDialog(QObject* request);
 
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);

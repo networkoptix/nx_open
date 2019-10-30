@@ -546,3 +546,8 @@ void QnWorkbench::requestAuthenticationDialog(QObject* request)
 {
     GraphicsWebEngineView::requestAuthenticationDialog(request, context()->mainWindowWidget());
 }
+
+void QnWorkbench::requestFileDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestFileDialog(request, context()->mainWindowWidget());
+}

@@ -36,6 +36,7 @@ WebEngineView
     onLoadingChanged: loadingStatusChanged(loadRequest.status)
     onJavaScriptDialogRequested: workbench.requestJavaScriptDialog(request)
     onAuthenticationDialogRequested: workbench.requestAuthenticationDialog(request)
+    onFileDialogRequested: workbench.requestFileDialog(request)
     profile.onDownloadRequested: workbench.requestDownload(download)
     onContextMenuRequested: function(request) { request.accepted = true }
 
