@@ -58,6 +58,8 @@ private:
 
     Vector positionUnsafe() const;
 
+    std::chrono::milliseconds elapsedTime() const;
+
 private:
     mutable QnMutex m_mutex;
 

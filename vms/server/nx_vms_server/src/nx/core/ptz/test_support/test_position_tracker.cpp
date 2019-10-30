@@ -198,9 +198,16 @@ Vector TestPositionTracker::positionUnsafe() const
         m_lastStaticPosition,
         m_continuousMovementSpeed,
         m_speedCoefficientsUnitPerSecond,
-        m_continuousMoveTimer.elapsed(),
+        elapsedTime(),
         m_limits,
         m_cyclingSettings);
+}
+
+std::chrono::milliseconds TestPositionTracker::elapsedTime() const
+{
+    return m_continuousMoveTimer.isValid()
+        ? m_continuousMoveTimer.elapsed()
+        : std::chrono::milliseconds::zero();
 }
 
 void TestPositionTracker::setLimits(const QnPtzLimits& limits)
@@ -263,7 +270,7 @@ bool TestPositionTracker::genericContinuousMove(const Vector& movementVector)
             m_lastStaticPosition,
             m_continuousMovementSpeed,
             m_speedCoefficientsUnitPerSecond,
-            m_continuousMoveTimer.elapsed(),
+            elapsedTime(),
             m_limits,
             m_cyclingSettings);
     }
@@ -284,7 +291,7 @@ bool TestPositionTracker::genericRelativeMovement(const Vector& movementVector)
         m_lastStaticPosition,
         m_continuousMovementSpeed,
         m_speedCoefficientsUnitPerSecond,
-        m_continuousMoveTimer.elapsed(),
+        elapsedTime(),
         m_limits,
         m_cyclingSettings);
 
