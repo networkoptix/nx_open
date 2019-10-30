@@ -36,18 +36,21 @@ public:
     static SpecialFunctionsCatcher* m_catcher;
 
 public:
-    SomeType() { m_catcher->construct(); }
+    SomeType(int value) : m_value(value)  { m_catcher->construct(); }
     ~SomeType() { m_catcher->destruct(); }
 
-    SomeType(const SomeType&) { m_catcher->copyConstruct(); }
-    SomeType& operator=(const SomeType&)
+    SomeType(const SomeType& other) : m_value(other.m_value) { m_catcher->copyConstruct(); }
+    SomeType& operator=(const SomeType& other)
     {
+        m_value = other.m_value;
         m_catcher->copyAssign();
         return *this;
     }
 
     SomeType(SomeType&&) = default;
     SomeType& operator=(SomeType&&) = default;
+
+    int m_value;
 };
 
 SpecialFunctionsNullCatcher SomeType::m_defaultCatcher;
@@ -109,13 +112,13 @@ TEST(CachedValue, ConstructionAndCopy)
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMocks[0], 0, -1, -1, -1);
-    CachedValue<SomeType> value([]() { return SomeType(); });
+    CachedValue<SomeType> value([n = 0]() mutable { return SomeType(n++); });
 
     expectSpecialFunctionCalls(catcherMocks[1], 1, -1, 1, 0);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 0);
 
     expectSpecialFunctionCalls(catcherMocks[2], 0, -1, 1, 0);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 0);
 
     expectSpecialFunctionCalls(catcherMocks[3], 1, 1, 0, 0);
     value.update();
@@ -137,8 +140,8 @@ TEST(CachedValue, ExpirationTime)
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
-    CachedValue<SomeType> value([]() { return SomeType(); }, expiryTime);
-    value.get();
+    CachedValue<SomeType> value([n = 0]() mutable { return SomeType(n++); }, expiryTime);
+    EXPECT_EQ(value.get().m_value, 0);
 
     // Nothing should happen before any call to CachedValue.
     expectSpecialFunctionCalls(catcherMocks[1], 0, 0, 0, 0);
@@ -146,12 +149,12 @@ TEST(CachedValue, ExpirationTime)
 
     // New value should be generated after timeout.
     expectSpecialFunctionCalls(catcherMocks[2], 1, -1, 1, 0);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 1);
 
     // No new value generated before timeout.
     expectSpecialFunctionCalls(catcherMocks[3], 0, -1, 1, 0);
     timeShift.applyRelativeShift(expiryTime / 2);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 1);
 
     // Update should reset timeout and update value.
     expectSpecialFunctionCalls(catcherMocks[4], 1, -1, 0, 0);
@@ -160,12 +163,12 @@ TEST(CachedValue, ExpirationTime)
     // Make sure previous timeout didn't fire.
     expectSpecialFunctionCalls(catcherMocks[5], 0, -1, 1, 0);
     timeShift.applyRelativeShift(expiryTime / 2 + 1ms);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 2);
 
     // Make sure value regenerated after timeout by update.
     expectSpecialFunctionCalls(catcherMocks[6], 1, -1, 1, 0);
     timeShift.applyRelativeShift(expiryTime / 2 + 1ms);
-    value.get();
+    EXPECT_EQ(value.get().m_value, 3);
 
     expectSpecialFunctionCalls(catcherMocks[7], 0, 1, 0, 0);
     value.reset();
@@ -182,18 +185,18 @@ TEST(CachedValue, LongTimeOfValueGeneration)
 
     expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
     CachedValue<SomeType> value(
-        [expiryTime, &timeShift]()
+        [expiryTime, &timeShift, n = 0]() mutable
         {
             timeShift.applyRelativeShift(expiryTime + 1ms);
-            return SomeType();
+            return SomeType(n++);
         }, expiryTime);
     value.update();
-    value.get();
+    EXPECT_EQ(value.get().m_value, 0);
 
     expectSpecialFunctionCalls(catcherMocks[1], 1, -1, 2, 0);
     timeShift.applyRelativeShift(expiryTime + 1ms);
-    value.get();
-    value.get();
+    EXPECT_EQ(value.get().m_value, 1);
+    EXPECT_EQ(value.get().m_value, 1);
 }
 
 TEST(CachedValue, Concurrency)
@@ -206,13 +209,13 @@ TEST(CachedValue, Concurrency)
 
     expectSpecialFunctionCalls(catcherMock, 1, -1, 2, 0);
     CachedValue<SomeType> value(
-        [&timeShift]()
+        [&timeShift, n = 0]() mutable
         {
             timeShift.applyRelativeShift(std::chrono::milliseconds(7));
-            return SomeType();
+            return SomeType(n++);
         });
-    std::thread t1([&value](){ value.get(); });;
-    std::thread t2([&value](){ value.get(); });
+    std::thread t1([&value](){ EXPECT_EQ(value.get().m_value, 0); });;
+    std::thread t2([&value](){ EXPECT_EQ(value.get().m_value, 0); });
 
     t1.join();
     t2.join();
