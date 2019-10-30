@@ -110,7 +110,7 @@ TEST(RelativeMoveWorkaround, relativeMoveProxy)
     const ptz::Vector moveDirection(0, 0.1, 0.2, 0.3);
     ptz::Vector moveResult;
     controller->setRelativeMoveExecutor(
-        [&moveResult](const ptz::Vector& direction, const ptz::Options& options)
+        [&moveResult](const ptz::Vector& direction, const ptz::Options& /*options*/)
         {
             moveResult = direction + moveResult;
             return true;
@@ -119,7 +119,7 @@ TEST(RelativeMoveWorkaround, relativeMoveProxy)
     const qreal focusDirection = -1.0;
     qreal focusResult = 0.0;
     controller->setRelativeFocusExecutor(
-        [&focusResult](qreal direction, const ptz::Options& options)
+        [&focusResult](qreal direction, const ptz::Options& /*options*/)
         {
             focusResult += direction;
             return true;
@@ -272,9 +272,9 @@ TEST(RelativeMoveWorkaround, DISABLED_relativeMoveViaContinuousMove)
 
     controller->setGetPositionExecutor(
         [&tracker](
-            Qn::PtzCoordinateSpace space,
+            Qn::PtzCoordinateSpace /*space*/,
             ptz::Vector* outPosition,
-            const ptz::Options& options)
+            const ptz::Options& /*options*/)
         {
             *outPosition = tracker.position();
             return true;
