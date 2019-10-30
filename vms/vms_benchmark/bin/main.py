@@ -546,8 +546,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 }
                 streaming_ended_expectedly = False
                 issues = []
-                cpu_usage_max_collector = [None]
-                cpu_usage_avg_collector = []
+                first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
+                cpu_usage_max = 0
                 tx_rx_errors_collector = [None]
                 monitoring_results = []
 
@@ -555,21 +555,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 exception_collector = []
 
                 def box_poller():
-                    prev_cpu_times = None
                     try:
                         while not stop_event.isSet():
+                            stop_event.wait(60)
                             cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
-                            if prev_cpu_times is not None:
-                                cpu_usage_last_minute = cpu_times.cpu_usage(prev_cpu_times)
-                                if not cpu_usage_max_collector[0] is None:
-                                    cpu_usage_max_collector[0] = max(cpu_usage_max_collector[0], cpu_usage_last_minute)
-                                else:
-                                    cpu_usage_max_collector[0] = cpu_usage_last_minute
-                                cpu_usage_avg_collector.append(cpu_usage_last_minute)
-
-                                storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
-                                monitoring_results.append((cpu_usage_last_minute, storage_failure_event_count))
-                            prev_cpu_times = cpu_times
+                            storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
+                            monitoring_results.append((cpu_times, storage_failure_event_count))
 
                             tx_rx_errors = box_tx_rx_errors(box)
 
@@ -577,8 +568,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 tx_rx_errors_collector[0] = 0
 
                             tx_rx_errors_collector[0] += tx_rx_errors
-
-                            stop_event.wait(60)
                     except Exception as e:
                         exception_collector.append(e)
                         return
@@ -621,9 +610,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_usage_last_minute, storage_failure_event_count] = monitoring_results.pop()
+                             [cpu_times, storage_failure_event_count] = monitoring_results.pop()
                         except LookupError:
                             continue
+                        cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
+                        cpu_usage_max = max(cpu_usage_max, cpu_usage_last_minute)
+                        last_cpu_times = cpu_times
 
                         live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
                         archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
@@ -666,10 +658,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 finally:
                     stop_event.set()
 
-                cpu_usage_max = cpu_usage_max_collector[0]
-
-                if cpu_usage_avg_collector:
-                    cpu_usage_avg = sum(cpu_usage_avg_collector) / len(cpu_usage_avg_collector)
+                if last_cpu_times is not first_cpu_times:
+                    cpu_usage_avg = last_cpu_times.cpu_usage(first_cpu_times)
                 else:
                     cpu_usage_avg = None
 
