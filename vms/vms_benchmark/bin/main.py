@@ -547,8 +547,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 streaming_ended_expectedly = False
                 issues = []
                 first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
+                first_tx_rx_errors = last_tx_rx_errors = box_tx_rx_errors(box)
                 cpu_usage_max = 0
-                tx_rx_errors_collector = [None]
                 monitoring_results = []
 
                 stop_event = threading.Event()
@@ -560,14 +560,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             stop_event.wait(60)
                             cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
                             storage_failure_event_count = report_server_storage_failures(api, round(streaming_test_started_at_s * 1000))
-                            monitoring_results.append((cpu_times, storage_failure_event_count))
-
                             tx_rx_errors = box_tx_rx_errors(box)
-
-                            if tx_rx_errors_collector[0] is None:
-                                tx_rx_errors_collector[0] = 0
-
-                            tx_rx_errors_collector[0] += tx_rx_errors
+                            monitoring_results.append((cpu_times, storage_failure_event_count, tx_rx_errors))
                     except Exception as e:
                         exception_collector.append(e)
                         return
@@ -610,12 +604,13 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count] = monitoring_results.pop()
+                             [cpu_times, storage_failure_event_count, tx_rx_errors] = monitoring_results.pop()
                         except LookupError:
                             continue
                         cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
                         cpu_usage_max = max(cpu_usage_max, cpu_usage_last_minute)
                         last_cpu_times = cpu_times
+                        last_tx_rx_errors = tx_rx_errors
 
                         live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
                         archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
@@ -685,13 +680,14 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         original_exception=e
                     ))
 
-                if tx_rx_errors_collector[0] is None:
-                    tx_rx_errors_collector[0] = 0
-
-                if tx_rx_errors_collector[0] > ini['maxAllowedNetworkErrors']:
-                    issues.append(exceptions.TestCameraStreamingIssue(
-                        f"Network errors detected: {tx_rx_errors_collector[0]}"
-                    ))
+                if last_tx_rx_errors is not None and first_tx_rx_errors is not None:
+                    tx_rx_errors_during_test = last_tx_rx_errors - first_tx_rx_errors
+                    if tx_rx_errors_during_test > ini['maxAllowedNetworkErrors']:
+                        issues.append(exceptions.TestCameraStreamingIssue(
+                            f"Network errors detected: {tx_rx_errors_during_test}"
+                        ))
+                else:
+                    tx_rx_errors_during_test = None
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                 report(
@@ -699,8 +695,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     f"        Frame drops in live stream: {stream_stats['live'].frame_drops} (expected 0)\n"
                     f"        Frame drops in archive stream: {stream_stats['archive'].frame_drops} (expected 0)\n"
                     + (
-                        f"        Box network errors: {tx_rx_errors_collector[0]} (expected 0)\n"
-                        if tx_rx_errors_collector[0] is not None else '')
+                        f"        Box network errors: {tx_rx_errors_during_test} (expected 0)\n"
+                        if tx_rx_errors_during_test is not None else '')
                     + (
                         f"        Maximum box CPU usage: {cpu_usage_max * 100:.0f}%\n"
                         if cpu_usage_max is not None else '')
