@@ -165,7 +165,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 {
     // fill camera's ID
     {
-        QnMutexLocker lock(&m_discoveryMutex);
+        NX_MUTEX_LOCKER lock(&m_discoveryMutex);
         int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
         while (m_tmpForeignResources.size() <= foreignResourceIndex)
             m_tmpForeignResources.push_back(ResourceList());
@@ -432,7 +432,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
 
     std::vector<QnManualCameraInfo> newCameras;
     {
-        QnMutexLocker lock(&m_searchersListMutex);
+        NX_MUTEX_LOCKER lock(&m_searchersListMutex);
         const auto camera = resource.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->isManuallyAdded())
             return;
@@ -445,7 +445,7 @@ void QnMServerResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr & r
         registerManualCameras(newCameras);
 }
 
-void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr & resource)
+void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
@@ -454,12 +454,12 @@ void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr &
         updateSearchersUsage();
     }
 
-    QnMutexLocker lock(&m_searchersListMutex);
+    NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     m_manualCameraByUniqueId.remove(resource->getUniqueId());
     m_recentlyDeleted << resource->getUniqueId();
 
-    NX_DEBUG(this, "Manual camera %1 is deleted on %2",
-        resource->getUniqueId(), resource->getUrl());
+    NX_DEBUG(this, "Resource %1 (URL: %2) was deleted",
+        resource, nx::utils::url::hidePassword(resource->getUrl()));
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
