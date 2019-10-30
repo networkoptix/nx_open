@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Use server time</source>
-      <translation type="unfinished">Use server time</translation>
+      <translation>Serverzeit verwenden</translation>
     </message>
   </context>
   <context>
