@@ -28,8 +28,6 @@ qt_libraries = [
     'QuickWidgets',
     'QuickTemplates2',
     'QuickControls2',
-    'WebKit',
-    'WebKitWidgets',
     'WebEngine',
     'WebEngineCore',
     'WebEngineWidgets',
