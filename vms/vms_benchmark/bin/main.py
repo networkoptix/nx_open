@@ -3,6 +3,7 @@ import itertools
 import logging
 import math
 import platform
+import re
 import signal
 import sys
 import time
@@ -308,6 +309,13 @@ def _get_storages(api) -> List[Storage]:
         'Unable to get Server Storages via REST HTTP: not all Storages are initialized.')
 
 
+_rtsp_perf_frame_regex = re.compile(
+    r'.+'
+    r'vms_benchmark_stream_id=(?P<stream_id>[-\w]+)'
+    r'.+'
+    r'timestamp (?P<timestamp>\d+) us')
+
+
 def _rtsp_perf_frames(stdout, output_file_path):
     if output_file_path:
         output_file = open(output_file_path, "w")
@@ -325,22 +333,11 @@ def _rtsp_perf_frames(stdout, output_file_path):
         if line.startswith(warning_prefix):
             raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
 
-        import re
-        match_res = re.match(r'.*\/([a-z0-9-]+)\?(.*) timestamp (\d+) us', line)
-        if not match_res:
-            continue
+        match_res = _rtsp_perf_frame_regex.match(line)
+        if match_res is not None:
+            yield match_res.group('stream_id'), int(match_res.group('timestamp'))
 
-        rtsp_url_params = dict(
-            [param_pair[0], (param_pair[1] if len(param_pair) > 1 else None)]
-            for param_pair in [
-                param_pair_str.split('=')
-                for param_pair_str in match_res.group(2).split('&')
-            ]
-        )
-
-        stream_id = rtsp_url_params['vms_benchmark_stream_id']
-        pts_us = int(match_res.group(3))
-        yield stream_id, pts_us
+        logging.info(f"Unrecognized line from rtsp_perf: {line}")
 
 
 class _StreamTypeStats:
