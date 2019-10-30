@@ -6,8 +6,8 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-ini_rtsp_perf_bin = './testcamera/rtsp_perf'
-debug = False
+ini_rtsp_perf_bin: str
+ini_rtsp_perf_stderr_file: str
 
 
 @contextmanager
@@ -18,7 +18,8 @@ def stream_reader_running(
     user,
     password,
     box_ip,
-    vms_port
+    vms_port,
+    archive_read_pos_ms_utc: int,
 ):
     args = [
         ini_rtsp_perf_bin,
@@ -32,52 +33,42 @@ def stream_reader_running(
 
     streams = {}
 
-    def make_number_of_ids(count):
-        return (camera_ids[i % len(camera_ids)] for i in range(count))
+    for type, count in ('live', total_live_stream_count), ('archive', total_archive_stream_count):
+        for i in range(count):
+            camera_id = camera_ids[i % len(camera_ids)]
+            stream_id = f'{type}{i:03d}'
 
-    for camera_id, opts in (
-        [
-            [camera_id, {"type": 'live'}]
-            for camera_id in make_number_of_ids(total_live_stream_count)
-        ] + [
-            [camera_id, {"type": 'archive'}]
-            for camera_id in make_number_of_ids(total_archive_stream_count)
-        ]
-    ):
-        import uuid
-        stream_uuid = str(uuid.uuid4())
+            base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
 
-        base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
+            params = {
+                'vms_benchmark_stream_id': stream_id,
+            }
 
-        params = {
-            'vms_benchmark_stream_id': stream_uuid,
-        }
+            if type == 'archive':
+                params['pos'] = archive_read_pos_ms_utc
 
-        if opts.get('type', 'live') == 'archive':
-            params['pos'] = 0
+            params['stream'] = 0  # Request primary stream.
 
-        params['stream'] = 0
+            url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
-        url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
+            args.append('--url')
+            args.append(url)
 
-        args.append('--url')
-        args.append(url)
-
-        streams[stream_uuid] = {
-            "camera_id": camera_id,
-            "type": opts.get('type', 'live')
-        }
+            streams[stream_id] = {
+                "camera_id": camera_id,
+                "type": type
+            }
 
     # E.g. if 3 URLs are passed to rtsp_perf and --count is 5, it may open streams 1, 1, 2, 2, 3.
     args.append('--count')
     args.append(len(streams.items()))
 
-    opts = {
-        'stdout': subprocess.PIPE,
-    }
-
-    if not debug:
-        opts['stderr'] = subprocess.PIPE
+    opts = {'stdout': subprocess.PIPE}
+    if not ini_rtsp_perf_stderr_file:
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_rtsp_perf_stderr_file, 'wb')
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':

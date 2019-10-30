@@ -29,10 +29,10 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
     // Do nothing.
 }
 
-void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
+void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
 {
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
-    m_videoTranscoder->setResolution(dstVideSize);
+    m_videoTranscoder->setResolution(dstVideoSize);
 }
 
 void QnRtspFfmpegEncoder::init()
@@ -74,6 +74,9 @@ QnConstAbstractMediaDataPtr QnRtspFfmpegEncoder::transcodeVideoPacket(QnConstAbs
 
 void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
+    NX_VERBOSE(this, "Received media data: timestamp %1, dataType %2",
+        media->timestamp, media->dataType);
+
     if (m_videoTranscoder && media->dataType == QnAbstractMediaData::VIDEO)
         media = transcodeVideoPacket(media);
     if (!media)
@@ -103,7 +106,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
-    if (!m_media)
+    if (m_eofReached || !m_media)
         return false;
 
     bool hasDataContext = !m_codecCtxData.isEmpty();
@@ -132,7 +135,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     flags |= m_additionFlags;
 
     int cseq = m_media->opaque;
-
     bool isLive = m_media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (isLive) {
         cseq = m_liveMarker;
@@ -145,12 +147,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     // difference codecContext). Max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel
     // used 2 ssrc: for data and for CodecContext.
 
-    const char* dataEnd = m_media->data() + m_media->dataSize();
-    int dataRest = dataEnd - m_curDataBuffer;
-    if (m_eofReached)
-        return false; // no more data to send
-
-    if (m_curDataBuffer == m_media->data())
+    const bool isFirstPacketForFrame = m_curDataBuffer == m_media->data();
+    if (isFirstPacketForFrame)
     {
         // send data with RTP headers
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
@@ -178,7 +176,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         }
     }
 
-    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), dataRest);
+    const char* const dataEnd = m_media->data() + m_media->dataSize();
+    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), int(dataEnd - m_curDataBuffer));
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
 
@@ -186,6 +185,12 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     nx::streaming::rtp::RtpHeader* rtpHeader =
         (nx::streaming::rtp::RtpHeader*)(sendBuffer.data() + dataStartIndex);
     rtpHeader->marker = m_eofReached;
+
+    NX_VERBOSE(this, "Made RTP packet: isFirst %1, timestamp %2, sequence %3",
+        isFirstPacketForFrame ? "true" : "false",
+        m_media->timestamp,
+        qFromBigEndian(rtpHeader->sequence));
+
     return true;
 }
 

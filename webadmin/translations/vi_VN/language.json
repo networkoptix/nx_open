@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} giao diện web"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "giờ nghĩ giảo lao",
-            "help": "help | show commands",
-            "collapse all servers": "tất cả máy chủ mất ổn định",
-            "collapse server": "collapse server + [server name]",
-            "play": "broadcast",
-            "clear search": "xóa tìm kiếm",
-            "live": "go to live | show me live",
-            "expand all servers": "mở rộng tất cả các máy chủ",
-            "stop listening": "ngừng lắng nghe",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Hệ thống offline",
         "cameraLinks": {
-            "copyToClipboard": "sao chép vào clipboard",
             "highStream": "Luồng tốc độ cao",
-            "copyDefaultText": "bản sao",
-            "unknown": "Không xác định",
             "lowStream": "Luồng tốc độ thấp",
             "transcoding": "Đang chuyển mã",
+            "unknown": "Không xác định",
+            "copyToClipboard": "sao chép vào clipboard",
+            "copyDefaultText": "bản sao",
             "copyActiveText": "đã sao chép vào clipboard"
         },
-        "searchCamPlaceholder": "Tìm kiếm",
+        "systemOffline": "Hệ thống offline",
         "cameraStates": {
-            "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
-            "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
-            "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+            "offline": "Ẩn",
+            "error": "Lỗi",
             "unauthorized": "Yêu cầu xác thực",
-            "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
-            "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+            "noData": "Không có dữ liệu",
+            "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video.",
             "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
             "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
-            "error": "Lỗi",
-            "offline": "Ẩn",
-            "noData": "Không có dữ liệu",
-            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video."
+            "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
+            "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+            "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
+            "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế."
+        },
+        "searchCamPlaceholder": "Tìm kiếm",
+        "resolution": {
+            "auto": "Tự động",
+            "high": "cao (H)",
+            "low": "Thấp (L)"
         },
         "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
-        "resolution": {
-            "high": "cao (H)",
-            "auto": "Tự động",
-            "low": "Thấp (L)"
+        "voiceCommands": {
+            "play": "broadcast",
+            "pause": "giờ nghĩ giảo lao",
+            "live": "go to live | show me live",
+            "view": "view + [camera name]",
+            "search": "find + [text for searchbar]",
+            "clear search": "xóa tìm kiếm",
+            "expand server": "expand server + [server name]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "mở rộng tất cả các máy chủ",
+            "collapse all servers": "tất cả máy chủ mất ổn định",
+            "stop listening": "ngừng lắng nghe",
+            "help": "help | show commands"
         }
     }
 }

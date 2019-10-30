@@ -6,9 +6,11 @@
 #include <QMap>
 #include <QFile>
 #include <QtCore/QMutex>
+
 #include <nx/network/socket.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
+#include <nx/utils/thread/mutex.h>
 
 
 class QnCommonModule;
@@ -16,7 +18,6 @@ class QnCommonModule;
 class QnTestCamera
 {
 public:
-
     QnTestCamera(quint32 num, bool includePts);
 
     QByteArray getMac() const;
@@ -33,10 +34,17 @@ public:
         QnCommonModule* commonModule);
 
     bool isEnabled();
+
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, nx::network::AbstractStreamSocket* socket, int fps);
+    bool doStreamingFile(
+        QList<QnCompressedVideoDataPtr> data,
+        nx::network::AbstractStreamSocket* socket,
+        int fps,
+        bool isSecondary);
+
     void makeOfflineFlood();
     int sendAll(nx::network::AbstractStreamSocket* socket, const void* data, int size);
+
 private:
     quint32 m_num;
     const bool m_includePts;
@@ -50,6 +58,9 @@ private:
     QTime m_offlineTimer;
     QTime m_checkTimer;
     int m_offlineDuration;
+
+    static QnMutex s_logFramesFileMutex;
+    static std::unique_ptr<QFile> s_logFramesFile;
 };
 
 class QnFileCache

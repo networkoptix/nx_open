@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} web arayüzü"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "duraklat",
-            "help": "help | show commands",
-            "collapse all servers": "tüm sunucuları daralt",
-            "collapse server": "collapse server + [server name]",
-            "play": "oynat",
-            "clear search": "aramayı temizle",
-            "live": "go to live | show me live",
-            "expand all servers": "tüm sunucuları genişlet",
-            "stop listening": "dinlemeyi durdur",
-            "expand server": "expand server + [server name]",
-            "view": "görüntüle + [kamera adı]"
-        },
-        "systemOffline": "Sistem çevrimdışı",
         "cameraLinks": {
-            "copyToClipboard": "panoya kopyala",
             "highStream": "Yüksek çözünürlük",
-            "copyDefaultText": "kopyala",
-            "unknown": "Belirtilmemiş",
             "lowStream": "Düşük çözünürlük",
             "transcoding": "Dönüştürme",
+            "unknown": "Belirtilmemiş",
+            "copyToClipboard": "panoya kopyala",
+            "copyDefaultText": "kopyala",
             "copyActiveText": "panoya kopyalandı"
         },
-        "searchCamPlaceholder": "Arama",
+        "systemOffline": "Sistem çevrimdışı",
         "cameraStates": {
-            "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
-            "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
-            "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+            "offline": "Çevrimdışı",
+            "error": "Hata",
             "unauthorized": "Kimlik doğrulaması gerekli",
-            "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın.",
-            "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+            "noData": "Veri bulunamadı",
+            "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+            "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin.",
             "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
             "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
-            "error": "Hata",
-            "offline": "Çevrimdışı",
-            "noData": "Veri bulunamadı",
-            "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin."
+            "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
+            "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+            "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+            "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
+        },
+        "searchCamPlaceholder": "Arama",
+        "resolution": {
+            "auto": "Oto",
+            "high": "Yüksek",
+            "low": "Düşük"
         },
         "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
-        "resolution": {
-            "high": "Yüksek",
-            "auto": "Oto",
-            "low": "Düşük"
+        "voiceCommands": {
+            "play": "oynat",
+            "pause": "duraklat",
+            "live": "go to live | show me live",
+            "view": "görüntüle + [kamera adı]",
+            "search": "find + [text for searchbar]",
+            "clear search": "aramayı temizle",
+            "expand server": "expand server + [server name]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "tüm sunucuları genişlet",
+            "collapse all servers": "tüm sunucuları daralt",
+            "stop listening": "dinlemeyi durdur",
+            "help": "help | show commands"
         }
     }
 }

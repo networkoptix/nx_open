@@ -91,12 +91,7 @@ class BoxConnection:
             f"Executing remote command:\n"
             f"    {command_wrapped}\n"
             f"    stdin:\n"
-            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'NO'}")
-
-        opts = {}
-
-        if stdin:
-            opts['input'] = stdin.encode('UTF-8')
+            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'N/A'}")
 
         try:
             actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
@@ -105,7 +100,7 @@ class BoxConnection:
                 timeout=actual_timeout_s,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                **opts
+                input=stdin.encode() if stdin else None,
             )
         except subprocess.TimeoutExpired:
             message = (f'Unable to execute remote command via ssh: '
@@ -137,7 +132,7 @@ class BoxConnection:
                     raise exceptions.BoxCommandError(
                         "Cannot connect via SSH, "
                         "check that SSH service is running "
-                        "on port specified in boxSshPort setting (22 by default)")
+                        "on port specified in boxSshPort .conf setting (22 by default)")
         else:
             if run.returncode == 255:
                 if exc:
