@@ -85,12 +85,16 @@ public:
                 // Currently all of the values are optional. If one of them is missing, the formula
                 // result should be missing too.
                 // TODO: Add optionality marker to all formulas and report error if any of
-                // non-optional values is missing.
+                // non-optional values are missing.
+
+                // TODO: should throw some exception inherited from the common one for all rules.
+                // TODO: Catch thrown exception in appropriate place and check for optionality.
                 const Value v1 = getter1();
                 const Value v2 = getter2();
-                return (v1.isNull() || v2.isNull())
-                    ? Value() //< No value if 1 of arguments is missing.
-                    : Value(operation(std::move(v1), std::move(v2)));
+                if (v1.isNull() || v2.isNull())
+                    throw std::domain_error("At least one argument is missing");
+
+                return Value(operation(std::move(v1), std::move(v2)));
             };
     }
 
@@ -101,24 +105,39 @@ public:
             firstI, secondI,
             [operation](Value v1, Value v2)
             {
-                // Currenlty we do not have any way of reporting errors to the user. Returning the
-                // error string is the only option for error detection during manual testing. End
-                // users will newer see them, because rules newer change and we test our product
-                // properly :).
-                // TODO: Implement some kind of error handling, visible to the user.
-                return (!v1.isDouble() || !v2.isDouble())
-                    ? Value("ERROR: One of the arguments is not an integer")
-                    : Value(operation(v1.toDouble(), v2.toDouble()));
+                // TODO: should throw some exception inherited from the common one for all rules one.
+                if (!v1.isDouble() || !v2.isDouble())
+                    throw std::domain_error("At least one argument is not a number");
+                return Value(operation(v1.toDouble(), v2.toDouble()));
             });
     }
 
-    static auto square(Value value)
+    template<typename Operation> //< Value(bool, bool)
+    ValueGenerator boolOperation(int firstI, int secondI, Operation operation) const
+    {
+        return binaryOperation(
+            firstI, secondI,
+            [operation](Value v1, Value v2)
+            {
+                // TODO: should throw some exception inherited from the common one for all rules.
+                if (!v1.isBool() || !v2.isBool())
+                    throw std::domain_error("At least one argument is not a boolean");
+                return Value(operation(v1.toBool(), v2.toBool()));
+            });
+    }
+
+    static int rect(Value value) noexcept(false)
     {
         const auto params = value.toString().split(L'x');
-        if (params.size() == 2)
-            return params[0].toInt() * params[1].toInt();
+        if (params.size() != 2)
+            throw std::domain_error("Invalid rectangle size syntax");
 
-        return 0;
+        bool isOk1;
+        bool isOk2;
+        int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
+        if (!isOk1 || !isOk2)
+            throw std::domain_error("Invalid rectangle size syntax: integers expected");
+        return result;
     }
 
     ValueGenerator getBinaryOperation() const
@@ -139,7 +158,7 @@ public:
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
         if (function() == "resolutionGreaterThan")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return square(v1) > square(v2); });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return rect(v1) > rect(v2); });
 
         if (function() == "<" || function() == "lessThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
@@ -151,10 +170,10 @@ public:
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
 
         if (function() == "&&" || function() == "and")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() && v2.toBool(); });
+            return boolOperation(1, 2, [](auto v1, auto v2) { return v1 && v2; });
 
         if (function() == "||" || function() == "or")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() || v2.toBool(); });
+            return boolOperation(1, 2, [](auto v1, auto v2) { return v1 || v2; });
 
         return nullptr;
     }
@@ -171,8 +190,8 @@ public:
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
-                    // TODO: Error handling.
-                    return Value("ERROR: Wrong duration: " + durationStr);
+                    // TODO: should throw some exception inherited from the common one for all rules.
+                    throw std::domain_error("Invalid duration: " + durationStr.toStdString());
                 }
 
                 return Value(operation(
@@ -197,6 +216,7 @@ public:
                 forEach(
                     [&](const Value& value, std::chrono::milliseconds duration)
                     {
+                        // TODO: should it be considered as an error?
                         if (value == Value())
                             return;
 
@@ -205,6 +225,7 @@ public:
                         totalValue += extract(value.toDouble(), durationS);
                     });
 
+                // TODO: should it be considered as an error?
                 if (divideByTime)
                     return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
 

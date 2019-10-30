@@ -27,11 +27,14 @@ public:
     Scope scope() const { return m_scope; }
     void setScope(Scope scope) { m_scope = scope; }
 
-    virtual api::metrics::Value value() const = 0;
+    virtual api::metrics::Value value() const noexcept(false) = 0;
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
     void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); };
-    api::metrics::Value formattedValue() const { return m_formatter ? m_formatter(value()) : value(); }
+    api::metrics::Value formattedValue() const noexcept(false)
+    {
+        return m_formatter ? m_formatter(value()) : value();
+    }
 
     QString toString() const { return lm("%1(%2)").args(m_name, m_scope); }
 
