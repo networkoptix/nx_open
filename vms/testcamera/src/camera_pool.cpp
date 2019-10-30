@@ -199,7 +199,11 @@ void QnCameraPool::addCameras(
         for (int i = 0; i < primaryFileList.length(); i++)
         {
             QString primaryFile = primaryFileList[i];
-            QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
+
+            const QString secondaryFile = //< Secondary file is optional.
+                (!m_noSecondaryStream && i < secondaryFileList.length())
+                    ? secondaryFileList[i]
+                    : QString();
 
             QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
