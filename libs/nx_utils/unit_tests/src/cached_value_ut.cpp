@@ -129,6 +129,8 @@ TEST(CachedValue, ConstructionAndCopy)
 
 TEST(CachedValue, ExpirationTime)
 {
+    ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
     constexpr std::chrono::milliseconds expiryTime(8);
     ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMocks[8];
     auto guard = nx::utils::makeScopeGuard(
@@ -140,7 +142,7 @@ TEST(CachedValue, ExpirationTime)
 
     // Nothing should happen before any call to CachedValue.
     expectSpecialFunctionCalls(catcherMocks[1], 0, 0, 0, 0);
-    std::this_thread::sleep_for(expiryTime + 1ms);
+    timeShift.applyRelativeShift(expiryTime + 1ms);
 
     // New value should be generated after timeout.
     expectSpecialFunctionCalls(catcherMocks[2], 1, -1, 1, 0);
@@ -148,7 +150,7 @@ TEST(CachedValue, ExpirationTime)
 
     // No new value generated before timeout.
     expectSpecialFunctionCalls(catcherMocks[3], 0, -1, 1, 0);
-    std::this_thread::sleep_for(expiryTime / 2);
+    timeShift.applyRelativeShift(expiryTime / 2);
     value.get();
 
     // Update should reset timeout and update value.
@@ -157,12 +159,12 @@ TEST(CachedValue, ExpirationTime)
 
     // Make sure previous timeout didn't fire.
     expectSpecialFunctionCalls(catcherMocks[5], 0, -1, 1, 0);
-    std::this_thread::sleep_for(expiryTime / 2 + 1ms);
+    timeShift.applyRelativeShift(expiryTime / 2 + 1ms);
     value.get();
 
     // Make sure value regenerated after timeout by update.
     expectSpecialFunctionCalls(catcherMocks[6], 1, -1, 1, 0);
-    std::this_thread::sleep_for(expiryTime / 2 + 1ms);
+    timeShift.applyRelativeShift(expiryTime / 2 + 1ms);
     value.get();
 
     expectSpecialFunctionCalls(catcherMocks[7], 0, 1, 0, 0);
@@ -171,6 +173,8 @@ TEST(CachedValue, ExpirationTime)
 
 TEST(CachedValue, LongTimeOfValueGeneration)
 {
+    ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
     constexpr std::chrono::milliseconds expiryTime(2);
     ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMocks[8];
     auto guard = nx::utils::makeScopeGuard(
@@ -178,31 +182,33 @@ TEST(CachedValue, LongTimeOfValueGeneration)
 
     expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
     CachedValue<SomeType> value(
-        [expiryTime]()
+        [expiryTime, &timeShift]()
         {
-            std::this_thread::sleep_for(expiryTime + 1ms);
+            timeShift.applyRelativeShift(expiryTime + 1ms);
             return SomeType();
         }, expiryTime);
     value.update();
     value.get();
 
     expectSpecialFunctionCalls(catcherMocks[1], 1, -1, 2, 0);
-    std::this_thread::sleep_for(expiryTime + 1ms);
+    timeShift.applyRelativeShift(expiryTime + 1ms);
     value.get();
     value.get();
 }
 
 TEST(CachedValue, Concurrency)
 {
+    ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
     ::testing::NiceMock<SpecialFunctionsCatcherMock> catcherMock;
     auto guard = nx::utils::makeScopeGuard(
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMock, 1, -1, 2, 0);
     CachedValue<SomeType> value(
-        []()
+        [&timeShift]()
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(7));
+            timeShift.applyRelativeShift(std::chrono::milliseconds(7));
             return SomeType();
         });
     std::thread t1([&value](){ value.get(); });;
