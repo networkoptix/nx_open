@@ -207,7 +207,7 @@ void QnCameraPool::addCameras(
 
             QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
-            if (!m_noSecondaryStream)
+            if (!secondaryFile.isEmpty())
                 camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
 
