@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.164",
+    "version": "1.0.1.168",
     "data": [
         {
             "keys": [
@@ -2211,7 +2211,8 @@
                 "Honeywell*|H4W4PER2",
                 "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest"
             ],
-            "trustToVideoSourceSize": false
+            "trustToVideoSourceSize": false,
+            "alternativeSecondStreamSorter": true
         },
         {
             "keys": [
