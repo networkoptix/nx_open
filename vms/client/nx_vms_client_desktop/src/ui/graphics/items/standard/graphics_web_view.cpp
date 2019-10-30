@@ -299,11 +299,22 @@ void GraphicsWebEngineView::requestJavaScriptDialog(QObject* request, QWidget* p
 
 void GraphicsWebEngineView::requestAuthenticationDialog(QObject* request, QWidget* parent)
 {
+    // Should be mapped to non-public QQuickWebEngineAuthenticationDialogRequest::AuthenticationType.
+    enum AuthenticationDialogRequestAuthenticationType
+    {
+        AuthenticationTypeHTTP,
+        AuthenticationTypeProxy
+    };
+
     // Prevent showing the default dialog.
     request->setProperty("accepted", true);
 
     PasswordDialog dialog(parent);
-    dialog.setCaption(request->property("url").toString());
+
+    if (request->property("type").toInt() == AuthenticationTypeProxy)
+        dialog.setCaption(request->property("proxyHost").toString());
+    else
+        dialog.setCaption(request->property("url").toString());
 
     if (dialog.exec() == QDialog::Accepted)
     {
