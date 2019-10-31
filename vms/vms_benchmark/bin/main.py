@@ -871,11 +871,11 @@ def _obtain_restarted_vms(box, linux_distribution):
 
 def _override_ini_config(vms, ini):
     high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
-    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
+    unlooping_period_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
     vms.override_ini_config({
         'nx_streaming': {
             'enableTimeCorrection': 0,
-            'unloopCameraPtsWithModulus': modulus_us,
+            'unloopCameraPtsWithModulus': unlooping_period_us,
         },
     })
 
