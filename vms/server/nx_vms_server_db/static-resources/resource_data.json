@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.168",
+    "version": "1.0.1.170",
     "data": [
         {
             "keys": [
@@ -2207,9 +2207,49 @@
         {
             "keys": [
                 "Dahua*|*",
-                "Honewell|H4W4PER2",
-                "Honeywell*|H4W4PER2",
-                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest"
+                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest",
+                "Activecam*|*",
+                "Advidia*|*",
+                "Amcrest*|*",
+                "Ameta*|*",
+                "Ascendent*|*",
+                "BV Security*|*",
+                "CCTV Security Pros*|*",
+                "CCTV Star*|*",
+                "CP Plus*|*",
+                "eLine*|*",
+                "ENS*|*",
+                "Expose*|*",
+                "Lorex*|*",
+                "GSS*|*",
+                "Honeywell*|*",
+                "IC Realtime*|*",
+                "Ikegami*|*",
+                "Impath Networks*|*",
+                "Inaxsys*|*",
+                "IndigoVision*|*",
+                "Infinity CCTV*|*",
+                "Innekt*|*",
+                "Intelbras*|*",
+                "KBVision*|*",
+                "Lumixen*|*",
+                "Maxron*|*",
+                "Montavue*|*",
+                "Oco*|*",
+                "People Fu*|*",
+                "Rhodium*|*",
+                "RVI*|*",
+                "Saxco*|*",
+                "Security Camera King*|*",
+                "Space Technology*|*",
+                "Speco*|*",
+                "ToughDog*|*",
+                "Tyco Holis*|*",
+                "Tyco Illustra Essentials*|*",
+                "Unisight*|*",
+                "VIP Vision*|*",
+                "Watchnet*|*",
+                "Winic*|*"
             ],
             "trustToVideoSourceSize": false,
             "alternativeSecondStreamSorter": true
