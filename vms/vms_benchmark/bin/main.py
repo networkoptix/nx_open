@@ -99,7 +99,6 @@ ini_definition = {
     "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
     "swapThresholdMegabytes": {"type": "int", "range": [0, None], "default": 0},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
-    "maxAllowedNetworkErrors": {"type": "int", "range": [0, None], "default": 0},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
     "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 5},
@@ -700,10 +699,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 if last_tx_rx_errors is not None and first_tx_rx_errors is not None:
                     tx_rx_errors_during_test = last_tx_rx_errors - first_tx_rx_errors
-                    if tx_rx_errors_during_test > ini['maxAllowedNetworkErrors']:
-                        issues.append(exceptions.TestCameraStreamingIssue(
-                            f"Network errors detected: {tx_rx_errors_during_test}"
-                        ))
                 else:
                     tx_rx_errors_during_test = None
 
