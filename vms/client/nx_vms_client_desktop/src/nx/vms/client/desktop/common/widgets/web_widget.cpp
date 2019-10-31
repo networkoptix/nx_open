@@ -70,11 +70,7 @@ void WebWidget::load(const QUrl& url)
 void WebWidget::reset()
 {
     m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
-    //FIXME: There is no analog for StopScheduledPageRefresh
-
-    // Synchronously load blank page to replicate QWebView behavior.
     m_webEngineView->load(QUrl());
-    m_webEngineView->waitLoadFinished(kBlankPageLoadTimeout);
 }
 
 } // namespace nx::vms::client::desktop
