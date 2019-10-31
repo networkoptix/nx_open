@@ -48,7 +48,7 @@ static void skipWhitespace(const char** const pp)
 }
 
 template<typename T>
-std::string toString(const T& value)
+std::string defaultValueToString(const T& value)
 {
     std::ostringstream os;
     os << value;
@@ -242,7 +242,11 @@ struct Param: AbstractParam
     /**
      * Specializations may report and fix invalid default values.
      */
-    static Value validateDefaultValue(Value defaultValue)
+    static Value validateDefaultValue(
+        Value defaultValue,
+        std::ostream* /*output*/,
+        const char* /*paramName*/,
+        const char* /*iniFile*/)
     {
         return defaultValue;
     }
@@ -266,7 +270,7 @@ bool Param<Value>::reload(const std::string* value, std::ostream* output)
 template<typename Value>
 std::string Param<Value>::defaultValueStr() const
 {
-    return toString(defaultValue);
+    return defaultValueToString(defaultValue);
 }
 
 template<>
@@ -296,10 +300,24 @@ std::string Param<bool>::defaultValueStr() const
 
 template<>
 const char* Param<const char*>::validateDefaultValue(
-    const char* defaultValue)
+    const char* defaultValue, std::ostream* output, const char* paramName, const char* iniFile)
 {
     if (defaultValue == nullptr)
         return "";
+
+    for (const char* p = defaultValue; *p != '\0'; ++p)
+    {
+        if (!nx::kit::utils::isAsciiPrintable(*p))
+        {
+            if (output)
+            {
+                *output << "INTERNAL ERROR: Invalid char with code "
+                    << (int) (unsigned char) *p << " in default value of " << paramName
+                    << " in " << iniFile << "." << std::endl;
+            }
+        }
+    }
+
     return defaultValue;
 }
 
@@ -415,7 +433,8 @@ template<typename Value>
 Value IniConfig::Impl::regParam(
     const Value* pValue, const Value& defaultValue, const char* paramName, const char* description)
 {
-    const Value& validatedDefaultValue = Param<Value>::validateDefaultValue(defaultValue);
+    const Value& validatedDefaultValue =
+        Param<Value>::validateDefaultValue(defaultValue, output(), paramName, iniFile.c_str());
     if (isEnabled())
     {
         m_paramNames.insert(paramName);
