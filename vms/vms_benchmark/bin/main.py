@@ -429,7 +429,13 @@ class _BoxPoller:
                 cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
                 storage_failure_event_count = self._count_storage_failures()
                 tx_rx_errors = box_tx_rx_errors(self._box)
-                self._results.append((cpu_times, storage_failure_event_count, tx_rx_errors))
+                swapped_bytes = get_cumulative_swap_bytes(self._box)
+                self._results.append((
+                    cpu_times,
+                    storage_failure_event_count,
+                    tx_rx_errors,
+                    swapped_bytes,
+                ))
         except Exception as e:
             self.exception = e
 
@@ -621,7 +627,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count, tx_rx_errors] = box_poller.get_results()
+                             [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_bytes] = box_poller.get_results()
                         except LookupError:
                             continue
                         cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -649,6 +655,17 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         if storage_failure_event_count > 0:
                             issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
+
+                        if swapped_before_bytes is not None:
+                            swapped_during_test_bytes = swapped_bytes - swapped_before_bytes
+                            if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
+                                if swapped_during_test_bytes > 1024 * 1024:
+                                    swapped_str = f'{swapped_during_test_bytes // (1024 * 1024)} MB'
+                                else:
+                                    swapped_str = f'{swapped_during_test_bytes} bytes'
+                                issues.append(exceptions.BoxStateError(
+                                    f"More than {ini['swapThresholdMegabytes']} MB swapped "
+                                    f"at the box during the tests: {swapped_str}."))
 
                         for stream_type in 'live', 'archive':
                             if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
@@ -732,17 +749,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
 
                 report(f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) succeeded.")
-
-    if swapped_before_bytes is not None:
-        swapped_after_bytes = get_cumulative_swap_bytes(box)
-        swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
-        if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
-            if swapped_during_test_bytes > 1024 * 1024:
-                swapped_str = f'{swapped_during_test_bytes // (1024 * 1024)} MB'
-            else:
-                swapped_str = f'{swapped_during_test_bytes} bytes'
-            raise exceptions.BoxStateError(
-                f"More than {ini['swapThresholdMegabytes']} MB swapped at the box during the tests: {swapped_str}.")
 
     report(
         f'\nLoad tests finished successfully; '
