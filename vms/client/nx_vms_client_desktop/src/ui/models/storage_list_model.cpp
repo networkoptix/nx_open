@@ -203,14 +203,32 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
         }
 
         case StoragePoolColumn:
+        {
             if (!storageData.isOnline)
                 return tr("Inaccessible");
             if (!storageData.isWritable)
-                return lit("Reserved");
+                return tr("Reserved");
             return storageData.isBackup ? tr("Backup") : tr("Main");
+        }
 
         case TypeColumn:
-            return storageData.storageType;
+        {
+            // TODO: #GDM Make server provide a correct enumeration value instead and/or make the
+            // corresponding enumeration available in the client code.
+            if (storageData.storageType == "local")
+                return tr("local");
+            if (storageData.storageType == "ram")
+                return tr("ram");
+            if (storageData.storageType == "optical")
+                return tr("optical");
+            if (storageData.storageType == "swap")
+                return tr("swap");
+            if (storageData.storageType == "network")
+                return tr("network");
+            if (storageData.storageType == "usb")
+                return tr("usb");
+            return tr("unknown");
+        }
 
         case TotalSpaceColumn:
         {
@@ -225,7 +243,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
                     const auto tb = storageData.totalSpace / kBytesInTb;
                     if (tb >= 1.0)
-                        return lit("%1 TB").arg(QString::number(tb, 'f', 1));
+                        return tr("%1 TB").arg(QString::number(tb, 'f', 1));
 
                     const auto gb = storageData.totalSpace / kBytesInGB;
                     return tr("%1 GB").arg(QString::number(gb, 'f', 1));

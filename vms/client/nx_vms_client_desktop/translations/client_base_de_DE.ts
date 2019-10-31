@@ -982,6 +982,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>Kalendar abdocken</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation>Seite...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2961,6 +2965,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44,1 kHz und 48 kHz Audioformate werden vom Tonaufnahmegerät nicht unterstützt! Bitte wählen Sie ein anderes Audiogerät oder &quot;Keine&quot; in den Aufnahmeeinstellungen.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Die Erfassungsauflösung konnte nicht erkannt werden</translation>
     </message>
   </context>
   <context>
@@ -5736,6 +5744,42 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Stores analytics data</source>
       <translation>Speichert Analysedaten</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>Reserviert</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation>lokal</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation>RAM</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation>optisch</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation>tauschen</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation>Netzwerk</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation>USB</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation>unbekannt</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6428,6 +6472,13 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation>HERUNTERLADEN&lt;br&gt;BEGONNEN</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6563,6 +6614,13 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Fehler beim Zusammenführen von %1 mit unserem System.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Das Ereignis kann bei entfernter Kamera nicht bestätigt werden.</translation>
     </message>
   </context>
   <context>
@@ -9990,6 +10048,45 @@ Sie können einen anderen Speicherort auf der Registerkarte &quot;Speicherverwal
     <message>
       <source>New Layout %1</source>
       <translation>Neues Layout %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation>Datei speichern als...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>Fehler beim Überschreiben der Datei</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation>Speichern der Datei fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation>%1 Ordner ist zum Schreiben gesperrt.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Datei wird heruntergeladen...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Enthaltene Ordner öffnen</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation>Dateidownload stoppen?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation>Datei heruntergeladen</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation>Dateidownload fehlgeschlagen</translation>
     </message>
   </context>
 </TS>

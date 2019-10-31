@@ -982,6 +982,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>Kalender losmaken</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation>Pagina...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2961,6 +2965,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44,1 kHz en 48 kHz geluidsformaten worden niet ondersteund door het audio-opnameapparaat. Selecteer alstublieft een ander audio apparaat of &quot;none&quot; in de schermopname-instellingen.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Kan opnameresolutie niet detecteren</translation>
     </message>
   </context>
   <context>
@@ -5736,6 +5744,42 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Stores analytics data</source>
       <translation>Slaat analytics gegevens op</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>Gereserveerd</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation>lokaal</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation>RAM</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation>optisch</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation>swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation>netwerk</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation>USB</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation>onbekend</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6428,6 +6472,13 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation>DOWNLOADEN&lt;br&gt;GESTART</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6563,6 +6614,13 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Kan %1 niet samenvoegen met ons systeem.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Het is niet mogelijk een event te bevestigen op een verwijderde camera.</translation>
     </message>
   </context>
   <context>
@@ -9990,6 +10048,45 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     <message>
       <source>New Layout %1</source>
       <translation>Nieuwe schermindeling %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation>Bestand opslaan als...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>Fout tijdens het overschrijven van het bestand</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation>Bestand opslaan mislukt</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation>Map %1 is geblokkeerd voor schrijven.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Bestanden worden gedownload...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Open de vereiste map</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation>Downloaden stoppen?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation>Bestand gedownload</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation>Het downloaden van bestanden is mislukt</translation>
     </message>
   </context>
 </TS>

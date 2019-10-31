@@ -983,6 +983,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>解鎖月曆</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation type="unfinished">Page...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2937,6 +2941,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>音源擷取裝置不支援 44.1khz 和 48khz 格式. 請在螢幕錄影設定中選擇其他音源裝置或選擇&quot;無&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation type="unfinished">Could not detect capturing resolution</translation>
     </message>
   </context>
   <context>
@@ -5679,6 +5687,42 @@ If you intended to move analytics data to another storage location, please conta
       <source>Stores analytics data</source>
       <translation>儲存分析數據</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>保留</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation>本機</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation type="unfinished">ram</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation type="unfinished">optical</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation type="unfinished">swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation type="unfinished">network</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation type="unfinished">usb</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation type="unfinished">unknown</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6369,6 +6413,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6503,6 +6554,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>無法將 %1 合併到我們的系統。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
     </message>
   </context>
   <context>
@@ -9863,6 +9921,45 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>New Layout %1</source>
       <translation>新佈局 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation type="unfinished">Save File As...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>覆寫檔案失敗</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation type="unfinished">Failed to save file</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation type="unfinished">Downloading file...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>開啟檔案所在目錄</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation type="unfinished">Stop file downloading?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation type="unfinished">File downloaded</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation type="unfinished">File downloading failed</translation>
     </message>
   </context>
 </TS>

@@ -4,3 +4,6 @@ RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
 MultiVideoLayout 1.0 MultiVideoLayout.qml
 MultiVideoOutput 1.0 MultiVideoOutput.qml
 VideoPositioner 1.0 VideoPositioner.qml
+FigureEditor 1.0 FigureEditor.qml
+FigurePreview 1.0 FigurePreview.qml
+Line 1.0 Line.qml

@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} ウェブインターフェース"
     },
     "common": {
-        "voiceCommands": {
-            "search": "検索+ [検索バーのテキスト]",
-            "pause": "一時停止",
-            "help": "ヘルプ| 表示コマンド",
-            "collapse all servers": "すべてのサーバーを折りたたむ",
-            "collapse server": "サーバー折りたたみ+ [サーバー名]",
-            "play": "再生",
-            "clear search": "検索をクリア",
-            "live": "ライブに移動|ライブ表示",
-            "expand all servers": "すべてのサーバーを展開する",
-            "stop listening": "聞くのをやめる",
-            "expand server": "サーバー展開+ [サーバー名]",
-            "view": "表示 + [カメラ名]"
-        },
-        "systemOffline": "システムはオフラインです",
         "cameraLinks": {
-            "copyToClipboard": "クリップボードにコピー",
             "highStream": "高解像度ストリーム",
-            "copyDefaultText": "コピー",
-            "unknown": "不明",
             "lowStream": "低解像度ストリーム",
             "transcoding": "トランスコーディング",
+            "unknown": "不明",
+            "copyToClipboard": "クリップボードにコピー",
+            "copyDefaultText": "コピー",
             "copyActiveText": "クリップボードにコピーしました"
         },
-        "searchCamPlaceholder": "検索",
+        "systemOffline": "システムはオフラインです",
         "cameraStates": {
-            "noFormat": "このブラウザは、このカメラのビデオ再生をサポートしていません。",
-            "ieWin10": "Microsoft EdgeまたはGoogle Chromeブラウザを使用してください。",
-            "iosVideoTooLarge": "iOSはfullHD(2M：1920x1080) より大きいビデオをサポートしていません",
+            "offline": "オフライン",
+            "error": "エラー",
             "unauthorized": "認証が必要です。",
-            "ubuntuNX": "このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください。",
-            "ieNoWebm": "ビデオを再生することはできません <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+            "noData": "データがありません",
+            "iosVideoTooLarge": "iOSはfullHD(2M：1920x1080) より大きいビデオをサポートしていません",
+            "flashRequired": "動画を再生するには <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash をインストール</a> してください。",
             "flashOrWebmRequired": "ビデオを再生することはできません <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> または <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
             "noArmSupport": "このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません。",
-            "error": "エラー",
-            "offline": "オフライン",
-            "noData": "データがありません",
-            "flashRequired": "動画を再生するには <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash をインストール</a> してください。"
+            "noFormat": "このブラウザは、このカメラのビデオ再生をサポートしていません。",
+            "ieNoWebm": "ビデオを再生することはできません <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+            "ieWin10": "Microsoft EdgeまたはGoogle Chromeブラウザを使用してください。",
+            "ubuntuNX": "このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください。"
+        },
+        "searchCamPlaceholder": "検索",
+        "resolution": {
+            "auto": "自動",
+            "high": "高い",
+            "low": "低い"
         },
         "chromeCastWarning": "Chromecastはリソースを大量に消費するため、サーバーに問題を引き起こす可能性があります。",
-        "resolution": {
-            "high": "高い",
-            "auto": "自動",
-            "low": "低い"
+        "voiceCommands": {
+            "play": "再生",
+            "pause": "一時停止",
+            "live": "ライブに移動|ライブ表示",
+            "view": "表示 + [カメラ名]",
+            "search": "検索+ [検索バーのテキスト]",
+            "clear search": "検索をクリア",
+            "expand server": "サーバー展開+ [サーバー名]",
+            "collapse server": "サーバー折りたたみ+ [サーバー名]",
+            "expand all servers": "すべてのサーバーを展開する",
+            "collapse all servers": "すべてのサーバーを折りたたむ",
+            "stop listening": "聞くのをやめる",
+            "help": "ヘルプ| 表示コマンド"
         }
     }
 }

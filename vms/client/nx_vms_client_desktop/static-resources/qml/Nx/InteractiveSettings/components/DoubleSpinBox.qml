@@ -31,15 +31,15 @@ LabeledItem
 
         onValueChanged: control.value = value / multiplier
 
-        textFromValue: function(value, locale)
+        textFromValue: (function(value, locale)
         {
             return Number(value / multiplier).toLocaleString(locale, "f", decimals)
-        }
+        })
 
-        valueFromText: function(text, locale)
+        valueFromText: (function(text, locale)
         {
             return Number.fromLocaleString(locale, text) * multiplier
-        }
+        })
     }
 }
 

@@ -247,6 +247,33 @@ Button::Button(QObject* parent):
 }
 
 //-------------------------------------------------------------------------------------------------
+// ROI components.
+
+LineFigure::LineFigure(QObject* parent):
+    ValueItem(QStringLiteral("LineFigure"), parent)
+{
+}
+
+PolygonFigure::PolygonFigure(QObject* parent):
+    ValueItem(QStringLiteral("BoxFigure"), parent)
+{
+}
+
+void PolygonFigure::setMaxPoints(int maxPoints)
+{
+    if (m_maxPoints == maxPoints)
+        return;
+
+    m_maxPoints = maxPoints;
+    emit maxPointsChanged();
+}
+
+BoxFigure::BoxFigure(QObject* parent):
+    ValueItem(QStringLiteral("PolygonFigure"), parent)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 // Items factory.
 
 namespace {
@@ -295,6 +322,10 @@ void Factory::registerTypes()
     registerType<DoubleSpinBox>("DoubleSpinBox");
     registerType<CheckBox>("CheckBox");
     registerType<Button>("Button");
+
+    registerType<LineFigure>("LineFigure");
+    registerType<BoxFigure>("BoxFigure");
+    registerType<PolygonFigure>("PolygonFigure");
 }
 
 Item* Factory::createItem(const QString& type, QObject* parent)

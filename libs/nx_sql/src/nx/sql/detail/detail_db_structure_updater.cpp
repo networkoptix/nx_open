@@ -120,6 +120,8 @@ void DbStructureUpdater::updateStruct(QueryContext* const queryContext)
     dbResult = updateDbVersion(queryContext, dbState);
     if (dbResult != DBResult::ok)
         throw Exception(dbResult);
+
+    NX_DEBUG(this, "DB schema %1 updated to version %2", m_schemaName, dbState.version);
 }
 
 DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
@@ -149,6 +151,9 @@ DBResult DbStructureUpdater::createInitialSchema(
 
     if (!m_fullSchemaScriptByVersion.empty())
     {
+        NX_DEBUG(this, "Creating initial DB schema %1 of version %2",
+            m_schemaName, m_fullSchemaScriptByVersion.rbegin()->first);
+
         // Applying full schema.
         if (!execSqlScript(
                 queryContext,
@@ -195,7 +200,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
     nx::sql::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
-    NX_VERBOSE(this, lm("Updating structure to version %1").arg(dbState->version));
+    NX_DEBUG(this, "Updating schema %1 to version %2", m_schemaName, dbState->version);
 
     if (!execDbUpdate(
             m_updateScripts[dbState->version - m_initialVersion],

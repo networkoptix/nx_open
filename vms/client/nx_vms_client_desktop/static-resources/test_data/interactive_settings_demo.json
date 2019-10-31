@@ -1,0 +1,97 @@
+{
+    "items": [
+        {
+            "type": "TextField",
+            "name": "text",
+            "caption": "Text Field",
+            "description": "A text field",
+            "defaultValue": "a text",
+            "value": "a text"
+        },
+        {
+            "type": "GroupBox",
+            "name": "group",
+            "caption": "Group Box",
+            "items": [
+                {
+                    "type": "SpinBox",
+                    "name": "number",
+                    "caption": "Spin Box",
+                    "description": "A number",
+                    "defaultValue": 42,
+                    "value": 42,
+                    "minValue": 0,
+                    "maxValue": 100
+                },
+                {
+                    "type": "DoubleSpinBox",
+                    "name": "double",
+                    "caption": "Double Spin Box",
+                    "description": "A real number",
+                    "defaultValue": 3.14,
+                    "value": 3.14,
+                    "minValue": 0.0,
+                    "maxValue": 100.0
+                },
+                {
+                    "type": "ComboBox",
+                    "name": "combobox",
+                    "caption": "Combo Box",
+                    "description": "A choice",
+                    "defaultValue": "value2",
+                    "value": "value2",
+                    "range": ["value1", "value2", "value3"]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "checkbox",
+                    "caption": "Check Box",
+                    "description": "True or False",
+                    "defaultValue": true,
+                    "value": true
+                },
+                {
+                    "type": "GroupBox",
+                    "name": "buttons",
+                    "caption": "Buttons",
+                    "items": [
+                        {
+                            "type": "Row",
+                            "name": "row",
+                            "items": [
+                                {
+                                    "type": "Button",
+                                    "name": "button1",
+                                    "caption": "Button 1",
+                                    "description": "Action 1"
+                                },
+                                {
+                                    "type": "Button",
+                                    "name": "button2",
+                                    "caption": "Button 2",
+                                    "description": "Action 2"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "PolygonFigure",
+            "name": "polygon",
+            "caption": "Polygon"
+        },
+        {
+            "type": "BoxFigure",
+            "name": "box",
+            "caption": "Box"
+        },
+        {
+            "type": "LineFigure",
+            "name": "line",
+            "caption": "Line"
+        }
+    ]
+}
+

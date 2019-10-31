@@ -16,6 +16,7 @@ Scrollable 1.0 Scrollable.qml
 AlertBar 1.0 AlertBar.qml
 ToolTip 1.0 ToolTip.qml
 TextArea 1.0 TextArea.qml
+LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

@@ -1725,9 +1725,7 @@ ActionVisibility ReachableServerCondition::check(
         return InvisibleAction;
 
     if (!server->isOnline()
-        || !context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId())
-        || (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
-            && !context->commonModule()->globalSettings()->cloudSystemId().isEmpty()))
+        || !context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId()))
     {
         return DisabledAction;
     }

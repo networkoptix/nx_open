@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} web interfész"
     },
     "common": {
-        "voiceCommands": {
-            "search": "keresés + [szöveg a keresősávhoz]",
-            "pause": "szünet",
-            "help": "súgó | parancsok megjelenítése",
-            "collapse all servers": "összes szerver összecsukása",
-            "collapse server": "szerver összecsukása + [szerver neve]",
-            "play": "letjátszás",
-            "clear search": "keresés törlése",
-            "live": "élőbe menni | mutatsd élőben",
-            "expand all servers": "összes szerver kibontása",
-            "stop listening": "figyelés leállítása",
-            "expand server": "szerver kibontása + [szerver neve]",
-            "view": "nézet + [kamera neve]"
-        },
-        "systemOffline": "A rendszer offline",
         "cameraLinks": {
-            "copyToClipboard": "másolás vágólapra",
             "highStream": "Elsődleges stream",
-            "copyDefaultText": "másolás",
-            "unknown": "Ismeretlen",
             "lowStream": "Másodlagos stream",
             "transcoding": "Transzkódolás",
+            "unknown": "Ismeretlen",
+            "copyToClipboard": "másolás vágólapra",
+            "copyDefaultText": "másolás",
             "copyActiveText": "vágólapra másolva"
         },
-        "searchCamPlaceholder": "Keresés",
+        "systemOffline": "A rendszer offline",
         "cameraStates": {
-            "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
-            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
-            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+            "offline": "Offline",
+            "error": "Hiba",
             "unauthorized": "Hitelesítés szükséges",
-            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
-            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+            "noData": "Nincs adat",
+            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához.",
             "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
             "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-            "error": "Hiba",
-            "offline": "Offline",
-            "noData": "Nincs adat",
-            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához."
+            "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
+            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."
+        },
+        "searchCamPlaceholder": "Keresés",
+        "resolution": {
+            "auto": "Auto",
+            "high": "Elsődleges",
+            "low": "Alacsony"
         },
         "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
-        "resolution": {
-            "high": "Elsődleges",
-            "auto": "Auto",
-            "low": "Alacsony"
+        "voiceCommands": {
+            "play": "letjátszás",
+            "pause": "szünet",
+            "live": "élőbe menni | mutatsd élőben",
+            "view": "nézet + [kamera neve]",
+            "search": "keresés + [szöveg a keresősávhoz]",
+            "clear search": "keresés törlése",
+            "expand server": "szerver kibontása + [szerver neve]",
+            "collapse server": "szerver összecsukása + [szerver neve]",
+            "expand all servers": "összes szerver kibontása",
+            "collapse all servers": "összes szerver összecsukása",
+            "stop listening": "figyelés leállítása",
+            "help": "súgó | parancsok megjelenítése"
         }
     }
 }

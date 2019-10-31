@@ -9,7 +9,7 @@ from vms_benchmark import exceptions
 ini_testcamera_bin: str
 ini_test_file_high_resolution: str
 ini_test_file_low_resolution: str
-ini_testcamera_debug: bool
+ini_testcamera_output_file: str
 
 
 @contextmanager
@@ -24,10 +24,13 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     ]
 
     opts = {}
-
-    if not ini_testcamera_debug:
-        opts['stdout'] = subprocess.PIPE
-        opts['stderr'] = subprocess.PIPE
+    if not ini_testcamera_output_file:
+        opts['stdout'] = subprocess.DEVNULL
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_testcamera_output_file, 'wb')
+        opts['stdout'] = output_fd
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':

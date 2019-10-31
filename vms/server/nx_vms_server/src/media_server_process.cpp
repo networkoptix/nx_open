@@ -3801,9 +3801,6 @@ void MediaServerProcess::stopObjects()
     if (const auto manager = commonModule()->moduleDiscoveryManager())
         manager->stop();
 
-    if (m_universalTcpListener)
-        m_universalTcpListener.reset();
-
     serverModule()->resourceCommandProcessor()->stop();
     if (m_initStoragesAsyncPromise)
         m_initStoragesAsyncPromise->get_future().wait();
@@ -3829,6 +3826,9 @@ void MediaServerProcess::stopObjects()
 
     m_ec2ConnectionFactory->shutdown();
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
+
+    if (m_universalTcpListener)
+        m_universalTcpListener.reset();
 
     commonModule()->resourcePool()->clear();
 
