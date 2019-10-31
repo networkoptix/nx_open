@@ -302,7 +302,8 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "type": {
                         "display": "table|panel"
@@ -509,7 +510,8 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "type": {
                         "display": "table|panel"
@@ -592,7 +594,8 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "state": {
                         "display": "table|panel"

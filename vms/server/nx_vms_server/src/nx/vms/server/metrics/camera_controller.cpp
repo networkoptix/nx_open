@@ -68,7 +68,7 @@ auto makeInfoProviders()
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
             "server",
-            [](const auto& r) { return Value(r->getParentServer()->getName()); }
+            [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "type",
