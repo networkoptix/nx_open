@@ -20,7 +20,7 @@
 
 using namespace nx::core;
 
-static QByteArray ENCODE_PREFIX("BASE64_");
+static const QByteArray ENCODE_PREFIX("BASE64_");
 
 static std::string toLatinStdString(const QString& value)
 {
@@ -30,7 +30,7 @@ static std::string toLatinStdString(const QString& value)
     if (value1 == value2)
         return value1;
     else {
-        QByteArray result = ENCODE_PREFIX.append(value.toUtf8().toBase64());
+        QByteArray result = ENCODE_PREFIX + value.toUtf8().toBase64();
         return std::string(result.constData(), result.length());
     }
 }
