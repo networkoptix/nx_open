@@ -97,7 +97,7 @@ ini_definition = {
     "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
     "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
-    "swapThresholdMegabytes": {"type": "int", "range": [0, None], "default": 0},
+    "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
@@ -183,7 +183,7 @@ def _check_storages(api, ini, camera_count):
             f"of non-reserved free space.")
 
 
-def get_cumulative_swap_bytes(box):
+def get_cumulative_swap_kilobytes(box):
     output = box.eval('cat /proc/vmstat')
     raw = [line.split() for line in output.splitlines()]
     try:
@@ -194,7 +194,7 @@ def get_cumulative_swap_bytes(box):
         pages_swapped = data['pswpout']
     except KeyError:
         return None
-    return pages_swapped * 4096  # All modern OSes operate with 4k pages.
+    return pages_swapped * 4  # All modern OSes operate with 4K pages.
 
 
 class _BoxCpuTimes:
@@ -429,12 +429,12 @@ class _BoxPoller:
                 cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
                 storage_failure_event_count = self._count_storage_failures()
                 tx_rx_errors = box_tx_rx_errors(self._box)
-                swapped_bytes = get_cumulative_swap_bytes(self._box)
+                swapped_kilobytes = get_cumulative_swap_kilobytes(self._box)
                 self._results.append((
                     cpu_times,
                     storage_failure_event_count,
                     tx_rx_errors,
-                    swapped_bytes,
+                    swapped_kilobytes,
                 ))
         except Exception as e:
             self.exception = e
@@ -464,8 +464,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('Starting load tests...')
     load_test_started_at_s = time.time()
 
-    swapped_before_bytes = get_cumulative_swap_bytes(box)
-    if swapped_before_bytes is None:
+    swapped_initially_kilobytes = get_cumulative_swap_kilobytes(box)
+    if swapped_initially_kilobytes is None:
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
@@ -627,7 +627,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_bytes] = box_poller.get_results()
+                             [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_kilobytes] = box_poller.get_results()
                         except LookupError:
                             continue
                         cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -656,16 +656,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if storage_failure_event_count > 0:
                             issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
 
-                        if swapped_before_bytes is not None:
-                            swapped_during_test_bytes = swapped_bytes - swapped_before_bytes
-                            if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
-                                if swapped_during_test_bytes > 1024 * 1024:
-                                    swapped_str = f'{swapped_during_test_bytes // (1024 * 1024)} MB'
-                                else:
-                                    swapped_str = f'{swapped_during_test_bytes} bytes'
+                        if swapped_initially_kilobytes is not None:
+                            swapped_during_test_kilobytes = swapped_kilobytes - swapped_initially_kilobytes
+                            if swapped_during_test_kilobytes > ini['swapThresholdKilobytes']:
                                 issues.append(exceptions.BoxStateError(
-                                    f"More than {ini['swapThresholdMegabytes']} MB swapped "
-                                    f"at the box during the tests: {swapped_str}."))
+                                    f"More than {ini['swapThresholdKilobytes']} KB swapped at the "
+                                    f"box during the tests: {swapped_during_test_kilobytes} KB."))
 
                         for stream_type in 'live', 'archive':
                             if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
