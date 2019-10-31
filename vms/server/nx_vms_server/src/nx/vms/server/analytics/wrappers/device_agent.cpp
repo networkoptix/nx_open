@@ -83,6 +83,8 @@ SdkObjectDescription DeviceAgent::sdkObjectDescription() const
 
 void DeviceAgent::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 {
+    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::setHandler);
+
     Ptr<IDeviceAgent> sdkDeviceAgent = sdkObject();
     if (!NX_ASSERT(sdkDeviceAgent))
         return;
@@ -92,6 +94,8 @@ void DeviceAgent::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 
 bool DeviceAgent::setNeededMetadataTypes(const MetadataTypes& metadataTypes)
 {
+    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::setNeededMetadataTypes);
+
     Ptr<IDeviceAgent> sdkDeviceAgent = sdkObject();
     if (!NX_ASSERT(sdkDeviceAgent))
         return false;
@@ -112,6 +116,8 @@ bool DeviceAgent::setNeededMetadataTypes(const MetadataTypes& metadataTypes)
 
 bool DeviceAgent::pushDataPacket(Ptr<IDataPacket> data)
 {
+    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::pushDataPacket);
+
     if (!NX_ASSERT(m_consumingDeviceAgent))
         return false;
 

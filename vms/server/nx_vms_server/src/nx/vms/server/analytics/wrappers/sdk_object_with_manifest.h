@@ -6,6 +6,8 @@
 
 #include <nx/sdk/ptr.h>
 
+#include <nx/utils/timed_guard.h>
+
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
 
@@ -15,6 +17,7 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/analytics/wrappers/string_builder.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
+#include <nx/vms/server/analytics/wrappers/method_timeouts.h>
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -40,6 +43,8 @@ public:
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
+        nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::manifest);
+
         if (!NX_ASSERT(m_mainSdkObject))
             return std::nullopt;
 
@@ -88,10 +93,16 @@ protected:
     ReturnType handleGenericError(
         SdkMethod sdkMethod,
         const GenericError& error,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool isCritical = false) const
     {
         const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
-        NX_DEBUG(this, stringBuilder.buildLogString());
+
+        if (isCritical)
+            NX_ASSERT(this, stringBuilder.buildLogString());
+        else
+            NX_DEBUG(this, stringBuilder.buildLogString());
+
         throwPluginEvent(
             stringBuilder.buildPluginDiagnosticEventCaption(),
             stringBuilder.buildPluginDiagnosticEventDescription());
@@ -103,21 +114,23 @@ protected:
     ReturnType handleError(
         SdkMethod sdkMethod,
         const sdk_support::Error& error,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool isCritical = false) const
     {
         if (!NX_ASSERT(!error.isOk()))
             return returnValue;
 
-        return handleGenericError(sdkMethod, error, returnValue);
+        return handleGenericError(sdkMethod, error, returnValue, isCritical);
     }
 
     template<typename ReturnType>
     ReturnType handleViolation(
         SdkMethod sdkMethod,
         const Violation& violation,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool isCritical = false) const
     {
-        return handleGenericError(sdkMethod, violation, returnValue);
+        return handleGenericError(sdkMethod, violation, returnValue, isCritical);
     }
 
     void throwPluginEvent(
@@ -146,6 +159,22 @@ protected:
             "at_pluginDiagnosticEvent",
             Qt::QueuedConnection,
             Q_ARG(nx::vms::event::PluginDiagnosticEventPtr, pluginDiagnosticEvent));
+    }
+
+    nx::utils::TimedGuard makeTimedGuard(
+        SdkMethod sdkMethod,
+        QString additionalInfo = QString()) const
+    {
+        return nx::utils::TimedGuard(
+            sdkMethodTimeout(sdkMethod),
+            [this, sdkMethod, additionalInfo]()
+            {
+                handleViolation(
+                    sdkMethod,
+                    {ViolationType::methodExecutionTookTooLong, additionalInfo},
+                    /*returnValue*/ nullptr,
+                    /*isCritical*/ true);
+            });
     }
 
 private:

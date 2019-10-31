@@ -75,6 +75,55 @@ struct PluginsIniConfig: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, enableStrictManifestValidationMode,
         "If set then any error in a manifest leads to the Plugin/Engine/DeviceAgent rejection.");
+
+    // --------------------------------------------------------------------------------------------
+
+    NX_INI_INT(1, manifestSdkMethodTimeoutS,
+        "Maximum duration of the `*::manifest` method execution in seconds. If method execution\n"
+        "takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(10, setSettingsSdkMethodTimeoutS,
+        "Maximum duration of the `*::setSettings` method execution in seconds. If method execution\n"
+        "takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(10, pluginSideSettingsSdkMethodTimeoutS,
+        "Maximum duration of the `*::pluginSideSettings` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(1, setHandlerSdkMethodTimeoutS,
+        "Maximum duration of the `*::setHandler` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(1, createEngineSdkMethodTimeoutS,
+        "Maximum duration of the `IPlugin::createEngine` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(1, setEngineInfoSdkMethodTimeoutS,
+        "Maximum duration of the `IEngine::setEngineInfo` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(1, isCompatibleSdkMethodTimeoutS,
+        "Maximum duration of the `IEngine::isCompatible` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(10, obtainDeviceAgentSdkMethodTimeoutS,
+        "Maximum duration of the `IEngine::obtainDeviceAgent` method execution in seconds. If\n"
+        "method execution takes more time server reports it in the logs (and crashes in the\n"
+        "debug mode)");
+
+    NX_INI_INT(30, executeActionSdkMethodTimeoutS,
+        "Maximum duration of the `IEngine::executeAction` method execution in seconds. If method\n"
+        "execution takes more time server reports it in the logs (and crashes in the debug mode)");
+
+    NX_INI_INT(30, setNeededMetadataTypesSdkMethodTimeoutS,
+        "Maximum duration of the `IDeviceAgent::setNeededMetadataTypes` method execution in\n"
+        "seconds. If method execution takes more time server reports it in the logs (and crashes\n"
+        "in the debug mode)");
+
+    NX_INI_INT(1, pushDataPacketSdkMethodTimeoutS,
+        "Maximum duration of the `IDeviceAgent::pushDataPacket` method execution in seconds. If\n"
+        "method execution takes more time server reports it in the logs (and crashes in the\n"
+        "debug mode)");
 };
 
 inline PluginsIniConfig& pluginsIni()
