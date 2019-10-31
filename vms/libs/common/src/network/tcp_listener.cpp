@@ -28,28 +28,17 @@ public:
     QByteArray authDigest;
     mutable QnMutex mutex;
     QnMutex connectionMtx;
-    std::atomic<int> newPort;
+    std::atomic<int> newPort{};
     QHostAddress serverAddress;
-    std::atomic<int> localPort;
-    bool useSSL;
-    int maxConnections;
-    bool ddosWarned;
-    SystemError::ErrorCode lastError;
-    bool isStopped;
+    std::atomic<int> localPort = 0;
+    bool useSSL = false;
+    int maxConnections = 0;
+    bool ddosWarned = false;
+    SystemError::ErrorCode lastError = SystemError::noError;
+    bool isStopped = false;
 
     static QByteArray defaultPage;
     static QString pathIgnorePrefix;
-
-    QnTcpListenerPrivate():
-        newPort(0),
-        localPort(0),
-        useSSL(false),
-        maxConnections(0),
-        ddosWarned(false),
-        lastError(SystemError::noError),
-        isStopped(false)
-    {
-    }
 };
 
 QByteArray QnTcpListenerPrivate::defaultPage;
