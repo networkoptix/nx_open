@@ -865,8 +865,6 @@ def _obtain_restarted_vms(box, linux_distribution):
 
         time.sleep(0.5)
 
-    time.sleep(5)  # TODO: Investigate this sleep
-
     vms = vmses[0]
     return vms
 
