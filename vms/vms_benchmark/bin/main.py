@@ -86,8 +86,9 @@ ini_definition = {
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
-    "testFileHighDurationMs": {"type": "int", "range": [1, None], "default": 10000},
+    "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
+    "testFileLowPeriodUs": {"type": "int", "range": [1, None], "default": 10000000},
     "testStreamFpsHigh": {"type": "int", "range": [1, 999], "default": 30},
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
     "testcameraOutputFile": {"type": "str", "default": ""},
@@ -110,6 +111,7 @@ ini_definition = {
     "apiReadinessTimeoutSeconds": {"type": "int", "range": [1, None], "default": 30},
     "worstAllowedStreamLagUs": {"type": "int", "range": [0, None], "default": 5_000_000},
     "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
+    "unloopViaTestcamera": {"type": "bool", "default": "true"},
 }
 
 
@@ -121,6 +123,9 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
     test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
+    test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
+    test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
+    test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
@@ -870,12 +875,10 @@ def _obtain_restarted_vms(box, linux_distribution):
 
 
 def _override_ini_config(vms, ini):
-    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
-    unlooping_period_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
     vms.override_ini_config({
         'nx_streaming': {
             'enableTimeCorrection': 0,
-            'unloopCameraPtsWithModulus': unlooping_period_us,
+            'unloopCameraPtsWithModulus': ini['testFileHighPeriodUs'],
         },
     })
 
@@ -939,14 +942,16 @@ def main(conf_file, ini_file, log_file):
     _check_time_diff(box, ini)
 
     vms = _obtain_running_vms(box, linux_distribution)
-    vms.dismount_ini_dirs()
+    if not ini['unloopViaTestcamera']:
+        vms.dismount_ini_dirs()
     try:
         api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
         _test_api(api, ini)
 
         storages = _get_storages(api)
         _stop_vms(vms)
-        _override_ini_config(vms, ini)
+        if not ini['unloopViaTestcamera']:
+            _override_ini_config(vms, ini)
         _clear_storages(box, storages, conf)
         vms = _restart_vms(api, box, linux_distribution, vms, ini)
 
@@ -954,7 +959,8 @@ def main(conf_file, ini_file, log_file):
 
         report('\nSUCCESS: All tests finished.')
     finally:
-        vms.dismount_ini_dirs()
+        if not ini['unloopViaTestcamera']:
+            vms.dismount_ini_dirs()
 
 
 def _restart_vms(api, box, linux_distribution, vms, ini):
