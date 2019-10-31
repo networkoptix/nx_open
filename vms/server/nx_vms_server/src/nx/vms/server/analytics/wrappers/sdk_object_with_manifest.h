@@ -3,6 +3,7 @@
 #include <QtCore/QMetaObject>
 
 #include <utils/common/synctime.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/sdk/ptr.h>
 
@@ -18,6 +19,7 @@
 #include <nx/vms/server/analytics/wrappers/string_builder.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/method_timeouts.h>
+
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -99,7 +101,7 @@ protected:
         const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
 
         if (isCritical)
-            NX_ASSERT(this, stringBuilder.buildLogString());
+            NX_ASSERT(false, stringBuilder.buildLogString());
         else
             NX_DEBUG(this, stringBuilder.buildLogString());
 
@@ -167,13 +169,13 @@ protected:
     {
         return nx::utils::TimedGuard(
             sdkMethodTimeout(sdkMethod),
-            [this, sdkMethod, additionalInfo]()
+            [this, sdkMethod, additionalInfo = std::move(additionalInfo)]()
             {
                 handleViolation(
                     sdkMethod,
-                    {ViolationType::methodExecutionTookTooLong, additionalInfo},
+                    {ViolationType::methodExecutionTookTooLong, std::move(additionalInfo)},
                     /*returnValue*/ nullptr,
-                    /*isCritical*/ true);
+                    pluginsIni().isMethodTimeoutViolationCritical);
             });
     }
 
