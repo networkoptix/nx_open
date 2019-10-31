@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.170",
+    "version": "1.0.1.172",
     "data": [
         {
             "keys": [
@@ -3335,7 +3335,9 @@
             "onvif|hnc6d24-izs",
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
-            "cellinx|nbm2-h6"
+            "cellinx|nbm2-h6",
+            "neutral|DSC-TVC-0200",
+            "entropix|DSC-TVC-0200"
             ],
             "canShareLicenseGroup": true
         },
