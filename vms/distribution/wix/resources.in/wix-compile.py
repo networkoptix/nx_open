@@ -11,22 +11,16 @@ from insignia_interface import extract_engine, reattach_engine
 
 engine_tmp_folder = 'obj'
 
-# TODO: #GDM Remove filtered variables
-
 installer_target_dir = '${installer.target.dir}'
 if environment.distribution_output_dir:
     installer_target_dir = environment.distribution_output_dir
 
-client_msi_name = environment.client_distribution_name + '.msi'
 client_exe_name = environment.client_distribution_name + '.exe'
 client_stripped_file = os.path.join(engine_tmp_folder, 'client-strip.msi')
-client_msi_file = os.path.join(installer_target_dir, client_msi_name)
 client_exe_file = os.path.join(installer_target_dir, client_exe_name)
 
-server_msi_name = environment.server_distribution_name + '.msi'
 server_exe_name = environment.server_distribution_name + '.exe'
 server_stripped_file = os.path.join(engine_tmp_folder, 'server-strip.msi')
-server_msi_file = os.path.join(installer_target_dir, server_msi_name)
 server_exe_file = os.path.join(installer_target_dir, server_exe_name)
 
 bundle_exe_name = environment.bundle_distribution_name + '.exe'
@@ -120,10 +114,6 @@ def build_exe(project, filename, components, candle_variables, config, external_
         sign(filename, code_signing)                       # Sign the bundle
 
 
-def set_embedded_cabs(params, value):
-    params['NoStrip'] = ('yes' if value else 'no')
-
-
 def build_client(config):
 
     client_common_components = [
@@ -142,16 +132,7 @@ def build_client(config):
         'ClientHelpSourceDir': environment.client_help_source_dir,
         'ClientBgSourceDir': environment.client_background_source_dir
     }
-    set_embedded_cabs(candle_msi_variables, True)
-    build_msi(
-        'client-msi',
-        client_msi_file,
-        client_components,
-        candle_msi_variables,
-        config,
-        external_components=client_common_components_paths)
 
-    set_embedded_cabs(candle_msi_variables, False)
     build_msi(
         'client-strip',
         client_stripped_file,
@@ -162,7 +143,6 @@ def build_client(config):
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'ClientMsiName': client_msi_name,
         'ClientStrippedMsiFile': client_stripped_file
     }
     build_exe(
@@ -177,15 +157,11 @@ def build_server(config):
     candle_msi_variables = {
         'VoxSourceDir': environment.vox_source_dir
     }
-    set_embedded_cabs(candle_msi_variables, True)
-    build_msi('server-msi', server_msi_file, server_components, candle_msi_variables, config)
 
-    set_embedded_cabs(candle_msi_variables, False)
     build_msi('server-msi', server_stripped_file, server_components, candle_msi_variables, config)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'ServerMsiName': server_msi_name,
         'ServerStrippedMsiFile': server_stripped_file
     }
     build_exe(
@@ -199,8 +175,6 @@ def build_server(config):
 def build_bundle(config):
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'ClientMsiName': client_msi_name,
-        'ServerMsiName': server_msi_name,
         'ClientStrippedMsiFile': client_stripped_file,
         'ServerStrippedMsiFile': server_stripped_file
     }

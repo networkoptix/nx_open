@@ -227,8 +227,8 @@
             <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="server.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="shared.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="1" Cabinet="server.cab" EmbedCab="no" />
+        <Media Id="2" Cabinet="shared.cab" EmbedCab="no" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
