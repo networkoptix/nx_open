@@ -8,6 +8,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
+#include <QtWidgets/QAction>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
@@ -18,6 +19,8 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +35,13 @@ EulaDialog::EulaDialog(QWidget* parent):
     ui(new Ui::EulaDialog())
 {
     ui->setupUi(this);
+
+    ui->eulaView->setRedirectLinksToDesktop(true);
+    ui->eulaView->setUseActionsForLinks(true);
+    ui->eulaView->insertActions(nullptr,
+        {ui->eulaView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+    ui->eulaView->page()->setBackgroundColor(Qt::transparent);
+
     ui->iconLabel->setPixmap(
         QnSkin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
 
@@ -85,7 +95,7 @@ void EulaDialog::setEulaHtml(const QString& html)
         lit("<head>"),
         lit("<head><style>%1</style>").arg(eulaHtmlStyle));
 
-    ui->eulaView->setHtml(eulaText);
+    ui->eulaView->setHtml(eulaText, QUrl("qrc://"));
 
     // We do not want to copy embedded style to clipboard.
     QTextDocument doc;

@@ -24,8 +24,10 @@
             <Component><File Name="Qt5QuickWidgets.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5QuickControls2.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5QuickTemplates2.dll" KeyPath="yes"/></Component>
-            <Component><File Name="Qt5WebKit.dll" KeyPath="yes"/></Component>
-            <Component><File Name="Qt5WebKitWidgets.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5WebEngine.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5WebEngineCore.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5WebEngineWidgets.dll" KeyPath="yes"/></Component>
+            <Component><File Name="QtWebEngineProcess.exe" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <ComponentGroup Id="client_qt_imageformats" Source="$(var.QtPluginsDir)\imageformats" Directory="imageformats">

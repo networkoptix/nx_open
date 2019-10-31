@@ -7,9 +7,8 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QFrame>
 
-#include <ui/widgets/common/web_page.h>
-
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,7 +16,7 @@ WebViewDialog::WebViewDialog(const QUrl& url, QWidget* parent):
     base_type(parent, Qt::Window)
 {
     auto webWidget = new WebWidget(this);
-    webWidget->view()->setPage(new QnWebPage(this));
+    webWidget->webEngineView()->setIgnoreSslErrors(true);
 
     auto line = new QFrame(this);
     line->setFrameShape(QFrame::HLine);

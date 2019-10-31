@@ -1292,7 +1292,7 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     bool canMoveFocus = !focusItem
         || dynamic_cast<QnResourceWidget*>(focusItem)
-        || dynamic_cast<QnGraphicsWebView*>(focusItem);
+        || dynamic_cast<GraphicsWebEngineView*>(focusItem);
 
     if (newWidget && canMoveFocus)
         newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */

@@ -291,7 +291,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* We should disable all one-key shortcuts while web view is in the focus. */
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
     {
-        bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
+        bool isWebView = scene() && dynamic_cast<GraphicsWebEngineView*>(scene()->focusItem());
 
         for (auto actionId : {
             action::NotificationsTabAction, //< N

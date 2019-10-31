@@ -253,6 +253,7 @@ def main():
     parser.add_argument("--prefer-compiled", action="store_true", help="Skip base version if compiled exists")
     parser.add_argument("--skip-styles", action="store_true", help="Skip QuickControls2 styles")
     parser.add_argument("--additional-plugins", nargs="+", help="Additional plugins to process.")
+    parser.add_argument("--clean", action="store_true", help="Clean output folder before copying files.")
 
     args = parser.parse_args()
 
@@ -269,6 +270,9 @@ def main():
     else:
         if not args.output:
             exit("Output directory is not specified.")
+
+        if args.clean and os.path.exists(args.output):
+            shutil.rmtree(args.output)
 
         deploy_util.deploy(
             args.qml_root,

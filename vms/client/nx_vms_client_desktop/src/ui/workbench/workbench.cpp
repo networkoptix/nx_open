@@ -18,10 +18,12 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
+#include <utils/web_downloader.h>
 
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
@@ -528,4 +530,29 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
 bool QnWorkbench::isInLayoutChangeProcess() const
 {
     return m_inLayoutChangeProcess;
+}
+
+void QnWorkbench::requestDownload(QObject* item)
+{
+    utils::WebDownloader::download(item, context());
+}
+
+void QnWorkbench::requestJavaScriptDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestJavaScriptDialog(request, context()->mainWindowWidget());
+}
+
+void QnWorkbench::requestAuthenticationDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestAuthenticationDialog(request, context()->mainWindowWidget());
+}
+
+void QnWorkbench::requestFileDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestFileDialog(request, context()->mainWindowWidget());
+}
+
+void QnWorkbench::requestColorDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestColorDialog(request, context()->mainWindowWidget());
 }
