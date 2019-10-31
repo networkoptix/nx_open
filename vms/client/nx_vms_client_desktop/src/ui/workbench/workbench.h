@@ -185,6 +185,11 @@ public:
      */
     Q_INVOKABLE void requestFileDialog(QObject* request);
 
+    /**
+     * Requests a dialog for selecting a color by the user.
+     */
+    Q_INVOKABLE void requestColorDialog(QObject* request);
+
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);
 

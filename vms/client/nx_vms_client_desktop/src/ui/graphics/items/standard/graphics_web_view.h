@@ -57,6 +57,8 @@ public:
 
     static void requestFileDialog(QObject* request, QWidget* parent);
 
+    static void requestColorDialog(QObject* request, QWidget* parent);
+
 public slots:
     void back();
 

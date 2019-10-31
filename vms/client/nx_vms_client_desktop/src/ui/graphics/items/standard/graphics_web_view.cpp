@@ -4,6 +4,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QColorDialog>
 
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/style/webview_style.h>
@@ -376,6 +377,28 @@ void GraphicsWebEngineView::requestFileDialog(QObject* request, QWidget* parent)
         QMetaObject::invokeMethod(request, "dialogAccept", Q_ARG(QStringList, files));
     else
         QMetaObject::invokeMethod(request, "dialogReject");
+}
+
+void GraphicsWebEngineView::requestColorDialog(QObject* request, QWidget* parent)
+{
+    // Prevent showing the default dialog.
+    request->setProperty("accepted", true);
+
+    const auto initialColor = request->property("color").value<QColor>();
+    QColorDialog* dialog = new QColorDialog(initialColor, parent);
+
+    // For unknown reason invoking dialogAccept(color) directly from here causes a crash
+    // inside WebEngine code. Copy QWebEnginePage implementation of showColorDialog()
+    // which shows the dialog after returning from the colorDialogRequested signal handler.
+
+    connect(dialog, SIGNAL(colorSelected(QColor)), request, SLOT(dialogAccept(QColor)));
+    connect(dialog, SIGNAL(rejected()), request, SLOT(dialogReject()));
+
+    // Delete when done.
+    connect(dialog, SIGNAL(colorSelected(QColor)), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(rejected()), dialog, SLOT(deleteLater()));
+
+    dialog->open();
 }
 
 } // namespace nx::vms::client::desktop

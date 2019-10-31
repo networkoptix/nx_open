@@ -551,3 +551,8 @@ void QnWorkbench::requestFileDialog(QObject* request)
 {
     GraphicsWebEngineView::requestFileDialog(request, context()->mainWindowWidget());
 }
+
+void QnWorkbench::requestColorDialog(QObject* request)
+{
+    GraphicsWebEngineView::requestColorDialog(request, context()->mainWindowWidget());
+}

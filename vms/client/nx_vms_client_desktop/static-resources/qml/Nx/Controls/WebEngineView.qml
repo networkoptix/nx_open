@@ -37,6 +37,7 @@ WebEngineView
     onJavaScriptDialogRequested: workbench.requestJavaScriptDialog(request)
     onAuthenticationDialogRequested: workbench.requestAuthenticationDialog(request)
     onFileDialogRequested: workbench.requestFileDialog(request)
+    onColorDialogRequested: workbench.requestColorDialog(request)
     profile.onDownloadRequested: workbench.requestDownload(download)
     onContextMenuRequested: function(request) { request.accepted = true }
 
