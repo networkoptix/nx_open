@@ -658,8 +658,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
                                 worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
                                 issues.append(exceptions.TestCameraStreamingIssue(
-                                    'Streaming video from the Server FAILED: '
-                                    f'{stream_type} streams lagged by {worst_lag_s :.3f} seconds.'
+                                    f'Lag of one of {stream_type} streams '
+                                    f'reached {worst_lag_s :.3f} seconds.'
                                 ))
 
                         if issues:
