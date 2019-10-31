@@ -1,26 +1,30 @@
 #include "network_controller.h"
 
-#include "helpers.h"
-
 #include <QJsonArray>
-#include <nx/utils/std/algorithm.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/switch.h>
 #include <platform/platform_abstraction.h>
+
+#include "helpers.h"
 
 namespace nx::vms::server::metrics {
 
 namespace {
 
 constexpr std::chrono::seconds kInterfacesCacheExpiration(7);
+constexpr std::chrono::seconds kIoRateUpdateInterval(5);
 
 } // namespace
 
-class NetworkInterfaceResource
+class NetworkInterfaceResource: public ServerModuleAware
 {
 public:
-    NetworkInterfaceResource(QNetworkInterface iface)
-        : m_interface(std::move(iface))
+    NetworkInterfaceResource(QnMediaServerModule* serverModule, QNetworkInterface iface):
+        ServerModuleAware(serverModule),
+        m_interface(std::move(iface))
     {}
 
     QString name() const
@@ -59,6 +63,19 @@ public:
         return m_interface.flags().testFlag(QNetworkInterface::IsUp) ? "Up" : "Down";
     }
 
+    enum class Rate { in, out };
+    api::metrics::Value load(Rate rate) const
+    {
+        const auto load = serverModule()->platform()->monitor()->networkInterfaceLoad(name());
+        if (!load)
+            return api::metrics::Value();
+        return api::metrics::Value(nx::utils::switch_(rate,
+            Rate::in, [&]{ return load->bytesPerSecIn; },
+            Rate::out, [&]{ return load->bytesPerSecOut; }));
+    }
+
+    QnCommonModule* commonModule() const { return serverModule()->commonModule(); }
+
 private:
     QNetworkInterface m_interface;
     mutable nx::utils::Mutex m_mutex;
@@ -79,8 +96,6 @@ void NetworkController::start()
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
-    // NOTE: The values in 'rates' group are not instant ones, but an avarage calculated on a small
-    // interval.
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
@@ -112,21 +127,13 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
             "rates",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "inBps",
-                [this](const auto& r)
-                {
-                    auto platform = serverModule()->platform()->monitor();
-                    const auto load = platform->networkInterfaceLoad(r->name());
-                    return load ? Value(load->bytesPerSecIn) : Value();
-                }
+                [](const auto& r) { return r->load(NetworkInterfaceResource::Rate::in); },
+                timerWatch<Resource>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "outBps",
-                [this](const auto& r)
-                {
-                    auto platform = serverModule()->platform()->monitor();
-                    const auto load = platform->networkInterfaceLoad(r->name());
-                    return load ? Value(load->bytesPerSecOut) : Value();
-                }
+                [](const auto& r) { return r->load(NetworkInterfaceResource::Rate::out); },
+                timerWatch<Resource>(kIoRateUpdateInterval)
             )
         )
     );
@@ -154,7 +161,7 @@ void NetworkController::updateInterfacesPool()
         return;
 
     NX_VERBOSE(this, "Updating network interfaces info");
-    const auto newInterfacesList = nx::utils::filter_if(QNetworkInterface::allInterfaces(),
+    const auto newInterfacesList = nx::utils::copy_if(QNetworkInterface::allInterfaces(),
         [](const auto& iface){ return !iface.flags().testFlag(QNetworkInterface::IsLoopBack); });
 
     removeDisappearedInterfaces(newInterfacesList);
@@ -186,7 +193,8 @@ void NetworkController::addOrUpdateInterfaces(QList<QNetworkInterface> newIfaces
         const auto name = iface.name();
         if (m_interfacesPool.find(name) == m_interfacesPool.end())
         {
-            m_interfacesPool[name] = std::make_shared<NetworkInterfaceResource>(std::move(iface));
+            m_interfacesPool[name] = std::make_shared<NetworkInterfaceResource>(
+                serverModule(), std::move(iface));
             add(m_interfacesPool[name], interfaceIdFromName(name),
                 utils::metrics::Scope::local);
             continue;

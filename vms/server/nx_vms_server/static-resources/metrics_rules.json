@@ -14,16 +14,9 @@
                         "display": "panel",
                         "alarms": [{
                             "level": "warning",
-                            "condition": "greaterThan %servers %recommendedMaxServers",
+                            "condition": "greaterOrEqual %servers %recommendedMaxServers",
                             "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
                         }]
-                    },
-                    "users": {
-                        "display": "panel"
-                    },
-                    "storages": {
-                        "name": "Storage locations",
-                        "display": "panel"
                     },
                     "recommendedMaxCameras": {
                         "calculate": "const 10000"
@@ -33,9 +26,16 @@
                         "display": "panel",
                         "alarms": [{
                             "level": "warning",
-                            "condition": "greaterThan %servers %recommendedMaxCameras",
+                            "condition": "greaterOrEqual %servers %recommendedMaxCameras",
                             "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
-                        }]
+                            }]
+                        },
+                    "storages": {
+                        "name": "Storage locations",
+                        "display": "panel"
+                    },
+                    "users": {
+                        "display": "panel"
                     },
                     "version": {
                         "display": "panel"
@@ -610,15 +610,19 @@
             "rates": {
                 "name": "I/O Rates",
                 "values": {
-                    "inBps": {
+                    "inBps1m": {
                         "name": "IN Rate",
                         "format": "kbps",
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "calculate": "sampleAvg %inBps 1m",
+                        "insert": "inBps"
                     },
-                    "outBps": {
+                    "outBps1m": {
                         "name": "OUT Rate",
                         "format": "kbps",
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "calculate": "sampleAvg %outBps 1m",
+                        "insert": "outBps"
                     }
                 }
             }
