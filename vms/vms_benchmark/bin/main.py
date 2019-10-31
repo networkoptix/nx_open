@@ -655,6 +655,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 issues.append(exceptions.VmsBenchmarkIssue(
                                     f'{stream_stats[stream_type].frame_drops} frame drops detected '
                                     f'in {stream_type} streams.'))
+                            if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
+                                worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
+                                issues.append(exceptions.TestCameraStreamingIssue(
+                                    'Streaming video from the Server FAILED: '
+                                    f'{stream_type} streams lagged by {worst_lag_s :.3f} seconds.'
+                                ))
 
                         if issues:
                             streaming_ended_expectedly = True
@@ -721,13 +727,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if ram_free_bytes is not None else '')
                     + f"        Streaming test duration: {streaming_test_duration_s} s"
                 )
-
-                if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
-                    worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
-                    issues.append(exceptions.TestCameraStreamingIssue(
-                        'Streaming video from the Server FAILED: '
-                        f'{stream_type} streams lagged by {worst_lag_s :.3f} seconds.'
-                    ))
 
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
