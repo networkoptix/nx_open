@@ -20,7 +20,7 @@ using ValueFormatter = std::function<api::metrics::Value(const api::metrics::Val
 class NX_VMS_UTILS_API ValueMonitor
 {
 public:
-    explicit ValueMonitor(Scope scope, QString name): m_scope(scope), m_name(std::move(name)) {}
+    explicit ValueMonitor(QString name, Scope scope): m_name(std::move(name)), m_scope(scope) {}
     virtual ~ValueMonitor() = default;
 
     QString name() const { return m_name; }
@@ -39,8 +39,8 @@ public:
     QString toString() const { return lm("%1(%2)").args(m_name, m_scope); }
 
 private:
-    Scope m_scope = Scope::local;
     QString m_name; // TODO: better to have full name?
+    Scope m_scope = Scope::local;
     ValueFormatter m_formatter;
 };
 
@@ -62,8 +62,8 @@ class RuntimeValueMonitor: public ValueMonitor
 {
 public:
     RuntimeValueMonitor(
-        Scope scope,
         QString name,
+        Scope scope,
         const ResourceType& resource,
         const Getter<ResourceType>& getter);
 
@@ -83,8 +83,8 @@ class ValueHistoryMonitor: public RuntimeValueMonitor<ResourceType>
 {
 public:
     ValueHistoryMonitor(
-        Scope scope,
         QString name,
+        Scope scope,
         const ResourceType& resource,
         const Getter<ResourceType>& getter,
         const Watch<ResourceType>& watch);
@@ -104,12 +104,12 @@ private:
 
 template<typename ResourceType>
 RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
-    Scope scope,
     QString name,
+    Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter)
 :
-    ValueMonitor(scope, std::move(name)),
+    ValueMonitor(std::move(name), scope),
     m_resource(resource),
     m_getter(getter)
 {
@@ -130,13 +130,13 @@ void RuntimeValueMonitor<ResourceType>::forEach(
 
 template<typename ResourceType>
 ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
-    Scope scope,
     QString name,
+    Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter,
     const Watch<ResourceType>& watch)
 :
-    RuntimeValueMonitor<ResourceType>(scope, std::move(name), resource, getter),
+    RuntimeValueMonitor<ResourceType>(std::move(name), scope, resource, getter),
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     updateValue();

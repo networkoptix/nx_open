@@ -95,11 +95,11 @@ std::unique_ptr<ValueMonitor> ValueProvider<ResourceType>::monitor(
     if (!m_watch)
     {
         return std::make_unique<RuntimeValueMonitor<ResourceType>>(
-            m_scope, m_id, resource, m_getter);
+            m_id, m_scope, resource, m_getter);
     }
 
     return std::make_unique<ValueHistoryMonitor<ResourceType>>(
-        m_scope, m_id, resource, m_getter, m_watch);
+        m_id, m_scope, resource, m_getter, m_watch);
 }
 
 template<typename ResourceType, typename... Args>
