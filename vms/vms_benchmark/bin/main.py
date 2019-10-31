@@ -344,11 +344,13 @@ def _rtsp_perf_frames(stdout, output_file_path):
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
             yield match_res.group('stream_id'), int(match_res.group('timestamp'))
+            continue
 
         match_res = _rtsp_perf_summary_regex.match(line)
         if match_res is not None:
             if int(match_res.group('failed')) > 0:
                 raise exceptions.RtspPerfError("Streaming error: Some RTSP sessions failed")
+            continue
 
         logging.info(f"Unrecognized line from rtsp_perf: {line}")
 
