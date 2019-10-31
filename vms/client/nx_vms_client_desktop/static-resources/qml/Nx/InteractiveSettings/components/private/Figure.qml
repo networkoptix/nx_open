@@ -23,6 +23,40 @@ LabeledItem
             implicitWidth: 120
             implicitHeight: 80
 
+            Image
+            {
+                id: backgroundImage
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+
+                Connections
+                {
+                    target: thumbnailProvider
+
+                    onThumbnailUpdated:
+                    {
+                        if (cameraId.toString() === settingsView.resourceId.toString())
+                            backgroundImage.source = thumbnailUrl
+                    }
+                }
+
+                Connections
+                {
+                    target: settingsView
+
+                    onResourceIdChanged:
+                    {
+                        if (!thumbnailProvider)
+                            return
+
+                        if (settingsView.resourceId.isNull())
+                            return
+
+                        thumbnailProvider.refresh(settingsView.resourceId)
+                    }
+                }
+            }
+
             FigurePreview
             {
                 id: preview

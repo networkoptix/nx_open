@@ -19,6 +19,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/camera/thumbnail/thumbnail_image_provider.h>
 #include <nx/client/core/settings/migration.h>
 #include <ec2/remote_connection_factory.h>
 #include <nx/client/core/utils/operation_manager.h>
@@ -59,6 +60,10 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     m_qmlEngine = new QQmlEngine(this);
     m_qmlEngine->setOutputWarningsToStandardError(true);
+
+    const auto thumbnailProvider = new ThumbnailImageProvider();
+    m_qmlEngine->addImageProvider(ThumbnailImageProvider::id, thumbnailProvider);
+    m_commonModule->store(thumbnailProvider);
 
     registerResourceDataProviders();
 }

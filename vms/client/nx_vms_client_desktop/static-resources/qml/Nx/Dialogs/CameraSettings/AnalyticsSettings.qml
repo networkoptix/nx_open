@@ -5,6 +5,7 @@ import Nx.Utils 1.0
 import Nx.Controls 1.0
 import Nx.Controls.NavigationMenu 1.0
 import Nx.InteractiveSettings 1.0
+import nx.vms.client.core 1.0
 
 Item
 {
@@ -74,6 +75,11 @@ Item
 
             alertBar.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
+    }
+
+    LiveThumbnailProvider
+    {
+        id: thumbnailProvider
     }
 
     NavigationMenu
