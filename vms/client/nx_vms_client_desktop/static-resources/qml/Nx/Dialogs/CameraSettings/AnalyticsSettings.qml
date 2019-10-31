@@ -28,8 +28,6 @@ Item
         onStateChanged:
         {
             loading = store.analyticsSettingsLoading()
-            console.log("State changed, loading is")
-            console.log(loading)
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
             settingsView.resourceId = store.resourceId()
