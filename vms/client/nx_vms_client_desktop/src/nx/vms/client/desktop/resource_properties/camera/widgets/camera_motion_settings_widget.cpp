@@ -4,7 +4,6 @@
 #include "../redux/camera_settings_dialog_store.h"
 
 #include <QtQuick/QQuickItem>
-#include <QtQuick/QQuickView>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QButtonGroup>
 
@@ -39,7 +38,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui(new Ui::CameraMotionSettingsWidget()),
     m_motionHelper(new core::CameraMotionHelper()),
     m_sensitivityButtons(new QButtonGroup(this)),
-    m_motionView(new QQuickView(qnClientCoreModule->mainQmlEngine(), nullptr))
+    m_motionWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
 {
     ui->setupUi(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -94,10 +93,10 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
 
     setHelpTopic(this, Qn::CameraSettings_Motion_Help);
 
-    connect(m_motionView, &QQuickView::statusChanged, this,
-        [this](QQuickView::Status status)
+    connect(m_motionWidget, &QQuickWidget::statusChanged, this,
+        [this](QQuickWidget::Status status)
         {
-            if (status != QQuickView::Status::Ready)
+            if (status != QQuickWidget::Status::Ready)
                 return;
 
             auto motionItem = this->motionItem();
@@ -111,9 +110,9 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
             motionItem->setProperty("visible", QVariant::fromValue(false));
     });
 
-    m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
-    m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);
-    ui->motionContainerWidget->layout()->addWidget(QWidget::createWindowContainer(m_motionView));
+    m_motionWidget->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
+    m_motionWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    ui->motionContainerWidget->layout()->addWidget(m_motionWidget);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::toggled,
         store, &CameraSettingsDialogStore::setMotionDetectionEnabled);
@@ -134,7 +133,7 @@ CameraMotionSettingsWidget::~CameraMotionSettingsWidget()
 
 QQuickItem* CameraMotionSettingsWidget::motionItem() const
 {
-    return m_motionView->rootObject();
+    return m_motionWidget->rootObject();
 }
 
 void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& state)
