@@ -88,7 +88,6 @@ ini_definition = {
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
     "testFileHighDurationMs": {"type": "int", "range": [1, None], "default": 10000},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
-    "testFileFps": {"type": "int", "range": [1, 999], "default": 30},
     "testStreamFpsHigh": {"type": "int", "range": [1, 999], "default": 30},
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
     "testcameraOutputFile": {"type": "str", "default": ""},
