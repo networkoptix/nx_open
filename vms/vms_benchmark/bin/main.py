@@ -118,11 +118,11 @@ def load_configs(conf_file, ini_file):
     ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
-    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
-    stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
     test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
+    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
