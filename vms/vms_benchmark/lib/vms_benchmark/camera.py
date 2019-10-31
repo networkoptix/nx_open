@@ -1,7 +1,6 @@
-import urllib.request
 import base64
 import json
-import sys
+import urllib.request
 
 
 class Camera:
@@ -11,7 +10,7 @@ class Camera:
         self.name = name
         self.mac = mac
 
-    def enable_recording(self, highStreamFps=30, enable=True):
+    def enable_recording(self, highStreamFps, enable=True):
         request = urllib.request.Request(f"http://{self.api.ip}:{self.api.port}/ec2/saveCameraUserAttributes")
         credentials = f"{self.api.user}:{self.api.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
@@ -24,9 +23,9 @@ class Camera:
                 "endTime": 86400,
                 "dayOfWeek": day_of_week,
                 "fps": highStreamFps,
-                "recordingType": "RT_Always"
+                "recordingType": "RT_Always",
             }
-            for day_of_week in range(0, 7)
+            for day_of_week in range(1, 8)
         ]
 
         if enable:

@@ -101,12 +101,12 @@ namespace detail
         friend class PersistentStorage;
     public:
         QnDbManager(QnCommonModule* commonModule);
-        virtual ~QnDbManager();
+        virtual ~QnDbManager() override;
 
         bool init(const nx::utils::Url& dbUrl);
         bool isInitialized() const;
         static QString ecsDbFileName(const QString& basePath);
-        static int currentBuildNumber(const QString& basePath);
+        static nx::utils::SoftwareVersion currentSoftwareVersion(const QString& basePath);
 
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -828,6 +828,7 @@ namespace detail
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
         bool encryptBusinessRules();
+        bool encryptStoragePasswords();
         bool moveAnalyticsStorageIdToProperty();
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();
@@ -851,7 +852,7 @@ namespace detail
         nx::vms::api::ResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
         QnUuid m_dbInstanceId;
-        bool m_initialized;
+        std::atomic<bool> m_initialized;
         /*
         * Database for static or very rare modified data. Be careful! It's not supported DB transactions for static DB
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB

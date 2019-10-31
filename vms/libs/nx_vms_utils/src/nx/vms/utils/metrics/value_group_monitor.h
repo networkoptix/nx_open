@@ -19,7 +19,7 @@ public:
     ValueGroupMonitor(ValueMonitors monitors);
 
     api::metrics::ValueGroup values(Scope requiredScope, bool formatted) const;
-    std::vector<api::metrics::Alarm> alarms(Scope requiredScope) const;
+    api::metrics::ValueGroupAlarms alarms(Scope requiredScope) const;
 
     void setRules(
         const std::map<QString, api::metrics::ValueRule>& rules,

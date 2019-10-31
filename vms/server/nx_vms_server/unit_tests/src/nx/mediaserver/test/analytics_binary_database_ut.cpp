@@ -26,20 +26,20 @@ auto kBaseDateMs2 =
 using namespace std::chrono;
 using namespace nx::vms::server::metadata;
 
-class DataProviderStub: public QnAbstractStreamDataProvider
-{
-public:
-    using QnAbstractStreamDataProvider::QnAbstractStreamDataProvider;
-};
-
 class AnalyticsArchive: public MediaServerModuleFixture
 {
   public:
       AnalyticsArchive(): MediaServerModuleFixture()
       {
+      }
+
+      virtual void SetUp() override
+      {
+          MediaServerModuleFixture::SetUp();
+
           m_camera.reset(new resource::test::CameraMock(&serverModule()));
           m_camera->setPhysicalId("analytics binary archive test");
-          m_dataProviderStub.reset(new DataProviderStub(m_camera));
+          m_dataProviderStub.reset(new QnAbstractStreamDataProvider(m_camera));
 
           m_resList << m_camera;
       }
@@ -85,7 +85,7 @@ class AnalyticsArchive: public MediaServerModuleFixture
 
       QnVirtualCameraResourcePtr m_camera;
       QnSecurityCamResourceList m_resList;
-      std::unique_ptr<DataProviderStub> m_dataProviderStub;
+      std::unique_ptr<QnAbstractStreamDataProvider> m_dataProviderStub;
       std::vector<qint64> m_numericDates;
 };
 

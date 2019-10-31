@@ -13,8 +13,6 @@
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
-#include "platform/monitoring/global_monitor.h"
-#include <platform/platform_abstraction.h>
 
 #include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
@@ -25,7 +23,6 @@
 #include <media_server/media_server_module.h>
 
 #include "health/system_health.h"
-#include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 
@@ -57,8 +54,6 @@
 #include <system_log/system_event_log_reader.h>
 #include <nx/vms/utils/metrics/system_controller.h>
 
-#include <nx/utils/timer_manager.h>
-
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
@@ -77,6 +72,7 @@ class LocalConnectionFactory;
 } // namespace ec2
 
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
+namespace nx::utils { class EventLoopTimer; }
 
 void restartServer(int restartTimeout);
 
@@ -101,19 +97,22 @@ public:
     {
         if (const auto& module = m_serverModule.lock())
             return module->commonModule();
-        else
-            return nullptr;
+
+        NX_ASSERT(false, "No common module!");
+        return nullptr;
     }
 
     QnMediaServerModule* serverModule() const
     {
         if (const auto& module = m_serverModule.lock())
             return module.get();
-        else
-            return nullptr;
+
+        NX_ASSERT(false, "No server module!");
+        return nullptr;
     }
 
     nx::vms::server::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
+    QnMediaServerResourcePtr thisServer() const { return m_mediaServer; }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -121,6 +120,7 @@ public:
     void initStaticCommonModule();
     void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
     bool installUpdateRequestReceived() const { return m_installUpdateRequestReceived; }
+    bool initializeAnalyticsEvents();
 
 signals:
     void started();
@@ -238,7 +238,6 @@ private:
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
-    bool initializeAnalyticsEvents();
     void saveMediaServerUserAttributes(
         ec2::AbstractECConnectionPtr ec2Connection,
         const nx::vms::api::MediaServerUserAttributesData& userAttrsData);
@@ -257,8 +256,11 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
-    void onBackupDbTimer();
     void initMetricsController();
+    void onBackupDbTimer();
+    std::chrono::milliseconds calculateDbBackupTimeout() const;
+    void updateSpecificFeatures() const;
+
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -270,7 +272,6 @@ private:
     mutable QnMutex m_stopMutex;
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QSet<QnUuid> m_updateUserRequests;
-    std::unique_ptr<QnPlatformAbstraction> m_platform;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;
@@ -278,7 +279,7 @@ private:
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
-    std::unique_ptr<nx::utils::TimerManager> m_createDbBackupTimer;
+    std::unique_ptr<nx::utils::EventLoopTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
     QString m_oldAnalyticsStoragePath;

@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/log/log.h>
@@ -21,56 +22,52 @@
 #include <utils/common/util.h>
 #include <nx/system_commands.h>
 
+#if defined (Q_OS_MACOS) && !defined (_GNU_SOURCE)
+    #define _GNU_SOURCE
+#endif
+
+#include <boost/stacktrace.hpp>
+
 namespace nx {
 namespace vms {
 namespace utils {
 
 struct VmsUtilsFunctionsTag{};
+static const auto& kLogTag = typeid(VmsUtilsFunctionsTag);
 
-bool backupDatabase(const QString& backupDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection,
-    const boost::optional<QString>& dbFilePath,
-    const boost::optional<int>& buildNumber)
+QString backupDbFileName(const QString& backupDir, int buildNumber)
 {
-    const auto buildNumberArg = buildNumber
-        ? *buildNumber
-        : nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
+    return QString("%1_%2_%3.db")
+        .arg(closeDirPath(backupDir) + "ecs")
+        .arg(buildNumber)
+        .arg(qnSyncTime->currentMSecsSinceEpoch());
+}
 
-    const QString fileName = lm("%1_%2_%3.db").args(closeDirPath(backupDir) + "ecs",
-        buildNumberArg, qnSyncTime->currentMSecsSinceEpoch());
+bool backupDatabaseLive(
+    const QString& backupDir,
+    const ec2::AbstractECConnectionPtr& connection)
+{
+    const auto buildNumber =
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
 
-    QDir dir(backupDir);
-    if (!dir.exists() && !dir.mkdir(backupDir))
+    if (!QDir(backupDir).exists() && !QDir().mkpath(backupDir))
     {
-        NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
+        NX_ERROR(kLogTag, "Failed to create DB backup path %1", backupDir);
         return false;
     }
 
-    if (!dbFilePath)
+    const auto fileName = backupDbFileName(backupDir, buildNumber);
+    const auto errorCode = connection->dumpDatabaseToFileSync(fileName);
+    if (errorCode != ec2::ErrorCode::ok)
     {
-        const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
-        if (errorCode != ec2::ErrorCode::ok)
-        {
-            NX_ERROR(typeid(VmsUtilsFunctionsTag),
-                lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
-            return false;
-        }
-    }
-    else
-    {
-        if (!QFile::copy(*dbFilePath, fileName))
-        {
-            NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
-            return false;
-        }
+        NX_ERROR(kLogTag, "Failed to dump EC database: %1", ec2::toString(errorCode));
+        return false;
     }
 
     deleteOldBackupFilesIfNeeded(
         backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
 
-    NX_WARNING(
-        typeid(VmsUtilsFunctionsTag), lm("Successfully created DB backup %1").args(fileName));
-
+    NX_INFO(kLogTag, "Successfully created DB backup %1", fileName);
     return true;
 }
 

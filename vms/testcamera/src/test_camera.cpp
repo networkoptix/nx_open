@@ -13,9 +13,15 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
 
+#include <core/resource/test_camera_ini.h>
+
 namespace {
     static const unsigned int kSendTimeoutMs = 1000;
 }
+
+QnMutex QnTestCamera::s_logFramesFileMutex;
+
+std::unique_ptr<QFile> QnTestCamera::s_logFramesFile;
 
 QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(
     const QString& fileName,
@@ -84,6 +90,24 @@ QnTestCamera::QnTestCamera(quint32 num, bool includePts): m_num(num), m_includeP
     m_isEnabled = true;
     m_offlineDuration = 0;
     m_checkTimer.restart();
+
+    {
+        QnMutexLocker lock(&s_logFramesFileMutex);
+        const QString logFramesFile = testCameraIni().logFramesFile;
+        if (!logFramesFile.isEmpty() && !s_logFramesFile)
+        {
+            s_logFramesFile.reset(new QFile(logFramesFile));
+            if (!s_logFramesFile->open(QIODevice::WriteOnly))
+            {
+                qWarning() << "Unable to open file for logging frames:" << logFramesFile;
+                s_logFramesFile.reset();
+            }
+            else
+            {
+                qDebug() << "Logging frames to" << logFramesFile;
+            }
+        }
+    }
 }
 
 QByteArray QnTestCamera::getMac() const
@@ -127,7 +151,10 @@ int QnTestCamera::sendAll(nx::network::AbstractStreamSocket* socket, const void*
 }
 
 bool QnTestCamera::doStreamingFile(
-    const QList<QnCompressedVideoDataPtr> data, nx::network::AbstractStreamSocket* socket, int fps)
+    const QList<QnCompressedVideoDataPtr> data,
+    nx::network::AbstractStreamSocket* socket,
+    int fps,
+    bool isSecondary)
 {
     double streamingTime = 0;
     QTime timer;
@@ -192,6 +219,21 @@ bool QnTestCamera::doStreamingFile(
             qint64 ptsBigEndian = (qint64) htonll((quint64) video->timestamp);
             if (!sendAll(socket, &ptsBigEndian, sizeof(ptsBigEndian)))
                 return false;
+
+            {
+                QnMutexLocker lock(&s_logFramesFileMutex);
+                if (s_logFramesFile)
+                {
+                    const QString message = lm("Camera %1: stream %2, PTS %3, dataSize %4\n").args(
+                        m_num,
+                        isSecondary ? "secondary" : "primary",
+                        video->timestamp,
+                        video->dataSize());
+
+                    if (s_logFramesFile->write(message.toUtf8()) <= 0)
+                        qDebug() << "Unable to log the frame to" << s_logFramesFile->fileName();
+                }
+            }
         }
 
         if (!sendAll(socket, video->data(), (int) video->dataSize()))
@@ -229,7 +271,7 @@ void QnTestCamera::startStreaming(
             break;
         }
 
-        if (!doStreamingFile(data, socket, fps))
+        if (!doStreamingFile(data, socket, fps, isSecondary))
             break;
         fileIndex = (fileIndex+1) % fileList.size();
     }

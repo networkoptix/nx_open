@@ -11,6 +11,7 @@
 #include <QtCore/QPointer>
 
 
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 
 namespace {
@@ -151,19 +152,23 @@ QnPlatformProcess::Priority QnUnixProcess::priority() const {
 
 void QnUnixProcess::setPriority(Priority priority) {
     Q_D(QnUnixProcess);
-    if(!d->valid) {
-        qnWarning("Process is not valid, could not set priority.");
+    if (!d->valid)
+    {
+        NX_WARNING(this, "Process is not valid, could not set priority");
         return;
     }
 
     int systemPriority = d->qnToSystemPriority(priority);
-    if(systemPriority == (int)InvalidNiceValue) {
-        qnWarning("Invalid process priority value '%1'.", static_cast<int>(priority));
+    if (systemPriority == (int)InvalidNiceValue)
+    {
+        NX_WARNING(this, "Invalid process priority value '%1'", static_cast<int>(priority));
         return;
     }
 
-    if(setpriority(PRIO_PROCESS, d->pid, systemPriority) != 0) {
-        qnWarning("Could not set priority for process.");
+    if (setpriority(PRIO_PROCESS, d->pid, systemPriority) != 0)
+    {
+        NX_WARNING(this, "Could not set priority [%1] for process [%2]: %3",
+            static_cast<int>(priority), d->pid, strerror(errno));
         return;
     }
 }

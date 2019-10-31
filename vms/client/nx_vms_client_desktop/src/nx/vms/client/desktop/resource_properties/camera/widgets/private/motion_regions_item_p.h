@@ -2,7 +2,6 @@
 
 #include "../motion_regions_item.h"
 
-#include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QPointer>
 
@@ -48,6 +47,7 @@ public:
     void setFillOpacity(qreal value);
 
     QSGNode* updatePaintNode(QSGNode* node);
+    void releaseResources();
 
 private:
     void invalidateRegionsTexture();
@@ -96,7 +96,7 @@ private:
     State m_currentState;
 
     QVector<LabelData> m_labels;
-    QScopedPointer<QSGTexture, QScopedPointerDeleteLater> m_labelsTexture;
+    QSharedPointer<QSGTexture> m_labelsTexture;
     QSizeF m_cellSize;
     QSize m_labelSize;
     QColor m_labelsColor = Qt::black;
@@ -105,6 +105,7 @@ private:
 
     core::MotionGrid m_motionGrid;
     QImage m_regionsImage;
+    bool m_updateRegionsTexture = true;
 };
 
 } // namespace nx::vms::client::desktop

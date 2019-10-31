@@ -982,6 +982,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>달력 숨김</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation type="unfinished">Page...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2932,6 +2936,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1 khz와 48 Khz 오디오 포맷 오디오 캡처 장치에서 지원 되지 않습니다. 다른 오디오 장치 또는 화면 녹화 설정에서 "없음"을 선택 하십시오</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation type="unfinished">Could not detect capturing resolution</translation>
     </message>
   </context>
   <context>
@@ -5674,6 +5682,42 @@ If you intended to move analytics data to another storage location, please conta
       <source>Stores analytics data</source>
       <translation>분석 데이터를 저장합니다</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>예약됨</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation type="unfinished">local</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation type="unfinished">ram</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation type="unfinished">optical</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation type="unfinished">swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation type="unfinished">network</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation type="unfinished">usb</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation type="unfinished">unknown</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6364,6 +6408,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6498,6 +6549,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>시스템에 %1 을 병합하지 못했습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
     </message>
   </context>
   <context>
@@ -9858,6 +9916,45 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <message>
       <source>New Layout %1</source>
       <translation>%1 새 레이아웃</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation type="unfinished">Save File As...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>파일을 덮어쓸지 실패</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation type="unfinished">Failed to save file</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation type="unfinished">Downloading file...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>연결된 폴더 열기</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation type="unfinished">Stop file downloading?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation type="unfinished">File downloaded</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation type="unfinished">File downloading failed</translation>
     </message>
   </context>
 </TS>

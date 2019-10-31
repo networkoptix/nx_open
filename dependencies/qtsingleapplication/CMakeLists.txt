@@ -4,6 +4,8 @@ add_library(qtsingleapplication STATIC
     ${src_dir}/src/qtsingleapplication.cpp
     ${src_dir}/src/qtlocalpeer.cpp
 )
+set_target_properties(qtsingleapplication PROPERTIES FOLDER third_party)
+
 nx_add_qt_mocables(qtsingleapplication
     ${src_dir}/src/qtsingleapplication.h
     ${src_dir}/src/qtlocalpeer.h

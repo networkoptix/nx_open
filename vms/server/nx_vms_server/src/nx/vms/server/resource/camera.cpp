@@ -20,6 +20,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
 #include <nx/vms/server/resource/multicast_parameters.h>
+#include <utils/common/delayed.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -39,11 +40,19 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]()
-    {
-        QnMutexLocker lk(&m_initMutex);
-        fixInputPortMonitoring();
-    });
+    connect(this, &QnResource::initializedChanged,
+        [this]()
+        {
+            const auto weakRef = toSharedPointer(this).toWeakRef();
+            executeDelayed(
+                [weakRef, this]()
+                {
+                    if (const auto device = weakRef.toStrongRef())
+                        this->fixInputPortMonitoringSafe();
+                },
+                /*delay*/ 0,
+                this->serverModule()->thread());
+        });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -436,6 +445,11 @@ void Camera::initializationDone()
     base_type::initializationDone();
 
     // TODO: Find out is it's ever required, monitoring resource state change should be enough!
+    fixInputPortMonitoringSafe();
+}
+
+void Camera::fixInputPortMonitoringSafe()
+{
     QnMutexLocker lk(&m_initMutex);
     fixInputPortMonitoring();
 }
@@ -563,11 +577,19 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex str
     };
 
     using namespace nx::media;
-    auto mergeField = [](int& dst, const int& src)
-    {
-        if (dst == 0)
-            dst = src;
-    };
+    auto mergeIntField =
+        [](int& dst, const int& src)
+        {
+            if (dst == 0)
+                dst = src;
+        };
+
+    auto mergeFloatField =
+        [](float& dst, const float& src)
+        {
+            if (qFuzzyIsNull(dst))
+                dst = src;
+        };
 
     StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
@@ -586,11 +608,11 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex str
     {
         auto& value = itr.value();
         const auto defaultValue = defaultStreamCapability(itr.key());
-        mergeField(value.minBitrateKbps, defaultValue.minBitrateKbps);
-        mergeField(value.maxBitrateKbps, defaultValue.maxBitrateKbps);
-        mergeField(value.defaultBitrateKbps, defaultValue.defaultBitrateKbps);
-        mergeField(value.defaultFps, defaultValue.defaultFps);
-        mergeField(value.maxFps, defaultValue.maxFps);
+        mergeFloatField(value.minBitrateKbps, defaultValue.minBitrateKbps);
+        mergeFloatField(value.maxBitrateKbps, defaultValue.maxBitrateKbps);
+        mergeFloatField(value.defaultBitrateKbps, defaultValue.defaultBitrateKbps);
+        mergeIntField(value.defaultFps, defaultValue.defaultFps);
+        mergeIntField(value.maxFps, defaultValue.maxFps);
     }
 
     return result;
@@ -832,7 +854,7 @@ std::optional<QnLiveStreamParams> Camera::targetParams(StreamIndex streamIndex)
 {
     if (auto reader = findReader(streamIndex); reader && reader->isRunning())
         return reader->getLiveParams();
-    return std::optional<QnLiveStreamParams>();
+    return std::nullopt;
 }
 
 std::optional<QnLiveStreamParams> Camera::actualParams(StreamIndex streamIndex)
@@ -868,12 +890,19 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
         serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
 }
 
+bool Camera::hasArchiveRotated() const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->hasArchiveRotated(ptr) ||
+        serverModule()->backupStorageManager()->hasArchiveRotated(ptr);
+}
+
 std::chrono::milliseconds Camera::calendarDuration() const
 {
     const auto ptr = toSharedPointer().dynamicCast<Camera>();
-    return std::chrono::milliseconds(std::max(
-        serverModule()->normalStorageManager()->calendarDuration(ptr).count(),
-        serverModule()->backupStorageManager()->calendarDuration(ptr).count()));
+    return std::max(
+        serverModule()->normalStorageManager()->archiveAge(ptr),
+        serverModule()->backupStorageManager()->archiveAge(ptr));
 }
 
 qint64 Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const

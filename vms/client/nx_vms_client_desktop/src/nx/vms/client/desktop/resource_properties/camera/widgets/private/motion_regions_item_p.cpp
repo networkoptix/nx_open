@@ -13,6 +13,7 @@
 #include <nx/client/core/motion/helpers/camera_motion_helper.h>
 
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/utils/thread/custom_runnable.h>
 
 namespace nx::vms::client::desktop {
 
@@ -211,6 +212,23 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     return geometryNode;
 }
 
+void MotionRegionsItem::Private::releaseResources()
+{
+    const auto clearTextures =
+        [texture = std::move(m_currentState.texture),
+            labelsTexture = std::move(m_labelsTexture)]() mutable
+        {
+            texture.reset();
+            labelsTexture.reset();
+        };
+
+    const auto window = q->window();
+    window->scheduleRenderJob(
+        new nx::utils::thread::CustomRunnable(clearTextures),
+        QQuickWindow::AfterSynchronizingStage);
+    window->update();
+}
+
 void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
 {
     auto labelsNode = mainNode->childCount() > 0
@@ -288,28 +306,22 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geomet
 
 void MotionRegionsItem::Private::invalidateRegionsTexture()
 {
-    m_currentState.texture.reset();
+    m_updateRegionsTexture = true;
 }
 
 void MotionRegionsItem::Private::ensureRegionsTexture()
 {
-    if (m_currentState.texture)
+    if (!m_updateRegionsTexture && m_currentState.texture)
         return;
 
+    m_updateRegionsTexture = false;
     const auto window = q->window();
     if (!window)
         return;
 
     updateRegionsImage();
 
-    const auto textureDeleter =
-        [](QSGTexture* texture)
-        {
-            if (texture)
-                texture->deleteLater();
-        };
-
-    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage), textureDeleter);
+    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage));
     m_currentState.texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
     m_currentState.texture->setFiltering(QSGTexture::Nearest);

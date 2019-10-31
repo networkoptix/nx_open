@@ -214,6 +214,7 @@ public:
     std::chrono::milliseconds nxOccupiedDuration() const;
     std::chrono::milliseconds calendarDuration() const;
     qint64 recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
+    bool hasArchiveRotated() const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -264,6 +265,7 @@ private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
     QSharedPointer<QnLiveStreamProvider> findReader(nx::vms::api::StreamIndex streamIndex);
+    void fixInputPortMonitoringSafe();
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 

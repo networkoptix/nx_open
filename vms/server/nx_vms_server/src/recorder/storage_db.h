@@ -72,7 +72,7 @@ private:
 
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
-    void addCatalogFromMediaFolder(const QString& postfix,
+    void addCatalogFromMediaFolder(
         QnServer::ChunksCatalog catalog,
         QVector<DeviceFileCatalogPtr>& result);
     bool resetIoDevice();

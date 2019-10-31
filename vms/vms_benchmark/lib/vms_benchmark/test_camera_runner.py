@@ -6,32 +6,35 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-binary_file = './testcamera'
-test_file_high_resolution = './test_file_high_resolution.ts'
-test_file_low_resolution = './test_file_low_resolution.ts'
-debug = False
+ini_testcamera_bin: str
+ini_test_file_high_resolution: str
+ini_test_file_low_resolution: str
+ini_testcamera_output_file: str
 
 
 @contextmanager
 def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     camera_args = [
-        binary_file,
+        ini_testcamera_bin,
         f"--local-interface={local_ip}",
         '--pts',
         f"--fps-primary", str(primary_fps),
         f"--fps-secondary", str(secondary_fps),
-        f"files=\"{test_file_high_resolution}\";secondary-files=\"{test_file_low_resolution}\";count={count}",
+        f"files=\"{ini_test_file_high_resolution}\";secondary-files=\"{ini_test_file_low_resolution}\";count={count}",
     ]
 
     opts = {}
-
-    if not debug:
-        opts['stdout'] = subprocess.PIPE
-        opts['stderr'] = subprocess.PIPE
+    if not ini_testcamera_output_file:
+        opts['stdout'] = subprocess.DEVNULL
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_testcamera_output_file, 'wb')
+        opts['stdout'] = output_fd
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(ini_testcamera_bin)
         opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.
@@ -45,7 +48,7 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     try:
         proc = subprocess.Popen(camera_args, **opts)
     except Exception as exception:
-        raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
+        raise exceptions.TestCameraError(f"Unable to spawn virtual cameras: {str(exception)}")
 
     try:
         yield proc

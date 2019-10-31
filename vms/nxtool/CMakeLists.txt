@@ -16,7 +16,8 @@ nx_add_target(nxtool EXECUTABLE SIGNED
         Qt5::Gui
         Qt5::Network
         Qt5::Quick
-        Qt5::Qml)
+        Qt5::Qml
+    FOLDER utils)
 
 if(WINDOWS)
     target_link_libraries(nxtool PRIVATE ws2_32)

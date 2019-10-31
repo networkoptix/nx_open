@@ -67,7 +67,7 @@ public:
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
     virtual void start(Priority priority = InheritPriority) override;
-    void beforeDestroy();
+    void disableStartThread();
 
     virtual bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);

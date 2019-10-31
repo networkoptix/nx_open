@@ -26,7 +26,6 @@ FocusScope
     {
         id: label
         height: parent.height
-        verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignRight
         wrapMode: Text.WordWrap
 

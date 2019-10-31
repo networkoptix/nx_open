@@ -101,12 +101,13 @@ protected:
                     continue;
 
                 if (QByteArray((const char*) buffer, bytesRead).startsWith(
-                    testCameraIni().findMessage))
+                    testCameraIni().findMessage + QByteArray("\n")))
                 {
                     // got discovery message
                     qDebug() << "Got discovery message from " << peerEndpoint.toString();
                     QByteArray camResponse = QnCameraPool::instance()->getDiscoveryResponse();
                     QByteArray rez(testCameraIni().idMessage);
+                    rez.append('\n');
                     rez.append(';');
                     rez.append(camResponse);
                     discoverySock->setDestAddr( peerEndpoint );

@@ -10,6 +10,7 @@
 #include <core/resource/motion_window.h>
 
 #include <nx/utils/std/optional.h>
+#include <nx/vms/client/desktop/common/redux/redux_types.h>
 
 class QnAspectRatio;
 struct QnMediaDewarpingParams;
@@ -82,6 +83,7 @@ public:
     void generateLogicalId();
     void resetExpertSettings();
 
+    Q_INVOKABLE QnUuid resourceId() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
@@ -101,7 +103,8 @@ public:
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
-    void setStreamUrls(const QString& primary, const QString& secondary);
+    void setStreamUrls(const QString& primary, const QString& secondary,
+        ModificationSource source = ModificationSource::local);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

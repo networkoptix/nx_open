@@ -10,13 +10,13 @@ namespace media {
 
 struct CameraStreamCapability
 {
-    int minBitrateKbps = 0;
-    int maxBitrateKbps = 0;
-    int defaultBitrateKbps = 0;
+    float minBitrateKbps = 0;
+    float maxBitrateKbps = 0;
+    float defaultBitrateKbps = 0;
     int defaultFps = 0;
     int maxFps = 0;
 
-    CameraStreamCapability(int minBitrate = 0, int maxBitrate = 0, int fps = 0);
+    CameraStreamCapability(float minBitrate = 0.0, float maxBitrate = 0.0, int fps = 0);
     bool isNull() const;
     QString toString() const;
 };

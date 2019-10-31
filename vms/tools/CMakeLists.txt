@@ -1,0 +1,2 @@
+add_subdirectory(nov_browser)
+add_subdirectory(screen_checker)

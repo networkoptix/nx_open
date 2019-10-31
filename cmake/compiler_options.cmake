@@ -8,6 +8,10 @@ if(developerBuild)
     set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 endif()
 
+if(LINUX AND NOT ANDROID)
+    option(useLdGold "Use ld.gold to link binaries" OFF)
+endif()
+
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     # TODO: Use CMake defaults in the next release version (remove the following two lines).
     string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
@@ -196,8 +200,16 @@ if(LINUX)
 
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--no-undefined")
-    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
-    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
+
+    set(link_flags " -Wl,--as-needed")
+
+    if(useLdGold)
+        list(APPEND link_flags " -fuse-ld=gold")
+        list(APPEND link_flags " -Wl,--gdb-index")
+    endif()
+
+    string(APPEND CMAKE_EXE_LINKER_FLAGS ${link_flags})
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS ${link_flags})
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-ggdb1 -fno-omit-frame-pointer)

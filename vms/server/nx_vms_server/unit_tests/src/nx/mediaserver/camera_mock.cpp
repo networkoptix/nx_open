@@ -7,13 +7,21 @@ namespace vms::server {
 namespace resource {
 namespace test {
 
-CameraMock::CameraMock(QnMediaServerModule* serverModule): Camera(serverModule)
+CameraMock::CameraMock(QnMediaServerModule* serverModule, std::optional<int> id):
+    Camera(serverModule)
 {
     static std::atomic<int> number{0};
-    const auto current = QString::number(number++);
+    const auto current = QString::number(id ? *id : number++);
     setIdUnsafe(QnUuid::createUuid());
+    setName("CMock " + current);
     setPhysicalId("CMock_" + current);
-    setUrl("http://cmock" + current + ":80/api");
+    setUrl("http://192.168.0." + current + ":80/api");
+    setModel("Model_" + current);
+    setVendor("Vendor_" + current);
+    setFirmware("1.0." + current);
+    if (id)
+        setLogicalId(*id);
+    setMAC(nx::utils::MacAddress(QLatin1String("12:12:12:12:12:12")));
 }
 
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)

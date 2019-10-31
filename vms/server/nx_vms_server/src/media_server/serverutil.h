@@ -98,14 +98,16 @@ public:
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 
-    bool backupDatabase(
-        const boost::optional<QString>& dbFilePath = boost::none,
-        const boost::optional<int>& buildNumber = boost::none);
+    bool backupDatabase();
     /**
      * Returns none if no backup file has been found.
      */
     boost::optional<int64_t> lastDbBackupTimestamp() const;
-    bool timeToMakeDbBackup() const;
+
+    /**
+     * Should be used when database file has not been opened yet.
+     */
+    bool backupDatabaseViaCopy(int buildNumber);
 };
 
 } // namespace vms::server

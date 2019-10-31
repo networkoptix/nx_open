@@ -11,6 +11,7 @@ nx_add_target(applauncher EXECUTABLE SIGNED
         common
         nx_vms_applauncher_api
         nx_kit
+    FOLDER utils
 )
 
 string(REPLACE ".exe" "" binary_name ${applauncher.binary.name})

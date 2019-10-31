@@ -45,17 +45,7 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "servers",
-                [pool](const auto&)
-                {
-                    return Value(pool->getAllServers(Qn::AnyStatus).size());
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "users",
-                [pool](const auto&)
-                {
-                    return Value(pool->getResources<QnUserResource>().size());
-                }
+                [pool](const auto&) { return Value(pool->getAllServers(Qn::AnyStatus).size()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "cameras",
@@ -67,10 +57,11 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "storages",
-                [pool](const auto&)
-                {
-                    return Value(pool->getResources<QnStorageResource>().size());
-                }
+                [pool](const auto&) { return Value(pool->getResources<QnStorageResource>().size()); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "users",
+                [pool](const auto&) { return Value(pool->getResources<QnUserResource>().size()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "version",

@@ -61,11 +61,6 @@ protected:
         vms::api::TranState newSubscription,
         bool addImplicitData) override;
 
-    void gotTransaction(
-        const QnTransaction<nx::vms::api::UpdateSequenceData>& tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
-
     template <class T>
     void gotTransaction(
         const QnTransaction<T>& tran,

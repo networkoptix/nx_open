@@ -27,11 +27,11 @@ for item in site_list_draft:
             site_list.append(match.group(0))
 
 site_set = set(site_list)
-f1_path = os.path.abspath(os.getcwd() + '/..' + '/..' +
-    '/appserver2/static-resources/resources/camera_types/arecontvision.xml')
+f1_path = os.path.abspath(os.getcwd() + '/..' + '/..' + '/..' +
+    '/server/nx_vms_server_db/static-resources/resources/camera_types/arecontvision.xml')
 
-f2_path = os.path.abspath(os.getcwd() + '/..' + '/..' +
-    '/appserver2/static-resources/02_insert_all_vendors.sql')
+f2_path = os.path.abspath(os.getcwd() + '/..' + '/..' + '/..' +
+    '/server/nx_vms_server_db/static-resources/02_insert_all_vendors.sql')
 f2 = open(f2_path, 'r')
 
 xml_list = []

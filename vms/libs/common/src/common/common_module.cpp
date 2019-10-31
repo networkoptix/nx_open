@@ -21,7 +21,7 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
-#include <core/resource_access/providers/parent_server_monitor_access_provider.h>
+#include <core/resource_access/providers/implicit_server_monitor_access_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resource_properties.h>
@@ -197,8 +197,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
         new QnSharedLayoutItemAccessProvider(resourceAccessMode, this));
     m_resourceAccessProvider->addBaseProvider(
         new QnVideoWallItemAccessProvider(resourceAccessMode, this));
-    m_resourceAccessProvider->addBaseProvider(new QnParentServerMonitorAccessProvider(
-        resourceAccessMode, m_resourceAccessProvider->providers(), this));
+    m_resourceAccessProvider->addBaseProvider(
+        new QnImplicitServerMonitorAccessProvider(resourceAccessMode, this));
 
     // Depends on access provider.
     m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);
@@ -544,6 +544,11 @@ void QnCommonModule::setStandAloneMode(bool value)
 nx::metrics::Storage* QnCommonModule::metrics() const
 {
     return m_metrics.get();
+}
+
+std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
+{
+    return std::weak_ptr<nx::metrics::Storage>(m_metrics);
 }
 
 bool QnCommonModule::isStandAloneMode() const

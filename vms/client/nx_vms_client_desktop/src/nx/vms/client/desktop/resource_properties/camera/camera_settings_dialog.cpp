@@ -34,6 +34,7 @@
 #include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 #include "watchers/camera_settings_global_permissions_watcher.h"
+#include "watchers/camera_settings_property_watcher.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
@@ -60,6 +61,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QPointer<CameraSettingsAnalyticsEnginesWatcher> analyticsEnginesWatcher;
     QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
+    QPointer<CameraSettingsPropertyWatcher> cameraPropertyWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
@@ -264,6 +266,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
     d->analyticsEnginesWatcher = new CameraSettingsAnalyticsEnginesWatcher(d->store, this);
     d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
+    d->cameraPropertyWatcher = new CameraSettingsPropertyWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -462,6 +465,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
     d->analyticsEnginesWatcher->setCamera(singleCamera);
+    d->cameraPropertyWatcher->setCameras(cameras.toSet());
 
     d->previewManager->refreshSelectedCamera();
 
@@ -471,10 +475,10 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     return true;
 }
 
-void CameraSettingsDialog::reject()
+void CameraSettingsDialog::done(int result)
 {
+    base_type::done(result);
     d->resetChanges();
-    base_type::reject();
 }
 
 void CameraSettingsDialog::showEvent(QShowEvent* event)

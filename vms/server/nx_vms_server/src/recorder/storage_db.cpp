@@ -211,7 +211,7 @@ void QnStorageDb::replaceChunks(
 {
     deleteRecords(cameraUniqueId, catalog, -1);
     for (const auto &chunk: chunks)
-        addRecord(cameraUniqueId, catalog, chunk.chunk());
+        addRecord(cameraUniqueId, catalog, chunk);
 }
 
 bool QnStorageDb::open(const QString& fileName)
@@ -252,8 +252,8 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
 
-    addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
-    addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
+    addCatalogFromMediaFolder(QnServer::HiQualityCatalog, result);
+    addCatalogFromMediaFolder(QnServer::LowQualityCatalog, result);
 
     return result;
 }
@@ -267,26 +267,18 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result,
         if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
             return true;
     }
+
     return false;
 }
 
-void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
-                                            QnServer::ChunksCatalog catalog,
-                                            QVector<DeviceFileCatalogPtr>& result)
+void QnStorageDb::addCatalogFromMediaFolder(
+    QnServer::ChunksCatalog catalog,
+    QVector<DeviceFileCatalogPtr>& result)
 {
-    QString root = closeDirPath(QFileInfo(m_dbFileName).absoluteDir().path()) + postfix;
-
-    QnAbstractStorageResource::FileInfoList files;
-    if (m_storage)
-        files = m_storage->getFileList(root);
-    else
-        files = QnAbstractStorageResource::FIListFromQFIList(
-            QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot,
-                                     QDir::Name));
-
-    for (const QnAbstractStorageResource::FileInfo& fi: files)
+    const auto path = closeDirPath(m_storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog);
+    for (const auto& fi: m_storage->getFileList(path))
     {
-        QString uniqueId = fi.baseName();
+        const auto uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId))
         {
             result << DeviceFileCatalogPtr(new DeviceFileCatalog(

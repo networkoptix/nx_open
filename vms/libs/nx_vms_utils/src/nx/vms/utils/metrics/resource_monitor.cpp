@@ -15,45 +15,41 @@ ResourceMonitor::ResourceMonitor(
 api::metrics::ResourceValues ResourceMonitor::values(Scope requestScope, bool formatted) const
 {
     api::metrics::ResourceValues values;
+    size_t count = 0;
     for (const auto& [id, monitor]: m_monitors)
     {
         if (auto v = monitor->values(requestScope, formatted); !v.empty())
+        {
+            count += v.size();
             values[id] = std::move(v);
-    }
-
-    const auto countValues =
-        [&]()
-        {
-            size_t count = 0;
-            for (const auto& [id, value]: values) count += value.size();
-            return count;
-        };
-
-    NX_VERBOSE(this, "Return %1 %2 values in %3 groups", countValues(), requestScope, values.size());
-    return values;
-}
-
-std::vector<api::metrics::Alarm> ResourceMonitor::alarms(Scope requestScope) const
-{
-    std::vector<api::metrics::Alarm> allAlarms;
-    for (const auto& [groupId, monitor]: m_monitors)
-    {
-        auto alarms = monitor->alarms(requestScope);
-        for (auto& alarm: alarms)
-        {
-            alarm.parameter = groupId + "." + alarm.parameter;
-            allAlarms.push_back(std::move(alarm));
         }
     }
 
-    NX_VERBOSE(this, "Return %1 %2 alarms", allAlarms.size(), requestScope);
-    return allAlarms;
+    NX_VERBOSE(this, "Return %1 %2 values in %3 groups", count, requestScope, values.size());
+    return values;
+}
+
+api::metrics::ResourceAlarms ResourceMonitor::alarms(Scope requestScope) const
+{
+    api::metrics::ResourceAlarms resourceAlarms;
+    size_t count = 0;
+    for (const auto& [groupId, monitor]: m_monitors)
+    {
+        if (auto alarms = monitor->alarms(requestScope); !alarms.empty())
+        {
+            count += alarms.size();
+            resourceAlarms[groupId] = std::move(alarms);
+        }
+    }
+
+    NX_VERBOSE(this, "Return %1 %2 alarmed values", count, requestScope);
+    return resourceAlarms;
 }
 
 void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)
 {
     const auto skipOnMissing = m_resource->scope == Scope::system;
-    for (const auto& [id, groupRules]: rules)
+    for (const auto& [id, groupRules]: rules.values)
     {
         if (const auto& it = m_monitors.find(id); it != m_monitors.end())
         {

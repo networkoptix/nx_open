@@ -20,7 +20,7 @@ public:
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
-    void setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec);
+    void setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec);
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);

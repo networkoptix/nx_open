@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} webové rozhraní"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "pozastavit",
-            "help": "help | show commands",
-            "collapse all servers": "sbalit všechny servery",
-            "collapse server": "collapse server + [server name]",
-            "play": "přehrát",
-            "clear search": "smazat hledání",
-            "live": "go to live | show me live",
-            "expand all servers": "rozbalit všechny servery",
-            "stop listening": "zastavení poslech",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Systém je offline",
         "cameraLinks": {
-            "copyToClipboard": "kopírovat do schránky",
             "highStream": "Hlavní stream",
-            "copyDefaultText": "kopírovat",
-            "unknown": "Neznámý",
             "lowStream": "Vedlejší stream",
             "transcoding": "Překódování",
+            "unknown": "Neznámý",
+            "copyToClipboard": "kopírovat do schránky",
+            "copyDefaultText": "kopírovat",
             "copyActiveText": "zkopírováno do schránky"
         },
-        "searchCamPlaceholder": "Hledat",
+        "systemOffline": "Systém je offline",
         "cameraStates": {
-            "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
-            "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
-            "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+            "offline": "Offline",
+            "error": "Chyba",
             "unauthorized": "Ověření je vyžadováno",
-            "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium.",
-            "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+            "noData": "Žádná data",
+            "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+            "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>.",
             "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
             "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
-            "error": "Chyba",
-            "offline": "Offline",
-            "noData": "Žádná data",
-            "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>."
+            "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+            "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+            "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+            "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium."
+        },
+        "searchCamPlaceholder": "Hledat",
+        "resolution": {
+            "auto": "Auto",
+            "high": "Hlavní",
+            "low": "Vedlejší"
         },
         "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
-        "resolution": {
-            "high": "Hlavní",
-            "auto": "Auto",
-            "low": "Vedlejší"
+        "voiceCommands": {
+            "play": "přehrát",
+            "pause": "pozastavit",
+            "live": "go to live | show me live",
+            "view": "view + [camera name]",
+            "search": "find + [text for searchbar]",
+            "clear search": "smazat hledání",
+            "expand server": "expand server + [server name]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "rozbalit všechny servery",
+            "collapse all servers": "sbalit všechny servery",
+            "stop listening": "zastavení poslech",
+            "help": "help | show commands"
         }
     }
 }

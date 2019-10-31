@@ -5,9 +5,9 @@ namespace node_view {
 
 struct NodeViewBaseSortModel::Private
 {
-    QString filter;
+    bool filteringEnabled = true;
+    QString filterString;
     FilterFunctor filterFunctor;
-    NodeViewBaseSortModel::FilterScope scope;
 };
 
 NodeViewBaseSortModel::NodeViewBaseSortModel(QObject* parent):
@@ -20,11 +20,37 @@ NodeViewBaseSortModel::~NodeViewBaseSortModel()
 {
 }
 
-void NodeViewBaseSortModel::setFilter(const QString& filter, FilterScope scope)
+bool NodeViewBaseSortModel::filteringEnabled() const
 {
-    d->filter = filter;
-    d->scope = scope;
+    return d->filteringEnabled;
+}
+
+void NodeViewBaseSortModel::setFilteringEnabled(bool enabled)
+{
+    if (d->filteringEnabled == enabled)
+        return;
+
+    d->filteringEnabled = enabled;
     invalidateFilter();
+}
+
+QString NodeViewBaseSortModel::filterString() const
+{
+    return d->filterString;
+}
+
+void NodeViewBaseSortModel::setFilterString(const QString& string)
+{
+    if (d->filterString == string)
+        return;
+
+    d->filterString = string;
+    invalidateFilter();
+}
+
+void NodeViewBaseSortModel::setFilterFunctor(FilterFunctor filterFunctor)
+{
+    d->filterFunctor = filterFunctor;
 }
 
 void NodeViewBaseSortModel::setSourceModel(QAbstractItemModel* model)
@@ -53,7 +79,7 @@ bool NodeViewBaseSortModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (d->filter.isEmpty())
+    if (d->filterString.isEmpty() || !d->filteringEnabled)
         return true;
 
     const auto source = sourceModel();
@@ -64,11 +90,11 @@ bool NodeViewBaseSortModel::filterAcceptsRow(
     for (int column = 0; column != sourceColumnCount; ++column)
     {
         const auto index = source->index(sourceRow, column, sourceParent);
-        if (d->scope == AnyNodeFilterScope || source->rowCount(index) == 0)
+        if (source->rowCount(index) == 0)
         {
-            if (d->filterFunctor && d->filterFunctor(index, d->filter))
+            if (d->filterFunctor && d->filterFunctor(index, d->filterString))
                 return true;
-            else if (index.data().toString().contains(d->filter, Qt::CaseInsensitive))
+            else if (index.data().toString().contains(d->filterString, Qt::CaseInsensitive))
                 return true;
         }
 
@@ -80,11 +106,6 @@ bool NodeViewBaseSortModel::filterAcceptsRow(
         }
     }
     return false;
-}
-
-void NodeViewBaseSortModel::setFilterFunctor(FilterFunctor filterFunctor)
-{
-    d->filterFunctor = filterFunctor;
 }
 
 } // namespace node_view

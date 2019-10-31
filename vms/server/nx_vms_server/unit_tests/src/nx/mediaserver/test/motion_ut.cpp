@@ -13,20 +13,20 @@ namespace nx::vms::server::test
 static const int kSteps = 1200;
 static const int kDeltaMs = 10 * 1000LL;
 
-class DataProviderStub: public QnAbstractStreamDataProvider
-{
-public:
-    using QnAbstractStreamDataProvider::QnAbstractStreamDataProvider;
-};
-
 class MotionArchive: public MediaServerModuleFixture
 {
   public:
       MotionArchive(): MediaServerModuleFixture()
       {
+      }
+
+      virtual void SetUp() override
+      {
+          MediaServerModuleFixture::SetUp();
+
           m_camera.reset(new resource::test::CameraMock(&serverModule()));
           m_camera->setPhysicalId("motion archive test");
-          m_dataProviderStub.reset(new DataProviderStub(m_camera));
+          m_dataProviderStub.reset(new QnAbstractStreamDataProvider(m_camera));
       }
 
       void createTestData()
@@ -72,7 +72,7 @@ class MotionArchive: public MediaServerModuleFixture
       }
 
       QnVirtualCameraResourcePtr m_camera;
-      std::unique_ptr<DataProviderStub> m_dataProviderStub;
+      std::unique_ptr<QnAbstractStreamDataProvider> m_dataProviderStub;
       std::vector<qint64> m_numericDates;
 };
 

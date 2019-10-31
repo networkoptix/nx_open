@@ -17,12 +17,14 @@ NX_VMS_API void merge(Value* destination, Value* source)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(ValueGroupRules)(Alarm),
+    (ValueManifest)(ValueGroupManifest)(ResourceManifest)
+    (AlarmRule)(ResourceRules)(ValueRule)(ValueGroupRules)
+    (Alarm),
     (json), _Fields, (optional, true))
 
 static QString nameOrCapitalizedId(QString name, const QString& id)
 {
-    if (!name.isEmpty() || id.isEmpty())
+    if (!name.isEmpty() || id.isEmpty() || id == "_")
         return name;
 
     return id.left(1).toUpper() + id.mid(1);
@@ -38,11 +40,6 @@ ValueManifest::ValueManifest(Label label, Displays display, QString format):
     Label(std::move(label)),
     display(display),
     format(std::move(format))
-{
-}
-
-ValueGroupManifest::ValueGroupManifest(Label label):
-    Label(std::move(label))
 {
 }
 
@@ -137,8 +134,9 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
 } // namespace nx::vms::api::metrics
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::metrics, AlarmLevel,
+    (nx::vms::api::metrics::AlarmLevel::none, "")
     (nx::vms::api::metrics::AlarmLevel::warning, "warning")
-    (nx::vms::api::metrics::AlarmLevel::danger, "danger")
+    (nx::vms::api::metrics::AlarmLevel::error, "error")
 )
 
 #define METRICS_DISPLAY_NAMES \

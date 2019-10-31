@@ -13,29 +13,33 @@ streams from virtual cameras, and creates a detailed report about potential perf
 ---------------------------------------------------------------------------------------------------
 ## Prerequisites
 
-The tool can run on either Linux or Windows PC called "host" here, and can connect to any other
-device (it may be ARM or x64) with Linux called "box" here.
+The tool can run on either Linux or Windows PC called "Host" here, and can connect to any other
+device (it may be ARM or x64) with Linux called "Box" here.
 
 The following prerequisites should be assured before running the tool:
 
-* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, and 4G RAM.
+* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, 8 GB RAM, 1 GB
+    free disk space.
 * Host PC OS: Ubuntu 18.04 or Windows 10.
-   * The tool may work with other OS versions, but it is not officially supported.
-   * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
-       officially supported.
+    * The tool may work with other OS versions, but it is not officially supported.
+    * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
+        officially supported.
 * Host PC should not run any other software at the time of running VMS Benchmark, besides built-in
     OS components. Such software may or may not interfere with VMS Benchmark and may or may not
     affect its ability to run or the accuracy of its report.
-* Linux host: `ssh` and `sshpass` tools should be installed on the host.
-* Windows host: Firewall should be disabled completely to enable spawning virtual cameras in the
+* Linux Host: `ssh` and `sshpass` tools should be installed on the Host.
+* Windows Host: Firewall should be disabled completely to enable spawning virtual cameras in the
     isolated network.
-* VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
+* VMS Server should be installed on the Box and VMS System should be set up via the Setup Wizard
     in the Server web-admin.
-* No more than one VMS should be installed on the box.
-* If the box Linux user is not root, it should be in sudoers and `sudo` should not ask for
+    * No other manipulations with the installed VMS Server should be performed before running the
+        tool, including adding cameras and changing the Server setting from the Client - such
+        activities may influence the Server state and thus lead to an incorrect report.
+* No more than one VMS should be installed on the Box.
+* If the Box Linux user is not root, it should be in sudoers and `sudo` should not ask for
     password.
-* The box should be connected to an isolated network together with the host, and this network
-    should have the full bandwidth that the box is planned to work with, e.g. 100 Mbps or 1 Gbps.
+* The Box should be connected to an isolated network together with the host, and this network
+    should have the full bandwidth that the Box is planned to work with, e.g. 100 Mbps or 1 Gbps.
     There should be no cameras in this network, but it may be connected to the internet.
 
 If there is a need to contact the Support Team regarding an issue with the VMS Benchmark tool
@@ -55,7 +59,7 @@ a detailed comment in this file.
 
 Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
-- If `ssh <boxHostnameOrIp>` on the host machine requires to enter credentials, specify them in 
+- If `ssh <boxHostnameOrIp>` on the Host machine requires to enter credentials, specify them in 
     `boxLogin` and `boxPassword` fields.
 - Set the desired number of cameras in `virtualCamerasCount` field.
 
@@ -64,20 +68,33 @@ Then simply run the command `vms_benchmark` without arguments, and watch or capt
 Currently, the tool has no command-line options besides `--help` which shows a trivial help.
 
 If the tool encounters an error which prevents further testing (like some of the prerequisites is
-not fulfilled, or the connection to the box cannot be established, or some command at the box gives
+not fulfilled, or the connection to the Box cannot be established, or some command at the Box gives
 unexpected result), an ERROR is reported and the tool aborts execution. In this case it is
 recommended to investigate and fix the error cause, and run the tool again.
 
 If the assessment fails, an ISSUE is reported and the tool aborts execution. Due to the nature of
 the assessment process which depends on many environmental characteristics such as the performance
-of the host and the network, sometimes a false-negative assessment may take place - the tool is
+of the Host and the network, sometimes a false-negative assessment may take place - the tool is
 trying to be conservative and report an ISSUE when it suspects that the VMS Server performance may
-not be optimal on the box. Thus, in case an ISSUE is reported, it is recommended to run the tool
-several times using the same configuration, and estimate the percentage of failures. If the
-configured load (e.g. number of cameras and number of streams requested from each camera) is on the
-edge of the box capabilities, the assessment may have a near-50% rate of reporting an ISSUE.
-Generally, it is recommended to consider the assessment successful if the rate of reporting an
-ISSUE is up to 5%.
+not be optimal on the Box. Thus, in case an ISSUE is reported, it is recommended to run the tool
+several times using the same configuration (making sure that the Box is in the proper state before
+each run; see below), and estimate the percentage of failures. If the configured load (e.g. number
+of cameras and number of streams requested from each camera) is on the edge of the Box
+capabilities, the assessment may have a near-50% rate of reporting an ISSUE. Generally, it is
+recommended to consider the assessment successful if the rate of reporting an ISSUE is up to 5%.
+
+The Box and Server state after running the tool:
+
+* The tool is not intended to be run on a Server working in customer's production installation,
+    unless the whole VMS System is considered experimental and thus its operational status,
+    configuration and data is considered not valuable.
+* ATTENTION: The tool clears all video archives on the Server, thus, never run the tool on a Server
+    with valuable data.
+* After a successful run, the tool leaves the Server in a state which is good for re-running the
+    tool but may be not suitable for using the Server otherwise without rebooting the Box.
+* After a failed run, the tool may leave the Box and/or the Server in a state which is not suitable
+    for any further testing and assessment (the exact state depends on the failure nature), thus,
+    it is recommended to re-initialize the Box file system.
 
 ---------------------------------------------------------------------------------------------------
 ## Example of successful report

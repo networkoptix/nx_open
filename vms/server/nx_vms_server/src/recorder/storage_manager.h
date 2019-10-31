@@ -201,7 +201,8 @@ public:
 
     int64_t nxOccupiedSpace(const QnStorageResourcePtr& storage) const;
     std::chrono::milliseconds nxOccupiedDuration(const QnVirtualCameraResourcePtr& camera) const;
-    std::chrono::milliseconds calendarDuration(const QnVirtualCameraResourcePtr& camera) const;
+    bool hasArchiveRotated(const QnVirtualCameraResourcePtr& camera) const;
+    std::chrono::milliseconds archiveAge(const QnVirtualCameraResourcePtr& camera) const;
     qint64 recordingBitrateBps(
         const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const;
 signals:
@@ -303,7 +304,7 @@ private:
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
     void updateMountedStatus(const QnStorageResourcePtr& storage);
-    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(int storageIndex);
+    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(const QnStorageResourcePtr& storage);
     void scanMediaCatalog(
         const QnStorageResourcePtr& storage,
         const DeviceFileCatalogPtr& catalog,
@@ -314,6 +315,8 @@ private:
         const QnStorageResourcePtr& storage,
         const QString& cameraPath,
         nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
+
+    void emptyCatalogsForNotExistingFolders(const QnStorageResourcePtr& storage);
 
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;

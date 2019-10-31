@@ -7,6 +7,7 @@ qt5_wrap_cpp(moc_sources ${headers})
 add_library(qthttpserver
     ${headers} ${sources} ${moc_sources}
 )
+set_target_properties(qthttpserver PROPERTIES FOLDER third_party)
 
 target_link_libraries(qthttpserver
     PUBLIC

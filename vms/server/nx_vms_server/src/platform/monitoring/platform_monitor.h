@@ -9,7 +9,7 @@
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-class QnMediaServerModule;
+namespace nx::vms::server { class RootFileSystem; }
 
 namespace nx::vms::server {
 
@@ -132,10 +132,11 @@ public:
         qint64 bytesPerSecMax;
     };
 
-    PlatformMonitor(QObject *parent = NULL): QObject(parent) {}
+    PlatformMonitor(): QObject() {}
     virtual ~PlatformMonitor() {}
 
-    virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
+    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* /*rootFs*/) {}
+    virtual void logStatistics() {}
 
     /**
      * @returns Percent of CPU time (both user and kernel) consumed by all running processes since
@@ -170,6 +171,16 @@ public:
     virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
+     * @returns A total number of threads for the current process. Return 0 on error.
+     */
+    virtual int thisProcessThreads() = 0;
+
+    /**
+     * @return Network load entry for the specified network interface on this PC.
+     */
+    std::optional<NetworkLoad> networkInterfaceLoad(const QString& interfaceName);
+
+    /**
      * @returns A list of network load entries for all network interfaces of the given types on
      * this PC.
      */
@@ -185,14 +196,11 @@ public:
      */
     QList<PartitionSpace> totalPartitionSpaceInfo(PartitionTypes types);
 
-    /**
-     * @brief Get partition name by path to some folder located on this partition. Used to get
-     *     partition by path to the storage.
-     * @param path Platform-specific path to target folder.
-     * @returns Platform-specific string describing this logical partition, suitable to be shown
-     *     to the user.
-     */
-    virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
+    /** @returns Update period of values, in milliseconds. */
+    virtual std::chrono::milliseconds updatePeriod() const { return std::chrono::milliseconds(0); }
+
+    /** @returns Server uptime in milliseconds. */
+    virtual std::chrono::milliseconds processUptime() const { return std::chrono::milliseconds(0); }
 
 private:
     Q_DISABLE_COPY(PlatformMonitor)

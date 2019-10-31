@@ -34,6 +34,7 @@ if(targetDevice MATCHES "^linux-x64")
         COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/distrib/main ${stage_dir}/vms_benchmark
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/build_info.txt ${stage_dir}/
 
         COMMAND ${CMAKE_COMMAND} -E echo
             "  Zipping VMS Benchmark - see ${zip_log}"
@@ -57,6 +58,7 @@ elseif(targetDevice STREQUAL "windows-x64")
         COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/distrib/main.exe ${stage_dir}/vms_benchmark.exe
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/build_info.txt ${stage_dir}/
 
         COMMAND ${CMAKE_COMMAND} -E echo
             "  Zipping VMS Benchmark - see ${zip_log}"
@@ -74,3 +76,4 @@ else()
 endif()
 
 add_custom_target(vms_benchmark ALL DEPENDS ${zip_file})
+set_target_properties(vms_benchmark PROPERTIES FOLDER utils)

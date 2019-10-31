@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <transaction/message_bus_adapter.h>
 #include <transaction/transaction.h>
-#include <utils/common/rfc868_servers.h>
 #include <utils/common/delayed.h>
 
 #include <nx/network/http/http_client.h>
@@ -22,6 +21,9 @@ namespace time_sync {
 
 static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
+/** Requesting same server twice to greatly reduce chance of receiving corrupted time value. */
+static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com" };
+
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
     nx::vms::network::AbstractServerConnector* serverConnector)
@@ -33,9 +35,6 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
-            const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
-            saveSystemTimeDeltaMs(systemTimeDeltaMs);
-
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
             {
@@ -44,6 +43,11 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                     .arg(qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID()))
                     .arg(QDateTime::fromMSecsSinceEpoch(syncTimeMs).toString(Qt::ISODate)));
                 broadcastSystemTime();
+            }
+            else
+            {
+                const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
+                saveSystemTimeDeltaMs(systemTimeDeltaMs);
             }
         });
 }
@@ -133,7 +137,8 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connec
         commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
     if (m_serverConnector)
-        return m_serverConnector->connectTo(route, sslRequired, maxRtt);
+        return m_serverConnector->connect(route, maxRtt, sslRequired).get();
+
     return base_type::connectToRemoteHost(route, sslRequired);
 }
 
@@ -212,8 +217,9 @@ void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
 
 void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
 {
-    const qint64 systemTimeDeltaMs = qAbs(
-        std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
+    const auto ownId = commonModule()->moduleGUID();
+    qint64 systemTimeDeltaMs = getPrimaryTimeServerId() == ownId ? 0 :
+        qAbs(std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
     if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) > kMaxJitterForLocalClock.count())
         saveSystemTimeDeltaMs(systemTimeDeltaMs);
 }

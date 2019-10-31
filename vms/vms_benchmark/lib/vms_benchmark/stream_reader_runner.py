@@ -6,76 +6,73 @@ from contextlib import contextmanager
 
 from vms_benchmark import exceptions
 
-binary_file = './testcamera/rtsp_perf'
-debug = False
+ini_rtsp_perf_bin: str
+ini_rtsp_perf_stderr_file: str
 
 
 @contextmanager
 def stream_reader_running(
     camera_ids,
-    streams_per_camera,
-    archive_streams_count,
+    total_live_stream_count: int,
+    total_archive_stream_count: int,
     user,
     password,
     box_ip,
-    vms_port
+    vms_port,
+    archive_read_pos_ms_utc: int,
 ):
-    camera_ids = list(camera_ids)
-
-    archive_streams_list = []
-
-    for i in range(archive_streams_count):
-        archive_streams_list.append(camera_ids[i % len(camera_ids)])
-
     args = [
-        binary_file,
+        ini_rtsp_perf_bin,
         '-u',
         user,
         '-p',
         password,
         '--timestamps',
-        '--count',
-        streams_per_camera
+        '--disable-restart',
     ]
 
     streams = {}
 
-    for camera_id, opts in (
-        [
-            [camera_id, None]
-            for camera_id in camera_ids
-        ] + [
-            [camera_id, {"pos": 0}]
-            for camera_id in archive_streams_list
-        ]
-    ):
-        import uuid
-        stream_uuid = str(uuid.uuid4())
+    for type, count in ('live', total_live_stream_count), ('archive', total_archive_stream_count):
+        for i in range(count):
+            camera_id = camera_ids[i % len(camera_ids)]
+            stream_id = f'{type}{i:03d}'
 
-        base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
+            base_url = f"rtsp://{box_ip}:{vms_port}/{camera_id}"
 
-        opts = dict(opts) if isinstance(opts, dict) else {}
-        opts['vms_benchmark_stream_id'] = stream_uuid
+            params = {
+                'vms_benchmark_stream_id': stream_id,
+            }
 
-        url = base_url + '?' + '&'.join([f"{k}={v}" for k, v in opts.items()])
+            if type == 'archive':
+                params['pos'] = archive_read_pos_ms_utc
 
-        args.append('--url')
-        args.append(url)
+            params['stream'] = 0  # Request primary stream.
 
-        streams[stream_uuid] = {
-            "camera_id": camera_id
-        }
+            url = base_url + '?' + '&'.join([f"{str(k)}={str(v)}" for k, v in params.items()])
 
-    opts = {
-        'stdout': subprocess.PIPE,
-    }
+            args.append('--url')
+            args.append(url)
 
-    if not debug:
-        opts['stderr'] = subprocess.PIPE
+            streams[stream_id] = {
+                "camera_id": camera_id,
+                "type": type
+            }
+
+    # E.g. if 3 URLs are passed to rtsp_perf and --count is 5, it may open streams 1, 1, 2, 2, 3.
+    args.append('--count')
+    args.append(len(streams.items()))
+
+    opts = {'stdout': subprocess.PIPE}
+    if not ini_rtsp_perf_stderr_file:
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_rtsp_perf_stderr_file, 'wb')
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(ini_rtsp_perf_bin)
         opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.
@@ -89,7 +86,7 @@ def stream_reader_running(
     try:
         proc = subprocess.Popen([str(arg) for arg in args], **opts)
     except Exception as exception:
-        raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
+        raise exceptions.RtspPerfError(f"Unable to start rtsp_perf: {str(exception)}")
 
     try:
         yield [proc, streams]

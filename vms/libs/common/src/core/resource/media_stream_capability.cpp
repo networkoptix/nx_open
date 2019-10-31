@@ -4,7 +4,7 @@
 namespace nx {
 namespace media {
 
-CameraStreamCapability::CameraStreamCapability(int minBitrate, int maxBitrate, int fps)
+CameraStreamCapability::CameraStreamCapability(float minBitrate, float maxBitrate, int fps)
 :
     minBitrateKbps(minBitrate), maxBitrateKbps(maxBitrate), defaultBitrateKbps(maxBitrate),
     defaultFps(fps), maxFps(fps)

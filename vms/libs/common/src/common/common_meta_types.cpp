@@ -85,7 +85,6 @@
 
 #include <licensing/license.h>
 
-#include <network/system_description.h>
 #include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
@@ -302,7 +301,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
-    qRegisterMetaType<QnServerFields>();
 
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
     qRegisterMetaType<nx::media::CameraTraits>();

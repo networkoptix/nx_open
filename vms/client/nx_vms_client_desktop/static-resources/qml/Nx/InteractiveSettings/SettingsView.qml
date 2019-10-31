@@ -15,6 +15,8 @@ Item
     property bool contentEnabled: true
     property ScrollBar verticalScrollBar: null
 
+    property var resourceId
+
     function loadModel(model, initialValues)
     {
         if (contentItem)

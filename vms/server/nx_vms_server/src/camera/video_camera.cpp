@@ -109,7 +109,6 @@ private:
 
 private:
     mutable QnMutex m_queueMtx;
-    int m_lastKeyFrameChannel;
     QnConstCompressedAudioDataPtr m_lastAudioData;
     QnConstCompressedVideoDataPtr m_lastKeyFrame[CL_MAX_CHANNELS];
     std::deque<QnConstCompressedVideoDataPtr> m_lastKeyFrames[CL_MAX_CHANNELS];
@@ -121,7 +120,6 @@ private:
 
     int m_gotIFramesMask;
     int m_allChannelsMask;
-    bool m_isSecondaryStream;
     QnVideoCamera* m_camera;
     bool m_activityStarted;
     qint64 m_activityStartTime;
@@ -136,7 +134,6 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(
     :
     QnResourceConsumer(resource),
     QnAbstractDataConsumer(kMaxGopSize),
-    m_lastKeyFrameChannel(0),
     m_gotIFramesMask(0),
     m_allChannelsMask(0),
     m_camera(camera),
@@ -510,10 +507,13 @@ void QnVideoCameraGopKeeper::clearVideoData()
 {
     QnMutexLocker lock( &m_queueMtx );
 
-    for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
+    for (QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame)
         frame.reset();
-    for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
+    for (auto& lastKeyFramesForChannel: m_lastKeyFrames)
         lastKeyFramesForChannel.clear();
+
+    NX_DEBUG(this, "Gop keeper cleared fo camera: %1", m_resource);
+    m_dataQueue.clear();
     m_nextMinTryTime = 0;
 }
 
@@ -556,9 +556,14 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) con
     return nullptr; //< Fallback for the failed assertion.
 }
 
-void QnVideoCamera::beforeStop()
+void QnVideoCamera::stopAndCleanup()
 {
     QnMutexLocker lock(&m_getReaderMutex);
+
+    if (m_primaryReader)
+        m_primaryReader->disableStartThread();
+    if (m_secondaryReader)
+        m_secondaryReader->disableStartThread();
 
     if (m_primaryGopKeeper)
         m_primaryGopKeeper->beforeDisconnectFromResource();
@@ -583,6 +588,8 @@ void QnVideoCamera::beforeStop()
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
     }
+
+    stop();
 }
 
 void QnVideoCamera::stop()
@@ -595,18 +602,7 @@ void QnVideoCamera::stop()
 
 QnVideoCamera::~QnVideoCamera()
 {
-    beforeDestroy();
-}
-
-void QnVideoCamera::beforeDestroy()
-{
-    if (m_primaryReader)
-        m_primaryReader->beforeDestroy();
-    if (m_secondaryReader)
-        m_secondaryReader->beforeDestroy();
-
-    beforeStop();
-    stop();
+    stopAndCleanup();
 }
 
 void QnVideoCamera::at_camera_resourceChanged()

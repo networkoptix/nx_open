@@ -26,7 +26,6 @@ public:
 
 private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;
-    std::unique_ptr<QnPlatformAbstraction> m_platformAbstraction;
 };
 
 }}}

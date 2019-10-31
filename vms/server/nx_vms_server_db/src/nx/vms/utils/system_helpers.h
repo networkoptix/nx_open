@@ -17,12 +17,17 @@ struct DbBackupFileData
     qint64 timestamp = -1;
 };
 
-bool backupDatabase(const QString& backupDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection,
-    const boost::optional<QString>& dbFilePath = boost::none,
-    const boost::optional<int>& buildNumber = boost::none);
+/**
+ * Should be used when server is 'alive', i.e. Server Module has been initialized,
+ * transaction engine is operational.
+ * Note: Build number to make backup file name is taken from AppInfo. It means it corresponds
+ *     currently running server version.
+ */
+bool backupDatabaseLive(
+    const QString& backupDir,
+    const ec2::AbstractECConnectionPtr& connection);
 
-
+QString backupDbFileName(const QString& backupDir, int buildNumber);
 QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
 
 /* Newest files come first */

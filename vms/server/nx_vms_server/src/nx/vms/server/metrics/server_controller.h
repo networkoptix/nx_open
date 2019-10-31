@@ -5,6 +5,8 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <core/resource/media_server_resource.h>
 
+namespace nx::vms::server { class PlatformMonitor; }
+
 namespace nx::vms::server::metrics {
 
 /**
@@ -21,7 +23,6 @@ public:
     void start() override;
 
 private:
-
     enum class Metrics
     {
         transactions,
@@ -35,13 +36,18 @@ private:
     };
 
     utils::metrics::ValueGroupProviders<Resource> makeProviders();
+    utils::metrics::ValueProviders<Resource> makeAvailabilityProviders();
+    utils::metrics::ValueProviders<Resource> makeLoadProviders();
+    utils::metrics::ValueProviders<Resource> makeInfoProviders();
+    utils::metrics::ValueProviders<Resource> makeActivityProviders();
 
     qint64 getMetric(Metrics parameter);
     qint64 getDelta(Metrics key, qint64 value);
-    void at_syncTimeChanged(qint64 syncTime);
+    nx::vms::server::PlatformMonitor* platform();
+
 private:
     std::vector<std::atomic<qint64>> m_counters;
-    int m_timeChangeEvents = 0;
+    std::atomic<int> m_timeChangeEvents = 0;
 };
 
 } // namespace nx::vms::server::metrics

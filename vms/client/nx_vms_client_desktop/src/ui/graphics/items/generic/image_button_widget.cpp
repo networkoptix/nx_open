@@ -3,7 +3,6 @@
 
 #include <cassert>
 
-#include <QtCore/QPointer>
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
@@ -130,7 +129,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
 
 QnImageButtonWidget::~QnImageButtonWidget()
 {
-    return;
+    if (m_glWidget)
+        m_glWidget->makeCurrent(); //< Allows to delete textures in appropriate context.
 }
 
 const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const
@@ -146,8 +146,10 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
     m_pixmaps[flags] = pixmap;
 
     // The same pixmap may be the source for a lot of textures, so clear them all for simplicity.
-    m_textures.clear();
-
+    // Also wee have to release textures only when the OpenGL context of creation
+    // is equal to the current one. So, we store textures to delete them later in the appropriate
+    // place.
+    m_texturesForRemove.push_back(std::move(m_textures));
     update();
 }
 
@@ -329,9 +331,16 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     glWidget->makeCurrent();
 
+    if (m_glWidget)
+        NX_ASSERT(m_glWidget == glWidget, "Button can't be painted in the different GL widgets!");
+    else
+        m_glWidget = glWidget;
+
     const auto functions = glWidget->context()->functions();
     functions->glEnable(GL_BLEND);
     functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    m_texturesForRemove.clear();
 
     if (isOne || isZero)
     {

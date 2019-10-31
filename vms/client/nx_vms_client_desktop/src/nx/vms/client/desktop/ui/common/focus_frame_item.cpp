@@ -7,6 +7,9 @@
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGGeometryNode>
 
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/thread/custom_runnable.h>
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -69,8 +72,6 @@ FocusFrameItem::FocusFrameItem(QQuickItem* parent):
 
 FocusFrameItem::~FocusFrameItem()
 {
-    if (d->material->texture())
-        delete d->material->texture();
 }
 
 QColor FocusFrameItem::color() const
@@ -109,6 +110,21 @@ void FocusFrameItem::setFrameWidth(int frameWidth)
 void FocusFrameItem::registerQmlType()
 {
     qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
+}
+
+void FocusFrameItem::releaseResources()
+{
+    const auto texture = d->material->texture();
+    if (!texture)
+        return;
+
+    const auto quickWindow = window();
+    const auto clearTexture = nx::utils::guarded(texture, [texture]() { delete texture; });
+
+    quickWindow->scheduleRenderJob(
+        new nx::utils::thread::CustomRunnable(clearTexture),
+        QQuickWindow::AfterSynchronizingStage);
+    quickWindow->update();
 }
 
 QSGNode* FocusFrameItem::updatePaintNode(

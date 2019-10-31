@@ -90,6 +90,8 @@ public:
     virtual QSGNode* updatePaintNode(
         QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;
 
+    virtual void releaseResources() override;
+
     QColor textColor() const;
     void setTextColor(const QColor& color);
 

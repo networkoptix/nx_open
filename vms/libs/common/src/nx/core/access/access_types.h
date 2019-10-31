@@ -14,7 +14,7 @@ enum class Source
     shared,         //< Accessible by direct sharing.
     layout,         //< Accessible by placing on shared layout.
     videowall,      //< Accessible by placing on videowall.
-    childDevice,    //< Access to accessible device parent server monitor.
+    implicitMonitorAccess, //< Access to server monitors implicitly granted for everyone.
 };
 
 inline uint qHash(Source value, uint seed)

@@ -14,8 +14,7 @@ namespace sample {
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
-
+    Engine();
     virtual ~Engine() override;
 
 protected:

@@ -38,10 +38,12 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-/* Set of node types, that are require children to be visible. */
-bool nodeRequiresChildren(ResourceTreeNodeType nodeType)
+bool nodeRequiresChildren(
+    const QnResourceTreeModelNode* node,
+    const QnResourceAccessProvider* accessProvider,
+    const QnWorkbenchAccessController* accessController)
 {
-    switch (nodeType)
+    switch (node->type())
     {
         case ResourceTreeNodeType::otherSystems:
         case ResourceTreeNodeType::servers:
@@ -59,6 +61,25 @@ bool nodeRequiresChildren(ResourceTreeNodeType nodeType)
         case ResourceTreeNodeType::sharedLayouts:
         case ResourceTreeNodeType::layoutTours:
             return true;
+        case ResourceTreeNodeType::resource:
+            if (node->resourceFlags().testFlag(Qn::server))
+            {
+                const bool isLoggedIn = !accessController->user().isNull();
+                const bool isCustomUser =
+                    accessController->hasGlobalPermission(GlobalPermission::customUser);
+
+                if (isLoggedIn && isCustomUser)
+                {
+                    const auto accessibleVia =
+                        accessProvider->accessibleVia(accessController->user(), node->resource());
+
+                    const bool isDirectlyShared =
+                        accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
+
+                    return !isDirectlyShared;
+                }
+            }
+            return false;
         default:
             return false;
     }
@@ -175,7 +196,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
     }
 
     /* Invisible by default until has children. */
-    m_bastard |= nodeRequiresChildren(nodeType);
+    m_bastard |= nodeRequiresChildren(this, resourceAccessProvider(), accessController());
 }
 
 /**
@@ -472,8 +493,11 @@ void QnResourceTreeModelNode::setState(State state)
 
 bool QnResourceTreeModelNode::calculateBastard() const
 {
-    if (nodeRequiresChildren(m_type) && m_children.isEmpty())
+    if (nodeRequiresChildren(this, resourceAccessProvider(), accessController())
+        && m_children.isEmpty())
+    {
         return true;
+    }
 
     /* Here we can narrow nodes visibility, based on permissions, if needed. */
     bool isLoggedIn = !context()->user().isNull();
@@ -587,9 +611,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Hide local server resource. */
         if (m_flags.testFlag(Qn::local_server))
             return true;
-
-        if (m_flags.testFlag(Qn::server) && isLoggedIn && !isAdmin)
-            return !resourceAccessProvider()->hasAccess(accessController()->user(), m_resource);
 
         // Hide exported camera resources inside of exported layouts. Layout items are displayed instead.
         if (m_flags.testFlag(Qn::exported_media)
@@ -1336,8 +1357,13 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
     /* To subtract from checked/unchecked children counter & update parents recursively: */
     childCheckStateChanged(child->m_checkState, Qt::PartiallyChecked, true);
 
-    if (nodeRequiresChildren(m_type) && m_children.size() == 0)
+    if (nodeRequiresChildren(this, resourceAccessProvider(), accessController())
+        && m_children.size() == 0)
+    {
         setBastard(true);
+    }
+
+    emit childrenCountChanged(m_children.count());
 }
 
 void QnResourceTreeModelNode::removeChildLink(const QnResourceTreeModelNodePtr& child)
@@ -1370,8 +1396,10 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
     childCheckStateChanged(Qt::PartiallyChecked, child->m_checkState, true);
 
     /* Check if we must display parent node. */
-    if (nodeRequiresChildren(m_type) && isBastard())
+    if (nodeRequiresChildren(this, resourceAccessProvider(), accessController()) && isBastard())
         setBastard(calculateBastard());
+
+    emit childrenCountChanged(m_children.count());
 }
 
 void QnResourceTreeModelNode::changeInternal()

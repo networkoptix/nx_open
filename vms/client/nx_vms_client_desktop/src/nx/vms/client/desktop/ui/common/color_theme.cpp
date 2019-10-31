@@ -6,8 +6,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QRegularExpression>
 #include <QtGui/QColor>
-
-#include <ui/style/skin.h>
+#include <QtQml/QtQml>
 
 #include <nx/utils/log/log.h>
 
@@ -18,16 +17,13 @@ static uint qHash(const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-static const auto kBaseSkinFileName = "customization_common.json";
-static const auto kCustomSkinFileName = "skin.json";
-
 struct ColorTheme::Private
 {
     QVariantMap colors;
 
     QHash<QString, QList<QColor>> groups;
 
-    QMap<QString, QString> colorSubstitutions;  //< Default #XXXXXX to updated #YYYYYY.
+    QMap<QString, QString> colorSubstitutions; //< Default #XXXXXX to updated #YYYYYY.
 
     struct ColorInfo
     {
@@ -40,23 +36,26 @@ struct ColorTheme::Private
 
     QHash<QColor, ColorInfo> colorInfoByColor;
 
-    void loadColors(); //< Initialize color values, color groups and color substitutions.
+    /** Initialize color values, color groups and color substitutions. */
+    void loadColors(
+        const QString& mainColorsFile = ":/skin/customization_common.json",
+        const QString& skinColorsFile = ":/skin/skin.json");
 
 private:
-    QJsonObject readColorDataFromFile(const QString& filename) const;
+    QJsonObject readColorDataFromFile(const QString& fileName) const;
     QSet<QString> updateColors(const QJsonObject& newColors);
 };
 
-void ColorTheme::Private::loadColors()
+void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QString& skinColorsFile)
 {
     // Load base colors and override them with the actual skin values.
 
-    const QJsonObject baseColors = readColorDataFromFile(kBaseSkinFileName);
+    const QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
     updateColors(baseColors);
 
     const QVariantMap defaultColors = colors;
 
-    const QJsonObject currentSkinColors = readColorDataFromFile(kCustomSkinFileName);
+    const QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
     const QSet<QString> updatedColors = updateColors(currentSkinColors);
 
     // Calculate color substitutions.
@@ -71,11 +70,11 @@ void ColorTheme::Private::loadColors()
     }
 }
 
-QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& filename) const
+QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) const
 {
-    QFile file(qnSkin->path(filename));
+    QFile file(fileName);
     const bool opened = file.open(QFile::ReadOnly);
-    if (NX_ASSERT(opened, "Cannot read skin file %1", filename))
+    if (NX_ASSERT(opened, "Cannot read skin file %1", fileName))
     {
         const auto& jsonData = file.readAll();
 
@@ -149,6 +148,17 @@ ColorTheme::ColorTheme(QObject* parent):
     d(new Private())
 {
     d->loadColors();
+}
+
+ColorTheme::ColorTheme(
+    const QString& mainColorsFile,
+    const QString& skinColorsFile,
+    QObject* parent)
+    :
+    QObject(parent),
+    d(new Private())
+{
+    d->loadColors(mainColorsFile, skinColorsFile);
 }
 
 ColorTheme::~ColorTheme()
@@ -235,6 +245,11 @@ Q_INVOKABLE bool ColorTheme::isDark(const QColor& color)
 Q_INVOKABLE bool ColorTheme::isLight(const QColor& color)
 {
     return !isDark(color);
+}
+
+void ColorTheme::registerQmlType()
+{
+    qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
 }
 
 } // namespace nx::vms::client::desktop

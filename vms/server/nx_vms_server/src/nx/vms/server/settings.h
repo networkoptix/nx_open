@@ -249,6 +249,9 @@ public:
     Option<int> publicIPEnabled{this, "publicIPEnabled", 1,
         "If true, allow server to discovery its public IP address. Default value is 'true'."
     };
+    Option<int> onlineResourceDataEnabled{ this, "onlineResourceDataEnabled", 1,
+        "If true, allow to update camera configuration file (resource_data.json) online."
+    };
     Option<QString> staticPublicIP{this, "staticPublicIP", "",
         "Set server public IP address manually. If it set server won't discovery it."
     };
@@ -421,6 +424,10 @@ public:
     Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
         "How many discovery loops should pass before mark missed camera offline"
         };
+
+    Option<bool> noOutgoingConnectionsMetric{ this, "noOutgoingConnectionsMetric", false,
+        "Disable metric 'outgoingConnections'. Used for test purpose only."
+    };
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB

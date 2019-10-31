@@ -11,6 +11,7 @@ nx_add_target(nov_file_launcher EXECUTABLE SIGNED
         msi
         comctl32
         boost
+    FOLDER utils
 )
 
 set_target_properties(nov_file_launcher PROPERTIES

@@ -357,7 +357,13 @@ void CameraSettingsDialogStore::generateLogicalId()
 void CameraSettingsDialogStore::resetExpertSettings()
 {
     d->executeAction(
-        [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+                [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+}
+
+QnUuid CameraSettingsDialogStore::resourceId() const
+{
+    return d->state.isSingleCamera()
+        ? QnUuid::fromStringSafe(d->state.singleCameraProperties.id) : QnUuid();
 }
 
 QVariantList CameraSettingsDialogStore::analyticsEngines() const
@@ -473,10 +479,14 @@ void CameraSettingsDialogStore::setCredentials(
         [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
 }
 
-void CameraSettingsDialogStore::setStreamUrls(const QString& primary, const QString& secondary)
+void CameraSettingsDialogStore::setStreamUrls(
+    const QString& primary, const QString& secondary, ModificationSource source)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setStreamUrls(std::move(state), primary, secondary); });
+        [&](State state)
+        {
+            return Reducer::setStreamUrls(std::move(state), primary, secondary, source);
+        });
 }
 
 } // namespace nx::vms::client::desktop

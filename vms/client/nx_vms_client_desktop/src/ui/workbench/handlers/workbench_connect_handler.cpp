@@ -118,6 +118,11 @@ bool isConnectionToCloud(const nx::utils::Url& url)
     return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
 }
 
+bool hasInternet(const QnMediaServerResourcePtr& server)
+{
+    return NX_ASSERT(server) && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+}
+
 nx::vms::api::ClientInfoData clientInfo()
 {
     nx::vms::api::ClientInfoData clientData;
@@ -131,7 +136,7 @@ nx::vms::api::ClientInfoData clientInfo()
     clientData.cpuArchitecture = hw.cpuArchitecture;
     clientData.cpuModelName = hw.cpuModelName;
 
-    const auto gl = QnGlFunctions::openGLCachedInfo();
+    const auto gl = QnGlFunctions::openGLInfo();
     clientData.openGLRenderer = gl.renderer;
     clientData.openGLVersion = gl.version;
     clientData.openGLVendor = gl.vendor;
@@ -636,8 +641,12 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     qnSettings->setAutoLogin(autoLogin);
     qnSettings->save();
 
-    if (options.testFlag(StorePreferredCloudServer) && !info.cloudSystemId.isEmpty())
+    if (options.testFlag(StorePreferredCloudServer)
+        && !info.cloudSystemId.isEmpty()
+        && hasInternet(commonModule()->currentServer()))
+    {
         nx::vms::client::core::helpers::savePreferredCloudServer(info.cloudSystemId, info.serverId());
+    }
 
     if (cloudConnection)
     {
@@ -991,8 +1000,8 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     if (!system || !system->isConnectable())
         return;
 
-    auto reachableServer = nx::vms::client::core::helpers::preferredCloudServer(id);
-    if (reachableServer.isNull())
+    auto serverToConnect = nx::vms::client::core::helpers::preferredCloudServer(id);
+    if (serverToConnect.isNull() || !system->isReachableServer(serverToConnect))
     {
         const auto servers = system->servers();
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
@@ -1002,16 +1011,13 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
             });
 
         if (iter != servers.cend())
-            reachableServer = iter->id;
+            serverToConnect = iter->id;
     }
 
-    if (reachableServer.isNull())
+    if (serverToConnect.isNull())
         return;
 
-    nx::utils::Url url = system->getServerHost(reachableServer);
-
-    // Ensure the host is cloud.
-    url.setHost(nx::vms::client::core::helpers::serverCloudHost(id, reachableServer));
+    nx::utils::Url url = system->getServerHost(serverToConnect);
 
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
@@ -1078,7 +1084,7 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     url.setUserName(currentUrl.userName());
     url.setPassword(currentUrl.password());
     url.setPort(endpoint->port);
-    url.setHost(systemId.isEmpty()
+    url.setHost((systemId.isEmpty() || !hasInternet(server))
         ? endpoint->address.toString()
         : nx::vms::client::core::helpers::serverCloudHost(systemId, serverId));
 

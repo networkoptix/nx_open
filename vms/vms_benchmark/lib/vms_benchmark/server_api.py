@@ -1,15 +1,16 @@
-import urllib.request
-from collections import namedtuple
-from urllib.parse import urlencode
-from urllib.error import URLError
 import base64
 import json
 import logging
+import sys
+import urllib.request
+from collections import namedtuple
+from typing import List
+from urllib.error import URLError
+from urllib.parse import urlencode
 
 from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
-
 
 Response = namedtuple('Response', ['code', 'body'])
 
@@ -38,7 +39,8 @@ class ServerApi:
 
     @staticmethod
     def post_request(request, data):
-        logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n    with data\n    {data}")
+        logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n"
+            f"    with data\n    {data}")
         response = urllib.request.urlopen(request, data=data)
         return ServerApi._read_response(response)
 
@@ -59,6 +61,41 @@ class ServerApi:
             return None
 
         return result
+
+    def get_module_information(self):
+        try:
+            request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+            credentials = f"{self.user}:{self.password}"
+            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+            response = self.get_request(request)
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                raise exceptions.ServerApiError(
+                    "API of Server is not working: "
+                    "authentication was not successful, "
+                    "check vmsUser and vmsPassword in vms_benchmark.conf.")
+            raise
+
+        result = self.Response(response.code)
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.body)
+
+            if result.payload.get('error', 1) != '0' or 'reply' not in result.payload:
+                return None
+
+            return result.payload['reply']
+
+    def get_server_id(self):
+        module_information = self.get_module_information()
+
+        if module_information is None:
+            raise exceptions.ServerApiError(message="Unable to get module information.")
+
+        server_id_raw = module_information.get('id', '{00000000-0000-0000-0000-000000000000}')
+        server_id = server_id_raw[1:-1] if server_id_raw[0] == '{' and server_id_raw[-1] == '}' else server_id_raw
+
+        return server_id
 
     def check_authentication(self):
         try:
@@ -101,7 +138,7 @@ class ServerApi:
 
         return None
 
-    def get_test_cameras(self):
+    def get_test_cameras(self) -> List[Camera]:
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
@@ -142,18 +179,6 @@ class ServerApi:
                 License.parse(license_description['licenseBlock'])
                 for license_description in result.payload
             ]
-
-        return None
-
-    def get_storages(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getStorages")
-        credentials = f"{self.user}:{self.password}"
-        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = self.get_request(request)
-
-        if 200 <= response.code < 300:
-            return json.loads(response.body)
 
         return None
 
@@ -245,3 +270,44 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    def get_archive_start_time_ms(self, camera_id: str) -> int:
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}"
+            f"/ec2/recordedTimePeriods?cameraId={camera_id}")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = self.get_request(request)
+
+        result = self.Response(response.code)
+
+        if not (200 <= response.code < 300):
+            raise exceptions.ServerApiError(
+                "Unable to request recorded periods from the Server: "
+                f"/ec2/recordedTimePeriods returned HTTP code {response.code}.")
+
+        try:  # Any json deserialization errors and missing json object keys will be caught.
+            result.payload = json.loads(response.body)
+            error_code = result.payload['error']
+            error_string = result.payload['errorString']
+            if int(error_code) != 0:
+                raise exceptions.ServerApiError(  # Will be caught below in this method.
+                    f'API method reported error {error_code}: {error_string}')
+            reply: list = result.payload['reply']
+            min_start_time_ms = sys.maxsize
+            for server in reply:
+                periods: list = server['periods']
+                for period in periods:
+                    start_time_ms = int(period['startTimeMs'])
+                    if start_time_ms < min_start_time_ms:
+                        min_start_time_ms = start_time_ms
+            if min_start_time_ms == sys.maxsize:
+                raise exceptions.ServerApiError(  # Will be caught below in this method.
+                    f'No recorded periods returned.')
+
+            logging.info(f'Archive start time for camera {camera_id}: {min_start_time_ms} ms.')
+            return min_start_time_ms
+        except Exception:
+            logging.exception('Exception while parsing the response of /ec2/recordedTimePeriods:')
+            raise exceptions.ServerApiError(
+                "Unable to request recorded periods from the Server: "
+                f"Invalid response of /ec2/recordedTimePeriods.")

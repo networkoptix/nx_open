@@ -22,6 +22,18 @@ static const int kMaxOpenedConnections = 100 * 1000;
 
 } // namespace
 
+namespace detail {
+
+bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right)
+{
+    if (left.eventType != right.eventType)
+        return false;
+    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < GROUP_TIME_THRESHOLD;
+    bool sessionOK = left.authSession == right.authSession;
+    return peridOK && sessionOK;
+}
+
+} // namespace detail
 
 QnAuditRecord filteredRecord(QnAuditRecord record)
 {
@@ -55,9 +67,12 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
 QnMServerAuditManager::~QnMServerAuditManager()
 {
     m_timer.stop();
+    processRecords();
+    flushRecords();
+    serverModule()->serverDb()->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }
 
-QnAuditRecord QnMServerAuditManager::CameraPlaybackInfo::toAuditRecord() const
+QnAuditRecord detail::CameraPlaybackInfo::toAuditRecord() const
 {
     Qn::AuditRecordType eventType;
     if (isExport)
@@ -135,7 +150,7 @@ AuditHandle QnMServerAuditManager::notifyPlaybackStarted(const QnAuthSession& se
     QnMutexLocker lock(&m_mutex);
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end(); ++itr)
     {
-        CameraPlaybackInfo& pbInfo = *itr;
+        detail::CameraPlaybackInfo& pbInfo = *itr;
         if (pbInfo.session == session && pbInfo.cameraId == cameraId && pbInfo.isExport == isExport)
         {
             bool isLive = pbInfo.startTimeUsec == DATETIME_NOW && timestampUsec == DATETIME_NOW;
@@ -151,7 +166,7 @@ AuditHandle QnMServerAuditManager::notifyPlaybackStarted(const QnAuthSession& se
 
     // create new one
 
-    CameraPlaybackInfo pbInfo;
+    detail::CameraPlaybackInfo pbInfo;
     pbInfo.session = session;
     pbInfo.cameraId = cameraId;
     pbInfo.startTimeUsec = timestampUsec;
@@ -192,19 +207,10 @@ void QnMServerAuditManager::notifyPlaybackInProgress(const AuditHandle& handle, 
     auto itr = m_alivePlaybackInfo.find(*handle);
     if (itr != m_alivePlaybackInfo.end())
     {
-        CameraPlaybackInfo& pbInfo = itr.value();
+        detail::CameraPlaybackInfo& pbInfo = itr.value();
         if (!pbInfo.period.contains(timestampMs))
             pbInfo.period.addPeriod(QnTimePeriod(timestampMs, 1));
     }
-}
-
-bool QnMServerAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right)
-{
-    if (left.eventType != right.eventType)
-        return false;
-    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < GROUP_TIME_THRESHOLD;
-    bool sessionOK = left.authSession == right.authSession;
-    return peridOK && sessionOK;
 }
 
 void QnMServerAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName)
@@ -221,55 +227,9 @@ void QnMServerAuditManager::notifySettingsChanged(const QnAuthSession& authInfo,
 }
 
 template <class T>
-std::vector<QnAuditRecord> QnMServerAuditManager::processDelayedRecordsInternal(
-    QVector<T>& recordsToAggregate, int recordAggregationTimeMs)
-{
-    std::vector<QnAuditRecord> recordsToAdd;
-    int currentIndex = 0;
-    while (currentIndex < recordsToAggregate.size())
-    {
-        if (recordsToAggregate[currentIndex].timeout.elapsed() > recordAggregationTimeMs)
-        {
-            // aggregate data. join other records to this one
-            QnAuditRecord record = recordsToAggregate[currentIndex].toAuditRecord();
-
-            recordsToAggregate.remove(currentIndex);
-            for (int j = currentIndex; j < recordsToAggregate.size();)
-            {
-                QnAuditRecord newRecord = recordsToAggregate[j].toAuditRecord();
-                if (canJoinRecords(record, newRecord))
-                {
-                    for (const auto& res : newRecord.resources)
-                    {
-                        if (std::find(record.resources.begin(), record.resources.end(), res) == record.resources.end())
-                            record.resources.push_back(res);
-                    }
-                    record.createdTimeSec = qMin(record.createdTimeSec, newRecord.createdTimeSec);
-                    record.rangeStartSec = qMin(record.rangeStartSec, newRecord.rangeStartSec);
-                    record.rangeEndSec = qMax(record.rangeEndSec, newRecord.rangeEndSec);
-                    recordsToAggregate.remove(j);
-                }
-                else
-                {
-                    ++j;
-                }
-            }
-            recordsToAdd.push_back(std::move(record));
-        }
-        else
-        {
-            ++currentIndex;
-        }
-    }
-
-    return recordsToAdd;
-}
-
-template <class T>
 void QnMServerAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
 {
-    auto recordsToAdd =
-        processDelayedRecordsInternal(recordsToAggregate, AGGREGATION_TIME_MS);
+    auto recordsToAdd = detail::processDelayedRecords(recordsToAggregate, AGGREGATION_TIME_MS);
     for (const auto& record : recordsToAdd)
     {
         registerNewConnection(record.authSession, record.eventType == Qn::AR_Login); //< add new session if not exists
@@ -324,7 +284,7 @@ void QnMServerAuditManager::processRecords()
 
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end();)
     {
-        CameraPlaybackInfo& pbInfo = itr.value();
+        detail::CameraPlaybackInfo& pbInfo = itr.value();
         if (pbInfo.handle.use_count() == 1)
         {
             if (!pbInfo.timeout.isValid())
@@ -350,13 +310,6 @@ void QnMServerAuditManager::processRecords()
 
     processDelayedRecords(m_closedPlaybackInfo);
     processDelayedRecords(m_changedSettings);
-}
-
-void QnMServerAuditManager::stop()
-{
-    m_timer.stop();
-    flushRecords();
-    serverModule()->serverDb()->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }
 
 bool QnMServerAuditManager::readLastRecordIdIfNeed()

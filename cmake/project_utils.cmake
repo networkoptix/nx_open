@@ -24,7 +24,7 @@ endfunction()
 
 function(nx_add_target name type)
     set(options NO_MOC NO_RC_FILE WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
-    set(oneValueArgs LIBRARY_TYPE RC_FILE)
+    set(oneValueArgs LIBRARY_TYPE RC_FILE FOLDER)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES
         SOURCE_EXCLUSIONS
@@ -182,6 +182,12 @@ function(nx_add_target name type)
 
     if(NX_PRIVATE_LIBS)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
+    endif()
+
+    if(NX_FOLDER)
+        set_target_properties(${name} PROPERTIES FOLDER ${NX_FOLDER})
+    elseif("${type}" STREQUAL "LIBRARY")
+        set_target_properties(${name} PROPERTIES FOLDER libs)
     endif()
 endfunction()
 

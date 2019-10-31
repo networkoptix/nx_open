@@ -24,13 +24,29 @@ utils::metrics::Watch<ResourceType> qtSignalWatch(Signal signal)
         [signal](const ResourceType& resource, utils::metrics::OnChange change)
         {
             const auto connection = QObject::connect(
-                resource, signal,
-                [change = std::move(change)](const auto& /*resource*/)
-                {
-                    change();
-                });
+                resource, signal, [change = std::move(change)](const auto&) { change(); });
 
             return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
+        };
+}
+
+template<typename ResourceType, typename... SignalList>
+utils::metrics::Watch<ResourceType> qtSignalWatch(SignalList... signalList)
+{
+    return
+        [=](const ResourceType& resource, utils::metrics::OnChange change)
+        {
+            const auto sharedChange = std::make_shared<utils::metrics::OnChange>(std::move(change));
+            std::vector<QMetaObject::Connection> connections;
+            (connections.push_back(QObject::connect(
+                resource, signalList, [sharedChange](const auto&) { (*sharedChange)(); })), ...);
+
+            return nx::utils::makeSharedGuard(
+                [connections = std::move(connections)]()
+                {
+                    for (const auto& connection: connections)
+                        QObject::disconnect(connection);
+                });
         };
 }
 

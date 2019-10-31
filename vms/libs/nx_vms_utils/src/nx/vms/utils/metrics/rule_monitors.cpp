@@ -1,6 +1,6 @@
 #include "rule_monitors.h"
 
-#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
@@ -9,6 +9,8 @@
 #include "value_group_monitor.h"
 
 namespace nx::vms::utils::metrics {
+
+using Value = api::metrics::Value;
 
 namespace {
 
@@ -69,9 +71,9 @@ public:
 
         bool isNumber = false;
         if (const auto n = id.toDouble(&isNumber); isNumber)
-            return [n] { return api::metrics::Value(n); };
+            return [n] { return Value(n); };
 
-        return [id] { return api::metrics::Value(id); };
+        return [id] { return Value(id); };
     }
 
     template<typename Operation> //< Value(Value, Value)
@@ -84,11 +86,11 @@ public:
                 // result should be missing too.
                 // TODO: Add optionality marker to all formulas and report error if any of
                 // non-optional values is missing.
-                auto v1 = getter1();
-                auto v2 = getter2();
+                const Value v1 = getter1();
+                const Value v2 = getter2();
                 return (v1.isNull() || v2.isNull())
-                    ? api::metrics::Value() //< No value if 1 of arguments is missing.
-                    : api::metrics::Value(operation(std::move(v1), std::move(v2)));
+                    ? Value() //< No value if 1 of arguments is missing.
+                    : Value(operation(std::move(v1), std::move(v2)));
             };
     }
 
@@ -97,7 +99,7 @@ public:
     {
         return binaryOperation(
             firstI, secondI,
-            [operation](api::metrics::Value v1, api::metrics::Value v2)
+            [operation](Value v1, Value v2)
             {
                 // Currenlty we do not have any way of reporting errors to the user. Returning the
                 // error string is the only option for error detection during manual testing. End
@@ -105,22 +107,22 @@ public:
                 // properly :).
                 // TODO: Implement some kind of error handling, visible to the user.
                 return (!v1.isDouble() || !v2.isDouble())
-                    ? api::metrics::Value("ERROR: One of the arguments is not an integer")
-                    : api::metrics::Value(operation(v1.toDouble(), v2.toDouble()));
+                    ? Value("ERROR: One of the arguments is not an integer")
+                    : Value(operation(v1.toDouble(), v2.toDouble()));
             });
+    }
+
+    static auto square(Value value)
+    {
+        const auto params = value.toString().split(L'x');
+        if (params.size() == 2)
+            return params[0].toInt() * params[1].toInt();
+
+        return 0;
     }
 
     ValueGenerator getBinaryOperation() const
     {
-        static auto square =
-            [](QJsonValue value)
-            {
-                const auto params = value.toString().split(L'x');
-                if (params.size() == 2)
-                    return params[0].toInt() * params[1].toInt();
-                return 0;
-            };
-
         if (function() == "+" || function() == "add")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
@@ -148,112 +150,133 @@ public:
         if (function() == "<=" || function() == "lessOrEqual")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
 
+        if (function() == "&&" || function() == "and")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() && v2.toBool(); });
+
+        if (function() == "||" || function() == "or")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() || v2.toBool(); });
+
         return nullptr;
     }
 
     template<typename Operation> //< Value(void(Value, std::chrono::duration) forEach)
-    ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
+    ValueGenerator durationOperation(
+        int valueI, int durationI, Border border, Operation operation) const
     {
         return
-            [operation = std::move(operation), monitor = monitor(valueI), getDuration = value(durationI)]
+            [operation = std::move(operation), monitor = monitor(valueI),
+                getDuration = value(durationI), border]
             {
-                const auto durationStr = getDuration().toVariant().toString();
+                const QString durationStr = getDuration().toVariant().toString();
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
                     // TODO: Error handling.
-                    return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
+                    return Value("ERROR: Wrong duration: " + durationStr);
                 }
 
-                return api::metrics::Value(operation(
-                    [&monitor, &duration](const auto& action) { monitor->forEach(duration, action); }
-                ));
+                return Value(operation(
+                    [&monitor, &duration, border](const auto& action)
+                    {
+                        monitor->forEach(duration, action, border);
+                    }));
             };
     }
 
-    template<typename Condition> //< bool(Value)
-    ValueGenerator durationCount(int valueI, int durationI, Condition condition) const
-    {
-        return durationOperation(
-            valueI, durationI,
-            [condition = std::move(condition)](const auto& forEach)
-            {
-                size_t count = 0;
-                forEach([&](const auto& v, auto) { count += condition(v) ? 1 : 0; });
-                return (double) count;
-            });
-    }
-
     template<typename Extraction> // double(double value, double durationS)
-    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction, bool divideByTime) const
+    ValueGenerator durationAggregation(
+        int valueI, int durationI, Border border, Extraction extract,
+        bool divideByTime = false) const
     {
         return durationOperation(
-            valueI, durationI,
-            [extraction = std::move(extraction), divideByTime](const auto& forEach)
+            valueI, durationI, border,
+            [border, divideByTime, extract = std::move(extract)](const auto& forEach)
             {
-                double maxAgeS = 0;
-                double total = 0;
-                double lastValue = 0;
-                double lastAgeS = 0;
+                double totalValue = 0;
+                double totalDurationS = 0;
                 forEach(
-                    [&](const auto& value, auto time)
+                    [&](const Value& value, std::chrono::milliseconds duration)
                     {
-                        const double ageS = seconds(time);
-                        maxAgeS = std::max(ageS, maxAgeS);
-                        total += extraction(lastValue, lastAgeS - ageS);
-                        lastValue = value.toDouble();
-                        lastAgeS = ageS;
+                        if (value == Value())
+                            return;
+
+                        const double durationS = seconds(duration);
+                        totalDurationS += durationS;
+                        totalValue += extract(value.toDouble(), durationS);
                     });
-                total += extraction(lastValue, lastAgeS);
+
                 if (divideByTime)
-                {
-                    if (maxAgeS == 0.0)
-                        return api::metrics::Value();
-                    total /= maxAgeS;
-                }
-                return api::metrics::Value(total);
+                    return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
+
+                return Value(totalValue);
             });
     }
 
     ValueGenerator getDurationOperation() const
     {
-        if (function() == "history") // value duration
+        if (function() == "history")
         {
             return durationOperation(
-                1, 2,
+                1, 2, Border::move(),
                 [](const auto& forEach)
                 {
-                    QJsonObject items;
-                    forEach([&](const auto& v, auto a) { items[QString::number(seconds(a))] = v; });
+                    QJsonArray items;
+                    forEach([&](auto v, auto d) { items.append(QJsonArray() << v << ::toString(d)); });
                     return items;
                 });
         }
 
-        if (function() == "count") // value duration
-            return durationCount(1, 2, [](const auto&) { return true; });
+        if (function() == "count")
+            return durationAggregation(1, 2, Border::drop(), [](double, double) { return 1; });
 
-        if (function() == "countValues") // value duration expected
+        if (function() == "countValues")
         {
-            return durationCount(1, 2,
-                [expected = value(3)](const auto& v) { return v == expected(); });
+            return durationOperation(
+                1, 2, Border::drop(),
+                [expected = value(3)](const auto& forEach)
+                {
+                    int count = 0;
+                    forEach([&](auto v, auto) { if (v == expected()) count += 1; });
+                    return count;
+                });
         }
 
-        if (function() == "sum") // value duration
+        if (function() == "sum")
+            return durationAggregation(1, 2, Border::drop(), [](double v, double) { return v; });
+
+        if (function() == "sampleAvg") //< sum(v * dt) / t
         {
-            return durationExtraction(1, 2,
-                [](double v, double /*d*/) { return v; }, /*divideByTime*/ false);
+            return durationAggregation(
+                1, 2, Border::move(), [](double v, double d) { return v * d; },
+                /*divideByTime*/ true);
         }
 
-        if (function() == "average") // value duration
+        if (function() == "deltaAvg") //< sum(v) / t
         {
-            return durationExtraction(1, 2,
-                [](double v, double d) { return v * d; }, /*divideByTime*/ true);
+            return durationAggregation(
+                1, 2, Border::hardcode(0), [](double v, double) { return v; },
+                /*divideByTime*/ true);
         }
 
-        if (function() == "perSecond") // value duration
+        if (function() == "counterToAvg") //< dv / t
         {
-            return durationExtraction(1, 2,
-                [](double v, double) { return v; }, /*divideByTime*/ true);
+            return durationOperation(
+                1, 2, Border::move(),
+                [](const auto& forEach)
+                {
+                    std::optional<double> first;
+                    double last = 0;
+                    double totalTimeS = 0;
+                    forEach(
+                        [&](auto value, auto duration)
+                        {
+                            last = value.toDouble();
+                            if (!first) first = last;
+                            totalTimeS += seconds(duration);
+                        });
+
+                    return (first && totalTimeS)  ? Value((last - *first) / totalTimeS) : Value();
+                });
         }
 
         return nullptr;
@@ -340,19 +363,18 @@ api::metrics::Value ExtraValueMonitor::value() const
     return m_generator();
 }
 
-void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) const
+void ExtraValueMonitor::forEach(
+    Duration maxAge, const ValueIterator& iterator, Border /*border*/) const
 {
     iterator(value(), maxAge);
 }
 
 AlarmMonitor::AlarmMonitor(
-    QString parameter,
     api::metrics::AlarmLevel level,
     ValueGeneratorResult condition,
     TextGenerator text)
 :
     m_scope(condition.scope),
-    m_parameter(std::move(parameter)),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
     m_text(std::move(text))
@@ -364,7 +386,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     if (!m_condition().toBool())
         return std::nullopt;
 
-    return api::metrics::Alarm{"UNKNOWN", "UNKNOWN", m_parameter, m_level, m_text()};
+    return api::metrics::Alarm{m_level, m_text()};
 }
 
 } // namespace nx::vms::utils::metrics

@@ -138,11 +138,12 @@ public:
     static std::deque<nx::vms::server::Chunk> mergeChunks(
         const std::deque<nx::vms::server::Chunk>& chunks1,
         const std::deque<nx::vms::server::Chunk>& chunks2);
-    void addChunks(nx::vms::server::ChunksDeque chunk);
+    void addChunks(const nx::vms::server::ChunksDeque& chunks);
+    void addChunks(const std::deque<Chunk>& chunk);
 
     void assignChunksUnsafe(
-        std::deque<nx::vms::server::Chunk>::iterator begin,
-        std::deque<nx::vms::server::Chunk>::iterator end);
+        std::deque<Chunk>::const_iterator begin,
+        std::deque<Chunk>::const_iterator end);
 
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
@@ -153,11 +154,14 @@ public:
     bool hasArchive(int storageIndex) const;
 
     // only for unit tests, don't use in production.
-    nx::vms::server::ChunksDeque &getChunksUnsafe() { return m_chunks; }
+    const std::deque<Chunk>& getChunksUnsafe() const { return m_chunks.chunks(); }
 
     int64_t occupiedSpace(int storageIndex = -1) const;
     std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
     std::chrono::milliseconds calendarDuration(int storageIndex = -1) const;
+
+    bool hasArchiveRotated() const { return m_hasArchiveRotated; }
+    void setHasArchiveRotated(bool value) { m_hasArchiveRotated = value; }
 private:
 
     bool csvMigrationCheckFile(const nx::vms::server::Chunk& chunk, QnStorageResourcePtr storage);
@@ -200,6 +204,7 @@ private:
     QnMutex m_IOMutex;
     const QnServer::StoragePool m_storagePool;
     mutable int64_t m_lastSyncTime;
+    std::atomic<bool> m_hasArchiveRotated = false;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

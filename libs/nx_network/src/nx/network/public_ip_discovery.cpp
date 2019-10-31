@@ -175,7 +175,7 @@ void PublicIPDiscovery::sendRequestUnsafe(const QString &url)
             }
         };
 
-    NX_VERBOSE(this, lm("Sending request to %1").arg(url));
+    NX_VERBOSE(this, "Sending request to %1", url);
 
     httpRequest->setResponseReadTimeoutMs(kRequestTimeoutMs);
     httpRequest->doGet(url, at_reply_finished);

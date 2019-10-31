@@ -7,6 +7,7 @@ qt5_wrap_cpp(moc_sources ${headers})
 add_definitions(-DQUAZIP_BUILD)
 
 add_library(quazip SHARED ${sources} ${moc_sources})
+set_target_properties(quazip PROPERTIES FOLDER third_party)
 
 target_include_directories(quazip PUBLIC ${quazip_dir}/..)
 if(WINDOWS)

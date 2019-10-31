@@ -195,6 +195,20 @@ void remove_if(std::map<Key, Value>& container, UnaryPredicate predicate)
 }
 
 template<typename Container, typename UnaryPredicate>
+Container copy_if(Container values, UnaryPredicate filter)
+{
+    remove_if(values, [&filter](const auto& v) { return !filter(v); });
+    return values;
+}
+
+template<typename Key, typename Value, typename UnaryPredicate>
+std::map<Key, Value> copy_if(std::map<Key, Value> values, UnaryPredicate filter)
+{
+    remove_if(values, [&filter](const auto& k, const auto& v) { return !filter(k, v); });
+    return values;
+}
+
+template<typename Container, typename UnaryPredicate>
 const typename Container::value_type* find_if(const Container& container, UnaryPredicate p)
 {
     const auto it = std::find_if(container.begin(), container.end(), p);
@@ -213,6 +227,36 @@ template<typename StringType>
 void to_lower(StringType* str)
 {
     std::transform(str->begin(), str->end(), str->begin(), &tolower);
+}
+
+template<typename Key, typename T>
+auto flat_map(std::map<Key, T> values, Key /*delimeter*/)
+{
+    return values;
+}
+
+template<typename Key, typename T>
+auto flat_map(std::map<Key, std::vector<T>> values, Key delimeter = ".")
+{
+    std::map<Key, T> result;
+    for (auto& [key, vector]: values)
+    {
+        for (int i = 0; i < vector.size(); ++i)
+            result[key + delimeter + QString::number(i)] = std::move(vector[i]);
+    }
+    return flat_map(std::move(result), delimeter);
+}
+
+template<typename Key, typename T>
+auto flat_map(std::map<Key, std::map<Key, T>> values, Key delimeter = ".")
+{
+    std::map<Key, T> result;
+    for (auto& [key, subValues]: values)
+    {
+        for (auto& [subKey, value]: subValues)
+            result[key + delimeter + subKey] = std::move(value);
+    }
+    return flat_map(std::move(result), delimeter);
 }
 
 namespace detail {

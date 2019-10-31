@@ -18,21 +18,21 @@
 #   define QnMonitorImpl QnSigarMonitor
 #endif
 
-QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
-    base_type(parent)
+void QnPlatformAbstraction::setCustomMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> monitor)
 {
-    if(!qApp)
+    m_monitor = std::move(monitor);
+}
+
+QnPlatformAbstraction::QnPlatformAbstraction(
+    nx::vms::server::RootFileSystem* rootFs,
+    nx::utils::TimerManager* timerManager)
+    :
+    base_type()
+{
+    if (!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
-    m_monitor = new nx::vms::server::GlobalMonitor(new QnMonitorImpl(this), this);
-}
-
-QnPlatformAbstraction::~QnPlatformAbstraction()
-{
-    return;
-}
-
-void QnPlatformAbstraction::setServerModule(QnMediaServerModule* serverModule)
-{
-    m_monitor->setServerModule(serverModule);
+    m_monitor.reset(new nx::vms::server::GlobalMonitor(
+        std::make_unique<QnMonitorImpl>(), timerManager));
+    m_monitor->setRootFileSystem(rootFs);
 }

@@ -389,9 +389,8 @@ private:
             return;
         }
 
-        const auto storageIndex = m_owner->storageDbPool()->getStorageIndex(storage);
-        NX_CRITICAL(storageIndex != -1);
-        const auto catalogsToScan = m_owner->catalogsToScan(storageIndex);
+        m_owner->emptyCatalogsForNotExistingFolders(storage);
+        const auto catalogsToScan = m_owner->catalogsToScan(storage);
 
         m_totalCatalogs += catalogsToScan.size();
         if (m_totalCatalogs == 0)
@@ -667,11 +666,13 @@ public:
     }
     virtual void run() override
     {
+        NX_DEBUG(this, "Starting to test storages");
         for (const auto& storage: storagesToTest())
             m_owner->updateMountedStatus(storage);
 
         for (const auto& storage : storagesToTest())
         {
+            NX_DEBUG(this, "Testing storage %1", storage->getUrl());
             if (needToStop())
                 return;
 
@@ -686,6 +687,8 @@ public:
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
                     m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
+
+            NX_DEBUG(this, "Testing storage %1 done", storage->getUrl());
         }
 
         m_owner->testStoragesDone();
@@ -800,16 +803,47 @@ int64_t QnStorageManager::nxOccupiedSpace(const QnStorageResourcePtr& storage) c
     return occupiedSpace(storageIndex);
 }
 
-QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(int storageIndex)
+void QnStorageManager::emptyCatalogsForNotExistingFolders(const QnStorageResourcePtr& storage)
+{
+    for (const auto quality: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
+    {
+        const auto cameraIds = getAllCameraIdsUnderLock(quality);
+        const auto qualityPath =
+            closeDirPath(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(quality));
+
+        for (const auto& cameraId: cameraIds)
+        {
+            if (!storage->isDirExists(qualityPath + cameraId))
+            {
+                const auto emptyCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+                    serverModule(), cameraId, quality, m_role));
+
+                replaceChunks(
+                    QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()),
+                    storage, emptyCatalog, cameraId, quality);
+            }
+        }
+    }
+}
+
+QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(const QnStorageResourcePtr &storage)
 {
     QMap<DeviceFileCatalogPtr, qint64> result;
-    NX_MUTEX_LOCKER lock(&m_mutexCatalog);
+    for (const auto quality: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
+    {
+        const auto qualityPath =
+            closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(quality);
 
-    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::LowQualityCatalog])
-        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+        for (const auto& fileInfo: storage->getFileList(qualityPath))
+        {
+            if (!fileInfo.isDir())
+                continue;
 
-    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::HiQualityCatalog])
-        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+            const auto catalog = getFileCatalog(fileInfo.fileName(), quality);
+            result.insert(
+                catalog, catalog->lastChunkStartTime(storageDbPool()->getStorageIndex(storage)));
+        }
+    }
 
     return result;
 }
@@ -856,7 +890,19 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     return result;
 }
 
-std::chrono::milliseconds QnStorageManager::calendarDuration(
+bool QnStorageManager::hasArchiveRotated(const QnVirtualCameraResourcePtr& camera) const
+{
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        auto itr = m_devFileCatalog[i].find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog[i].end() && itr.value()->hasArchiveRotated())
+            return true;
+    }
+    return false;
+}
+
+std::chrono::milliseconds QnStorageManager::archiveAge(
     const QnVirtualCameraResourcePtr& camera) const
 {
     std::chrono::milliseconds result{};
@@ -980,6 +1026,8 @@ void QnStorageManager::scanMediaCatalog(
     for (const auto& chunk: newChunks)
         newCatalog->addChunk(chunk);
     replaceChunks(filter.scanPeriod, storage, newCatalog, cameraUuid, quality);
+    if (auto ownCatalog = getFileCatalogInternal(cameraUuid, quality))
+        ownCatalog->setHasArchiveRotated(false); //< Reset flag after rebuild archive.
 }
 
 void QnStorageManager::initDone()
@@ -1207,10 +1255,12 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             NX_ASSERT(std::is_sorted(
                 newCatalog->getChunksUnsafe().cbegin(), newCatalog->getChunksUnsafe().cend()));
 
+            std::deque<Chunk> chunks;
             std::set_difference(
                 c->getChunksUnsafe().begin(), c->getChunksUnsafe().end(),
                 newCatalog->getChunksUnsafe().begin(), newCatalog->getChunksUnsafe().end(),
-                nx::vms::server::ChunksDequeBackInserter(catalogToWrite->getChunksUnsafe()));
+                std::back_inserter(chunks));
+            catalogToWrite->addChunks(chunks);
 
             catalogsToWrite.push_back(catalogToWrite);
         }
@@ -1218,8 +1268,8 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     for (auto const &c : catalogsToWrite)
     {
-        for (auto const &chunk : c->getChunksUnsafe())
-            sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk.chunk());
+        for (auto const &chunk: c->getChunksUnsafe())
+            sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk);
     }
 }
 
@@ -1687,15 +1737,15 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnMutexLocker lock1(&catalogHi->m_mutex);
     QnMutexLocker lock2(&catalogLow->m_mutex);
 
-    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().chunk().startTimeMs,
-        catalogLow->m_chunks.front().chunk().startTimeMs);
+    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().startTimeMs,
+        catalogLow->m_chunks.front().startTimeMs);
 
     qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0
         ? bitrateAnalyzePeriodMs
         : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs);
 
     const auto archiveEndTimeMs = qMax(
-        catalogLow->m_chunks.back().chunk().startTimeMs, catalogHi->m_chunks.back().chunk().startTimeMs);
+        catalogLow->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs);
     qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
         ? archiveEndTimeMs - bitrateAnalyzePeriodMs
         : 0;
@@ -2690,17 +2740,17 @@ void QnStorageManager::replaceChunks(
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     qint64 newArchiveFirstChunkStartTimeMs = newCatalog->m_chunks.empty()
         ? std::numeric_limits<qint64>::max()
-        : newCatalog->m_chunks.front().chunk().startTimeMs;
+        : newCatalog->m_chunks.front().startTimeMs;
     qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
     for (const auto& chunk : ownCatalog->m_chunks)
     {
-        if (chunk.chunk().storageIndex != storageIndex)
+        if (chunk.storageIndex != storageIndex)
             continue;
 
-        if (chunk.chunk().startTimeMs >= newArchiveBorder)
+        if (chunk.startTimeMs >= newArchiveBorder)
             break;
 
-        newCatalog->addChunk(chunk.chunk());
+        newCatalog->addChunk(chunk);
     }
 
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
@@ -3005,9 +3055,8 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
         QVector<nx::vms::server::Chunk> notMigratedChunks;
         if (catalogFile->fromCSVFile(catalogName))
         {
-            for(const auto& proxyChunk: catalogFile->m_chunks)
+            for(const auto& chunk: catalogFile->m_chunks)
             {
-                const auto chunk = proxyChunk.chunk();
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
                 if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
                     storage.clear();

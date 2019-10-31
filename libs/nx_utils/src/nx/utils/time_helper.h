@@ -22,11 +22,11 @@ public:
     /**
      * Assume the camera sends PTSes starting from e.g. 0, and looping no later than modulusUs,
      * like testcamera can do with the appropriate options. The goal is to convert PTSes from the
-     * camera to "unlooped" PTSes which are monotonous. PTS 0 is converted to a moment with 
+     * camera to "unlooped" PTSes which are monotonous. PTS 0 is converted to a moment with
      * us-since-epoch divisible by modulusUs, and the first received PTS is converted to a moment
      * in the past which is the closest to the current time. This allows to restore the original
      * PTS by taking the "unlooped" PTS modulo modulusUs.
-     * 
+     *
      * NOTE: Logging is performed via NX_PRINT, because this function is intended to be used for
      * debugging and experimenting together with other functionality that uses the same log.
      */

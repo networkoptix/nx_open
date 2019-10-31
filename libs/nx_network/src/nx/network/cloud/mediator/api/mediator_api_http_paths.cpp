@@ -13,6 +13,8 @@ const char* const kServerSessionsPath = "/server/{hostname}/sessions/";
 
 const char* const kStatisticsMetricsPath = "/statistics/metrics/";
 
+const char* const kConnectionSpeedUplinkPath = "/connection_speed/uplink";
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

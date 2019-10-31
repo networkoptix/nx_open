@@ -158,6 +158,8 @@ static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not 
 
 static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
 
+static const auto kUpdateDetailsInterval = 1s;
+
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
 {
@@ -418,6 +420,11 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::beforeDestroy()
+{
+    qnResourceRuntimeDataManager->disconnect(this);
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(
@@ -1939,6 +1946,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
 QString QnMediaResourceWidget::calculateDetailsText() const
 {
+    if (!d->updateDetailsTimer.hasExpired(kUpdateDetailsInterval))
+        return d->currentDetailsText;
+
     qreal fps = 0.0;
     qreal mbps = 0.0;
 
@@ -1988,7 +1998,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString result;
     const auto addDetailsString =
-		[&result](const QString& value)
+        [&result](const QString& value)
         {
             if (!value.isEmpty())
                 result.append(htmlFormattedParagraph(value, kDetailsTextPixelSize, /*bold*/ true));
@@ -2011,7 +2021,10 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     addDetailsString(codecString);
     addDetailsString(hqLqString);
 
-    return result;
+    d->currentDetailsText = result;
+    d->updateDetailsTimer.restart();
+
+    return d->currentDetailsText;
 }
 
 void QnMediaResourceWidget::updateCurrentUtcPosMs()

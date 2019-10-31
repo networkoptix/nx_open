@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.115",
+    "version": "1.0.1.160",
     "data": [
         {
             "keys": [
@@ -192,7 +192,9 @@
             "keys": [
                 "ActiveCam|*",
                 "ACTI|B915",
-                "*|ACTi-915"
+                "*|ACTi-915",
+                "ACTi|Z*", "Z*|ACTi",
+                "ACTi Corporation|Z*", "Z*|ACTi Corporation"
             ],
             "forceONVIF": true
         },
@@ -915,7 +917,7 @@
                 "ds-7716ni-i4/16p|network video recorder",
                 "2d|eli-sip-eb21-4r",
                 "dahua|ipc-hdbw13a0e",
-                "hangzhou hikvision digital technology co., ltd|ds-7616ni-i2",
+                "hangzhou hikvision digital technology co., ltd|ds-7616*",
                 "zkd408a|embedded net dvr",
                 "zkd608a|embedded net dvr",
                 "mam-6me1012mta|encoder2",
@@ -933,7 +935,7 @@
                 "ds-7204hghi-f1/n|embedded net dvr",
                 "zkd408b|embedded net dvr",
                 "dahua|dhi-nvr4416-16p-4ks2",
-                "hangzhou hikvision digital technology co., ltd|ds-8632ni-st",
+                "hangzhou hikvision digital technology co., ltd|ds-8632*",
                 "dnr708|general",
                 "onvif|hq-thd0802a-h",
                 "dahua|dhi-nvr5232-8p-4ks2",
@@ -942,7 +944,27 @@
                 "dahua|dh-xvr7216a-4kl-x",
                 "lnr632|general",
                 "dahua|x21a3e",
-                "lnr616|general"
+                "lnr616|general",
+                "dh-nvr616dr-64-4k|private",
+                "dvtel|en-216",
+                "hdcvi_1008_-_gerao_2|intelbras",
+                "hdcvi_1032|intelbras",
+                "dw-enhd16|acm",
+                "dw-enhd16|dv",
+                "dw-enhd16|vlr-enc-16",
+                "moxa inc.|vport 364a-t",
+                "onvif|d-hktvi5mp908",
+                "ds-7716ni-sp/16|embedded net dvr",
+                "dahua|dhi-nvs0404hdc",
+                "ds-7216hghi-sh/a|embedded net dvr",
+                "onvif_encoder|vlr-enc-16",
+                "axis|p7304",
+                "ds-7204huhi-k1/p|thuis",
+                "os103t|onvif",
+                "dahua|nvr5216-8p-i",
+                "hangzhou hikvision digital technology co., ltd|ds-7116*",
+                "rvi-r16ma|rvi_dvr",
+                "scw|nvr-imp32"
             ],
             "analogEncoder": true
         },
@@ -1122,7 +1144,8 @@
             "keys": [
                 "AXIS|AXISP8221",
                 "AXIS|AXISC3003E",
-                "AXIS|AXISA9161"
+                "AXIS|AXISA9161",
+                "AXIS|AXISC1004E"
             ],
             "noVideoSupport": true
         },
@@ -2168,20 +2191,6 @@
             }
         },
         {
-            "keys": ["Dahua|22204TNI"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
-            "forcedOnvifParams":
-            {
-                "videoEncoders": ["000"],
-                "profiles": ["MediaProfile000"]
-            }
-        },
-        {
-            "keys": ["Dahua|IPC-HDBW8241E*"],
-            "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
-            "fixWrongUri": true
-        },
-        {
             "keys": [
                 "*Grandeye*|EVO-05NxD"
             ],
@@ -2197,7 +2206,8 @@
             "keys": [
                 "Dahua*|*",
                 "Honewell|H4W4PER2",
-                "Honeywell*|H4W4PER2"
+                "Honeywell*|H4W4PER2",
+                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest"
             ],
             "trustToVideoSourceSize": false
         },
@@ -2483,6 +2493,17 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
+        },
+        {
+            "keys":["neutral|DSC-TVC-0200"],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "1,3",
+                    "2,4"
+                ]
+            }
         },
         {
             "keys":["DW|DWC-PB6M4T"],
@@ -3265,7 +3286,13 @@
             "dahua|ipc-pdb4830-b360",
             "hikvision|ds-2cd6984g0-ihs",
             "20c-h4a-4mh-360|20c-h4a-4mh-360*",
-            "avigilon|20c-h4a-4mh-360*"
+            "avigilon|20c-h4a-4mh-360*",
+            "dahua|dh-ipc-hdbw4231fn-e2-m",
+            "wv-x8570|panasonic_wv-x8570",
+            "onvif|hnc6d24-izs",
+            "dahua|psdw5631s-b360",
+            "onvif|cmip7553w4-sz",
+            "cellinx|nbm2-h6"
             ],
             "canShareLicenseGroup": true
         },
@@ -3422,7 +3449,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8836*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3450,7 +3477,7 @@
             "keys": [
                 "Hikvision|DS-2DE4A320*"
             ],
-            "forceONVIF": true,
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -3675,6 +3702,62 @@
             ],
             "onvifIgnoreMedia2":  true,
             "trustToVideoSourceSize": false
+        },
+        {
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
+            "keys": [
+                "hikvision|DS-2DE4225W-DE"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.68, 4.64, 6.29, 8.00, 9.75, 11.21, 12.36, 13.14, 13.82, 14.32],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for V5.5.0 build 170724",
+            "keys": [
+                "hikvision|DS-2DE5330*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1.00, 2.85, 4.92, 6.46, 8.31, 10.08, 12.15, 14.00, 16.00, 18.23, 19.77],
+                        "logicalMultiplier": 33,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }

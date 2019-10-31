@@ -62,6 +62,7 @@ signals:
     void peerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void peerLost(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerUnauthorized(QnUuid id);
+    void remotePeerIncompatible(QnUuid id, const QString& message);
 
     /** Emitted on a new direct connection to a remote peer has been established */
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);

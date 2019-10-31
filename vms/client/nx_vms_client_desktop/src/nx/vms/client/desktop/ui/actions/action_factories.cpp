@@ -48,9 +48,9 @@ Factory::Factory(QObject* parent):
 {
 }
 
-QList<QAction*> Factory::newActions(const Parameters& /*parameters*/, QObject* /*parent*/)
+Factory::ActionList Factory::newActions(const Parameters& /*parameters*/, QObject* /*parent*/)
 {
-    return QList<QAction*>();
+    return ActionList();
 }
 
 QMenu* Factory::newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/)
@@ -63,7 +63,7 @@ OpenCurrentUserLayoutFactory::OpenCurrentUserLayoutFactory(QObject* parent):
 {
 }
 
-QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*parameters*/,
+Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /*parameters*/,
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
@@ -82,7 +82,7 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
 
     auto currentLayout = workbench()->currentLayout()->resource();
 
-    QList<QAction*> result;
+    ActionList result;
     for (const auto &layout: layouts)
     {
         if (layout->isFile())
@@ -123,10 +123,10 @@ PtzPresetsToursFactory::PtzPresetsToursFactory(QObject* parent):
 {
 }
 
-QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
+Factory::ActionList PtzPresetsToursFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
-    QList<QAction*> result;
+    ActionList result;
 
     auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget)
@@ -229,7 +229,7 @@ AspectRatioFactory::AspectRatioFactory(QObject* parent):
 {
 }
 
-QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
+Factory::ActionList AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     QObject* parent)
 {
     float current = workbench()->currentLayout()->cellAspectRatio();
@@ -260,7 +260,7 @@ LayoutTourSettingsFactory::LayoutTourSettingsFactory(QObject* parent):
 }
 
 
-QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& parameters,
+Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
     auto actionGroup = new QActionGroup(parent);
@@ -310,10 +310,10 @@ WebPageFactory::WebPageFactory(QObject* parent):
 {
 }
 
-QList<QAction*> WebPageFactory::newActions(const Parameters& parameters,
+Factory::ActionList WebPageFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
-    QList<QAction*> result;
+    ActionList result;
 
     QPointer<QnWebResourceWidget> widget(qobject_cast<QnWebResourceWidget*>(parameters.widget()));
     if (!NX_ASSERT(widget))

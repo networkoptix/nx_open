@@ -317,6 +317,7 @@ public:
 
 
     nx::metrics::Storage* metrics() const;
+    std::weak_ptr<nx::metrics::Storage> metricsWeakRef() const;
 
     void setAuditManager(QnAuditManager* auditManager);
     QnAuditManager* auditManager() const;

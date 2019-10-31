@@ -29,7 +29,7 @@ public:
     void setGenerator(ValueGenerator generator);
 
     api::metrics::Value value() const override;
-    void forEach(Duration maxAge, const ValueIterator& iterator) const override;
+    void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
 private:
     ValueGenerator m_generator;
@@ -42,7 +42,6 @@ class NX_VMS_UTILS_API AlarmMonitor
 {
 public:
     AlarmMonitor(
-        QString parameter,
         api::metrics::AlarmLevel level,
         ValueGeneratorResult condition,
         TextGenerator text);
@@ -52,12 +51,11 @@ public:
 
 private:
     const Scope m_scope = Scope::local;
-    const QString m_parameter;
     const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;
     const TextGenerator m_text;
 };
 
-using AlarmMonitors = std::vector<std::unique_ptr<AlarmMonitor>>;
+using AlarmMonitors = std::map<QString, std::vector<std::unique_ptr<AlarmMonitor>>>;
 
 } // namespace nx::vms::utils::metrics

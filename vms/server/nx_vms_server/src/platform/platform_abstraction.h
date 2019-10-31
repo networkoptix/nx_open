@@ -4,7 +4,9 @@
 
 #include <platform/core_platform_abstraction.h>
 #include "monitoring/global_monitor.h"
-#include <nx/utils/singleton.h>
+
+namespace nx::utils { class TimerManager; }
+namespace nx::vms::server { class RootFileSystem; }
 
 class QnPlatformAbstraction: public QnCorePlatformAbstraction
 {
@@ -12,16 +14,12 @@ class QnPlatformAbstraction: public QnCorePlatformAbstraction
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(QObject *parent = nullptr);
-    virtual ~QnPlatformAbstraction();
+    QnPlatformAbstraction(
+        nx::vms::server::RootFileSystem* rootFs,
+        nx::utils::TimerManager* timerManager);
 
-    nx::vms::server::GlobalMonitor *monitor() const
-    {
-        return m_monitor;
-    }
-
-    void setServerModule(QnMediaServerModule* serverModule);
-
+    nx::vms::server::PlatformMonitor *monitor() const { return m_monitor.get(); }
+    void setCustomMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> monitor);
 private:
-    nx::vms::server::GlobalMonitor *m_monitor;
+    std::unique_ptr<nx::vms::server::PlatformMonitor> m_monitor;
 };

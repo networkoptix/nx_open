@@ -3,25 +3,30 @@
 #include <chrono>
 
 #include <network/router.h>
+#include <nx/utils/thread/cf/cfuture.h>
 #include <nx/network/abstract_socket.h>
+#include <common/common_module_aware.h>
 
-namespace nx {
-namespace vms {
-namespace network {
+namespace nx::vms::network {
 
-class AbstractServerConnector
+class AbstractServerConnector:
+    public /*mixin*/ QnCommonModuleAware
 {
 public:
-    virtual ~AbstractServerConnector() {}
-    /*
-     * Open connection to the media server defined by QnUuid.
-     */
-    virtual std::unique_ptr<nx::network::AbstractStreamSocket> connectTo(
+    using QnCommonModuleAware::QnCommonModuleAware;
+    virtual ~AbstractServerConnector() = default;
+
+    using Connection = std::unique_ptr<nx::network::AbstractStreamSocket>;
+
+    virtual cf::future<Connection> connect(
         const QnRoute& route,
-        bool sslRequired,
-        std::chrono::milliseconds timeout) = 0;
+        std::chrono::milliseconds timeout,
+        bool sslRequired = true) = 0;
+
+    cf::future<Connection> connect(
+        const QnUuid& serverId,
+        std::chrono::milliseconds timeout,
+        bool sslRequired = true);
 };
 
-} // namespace network
-} //namespace vms
-} // namespace nx
+} // namespace nx::vms::network

@@ -500,8 +500,12 @@ void QnUserSettingsDialog::applyChanges()
 
     // Handle new user creating.
     auto callbackFunction =
-        [this, mode](bool success, const QnUserResourcePtr& user)
+        [actionManager = QPointer<action::Manager>(menu()), mode]
+            (bool success, const QnUserResourcePtr& user)
         {
+            if (!actionManager)
+                return;
+
             if (mode != QnUserSettingsModel::NewUser)
                 return;
 
@@ -509,7 +513,7 @@ void QnUserSettingsDialog::applyChanges()
             // transaction is received before the request callback.
             NX_ASSERT(user);
             if (success && user)
-                menu()->trigger(action::SelectNewItemAction, user);
+                actionManager->trigger(action::SelectNewItemAction, user);
         };
 
     qnResourcesChangesManager->saveUser(m_user, applyChangesFunction, callbackFunction);

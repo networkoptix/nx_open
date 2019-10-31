@@ -7,8 +7,8 @@
 #include <nx/client/core/media/abstract_motion_metadata_provider.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/client/core/media/abstract_metadata_consumer_owner.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
-
 #include <nx/vms/api/types/resource_types.h>
 
 #include <utils/common/connective.h>
@@ -51,6 +51,9 @@ public:
 
     QScopedPointer<WidgetAnalyticsController> analyticsController;
     std::unique_ptr<nx::analytics::MetadataLogParser> analyticsMetadataLogParser;
+
+    mutable nx::utils::ElapsedTimer updateDetailsTimer;
+    mutable QString currentDetailsText;
 
 public:
     explicit MediaResourceWidgetPrivate(

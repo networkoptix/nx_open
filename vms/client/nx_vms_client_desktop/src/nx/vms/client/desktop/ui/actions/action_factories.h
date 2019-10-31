@@ -16,8 +16,9 @@ class Factory: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
+    using ActionList = QList<QAction*>;
     Factory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent = nullptr);
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent = nullptr);
     virtual QMenu* newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/);
 };
 
@@ -27,7 +28,7 @@ class OpenCurrentUserLayoutFactory: public Factory
     Q_OBJECT
 public:
     OpenCurrentUserLayoutFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 
@@ -36,7 +37,7 @@ class PtzPresetsToursFactory: public Factory
     Q_OBJECT
 public:
     PtzPresetsToursFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 class EdgeNodeFactory: public Factory
@@ -52,7 +53,7 @@ class AspectRatioFactory: public Factory
     Q_OBJECT
 public:
     AspectRatioFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 class LayoutTourSettingsFactory: public Factory
@@ -60,7 +61,7 @@ class LayoutTourSettingsFactory: public Factory
     Q_OBJECT
 public:
     LayoutTourSettingsFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 class WebPageFactory: public Factory
@@ -68,7 +69,7 @@ class WebPageFactory: public Factory
     Q_OBJECT
 public:
     WebPageFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 } // namespace action

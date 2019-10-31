@@ -15,7 +15,7 @@ namespace sample {
 class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
-    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
 protected:
@@ -28,10 +28,8 @@ protected:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
     virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* /*outValue*/,
-        const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/) override
-    {
-    }
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
@@ -41,12 +39,15 @@ private:
     const std::string kHelloWorldObjectType = "nx.sample.helloWorld";
     const std::string kNewTrackEventType = "nx.sample.newTrack";
 
-    static constexpr int kTrackFrameCount = 256; //< The value was chosen arbitrarily.
+    /** Lenght of the the track (in frames). The value was chosen arbitrarily. */
+    static constexpr int kTrackFrameCount = 256;
 
 private:
     nx::sdk::Uuid m_trackId = nx::sdk::UuidHelper::randomUuid();
-    int m_frameIndex = 0;
-    int m_trackIndex = 0;
+    int m_frameIndex = 0; /**< Used for generating the detection in the right place. */
+    int m_trackIndex = 0; /**< Used in the description of the events. */
+
+    /** Used for binding object and event metadata to the particular video frame. */
     int64_t m_lastVideoFrameTimestampUs = 0;
 };
 

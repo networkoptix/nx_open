@@ -12,8 +12,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 
 #include <time.h>
 #include <signal.h>
@@ -379,15 +377,15 @@ private:
 // -------------------------------------------------------------------------- //
 // QnLinuxMonitor
 // -------------------------------------------------------------------------- //
-QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
-    base_type(parent),
+QnLinuxMonitor::QnLinuxMonitor():
+    base_type(),
     d_ptr(new QnLinuxMonitorPrivate())
 {
     d_ptr->q_ptr = this;
 }
 
-QnLinuxMonitor::~QnLinuxMonitor() {
-    return;
+QnLinuxMonitor::~QnLinuxMonitor()
+{
 }
 
 qreal QnLinuxMonitor::totalCpuUsage()
@@ -618,8 +616,14 @@ QList<PlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
     return result;
 }
 
-void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
+void QnLinuxMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
 {
     d_ptr->partitionsInfoProvider.reset(
-        new nx::vms::server::fs::PartitionsInformationProvider(serverModule->rootFileSystem()));
+        new nx::vms::server::fs::PartitionsInformationProvider(rootFs));
+}
+
+int QnLinuxMonitor::thisProcessThreads()
+{
+    const QString path("/proc/self/task");
+    return QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot).count();
 }

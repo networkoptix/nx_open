@@ -23,6 +23,7 @@ elseif(UNIX)
 endif()
 
 add_library(qtservice STATIC ${cpp_files})
+set_target_properties(qtservice PROPERTIES FOLDER third_party)
 nx_add_qt_mocables(qtservice ${mocables})
 
 target_include_directories(qtservice PUBLIC ${src_dir}/src)

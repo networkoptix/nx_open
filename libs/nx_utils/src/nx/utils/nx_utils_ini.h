@@ -8,18 +8,17 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_utils.ini") { reload(); }
 
+    static constexpr int kShowPasswordsInLogs = 0;
     #if defined(_DEBUG)
         static constexpr const char* kDefaultMutexImplementation = "debug";
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
-        static constexpr int kShowPasswordsInLogs = 1;
         static constexpr int kLogLevelReducerPassLimit = 100;
         static constexpr int kLogLevelReducerWindowSizeS = 20;
     #else
         static constexpr const char* kDefaultMutexImplementation = "qt";
         static constexpr int kDefaultAssertCrash = 0;
         static constexpr int kDefaultAssertHeavyCondition = 0;
-        static constexpr int kShowPasswordsInLogs = 0;
         static constexpr int kLogLevelReducerPassLimit = 100;
         static constexpr int kLogLevelReducerWindowSizeS = 600;
     #endif

@@ -1,7 +1,5 @@
 #include "analytics_db.h"
 
-#include <cmath>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/sql/filter.h>
@@ -17,6 +15,8 @@
 #include "object_track_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
+
+#include <cmath>
 
 namespace nx::analytics::db {
 
@@ -54,6 +54,71 @@ EventsStorage::~EventsStorage()
     done.get_future().wait();
 }
 
+bool EventsStorage::makePath(const QString& path)
+{
+    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
+        return true;
+
+    if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
+    {
+        NX_WARNING(this, "Failed to create directory %1", path);
+        return false;
+    }
+
+    NX_DEBUG(this, "Directory %1 exists or has been created successfully", path);
+    return true;
+}
+
+bool EventsStorage::changeOwner(const std::vector<PathAndMode>& pathAndModeList)
+{
+    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
+        return true;
+
+    for (const auto& entry: pathAndModeList)
+    {
+        const ChownMode mode = std::get<ChownMode>(entry);
+        const QString path = std::get<QString>(entry);
+        const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
+        const auto rootFs = m_mediaServerModule->rootFileSystem();
+
+        if (!rootFs->isPathExists(path))
+        {
+            NX_DEBUG(
+                this,
+                "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
+            continue;
+        }
+
+        if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
+        {
+            NX_WARNING(
+                this, "Failed to change access rights. Mode: %1. Path: %2", modeString, path);
+            return false;
+        }
+
+        NX_DEBUG(
+            this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
+    }
+
+    return true;
+}
+
+std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const QString& dbFileName)
+{
+    const auto fileInfo = QFileInfo(dbFileName);
+    const auto dirPath = fileInfo.canonicalPath();
+    NX_ASSERT(!dirPath.isEmpty(), "Invalid path");
+
+    const auto baseName = closeDirPath(dirPath) + fileInfo.baseName();
+    const QStringList possibleExtensions = {".sqlite", ".sqlite-shm", ".sqlite-wal"};
+    std::vector<PathAndMode> result;
+
+    for (const auto& ext: possibleExtensions)
+        result.push_back(std::make_tuple(baseName + ext, ChownMode::nonRecursive));
+
+    return result;
+}
+
 bool EventsStorage::initialize(const Settings& settings)
 {
     if (m_dbController)
@@ -71,8 +136,22 @@ bool EventsStorage::initialize(const Settings& settings)
     NX_DEBUG(this, "Opening analytics event storage from [%1]", dbConnectionOptions.dbName);
 
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
-    if (!ensureDbDirIsWritable(settings.path)
-        || !m_dbController->initialize()
+    const auto archivePath = closeDirPath(settings.path) + "archive/";
+
+    if (!makePath(archivePath)
+        || !changeOwner({
+            {settings.path, ChownMode::nonRecursive},
+            {archivePath, ChownMode::nonRecursive}})
+        || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName)))
+    {
+        m_dbController.reset();
+        NX_WARNING(this, "Failed to initialize analytics DB directories at %1", settings.path);
+        return false;
+    }
+
+    NX_DEBUG(this, "Initializing analytics SQLite DB");
+
+    if (!m_dbController->initialize()
         || !readMaximumEventTimestamp()
         || !loadDictionaries())
     {
@@ -81,9 +160,13 @@ bool EventsStorage::initialize(const Settings& settings)
         return false;
     }
 
+    NX_DEBUG(this, "Initializing archive directory at %1", archivePath);
+
     m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
         m_mediaServerModule,
-        settings.path + "/archive/");
+        archivePath);
+
+    NX_DEBUG(this, "Analytics DB initialized");
 
     return true;
 }
@@ -272,30 +355,10 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
         });
 }
 
-bool EventsStorage::ensureDbDirIsWritable(const QString& path)
-{
-    if (!m_mediaServerModule)
-        return true;
-
-    if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
-    {
-        NX_WARNING(this, "Failed to create directory %1 on root FS", path);
-        return false;
-    }
-
-    if (!m_mediaServerModule->rootFileSystem()->changeOwner(path))
-    {
-        NX_WARNING(this, "Failed to change owner of directory %1 on root FS", path);
-        return false;
-    }
-
-    NX_DEBUG(this, "Successfully changed access rights for %1", path);
-
-    return true;
-}
-
 bool EventsStorage::readMaximumEventTimestamp()
 {
+    NX_DEBUG(this, "Loading max event timestamp");
+
     try
     {
         m_maxRecordedTimestamp = m_dbController->queryExecutor().executeSelectQuerySync(
@@ -314,6 +377,8 @@ bool EventsStorage::readMaximumEventTimestamp()
         NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
         return false;
     }
+
+    NX_DEBUG(this, "Loaded max event timestamp %1", m_maxRecordedTimestamp);
 
     return true;
 }
@@ -347,6 +412,8 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
 
 bool EventsStorage::loadDictionaries()
 {
+    NX_DEBUG(this, "Loading dictionaries");
+
     try
     {
         m_dbController->queryExecutor().executeSelectQuerySync(
@@ -363,6 +430,8 @@ bool EventsStorage::loadDictionaries()
         NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
         return false;
     }
+
+    NX_DEBUG(this, "Dictionaries loaded");
 
     return true;
 }

@@ -15,6 +15,76 @@
     #include <unordered_map>
 #endif
 
+QString toString(const std::type_info& value)
+{
+    #if defined NX_UTILS_TO_STRING_CACHE
+        static QReadWriteLock mutex;
+        static std::unordered_map<std::type_index, QString> cache;
+
+        {
+            QReadLocker lock(&mutex);
+            const auto it = cache.find(value);
+            if (it != cache.end())
+                return it->second;
+        }
+
+        QWriteLocker lock(&mutex);
+        auto& s = cache[value];
+        if (s.isEmpty())
+            s = demangleTypeName(value.name());
+
+        return s;
+    #else
+        return demangleTypeName(value.name());
+    #endif
+}
+
+QString demangleTypeName(const char* type)
+{
+    #if defined(_MSC_VER)
+        static constexpr const char* kTypePrefixes[] = {"struct ", "class "};
+        static const size_t kTypePrefixesSize[] = {
+            strlen(kTypePrefixes[0]),
+            strlen(kTypePrefixes[1]),
+        };
+
+        QString result;
+        result.reserve(strlen(type)); //< Result is not shorter than the input.
+
+        const char* p = type;
+        for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
+        {
+            if (strncmp(type, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
+            {
+                p += kTypePrefixesSize[i];
+                break;
+            }
+        }
+
+        while (*p != '\0')
+        {
+            const char c = *p;
+            result += c;
+            if (c == '<' || c == ' ' || c == ',')
+            {
+                for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
+                {
+                     if (strncmp(p + 1, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
+                     {
+                         p += kTypePrefixesSize[i];
+                         break;
+                     }
+                }
+            }
+            ++p;
+        }
+
+        return result;
+    #else
+        return QString::fromStdString(boost::core::demangle(type));
+    #endif
+}
+
 QString toString(char value)
 {
     return QChar::fromLatin1(value);
@@ -107,76 +177,6 @@ QString toString(const std::chrono::nanoseconds &value)
 
     return QString(QLatin1String("%1ns")).arg(value.count());
 
-}
-
-QString toString(const std::type_info& value)
-{
-    #if defined NX_UTILS_TO_STRING_CACHE
-        static QReadWriteLock mutex;
-        static std::unordered_map<std::type_index, QString> cache;
-
-        {
-            QReadLocker lock(&mutex);
-            const auto it = cache.find(value);
-            if (it != cache.end())
-                return it->second;
-        }
-
-        QWriteLocker lock(&mutex);
-        auto& s = cache[value];
-        if (s.isEmpty())
-            s = demangleTypeName(value.name());
-
-        return s;
-    #else
-        return demangleTypeName(value.name());
-    #endif
-}
-
-QString demangleTypeName(const char* type)
-{
-    #if defined(_MSC_VER)
-        static constexpr const char* kTypePrefixes[] = {"struct ", "class "};
-        static const size_t kTypePrefixesSize[] = {
-            strlen(kTypePrefixes[0]),
-            strlen(kTypePrefixes[1]),
-        };
-
-        QString result;
-        result.reserve(strlen(type)); //< Result is not shorter than the input.
-
-        const char* p = type;
-        for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
-        {
-            if (strncmp(type, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
-            {
-                p += kTypePrefixesSize[i];
-                break;
-            }
-        }
-
-        while (*p != '\0')
-        {
-            const char c = *p;
-            result += c;
-            if (c == '<' || c == ' ' || c == ',')
-            {
-                for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
-                {
-                     if (strncmp(p + 1, kTypePrefixes[i], kTypePrefixesSize[i]) == 0)
-                     {
-                         p += kTypePrefixesSize[i];
-                         break;
-                     }
-                }
-            }
-            ++p;
-        }
-
-        return result;
-    #else
-        return QString::fromStdString(boost::core::demangle(type));
-    #endif
 }
 
 QString pointerTypeName(const void* /*value*/)

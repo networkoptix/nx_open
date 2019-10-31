@@ -82,52 +82,42 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_recActionCnt(0),
     m_statusFlags(Qn::CameraStatusFlag::CSF_NoFlags),
     m_manuallyAdded(false),
-    m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
+    m_cachedLicenseType([this] { return calculateLicenseType(); }),
     m_cachedHasDualStreaming(
-        [this]()->bool{ return hasDualStreamingInternal() && !isDualStreamingDisabled(); },
-        &m_mutex ),
+        [this]()->bool{ return hasDualStreamingInternal() && !isDualStreamingDisabled(); }),
     m_cachedSupportedMotionType(
-        std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
-        &m_mutex ),
+        std::bind(&QnSecurityCamResource::calculateSupportedMotionType, this)),
     m_cachedCameraCapabilities(
         [this]()->Qn::CameraCapabilities {
             return static_cast<Qn::CameraCapabilities>(
-                getProperty(ResourcePropertyKey::kCameraCapabilities).toInt()); },
-        &m_mutex ),
+                getProperty(ResourcePropertyKey::kCameraCapabilities).toInt());
+        }),
     m_cachedIsDtsBased(
-        [this]()->bool{ return getProperty(ResourcePropertyKey::kDts).toInt() > 0; },
-        &m_mutex ),
-    m_motionType(
-        std::bind( &QnSecurityCamResource::calculateMotionType, this ),
-        &m_mutex ),
+        [this]()->bool{ return getProperty(ResourcePropertyKey::kDts).toInt() > 0; }),
+    m_motionType(std::bind(&QnSecurityCamResource::calculateMotionType, this)),
     m_cachedIsIOModule(
-        [this]()->bool{ return getProperty(ResourcePropertyKey::kIoConfigCapability).toInt() > 0; },
-        &m_mutex),
+        [this]() { return getProperty(ResourcePropertyKey::kIoConfigCapability).toInt() > 0; }),
     m_cachedCanConfigureRemoteRecording(
-        [this]() { return getProperty(ResourcePropertyKey::kCanConfigureRemoteRecording).toInt() > 0; },
-        &m_mutex),
+        [this]()
+        {
+            return getProperty(ResourcePropertyKey::kCanConfigureRemoteRecording).toInt() > 0;
+        }),
     m_cachedCameraMediaCapabilities(
         [this]()
         {
             return QJson::deserialized<nx::media::CameraMediaCapability>(
                 getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
-        },
-        &m_mutex),
+        }),
     m_cachedExplicitDeviceType(
         [this]()
         {
             return QnLexical::deserialized<nx::core::resource::DeviceType>(
                 getProperty(ResourcePropertyKey::kDeviceType),
                 nx::core::resource::DeviceType::unknown);
-        },
-        &m_mutex),
+        }),
     m_cachedHasVideo(
-        [this]()
-        {
-            return !resourceData().value(ResourceDataKey::kNoVideoSupport, false);
-        },
-        &m_mutex),
-    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }, &m_mutex)
+        [this]() { return !resourceData().value(ResourceDataKey::kNoVideoSupport, false); }),
+    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); })
 {
     NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
@@ -1227,15 +1217,19 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    const auto commonModule = this->commonModule();
-    if (commonModule)
+    if (const auto commonModule = this->commonModule())
     {
         const auto& settings = commonModule->globalSettings();
         if (settings && !settings->isCameraSettingsOptimizationEnabled())
             return true;
     }
 
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    return isCameraControlDisabledInternal();
+}
+
+bool QnSecurityCamResource::isCameraControlDisabledInternal() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
     return (*userAttributesLock)->cameraControlDisabled;
 }
 
@@ -1549,8 +1543,8 @@ float QnSecurityCamResource::suggestBitrateKbps(
         auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
         if (streamCapability.maxBitrateKbps > 0)
         {
-            result = qBound((float) streamCapability.minBitrateKbps,
-                result, (float) streamCapability.maxBitrateKbps);
+            result = qBound(streamCapability.minBitrateKbps,
+                result, streamCapability.maxBitrateKbps);
         }
         return result;
     }

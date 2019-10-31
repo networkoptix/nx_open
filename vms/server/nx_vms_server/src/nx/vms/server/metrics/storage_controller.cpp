@@ -76,13 +76,12 @@ static auto infoGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getPath()); }
+                "server",
+                [](const auto& r) { return Value(r->getParentServer()->getName()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "type", [](const auto& r) { return Value(r->getStorageType()); }
+                "type",
+                [](const auto& r) { return Value(r->getStorageType()); }
             )
         );
 }
@@ -93,17 +92,26 @@ static auto stateGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "state",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "status", // FIXME: Impl does not fallow spec so far.
-                    [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
-                    qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
+                "status",
+                [](const auto& r)
+                {
+                    auto status = r->getStatus();
+                    if (status == Qn::Online && r->isUsedForWriting())
+                        status = Qn::Recording;
+                    return Value(QnLexical::serialized(status));
+                },
+                qtSignalWatch<Resource>(
+                    &QnStorageResource::statusChanged,
+                    &QnStorageResource::isUsedForWritingChanged
+                )
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "issues",
-                    [](const auto& r)
-                    {
-                        return Value(r->getAndResetMetric(&StorageResource::Metrics::issues));
-                    },
-                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
+                [](const auto& r)
+                {
+                    return Value(r->getAndResetMetric(&StorageResource::Metrics::issues));
+                },
+                timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
             )
         );
 }
@@ -115,19 +123,17 @@ static auto activityGroupProvider()
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "readRateBps",
-                    [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
-                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
+                timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "writeRateBps",
-                    [](const auto& r)
-                    {
-                        return ioRate(r, &StorageResource::Metrics::bytesWritten);
-                    },
-                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesWritten); },
+                timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "transactionsPerSecond", [](const auto& r) { return transactionsPerSecond(r); }
+                "transactionsPerSecond",
+                [](const auto& r) { return transactionsPerSecond(r); }
             )
         );
 }
@@ -138,13 +144,16 @@ static auto spaceGroupProvider()
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "totalSpaceB", [](const auto& r) { return r->getTotalSpace(); }
+                "totalSpaceB",
+                [](const auto& r) { return r->getTotalSpace(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceP", [](const auto& r) { return r->nxOccupedSpace() / (double) r->getTotalSpace(); }
+                "mediaSpaceP",
+                [](const auto& r) { return r->nxOccupedSpace() / (double) r->getTotalSpace(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceB", [](const auto& r) { return r->nxOccupedSpace(); }
+                "mediaSpaceB",
+                [](const auto& r) { return r->nxOccupedSpace(); }
             )
         );
 }
@@ -152,6 +161,12 @@ static auto spaceGroupProvider()
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "_",
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "name", [](const auto& r) { return Value(r->getPath()); }
+            )
+        ),
         infoGroupProvider(),
         stateGroupProvider(),
         activityGroupProvider(),

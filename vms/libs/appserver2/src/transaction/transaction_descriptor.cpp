@@ -1088,7 +1088,7 @@ struct FilterListByAccess<ModifyResourceAccess>
     void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, this, commonModule](const typename ParamContainer::value_type &param)
+            [&accessData, commonModule](const typename ParamContainer::value_type &param)
         {
             return ModifyResourceAccess()(commonModule, accessData, param) != ErrorCode::ok;
         }), outList.end());
@@ -1244,18 +1244,18 @@ struct SetResourceParamTransactionType
         const nx::vms::api::ResourceParamWithRefData& param,
         AbstractPersistentStorage* /*db*/)
     {
-        if (param.resourceId == QnUserResource::kAdminGuid &&
-            param.name == nx::settings_names::kNameSystemName)
+        if (param.resourceId == QnUserResource::kAdminGuid)
         {
-            // System rename MUST be propagated to Nx Cloud
-            return TransactionType::Cloud;
+            if (param.name == nx::settings_names::kNameSystemName)
+                return TransactionType::Cloud;
+            if (param.name == nx::settings_names::kNameSpecificFeatures)
+                return TransactionType::Cloud;
         }
 
-        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName ||
-            param.name == Qn::USER_FULL_NAME)
-        {
+        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName)
             return TransactionType::Cloud;
-        }
+        if (param.name == Qn::USER_FULL_NAME)
+            return TransactionType::Cloud;
 
         return TransactionType::Regular;
     }

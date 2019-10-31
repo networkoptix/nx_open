@@ -16,6 +16,10 @@ class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject, public Singleton<Col
 
 public:
     explicit ColorTheme(QObject* parent = nullptr);
+    explicit ColorTheme(
+        const QString& mainColorsFile,
+        const QString& skinColorsFile,
+        QObject* parent = nullptr);
     virtual ~ColorTheme() override;
 
     QVariantMap colors() const;
@@ -41,6 +45,8 @@ public:
 
     Q_INVOKABLE static bool isDark(const QColor& color);
     Q_INVOKABLE static bool isLight(const QColor& color);
+
+    static void registerQmlType();
 
 private:
     struct Private;

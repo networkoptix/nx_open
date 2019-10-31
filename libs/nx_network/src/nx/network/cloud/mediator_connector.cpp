@@ -96,6 +96,8 @@ void MediatorConnector::setSystemCredentials(std::optional<SystemCredentials> va
 
     if (needToReconnect)
         m_stunClient->closeConnection(SystemError::connectionReset);
+
+    m_credentialsSetEvent.notify(m_credentials);
 }
 
 std::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
@@ -130,6 +132,18 @@ void MediatorConnector::fetchAddress(
 std::optional<MediatorAddress> MediatorConnector::address() const
 {
     return m_mediatorEndpointProvider->mediatorAddress();
+}
+
+void MediatorConnector::subsribeToSystemCredentialsSet(
+    nx::utils::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
+    nx::utils::SubscriptionId* outId)
+{
+    m_credentialsSetEvent.subscribe(std::move(handler), outId);
+}
+
+void MediatorConnector::unsubscribeFromSystemCredentialsSet(nx::utils::SubscriptionId id)
+{
+    m_credentialsSetEvent.removeSubscription(id);
 }
 
 void MediatorConnector::setStunClientSettings(

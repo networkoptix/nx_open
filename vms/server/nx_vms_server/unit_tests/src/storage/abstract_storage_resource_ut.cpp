@@ -92,7 +92,6 @@ protected:
         this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
         pluginManager = std::make_unique<PluginManager>(&serverModule());
-        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
         serverModule().storagePluginFactory()->registerStoragePlugin(
             "file",
             [this](QnCommonModule*, const QString& path)
@@ -120,7 +119,6 @@ protected:
     QString smbStorageUrl;
     std::unique_ptr<PluginManager> pluginManager;
     nx::ut::utils::WorkDirResource workDirResource;
-    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
 };
 
 } // namespace

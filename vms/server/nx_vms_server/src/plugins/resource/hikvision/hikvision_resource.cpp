@@ -300,7 +300,7 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
         auto value = itr.value();
         result.codecs.insert(QnAvCodecHelper::codecIdFromString(key.codec));
         result.resolutions.push_back(key.resolution);
-        result.bitrateRange = std::make_pair(value.minBitrateKbps, value.maxBitrateKbps);
+        result.bitrateRange = std::make_pair((int)value.minBitrateKbps, (int)value.maxBitrateKbps);
         result.fpsInDeviceUnits.push_back(value.maxFps * 100);
     }
     return result;

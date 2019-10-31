@@ -42,6 +42,8 @@ struct GotTransactionFuction
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader) const
     {
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+            bus->printTran(connection, transaction, Connection::Direction::incoming);
         bus->gotTransaction(transaction, connection, transportHeader);
     }
 };
@@ -493,7 +495,14 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
+    {
         emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id);
+    }
+    else if (connection->state() == Connection::State::forbidden)
+    {
+        emitAsync(this, &MessageBus::remotePeerIncompatible, remotePeer.id,
+            connection->lastErrorMessage());
+    }
 }
 
 void MessageBus::at_stateChanged(
@@ -532,6 +541,7 @@ void MessageBus::at_stateChanged(
                 if (removeUrlInfo.peerId == remoteId)
                     removeUrlInfo.unauthorizedTimer.restart();
             }
+        case Connection::State::forbidden:
         case Connection::State::Error:
         {
             removeConnectionUnsafe(weakRef);
@@ -811,6 +821,144 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     return true;
 }
 
+template<class T>
+void MessageBus::sendTransactionImpl(
+    const P2pConnectionPtr& connection,
+    const ec2::QnTransaction<T>& srcTran,
+    TransportHeader transportHeader)
+{
+    NX_ASSERT(srcTran.command != ApiCommand::NotDefined);
+
+    const vms::api::PersistentIdData remotePeer(connection->remotePeer());
+    if (!connection->shouldTransactionBeSentToPeer(srcTran))
+    {
+        NX_VERBOSE(this, "Peer %1 does not handler transactions like %2", remotePeer.id, srcTran);
+        return;
+    }
+
+    if (transportHeader.via.find(remotePeer.id) != transportHeader.via.end())
+    {
+        NX_VERBOSE(this, "Peer %1 already handled transaction %2", remotePeer.id, srcTran);
+        return;
+    }
+
+    const auto& descriptor = ec2::getTransactionDescriptorByTransaction(srcTran);
+    auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
+        commonModule(), connection.staticCast<Connection>()->userAccessData(), srcTran.params);
+    if (remoteAccess == RemotePeerAccess::Forbidden)
+    {
+        NX_VERBOSE(this, "Permission check failed while sending transaction %1 to peer %2",
+            srcTran, remotePeer.id);
+        return;
+    }
+
+    const vms::api::PersistentIdData peerId(srcTran.peerID, srcTran.persistentInfo.dbID);
+    const auto context = this->context(connection);
+
+    ec2::QnTransaction<T> modifiedTran;
+    if (connection->remotePeer().isClient())
+    {
+        modifiedTran = srcTran;
+        if (ec2::amendOutputDataIfNeeded(
+            connection.staticCast<Connection>()->userAccessData(),
+            commonModule()->resourceAccessManager(),
+            &modifiedTran.params))
+        {
+            // Make persistent info null in case if data has been amended. We don't want such
+            // transactions be checked against serialized transactions cache.
+            modifiedTran.persistentInfo = ec2::QnAbstractTransaction::PersistentInfo();
+        }
+    }
+    const ec2::QnTransaction<T>& tran(connection->remotePeer().isClient() ? modifiedTran : srcTran);
+
+    if (connection->remotePeer().isServer())
+    {
+        if (descriptor->isPersistent)
+        {
+            if (context->sendDataInProgress)
+            {
+                NX_VERBOSE(this, "Send to server %1 already in progress", remotePeer.id);
+                return;
+            }
+
+            if (!context->updateSequence(tran))
+            {
+                NX_VERBOSE(this, "Server %1 already knows transaction %2", remotePeer.id, tran);
+                return;
+            }
+        }
+        else
+        {
+            if (!context->isRemotePeerSubscribedTo(tran.peerID))
+            {
+                NX_VERBOSE(this, "Peer %1 is not subscribed for %2", remotePeer.id, tran.peerID);
+                return;
+            }
+        }
+    }
+    else if (remotePeer == peerId)
+    {
+        NX_VERBOSE(this, "Peer %1 is myself");
+        return;
+    }
+    else if (connection->remotePeer().isCloudServer())
+    {
+        if (!descriptor->isPersistent)
+        {
+            NX_VERBOSE(this, "Cloud %1 is not iterested in non-persistent transactions", remotePeer.id);
+            return;
+        }
+
+        if (context->sendDataInProgress)
+        {
+            NX_VERBOSE(this, "Send to cloud %1 already in progress", remotePeer.id);
+            return;
+        }
+
+        if (!context->updateSequence(tran))
+        {
+            NX_VERBOSE(this, "Cloud %1 already knows transaction %2", remotePeer.id, tran);
+            return;
+        }
+    }
+
+    NX_ASSERT(!(remotePeer == peerId)); //< loop
+
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
+        printTran(connection, tran, Connection::Direction::outgoing);
+
+    switch (connection->remotePeer().dataFormat)
+    {
+    case Qn::JsonFormat:
+        connection->sendMessage(
+            m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+        break;
+    case Qn::UbjsonFormat:
+        if (connection->remotePeer().isClient())
+        {
+            connection->sendMessage(
+                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+        }
+        else if (descriptor->isPersistent)
+        {
+            connection->sendMessage(MessageType::pushTransactionData,
+                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+        }
+        else
+        {
+            TransportHeader header(transportHeader);
+            header.via.insert(localPeer().id);
+            connection->sendMessage(MessageType::pushImpersistentBroadcastTransaction,
+                m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, header));
+        }
+        break;
+    default:
+        qWarning() << "Client has requested data in an unsupported format"
+            << connection->remotePeer().dataFormat;
+        break;
+    }
+}
+
 void MessageBus::sendRuntimeData(
     const P2pConnectionPtr& connection,
     const QList<PersistentIdData>& peers)
@@ -931,21 +1079,19 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
     }
 }
 
+template <>
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
     [[maybe_unused]] const TransportHeader& transportHeader)
 {
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
 }
 
-void MessageBus::processRuntimeInfo(
-    const QnTransaction<RuntimeData> &tran,
+template <>
+void MessageBus::gotTransaction(
+    const QnTransaction<nx::vms::api::RuntimeData>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
@@ -975,12 +1121,9 @@ void MessageBus::processRuntimeInfo(
 template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
+    const P2pConnectionPtr& /*connection*/,
+    const TransportHeader& /*transportHeader*/)
 {
-    if (processSpecialTransaction(tran, connection, transportHeader))
-        return;
-
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
 }
@@ -1327,6 +1470,135 @@ bool MessageBus::validateRemotePeerData(const vms::api::PeerDataEx& /*remotePeer
 {
     return true;
 }
+
+template <>
+void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
+{
+    QnMutexLocker lock(&m_mutex);
+    vms::api::PersistentIdData peerId(tran.params.peer);
+    m_lastRuntimeInfo[peerId] = tran.params;
+    for (const auto& connection: m_connections)
+        sendTransactionImpl(connection, tran, TransportHeader());
+}
+
+template<class T>
+void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& connection: m_connections)
+        sendTransactionImpl(connection, tran, header);
+}
+
+template<class T>
+void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
+{
+    NX_ASSERT(tran.command != ApiCommand::NotDefined);
+    QnMutexLocker lock(&m_mutex);
+    sendUnicastTransaction(tran, dstPeers);
+}
+
+template<class T>
+void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& connection: m_connections)
+        sendTransactionImpl(connection, tran, TransportHeader());
+}
+
+template<class T>
+void MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
+{
+    QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
+
+    // split dstPeers by connection
+    for (const auto& peer : dstPeers)
+    {
+        qint32 distance = kMaxDistance;
+        auto dstPeer = routeToPeerVia(peer, &distance, /*address*/ nullptr);
+        if (auto& connection = m_connections.value(dstPeer))
+            dstByConnection[connection].dstPeers.push_back(peer);
+    }
+    sendUnicastTransactionImpl(tran, dstByConnection);
+}
+
+template<class T>
+void MessageBus::sendUnicastTransactionImpl(
+    const QnTransaction<T>& tran,
+    const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection)
+{
+    for (auto itr = dstByConnection.begin(); itr != dstByConnection.end(); ++itr)
+    {
+        const auto& connection = itr.key();
+        TransportHeader transportHeader = itr.value();
+
+        if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
+            continue; //< Already processed by remote peer
+
+        if (!connection->shouldTransactionBeSentToPeer(tran))
+        {
+            NX_ASSERT(false,
+                lm("Transaction '%1' can't be send to peer %2 (%3)")
+                .arg(toString(tran.command))
+                .arg(connection->remotePeer().id.toString())
+                .arg(QnLexical::serialized(connection->remotePeer().peerType)));
+            return; //< This peer doesn't handle transactions of such type.
+        }
+
+        if (connection->remotePeer().isClient())
+        {
+            if (transportHeader.dstPeers.size() != 1
+                || transportHeader.dstPeers[0] != connection->remotePeer().id)
+            {
+                NX_ASSERT(0, lm("Unicast transaction routing error. "
+                    "Transaction %1 skipped. remotePeer: %2")
+                    .args(tran.command, connection->remotePeer().id));
+                return;
+            }
+            switch (connection->remotePeer().dataFormat)
+            {
+            case Qn::JsonFormat:
+                connection->sendMessage(
+                    m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                break;
+            case Qn::UbjsonFormat:
+                connection->sendMessage(
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+                break;
+            default:
+                NX_WARNING(this,
+                    lm("Client has requested data in an unsupported format %1")
+                    .arg(connection->remotePeer().dataFormat));
+                break;
+            }
+        }
+        else
+        {
+            switch (connection->remotePeer().dataFormat)
+            {
+            case Qn::UbjsonFormat:
+                transportHeader.via.insert(localPeer().id);
+                connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
+                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
+                break;
+            default:
+                NX_WARNING(this, lm("Server has requested data in an unsupported format %1")
+                    .arg(connection->remotePeer().dataFormat));
+                break;
+            }
+        }
+    }
+}
+
+#define INSTANTIATE(unused1, unused2, T) \
+template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&); \
+template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
+template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
+template void MessageBus::sendTransactionImpl(const P2pConnectionPtr&, \
+    const ec2::QnTransaction<T>&, TransportHeader);
+
+#include <transaction_types.h>
+BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
+
 
 } // namespace p2p
 } // namespace nx

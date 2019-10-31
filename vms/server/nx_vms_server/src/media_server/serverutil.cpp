@@ -42,6 +42,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/system_commands.h>
 #include <api/resource_property_adaptor.h>
 
 #include <QtCore/QJsonDocument>
@@ -106,45 +107,37 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath,
-    const boost::optional<int>& buildNumber)
+bool Utils::backupDatabase()
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
-        std::move(connection), dbFilePath, buildNumber);
+    return nx::vms::utils::backupDatabaseLive(
+        serverModule()->settings().backupDir(),
+        std::move(connection));
 }
 
-bool Utils::timeToMakeDbBackup() const
+bool Utils::backupDatabaseViaCopy(int buildNumber)
 {
-    const auto dataDir = serverModule()->settings().dataDir();
     const auto backupDir = serverModule()->settings().backupDir();
-    if (!QFile::exists(ec2::detail::QnDbManager::ecsDbFileName(dataDir)))
-        return false; //< Nothing to make a copy of.
+    const auto dbFilePath = ec2::detail::QnDbManager::ecsDbFileName(serverModule()->settings().dataDir());
 
-    const auto currentVersion =
-        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
-
-    const auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
-    QList<nx::vms::utils::DbBackupFileData> thisVersionBackupFilesData;
-
-    std::copy_if(allBackupFilesData.cbegin(), allBackupFilesData.cend(),
-        std::back_inserter(thisVersionBackupFilesData),
-        [&currentVersion](const nx::vms::utils::DbBackupFileData& backupFileData)
-        {
-            return backupFileData.build == currentVersion.build();
-        });
-
-    if (thisVersionBackupFilesData.isEmpty())
-        return true; //< Backups for the current server version haven't been found, let's make one.
-
-    NX_ASSERT(!thisVersionBackupFilesData.isEmpty());
-    if (qnSyncTime->currentMSecsSinceEpoch() - thisVersionBackupFilesData.front().timestamp
-        > serverModule()->settings().dbBackupPeriodMS().count())
+    if (!QDir(backupDir).exists() && !QDir().mkpath(backupDir))
     {
-        return true;
+        NX_ERROR(this, "Failed to create DB backup path %1", backupDir);
+        return false;
     }
 
-    return false;
+    const QString fileName = nx::vms::utils::backupDbFileName(backupDir, buildNumber);
+    if (!QFile::copy(dbFilePath, fileName))
+    {
+        NX_ERROR(this, "Failed to copy DB file %1 to %2", dbFilePath, fileName);
+        return false;
+    }
+
+    nx::vms::utils::deleteOldBackupFilesIfNeeded(
+        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+
+    NX_INFO(this, "Successfully created DB backup %1", fileName);
+    return true;
 }
 
 boost::optional<int64_t> Utils::lastDbBackupTimestamp() const

@@ -36,8 +36,7 @@ public:
             [this](QnMediaServerResourcePtr server) { addServerContainer(server); },
             [this](QnMediaServerResourcePtr server) { removeServerContainer(server); }),
         m_cachedMergedDescriptors(
-            [this]() { return mergedDescriptorsInternal(); },
-            &m_mutex)
+            [this]() { return mergedDescriptorsInternal(); })
     {
     }
 
@@ -208,7 +207,7 @@ private:
         const auto notifyWhenUpdated = [this]() { m_cachedMergedDescriptors.reset(); };
         auto storage = m_storageFactory(server, notifyWhenUpdated);
         m_containers[serverId] = std::make_shared<Container>(std::move(storage));
-        m_cachedMergedDescriptors.resetThreadUnsafe();
+        m_cachedMergedDescriptors.reset();
     }
 
     void removeServerContainer(QnMediaServerResourcePtr server)
@@ -220,7 +219,7 @@ private:
             m_ownResourceId = QnUuid();
 
         m_containers.erase(serverId);
-        m_cachedMergedDescriptors.resetThreadUnsafe();
+        m_cachedMergedDescriptors.reset();
     }
 
 private:

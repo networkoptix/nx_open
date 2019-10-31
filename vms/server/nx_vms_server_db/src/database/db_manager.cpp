@@ -379,14 +379,14 @@ QString QnDbManager::ecsDbFileName(const QString& basePath)
     return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
 }
 
-int QnDbManager::currentBuildNumber(const QString& basePath)
+nx::utils::SoftwareVersion QnDbManager::currentSoftwareVersion(const QString &basePath)
 {
     const QString dbFileName = ecsDbFileName(basePath);
     if (!QFile(dbFileName).exists())
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: File %1 does not exist").arg(dbFileName));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
     const static QString buildNumberConnectionName = "GetBuildNumberDB";
@@ -396,7 +396,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: Failed to open db %1").arg(dbFileName));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
     auto dbCloseGuard = nx::utils::makeScopeGuard(
@@ -414,10 +414,10 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     {
         NX_WARNING(typeid(QnDbManager),
             lm("currentBuildNumber: Failed to prepare or execute query %1").arg(queryString));
-        return 0;
+        return nx::utils::SoftwareVersion();
     }
 
-    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString()).build();
+    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString());
 }
 
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
@@ -1714,6 +1714,61 @@ bool QnDbManager::encryptKvPairs()
     return true;
 }
 
+static std::optional<std::vector<std::tuple<int, QString>>> storageIdAndUrls(const QSqlDatabase& db)
+{
+    QSqlQuery query(db);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT id, url FROM vms_storage as s LEFT JOIN vms_resource as r ON s.resource_ptr_id = r.id";
+    if (!query.prepare(queryStr))
+    {
+        NX_ERROR(typeid(QnDbManager), "Failed to prepare query %1. Error: %2", queryStr, query.lastError());
+        return std::nullopt;
+    }
+
+    if (!query.exec())
+    {
+        NX_ERROR(typeid(QnDbManager), "Failed to exec query %1. Error: %2", queryStr, query.lastError());
+        return std::nullopt;
+    }
+
+    std::vector<std::tuple<int, QString>> result;
+    while (query.next())
+        result.push_back(std::make_tuple(query.value(0).toInt(), query.value(1).toString()));
+
+    return result;
+}
+
+bool QnDbManager::encryptStoragePasswords()
+{
+    QSqlQuery query(m_sdb);
+    QString queryString = "UPDATE vms_resource SET url = ? WHERE id = ?";
+    if (!query.prepare(queryString))
+        return false;
+
+    const auto idUrls = storageIdAndUrls(m_sdb);
+    if (!idUrls)
+        return false;
+
+    for (const auto& [id, url]: *idUrls)
+    {
+        nx::utils::Url u(url);
+        if (u.password().isEmpty())
+            continue;
+
+        u.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(u.password()));
+        query.addBindValue(u.toString());
+        query.addBindValue(id);
+
+        if (!query.exec())
+        {
+            NX_ERROR(this, "Failed to execute query %1. Error: %2", queryString, query.lastError());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::encryptBusinessRules()
 {
     QSqlQuery query(m_sdb);
@@ -1985,6 +2040,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    if (updateName.endsWith(lit("/99_20180329_02_add_record_thresholds_camera_attributes.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
     const auto logTag = nx::utils::log::Tag(typeid(QnDbManager));
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
@@ -2044,6 +2102,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
         return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
+
+    if (updateName.endsWith(lit("/100_10172019_encrypt_storage_url_credentials.sql")))
+        return encryptStoragePasswords() && resyncIfNeeded({ResyncStorages});
 
     if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
         return resyncIfNeeded(ResyncRules);
@@ -4607,6 +4668,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
 // dumpDatabase
 ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
+    if (!m_initialized)
+        return ErrorCode::ioError;
+
     QnWriteLocker lock(&m_mutex);
 
     if (!execSQLScript("vacuum;", m_sdb))
@@ -4620,6 +4684,7 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
     QFile f(m_sdb.databaseName());
     if (!f.open(QFile::ReadOnly))
         return ErrorCode::ioError;
+
     data.data = f.readAll();
 
     //TODO #ak add license db to backup
@@ -4645,6 +4710,9 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
 ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     DatabaseDumpToFileData& databaseDumpToFileData)
 {
+    if (!m_initialized)
+        return ErrorCode::ioError;
+
     QnWriteLocker lock(&m_mutex);
     m_tran->physicalCommitLazyData();
 

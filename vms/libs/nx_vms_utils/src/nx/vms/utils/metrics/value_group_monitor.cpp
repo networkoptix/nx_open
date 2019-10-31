@@ -29,16 +29,22 @@ api::metrics::ValueGroup ValueGroupMonitor::values(Scope requiredScope, bool for
     return values;
 }
 
-std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms(Scope requiredScope) const
+api::metrics::ValueGroupAlarms ValueGroupMonitor::alarms(Scope requiredScope) const
 {
-    std::vector<api::metrics::Alarm> alarms;
-    for (const auto& monitor: m_alarmMonitors)
-    {
-        if (requiredScope == Scope::local && monitor->scope() == Scope::system)
-            continue;
+    // TODO: Use RW lock.
+    NX_MUTEX_LOCKER locker(&m_mutex);
 
-        if (auto alarm = monitor->alarm())
-            alarms.push_back(std::move(*alarm));
+    api::metrics::ValueGroupAlarms alarms;
+    for (const auto& [id, monitors]: m_alarmMonitors)
+    {
+        for (const auto& monitor: monitors)
+        {
+            if (requiredScope == Scope::local && monitor->scope() == Scope::system)
+                continue;
+
+            if (auto alarm = monitor->alarm())
+                alarms[id].push_back(std::move(*alarm));
+        }
     }
 
     return alarms;
@@ -48,7 +54,6 @@ void ValueGroupMonitor::setRules(
     const std::map<QString, api::metrics::ValueRule>& rules, bool skipOnMissingArgument)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-
     for (auto it = m_valueMonitors.begin(); it != m_valueMonitors.end();)
     {
         if (dynamic_cast<ExtraValueMonitor*>(it->second.get()))
@@ -58,15 +63,17 @@ void ValueGroupMonitor::setRules(
     }
 
     // Prepare monitors for extra values to make sure all of the formulas will find their arguments.
-    for (const auto& [parameterId, rule]: rules)
+    for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            m_valueMonitors.emplace(parameterId, std::make_unique<ExtraValueMonitor>());
+            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>());
+
+        NX_ASSERT(m_valueMonitors.count(id) || skipOnMissingArgument, "Unknown id in rules: %1", id);
     }
-    for (const auto& [parameterId, rule]: rules)
+    for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            updateExtraValue(parameterId, rule, skipOnMissingArgument);
+            updateExtraValue(id, rule, skipOnMissingArgument);
     }
 
     for (const auto& [id, monitor]: m_valueMonitors)
@@ -77,8 +84,8 @@ void ValueGroupMonitor::setRules(
     }
 
     m_alarmMonitors.clear();
-    for (const auto& [parameterId, rule]: rules)
-        updateAlarms(parameterId, rule, skipOnMissingArgument);
+    for (const auto& [id, rule]: rules)
+        updateAlarms(id, rule, skipOnMissingArgument);
 }
 
 void ValueGroupMonitor::updateExtraValue(
@@ -117,8 +124,7 @@ void ValueGroupMonitor::updateAlarms(
         {
             try
             {
-                m_alarmMonitors.push_back(std::make_unique<AlarmMonitor>(
-                    parameterId,
+                m_alarmMonitors[parameterId].push_back(std::make_unique<AlarmMonitor>(
                     alarmRule.level,
                     parseFormulaOrThrow(alarmRule.condition, m_valueMonitors),
                     parseTemplate(alarmRule.text, m_valueMonitors)

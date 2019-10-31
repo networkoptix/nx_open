@@ -568,12 +568,14 @@ void QnWorkbenchDisplay::initSceneView()
         executeDelayedParented(
             [this, updateViewScreens]()
             {
-                const auto window = mainWindowWidget()->windowHandle();
+                const auto mainWindowWidget = this->mainWindowWidget();
+                const auto window = mainWindowWidget ? mainWindowWidget->windowHandle() : nullptr;
+                if (!NX_ASSERT(window))
+                    return;
 
-                if (NX_ASSERT(window))
-                    connect(window, &QWindow::screenChanged, this, updateViewScreens);
-
+                connect(window, &QWindow::screenChanged, this, updateViewScreens);
                 updateViewScreens(window->screen());
+
             }, 1, this);
 
         const auto viewport = new QOpenGLWidget(m_view);
@@ -2038,22 +2040,32 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 
     QVector<QnUuid> selectedUuids;
     foreach(QnResourceWidget *widget, widgets())
+    {
         if (widget->isSelected())
             selectedUuids.push_back(widget->item()->uuid());
+    }
     layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QnUuid> >(selectedUuids));
 
     foreach(QnResourceWidget *widget, widgets())
     {
-        if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
         {
+            mediaWidget->beforeDestroy();
+
+            auto item = mediaWidget->item();
             qint64 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
             if (timeUSec != AV_NOPTS_VALUE)
-                mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
+            {
+                const qint64 actualTime = mediaWidget->display()->camDisplay()->isRealTimeSource()
+                    ? DATETIME_NOW
+                    : timeUSec / 1000;
+                item->setData(Qn::ItemTimeRole, actualTime);
+            }
 
-            mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
+            item->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
 
             if (const auto reader = mediaWidget->display()->archiveReader())
-                mediaWidget->item()->setData(Qn::ItemSpeedRole, reader->getSpeed());
+                item->setData(Qn::ItemSpeedRole, reader->getSpeed());
         }
     }
 

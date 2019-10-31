@@ -1,17 +1,14 @@
 #include "mediaserver_launcher.h"
 
 #include <api/global_settings.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/p2p/p2p_message_bus.h>
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
 #include <transaction/message_bus_adapter.h>
-#include <nx/p2p/p2p_message_bus.h>
-
-namespace {
-
-
-} // namespace
+#include <core/resource_management/resource_pool.h>
 
 MediaServerLauncher::MediaServerLauncher(
     const QString& tmpDir,
@@ -35,6 +32,15 @@ MediaServerLauncher::MediaServerLauncher(
 
     if (disabledFeatures.testFlag(DisabledFeature::noPlugins))
         addSetting(QnServer::kNoPlugins, "1");
+
+    if (disabledFeatures.testFlag(DisabledFeature::noPublicIp))
+        addSetting(QnServer::publicIPEnabled, "0");
+
+    if (disabledFeatures.testFlag(DisabledFeature::noOnlineResourceData))
+        addSetting(QnServer::onlineResourceDataEnabled, "0");
+
+    if (disabledFeatures.testFlag(DisabledFeature::noOutgoingConnectionsMetric))
+        addSetting("noOutgoingConnectionsMetric", "1");
 
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
@@ -185,7 +191,7 @@ bool MediaServerLauncher::waitForStarted()
     if (result != std::future_status::ready)
         return false;
 
-    while (m_mediaServerProcess->getTcpPort() == 0)
+    while (m_mediaServerProcess->getTcpPort() == 0 || m_mediaServerProcess->thisServer()->getStatus() != Qn::Online)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     return true;

@@ -420,7 +420,6 @@ class MediaDbTest:
 public:
     MediaDbTest()
     {
-        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
     }
 
     virtual void SetUp() override
@@ -437,8 +436,6 @@ public:
         auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
         ASSERT_TRUE(result);
     }
-
-    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
 
     std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
     QnFileStorageResourcePtr storage;
@@ -741,7 +738,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
             QSqlQuery query(sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
             const nx::vms::server::Chunk chunk =
-                referenceCatalogs[i]->getChunksUnsafe().at(j).chunk();
+                referenceCatalogs[i]->getChunksUnsafe().at(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
@@ -766,7 +763,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             sdb->addRecord(
                 referenceCatalogs[i]->cameraUniqueId(), referenceCatalogs[i]->getCatalog(),
-                referenceCatalogs[i]->getChunksUnsafe().at(j).chunk());
+                referenceCatalogs[i]->getChunksUnsafe().at(j));
         }
     }
 
@@ -885,7 +882,7 @@ TEST_F(MediaDbTest, StorageDB)
                     {
                         return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
                             && tc.catalog->quality == (*catalogIt)->getCatalog()
-                            && !tc.isVisited && !tc.isDeleted && tc.chunk == (*chunkIt).chunk();
+                            && !tc.isVisited && !tc.isDeleted && tc.chunk == (*chunkIt);
                     });
             bool tcmChunkFound = tcmIt != tcm.get().end();
             ASSERT_TRUE(tcmChunkFound);

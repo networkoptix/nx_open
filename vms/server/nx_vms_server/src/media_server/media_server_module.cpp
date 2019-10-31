@@ -27,6 +27,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource_proxy.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
@@ -93,6 +94,7 @@
 #include <nx/network/url/url_builder.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
+#include <nx/metrics/metrics_storage.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -143,6 +145,37 @@ public:
 
 };
 
+void QnMediaServerModule::initOutgoingSocketCounter()
+{
+    if (m_settings->settings().noOutgoingConnectionsMetric())
+        return;
+
+    nx::network::SocketFactory::setCreateStreamSocketFunc(
+        [weakRef = this->commonModule()->metricsWeakRef()](
+            bool sslRequired,
+            nx::network::NatTraversalSupport natTraversalRequired,
+            boost::optional<int> ipVersion)
+        {
+            auto socket = nx::network::SocketFactory::defaultStreamSocketFactoryFunc(
+                sslRequired,
+                natTraversalRequired,
+                ipVersion);
+            if (!socket)
+                return socket;
+            if (auto ref = weakRef.lock())
+            {
+                ref->tcpConnections().outgoing()++;
+                socket->setBeforeDestroyCallback(
+                    [weakRef]()
+                    {
+                        if (auto ref = weakRef.lock())
+                            ref->tcpConnections().outgoing()--;
+                    });
+            }
+            return socket;
+        });
+}
+
 QnMediaServerModule::QnMediaServerModule(
     const nx::vms::server::CmdLineArguments* arguments,
     std::unique_ptr<MSSettings> serverSettings,
@@ -171,13 +204,28 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
+    const bool isRootToolEnabled = !settings().ignoreRootTool();
+    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
+        isRootToolEnabled,
+        qApp->applicationFilePath());
+
+    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get(), timerManager()));
+    m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
+
     nx::vms::server::registerSerializers();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+
+    initOutgoingSocketCounter();
+
+#ifdef ENABLE_VMAX
+    store(new QnVmax480ResourceProxy(commonModule()));
+#endif
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
@@ -249,11 +297,6 @@ QnMediaServerModule::QnMediaServerModule(
 
         ));
 
-    const bool isRootToolEnabled = !settings().ignoreRootTool();
-    m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled,
-        qApp->applicationFilePath());
-
     if (QnAppInfo::isNx1())
     {
         m_settings->mutableSettings()->setBootedFromSdCard(
@@ -265,7 +308,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_pluginManager = store(new PluginManager(this));
 
 
-    if (!mutableSettings()->noPlugins())
+    if (!settings().noPlugins())
         m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
@@ -402,6 +445,7 @@ void QnMediaServerModule::stopLongRunnables()
 QnMediaServerModule::~QnMediaServerModule()
 {
     stop();
+    nx::network::SocketFactory::setCreateStreamSocketFunc(nullptr);
     m_context.reset();
     m_commonModule->resourcePool()->clear();
     clear();
@@ -653,12 +697,8 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
+    NX_CRITICAL(m_platform);
     return m_platform;
-}
-
-void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
-{
-    m_platform = platform;
 }
 
 QnServerConnector* QnMediaServerModule::serverConnector() const

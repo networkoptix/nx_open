@@ -18,7 +18,7 @@ class UnableToFetchDataFromBox(VmsBenchmarkError):
 
 class BoxFileContentError(VmsBenchmarkError):
     def __init__(self, path):
-        super(BoxFileContentError, self).__init__(f"File '{path}' has unexpected content")
+        super(BoxFileContentError, self).__init__(f"File {path!r} has unexpected content")
 
 
 class ServerError(VmsBenchmarkError):
@@ -42,18 +42,20 @@ class RtspPerfError(VmsBenchmarkError):
 
 
 class VmsBenchmarkIssue(VmsBenchmarkError):
-    pass
+    def __init__(self, message, original_exception=None, sub_issues=[]):
+        super(VmsBenchmarkIssue, self).__init__(message, original_exception=original_exception)
+        self.sub_issues = sub_issues
 
 
 class StorageFailuresIssue(VmsBenchmarkIssue):
     def __init__(self, failures_count):
-        super(StorageFailuresIssue, self).__init__(f"{failures_count} storage failures detected")
+        super(StorageFailuresIssue, self).__init__(f"{failures_count} Storage failures detected")
 
 
-class CPUUsageThresholdExceededIssue(VmsBenchmarkIssue):
+class CpuUsageThresholdExceededIssue(VmsBenchmarkIssue):
     def __init__(self, cpu_usage, threshold):
-        super(CPUUsageThresholdExceededIssue, self).__init__(
-            f"CPU usage {round(cpu_usage*100)}% exceeds maximum ({round(threshold*100)}%)"
+        super(CpuUsageThresholdExceededIssue, self).__init__(
+            f"CPU usage {round(cpu_usage*100)}% exceeds maximum ({round(threshold*100)}%)."
         )
 
 
@@ -73,5 +75,9 @@ class SshHostKeyObtainingFailed(VmsBenchmarkError):
     pass
 
 
-class InsuficientResourcesError(VmsBenchmarkError):
+class InsufficientResourcesError(VmsBenchmarkError):
+    pass
+
+
+class HostOperationError(VmsBenchmarkError):
     pass
