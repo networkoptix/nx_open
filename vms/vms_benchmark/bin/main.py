@@ -113,6 +113,7 @@ ini_definition = {
     "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
     "unloopViaTestcamera": {"type": "bool", "default": True},
     "reportingPeriodSeconds": {"type": "int", "default": 60},
+    "addCamerasManually": {"type": "bool", "default": False},
 }
 
 
@@ -467,7 +468,7 @@ class _BoxPoller:
         return self._results.pop()
 
 
-def _obtain_recording(test_camera_count, api, test_camera_context, ini, conf):
+def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf):
     def wait_test_cameras_discovered(
             timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
 
@@ -499,10 +500,13 @@ def _obtain_recording(test_camera_count, api, test_camera_context, ini, conf):
             "    Waiting for virtual camera discovery and going live "
             f"(timeout is {discovering_timeout_seconds} s)..."
         )
-        res, cameras = wait_test_cameras_discovered(
-            timeout=discovering_timeout_seconds, online_duration=3)
-        if not res:
-            raise exceptions.TestCameraError('Timeout expired.')
+        if ini['addCamerasManually']:
+            cameras = api.add_cameras(box.local_ip, test_camera_count)
+        else:
+            res, cameras = wait_test_cameras_discovered(
+                timeout=discovering_timeout_seconds, online_duration=3)
+            if not res:
+                raise exceptions.TestCameraError('Timeout expired.')
 
         report("    All virtual cameras discovered and went live.")
 
@@ -552,7 +556,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
 
-            cameras = _obtain_recording(test_camera_count, api, test_camera_context, ini, conf)
+            cameras = _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
 
             report(
                 f"    Waiting for the archives to be ready for streaming "

@@ -237,6 +237,41 @@ class ServerApi:
 
         return None
 
+    def add_cameras(self, hostname, count):
+        from pprint import pformat
+        cameras = []
+        for i in range(count):
+            request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/saveCamera")
+            credentials = f"{self.user}:{self.password}"
+            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+            request.add_header('Content-Type', 'application/json')
+            request.get_method = lambda: 'POST'
+            mac = f'92-61-00-00-00-{i + 1:02X}'
+            name = 'TestCameraLive'
+            data = {
+                'status': 'Online',
+                'mac': mac,
+                'physicalId': mac,
+                'name': name,
+                'model': name,
+                'url': f'tcp://{hostname}:4985/{mac}',
+                'typeId': '{f9c03047-72f1-4c04-a929-8538343b6642}',
+            }
+            response = self.post_request(
+                request,
+                data=json.dumps(data).encode('ascii')
+            )
+            response_data = json.loads(response.body)
+            logging.info(pformat(response_data))
+            cameras.append(Camera(
+                api=self,
+                id=response_data['id'].strip('{}'),
+                name=name,
+                mac=mac,
+            ))
+        return cameras
+
     def remove_camera(self, camera_id):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/removeResource")
         credentials = f"{self.user}:{self.password}"
