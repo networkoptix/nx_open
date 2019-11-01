@@ -467,6 +467,58 @@ class _BoxPoller:
         return self._results.pop()
 
 
+def _obtain_recording(test_camera_count, api, test_camera_context, ini, conf):
+    def wait_test_cameras_discovered(
+            timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
+
+        started_at = time.time()
+        detection_started_at = None
+        while time.time() - started_at < timeout:
+            if test_camera_context.poll() is not None:
+                raise exceptions.TestCameraError(
+                    f'Virtual camera (testcamera) process exited unexpectedly with code '
+                    f'{test_camera_context.returncode}')
+
+            cameras = api.get_test_cameras()
+
+            if len(cameras) >= test_camera_count:
+                if detection_started_at is None:
+                    detection_started_at = time.time()
+                elif time.time() - detection_started_at >= online_duration:
+                    return True, cameras
+            else:
+                detection_started_at = None
+
+            time.sleep(1)
+        return False, None
+
+    try:
+        discovering_timeout_seconds = conf['cameraDiscoveryTimeoutSeconds']
+
+        report(
+            "    Waiting for virtual camera discovery and going live "
+            f"(timeout is {discovering_timeout_seconds} s)..."
+        )
+        res, cameras = wait_test_cameras_discovered(
+            timeout=discovering_timeout_seconds, online_duration=3)
+        if not res:
+            raise exceptions.TestCameraError('Timeout expired.')
+
+        report("    All virtual cameras discovered and went live.")
+
+        for camera in cameras:
+            if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
+                report(f"    Recording on camera {camera.id} enabled.")
+            else:
+                raise exceptions.TestCameraError(
+                    f"Failed enabling recording on camera {camera.id}.")
+    except Exception as e:
+        raise exceptions.TestCameraError(
+            f"Not all virtual cameras were discovered or went live.", e) from e
+
+    return cameras
+
+
 def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('')
     report('Starting load tests...')
@@ -500,53 +552,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         with test_camera_context_manager as test_camera_context:
             report(f"    Started {test_camera_count} virtual camera(s).")
 
-            def wait_test_cameras_discovered(
-                timeout, online_duration) -> Tuple[bool, Optional[List[Camera]]]:
-
-                started_at = time.time()
-                detection_started_at = None
-                while time.time() - started_at < timeout:
-                    if test_camera_context.poll() is not None:
-                        raise exceptions.TestCameraError(
-                            f'Virtual camera (testcamera) process exited unexpectedly with code '
-                            f'{test_camera_context.returncode}')
-
-                    cameras = api.get_test_cameras()
-
-                    if len(cameras) >= test_camera_count:
-                        if detection_started_at is None:
-                            detection_started_at = time.time()
-                        elif time.time() - detection_started_at >= online_duration:
-                            return True, cameras
-                    else:
-                        detection_started_at = None
-
-                    time.sleep(1)
-                return False, None
-
-            try:
-                discovering_timeout_seconds = conf['cameraDiscoveryTimeoutSeconds']
-
-                report(
-                    "    Waiting for virtual camera discovery and going live "
-                    f"(timeout is {discovering_timeout_seconds} s)..."
-                )
-                res, cameras = wait_test_cameras_discovered(
-                    timeout=discovering_timeout_seconds, online_duration=3)
-                if not res:
-                    raise exceptions.TestCameraError('Timeout expired.')
-
-                report("    All virtual cameras discovered and went live.")
-
-                for camera in cameras:
-                    if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
-                        report(f"    Recording on camera {camera.id} enabled.")
-                    else:
-                        raise exceptions.TestCameraError(
-                            f"Failed enabling recording on camera {camera.id}.")
-            except Exception as e:
-                raise exceptions.TestCameraError(
-                    f"Not all virtual cameras were discovered or went live.", e) from e
+            cameras = _obtain_recording(test_camera_count, api, test_camera_context, ini, conf)
 
             report(
                 f"    Waiting for the archives to be ready for streaming "
