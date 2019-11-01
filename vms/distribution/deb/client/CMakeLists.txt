@@ -27,8 +27,7 @@ endforeach()
 
 nx_copy(${QT_DIR}/qml DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
-nx_copy(${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 # Variables used for configuring files.
 set(common_depends
