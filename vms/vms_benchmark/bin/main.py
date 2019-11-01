@@ -111,7 +111,7 @@ ini_definition = {
     "apiReadinessTimeoutSeconds": {"type": "int", "range": [1, None], "default": 30},
     "worstAllowedStreamLagUs": {"type": "int", "range": [0, None], "default": 5_000_000},
     "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
-    "unloopViaTestcamera": {"type": "bool", "default": "true"},
+    "unloopViaTestcamera": {"type": "bool", "default": True},
 }
 
 
