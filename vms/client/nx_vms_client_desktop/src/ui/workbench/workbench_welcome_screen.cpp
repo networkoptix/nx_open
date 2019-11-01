@@ -2,7 +2,6 @@
 
 #include <QtCore/QMimeData>
 
-#include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 
