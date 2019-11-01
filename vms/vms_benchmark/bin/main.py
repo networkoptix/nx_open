@@ -729,9 +729,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     box_poller.please_stop()
 
                 if last_cpu_times is not first_cpu_times:
-                    cpu_usage_avg = last_cpu_times.cpu_usage(first_cpu_times)
+                    cpu_usage_avg_report = f'{last_cpu_times.cpu_usage(first_cpu_times) * 100:.0f}%'
                 else:
-                    cpu_usage_avg = None
+                    cpu_usage_avg_report = 'N/A'
 
                 if not streaming_ended_expectedly:
                     raise exceptions.TestCameraStreamingIssue(
@@ -749,35 +749,34 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 try:
                     ram_free_bytes = box_platform.obtain_ram_free_bytes()
+                    ram_free_report = f'{to_megabytes(ram_free_bytes)} MB'
                 except exceptions.VmsBenchmarkError as e:
                     issues.append(exceptions.UnableToFetchDataFromBox(
                         'Unable to fetch box RAM usage',
                         original_exception=e
                     ))
+                    ram_free_report = 'N/A'
 
                 if last_tx_rx_errors is not None and first_tx_rx_errors is not None:
-                    tx_rx_errors_during_test = last_tx_rx_errors - first_tx_rx_errors
+                    tx_rx_errors_during_test_report = last_tx_rx_errors - first_tx_rx_errors
                 else:
-                    tx_rx_errors_during_test = None
+                    tx_rx_errors_during_test_report = 'N/A'
+
+                if cpu_usage_max is not None:
+                    cpu_usage_max_report = f'{cpu_usage_max * 100:.0f}%'
+                else:
+                    cpu_usage_max_report = 'N/A'
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                 report(
                     f"    Streaming test statistics:\n"
                     f"        Frame drops in live stream: {stream_stats['live'].frame_drops} (expected 0)\n"
                     f"        Frame drops in archive stream: {stream_stats['archive'].frame_drops} (expected 0)\n"
-                    + (
-                        f"        Box network errors: {tx_rx_errors_during_test} (expected 0)\n"
-                        if tx_rx_errors_during_test is not None else '')
-                    + (
-                        f"        Maximum box CPU usage: {cpu_usage_max * 100:.0f}%\n"
-                        if cpu_usage_max is not None else '')
-                    + (
-                        f"        Average box CPU usage: {cpu_usage_avg * 100:.0f}%\n"
-                        if cpu_usage_avg is not None else '')
-                    + (
-                        f"        Box free RAM: {to_megabytes(ram_free_bytes)} MB\n"
-                        if ram_free_bytes is not None else '')
-                    + f"        Streaming test duration: {streaming_test_duration_s} s"
+                    f"        Box network errors: {tx_rx_errors_during_test_report} (expected 0)\n"
+                    f"        Maximum box CPU usage: {cpu_usage_max_report}\n"
+                    f"        Average box CPU usage: {cpu_usage_avg_report}\n"
+                    f"        Box free RAM: {ram_free_report}\n"
+                    f"        Streaming test duration: {streaming_test_duration_s} s"
                 )
 
                 if len(issues) > 0:
