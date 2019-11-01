@@ -411,8 +411,8 @@ class _BoxPoller:
         self._box = box
         self._cpu_cores = cpu_cores
         self._results = []
-        self.stop_event = threading.Event()
-        self.exception = None
+        self._stop_event = threading.Event()
+        self._exception = None
         self._start_timestamp_ms = round(time.time() * 1000)
         self._thread = threading.Thread(target=self._target)
         self._thread.start()
@@ -430,8 +430,8 @@ class _BoxPoller:
 
     def _target(self):
         try:
-            while not self.stop_event.isSet():
-                self.stop_event.wait(60)
+            while not self._stop_event.isSet():
+                self._stop_event.wait(60)
                 cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
                 storage_failure_event_count = self._count_storage_failures()
                 tx_rx_errors = box_tx_rx_errors(self._box)
@@ -443,23 +443,23 @@ class _BoxPoller:
                     swapped_kilobytes,
                 ))
         except Exception as e:
-            self.exception = e
+            self._exception = e
 
     def please_stop(self):
-        self.stop_event.set()
+        self._stop_event.set()
 
     def is_alive(self):
         return self._thread.is_alive()
 
     def get_issues(self):
-        if self.exception is None:
+        if self._exception is None:
             return []
-        if isinstance(self.exception, exceptions.VmsBenchmarkIssue):
-            return [self.exception]
+        if isinstance(self._exception, exceptions.VmsBenchmarkIssue):
+            return [self._exception]
         return [exceptions.TestCameraStreamingIssue(
             'Unexpected error during acquiring VMS Server CPU usage. '
             'Can be caused by network issues or Server issues.',
-            original_exception=self.exception)]
+            original_exception=self._exception)]
 
     def get_results(self):
         return self._results.pop()
