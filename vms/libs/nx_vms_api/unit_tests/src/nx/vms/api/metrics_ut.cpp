@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/metrics.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::api::metrics::test {
@@ -389,6 +390,60 @@ static const QByteArray kAlarmsExample(R"json({
         "CAMERA_UUID_3": { "issues": { "offlineEvents": [ { "level": "warning", "text": "Offline Events is 2" } ] } }
     }
 })json");
+
+struct Counts
+{
+    const size_t types = 0;
+    const size_t resources = 0;
+    const size_t groups = 0;
+    const size_t values = 0;
+};
+
+class ValuesPerformance: public testing::TestWithParam<Counts>
+{
+protected:
+    SystemValues makeValues() const
+    {
+        const auto counts = GetParam();
+        SystemValues values;
+        for (size_t t = 0; t < counts.types; ++t)
+        {
+            auto& type = values[QStringLiteral("resource_type_%1").arg(t)];
+            for (size_t r = 0; r < counts.resources; ++r)
+            {
+                auto& resource = type[QStringLiteral("resource_id_%1").arg(r)];
+                for (size_t g = 0; g < counts.groups; ++g)
+                {
+                    auto& group = resource[QStringLiteral("group_id_%1").arg(g)];
+                    for (size_t v = 0; v < counts.values; ++v)
+                        group[QStringLiteral("parameter_value_id_%1").arg(r)] = Value((double) v);
+                }
+            }
+        }
+        return values;
+    }
+};
+
+TEST_P(ValuesPerformance, Serialization)
+{
+    const auto values = makeValues();
+
+    nx::utils::ElapsedTimer timer(/*started*/ true);
+    const auto serialized = QJson::serialized(values);
+    NX_INFO(this, "Serialized %1 bytes in %2", serialized.size(), timer.elapsed());
+
+    SystemValues deserialized;
+    timer.restart();
+    EXPECT_TRUE(QJson::deserialize(serialized, &deserialized));
+    NX_INFO(this, "Deserialized %1 bytes in %2", serialized.size(), timer.elapsed());
+}
+
+INSTANTIATE_TEST_CASE_P(Metrics, ValuesPerformance, ::testing::Values(
+   Counts{1, 100, 1, 5},
+   Counts{5, 100, 5, 10},
+   Counts{5, 1000, 5, 10},
+   Counts{5, 10000, 5, 10}
+));
 
 TEST(Metrics, Alarms)
 {

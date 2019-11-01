@@ -9,8 +9,10 @@ namespace utils {
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-ElapsedTimer::ElapsedTimer()
+ElapsedTimer::ElapsedTimer(bool started)
 {
+    if (started)
+        restart();
 }
 
 bool ElapsedTimer::hasExpired(milliseconds value) const

@@ -13,7 +13,9 @@ template<typename Value>
 class ValueHistory
 {
 public:
-    ValueHistory(std::chrono::milliseconds maxAge = std::chrono::hours(1));
+    ValueHistory(
+        std::chrono::milliseconds maxAge = std::chrono::hours(1),
+        size_t maxSize = 1024 * 1024); //< About 10MB for size_t.
 
     void update(Value value);
     Value current() const;
@@ -48,6 +50,7 @@ public:
 
 private:
     const std::chrono::milliseconds m_maxAge;
+    const size_t m_maxSize = 0;
     mutable nx::utils::Mutex m_mutex;
     std::deque<std::pair<Value, std::chrono::steady_clock::time_point>> m_values;
 };
@@ -55,8 +58,9 @@ private:
 // -----------------------------------------------------------------------------------------------
 
 template<typename Value>
-ValueHistory<Value>::ValueHistory(std::chrono::milliseconds maxAge):
-    m_maxAge(maxAge)
+ValueHistory<Value>::ValueHistory(std::chrono::milliseconds maxAge, size_t maxSize):
+    m_maxAge(maxAge),
+    m_maxSize(maxSize)
 {
 }
 
@@ -67,6 +71,9 @@ void ValueHistory<Value>::update(Value value)
     NX_MUTEX_LOCKER locker(&m_mutex);
     if (m_values.empty() || m_values.back().first != value)
         m_values.emplace_back(std::move(value), now);
+
+    if (m_values.size() > m_maxSize)
+        m_values.pop_front();
 
     const auto deadline = now - m_maxAge;
     while (m_values.size() >= 2 && m_values[1].second < deadline)
@@ -100,9 +107,18 @@ void ValueHistory<Value>::forEach(
 
     auto bound = m_values.begin();
     const auto deadline = now - maxAge;
-    decltype(bound) next;
-    while ((next = std::next(bound)) != m_values.end() && next->second < deadline)
-        bound = next;
+    if (maxAge > m_maxAge / 2)
+    {
+        decltype(bound) next;
+        while ((next = std::next(bound)) != m_values.end() && next->second < deadline)
+            bound = next;
+    }
+    else // Optimization: search for border from the right end because it's closer.
+    {
+        bound = std::prev(m_values.end());
+        while (bound->second >= deadline && bound != m_values.begin())
+            bound = std::prev(bound);
+    }
 
     using namespace std::chrono;
     const auto interval =
