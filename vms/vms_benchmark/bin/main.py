@@ -367,7 +367,8 @@ class _StreamTypeStats:
         self._type = type
         self._ini = ini
         self.frame_drops = 0
-        self.worst_lag_us = 0
+        self._min_lag_us = 0
+        self._max_lag_us = 0
         self._first_timestamp_us_by_stream_id = {}
         self._first_pts_us_by_stream_id = {}
         self._last_pts_us_by_stream_id = {}
@@ -404,8 +405,11 @@ class _StreamTypeStats:
         expected_relative_pts_us = (
             current_timestamp_us - self._first_timestamp_us_by_stream_id[pts_stream_id])
         lag_us = expected_relative_pts_us - relative_pts_us  # Positive lag: the stream is delayed.
-        if abs(lag_us) > abs(self.worst_lag_us):
-            self.worst_lag_us = lag_us
+        self._min_lag_us = min(self._min_lag_us, lag_us)
+        self._max_lag_us = max(self._max_lag_us, lag_us)
+
+    def worst_lag_us(self):
+        return self._max_lag_us - self._min_lag_us
 
 
 class _BoxPoller:
@@ -658,15 +662,15 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         last_cpu_times = cpu_times
                         last_tx_rx_errors = tx_rx_errors
 
-                        live_worst_lag_s = stream_stats['live'].worst_lag_us / 1_000_000
-                        archive_worst_lag_s = stream_stats['archive'].worst_lag_us / 1_000_000
+                        live_worst_lag_s = stream_stats['live'].worst_lag_us() / 1_000_000
+                        archive_worst_lag_s = stream_stats['archive'].worst_lag_us() / 1_000_000
                         report(
                             f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
                             f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
                             f"dropped frames: "
                             f"{stream_stats['live'].frame_drops} (live), "
                             f"{stream_stats['archive'].frame_drops} (archive), "
-                            f"worst stream lag: "
+                            f"stream lag at least: "
                             f"{live_worst_lag_s:.3f} s (live), "
                             f"{archive_worst_lag_s:.3f} s (archive).")
 
@@ -691,8 +695,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 issues.append(exceptions.VmsBenchmarkIssue(
                                     f'{stream_stats[stream_type].frame_drops} frame drops detected '
                                     f'in {stream_type} streams.'))
-                            if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
-                                worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
+
+                            worst_lag_us = stream_stats[stream_type].worst_lag_us()
+                            if worst_lag_us > ini['worstAllowedStreamLagUs']:
+                                worst_lag_s = worst_lag_us / 1_000_000
                                 issues.append(exceptions.TestCameraStreamingIssue(
                                     f'Lag of one of {stream_type} streams '
                                     f'reached {worst_lag_s :.3f} seconds.'
