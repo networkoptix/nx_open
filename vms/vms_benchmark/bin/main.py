@@ -112,6 +112,7 @@ ini_definition = {
     "worstAllowedStreamLagUs": {"type": "int", "range": [0, None], "default": 5_000_000},
     "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
     "unloopViaTestcamera": {"type": "bool", "default": True},
+    "reportingPeriodSeconds": {"type": "int", "default": 60},
 }
 
 
@@ -406,10 +407,11 @@ class _StreamTypeStats:
 
 
 class _BoxPoller:
-    def __init__(self, api, box, cpu_cores):
+    def __init__(self, api, box, cpu_cores, period_s):
         self._api = api
         self._box = box
         self._cpu_cores = cpu_cores
+        self._period_s = period_s
         self._results = []
         self._stop_event = threading.Event()
         self._exception = None
@@ -431,7 +433,7 @@ class _BoxPoller:
     def _target(self):
         try:
             while not self._stop_event.isSet():
-                self._stop_event.wait(60)
+                self._stop_event.wait(self._period_s)
                 cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
                 storage_failure_event_count = self._count_storage_failures()
                 tx_rx_errors = box_tx_rx_errors(self._box)
@@ -616,7 +618,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
                 first_tx_rx_errors = last_tx_rx_errors = box_tx_rx_errors(box)
                 cpu_usage_max = 0
-                box_poller = _BoxPoller(api, box, box_platform.cpu_count)
+                box_poller = _BoxPoller(api, box, box_platform.cpu_count, ini['reportingPeriodSeconds'])
 
                 try:
                     while True:
