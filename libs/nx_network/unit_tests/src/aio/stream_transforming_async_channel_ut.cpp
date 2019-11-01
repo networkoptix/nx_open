@@ -285,12 +285,12 @@ protected:
         return m_rawDataChannel;
     }
 
-    std::unique_ptr<aio::StreamTransformingAsyncChannel>& channel()
+    aio::StreamTransformingAsyncChannel& channel()
     {
         if (!m_channel)
             createTransformingChannel();
 
-        return m_channel;
+        return *m_channel;
     }
 
 private:
@@ -390,7 +390,7 @@ TEST_F(StreamTransformingAsyncChannel, cancel_read_scheduled_from_non_aio_thread
 
 TEST_F(StreamTransformingAsyncChannel, cancel_read_scheduled_from_aio_thread)
 {
-    channel()->executeInAioThreadSync(
+    channel().executeInAioThreadSync(
         [this]()
         {
             givenScheduledRead();
@@ -409,7 +409,7 @@ TEST_F(StreamTransformingAsyncChannel, cancel_write_scheduled_from_non_aio_threa
 
 TEST_F(StreamTransformingAsyncChannel, cancel_write_scheduled_from_aio_thread)
 {
-    channel()->executeInAioThreadSync(
+    channel().executeInAioThreadSync(
         [this]()
         {
             givenScheduledWrite();
@@ -463,7 +463,7 @@ protected:
         readBuffer.reserve(4*1024);
 
         nx::utils::promise<SystemError::ErrorCode> ioCompleted;
-        channel()->readSomeAsync(
+        channel().readSomeAsync(
             &readBuffer,
             [&ioCompleted](
                 SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)
