@@ -30,6 +30,8 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
+#include <nx/vms/client/desktop/settings/server/pages/poe_settings_widget.h>
+
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -42,6 +44,7 @@ struct QnServerSettingsDialog::Private
     QnServerSettingsWidget* const generalPage;
     QnStorageAnalyticsWidget* const statisticsPage;
     QnStorageConfigWidget* const storagesPage;
+    settings::PoESettingsWidget* const poeSettingsPage;
     ServerPluginsSettingsWidget* const pluginsPage;
     QLabel* const webPageLink;
 
@@ -51,6 +54,7 @@ struct QnServerSettingsDialog::Private
         generalPage(new QnServerSettingsWidget(q)),
         statisticsPage(new QnStorageAnalyticsWidget(q)),
         storagesPage(new QnStorageConfigWidget(q)),
+        poeSettingsPage(new settings::PoESettingsWidget(q)),
         pluginsPage(ini().pluginInformationInServerSettings
             ? new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)
             : nullptr),
@@ -89,6 +93,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(SettingsPage, d->generalPage, tr("General"));
     addPage(StorageManagmentPage, d->storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
+    addPage(PoEPage, d->poeSettingsPage, tr("PoE"));
 
     if (ini().pluginInformationInServerSettings)
         addPage(PluginsPage, new Private::PluginSettingsAdapter(d.get()), tr("Plugins"));
@@ -171,6 +176,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     d->generalPage->setServer(server);
     d->statisticsPage->setServer(server);
     d->storagesPage->setServer(server);
+    d->poeSettingsPage->setServerId(server ? server->getId() : QnUuid());
 
     if (d->server)
     {

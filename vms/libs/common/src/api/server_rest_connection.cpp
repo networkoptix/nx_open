@@ -1446,6 +1446,15 @@ QnUuid ServerConnection::getServerId() const
     return m_serverId;
 }
 
+Handle ServerConnection::getJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    rest::JsonResultCallback&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
 std::pair<QString, QString> ServerConnection::getRequestCredentials(
     const QnMediaServerResourcePtr& targetServer) const
 {

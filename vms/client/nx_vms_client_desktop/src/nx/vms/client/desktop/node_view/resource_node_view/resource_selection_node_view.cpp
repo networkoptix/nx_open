@@ -44,7 +44,7 @@ ResourceSelectionNodeView::Private::Private(
     const ColumnSet& selectionColumns)
     :
     q(owner),
-    itemDelegate(owner, selectionColumns)
+    itemDelegate(selectionColumns)
 {
 }
 

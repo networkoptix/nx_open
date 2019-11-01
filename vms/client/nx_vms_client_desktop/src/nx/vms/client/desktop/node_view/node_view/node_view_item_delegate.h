@@ -2,8 +2,6 @@
 
 #include <QtWidgets/QStyledItemDelegate>
 
-class QTreeView;
-
 namespace nx::vms::client::desktop {
 namespace node_view {
 
@@ -13,9 +11,7 @@ class NodeViewItemDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    NodeViewItemDelegate(QTreeView* owner, QObject* parent = nullptr);
-
-    QTreeView* owner() const;
+    NodeViewItemDelegate(QObject* parent = nullptr);
 
     virtual void paint(
         QPainter* painter,
@@ -26,10 +22,8 @@ protected:
     virtual void initStyleOption(
         QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
-
-private:
-    QTreeView* const m_owner;
 };
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
+

@@ -114,6 +114,36 @@ bool isSeparator(const QModelIndex& index)
     return isSeparator(nodeFromIndex(index));
 }
 
+qreal progressValue(const NodePtr& node, int column)
+{
+    return node ? progressValue(node->nodeData(), column) : 0.0;
+}
+
+qreal progressValue(const ViewNodeData& data, int column)
+{
+    return data.data(column, progressRole).toFloat();
+}
+
+qreal progressValue(const QModelIndex& index)
+{
+    return progressValue(nodeFromIndex(index), index.column());
+}
+
+bool useSwitchStyleForCheckbox(const NodePtr& node, int column)
+{
+    return node && useSwitchStyleForCheckbox(node->nodeData(), column);
+}
+
+bool useSwitchStyleForCheckbox(const ViewNodeData& data, int column)
+{
+    return data.data(column, useSwitchStyleForCheckboxRole).toBool();
+}
+
+bool useSwitchStyleForCheckbox(const QModelIndex& index)
+{
+    return useSwitchStyleForCheckbox(nodeFromIndex(index), index.column());
+}
+
 int groupSortOrder(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);

@@ -546,6 +546,12 @@ public:
     // Get ID of the server we are connected to.
     QnUuid getServerId() const;
 
+    Handle getJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        rest::JsonResultCallback&& callback,
+        QThread* targetThread = nullptr);
+
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 

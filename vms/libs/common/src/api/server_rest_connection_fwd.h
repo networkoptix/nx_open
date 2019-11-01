@@ -5,6 +5,8 @@
 
 #include <nx/vms/event//event_fwd.h>
 
+#include <rest/server/json_rest_result.h>
+
 namespace nx {
 namespace network {
 namespace http {
@@ -29,4 +31,6 @@ namespace rest
 
     class ServerConnection;
     using QnConnectionPtr = QSharedPointer<ServerConnection>;
+
+    using JsonResultCallback = Callback<QnJsonRestResult>;
 };

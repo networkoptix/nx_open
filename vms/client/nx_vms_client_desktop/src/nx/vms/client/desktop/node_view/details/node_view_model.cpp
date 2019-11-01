@@ -149,7 +149,7 @@ int NodeViewModel::rowCount(const QModelIndex& parent) const
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
 {
-    return d->columnCount;
+    return parent.isValid() ? 0 : d->columnCount;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const

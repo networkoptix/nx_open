@@ -31,11 +31,8 @@ struct ResourceNodeViewItemDelegate::Private
 
 //-------------------------------------------------------------------------------------------------
 
-ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(
-    QTreeView* owner,
-    QObject* parent)
-    :
-    base_type(owner, parent),
+ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(QObject* parent):
+    base_type(parent),
     d(new Private())
 {
 }

@@ -16,9 +16,7 @@ class ResourceNodeViewItemDelegate: public NodeViewItemDelegate
     using base_type = NodeViewItemDelegate;
 
 public:
-    ResourceNodeViewItemDelegate(
-        QTreeView* owner,
-        QObject* parent = nullptr);
+    ResourceNodeViewItemDelegate(QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 
     virtual void paint(

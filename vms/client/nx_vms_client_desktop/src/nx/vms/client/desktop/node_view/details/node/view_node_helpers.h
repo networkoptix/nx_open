@@ -20,6 +20,14 @@ NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const NodePtr& node);
 NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const ViewNodeData& data);
 NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const QModelIndex& index);
 
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const NodePtr& node, int column);
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const ViewNodeData& data, int column);
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const QModelIndex& index);
+
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const NodePtr& node, int column);
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const ViewNodeData& data, int column);
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const QModelIndex& index);
+
 /**
 * Assuming that the sort order is ascending, nodes with lesser group sort order property will go
 *     before nodes with greater group sort order property regardless any other contents.

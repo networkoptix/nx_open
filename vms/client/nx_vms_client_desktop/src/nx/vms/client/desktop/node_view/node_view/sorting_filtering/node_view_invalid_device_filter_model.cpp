@@ -23,7 +23,7 @@ void NodeViewInvalidDeviceFilterModel::setShowInvalidDevices(bool showInvalidDev
     invalidateFilter();
 }
 
-bool NodeViewInvalidDeviceFilterModel::getShowInvalidDevices() const
+bool NodeViewInvalidDeviceFilterModel::showInvalidDevices() const
 {
     return m_showInvalidDevices;
 }
@@ -32,7 +32,7 @@ bool NodeViewInvalidDeviceFilterModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (!getShowInvalidDevices())
+    if (!showInvalidDevices())
     {
         const auto sourceIndex = sourceModel()->index(
             sourceRow, ResourceNodeViewColumn::resourceNameColumn, sourceParent);
