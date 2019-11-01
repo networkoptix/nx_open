@@ -264,7 +264,8 @@ def _wait_for_api(api, ini):
 def _test_api(api, ini):
     logging.info('Starting REST API basic test...')
     if not _wait_for_api(api, ini):
-        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
+        raise exceptions.ServerApiError(
+            "API of Server is not working: ping request was not successful.")
     report('\nREST API basic test is OK.')
     logging.info('Starting REST API authentication test...')
     api.check_authentication()
@@ -626,7 +627,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 streaming_ended_expectedly = False
                 issues = []
                 first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
-                first_tx_rx_errors = last_tx_rx_errors = box_tx_rx_errors(box)
+                first_tx_rx_errors = box_tx_rx_errors(box)
+                last_tx_rx_errors = first_tx_rx_errors
                 cpu_usage_max = 0
                 box_poller = _BoxPoller(api, box, box_platform.cpu_count, ini['reportingPeriodSeconds'])
 
