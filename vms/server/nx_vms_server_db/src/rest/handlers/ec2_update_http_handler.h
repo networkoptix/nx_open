@@ -437,6 +437,10 @@ private:
                 m_cond.wakeAll();
             };
 
+        NX_DEBUG(
+            this, "Received transaction %1 via ec2 http request. Data: %2",
+            toString(command), debugString(requestData));
+
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
         processor.processUpdateAsync(command, requestData, queryDoneHandler);

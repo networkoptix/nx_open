@@ -692,7 +692,6 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setBackup(storageData.isBackup);
             storage->setSpaceLimit(storageData.reservedSpace);
 
-            resourcePool()->addResource(storage);
             result << storage;
         }
     }

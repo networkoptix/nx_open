@@ -148,6 +148,15 @@ float QnStorageResource::getAvarageWritingUsage() const
 
 void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
+    if (other->getParentId() != getParentId() || other->getUrl() != getUrl())
+    {
+        NX_WARNING(
+            this,
+            "Abnormal storage resource update. This parentId = %1, "
+            "this url = %2, other parentId = %3, other url = %4",
+            getParentId(), getUrl(), other->getParentId(), other->getUrl());
+    }
+
     NX_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
 
     base_type::updateInternal(other, notifiers);
