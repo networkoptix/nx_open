@@ -109,7 +109,7 @@
                         "alarms": [{
                             "level": "error",
                             "condition": "notEqual %status Online",
-                            "text": "Status is %status"
+                            "text": "is %status"
                         }]
                     },
                     "offlineEvents": {
@@ -335,12 +335,12 @@
                             {
                                 "level": "warning",
                                 "condition": "equal %status Unauthorized",
-                                "text": "Status is %status"
+                                "text": "is %status"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Offline",
-                                "text": "Status is %status"
+                                "text": "is %status"
                             }
                         ]
                     },
