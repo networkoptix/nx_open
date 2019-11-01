@@ -62,8 +62,8 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_qmlEngine->setOutputWarningsToStandardError(true);
 
     const auto thumbnailProvider = new ThumbnailImageProvider();
+    // QQmlEngine takes ownership of thumbnailProvider.
     m_qmlEngine->addImageProvider(ThumbnailImageProvider::id, thumbnailProvider);
-    m_commonModule->store(thumbnailProvider);
 
     registerResourceDataProviders();
 }
