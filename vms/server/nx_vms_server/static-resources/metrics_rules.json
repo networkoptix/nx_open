@@ -296,6 +296,11 @@
                 "values": {
                     "name": {
                         "display": "table|panel"
+                    },
+                    "thumbnail": {
+                        "display": "panel",
+                        "format": "thumbnail",
+                        "calculate": "const now"
                     }
                 }
             },
