@@ -284,6 +284,9 @@ constexpr bool kHasId = HasId<Data>::value;
 QString debugString(const nx::vms::api::StorageData& data);
 
 template<typename RequestData>
+QString debugString(const RequestData& data);
+
+template<typename RequestData>
 QString debugString(const std::vector<RequestData>& dataList)
 {
     QString result = "[";
