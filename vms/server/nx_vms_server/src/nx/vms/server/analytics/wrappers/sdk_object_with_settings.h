@@ -31,6 +31,8 @@ public:
 
     std::optional<sdk_support::ErrorMap> setSettings(const sdk_support::SettingMap& settings)
     {
+        nx::utils::TimedGuard guard = base_type::makeTimedGuard(SdkMethod::setSettings);
+
         SettingsProcessor settingsProcessor(
             this->makeSettingsProcessorSettings(),
             this->sdkObjectDescription(),
@@ -44,6 +46,8 @@ public:
 
     std::optional<sdk_support::SettingsResponse> pluginSideSettings() const
     {
+        nx::utils::TimedGuard guard = base_type::makeTimedGuard(SdkMethod::pluginSideSettings);
+
         DebugSettings settings = makeSettingsProcessorSettings();
         SettingsProcessor settingsProcessor(
             this->makeSettingsProcessorSettings(),

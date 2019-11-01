@@ -10,7 +10,9 @@ ini_testcamera_bin: str
 ini_test_file_high_resolution: str
 ini_test_file_low_resolution: str
 ini_testcamera_output_file: str
-
+ini_unloop_via_testcamera: bool
+ini_test_file_high_period_us: int
+ini_test_file_low_period_us: int
 
 @contextmanager
 def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
@@ -22,6 +24,13 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         f"--fps-secondary", str(secondary_fps),
         f"files=\"{ini_test_file_high_resolution}\";secondary-files=\"{ini_test_file_low_resolution}\";count={count}",
     ]
+
+    if ini_unloop_via_testcamera:
+        camera_args += [
+            "--unloop-pts",
+            "--shift-pts-primary-period-us", str(ini_test_file_high_period_us),
+            "--shift-pts-secondary-period-us", str(ini_test_file_low_period_us),
+        ]
 
     opts = {}
     if not ini_testcamera_output_file:

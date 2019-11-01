@@ -73,6 +73,7 @@ enum class ViolationType
 
     inconsistentActionResult,
     invalidActionResultUrl,
+    methodExecutionTookTooLong,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ViolationType);
