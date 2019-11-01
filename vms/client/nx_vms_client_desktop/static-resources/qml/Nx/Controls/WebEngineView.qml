@@ -40,6 +40,7 @@ WebEngineView
     onColorDialogRequested: workbench.requestColorDialog(request)
     profile.onDownloadRequested: workbench.requestDownload(download)
     onContextMenuRequested: function(request) { request.accepted = true }
+    onNewViewRequested: function(request) { url = request.requestedUrl }
 
     function triggerAction(action) { triggerWebAction(action) }
 

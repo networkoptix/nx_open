@@ -63,7 +63,7 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QUrl &url, QGraphicsItem *par
                 m_rootReadyCallback = nullptr;
             }
 
-            connect(webView, SIGNAL(urlChanged()), this, SLOT(viewUrlChanged()));
+            connect(webView, SIGNAL(urlChanged()), this, SLOT(updateCanGoBack()));
             connect(webView, SIGNAL(loadingStatusChanged(int)), this, SLOT(setViewStatus(int)));
             connect(webView, SIGNAL(loadProgressChanged()), this, SLOT(onLoadProgressChanged()));
 
@@ -147,6 +147,10 @@ void GraphicsWebEngineView::setViewStatus(int status)
         LoadFailedStatus
     };
 
+    // Sometimes canGoBack changes its value long after urlChanged is emitted.
+    // Update its value when page loading status is modified.
+    updateCanGoBack();
+
     switch (status)
     {
         case LoadStartedStatus:
@@ -168,12 +172,10 @@ void GraphicsWebEngineView::setViewStatus(int status)
     }
 }
 
-void GraphicsWebEngineView::viewUrlChanged()
+void GraphicsWebEngineView::updateCanGoBack()
 {
-    QQuickItem* webView = rootObject();
-    if (!webView)
-        return;
-    setCanGoBack(webView->property("canGoBack").toBool());
+    if (QQuickItem* webView = rootObject())
+        setCanGoBack(webView->property("canGoBack").toBool());
 }
 
 WebViewPageStatus GraphicsWebEngineView::status() const

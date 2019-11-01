@@ -74,7 +74,7 @@ signals:
     void loadFinished(bool ok);
 
 private slots:
-    void viewUrlChanged();
+    void updateCanGoBack();
 
     void setViewStatus(int status);
 
