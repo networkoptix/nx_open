@@ -452,6 +452,7 @@ class _BoxPoller:
                 ))
         except Exception as e:
             self._exception = e
+            self._results.append((None, None, None, None))
 
     def please_stop(self):
         self._stop_event.set()
@@ -633,7 +634,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
                 first_tx_rx_errors = box_tx_rx_errors(box)
                 last_tx_rx_errors = first_tx_rx_errors
-                cpu_usage_max = 0
+                cpu_usage_max = None
                 box_poller = _BoxPoller(api, box, box_platform.cpu_count, ini['reportingPeriodSeconds'])
 
                 try:
@@ -657,10 +658,17 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                              [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_kilobytes] = box_poller.get_results()
                         except LookupError:
                             continue
-                        cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
-                        cpu_usage_max = max(cpu_usage_max, cpu_usage_last_minute)
-                        last_cpu_times = cpu_times
-                        last_tx_rx_errors = tx_rx_errors
+                        if cpu_times is not None:
+                            cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
+                            if cpu_usage_max is None:
+                                cpu_usage_max = cpu_usage_last_minute
+                            else:
+                                cpu_usage_max = max(cpu_usage_max, cpu_usage_last_minute)
+                            last_cpu_times = cpu_times
+                        else:
+                            cpu_usage_last_minute = None
+                        if tx_rx_errors is not None:
+                            last_tx_rx_errors = tx_rx_errors
 
                         live_worst_lag_s = stream_stats['live'].worst_lag_us() / 1_000_000
                         archive_worst_lag_s = stream_stats['archive'].worst_lag_us() / 1_000_000
@@ -674,16 +682,18 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             f"{live_worst_lag_s:.3f} s (live), "
                             f"{archive_worst_lag_s:.3f} s (archive).")
 
-                        if cpu_usage_last_minute > ini['cpuUsageThreshold']:
-                            issues.append(exceptions.CpuUsageThresholdExceededIssue(
-                                cpu_usage_last_minute,
-                                ini['cpuUsageThreshold']
-                            ))
+                        if cpu_usage_last_minute is not None:
+                            if cpu_usage_last_minute > ini['cpuUsageThreshold']:
+                                issues.append(exceptions.CpuUsageThresholdExceededIssue(
+                                    cpu_usage_last_minute,
+                                    ini['cpuUsageThreshold']
+                                ))
 
-                        if storage_failure_event_count > 0:
-                            issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
+                        if storage_failure_event_count is not None:
+                            if storage_failure_event_count > 0:
+                                issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
 
-                        if swapped_initially_kilobytes is not None:
+                        if swapped_initially_kilobytes is not None and swapped_kilobytes is not None:
                             swapped_during_test_kilobytes = swapped_kilobytes - swapped_initially_kilobytes
                             if swapped_during_test_kilobytes > ini['swapThresholdKilobytes']:
                                 issues.append(exceptions.BoxStateError(
