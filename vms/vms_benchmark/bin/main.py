@@ -551,8 +551,11 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 f"({ini['sleepBeforeCheckingArchiveSeconds']} s)...")
             time.sleep(ini['sleepBeforeCheckingArchiveSeconds'])
 
-            archive_start_time_ms = api.get_archive_start_time_ms(cameras[0].id)
-            archive_read_pos_ms_utc = archive_start_time_ms + ini['archiveReadingPosS'] * 1000
+            if total_archive_stream_count > 0:
+                archive_start_time_ms = api.get_archive_start_time_ms(cameras[0].id)
+                archive_read_pos_ms_utc = archive_start_time_ms + ini['archiveReadingPosS'] * 1000
+            else:
+                archive_read_pos_ms_utc = 0
 
             report('    Streaming test...')
 
