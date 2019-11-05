@@ -90,7 +90,7 @@ protected:
             for (auto q: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
             {
                 const auto backupChunks = manager->getFileCatalog(it.key(), q)->getChunksUnsafe();
-                const test_support::ChunkDataList* generatedChunks;
+                const test_support::ChunkDataList* generatedChunks = nullptr;
                 if (q == QnServer::LowQualityCatalog)
                     generatedChunks = &it.value().lowQualityChunks;
                 else
