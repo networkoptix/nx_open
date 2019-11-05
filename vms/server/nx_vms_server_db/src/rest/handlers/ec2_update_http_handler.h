@@ -14,6 +14,7 @@
 
 #include <rest/server/request_handler.h>
 #include <transaction/transaction.h>
+#include <transaction/transaction_debug_helpers.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <audit/audit_manager.h>

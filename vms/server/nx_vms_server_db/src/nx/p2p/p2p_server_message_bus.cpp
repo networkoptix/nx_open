@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 #include "ec_connection_notification_manager.h"
 
+#include <transaction/transaction_debug_helpers.h>
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
 #include <nx/p2p/transport/i_p2p_transport.h>
