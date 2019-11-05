@@ -283,6 +283,7 @@
                     },
                     "plugins": {
                         "name": "Active Plugins",
+                        "isOptional": true,
                         "display": "panel"
                     }
                 }
@@ -397,15 +398,26 @@
                 "values": {
                     "resolution": {
                         "name": "Resolution",
+                        "isOptional": true,
                         "display": "table|panel"
+                    },
+                    "targetFps": {
+                        "name": "Target FPS",
+                        "isOptional": true,
+                        "display": "panel"
                     },
                     "actualFps": {
                         "name": "Actual FPS",
+                        "isOptional": true,
                         "display": "panel"
+                    },
+                    "fpsDelta": {
+                        "isOptional": true
                     },
                     "fpsDeltaAverage": {
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
+                        "isOptional": true,
                         "display": "panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
@@ -424,6 +436,7 @@
                     },
                     "actualBitrateBps": {
                         "name": "Bitrate",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "KBps"
                     }
@@ -434,6 +447,7 @@
                 "values": {
                     "resolution": {
                         "name": "Resolution",
+                        "isOptional": true,
                         "display": "table|panel",
                         "alarms": [
                             {
@@ -443,19 +457,30 @@
                             }
                         ]
                     },
+                    "targetFps": {
+                        "name": "Target FPS",
+                        "isOptional": true,
+                        "display": "panel"
+                    },
                     "actualFps": {
                         "name": "Actual FPS",
+                        "isOptional": true,
                         "display": "panel"
+                    },
+                    "fpsDelta": {
+                        "isOptional": true
                     },
                     "fpsDeltaAverage": {
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
+                        "isOptional": true,
                         "display": "panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
                     "actualBitrateBps": {
                         "name": "Bitrate",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "KBps"
                     }
@@ -467,20 +492,24 @@
                     "archiveLengthS": {
                         "name": "Forecast",
                         "description": "Archive Length Forecast",
+                        "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
                     },
                     "recordingBitrateBps": {
                         "name": "Recording Bitrate (5min)",
+                        "isOptional": true,
                         "display": "table|panel",
                         "format": "KBps"
                     },
                     "isArchiveTooSmall": {
+                        "isOptional": true,
                         "calculate": "greaterThan %minArchiveLengthS %archiveLengthS"
                     },
                     "minArchiveLengthS": {
                         "name": "Min Archive length",
                         "description": "Minimum Archive Length",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "durationS",
                         "alarms": [
@@ -549,6 +578,7 @@
                 "transactionsPerSecond": {
                         "name": "Transactions/s",
                         "description": "Analytics DB transactions per second",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "Transactions/s"
                     }
