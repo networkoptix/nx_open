@@ -80,6 +80,9 @@ void ValueGroupMonitor::setRules(
         const auto rule = rules.find(id);
         monitor->setFormatter(api::metrics::makeFormatter(
             rule != rules.end() ? rule->second.format : QString()));
+
+        if (rule != rules.end())
+            monitor->setOptional(rule->second.isOptional);
     }
 
     m_alarmMonitors.clear();

@@ -25,6 +25,10 @@ public:
     virtual ~ValueMonitor() = default;
 
     QString name() const { return m_name; }
+
+    bool optional() const { return m_optional; }
+    void setOptional(bool isOptional) { m_optional = isOptional; }
+
     Scope scope() const { return m_scope; }
     void setScope(Scope scope) { m_scope = scope; }
 
@@ -33,8 +37,7 @@ public:
         try
         {
             auto value = valueOrThrow();
-            if (value.isNull())
-                NX_VERBOSE(this, "The value is null");
+            NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
             return std::move(value);
         }
         // TODO: Add wrapping helpers which will be used in controllers, something like:
@@ -64,6 +67,7 @@ protected:
 private:
     QString m_name; // TODO: better to have full name?
     Scope m_scope = Scope::local;
+    bool m_optional = false;
     ValueFormatter m_formatter;
 };
 

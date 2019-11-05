@@ -101,13 +101,14 @@ struct NX_VMS_API ValueRule
 {
     QString name;
     QString description;
+    bool isOptional = false;
     Displays display;
     QString format;
     QString calculate;
     QString insert;
     std::vector<AlarmRule> alarms;
 };
-#define ValueRule_Fields (name)(description)(display)(format)(calculate)(insert)(alarms)
+#define ValueRule_Fields (name)(description)(isOptional)(display)(format)(calculate)(insert)(alarms)
 QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
 
 struct NX_VMS_API ValueGroupRules

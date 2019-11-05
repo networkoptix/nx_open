@@ -381,7 +381,19 @@ void ExtraValueMonitor::setGenerator(ValueGenerator generator)
 
 api::metrics::Value ExtraValueMonitor::valueOrThrow() const
 {
-    return m_generator();
+    if (!optional())
+        return m_generator();
+
+    try
+    {
+        return m_generator();
+    }
+    // TODO: should catch only rules related exceptions!
+    catch (const std::exception &e)
+    {
+        NX_VERBOSE(this, "Ignoring exception as this value marked 'optional': %1", e.what());
+        return {};
+    }
 }
 
 void ExtraValueMonitor::forEach(
