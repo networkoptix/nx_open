@@ -32,11 +32,9 @@ public:
     {
         try
         {
-            // TODO: After adding exceptions everywherem null value should be considered as
-            // completely expected case when the value should not be shown.
             auto value = valueOrThrow();
             if (value.isNull())
-                NX_DEBUG(this, "Failed to get value: unknown reason");
+                NX_VERBOSE(this, "The value is null");
             return std::move(value);
         }
         // TODO: Add wrapping helpers which will be used in controllers, something like:
@@ -58,6 +56,7 @@ public:
     }
 
     QString toString() const { return lm("%1(%2)").args(m_name, m_scope); }
+    QString idForToStringFromPtr() const { return name(); }
 
 protected:
     virtual api::metrics::Value valueOrThrow() const noexcept(false) = 0;
