@@ -16,7 +16,7 @@ namespace utils {
 class NX_UTILS_API ElapsedTimer
 {
 public:
-    ElapsedTimer();
+    ElapsedTimer(bool started = false);
 
     bool hasExpired(std::chrono::milliseconds value) const;
     std::chrono::milliseconds restart();

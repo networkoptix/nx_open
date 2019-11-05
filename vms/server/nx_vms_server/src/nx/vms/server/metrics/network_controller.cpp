@@ -106,12 +106,7 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "server",
-                [this](const auto&)
-                {
-                    const auto server = resourcePool()->getResourceById(QnUuid(m_serverId));
-                    return Value(server->getName());
-                }
+                "server", [this](const auto&) { return m_serverId; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "state", [this](const auto& r) { return r->state(); }

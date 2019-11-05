@@ -199,7 +199,7 @@ TEST_F(MetricsCamerasApi, infoGroup)
     EXPECT_EQ(cameraData["_"]["name"], "CMock 2");
 
     auto infoData = cameraData["info"];
-    EXPECT_EQ(infoData["server"], launcher->commonModule()->currentServer()->getName());
+    EXPECT_EQ(infoData["server"], launcher->id);
     EXPECT_EQ(infoData["type"], "Camera");
     EXPECT_EQ(infoData["ip"], "192.168.0.2");
     EXPECT_EQ(infoData["model"], "Model_2");

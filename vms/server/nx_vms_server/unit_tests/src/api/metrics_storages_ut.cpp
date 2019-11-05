@@ -62,7 +62,7 @@ TEST_F(MetricsStoragesApi, info)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto infoData = storageData["info"];
-    EXPECT_EQ(kTestServerName, infoData["server"].toString());
+    EXPECT_EQ(launcher->id, infoData["server"].toString());
     EXPECT_EQ("local", infoData["type"].toString());
 }
 
@@ -98,15 +98,15 @@ TEST_F(MetricsStoragesApi, space)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto spaceData = storageData["space"];
-    ASSERT_GT(spaceData["totalSpaceB"].toDouble(), 1024*1024);
+    EXPECT_EQ(spaceData["totalSpaceB"].toDouble(), storage->getTotalSpace());
     auto mediaSpace = spaceData["mediaSpaceB"].toDouble();
-    ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
+    EXPECT_EQ(kChunkSize * kChunks / 2, mediaSpace);
 
     auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];
     auto spaceData2 = storageData2["space"];
-    ASSERT_GT(spaceData2["totalSpaceB"].toDouble(), 1024 * 1024);
+    EXPECT_EQ(spaceData2["totalSpaceB"].toDouble(), storage2->getTotalSpace());
     auto mediaSpace2 = spaceData2["mediaSpaceB"].toDouble();
-    ASSERT_EQ(kChunkSize * kChunks / 2, mediaSpace);
+    EXPECT_EQ(kChunkSize * kChunks / 2, mediaSpace);
 }
 
 TEST_F(MetricsStoragesApi, state)
