@@ -874,9 +874,9 @@ def _obtain_running_vms(box, linux_distribution):
         f"\nDetected Server installation(s):\n"
         + '\n'.join(
             f"    {vms.customization} in {vms.dir} ("
-            f"port {vms.port or 'N/A'}, "
-            f"pid {vms.pid or 'N/A'}, "
-            f"uid {vms.uid or 'N/A'})"
+            f"port {'N/A' if vms.port is None else vms.port}, "
+            f"pid {'N/A' if vms.pid is None else vms.pid}, "
+            f"uid {'N/A' if vms.uid is None else vms.uid})"
             for vms in vmses)
     )
     if len(vmses) > 1:
