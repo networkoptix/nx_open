@@ -84,6 +84,21 @@ void FilteredResourceSelectionWidget::setInvalidMessage(const QString& text)
     ui->alertBar->setText(text);
 }
 
+QString FilteredResourceSelectionWidget::infoMessage() const
+{
+    return ui->infoBar->text();
+}
+
+void FilteredResourceSelectionWidget::setInfoMessage(const QString& text)
+{
+    ui->infoBar->setText(text);
+}
+
+void FilteredResourceSelectionWidget::clearInfoMessage()
+{
+    setInfoMessage(QString());
+}
+
 bool FilteredResourceSelectionWidget::detailsVisible() const
 {
     return ui->detailsArea->isVisible();
