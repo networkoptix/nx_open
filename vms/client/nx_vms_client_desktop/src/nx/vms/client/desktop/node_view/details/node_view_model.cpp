@@ -71,6 +71,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                 {
                     const auto parentPath = step.path;
                     const auto parentNode = d->state.nodeByPath(parentPath);
+                    qWarning() << "ADDING NODE, parent node child count" << parentNode->children().count();
                     const auto parentIndex = d->getModelIndex(parentNode);
                     const int row = parentNode->childrenCount();
                     return utils::SharedGuardPtr(
@@ -161,9 +162,9 @@ int NodeViewModel::rowCount(const QModelIndex& parent) const
     return node ? node->childrenCount() : 0;
 }
 
-int NodeViewModel::columnCount(const QModelIndex& parent) const
+int NodeViewModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return parent.isValid() ? 0 : d->columnCount;
+    return d->columnCount;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const
