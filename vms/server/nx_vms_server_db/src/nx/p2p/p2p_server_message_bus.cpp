@@ -775,7 +775,7 @@ void ServerMessageBus::gotTransaction(
     {
         NX_DEBUG(
             this, "Received transaction %1 via transaction bus. Data: %2",
-            toString(tran.command), ec2::debugString(tran.params));
+            tran.command, ec2::debugString(tran.params));
         updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
         std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
         dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(
