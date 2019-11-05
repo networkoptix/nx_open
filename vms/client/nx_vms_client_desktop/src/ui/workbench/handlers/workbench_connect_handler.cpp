@@ -641,12 +641,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     qnSettings->setAutoLogin(autoLogin);
     qnSettings->save();
 
-    if (options.testFlag(StorePreferredCloudServer)
-        && !info.cloudSystemId.isEmpty()
-        && isConnectionToCloud(info.effectiveUrl()))
-    {
+    if (options.testFlag(StorePreferredCloudServer) && cloudConnection)
         nx::vms::client::core::helpers::savePreferredCloudServer(info.cloudSystemId, info.serverId());
-    }
 
     if (cloudConnection)
     {
