@@ -379,7 +379,7 @@ void ExtraValueMonitor::setGenerator(ValueGenerator generator)
     m_generator = std::move(generator);
 }
 
-api::metrics::Value ExtraValueMonitor::value() const
+api::metrics::Value ExtraValueMonitor::valueOrThrow() const
 {
     return m_generator();
 }

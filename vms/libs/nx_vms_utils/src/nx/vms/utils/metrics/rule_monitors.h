@@ -28,9 +28,10 @@ public:
     ExtraValueMonitor(QString name, ValueGeneratorResult formula = {});
     void setGenerator(ValueGenerator generator);
 
-    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
+protected:
+    virtual api::metrics::Value valueOrThrow() const override;
 private:
     ValueGenerator m_generator;
 };

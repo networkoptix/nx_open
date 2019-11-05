@@ -4,6 +4,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/value_history.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/log/log.h>
 
 #include "resource_description.h"
 
@@ -27,16 +28,39 @@ public:
     Scope scope() const { return m_scope; }
     void setScope(Scope scope) { m_scope = scope; }
 
-    virtual api::metrics::Value value() const noexcept(false) = 0;
+    api::metrics::Value value() const noexcept
+    {
+        try
+        {
+            // TODO: After adding exceptions everywherem null value should be considered as
+            // completely expected case when the value should not be shown.
+            auto value = valueOrThrow();
+            if (value.isNull())
+                NX_DEBUG(this, "Failed to get value: unknown reason");
+            return std::move(value);
+        }
+        // TODO: Add wrapping helpers which will be used in controllers, something like:
+        //  metrics_unexpected_error, metrics_expected, etc.
+        catch (const std::exception &e)
+        {
+            NX_DEBUG(this, "Failed to get value: %1", e.what());
+        }
+
+        return {};
+    }
+
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
-    void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); };
-    api::metrics::Value formattedValue() const noexcept(false)
+    void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); }
+    api::metrics::Value formattedValue() const noexcept
     {
         return m_formatter ? m_formatter(value()) : value();
     }
 
     QString toString() const { return lm("%1(%2)").args(m_name, m_scope); }
+
+protected:
+    virtual api::metrics::Value valueOrThrow() const noexcept(false) = 0;
 
 private:
     QString m_name; // TODO: better to have full name?
@@ -67,10 +91,11 @@ public:
         const ResourceType& resource,
         const Getter<ResourceType>& getter);
 
-    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
 protected:
+    virtual api::metrics::Value valueOrThrow() const override;
+
     const ResourceType& m_resource;
     const Getter<ResourceType>& m_getter;
 };
@@ -89,8 +114,10 @@ public:
         const Getter<ResourceType>& getter,
         const Watch<ResourceType>& watch);
 
-    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
+
+protected:
+    virtual api::metrics::Value valueOrThrow() const override;
 
 private:
     void updateValue();
@@ -116,7 +143,7 @@ RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
 }
 
 template<typename ResourceType>
-api::metrics::Value RuntimeValueMonitor<ResourceType>::value() const
+api::metrics::Value RuntimeValueMonitor<ResourceType>::valueOrThrow() const
 {
     return m_getter(m_resource);
 }
@@ -143,7 +170,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
 }
 
 template<typename ResourceType>
-api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const
+api::metrics::Value ValueHistoryMonitor<ResourceType>::valueOrThrow() const
 {
     return m_history.current();
 }
