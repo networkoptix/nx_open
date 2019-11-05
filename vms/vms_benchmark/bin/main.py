@@ -342,7 +342,12 @@ def _rtsp_perf_frames(stdout, output_file_path):
         line = stdout.readline().decode('UTF-8').strip('\n')
 
         if output_file:
-            output_file.write(line.strip() + '\n')
+            timestamp_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            if line.startswith(timestamp_str):  # Some rtsp_perf lines already have timestamps.
+                prefix = ''
+            else:
+                prefix = timestamp_str + ' '
+            output_file.write(f'{prefix}{line}\n')
 
         warning_prefix = 'WARNING: '
         if line.startswith(warning_prefix):
