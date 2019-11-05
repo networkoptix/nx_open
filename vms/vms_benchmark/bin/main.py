@@ -672,9 +672,14 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         live_worst_lag_s = stream_stats['live'].worst_lag_us() / 1_000_000
                         archive_worst_lag_s = stream_stats['archive'].worst_lag_us() / 1_000_000
+                        if cpu_usage_last_minute is not None:
+                            cpu_usage = f'{round(cpu_usage_last_minute * 100)}%'
+                        else:
+                            cpu_usage = 'N/A'
+                        streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
                         report(
-                            f"    {round(time.time() - streaming_test_started_at_s)} seconds passed; "
-                            f"box CPU usage: {round(cpu_usage_last_minute * 100)}%, "
+                            f"    {streaming_test_duration_s} seconds passed; "
+                            f"box CPU usage: {cpu_usage}, "
                             f"dropped frames: "
                             f"{stream_stats['live'].frame_drops} (live), "
                             f"{stream_stats['archive'].frame_drops} (archive), "
