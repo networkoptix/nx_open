@@ -3,7 +3,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
-#include <QtWebKitWidgets/QWebPage>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtQuick/QQuickItem>
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>
@@ -314,43 +315,35 @@ Factory::ActionList WebPageFactory::newActions(const Parameters& parameters,
 {
     ActionList result;
 
-    auto widget = qobject_cast<QnWebResourceWidget*>(parameters.widget());
+    QPointer<QnWebResourceWidget> widget(qobject_cast<QnWebResourceWidget*>(parameters.widget()));
     if (!NX_ASSERT(widget))
         return result;
 
-    std::vector<QWebPage::WebAction> allowedActions = {
-        QWebPage::Back,
-        QWebPage::Forward,
-        QWebPage::Stop,
-        QWebPage::Reload
+    const auto allowedActions = {
+        QWebEnginePage::Back,
+        QWebEnginePage::Forward,
+        QWebEnginePage::Stop,
+        QWebEnginePage::Reload,
+        QWebEnginePage::SavePage
     };
 
-    if (ini().enableWebKitDeveloperExtras)
-        allowedActions.push_back(QWebPage::InspectElement);
-
-    // TODO: calculate actual position.
-    static const QPoint kExamplePosition(1, 1);
-
-    QPointer<QWebPage> page = widget->page();
     for (auto actionId: allowedActions)
     {
-        auto sourceAction = page->action(actionId);
-        if (sourceAction && sourceAction->isEnabled())
-        {
-            auto action = new QAction(parent);
-            action->setText(sourceAction->text());
-            connect(action, &QAction::triggered, this,
-                [this, actionId, page]
-                {
-                    if (!page)
-                        return;
+        if (!widget->isWebActionEnabled(actionId))
+            continue;
+        auto action = new QAction(parent);
+        action->setText(widget->webActionText(actionId));
+        connect(action, &QAction::triggered, this,
+            [actionId, widget]
+            {
+                if (!widget)
+                    return;
 
-                    page->updatePositionDependentActions(kExamplePosition);
-                    page->triggerAction(actionId);
-                });
-            result.push_back(action);
-        }
+                widget->triggerWebAction(actionId);
+            });
+        result.push_back(action);
     }
+
     return result;
 }
 

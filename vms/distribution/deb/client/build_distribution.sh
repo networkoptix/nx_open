@@ -12,6 +12,7 @@ LOG_FILE="$LOGS_DIR/client_build_distribution.log"
 STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
 STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/client/$VERSION"
 STAGE_BIN="$STAGE_MODULE/bin"
+STAGE_LIBEXEC="$STAGE_MODULE/libexec"
 STAGE_LIB="$STAGE_MODULE/lib"
 STAGE_ICONS="$STAGE/usr/share/icons"
 
@@ -21,6 +22,9 @@ STAGE_ICONS="$STAGE/usr/share/icons"
 copyBins()
 {
     echo "Copying client binaries"
+
+    mkdir -p "$STAGE_BIN"
+
     cp -r "$BUILD_DIR/bin/$CLIENT_BINARY_NAME" "$STAGE_BIN/"
     cp -r "$BUILD_DIR/bin/$APPLAUNCHER_BINARY_NAME" "$STAGE_BIN/"
     cp -r "bin/client" "$STAGE_BIN/"
@@ -159,10 +163,14 @@ copyLibs()
     fi
 }
 
+# [in] STAGE_MODULE
 copyQtPlugins()
 {
     echo ""
     echo "Copying Qt plugins"
+
+    local -r PLUGINS_DIR="$STAGE_MODULE/plugins"
+    mkdir "$PLUGINS_DIR"
 
     local QT_PLUGINS=(
         platforminputcontexts
@@ -170,7 +178,6 @@ copyQtPlugins()
         mediaservice
         xcbglintegrations
         platforms
-        qml
     )
     if [ "$ARCH" != "arm" ]
     then
@@ -183,7 +190,7 @@ copyQtPlugins()
     for QT_PLUGIN in "${QT_PLUGINS[@]}"
     do
         echo "  Copying (Qt plugin) $QT_PLUGIN"
-        cp -r "$BUILD_DIR/bin/$QT_PLUGIN" "$STAGE_BIN/"
+        cp -r "$QT_DIR/plugins/$QT_PLUGIN" "$PLUGINS_DIR/"
     done
 }
 
@@ -204,9 +211,11 @@ copyQtLibs()
         Core
         Gui
         Widgets
-        WebKit
         WebChannel
-        WebKitWidgets
+        WebEngineCore
+        WebEngine
+        WebEngineWidgets
+        WebView
         OpenGL
         Multimedia
         MultimediaQuick
@@ -241,6 +250,31 @@ copyQtLibs()
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
     done
+}
+
+# [in] STAGE_MODULE
+copyQml()
+{
+    cp -r "$QT_DIR/qml" "$STAGE_MODULE/qml"
+}
+
+# [in] STAGE_LIBEXEC
+# [in] STAGE_MODULE
+copyAdditionalQtFiles()
+{
+    echo ""
+    echo "Copying additional Qt files"
+
+    echo "  Copying qt.conf"
+    cp qt.conf "$STAGE_BIN/"
+
+    echo "  Copying (Qt) libexec"
+    mkdir "$STAGE_LIBEXEC"
+    cp "$QT_DIR/libexec/QtWebEngineProcess" "$STAGE_LIBEXEC"
+    cp "$QT_DIR/libexec/qt.conf" "$STAGE_LIBEXEC"
+
+    echo "  Copying (Qt) resources"
+    cp -r "$QT_DIR/resources" "$STAGE_MODULE/resources"
 }
 
 # [in] STAGE
@@ -307,10 +341,6 @@ buildDistribution()
     mkdir -p "$STAGE_MODULE/"
     cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
 
-    echo "Copying qt.conf"
-    mkdir -p "$STAGE_BIN"
-    cp qt.conf "$STAGE_BIN/"
-
     copyBins
     copyIcons
     copyHelp
@@ -318,14 +348,18 @@ buildDistribution()
     copyBackgrounds
     copyLibs
     copyQtPlugins
-    copyFestivalVox
-
+    copyQml
     copyQtLibs
+    copyAdditionalQtFiles
+    copyFestivalVox
 
     echo "Setting permissions"
     find "$STAGE" -type d -print0 |xargs -0 chmod 755
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
-    chmod 755 "$STAGE_BIN"/* #< Restore executable permission for the files in "bin".
+
+    # Restore permissions for executables.
+    chmod 755 "$STAGE_BIN"/{applauncher*,client*}
+    chmod 755 "$STAGE_LIBEXEC/QtWebEngineProcess"
 
     createDebianDir
 

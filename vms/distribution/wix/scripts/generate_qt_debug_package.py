@@ -28,8 +28,10 @@ qt_libraries = [
     'QuickWidgets',
     'QuickTemplates2',
     'QuickControls2',
-    'WebKit',
-    'WebKitWidgets']
+    'WebEngine',
+    'WebEngineCore',
+    'WebEngineWidgets',
+]
 
 qt_plugins = [
     'imageformats/qgif.pdb',

@@ -28,8 +28,14 @@ qt_libraries = [
     'QuickWidgets',
     'QuickTemplates2',
     'QuickControls2',
-    'WebKit',
-    'WebKitWidgets']
+    'WebEngine',
+    'WebEngineCore',
+    'WebEngineWidgets',
+]
+
+qt_binaries = [
+    'QtWebEngineProcess.exe',
+]
 
 qt_plugins = [
     'imageformats/qgif.dll',
@@ -66,6 +72,7 @@ def create_client_update_file(config, output_file):
     minilauncher_binary_name = config['minilauncher_binary_name']
     client_update_files_directory = config['client_update_files_directory']
     fonts_directory = config['fonts_directory']
+    locale_resources_directory = os.path.join(qt_directory, 'resources')
 
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
@@ -77,9 +84,12 @@ def create_client_update_file(config, output_file):
                        client_update_files_directory)
         e.zip_files_to(zip, e.icu_files(icu_directory), icu_directory)
         e.zip_files_to(zip, e.find_all_files(fonts_directory), binaries_dir)
+        e.zip_files_to(zip, e.find_all_files(locale_resources_directory), qt_directory)
 
         qt_bin_dir = os.path.join(qt_directory, 'bin')
         e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)
+        for qt_binary in qt_binaries:
+            zip.write(os.path.join(qt_bin_dir, qt_binary), qt_binary)
         e.zip_files_to(zip, e.find_all_files(client_qml_dir), client_qml_dir, 'qml')
 
         qt_plugins_dir = os.path.join(qt_directory, 'plugins')

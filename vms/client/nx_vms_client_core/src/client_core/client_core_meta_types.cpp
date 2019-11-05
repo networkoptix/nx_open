@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
+#include <nx/vms/client/core/camera/thumbnail/live_thumbnail_provider.h>
 #include <nx/client/core/media/media_player.h>
 #include <nx/client/core/resource/resource_helper.h>
 #include <nx/client/core/resource/media_resource_helper.h>
@@ -130,6 +131,7 @@ void initializeMetaTypes()
 
     nx::vms::client::core::TwoWayAudioController::registerQmlType();
     nx::vms::client::core::OperationManager::registerQmlType();
+    LiveThumbnailProvider::registerQmlType();
 }
 
 } // namespace nx::vms::client::core

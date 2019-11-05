@@ -1,9 +1,8 @@
 #pragma once
 
-#include <QFile>
-#include <QFileInfo>
-#include <QElapsedTimer>
-#include <QtNetwork/QNetworkReply>
+#include <QtCore/QFileInfo>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QPointer>
 
 #include <nx/utils/uuid.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -11,8 +10,9 @@
 namespace nx::vms::client::desktop {
 namespace utils {
 
-/*
- * Downloads QNetworkReply and reports download progress in right panel.
+/**
+ * Enables saving and downloading QQuickWebEngineDownloadItem
+ * and reports download progress in right panel.
  */
 class WebDownloader: public QObject, public QnWorkbenchContextAware
 {
@@ -27,38 +27,37 @@ class WebDownloader: public QObject, public QnWorkbenchContextAware
         Failed
     };
 
-public:
-    WebDownloader(QObject* parent,
-        std::shared_ptr<QNetworkAccessManager> networkManager,
-        QNetworkReply* reply,
-        std::unique_ptr<QFile> file,
-        const QFileInfo& fileInfo);
+    WebDownloader(QObject* parent, const QString& filePath, QObject* item);
+
     virtual ~WebDownloader();
 
-    static bool download(
-        std::shared_ptr<QNetworkAccessManager> manager, QNetworkReply* reply, QObject* parent);
+public:
+    // Handle download from QWebEngine-based browser.
+    static bool download(QObject* item, QnWorkbenchContext* context);
+
+    static QString selectFile(const QString& suggestedName, QWidget* widget);
 
 private:
     void startDownload();
     void setState(State state);
-    void removeProgress();
 
 private slots:
     void cancel();
     void onDownloadProgress(qint64 bytesRead, qint64 bytesTotal);
-    void writeAvailableData();
-    void onReplyFinished();
+
+    void onReceivedBytesChanged();
+    void onStateChanged();
 
 private:
     State m_state = State::Init;
     QElapsedTimer m_downloadTimer;
-    std::shared_ptr<QNetworkAccessManager> m_networkManager;
-    QNetworkReply* m_reply;
-    std::unique_ptr<QFile> m_file;
     QFileInfo m_fileInfo;
     QnUuid m_activityId;
     bool m_cancelRequested = false;
     bool m_hasWriteError = false;
+    QPointer<QObject> m_item;
+    qint64 m_initBytesRead = 0;
+    qint64 m_initElapsed = 0;
 };
 
 } // namespace utils

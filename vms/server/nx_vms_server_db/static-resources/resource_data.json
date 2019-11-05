@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.160",
+    "version": "1.0.1.172",
     "data": [
         {
             "keys": [
@@ -1354,7 +1354,8 @@
         {
             "keys": [
                 "HIKVISION|DS-2TD1217-6/V1",
-                "HIKVISION|DFI6256A"
+                "HIKVISION|DFI6256A",
+                "hikvision|DS-2CD2955FWD*"
             ],
             "pullInputEventsAsOdm": true
         },
@@ -1384,7 +1385,8 @@
                 "HIKVISION|DS-2DE3304W-DE",
                 "ONVIF|NC328-VBZ",
                 "HIKVISION|DS-2TD1217-6/V1",
-                "HIKVISION|DFI6256A"
+                "HIKVISION|DFI6256A",
+                "hikvision|DS-2CD2955FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -2205,11 +2207,52 @@
         {
             "keys": [
                 "Dahua*|*",
-                "Honewell|H4W4PER2",
-                "Honeywell*|H4W4PER2",
-                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest"
+                "Amcrest|IP4M-1026*", "IP4M-1026*|Amcrest",
+                "Activecam*|*",
+                "Advidia*|*",
+                "Amcrest*|*",
+                "Ameta*|*",
+                "Ascendent*|*",
+                "BV Security*|*",
+                "CCTV Security Pros*|*",
+                "CCTV Star*|*",
+                "CP Plus*|*",
+                "eLine*|*",
+                "ENS*|*",
+                "Expose*|*",
+                "Lorex*|*",
+                "GSS*|*",
+                "Honeywell*|*",
+                "IC Realtime*|*",
+                "Ikegami*|*",
+                "Impath Networks*|*",
+                "Inaxsys*|*",
+                "IndigoVision*|*",
+                "Infinity CCTV*|*",
+                "Innekt*|*",
+                "Intelbras*|*",
+                "KBVision*|*",
+                "Lumixen*|*",
+                "Maxron*|*",
+                "Montavue*|*",
+                "Oco*|*",
+                "People Fu*|*",
+                "Rhodium*|*",
+                "RVI*|*",
+                "Saxco*|*",
+                "Security Camera King*|*",
+                "Space Technology*|*",
+                "Speco*|*",
+                "ToughDog*|*",
+                "Tyco Holis*|*",
+                "Tyco Illustra Essentials*|*",
+                "Unisight*|*",
+                "VIP Vision*|*",
+                "Watchnet*|*",
+                "Winic*|*"
             ],
-            "trustToVideoSourceSize": false
+            "trustToVideoSourceSize": false,
+            "alternativeSecondStreamSorter": true
         },
         {
             "keys": [
@@ -2495,7 +2538,7 @@
 
         },
         {
-            "keys":["neutral|DSC-TVC-0200"],
+            "keys":["neutral|DSC-TVC-0200", "entropix|DSC-TVC-0200"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -3292,7 +3335,9 @@
             "onvif|hnc6d24-izs",
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
-            "cellinx|nbm2-h6"
+            "cellinx|nbm2-h6",
+            "neutral|DSC-TVC-0200",
+            "entropix|DSC-TVC-0200"
             ],
             "canShareLicenseGroup": true
         },

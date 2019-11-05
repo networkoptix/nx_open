@@ -86,9 +86,9 @@ ini_definition = {
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
-    "testFileHighDurationMs": {"type": "int", "range": [1, None], "default": 10000},
+    "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
-    "testFileFps": {"type": "int", "range": [1, 999], "default": 30},
+    "testFileLowPeriodUs": {"type": "int", "range": [1, None], "default": 10000000},
     "testStreamFpsHigh": {"type": "int", "range": [1, 999], "default": 30},
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
     "testcameraOutputFile": {"type": "str", "default": ""},
@@ -97,9 +97,8 @@ ini_definition = {
     "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
     "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
-    "swapThresholdMegabytes": {"type": "int", "range": [0, None], "default": 0},
+    "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
-    "maxAllowedNetworkErrors": {"type": "int", "range": [0, None], "default": 0},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
     "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 5},
@@ -112,6 +111,7 @@ ini_definition = {
     "apiReadinessTimeoutSeconds": {"type": "int", "range": [1, None], "default": 30},
     "worstAllowedStreamLagUs": {"type": "int", "range": [0, None], "default": 5_000_000},
     "maxAllowedPtsDiffDeviationUs": {"type": "int", "range": [0, None], "default": 2000},
+    "unloopViaTestcamera": {"type": "bool", "default": "true"},
 }
 
 
@@ -120,11 +120,14 @@ def load_configs(conf_file, ini_file):
     ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
-    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
-    stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
     test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
+    test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
+    test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
+    test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
+    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
@@ -184,7 +187,7 @@ def _check_storages(api, ini, camera_count):
             f"of non-reserved free space.")
 
 
-def get_cumulative_swap_bytes(box):
+def get_cumulative_swap_kilobytes(box):
     output = box.eval('cat /proc/vmstat')
     raw = [line.split() for line in output.splitlines()]
     try:
@@ -195,7 +198,7 @@ def get_cumulative_swap_bytes(box):
         pages_swapped = data['pswpout']
     except KeyError:
         return None
-    return pages_swapped * 4096  # All modern OSes operate with 4k pages.
+    return pages_swapped * 4  # All modern OSes operate with 4K pages.
 
 
 class _BoxCpuTimes:
@@ -345,11 +348,13 @@ def _rtsp_perf_frames(stdout, output_file_path):
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
             yield match_res.group('stream_id'), int(match_res.group('timestamp'))
+            continue
 
         match_res = _rtsp_perf_summary_regex.match(line)
         if match_res is not None:
             if int(match_res.group('failed')) > 0:
                 raise exceptions.RtspPerfError("Streaming error: Some RTSP sessions failed")
+            continue
 
         logging.info(f"Unrecognized line from rtsp_perf: {line}")
 
@@ -430,7 +435,13 @@ class _BoxPoller:
                 cpu_times = _BoxCpuTimes(self._box, self._cpu_cores)
                 storage_failure_event_count = self._count_storage_failures()
                 tx_rx_errors = box_tx_rx_errors(self._box)
-                self._results.append((cpu_times, storage_failure_event_count, tx_rx_errors))
+                swapped_kilobytes = get_cumulative_swap_kilobytes(self._box)
+                self._results.append((
+                    cpu_times,
+                    storage_failure_event_count,
+                    tx_rx_errors,
+                    swapped_kilobytes,
+                ))
         except Exception as e:
             self.exception = e
 
@@ -459,8 +470,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('Starting load tests...')
     load_test_started_at_s = time.time()
 
-    swapped_before_bytes = get_cumulative_swap_bytes(box)
-    if swapped_before_bytes is None:
+    swapped_initially_kilobytes = get_cumulative_swap_kilobytes(box)
+    if swapped_initially_kilobytes is None:
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
@@ -622,7 +633,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count, tx_rx_errors] = box_poller.get_results()
+                             [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_kilobytes] = box_poller.get_results()
                         except LookupError:
                             continue
                         cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -651,11 +662,24 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if storage_failure_event_count > 0:
                             issues.append(exceptions.StorageFailuresIssue(storage_failure_event_count))
 
+                        if swapped_initially_kilobytes is not None:
+                            swapped_during_test_kilobytes = swapped_kilobytes - swapped_initially_kilobytes
+                            if swapped_during_test_kilobytes > ini['swapThresholdKilobytes']:
+                                issues.append(exceptions.BoxStateError(
+                                    f"More than {ini['swapThresholdKilobytes']} KB swapped at the "
+                                    f"box during the tests: {swapped_during_test_kilobytes} KB."))
+
                         for stream_type in 'live', 'archive':
                             if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
                                 issues.append(exceptions.VmsBenchmarkIssue(
                                     f'{stream_stats[stream_type].frame_drops} frame drops detected '
                                     f'in {stream_type} streams.'))
+                            if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
+                                worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
+                                issues.append(exceptions.TestCameraStreamingIssue(
+                                    f'Lag of one of {stream_type} streams '
+                                    f'reached {worst_lag_s :.3f} seconds.'
+                                ))
 
                         if issues:
                             streaming_ended_expectedly = True
@@ -700,10 +724,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 if last_tx_rx_errors is not None and first_tx_rx_errors is not None:
                     tx_rx_errors_during_test = last_tx_rx_errors - first_tx_rx_errors
-                    if tx_rx_errors_during_test > ini['maxAllowedNetworkErrors']:
-                        issues.append(exceptions.TestCameraStreamingIssue(
-                            f"Network errors detected: {tx_rx_errors_during_test}"
-                        ))
                 else:
                     tx_rx_errors_during_test = None
 
@@ -727,28 +747,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     + f"        Streaming test duration: {streaming_test_duration_s} s"
                 )
 
-                if stream_stats[stream_type].worst_lag_us > ini['worstAllowedStreamLagUs']:
-                    worst_lag_s = stream_stats[stream_type].worst_lag_us / 1_000_000
-                    issues.append(exceptions.TestCameraStreamingIssue(
-                        'Streaming video from the Server FAILED: '
-                        f'{stream_type} streams lagged by {worst_lag_s :.3f} seconds.'
-                    ))
-
                 if len(issues) > 0:
                     raise exceptions.VmsBenchmarkIssue(f'{len(issues)} issue(s) detected:', sub_issues=issues)
 
                 report(f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) succeeded.")
-
-    if swapped_before_bytes is not None:
-        swapped_after_bytes = get_cumulative_swap_bytes(box)
-        swapped_during_test_bytes = swapped_after_bytes - swapped_before_bytes
-        if swapped_during_test_bytes > ini['swapThresholdMegabytes'] * 1024 * 1024:
-            if swapped_during_test_bytes > 1024 * 1024:
-                swapped_str = f'{swapped_during_test_bytes // (1024 * 1024)} MB'
-            else:
-                swapped_str = f'{swapped_during_test_bytes} bytes'
-            raise exceptions.BoxStateError(
-                f"More than {ini['swapThresholdMegabytes']} MB swapped at the box during the tests: {swapped_str}.")
 
     report(
         f'\nLoad tests finished successfully; '
@@ -868,19 +870,15 @@ def _obtain_restarted_vms(box, linux_distribution):
 
         time.sleep(0.5)
 
-    time.sleep(5)  # TODO: Investigate this sleep
-
     vms = vmses[0]
     return vms
 
 
 def _override_ini_config(vms, ini):
-    high_stream_interval_us = 1000000 // ini['testStreamFpsHigh']
-    modulus_us = ini['testFileHighDurationMs'] * 1000 + high_stream_interval_us
     vms.override_ini_config({
         'nx_streaming': {
             'enableTimeCorrection': 0,
-            'unloopCameraPtsWithModulus': modulus_us,
+            'unloopCameraPtsWithModulus': ini['testFileHighPeriodUs'],
         },
     })
 
@@ -944,14 +942,16 @@ def main(conf_file, ini_file, log_file):
     _check_time_diff(box, ini)
 
     vms = _obtain_running_vms(box, linux_distribution)
-    vms.dismount_ini_dirs()
+    if not ini['unloopViaTestcamera']:
+        vms.dismount_ini_dirs()
     try:
         api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
         _test_api(api, ini)
 
         storages = _get_storages(api)
         _stop_vms(vms)
-        _override_ini_config(vms, ini)
+        if not ini['unloopViaTestcamera']:
+            _override_ini_config(vms, ini)
         _clear_storages(box, storages, conf)
         vms = _restart_vms(api, box, linux_distribution, vms, ini)
 
@@ -959,7 +959,8 @@ def main(conf_file, ini_file, log_file):
 
         report('\nSUCCESS: All tests finished.')
     finally:
-        vms.dismount_ini_dirs()
+        if not ini['unloopViaTestcamera']:
+            vms.dismount_ini_dirs()
 
 
 def _restart_vms(api, box, linux_distribution, vms, ini):

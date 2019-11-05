@@ -985,7 +985,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Side...</translation>
     </message>
   </context>
   <context>
@@ -2973,7 +2973,7 @@ til %1</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Kunne ikke oppdage opptaks-oppløsningen</translation>
     </message>
   </context>
   <context>
@@ -5755,31 +5755,31 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>lokal</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optisk</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>nettverk</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>ukjent</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6480,7 +6480,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>LAST NED&lt;br&gt;STARTET</translation>
     </message>
   </context>
   <context>
@@ -10059,7 +10059,7 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Lagre fil som...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10067,15 +10067,15 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Kunne ikke lagre filen</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 mappen er blokkert for skriving.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Laster ned fil...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10083,15 +10083,15 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Vil du stoppe nedlasting av fil?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Fil lastet ned</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Nedlasting av fil mislyktes</translation>
     </message>
   </context>
 </TS>

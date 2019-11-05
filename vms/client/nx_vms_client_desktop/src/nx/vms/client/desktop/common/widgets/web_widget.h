@@ -3,11 +3,14 @@
 #include <QtWidgets/QWidget>
 
 class QUrl;
-class QWebView;
-class QNetworkRequest;
 
 namespace nx::vms::client::desktop {
 
+class WebEngineView;
+
+/**
+ * Adds busy indicator and simple error label on top of WebEngineView.
+ */
 class WebWidget: public QWidget
 {
     Q_OBJECT
@@ -16,14 +19,13 @@ class WebWidget: public QWidget
 public:
     WebWidget(QWidget* parent = nullptr);
 
-    QWebView* view() const;
+    WebEngineView* webEngineView() const;
 
     void load(const QUrl& url);
-    void load(const QNetworkRequest& request);
     void reset();
 
 private:
-    QWebView* const m_webView;
+    WebEngineView* m_webEngineView = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

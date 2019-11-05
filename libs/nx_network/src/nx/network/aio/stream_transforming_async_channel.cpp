@@ -34,6 +34,9 @@ StreamTransformingAsyncChannel::~StreamTransformingAsyncChannel()
 void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
+
+    m_readScheduler.bindToAioThread(aioThread);
+    m_sendScheduler.bindToAioThread(aioThread);
     m_rawDataChannel->bindToAioThread(aioThread);
 }
 
@@ -41,7 +44,7 @@ void StreamTransformingAsyncChannel::readSomeAsync(
     nx::Buffer* const buffer,
     UserIoHandler handler)
 {
-    post(
+    m_readScheduler.post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
@@ -54,7 +57,7 @@ void StreamTransformingAsyncChannel::sendAsync(
     const nx::Buffer& buffer,
     UserIoHandler handler)
 {
-    post(
+    m_sendScheduler.post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
@@ -65,6 +68,8 @@ void StreamTransformingAsyncChannel::sendAsync(
 
 void StreamTransformingAsyncChannel::stopWhileInAioThread()
 {
+    m_readScheduler.pleaseStopSync();
+    m_sendScheduler.pleaseStopSync();
     m_rawDataChannel.reset();
 }
 
@@ -478,6 +483,12 @@ void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventTyp
             ++it;
         }
     }
+
+    if (eventType == aio::EventType::etRead || eventType == aio::EventType::etNone)
+        m_readScheduler.cancelPostedCallsSync();
+
+    if (eventType == aio::EventType::etWrite || eventType == aio::EventType::etNone)
+        m_sendScheduler.cancelPostedCallsSync();
 
     // Needed for pleaseStop to work correctly.
     // Should be removed when AbstractStreamSocket inherits BasicPollable.
