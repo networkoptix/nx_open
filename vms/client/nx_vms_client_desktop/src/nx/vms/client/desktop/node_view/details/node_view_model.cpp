@@ -71,7 +71,6 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                 {
                     const auto parentPath = step.path;
                     const auto parentNode = d->state.nodeByPath(parentPath);
-                    qWarning() << "ADDING NODE, parent node child count" << parentNode->children().count();
                     const auto parentIndex = d->getModelIndex(parentNode);
                     const int row = parentNode->childrenCount();
                     return utils::SharedGuardPtr(

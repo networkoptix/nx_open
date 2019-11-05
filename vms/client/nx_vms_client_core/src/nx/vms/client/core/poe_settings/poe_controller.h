@@ -33,6 +33,10 @@ public:
     using OptionalBlockData = std::optional<BlockData>;
     OptionalBlockData blockData() const;
 
+    using PortPoweringMode = nx::vms::api::NetworkPortWithPoweringMode;
+    using PowerModes = QList<PortPoweringMode>;
+    void setPowered(const PowerModes& value);
+
 signals:
     void resourceIdChanged();
     void autoUpdateChanged();

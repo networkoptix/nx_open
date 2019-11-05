@@ -2,7 +2,7 @@
 
 #include "../details/node/view_node_helpers.h"
 
-//#include <ui/style/helper.h>
+#include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -42,19 +42,18 @@ void drawSeparator(
 void tryDrawProgressBackground(
     QPainter* painter,
     QStyleOptionViewItem option,
+    const QColor& chartColor,
     const QModelIndex& index)
 {
     const auto progress = progressValue(index);
     if (progress <= 0)
         return;
 
-    const QColor progressColor(Qt::red);
-    const QnScopedPainterPenRollback penRollback(painter, progressColor);
-    const QnScopedPainterBrushRollback brushRollback(painter, progressColor);
-    const auto sourceRect = option.rect;
-    const auto size = QSize(sourceRect.width() * progress / 100.0, sourceRect.height());
-    const auto targetRect = QRect(sourceRect.topLeft(), size);
-    painter->drawRect(targetRect);
+    const QnScopedPainterPenRollback penRollback(painter, chartColor);
+    const QnScopedPainterBrushRollback brushRollback(painter, chartColor);
+    auto rect = option.rect.adjusted(style::Metrics::kStandardPadding, 1, -1, -1);
+    rect.setWidth(rect.width() * progress / 100.0);
+    painter->drawRect(rect);
 }
 
 }
@@ -89,7 +88,7 @@ void NodeViewItemDelegate::paint(
         return;
     }
 
-    tryDrawProgressBackground(painter, option, index);
+    tryDrawProgressBackground(painter, option, m_colors.chartColor, index);
 
     base_type::paint(painter, styleOption, index);
 }
@@ -110,6 +109,16 @@ void NodeViewItemDelegate::initStyleOption(
         option->state |= QStyle::State_On;
     else
         option->state |= QStyle::State_Off;
+}
+
+const NodeViewStatsColors& NodeViewItemDelegate::colors() const
+{
+    return m_colors;
+}
+
+void NodeViewItemDelegate::setColors(const NodeViewStatsColors& value)
+{
+    m_colors = value;
 }
 
 } // namespace node_view

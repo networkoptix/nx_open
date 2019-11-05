@@ -319,6 +319,12 @@
         }
     },
 
+    "NodeViewItemDelegate": {
+	"colors": {
+	    "chartColor": "brand_d3"
+	}
+    },
+    
     "QnRecordingStatsItemDelegate": {
         "colors": {
             "chartBackground": "brand_d3",

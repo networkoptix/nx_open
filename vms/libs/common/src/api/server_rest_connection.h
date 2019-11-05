@@ -552,6 +552,13 @@ public:
         rest::JsonResultCallback&& callback,
         QThread* targetThread = nullptr);
 
+    Handle postJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        rest::JsonResultCallback&& callback,
+        QThread* targetThread = nullptr);
+
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 

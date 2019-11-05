@@ -8,9 +8,15 @@
 #include <utils/common/delayed.h>
 #include <nx/vms/client/core/resource/resource_holder.h>
 
+namespace {
+
+static constexpr auto kNvrAction = "/api/nvrNetworkBlock";
+
+} // namespace
+
 namespace nx::vms::client::core {
 
-static constexpr int kUpdateIntervalMs = 5000;
+static constexpr int kUpdateIntervalMs = 2000;
 
 struct PoEController::Private: public QObject
 {
@@ -19,7 +25,8 @@ struct PoEController::Private: public QObject
     void updateTargetResource(const QnUuid& value);
     void setBlockData(const OptionalBlockData& value);
     void update();
-    void cleanup();
+
+    void setPowered(const PoEController::PowerModes& value);
     \
     PoEController* const q;
 
@@ -69,35 +76,47 @@ void PoEController::Private::update()
     if (!connection)
         return;
 
+    PortPoweringMode mode;
+    mode.portNumber = 0;
+    mode.poweringMode = PortPoweringMode::PoweringMode::on;
+    setPowered({mode});
     const auto callback =
-        [this, guiThread = QThread::currentThread()]
-            (bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
+        [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
         {
             if (handle != currentHandle)
                 return;
 
             handle = -1;
 
-            const auto replyHandler = nx::utils::guarded(this,
-                [this, success, result]()
-                {
-                    if (autoUpdate)
-                        updateTimer.start();
+            if (autoUpdate)
+                updateTimer.start();
 
-                    if (!success || result.error != QnRestResult::NoError)
-                        return;
+            if (!success || result.error != QnRestResult::NoError)
+                return;
 
-                    BlockData data;
-                    if (QJson::deserialize(result.reply, &data))
-                        setBlockData(data);
-                });
-            executeLaterInThread(replyHandler, guiThread);
+            BlockData data;
+            if (QJson::deserialize(result.reply, &data))
+                setBlockData(data);
         };
 
     updateTimer.stop();
 
-    static constexpr auto kAction = "/api/nvrNetworkBlock";
-    handle = connection->getJsonResult(kAction, QnRequestParamList(), callback);
+    handle = connection->getJsonResult(
+        kNvrAction, QnRequestParamList(), callback, QThread::currentThread());
+}
+
+void PoEController::Private::setPowered(const PoEController::PowerModes& value)
+{
+    if (!connection)
+        return;
+
+    const auto callback =
+        [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
+        {
+            qWarning() << success << result.reply.toString();
+        };
+    connection->postJsonResult(
+        kNvrAction, QnRequestParamList(), QJson::serialized(value), callback, QThread::currentThread());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -145,6 +164,11 @@ void PoEController::setAutoUpdate(bool value)
 bool PoEController::autoUpdate() const
 {
     return d->autoUpdate;
+}
+
+void PoEController::setPowered(const PowerModes& value)
+{
+    d->setPowered(value);
 }
 
 } // namespace nx::vms::client::core
