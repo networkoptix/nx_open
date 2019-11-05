@@ -2,7 +2,7 @@
 
 #include <nx/network/aio/timer.h>
 
-namespace nx::utils {
+namespace nx::vms::server::sdk_support {
 
 class TimedGuard
 {
@@ -14,4 +14,4 @@ private:
     nx::network::aio::Timer m_timer;
 };
 
-} // namespace nx::utils
+} // namespace nx::vms::server::sdk_support
