@@ -40,11 +40,14 @@ QString getSpeed(const NetworkPortState& port)
 
 QString getConsumption(const NetworkPortState& port)
 {
+
+
     if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
         return "0 W";
 
-    return QString("%1 W / %@ W").arg(
-        port.devicePowerConsumptionWatts, port.devicePowerConsumptionLimitWatts);
+    return QString("%1 W / %2 W")
+        .arg(port.devicePowerConsumptionWatts)
+        .arg(port.devicePowerConsumptionLimitWatts);
 }
 
 QString getPoweringStatus(const NetworkPortState& port)
@@ -70,6 +73,31 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
         : Qt::Checked;
 }
 
+ViewNodeData dataFromPort(
+    const NetworkPortState& value,
+    const QnResourcePool& resourcePool)
+{
+    auto port = value; // tmp
+    port.devicePowerConsumptionLimitWatts = 100; // tmp
+    port.devicePowerConsumptionWatts = rand() % 100; // tmp
+
+    return ViewNodeDataBuilder()
+        .withText(PoESettingsColumn::port, QString::number(port.portNumber))
+        .withText(PoESettingsColumn::camera, getConnectedCamera(port, resourcePool))
+
+        .withText(PoESettingsColumn::consumption, getConsumption(port))
+        .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
+        .withData(PoESettingsColumn::consumption, progressRole,
+            100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts)
+
+        .withText(PoESettingsColumn::speed, getSpeed(port))
+        .withText(PoESettingsColumn::status, getPoweringStatus(port))
+
+        .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
+        .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
+        .data();
+}
+
 NodePtr createPortNodes(
     const nx::vms::api::NetworkBlockData& data,
     const QnResourcePool& resourcePool)
@@ -79,22 +107,8 @@ NodePtr createPortNodes(
 
     const auto root = ViewNode::create();
     for (const auto& port: data.portStates)
-    {
-        root->addChild(ViewNode::create(ViewNodeDataBuilder()
-            .withText(PoESettingsColumn::port, QString::number(port.portNumber))
-            .withText(PoESettingsColumn::camera, getConnectedCamera(port, resourcePool))
+        root->addChild(ViewNode::create(dataFromPort(port, resourcePool)));
 
-            .withText(PoESettingsColumn::consumption, getConsumption(port))
-            .withData(PoESettingsColumn::consumption, progressRole, rand() % 100)
-            .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
-
-            .withText(PoESettingsColumn::speed, getSpeed(port))
-            .withText(PoESettingsColumn::status, getPoweringStatus(port))
-
-            .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
-            .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
-            .data()));
-    }
     return root;
 }
 
@@ -114,7 +128,25 @@ NodeViewStatePatch PoESettingsTableStateReducer::applyBlockDataChanges(
     if (!state.rootNode)
         return NodeViewStatePatch::fromRootNode(createPortNodes(blockData, resourcePool));
 
-    return NodeViewStatePatch();
+    // It is supposed that ports are always ordered and their count is never changed.
+
+    // TODO: check for server switch.
+
+    NodeViewStatePatch result;
+
+    int index = 0;
+    for (const auto node: state.rootNode->children())
+    {
+        ViewNodeData forRemove;
+        ViewNodeData forOverride;
+        const auto source = node->nodeData();
+        const auto target = dataFromPort(blockData.portStates[index++], resourcePool);
+        const auto difference = source.difference(target);
+
+        result.appendPatchStep({node->path(), difference.removeOperation});
+        result.appendPatchStep({node->path(), difference.overrideOperation});
+    }
+    return result;
 }
 
 

@@ -2,7 +2,6 @@
 
 #include "node_view_state.h"
 #include "node/view_node_path.h"
-#include "node/view_node_data.h"
 
 #include <nx/utils/scope_guard.h>
 
@@ -10,19 +9,29 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
+class ViewNodeData;
+
 enum PatchStepOperation
 {
-    AppendNodeOperation,
-    ChangeNodeOperation,
-    RemoveNodeOperation
+    appendNodeOperation,
+    overrideDataOperation,
+    removeDataOperation,
+    removeNodeOperation
+};
+
+struct OperationData
+{
+    PatchStepOperation operation;
+    QVariant data;
 };
 
 struct PatchStep
 {
-    PatchStepOperation operation;
     ViewNodePath path;
-    ViewNodeData data;
+    OperationData operationData;
 };
+
+using PatchStepList = std::vector<PatchStep>;
 
 struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
 {
@@ -34,13 +43,14 @@ struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
         NodeViewState&& state,
         const GetNodeOperationGuard& getOperationGuard = {}) const;
 
-    void addChangeStep(const ViewNodePath& path, const ViewNodeData& changedData);
+    void addRemoveDataStep(const ViewNodePath& path, const ColumnRoleHash& roleHash);
+    void addOverrideDataStep(const ViewNodePath& path, const ViewNodeData& overrideData);
     void addAppendStep(const ViewNodePath& path, const ViewNodeData& data);
     void addRemovalStep(const ViewNodePath& path);
 
+    void appendPatchStep(const PatchStep& step);
     void appendPatchSteps(const NodeViewStatePatch& patch);
 
-    using PatchStepList = std::vector<PatchStep>;
     PatchStepList steps;
 };
 

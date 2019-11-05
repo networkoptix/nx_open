@@ -176,6 +176,11 @@ void ViewNode::applyNodeData(const ViewNodeData& data)
     d->nodeData.applyData(data);
 }
 
+void ViewNode::removeNodeData(const ColumnRoleHash& roleHash)
+{
+    d->nodeData.removeData(roleHash);
+}
+
 WeakNodePtr ViewNode::currentSharedNode()
 {
     const auto result = sharedFromThis();

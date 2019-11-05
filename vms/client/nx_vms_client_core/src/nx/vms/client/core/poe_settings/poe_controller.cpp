@@ -60,7 +60,6 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
 
 void PoEController::Private::setBlockData(const OptionalBlockData& value)
 {
-    qWarning() << ">>>>> update data";
     blockData = value;
     emit q->updated();
 }

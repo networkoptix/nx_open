@@ -65,9 +65,9 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
     const auto getNodeOperationGuard =
         [this](const PatchStep& step) -> utils::SharedGuardPtr
         {
-            switch (step.operation)
+            switch (step.operationData.operation)
             {
-                case AppendNodeOperation:
+                case appendNodeOperation:
                 {
                     const auto parentPath = step.path;
                     const auto parentNode = d->state.nodeByPath(parentPath);
@@ -76,21 +76,35 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                     return utils::SharedGuardPtr(
                         new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
                 }
-                case ChangeNodeOperation:
+                case overrideDataOperation:
+                case removeDataOperation:
                 {
-                    return utils::makeSharedGuard(
-                        [this, step]()
+                    const auto rolesHash =
+                        [step]()
                         {
-                            const auto node = d->state.rootNode->nodeAt(step.path);
-                            for (const int column: step.data.usedColumns())
+                            if (step.operationData.operation == removeDataOperation)
+                                return step.operationData.data.value<ColumnRoleHash>();
+
+                            const auto& data = step.operationData.data.value<ViewNodeData>();
+                            ColumnRoleHash result;
+                            for (const auto column: data.usedColumns())
+                                result.insert(column, data.rolesForColumn(column));
+
+                            return result;
+                        }();
+
+                    return utils::makeSharedGuard(
+                        [this, path = step.path, rolesHash]()
+                        {
+                            const auto node = d->state.rootNode->nodeAt(path);
+                            for (const auto column: rolesHash.keys())
                             {
                                 const auto nodeIndex = d->getModelIndex(node, column);
-                                emit dataChanged(nodeIndex, nodeIndex,
-                                    step.data.rolesForColumn(column));
+                                emit dataChanged(nodeIndex, nodeIndex, rolesHash.value(column));
                             }
                         });
                 }
-                case RemoveNodeOperation:
+                case removeNodeOperation:
                 {
                     const auto node = d->state.nodeByPath(step.path);
                     const auto parent = node->parent();

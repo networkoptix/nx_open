@@ -30,10 +30,6 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
 
 void PoESettingsWidget::Private::updateBlockData()
 {
-    static int i = 0;
-    if (++i > 2)
-        return;
-
     const auto table = ui.poeTable;
     const auto& optionalBlockData = controller.blockData();
     const auto& blockData = optionalBlockData

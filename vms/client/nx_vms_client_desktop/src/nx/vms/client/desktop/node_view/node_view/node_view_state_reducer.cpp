@@ -31,7 +31,7 @@ details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     }
 
     if (hasChangedData)
-        patch.addChangeStep(node->path(), data);
+        patch.addOverrideDataStep(node->path(), data);
     return patch;
 
 }
@@ -55,7 +55,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
         return NodeViewStatePatch();
 
     NodeViewStatePatch patch;
-    patch.addChangeStep(path, ViewNodeDataBuilder().withExpanded(value));
+    patch.addOverrideDataStep(path, ViewNodeDataBuilder().withExpanded(value));
     return patch;
 }
 

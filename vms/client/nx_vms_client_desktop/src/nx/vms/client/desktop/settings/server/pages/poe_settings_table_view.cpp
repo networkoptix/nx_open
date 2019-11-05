@@ -1,5 +1,7 @@
 #include "poe_settings_table_view.h"
 
+#include <QtWidgets/QHeaderView>
+
 #include <utils/math/math.h>
 
 namespace {
@@ -43,17 +45,41 @@ const auto kHeaderDataProvider =
         }
     };
 
+void setupHeader(QTableView* view)
+{
+    static constexpr int kMinimumColumnWidth = 110;
+
+    const auto header = new QHeaderView(Qt::Horizontal, view);
+    view->setHorizontalHeader(header);
+
+    header->setSectionsClickable(true);
+    header->setMinimumSectionSize(kMinimumColumnWidth);
+    header->setSectionResizeMode(QHeaderView::Fixed);
+    header->setSectionResizeMode(PoESettingsColumn::camera, QHeaderView::Stretch);
+    header->setDefaultAlignment(Qt::AlignLeft);
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
 namespace settings {
 
+struct PoESettingsTableView::Private
+{
+};
+
+//--------------------------------------------------------------------------------------------------
+
 PoESettingsTableView::PoESettingsTableView(QWidget* parent):
-    base_type(PoESettingsColumn::count, parent)
+    base_type(PoESettingsColumn::count, parent),
+    d(new Private())
 {
     setHeaderDataProvider(kHeaderDataProvider);
+    setupHeader(this);
+}
 
-
+PoESettingsTableView::~PoESettingsTableView()
+{
 }
 
 } // namespace settings

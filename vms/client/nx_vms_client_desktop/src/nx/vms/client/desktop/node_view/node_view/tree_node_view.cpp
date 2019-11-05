@@ -126,7 +126,11 @@ void TreeNodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 
     for (const auto step: patch.steps)
     {
-        if (!step.data.hasProperty(isExpandedProperty))
+        if (step.operationData.operation == PatchStepOperation::removeDataOperation)
+            continue;
+
+        const auto& data = step.operationData.data.value<ViewNodeData>();
+        if (!data.hasProperty(isExpandedProperty))
             continue;
 
         const auto index = getRootModelIndex(model.index(step.path, kAnyColumn), owner->model());
