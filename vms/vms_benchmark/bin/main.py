@@ -334,12 +334,12 @@ _rtsp_perf_summary_regex = re.compile(
 def _rtsp_perf_frames(stdout, output_file_path):
     if output_file_path:
         output_file = open(output_file_path, "w")
-        report(f'INI: Going to log rtsp_perf stdout lines to {output_file_path}')
+        report(f'INI: Going to log rtsp_perf stdout lines to {output_file_path!r}')
     else:
         output_file = None
 
     while True:
-        line = stdout.readline().decode('UTF-8').strip('\n')
+        line = stdout.readline().decode('UTF-8').strip('\n\r')
 
         if output_file:
             timestamp_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -361,10 +361,10 @@ def _rtsp_perf_frames(stdout, output_file_path):
         match_res = _rtsp_perf_summary_regex.match(line)
         if match_res is not None:
             if int(match_res.group('failed')) > 0:
-                raise exceptions.RtspPerfError("Streaming error: Some RTSP sessions failed")
+                raise exceptions.RtspPerfError("Streaming error: Some RTSP sessions failed.")
             continue
 
-        logging.info(f"Unrecognized line from rtsp_perf: {line}")
+        logging.info(f"Unrecognized line from rtsp_perf: {line!r}")
 
 
 class _StreamTypeStats:
