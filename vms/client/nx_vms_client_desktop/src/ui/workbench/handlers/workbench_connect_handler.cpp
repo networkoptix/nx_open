@@ -643,7 +643,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
 
     if (options.testFlag(StorePreferredCloudServer)
         && !info.cloudSystemId.isEmpty()
-        && hasInternet(commonModule()->currentServer()))
+        && isConnectionToCloud(info.effectiveUrl()))
     {
         nx::vms::client::core::helpers::savePreferredCloudServer(info.cloudSystemId, info.serverId());
     }
