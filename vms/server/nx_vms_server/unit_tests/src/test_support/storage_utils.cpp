@@ -35,7 +35,10 @@ class TestFileStorage: public QnFileStorageResource
 public:
     using QnFileStorageResource::QnFileStorageResource;
 
-    static QnStorageResourcePtr create(MediaServerLauncher* server, const QString& path)
+    static QnStorageResourcePtr create(
+        MediaServerLauncher* server,
+        const QString& path,
+        bool isBackup = false)
     {
         QnStorageResourcePtr storage(new TestFileStorage(server->serverModule()));
 
@@ -47,6 +50,7 @@ public:
         storage->setUsedForWriting(
             storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
         storage->setIdUnsafe(QnUuid::createUuid());
+        storage->setBackup(isBackup);
 
         NX_ASSERT(storage->isUsedForWriting());
 
@@ -82,7 +86,8 @@ static bool storagePresent(MediaServerLauncher* server, const QString& storagePa
 
 } // namespace
 
-QnStorageResourcePtr addStorage(MediaServerLauncher* server, const QString& path)
+QnStorageResourcePtr addStorage(
+    MediaServerLauncher* server, const QString& path, QnServer::StoragePool storageRole)
 {
     NX_ASSERT(!path.isEmpty());
     if (storagePresent(server, path))
@@ -93,15 +98,22 @@ QnStorageResourcePtr addStorage(MediaServerLauncher* server, const QString& path
             path);
     }
 
-    auto storage = TestFileStorage::create(server, path);
-    server->serverModule()->normalStorageManager()->onNewResource(storage);
-    server->serverModule()->normalStorageManager()->initDone();
-    server->commonModule()->resourcePool()->addResource(storage);
+    const auto storageManager = storageRole == QnServer::StoragePool::Normal
+        ? server->serverModule()->normalStorageManager()
+        : server->serverModule()->backupStorageManager();
+    auto storage = TestFileStorage::create(
+        server, path, storageRole == QnServer::StoragePool::Backup);
 
     NX_DEBUG(
         typeid(TestFileStorage),
-        "Storage %1 has been successfully added to the mediaserver's storage pool",
-        path);
+        "Adding TestStorage '%1', pool: '%2' to the '%3' StorageManager storage pool"
+        " and to the Mediaserver resource pool",
+        path, storageRole, storageManager->getRole());
+
+    storageManager->onNewResource(storage);
+    storageManager->initDone();
+    server->commonModule()->resourcePool()->addResource(storage);
+
     return storage;
 }
 

@@ -4,7 +4,10 @@
 #include "storage_utils.h"
 #include <recorder/storage_manager.h>
 #include <api/test_api_requests.h>
+#include <api/global_settings.h>
 #include <rest/server/json_rest_result.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <gtest/gtest.h>
 
@@ -30,16 +33,12 @@ protected:
     virtual void SetUp() override
     {
         m_server.reset(new MediaServerLauncher());
-
-        m_storagePath = QDir(m_server->dataDir()).absoluteFilePath("test_storage");
-        QDir(m_storagePath).removeRecursively();
-        QDir().mkpath(m_storagePath);
+        m_storagePath = initStoragePath("test_storage");
     }
 
     virtual void TearDown() override
     {
-        if (!m_storagePath.isEmpty())
-            QDir(m_storagePath).removeRecursively();
+        cleanupStoragePath(m_storagePath);
     }
 
     void whenServerStarted()
@@ -48,8 +47,7 @@ protected:
         QObject::connect(
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
             this, &MediaserverWithStorageFixture::onReindexFinished, Qt::DirectConnection);
-
-        test_support::addStorage(m_server.get(), m_storagePath);
+        test_support::addStorage(m_server.get(), m_storagePath, QnServer::StoragePool::Normal);
     }
 
     void whenServerStopped()
@@ -63,11 +61,11 @@ protected:
         qint64 startTimeMs = 0;
         for (const auto& catalog : m_generatedArchive)
         {
-            if (!catalog.lowQualityChunks.empty() && startTimeMs < catalog.lowQualityChunks.back().startTimeMs)
-                startTimeMs = catalog.lowQualityChunks.back().startTimeMs;
-
-            if (!catalog.highQualityChunks.empty() && startTimeMs < catalog.highQualityChunks.back().startTimeMs)
-                startTimeMs = catalog.highQualityChunks.back().startTimeMs;
+            for (auto chunks: {&catalog.lowQualityChunks, &catalog.highQualityChunks})
+            {
+                if (!chunks->empty() && startTimeMs < chunks->back().startTimeMs)
+                    startTimeMs = chunks->back().startTimeMs;
+            }
         }
 
         using namespace std::chrono;
@@ -82,7 +80,10 @@ protected:
         }
 
         for (const auto& cameraChunksInfo: cameraChunks)
-            addArchiveDataForCamera(cameraChunksInfo.cameraName, cameraChunksInfo.chunksCount, startTimeMs);
+        {
+            addArchiveDataForCamera(
+                cameraChunksInfo.cameraName, cameraChunksInfo.chunksCount, startTimeMs);
+        }
     }
 
     void addArchiveDataForCamera(const QString& cameraName, int count, qint64 startTimeMs)
@@ -178,6 +179,20 @@ protected:
     bool m_reindexFinished = false;
     bool m_acquireServerCatalogs = true;
 
+    QString initStoragePath(const QString& pathPostfix)
+    {
+        QString storagePath = QDir(m_server->dataDir()).absoluteFilePath(pathPostfix);
+        QDir(storagePath).removeRecursively();
+        QDir().mkpath(storagePath);
+        return storagePath;
+    }
+
+    static void cleanupStoragePath(const QString& path)
+    {
+        if (!path.isEmpty())
+            QDir(path).removeRecursively();
+    }
+
     void onReindexFinished(QnSystemHealth::MessageType /*message*/)
     {
         NX_MUTEX_LOCKER lock(&m_reindexMutex);
@@ -232,8 +247,6 @@ protected:
                 NX_ASSERT(false);
                 return "";
         }
-
-        return "";
     }
 };
 } // namespace nx::vms::server::test::test_support

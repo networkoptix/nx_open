@@ -109,8 +109,8 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
 }
 
 
-boost::optional<QnScheduleSync::ChunkKeyVector>
-QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
+boost::optional<QnScheduleSync::ChunkKeyVector> QnScheduleSync::getOldestChunk(
+    qint64 fromTimeMs) const
 {
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
@@ -365,7 +365,8 @@ template<typename NeedMoveOnCB>
 vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
-    if (!serverModule()->backupStorageManager()->getOptimalStorageRoot()) {
+    if (!serverModule()->backupStorageManager()->getOptimalStorageRoot())
+    {
         NX_DEBUG(this, "[Backup] No approprirate storages found. Bailing out.");
         return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
@@ -379,47 +380,50 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     initSyncData();
     m_syncing = true;
 
-    while (1) {
+    while (1)
+    {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
-        if (!chunkKeyVector) {
+        if (!chunkKeyVector)
+        {
             NX_VERBOSE(this, "[Backup] chunks ended, backup done");
             break;
         }
-        else {
-            m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
-            m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(),
-                                      m_syncEndTimePoint);
-            NX_VERBOSE(this, lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint));
-        }
-        for (const auto &chunkKey : *chunkKeyVector) {
+        m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
+        m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), m_syncEndTimePoint);
+        NX_VERBOSE(this, lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint));
+        for (const auto &chunkKey : *chunkKeyVector)
+        {
             auto err = copyChunk(chunkKey);
-            if (err != CopyError::NoError && err != CopyError::SourceFileError) {
+            if (err != CopyError::NoError && err != CopyError::SourceFileError)
+            {
                 m_lastError = err;
                 NX_WARNING(this, lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)));
-                switch (err) {
-                case CopyError::NoBackupStorageError:
-                case CopyError::GetCatalogError:
-                    return vms::api::EventReason::backupFailedNoBackupStorageError;
-                case CopyError::FromStorageError:
-                    return vms::api::EventReason::backupFailedSourceStorageError;
-                case CopyError::TargetFileError:
-                    return vms::api::EventReason::backupFailedTargetFileError;
-                case CopyError::ChunkError:
-                    return vms::api::EventReason::backupFailedChunkError;
-                case CopyError::Interrupted:
-                    return vms::api::EventReason::backupCancelled;
+                switch (err)
+                {
+                    case CopyError::NoBackupStorageError:
+                    case CopyError::GetCatalogError:
+                        return vms::api::EventReason::backupFailedNoBackupStorageError;
+                    case CopyError::FromStorageError:
+                        return vms::api::EventReason::backupFailedSourceStorageError;
+                    case CopyError::TargetFileError:
+                        return vms::api::EventReason::backupFailedTargetFileError;
+                    case CopyError::ChunkError:
+                        return vms::api::EventReason::backupFailedChunkError;
+                    case CopyError::Interrupted:
+                        return vms::api::EventReason::backupCancelled;
                 }
             }
         }
-        auto needMoveOnCode = needMoveOn();
-        bool needStop = needMoveOnCode != SyncCode::Ok;
-        if (needStop) {
-            if (needMoveOnCode == SyncCode::OutOfTime) {
+        const auto needMoveOnCode = needMoveOn();
+        if (needMoveOnCode != SyncCode::ok)
+        {
+            NX_DEBUG(
+                this, "Interrupting backup because: '%1'",
+                toString(needMoveOnCode));
+            if (needMoveOnCode == SyncCode::wrongTime)
                 return vms::api::EventReason::backupEndOfPeriod;
-            } else if (needMoveOnCode == SyncCode::WrongBackupType ||
-                       needMoveOnCode == SyncCode::Interrupted) {
+            if (needMoveOnCode == SyncCode::wrongBackupType || needMoveOnCode == SyncCode::interrupted)
                 return vms::api::EventReason::backupCancelled;
-            }
             break;
         }
     }
@@ -467,6 +471,7 @@ int QnScheduleSync::interrupt()
 
 int QnScheduleSync::forceStart()
 {
+    NX_DEBUG(this, "Start forced");
     if (m_needStop)
         return Idle;
     if (m_forced)
@@ -484,6 +489,9 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
+    NX_VERBOSE(
+        this, "getStatus: state: %1",
+        (ret.state == Qn::BackupState_InProgress ? "'in progress'" : "'none'"));
     ret.backupTimeMs = m_syncEndTimePoint;
     int totalChunks = std::accumulate(
         m_syncData.cbegin(),
@@ -524,16 +532,25 @@ void QnScheduleSync::renewSchedule()
     }
 }
 
+QString QnScheduleSync::toString(SyncCode code)
+{
+    switch (code)
+    {
+        case SyncCode::ok: return "ok";
+        case SyncCode::wrongTime: return "wrong time";
+        case SyncCode::interrupted: return "interrupted";
+        case SyncCode::wrongBackupType: return "wrong backup type";
+        case SyncCode::reindexInProgress: return "reindex in progress";
+    }
+    return "";
+}
+
 void QnScheduleSync::run()
 {
-    static const auto REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     auto stopFuture = m_stopPromise.get_future();
-
     while (!m_needStop)
     {
-        stopFuture.wait_for(REDUNDANT_SYNC_TIMEOUT);
-
-
+        stopFuture.wait_for(std::chrono::seconds(5));
         if (m_needStop)
             return;
 
@@ -544,14 +561,13 @@ void QnScheduleSync::run()
         auto isItTimeForSync = [this] ()
         {
             if (m_needStop)
-                return SyncCode::Interrupted;
+                return SyncCode::interrupted;
             if (m_forced)
-                return SyncCode::Ok;
+                return SyncCode::ok;
             if (m_schedule.backupType != vms::api::BackupType::scheduled)
-                return SyncCode::WrongBackupType;
-
+                return SyncCode::wrongBackupType;
             if (m_schedule.backupDaysOfTheWeek == 0)
-                return SyncCode::WrongBackupType;
+                return SyncCode::wrongBackupType;
 
             QDateTime now = qnSyncTime->currentDateTime();
             const auto today = vms::api::dayOfWeek(Qt::DayOfWeek(now.date().dayOfWeek()));
@@ -564,7 +580,11 @@ void QnScheduleSync::run()
             }
 
             if (m_interrupted)
-                return SyncCode::Interrupted;
+                return SyncCode::interrupted;
+
+            const auto rebuildInfo = serverModule()->normalStorageManager()->rebuildInfo();
+            if (rebuildInfo.state != Qn::RebuildState::RebuildState_None)
+                return SyncCode::reindexInProgress;
 
             if (allowedDays.testFlag(today))
             {
@@ -574,7 +594,7 @@ void QnScheduleSync::run()
                 const bool syncUntilFinished = m_schedule.backupDurationSec == -1;
 
                 if (nowIsPastTheBackupStartPoint && syncUntilFinished)
-                    return SyncCode::Ok;
+                    return SyncCode::ok;
 
                 const auto backupFinishTimePointMs =
                     m_schedule.backupStartSec * 1000 + m_schedule.backupDurationSec * 1000;
@@ -582,35 +602,25 @@ void QnScheduleSync::run()
                     curTime.msecsSinceStartOfDay() < backupFinishTimePointMs;
 
                 if (nowIsPastTheBackupStartPoint && backupPeriodNotFinishedYet)
-                    return SyncCode::Ok;
+                    return SyncCode::ok;
 
                 if (m_syncing && syncUntilFinished)
-                    return SyncCode::Ok;
+                    return SyncCode::ok;
 
                 if (m_syncing && backupPeriodNotFinishedYet)
-                    return SyncCode::Ok;
+                    return SyncCode::ok;
             }
-            return SyncCode::OutOfTime;
+            return SyncCode::wrongTime;
         };
 
-        if (isItTimeForSync() == SyncCode::Ok) // we are there
+        const auto shouldStartCode = isItTimeForSync();
+        NX_VERBOSE(
+            this, "Checking if rebuild might be started. Result is: '%1'",
+            toString(shouldStartCode));
+
+        if (shouldStartCode == SyncCode::ok)
         {
-            while (true)
-            {
-                bool hasRebuildingStorages = serverModule()->normalStorageManager()->hasRebuildingStorages();
-                if (hasRebuildingStorages)
-                {
-                    NX_DEBUG(this, lit("[Backup] Can't start because some of the source storages are being rebuilded."));
-                }
-                else if (!hasRebuildingStorages || m_interrupted)
-                    break;
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            }
-
-            if (m_interrupted)
-                continue;
-
-            if (m_forced)
+             if (m_forced)
                 m_failReported = false;
 
             auto result = synchronize(isItTimeForSync);
