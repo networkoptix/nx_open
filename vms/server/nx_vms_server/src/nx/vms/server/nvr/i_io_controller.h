@@ -2,16 +2,20 @@
 
 #include <chrono>
 
+#include <nx/vms/server/nvr/i_startable.h>
+
 #include <api/model/api_ioport_data.h>
 
 namespace nx::vms::server::nvr {
 
-class IIoController
+class IIoController: public IStartable
 {
 public:
     using StateChangeHandler = std::function<void(const QnIOStateDataList& state)>;
 public:
     virtual ~IIoController() = default;
+
+    virtual void start() = 0;
 
     virtual QnIOPortDataList portDesriptiors() const = 0;
 

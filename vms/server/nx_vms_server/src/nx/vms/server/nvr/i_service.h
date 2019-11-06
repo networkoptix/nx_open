@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/vms/server/nvr/i_startable.h>
 #include <nx/vms/server/nvr/i_buzzer_controller.h>
 #include <nx/vms/server/nvr/i_network_block_controller.h>
 #include <nx/vms/server/nvr/i_io_controller.h>
@@ -8,7 +9,7 @@
 
 namespace nx::vms::server::nvr {
 
-class IService
+class IService: public IStartable
 {
 public:
     enum class Capability
@@ -24,6 +25,8 @@ public:
 public:
     virtual ~IService() = default;
 
+    virtual void start() = 0;
+
     virtual IBuzzerController* buzzerController() = 0;
 
     virtual INetworkBlockController* networkBlockController() = 0;
@@ -32,7 +35,7 @@ public:
 
     virtual ILedController* ledController() = 0;
 
-    virtual QnAbstractResourceSearcher* searcher() = 0;
+    virtual QnAbstractResourceSearcher* createSearcher() = 0;
 
     virtual Capabilities capabilities() const = 0;
 };

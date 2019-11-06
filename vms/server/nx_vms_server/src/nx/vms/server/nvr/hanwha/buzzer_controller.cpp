@@ -2,6 +2,11 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
+void BuzzerController::start()
+{
+    // TODO: #dmishin implement.
+}
+
 bool BuzzerController::enable(std::chrono::milliseconds duration)
 {
     // TODO: #dmishin implement.

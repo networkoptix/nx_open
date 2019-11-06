@@ -55,11 +55,11 @@ QnResourcePtr IoModuleSearcher::createResource(
     if (resourceType.isNull())
     {
         NX_DEBUG(this, "No resource type for ID %1", resourceTypeId);
-        return nullptr;
+        return {};
     }
 
     if (resourceType->getManufacturer() != manufacturer())
-        return nullptr;
+        return {};
 
     QnResourcePtr result;
     result.reset(new IoModuleResource(serverModule()));

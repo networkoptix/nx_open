@@ -2,6 +2,11 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
+void LedController::start()
+{
+    // TODO: #dmishin implement.
+}
+
 std::vector<ILedController::LedDescriptor> LedController::ledDescriptors() const
 {
     // TODO: #dmishin implement.

@@ -47,6 +47,11 @@ struct QnIOStateData
     qint64 timestamp;
 };
 
+inline bool operator<(const QnIOStateData& lhs, const QnIOStateData& rhs)
+{
+    return lhs.id < rhs.id;
+}
+
 typedef std::vector<QnIOStateData> QnIOStateDataList;
 #define QnIOStateData_Fields (id)(isActive)(timestamp)
 

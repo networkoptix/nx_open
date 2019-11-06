@@ -5,6 +5,7 @@
 #include <nx/vms/server/nvr/hanwha/network_block_controller.h>
 #include <nx/vms/server/nvr/hanwha/buzzer_controller.h>
 #include <nx/vms/server/nvr/hanwha/io_module_searcher.h>
+#include <nx/vms/server/nvr/hanwha/led_manager.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -14,8 +15,22 @@ Service::Service(QnMediaServerModule* serverModule):
     m_networkBlockController(std::make_unique<NetworkBlockController>()),
     m_ioController(std::make_unique<IoController>()),
     m_ledController(std::make_unique<LedController>()),
-    m_searcher(std::make_unique<IoModuleSearcher>(serverModule))
+    m_ledManager(std::make_unique<LedManager>(serverModule))
 {
+}
+
+Service::~Service()
+{
+    // TODO: #dmishin implement
+}
+
+void Service::start()
+{
+    m_buzzerController->start();
+    m_networkBlockController->start();
+    m_ioController->start();
+    m_ledController->start();
+    m_ledManager->start();
 }
 
 IBuzzerController* Service::buzzerController()
@@ -38,9 +53,9 @@ ILedController* Service::ledController()
     return m_ledController.get();
 }
 
-QnAbstractResourceSearcher* Service::searcher()
+QnAbstractResourceSearcher* Service::createSearcher()
 {
-    return m_searcher.get();
+    return new IoModuleSearcher(serverModule());
 }
 
 IService::Capabilities Service::capabilities() const

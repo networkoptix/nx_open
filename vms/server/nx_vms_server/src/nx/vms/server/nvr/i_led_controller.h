@@ -3,9 +3,11 @@
 #include <map>
 #include <vector>
 
+#include <nx/vms/server/nvr/i_startable.h>
+
 namespace nx::vms::server::nvr {
 
-class ILedController
+class ILedController: public IStartable
 {
 
 public:
@@ -25,6 +27,8 @@ public:
 
 public:
     virtual ~ILedController() = default;
+
+    virtual void start() override = 0;
 
     virtual std::vector<LedDescriptor> ledDescriptors() const = 0;
 

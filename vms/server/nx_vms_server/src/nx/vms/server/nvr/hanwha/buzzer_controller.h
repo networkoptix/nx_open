@@ -7,6 +7,8 @@ namespace nx::vms::server::nvr::hanwha {
 class BuzzerController: public IBuzzerController
 {
 public:
+    virtual void start() override;
+
     virtual bool enable(std::chrono::milliseconds duration) override;
 
     virtual bool disable() override;

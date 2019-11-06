@@ -19,7 +19,7 @@ namespace nx::vms::api {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkPortWithPoweringMode, (json),
     nx_vms_api_NetworkPortWithPoweringMode_Fields);
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkPortState, (json), nx_vms_api_NetworkPortState_Fields);
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkBlockData, (json), nx_vms_api_NetworkBlockData_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkPortState, (json)(eq), nx_vms_api_NetworkPortState_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkBlockData, (json)(eq), nx_vms_api_NetworkBlockData_Fields);
 
 } // namespace nx::vms::api
