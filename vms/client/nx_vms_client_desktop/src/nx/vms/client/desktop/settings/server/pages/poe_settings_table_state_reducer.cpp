@@ -140,11 +140,10 @@ NodeViewStatePatch PoESettingsTableStateReducer::applyBlockDataChanges(
     {
         ViewNodeData forRemove;
         ViewNodeData forOverride;
-        const auto source = node->nodeData();
+        const auto source = node->data();
         const auto target = dataFromPort(blockData.portStates[index++], resourcePool);
 
         const auto difference = source.difference(target);
-        result.appendPatchStep({node->path(), difference.removeOperation});
         result.appendPatchStep({node->path(), difference.updateOperation});
     }
     return result;

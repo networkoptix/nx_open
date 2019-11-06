@@ -87,7 +87,7 @@ TableNodeView::TableNodeView(int columnCount, QWidget* parent):
     setItemDelegate(new NodeViewItemDelegate(this));
     setModel(&d->model);
     connect(&d->model, &details::NodeViewModel::dataChangeRequestOccured,
-        this, &TableNodeView::handleDataChangeRequest);
+        this, &TableNodeView::handleUserDataChangeRequested);
 }
 
 TableNodeView::~TableNodeView()
@@ -114,7 +114,7 @@ const details::NodeViewStore& TableNodeView::store() const
     return d->store;
 }
 
-void TableNodeView::handleDataChangeRequest(
+void TableNodeView::handleUserDataChangeRequested(
     const QModelIndex& index,
     const QVariant& value,
     int role)
@@ -125,7 +125,10 @@ void TableNodeView::handleDataChangeRequest(
     const auto node = details::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
     d->store.applyPatch(NodeViewStateReducer::setNodeChecked(
-        d->store.state(), node->path(), {index.column()}, checkedState));
+        d->store.state(), node->path(), {index.column()}, checkedState, true));
+
+    static const QVector<int> kCheckStateRole(Qt::CheckStateRole, 1);
+    d->model.dataChanged(index, index, kCheckStateRole);
 }
 
 } // node_view

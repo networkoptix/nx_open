@@ -4,6 +4,7 @@
 #include "node_view_state_patch.h"
 #include "node/view_node.h"
 #include "node/view_node_helpers.h"
+#include "node/view_node_constants.h"
 
 #include <QtCore/QAbstractProxyModel>
 
@@ -180,7 +181,13 @@ bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
     const auto node = nodeFromIndex(index);
-    return node ? node->data(index.column(), role) : QVariant();
+    if (!node)
+        return QVariant();
+
+    const int column = index.column();
+    return role == Qt::CheckStateRole
+        ? checkedState(index, true)
+        : node->data(column, role);
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const

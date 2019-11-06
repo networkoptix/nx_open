@@ -33,7 +33,7 @@ protected:
     /**
      * Implements basic item check functionality.
      */
-    virtual void handleDataChangeRequest(
+    virtual void handleUserDataChangeRequested(
         const QModelIndex& index,
         const QVariant& value,
         int role);

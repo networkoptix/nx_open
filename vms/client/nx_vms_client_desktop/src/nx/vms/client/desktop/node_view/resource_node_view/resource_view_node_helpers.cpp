@@ -139,7 +139,7 @@ QString extraText(const QModelIndex& index)
 
 bool isValidNode(const NodePtr& node)
 {
-    const auto& data = node->nodeData();
+    const auto& data = node->data();
     return !data.hasProperty(validResourceProperty)
         || data.property(validResourceProperty).toBool();
 }

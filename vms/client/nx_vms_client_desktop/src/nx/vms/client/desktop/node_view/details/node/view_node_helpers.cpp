@@ -41,6 +41,11 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
+int makeUserActionRole(int initialRole, bool isUserAction)
+{
+    return isUserAction ? initialRole + userChangesRoleOffset : initialRole;
+}
+
 NodePtr nodeFromIndex(const QModelIndex& index)
 {
     if (!index.isValid() || !index.model())
@@ -70,7 +75,7 @@ void forEachNode(const NodePtr& root, const ForEachNodeCallback& callback)
 
 bool expanded(const NodePtr& node)
 {
-    return node && expanded(node->nodeData());
+    return node && expanded(node->data());
 }
 
 bool expanded(const ViewNodeData& data)
@@ -81,12 +86,12 @@ bool expanded(const ViewNodeData& data)
 bool expanded(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node && expanded(node->nodeData());
+    return node && expanded(node->data());
 }
 
 bool checkable(const NodePtr& node, int column)
 {
-    return node && checkable(node->nodeData(), column);
+    return node && checkable(node->data(), column);
 }
 
 bool checkable(const QModelIndex& index)
@@ -106,7 +111,7 @@ bool isSeparator(const ViewNodeData& data)
 
 bool isSeparator(const NodePtr& node)
 {
-    return node && isSeparator(node->nodeData());
+    return node && isSeparator(node->data());
 }
 
 bool isSeparator(const QModelIndex& index)
@@ -116,7 +121,7 @@ bool isSeparator(const QModelIndex& index)
 
 qreal progressValue(const NodePtr& node, int column)
 {
-    return node ? progressValue(node->nodeData(), column) : 0.0;
+    return node ? progressValue(node->data(), column) : 0.0;
 }
 
 qreal progressValue(const ViewNodeData& data, int column)
@@ -131,7 +136,7 @@ qreal progressValue(const QModelIndex& index)
 
 bool useSwitchStyleForCheckbox(const NodePtr& node, int column)
 {
-    return node && useSwitchStyleForCheckbox(node->nodeData(), column);
+    return node && useSwitchStyleForCheckbox(node->data(), column);
 }
 
 bool useSwitchStyleForCheckbox(const ViewNodeData& data, int column)
@@ -152,7 +157,7 @@ int groupSortOrder(const QModelIndex& index)
 
 QString text(const NodePtr& node, int column)
 {
-    return node ? text(node->nodeData(), column) : QString();
+    return node ? text(node->data(), column) : QString();
 }
 
 QString text(const ViewNodeData& data, int column)
@@ -165,19 +170,33 @@ QString text(const QModelIndex& index)
     return index.data(Qt::DisplayRole).toString();
 }
 
-Qt::CheckState checkedState(const NodePtr& node, int column)
+Qt::CheckState checkedState(
+    const NodePtr& node,
+    int column,
+    bool isUserAction)
 {
-    return node ? checkedState(node->nodeData(), column) : Qt::Unchecked;
+    return node ? checkedState(node->data(), column, isUserAction) : Qt::Unchecked;
 }
 
-Qt::CheckState checkedState(const ViewNodeData& data, int column)
+Qt::CheckState checkedState(
+    const ViewNodeData& data,
+    int column,
+    bool isUserAction)
 {
-    return data.data(column, Qt::CheckStateRole).value<Qt::CheckState>();
+    if (!isUserAction)
+        return data.data(column, Qt::CheckStateRole).value<Qt::CheckState>();
+
+    const auto userActionCheckRole = makeUserActionRole(Qt::CheckStateRole);
+    const bool hasUserCheckStateData = data.hasData(column, userActionCheckRole);
+    const auto targetCheckRole = makeUserActionRole(Qt::CheckStateRole, hasUserCheckStateData);
+    return data.data(column, targetCheckRole).value<Qt::CheckState>();
 }
 
-Qt::CheckState checkedState(const QModelIndex& index)
+Qt::CheckState checkedState(
+    const QModelIndex& index,
+    bool isUserAction)
 {
-    return index.data(Qt::CheckStateRole).value<Qt::CheckState>();
+    return checkedState(nodeFromIndex(index), index.column(), isUserAction);
 }
 
 NodePtr createSeparatorNode(int groupSortOrder)

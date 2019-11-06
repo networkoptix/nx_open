@@ -2,6 +2,7 @@
 
 #include <QtGui/QIcon>
 
+#include "view_node_helpers.h"
 #include "view_node_constants.h"
 
 namespace nx::vms::client::desktop {
@@ -43,29 +44,33 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withText(int column, const QString& va
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     int column,
-    Qt::CheckState value)
+    Qt::CheckState value,
+    bool isUserAction)
 {
-    m_data->setData(column, Qt::CheckStateRole, value);
+    m_data->setData(column, makeUserActionRole(Qt::CheckStateRole, isUserAction), value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     const ColumnSet& columns,
-    Qt::CheckState value)
+    Qt::CheckState value,
+    bool isUserAction)
 {
     for (const auto column: columns)
-        m_data->setData(column, Qt::CheckStateRole, value);
+        withCheckedState(column, value, isUserAction);
+
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     int column,
-    const OptionalCheckedState& value)
+    const OptionalCheckedState& value,
+    bool isUserAction)
 {
     if (value)
-        return withCheckedState(column, *value);
+        return withCheckedState(column, *value, isUserAction);
 
-    m_data->removeData(column, Qt::CheckStateRole);
+    m_data->removeData(column, makeUserActionRole(Qt::CheckStateRole, isUserAction));
     return *this;
 }
 

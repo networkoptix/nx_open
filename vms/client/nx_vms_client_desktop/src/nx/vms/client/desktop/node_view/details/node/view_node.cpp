@@ -166,7 +166,7 @@ NodePtr ViewNode::parent() const
     return d->parent ? d->parent.lock() : NodePtr();
 }
 
-const ViewNodeData& ViewNode::nodeData() const
+const ViewNodeData& ViewNode::data() const
 {
     return d->nodeData;
 }

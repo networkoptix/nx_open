@@ -12,7 +12,8 @@ using namespace details;
 details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::NodePtr& node,
     const details::ColumnSet& columns,
-    Qt::CheckState nodeCheckedState)
+    Qt::CheckState nodeCheckedState,
+    bool isUserAction)
 {
     if (!node || columns.empty())
         return NodeViewStatePatch();
@@ -23,10 +24,10 @@ details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     bool hasChangedData = false;
     for (const int column: columns)
     {
-        if (!checkable(node, column) || checkedState(node, column) == nodeCheckedState)
+        if (!checkable(node, column) || checkedState(node, column, isUserAction) == nodeCheckedState)
             continue;
 
-        ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState);
+        ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState, isUserAction);
         hasChangedData = true;
     }
 
@@ -40,9 +41,10 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::NodeViewState& state,
     const ViewNodePath& path,
     const details::ColumnSet& columns,
-    Qt::CheckState nodeCheckedState)
+    Qt::CheckState nodeCheckedState,
+    bool isUserAction)
 {
-    return setNodeChecked(state.nodeByPath(path), columns, nodeCheckedState);
+    return setNodeChecked(state.nodeByPath(path), columns, nodeCheckedState, isUserAction);
 }
 
 NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(

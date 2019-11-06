@@ -16,7 +16,7 @@ static constexpr auto kNvrAction = "/api/nvrNetworkBlock";
 
 namespace nx::vms::client::core {
 
-static constexpr int kUpdateIntervalMs = 4000;
+static constexpr int kUpdateIntervalMs = 1000;
 
 struct PoEController::Private: public QObject
 {

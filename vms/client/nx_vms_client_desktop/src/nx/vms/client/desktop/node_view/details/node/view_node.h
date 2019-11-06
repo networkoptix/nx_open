@@ -43,7 +43,7 @@ public:
 
     NodePtr parent() const;
 
-    const ViewNodeData& nodeData() const;
+    const ViewNodeData& data() const;
 
     void applyNodeData(const ViewNodeData& data);
 

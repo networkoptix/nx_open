@@ -14,7 +14,7 @@ void addNode(NodeViewStatePatch& patch, const NodePtr& node)
     if (node->parent())
     {
         const auto parentPath = node->path().parentPath();
-        patch.addAppendStep(parentPath, node->nodeData());
+        patch.addAppendStep(parentPath, node->data());
     }
 
     for (const auto child: node->children())
