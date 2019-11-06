@@ -76,10 +76,15 @@ void PoEController::Private::update()
     if (!connection)
         return;
 
-    PortPoweringMode mode;
-    mode.portNumber = 0;
-    mode.poweringMode = PortPoweringMode::PoweringMode::on;
-    setPowered({mode});
+    PowerModes modes;
+    for (int i = 0; i != 8; ++i)
+    {
+        PortPoweringMode mode;
+        mode.portNumber = i;
+        mode.poweringMode = rand() % 2 ? PortPoweringMode::PoweringMode::on : PortPoweringMode::PoweringMode::off;
+        modes.append(mode);
+    }
+    setPowered(modes);
     const auto callback =
         [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
         {
@@ -113,7 +118,6 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
     const auto callback =
         [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
         {
-            qWarning() << success << result.reply.toString();
         };
     connection->postJsonResult(
         kNvrAction, QnRequestParamList(), QJson::serialized(value), callback, QThread::currentThread());

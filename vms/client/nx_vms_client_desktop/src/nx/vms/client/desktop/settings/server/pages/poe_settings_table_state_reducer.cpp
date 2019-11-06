@@ -30,7 +30,7 @@ QString getConnectedCamera(const NetworkPortState& port, const QnResourcePool& r
     const auto resource = resourcePool.getResourceById(port.deviceId);
     return resource
         ? resource->getName()
-        : PoESettingsTableView::tr("Empty", "In meaning 'There is no camera connected now'");
+        : PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
 }
 
 QString getSpeed(const NetworkPortState& port)
@@ -40,8 +40,6 @@ QString getSpeed(const NetworkPortState& port)
 
 QString getConsumption(const NetworkPortState& port)
 {
-
-
     if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
         return "0 W";
 
