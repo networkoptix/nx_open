@@ -3,9 +3,13 @@ import QtQuick.Window 2.0
 import Nx 1.0
 import Nx.Items 1.0
 import Nx.Controls 1.0
+import Nx.Core 1.0
+import Nx.Media 1.0
 
 Window
 {
+    id: dialog
+
     modality: Qt.WindowModal
 
     width: 600
@@ -18,12 +22,67 @@ Window
     property alias figureType: editor.figureType
     property int maxPolygonPoints: -1
 
-    property alias resourceId: editor.resourceId
+    property var resourceId
+
+    MediaResourceHelper
+    {
+        id: helper
+        resourceId: dialog.resourceId ? dialog.resourceId.toString() : ""
+    }
+
+    MediaPlayer
+    {
+        id: player
+
+        resourceId: helper.resourceId
+        audioEnabled: false
+
+        readonly property bool loaded: mediaStatus === MediaPlayer.MediaStatus.Loaded
+
+        onResourceIdChanged: video.clear()
+        onSourceChanged: updatePlayingState()
+    }
 
     Item
     {
         width: parent.width
         height: parent.height - bottomPanel.height
+
+        VideoPositioner
+        {
+            id: content
+
+            anchors.fill: parent
+
+            sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
+            item: video
+
+            customAspectRatio:
+            {
+                var aspectRatio = helper ? helper.customAspectRatio : 0.0
+                if (aspectRatio === 0.0)
+                {
+                    if (player && player.loaded)
+                        aspectRatio = player.aspectRatio
+                    else if (helper)
+                        aspectRatio = helper.aspectRatio
+                    else
+                        aspectRatio = sourceSize.width / sourceSize.height
+                }
+
+                var layoutSize = helper ? helper.layoutSize : Qt.size(1, 1)
+                aspectRatio *= layoutSize.width / layoutSize.height
+
+                return aspectRatio
+            }
+
+            MultiVideoOutput
+            {
+                id: video
+                resourceHelper: helper
+                mediaPlayer: player
+            }
+        }
 
         FigureEditor
         {
@@ -136,6 +195,16 @@ Window
                 width: Math.max(implicitWidth, 80)
             }
         }
+    }
+
+    onVisibleChanged: updatePlayingState()
+
+    function updatePlayingState()
+    {
+        if (visible)
+            player.playLive()
+        else
+            player.pause()
     }
 
     function serializeFigure()
