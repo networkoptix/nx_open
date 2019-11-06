@@ -38,7 +38,7 @@ public:
         if (m_parts.size() > index)
             return m_parts[index];
 
-        throw std::domain_error("Missing parameter in formula: " + m_formula.toStdString());
+        throw ruleSyntaxError("Missing parameter in formula: " + m_formula.toStdString());
     }
 
     ValueMonitor* monitor(int index) const
@@ -47,7 +47,7 @@ public:
         if (id.startsWith(kVariableMark))
             return monitor(id.mid(kVariableMark.size()));
 
-        throw std::domain_error("Expected parameter instead of value in formula: "
+        throw ruleSyntaxError("Expected parameter instead of value in formula: "
             + m_formula.toStdString());
     }
 
@@ -60,7 +60,7 @@ public:
             return m;
         }
 
-        throw std::invalid_argument("Unknown value id: " + id.toStdString());
+        throw ruleSyntaxError("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }
@@ -305,7 +305,7 @@ public:
         if (auto generator = getDurationOperation())
             return generator;
 
-        throw std::domain_error("Unsupported function: " + function().toStdString());
+        throw ruleSyntaxError("Unsupported function: " + function().toStdString());
     }
 
     bool isLocal() const { return m_isLocal; }
@@ -325,7 +325,7 @@ ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& m
     {
         return parseFormulaOrThrow(formula, monitors);
     }
-    catch (const std::domain_error& error)
+    catch (const ruleSyntaxError& error)
     {
         NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formula '%1': %2", formula, error.what());
         return ValueGeneratorResult{nullptr, Scope::local};
