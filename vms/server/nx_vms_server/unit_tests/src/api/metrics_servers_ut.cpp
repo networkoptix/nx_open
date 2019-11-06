@@ -33,7 +33,9 @@ public:
         hardware.physicalCores = 4;
     }
 
-    MetricsServersApi()
+    MetricsServersApi():
+        ServerForTests(DisabledFeature(
+        (int)DisabledFeature::all & ~DisabledFeature::noOutgoingConnectionsMetric))
     {
         serverModule()->platform()->setCustomMonitor(std::make_unique<StubMonitor>());
     }
@@ -87,7 +89,7 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["activity"]["plugins"], api::metrics::Value());
 
     auto startAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    startAlarms = nx::utils::filter_if(
+    startAlarms = nx::utils::copy_if(
         startAlarms, [](auto k, auto /*v*/) { return !k.contains(".load.logLevel."); });
     EXPECT_EQ(startAlarms.size(), 0) << QJson::serialized(startAlarms).data();
 
@@ -108,7 +110,7 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_DOUBLE(runValues["load"]["serverRamUsageP"], 6.0 / 8);
 
     auto runAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    runAlarms = nx::utils::filter_if(
+    runAlarms = nx::utils::copy_if(
         runAlarms, [](auto k, auto /*v*/) { return !k.contains(".load.logLevel."); });
     ASSERT_EQ(runAlarms.size(), 2) << QJson::serialized(runAlarms).data();
     EXPECT_EQ(runAlarms["servers." + id + ".load.cpuUsageP.0"].level, api::metrics::AlarmLevel::warning);
@@ -129,7 +131,7 @@ TEST_F(MetricsServersApi, twoServers)
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
         EXPECT_EQ(serverValues["servers"].size(), 1);
-        EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
+        EXPECT_GT(serverValues["servers"][mainServerId]["info"].size(), 4);
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
         EXPECT_EQ(serverValues["cameras"].size(), 0);
@@ -181,7 +183,7 @@ TEST_F(MetricsServersApi, twoServers)
         auto serverValues = get<SystemValues>("/api/metrics/values");
         EXPECT_EQ(serverValues["systems"].size(), 0);
         EXPECT_EQ(serverValues["servers"].size(), 1);
-        EXPECT_FALSE(serverValues["servers"][mainServerId].count("info"));
+        EXPECT_GT(serverValues["servers"][mainServerId]["info"].size(), 4);
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 

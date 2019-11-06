@@ -8,7 +8,8 @@ namespace nx::vms::server::test {
 
 using namespace nx::test;
 
-ServerForTests::ServerForTests():
+ServerForTests::ServerForTests(DisabledFeature disabledFeatures):
+    MediaServerLauncher(/*tmpDir*/ QString(), /*port*/ 0, disabledFeatures),
     id((
         serverStartTimer.restart(),
         NX_CRITICAL(start()) /* skip critical result */,

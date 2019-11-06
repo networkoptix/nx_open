@@ -148,6 +148,9 @@ public:
 
 void QnMediaServerModule::initOutgoingSocketCounter()
 {
+    if (m_settings->settings().noOutgoingConnectionsMetric())
+        return;
+
     nx::network::SocketFactory::setCreateStreamSocketFunc(
         [weakRef = this->commonModule()->metricsWeakRef()](
             bool sslRequired,

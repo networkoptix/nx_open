@@ -8,19 +8,13 @@ std::vector<ILedController::LedDescriptor> LedController::ledDescriptors() const
     return {};
 }
 
-std::vector<ILedController::LedState> LedController::ledStates() const
+std::map<ILedController::LedId, ILedController::LedState> LedController::ledStates() const
 {
     // TODO: #dmishin implement.
     return {};
 }
 
-bool LedController::enable(const QString& ledId)
-{
-    // TODO: #dmishin implement.
-    return false;
-}
-
-bool LedController::disable(const QString& ledId)
+bool LedController::setState(const LedId& ledId, LedState state)
 {
     // TODO: #dmishin implement.
     return false;

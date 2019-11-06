@@ -1253,18 +1253,18 @@ struct SetResourceParamTransactionType
         const nx::vms::api::ResourceParamWithRefData& param,
         AbstractPersistentStorage* /*db*/)
     {
-        if (param.resourceId == QnUserResource::kAdminGuid &&
-            param.name == nx::settings_names::kNameSystemName)
+        if (param.resourceId == QnUserResource::kAdminGuid)
         {
-            // System rename MUST be propagated to Nx Cloud
-            return TransactionType::Cloud;
+            if (param.name == nx::settings_names::kNameSystemName)
+                return TransactionType::Cloud;
+            if (param.name == nx::settings_names::kNameSpecificFeatures)
+                return TransactionType::Cloud;
         }
 
-        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName ||
-            param.name == Qn::USER_FULL_NAME)
-        {
+        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName)
             return TransactionType::Cloud;
-        }
+        if (param.name == Qn::USER_FULL_NAME)
+            return TransactionType::Cloud;
 
         return TransactionType::Regular;
     }

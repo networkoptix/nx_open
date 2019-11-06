@@ -2,35 +2,24 @@
 
 #include "helpers.h"
 
-#include <media_server/media_server_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <QJsonArray>
+#include <nx/utils/std/algorithm.h>
+#include <core/resource_management/resource_pool.h>
+#include <media_server/media_server_module.h>
+#include <platform/platform_abstraction.h>
 
 namespace nx::vms::server::metrics {
 
 namespace {
 
-// TODO: change to 1 minute
-std::chrono::seconds interfacesPollingPeriod(10);
-
-std::set<QString> stringSetDifference(
-    const std::set<QString>& left,
-    const std::set<QString>& right)
-{
-    std::set<QString> result;
-    std::set_difference(
-        left.begin(), left.end(),
-        right.begin(), right.end(),
-        std::inserter(result, result.end()));
-    return result;
-}
+constexpr std::chrono::seconds kInterfacesCacheExpiration(7);
 
 } // namespace
 
-class InterfaceResource
+class NetworkInterfaceResource
 {
 public:
-    InterfaceResource(QNetworkInterface iface)
+    NetworkInterfaceResource(QNetworkInterface iface)
         : m_interface(std::move(iface))
     {}
 
@@ -59,7 +48,7 @@ public:
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         const auto addresses = m_interface.addressEntries();
-        if (addresses.size() > 0)
+        if (!addresses.empty())
             return addresses.first().ip().toString();
         return {};
     }
@@ -77,7 +66,7 @@ private:
 
 NetworkController::NetworkController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    utils::metrics::ResourceControllerImpl<std::shared_ptr<InterfaceResource>>(
+    utils::metrics::ResourceControllerImpl<std::shared_ptr<NetworkInterfaceResource>>(
         "networkInterfaces", makeProviders()),
     m_serverId(serverModule->commonModule()->moduleGUID().toSimpleString())
 {
@@ -86,14 +75,12 @@ NetworkController::NetworkController(QnMediaServerModule* serverModule):
 void NetworkController::start()
 {
     updateInterfacesPool();
-    m_timerGuard = makeTimer(
-        serverModule()->timerManager(),
-        interfacesPollingPeriod,
-        [this]() { updateInterfacesPool(); });
 }
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
+    // NOTE: The values in 'rates' group are not instant ones, but an avarage calculated on a small
+    // interval.
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
@@ -105,7 +92,7 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
             "info",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "server",
-                [this](const auto& r)
+                [this](const auto&)
                 {
                     const auto server = resourcePool()->getResourceById(QnUuid(m_serverId));
                     return Value(server->getName());
@@ -115,22 +102,44 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "state", [this](const auto& r) { return r->state(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ipList", [this](const auto& r) { return r->addressesJson(); }
+                "firstIp", [this](const auto& r) { return r->firstAddress(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "firstIp", [this](const auto& r) { return r->firstAddress(); }
+                "ipList", [this](const auto& r) { return r->addressesJson(); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "rates",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "inBps", [](const auto&) { return Value(0); } // TODO: Implement.
+                "inBps",
+                [this](const auto& r)
+                {
+                    auto platform = serverModule()->platform()->monitor();
+                    const auto load = platform->networkInterfaceLoad(r->name());
+                    return load ? Value(load->bytesPerSecIn) : Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "outBps", [](const auto&) { return Value(0); } // TODO: Implement.
+                "outBps",
+                [this](const auto& r)
+                {
+                    auto platform = serverModule()->platform()->monitor();
+                    const auto load = platform->networkInterfaceLoad(r->name());
+                    return load ? Value(load->bytesPerSecOut) : Value();
+                }
             )
         )
     );
+}
+
+void NetworkController::beforeValues(utils::metrics::Scope, bool)
+{
+    updateInterfacesPool();
+}
+
+void NetworkController::beforeAlarms(utils::metrics::Scope)
+{
+    updateInterfacesPool();
 }
 
 QString NetworkController::interfaceIdFromName(const QString& name) const
@@ -140,39 +149,51 @@ QString NetworkController::interfaceIdFromName(const QString& name) const
 
 void NetworkController::updateInterfacesPool()
 {
-    std::set<QString> previousIfacesByName;
-    for (const auto& ifaceEntry: m_interfacesPool)
-        previousIfacesByName.insert(ifaceEntry.first);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_lastInterfacesUpdate.hasExpired(kInterfacesCacheExpiration))
+        return;
 
-    const auto newInterfacesList = QNetworkInterface::allInterfaces();
-    std::set<QString> newIfacesByName;
-    for (const auto& iface: newInterfacesList)
+    NX_VERBOSE(this, "Updating network interfaces info");
+    const auto newInterfacesList = nx::utils::copy_if(QNetworkInterface::allInterfaces(),
+        [](const auto& iface){ return !iface.flags().testFlag(QNetworkInterface::IsLoopBack); });
+
+    removeDisappearedInterfaces(newInterfacesList);
+    addOrUpdateInterfaces(std::move(newInterfacesList));
+
+    m_lastInterfacesUpdate.restart();
+}
+
+void NetworkController::removeDisappearedInterfaces(const QList<QNetworkInterface>& newIfaces)
+{
+    for (auto it = m_interfacesPool.begin(); it != m_interfacesPool.end();)
     {
-        if (iface.flags().testFlag(QNetworkInterface::IsLoopBack))
+        if (nx::utils::find_if(newIfaces,
+            [&it](const auto& iface){ return iface.name() == it->first; }) == nullptr)
+        {
+            remove(interfaceIdFromName(it->first));
+            it = m_interfacesPool.erase(it);
             continue;
-        newIfacesByName.insert(iface.name());
+        }
+
+        it++;
     }
+}
 
-    const auto discoveredInterfaces = stringSetDifference(newIfacesByName, previousIfacesByName);
-    const auto disappearedInterfaces = stringSetDifference(previousIfacesByName, newIfacesByName);
-
-    for (const auto& iface: disappearedInterfaces)
-        m_interfacesPool.erase(iface);
-    for (const auto& iface: newInterfacesList)
+void NetworkController::addOrUpdateInterfaces(QList<QNetworkInterface> newIfaces)
+{
+    for (auto& iface: newIfaces)
     {
-        if (discoveredInterfaces.find(iface.name()) != discoveredInterfaces.end())
-            m_interfacesPool[iface.name()] = std::make_shared<InterfaceResource>(iface);
-        else if (m_interfacesPool.find(iface.name()) != m_interfacesPool.end())
-            m_interfacesPool[iface.name()]->updateInterface(iface);
-    }
+        const auto name = iface.name();
+        if (m_interfacesPool.find(name) == m_interfacesPool.end())
+        {
+            m_interfacesPool[name] = std::make_shared<NetworkInterfaceResource>(std::move(iface));
+            add(m_interfacesPool[name], interfaceIdFromName(name),
+                utils::metrics::Scope::local);
+            continue;
+        }
 
-    for (const auto& iface: discoveredInterfaces)
-        add(m_interfacesPool[iface], interfaceIdFromName(iface), utils::metrics::Scope::local);
-    for (const auto& iface: disappearedInterfaces)
-        remove(interfaceIdFromName(iface));
+        m_interfacesPool[name]->updateInterface(std::move(iface));
+    }
 }
 
 } // namespace nx::vms::server::metrics
-
-
-

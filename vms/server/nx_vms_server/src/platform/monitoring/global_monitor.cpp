@@ -128,6 +128,7 @@ GlobalMonitor::GlobalMonitor(
     nx::utils::TimerManager* timerManager)
     :
     nx::vms::server::PlatformMonitor(),
+    m_monitorBase(std::move(base)),
     m_cachedTotalCpuUsage(
         [this]() { return m_monitorBase->totalCpuUsage(); }),
     m_cachedTotalRamUsage(
@@ -143,8 +144,9 @@ GlobalMonitor::GlobalMonitor(
     m_cachedTotalPartitionSpaceInfo(
         [this]() { return m_monitorBase->totalPartitionSpaceInfo(); }, kCacheExpirationTime)
 {
-    NX_ASSERT(base);
-    NX_ASSERT(base->thread() == thread(), "Cannot use a base monitor that lives in another thread.");
+    NX_CRITICAL(m_monitorBase);
+    NX_CRITICAL(m_monitorBase->thread() == thread(),
+        "Can't use a base monitor that lives in another thread.");
     NX_CRITICAL(timerManager);
 
     m_uptimeTimer.restart();
@@ -162,8 +164,6 @@ GlobalMonitor::GlobalMonitor(
         kCacheExpirationTime,
         /*firstShotDelay*/ 0ms);
     m_timerGuard = {timerManager, timerId};
-
-    m_monitorBase = std::move(base);
 }
 
 GlobalMonitor::~GlobalMonitor()
