@@ -893,9 +893,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
-                    QnFfmpegVideoDecoder decoder(
-                        DecoderConfig(),
-                        mediaData->compressionType, videoData);
+                    QnFfmpegVideoDecoder decoder(DecoderConfig(), videoData);
                     decoder.decode(videoData, &outFrame);
                     if (m_role == StreamRecorderRole::fileExport)
                     {

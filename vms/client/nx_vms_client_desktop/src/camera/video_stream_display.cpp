@@ -486,9 +486,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(/*mtDecoding*/ enableFrameQueue);
 
-        dec = new QnFfmpegVideoDecoder(
-            config,
-            data->compressionType, data);
+        dec = new QnFfmpegVideoDecoder(config, data);
         if (dec == nullptr)
         {
             NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));

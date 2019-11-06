@@ -466,9 +466,7 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
-            QnFfmpegVideoDecoder decoder(
-                DecoderConfig(),
-                frame->compressionType, frame);
+            QnFfmpegVideoDecoder decoder(DecoderConfig(), frame);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 

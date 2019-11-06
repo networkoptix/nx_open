@@ -30,9 +30,7 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atomically decremented in destructor
     */
-    QnFfmpegVideoDecoder(
-        const DecoderConfig& config,
-        AVCodecID codec, const QnConstCompressedVideoDataPtr& data);
+    QnFfmpegVideoDecoder(const DecoderConfig& config, const QnConstCompressedVideoDataPtr& data);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 

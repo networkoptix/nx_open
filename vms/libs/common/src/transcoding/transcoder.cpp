@@ -149,9 +149,7 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
 
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    QnFfmpegVideoDecoder decoder(
-        DecoderConfig(),
-        video->compressionType, video);
+    QnFfmpegVideoDecoder decoder(DecoderConfig(), video);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)

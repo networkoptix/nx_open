@@ -75,15 +75,11 @@ struct FffmpegLog
 };
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
-    const DecoderConfig& config,
-    AVCodecID codec_id,
-    const QnConstCompressedVideoDataPtr& data)
+    const DecoderConfig& config, const QnConstCompressedVideoDataPtr& data)
     :
     m_passedContext(0),
     m_context(0),
-    //m_width(0),
-    //m_height(0),
-    m_codecId(codec_id),
+    m_codecId(data->compressionType),
     m_showmotion(false),
     m_decodeMode(DecodeMode_Full),
     m_newDecodeMode(DecodeMode_NotDefined),
