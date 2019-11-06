@@ -102,26 +102,40 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NetworkPortState::PoweringStatus);
     (linkSpeedMbps) \
     (poweringStatus)
 
-QN_FUSION_DECLARE_FUNCTIONS(NetworkPortState, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(NetworkPortState, (json)(eq), NX_VMS_API);
 
 struct NX_VMS_API NetworkBlockData
 {
     /**%apidoc
-     * Array of current network port states with the folowing structure:
+     * Array of current network port states with the following structure:
      *     %struct NetworkPortState
      */
     std::vector<NetworkPortState> portStates;
 
     /**%apidoc
-     * Overall power limit for NVR in watts.
+     * Upper power limit for the NVR in watts. When this limit is exceeded NVR goes to the "PoE
+     *     over budget" state.
      */
-    double totalPowerLimitWatts = 0.0;
+    double upperPowerLimitWatts = 0.0;
+
+    /**%apidoc
+     * Lower power limit for the NVR in watts. If the NVR is in the "PoE over budget" state and
+     *     power consumption goes below this limit then the NVR goes to the normal state.
+     */
+    double lowerPowerLimitWatts = 0.0;
+
+    /**%apidoc
+     * Indicates whether the NVR is in "PoE over budget" state.
+     */
+    bool isInPoeOverBudgetMode = false;
 };
 #define nx_vms_api_NetworkBlockData_Fields \
     (portStates) \
-    (totalPowerLimitWatts)
+    (upperPowerLimitWatts) \
+    (lowerPowerLimitWatts) \
+    (isInPoeOverBudgetMode)
 
-QN_FUSION_DECLARE_FUNCTIONS(NetworkBlockData, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(NetworkBlockData, (json)(eq), NX_VMS_API);
 
 } // namespace nx::vms::api
 

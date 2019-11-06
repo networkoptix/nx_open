@@ -1,14 +1,51 @@
 #include "io_controller.h"
 
-#include <utils/common/synctime.h>
+#include <nx/vms/server/nvr/hanwha/io_state_fetcher.h>
+#include <nx/vms/server/nvr/hanwha/common.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
-static const QString kInputIdPrefix("DI");
-static const QString kOutputIdPrefix("DO");
+static QnIOStateDataList calculateChangedPortStates(
+    const std::set<QnIOStateData>& oldState,
+    const std::set<QnIOStateData>& newState)
+{
+    QnIOStateDataList result;
+    for (const auto& newPortState: newState)
+    {
+        if (const auto it = oldState.find(newPortState);
+            it == oldState.cend() || it->isActive != newPortState.isActive)
+        {
+            result.push_back(newPortState);
+        }
+    }
 
-static constexpr int kInputCount = 4;
-static constexpr int kOutputCount = 2;
+    return result;
+}
+
+static QnIOStateDataList toList(const std::set<QnIOStateData>& state)
+{
+    QnIOStateDataList result;
+    for (const auto& portState: state)
+        result.push_back(portState);
+
+    return result;
+}
+
+IoController::IoController():
+    m_stateFetcher(std::make_unique<IoStateFetcher>(
+        [this](const std::set<QnIOStateData>& state) { handleState(state); }))
+{
+}
+
+IoController::~IoController()
+{
+    m_stateFetcher->stop();
+}
+
+void IoController::start()
+{
+    m_stateFetcher->start();
+}
 
 QnIOPortDataList IoController::portDesriptiors() const
 {
@@ -50,29 +87,8 @@ QnIOStateDataList IoController::setOutputPortStates(
 
 QnIOStateDataList IoController::portStates() const
 {
-    // TODO: #dmsihin this is fake implementation! Don't forget to replace with the proper one.
-    QnIOStateDataList result;
-    for (int i = 0; i < kInputCount; ++i)
-    {
-        QnIOStateData inputState;
-        inputState.id = kInputIdPrefix + QString::number(i);
-        inputState.isActive = false;
-        inputState.timestamp = qnSyncTime->currentMSecsSinceEpoch();
-
-        result.push_back(std::move(inputState));
-    }
-
-    for (int i = 0; i < kOutputCount; ++i)
-    {
-        QnIOStateData outputState;
-        outputState.id = kOutputIdPrefix + QString::number(i);
-        outputState.isActive = false;
-        outputState.timestamp = qnSyncTime->currentMSecsSinceEpoch();
-
-        result.push_back(std::move(outputState));
-    }
-
-    return result;
+    QnMutexLocker lock(&m_mutex);
+    return toList(m_lastIoState);
 }
 
 QnUuid IoController::registerStateChangeHandler(StateChangeHandler handler)
@@ -89,6 +105,28 @@ void IoController::unregisterStateChangeHandler(QnUuid handlerId)
 {
     QnMutexLocker lock(&m_handlerMutex);
     m_handlers.erase(handlerId);
+}
+
+void IoController::handleState(const std::set<QnIOStateData>& state)
+{
+    QnIOStateDataList changedPortStates;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (state == m_lastIoState)
+            return;
+
+        changedPortStates = calculateChangedPortStates(state, m_lastIoState);
+        m_lastIoState = state;
+    }
+
+    if (changedPortStates.empty())
+        return;
+
+    {
+        QnMutexLocker lock(&m_handlerMutex);
+        for (const auto& [_, handler]: m_handlers)
+            handler(changedPortStates);
+    }
 }
 
 } // namespace nx::vms::server::nvr::hanwha

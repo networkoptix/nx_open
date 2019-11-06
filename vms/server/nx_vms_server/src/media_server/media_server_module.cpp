@@ -224,6 +224,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnVMax480Server());
 #endif
     m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>(this);
+    m_nvrService->start();
 
     initOutgoingSocketCounter();
 

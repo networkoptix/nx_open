@@ -62,7 +62,7 @@ void QnMediaServerResourceSearchers::initialize()
     const auto nvrService = serverModule()->nvrService();
     if (nvrService)
     {
-        if (QnAbstractResourceSearcher* const localNvrSearcher = nvrService->searcher())
+        if (QnAbstractResourceSearcher* const localNvrSearcher = nvrService->createSearcher())
             registerSearcher(localNvrSearcher);
     }
 
