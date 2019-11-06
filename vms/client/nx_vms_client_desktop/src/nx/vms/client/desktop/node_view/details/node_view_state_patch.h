@@ -14,7 +14,7 @@ class ViewNodeData;
 enum PatchStepOperation
 {
     appendNodeOperation,
-    overrideDataOperation,
+    updateDataOperation,
     removeDataOperation,
     removeNodeOperation
 };
@@ -44,7 +44,7 @@ struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
         const GetNodeOperationGuard& getOperationGuard = {}) const;
 
     void addRemoveDataStep(const ViewNodePath& path, const ColumnRoleHash& roleHash);
-    void addOverrideDataStep(const ViewNodePath& path, const ViewNodeData& overrideData);
+    void addUpdateDataStep(const ViewNodePath& path, const ViewNodeData& updateData);
     void addAppendStep(const ViewNodePath& path, const ViewNodeData& data);
     void addRemovalStep(const ViewNodePath& path);
 

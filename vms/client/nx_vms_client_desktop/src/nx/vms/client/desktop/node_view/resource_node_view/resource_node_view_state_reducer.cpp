@@ -18,7 +18,7 @@ NodeViewStatePatch ResourceNodeViewStateReducer::setInvalidNodes(
     {
         const auto node = state.rootNode->nodeAt(path);
         if (node && isValidNode(node) == invalid)
-            patch.addOverrideDataStep(path, getDataForInvalidNode(invalid));
+            patch.addUpdateDataStep(path, getDataForInvalidNode(invalid));
     }
     return patch;
 }

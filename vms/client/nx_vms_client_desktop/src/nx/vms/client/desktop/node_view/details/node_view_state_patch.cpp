@@ -130,7 +130,7 @@ NodeViewState&& NodeViewStatePatch::applyTo(
             case appendNodeOperation:
                 handleAddOperation(step, state, safeOperationGuard);
                 break;
-            case overrideDataOperation:
+            case updateDataOperation:
                 handleChangeOperation(step, state, safeOperationGuard);
                 break;
             case removeNodeOperation:
@@ -154,11 +154,11 @@ void NodeViewStatePatch::addRemoveDataStep(
     steps.push_back({path, {removeDataOperation, QVariant::fromValue(roleHash)}});
 }
 
-void NodeViewStatePatch::addOverrideDataStep(
+void NodeViewStatePatch::addUpdateDataStep(
     const ViewNodePath& path,
-    const ViewNodeData& overrideData)
+    const ViewNodeData& updateData)
 {
-    steps.push_back({path, {overrideDataOperation, QVariant::fromValue(overrideData)}});
+    steps.push_back({path, {updateDataOperation, QVariant::fromValue(updateData)}});
 }
 
 void NodeViewStatePatch::addAppendStep(

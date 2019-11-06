@@ -16,7 +16,7 @@ static constexpr auto kNvrAction = "/api/nvrNetworkBlock";
 
 namespace nx::vms::client::core {
 
-static constexpr int kUpdateIntervalMs = 2000;
+static constexpr int kUpdateIntervalMs = 4000;
 
 struct PoEController::Private: public QObject
 {
@@ -76,15 +76,6 @@ void PoEController::Private::update()
     if (!connection)
         return;
 
-    PowerModes modes;
-    for (int i = 0; i != 8; ++i)
-    {
-        PortPoweringMode mode;
-        mode.portNumber = i;
-        mode.poweringMode = rand() % 2 ? PortPoweringMode::PoweringMode::on : PortPoweringMode::PoweringMode::off;
-        modes.append(mode);
-    }
-    setPowered(modes);
     const auto callback =
         [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
         {
@@ -102,6 +93,18 @@ void PoEController::Private::update()
             BlockData data;
             if (QJson::deserialize(result.reply, &data))
                 setBlockData(data);
+
+            static int k = 0;
+            PowerModes modes;
+            ++k;
+            for (int i = 0; i != 8; ++i)
+            {
+                PortPoweringMode mode;
+                mode.portNumber = i + 1;
+                mode.poweringMode = k % 2 ? PortPoweringMode::PoweringMode::on : PortPoweringMode::PoweringMode::off;
+                modes.append(mode);
+            }
+            setPowered(modes);
         };
 
     updateTimer.stop();
@@ -129,12 +132,10 @@ PoEController::PoEController(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-
 }
 
 PoEController::~PoEController()
 {
-
 }
 
 void PoEController::setResourceId(const QnUuid& value)

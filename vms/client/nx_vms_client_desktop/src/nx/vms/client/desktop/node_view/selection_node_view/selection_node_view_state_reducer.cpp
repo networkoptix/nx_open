@@ -224,7 +224,7 @@ int setNodeCheckedInternal(
         ViewNodeData selectionCountData;
         const int nodeSelectedChildrenCount = selectedChildrenCount(node) + childrenSelectionDiff;
         setSelectedChildrenCount(selectionCountData, nodeSelectedChildrenCount);
-        patch.addOverrideDataStep(node->path(), selectionCountData);
+        patch.addUpdateDataStep(node->path(), selectionCountData);
     }
     return upflowSelectedDiff;
 }

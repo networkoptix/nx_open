@@ -119,7 +119,6 @@ void ViewNodeData::setData(Column column, Role role, const QVariant& data)
 {
     NX_ASSERT(!data.isNull(), "Empty data is not allowed!");
     NX_ASSERT(isDifferentData(d->data, column, role, data), "Same value is not allowed!");
-
     d->data[column][role] = data;
 }
 
@@ -299,7 +298,7 @@ ViewNodeData::DifferenceData ViewNodeData::difference(const ViewNodeData& other)
 
     return {
         {PatchStepOperation::removeDataOperation, QVariant::fromValue(forRemove)},
-        {PatchStepOperation::overrideDataOperation, QVariant::fromValue(forOverride)}
+        {PatchStepOperation::updateDataOperation, QVariant::fromValue(forOverride)}
     };
 }
 

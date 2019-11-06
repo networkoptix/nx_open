@@ -76,7 +76,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                     return utils::SharedGuardPtr(
                         new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
                 }
-                case overrideDataOperation:
+                case updateDataOperation:
                 case removeDataOperation:
                 {
                     const auto rolesHash =

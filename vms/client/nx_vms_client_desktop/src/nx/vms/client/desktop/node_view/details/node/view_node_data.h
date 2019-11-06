@@ -73,9 +73,12 @@ public:
     struct DifferenceData
     {
         OperationData removeOperation;
-        OperationData overrideOperation;
+        OperationData updateOperation;
     };
 
+    /**
+     * Returns operations witch should be applied to current data to become "other" one.
+     */
     DifferenceData difference(const ViewNodeData& other) const;
 
 private:

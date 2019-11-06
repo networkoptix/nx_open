@@ -15,7 +15,6 @@ public:
         const node_view::details::NodeViewState& state,
         const nx::vms::api::NetworkBlockData& blockData,
         const QnResourcePool& resourcePool);
-
 };
 
 } // namespace settings

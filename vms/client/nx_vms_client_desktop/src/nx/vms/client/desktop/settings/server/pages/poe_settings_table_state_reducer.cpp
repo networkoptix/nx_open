@@ -105,7 +105,10 @@ NodePtr createPortNodes(
 
     const auto root = ViewNode::create();
     for (const auto& port: data.portStates)
+    {
         root->addChild(ViewNode::create(dataFromPort(port, resourcePool)));
+        break;
+    }
 
     return root;
 }
@@ -139,10 +142,10 @@ NodeViewStatePatch PoESettingsTableStateReducer::applyBlockDataChanges(
         ViewNodeData forOverride;
         const auto source = node->nodeData();
         const auto target = dataFromPort(blockData.portStates[index++], resourcePool);
-        const auto difference = source.difference(target);
 
+        const auto difference = source.difference(target);
         result.appendPatchStep({node->path(), difference.removeOperation});
-        result.appendPatchStep({node->path(), difference.overrideOperation});
+        result.appendPatchStep({node->path(), difference.updateOperation});
     }
     return result;
 }
