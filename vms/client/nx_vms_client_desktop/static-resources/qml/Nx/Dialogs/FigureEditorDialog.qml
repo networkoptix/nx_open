@@ -5,6 +5,7 @@ import Nx.Items 1.0
 import Nx.Controls 1.0
 import Nx.Core 1.0
 import Nx.Media 1.0
+import Nx.Core.Items 1.0
 
 Window
 {
@@ -39,7 +40,7 @@ Window
 
         readonly property bool loaded: mediaStatus === MediaPlayer.MediaStatus.Loaded
 
-        onResourceIdChanged: video.clear()
+        onResourceIdChanged: video.videoOutput.clear()
         onSourceChanged: updatePlayingState()
     }
 
@@ -48,47 +49,22 @@ Window
         width: parent.width
         height: parent.height - bottomPanel.height
 
-        VideoPositioner
+        MultiVideoPositioner
         {
-            id: content
+            id: video
 
             anchors.fill: parent
 
-            sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
-            item: video
+            resourceHelper: helper
+            mediaPlayer: player
 
-            customAspectRatio:
+            FigureEditor
             {
-                var aspectRatio = helper ? helper.customAspectRatio : 0.0
-                if (aspectRatio === 0.0)
-                {
-                    if (player && player.loaded)
-                        aspectRatio = player.aspectRatio
-                    else if (helper)
-                        aspectRatio = helper.aspectRatio
-                    else
-                        aspectRatio = sourceSize.width / sourceSize.height
-                }
-
-                var layoutSize = helper ? helper.layoutSize : Qt.size(1, 1)
-                aspectRatio *= layoutSize.width / layoutSize.height
-
-                return aspectRatio
+                id: editor
+                anchors.fill: video.sourceSize.width > 0 && video.sourceSize.height > 0
+                    ? video.videoOutput : parent
+                rotation: video.videoRotation
             }
-
-            MultiVideoOutput
-            {
-                id: video
-                resourceHelper: helper
-                mediaPlayer: player
-            }
-        }
-
-        FigureEditor
-        {
-            id: editor
-
-            anchors.fill: parent
         }
 
         Rectangle
