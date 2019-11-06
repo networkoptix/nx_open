@@ -45,6 +45,8 @@ set(common_depends
     "libsm6"
     "libice6"
     "libaudio2"
+    "libgl1-mesa-glx | libgl1"
+    "libegl1-mesa | libegl1-x11"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 
