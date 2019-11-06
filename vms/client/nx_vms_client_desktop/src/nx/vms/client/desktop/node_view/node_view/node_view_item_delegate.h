@@ -3,14 +3,15 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_color_types.h>
+#include <ui/customization/customized.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class NodeViewItemDelegate: public QStyledItemDelegate
+class NodeViewItemDelegate: public Customized<QStyledItemDelegate>
 {
     Q_OBJECT
-    using base_type = QStyledItemDelegate;
+    using base_type = Customized<QStyledItemDelegate>;
 
     Q_PROPERTY(NodeViewStatsColors colors READ colors WRITE setColors)
 

@@ -319,7 +319,7 @@
         }
     },
 
-    "NodeViewItemDelegate": {
+    "nx::vms::client::desktop::node_view::NodeViewItemDelegate": {
 	"colors": {
 	    "chartColor": "brand_d3"
 	}
