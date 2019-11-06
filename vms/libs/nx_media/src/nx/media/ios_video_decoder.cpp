@@ -13,6 +13,7 @@ extern "C" {
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/nalUnits.h>
 #include <utils/media/utils.h>
+#include <utils/media/h264_utils.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
@@ -51,7 +52,7 @@ namespace {
     {
         int status = av_videotoolbox_default_init(s);
         if (status != 0)
-            qWarning() << "IOS hardware decoder init failure:" << status;
+            NX_WARNING(NX_SCOPE_TAG, "IOS hardware decoder init failure: %1", status);
         return pix_fmts[0];
     }
 
@@ -84,7 +85,6 @@ namespace {
             case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
                 return QVideoFrame::Format_NV12;
             default:
-                qWarning() << "unknown OSType format " << (int) pixFormat;
                 return QVideoFrame::Format_Invalid;
         }
     }
@@ -234,7 +234,7 @@ public:
 
 void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
 {
-    if (!frame)
+    if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         return;
 
     auto codec = avcodec_find_decoder(frame->compressionType);
@@ -248,15 +248,34 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
         codecContext->width = frameSize.width();
         codecContext->height = frameSize.height();
     }
+    if (!isValidFrameSize(frameSize))
+    {
+        closeCodecContext();
+        return;
+    }
 
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
-    codecContext->extradata_size = 1;
+    if (codecContext->extradata_size == 0 && frame->compressionType == AV_CODEC_ID_H264)
+    {
+        std::vector<uint8_t> extradata = nx::media_utils::buildExtraData(
+            (const uint8_t*)frame->data(), frame->dataSize());
+        if (extradata.empty())
+        {
+            NX_ERROR(this, "Failed to build extra data");
+            closeCodecContext();
+            return;
+        }
+        codecContext->extradata = (uint8_t*)av_malloc(extradata.size());
+        codecContext->extradata_size = extradata.size();
+        memcpy(codecContext->extradata, extradata.data(), extradata.size());
+    }
 
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        qWarning() << "Can't open decoder for codec" << frame->compressionType;
+        NX_WARNING(this, "Can't open decoder for codec %1 resolution %2x%3",
+            frame->compressionType, codecContext->width, codecContext->height);
         closeCodecContext();
         return;
     }
@@ -376,6 +395,15 @@ int IOSVideoDecoder::decode(
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = compressedVideoData->timestamp;
+        if (compressedVideoData->compressionType == AV_CODEC_ID_H264
+            && avpkt.size >= 4
+            && avpkt.data[0] == 0
+            && avpkt.data[1] == 0
+            && avpkt.data[2] == 0
+            && avpkt.data[3] == 1)
+        {
+            nx::media_utils::convertStartCodesToSizes(avpkt.data, avpkt.size);
+        }
     }
     else
     {
@@ -389,7 +417,7 @@ int IOSVideoDecoder::decode(
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
     {
-        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << res;
+        NX_WARNING(this, "IOS decoder error. gotPicture %1, errorCode %2", gotPicture, res);
         // hardware decoder crash if use same frame after decoding error. It seems
         // leaves invalid ref_count on error.
         av_frame_free(&d->frame);
@@ -418,6 +446,7 @@ int IOSVideoDecoder::decode(
     }
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
     {
+        NX_WARNING(this, "Unknown pixel format");
         // Recreate frame just in case.
         // I am not sure hardware decoder can reuse it.
         av_frame_free(&d->frame);

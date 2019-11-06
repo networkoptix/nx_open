@@ -82,7 +82,7 @@ public:
     void setBuffer(uint8_t* buffer, int size);
     void skipBits(uint32_t cnt);
     void putBits(uint32_t num, uint32_t value);
-    void putBytes(uint8_t* data, uint32_t size);
+    void putBytes(const uint8_t* data, uint32_t size);
     void putBit(uint32_t value);
     void flushBits(bool finishLastByte = false);
     uint32_t getBitsCount();
