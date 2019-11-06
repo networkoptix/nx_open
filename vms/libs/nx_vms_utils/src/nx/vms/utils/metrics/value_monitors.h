@@ -10,6 +10,12 @@
 
 namespace nx::vms::utils::metrics {
 
+// NOTE: Inherited from std::runtime_error to have a constructor from a string.
+class metricsError: public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
 using Border = nx::utils::ValueHistory<api::metrics::Value>::Border;
 using Duration = std::chrono::milliseconds;
 using ValueIterator = std::function<void(const api::metrics::Value& value, Duration age)>;
@@ -40,9 +46,11 @@ public:
             NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
             return std::move(value);
         }
-        // TODO: Add wrapping helpers which will be used in controllers, something like:
-        //  metrics_unexpected_error, metrics_expected, etc.
-        catch (const std::exception &e)
+        catch (const metricsError& e)
+        {
+            NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
+        }
+        catch (const std::exception& e)
         {
             NX_DEBUG(this, "Failed to get value: %1", e.what());
         }

@@ -4,6 +4,21 @@
 
 namespace nx::vms::utils::metrics {
 
+class ruleSyntaxError: public metricsError
+{
+    using metricsError::metricsError;
+};
+
+class valueCalculationError: public metricsError
+{
+   using metricsError::metricsError;
+};
+
+class nullValueError: public valueCalculationError
+{
+    using valueCalculationError::valueCalculationError;
+};
+
 using ValueGenerator = std::function<api::metrics::Value()>;
 
 struct ValueGeneratorResult

@@ -82,17 +82,10 @@ public:
         return
             [operation, getter1 = value(firstI), getter2 = value(secondI)]
             {
-                // Currently all of the values are optional. If one of them is missing, the formula
-                // result should be missing too.
-                // TODO: Add optionality marker to all formulas and report error if any of
-                // non-optional values are missing.
-
-                // TODO: should throw some exception inherited from the common one for all rules.
-                // TODO: Catch thrown exception in appropriate place and check for optionality.
                 const Value v1 = getter1();
                 const Value v2 = getter2();
                 if (v1.isNull() || v2.isNull())
-                    throw std::domain_error("At least one argument is missing");
+                    throw nullValueError("At least one argument is missing");
 
                 return Value(operation(std::move(v1), std::move(v2)));
             };
@@ -105,9 +98,8 @@ public:
             firstI, secondI,
             [operation](Value v1, Value v2)
             {
-                // TODO: should throw some exception inherited from the common one for all rules one.
                 if (!v1.isDouble() || !v2.isDouble())
-                    throw std::domain_error("At least one argument is not a number");
+                    throw valueCalculationError("At least one argument is not a number");
                 return Value(operation(v1.toDouble(), v2.toDouble()));
             });
     }
@@ -119,9 +111,8 @@ public:
             firstI, secondI,
             [operation](Value v1, Value v2)
             {
-                // TODO: should throw some exception inherited from the common one for all rules.
                 if (!v1.isBool() || !v2.isBool())
-                    throw std::domain_error("At least one argument is not a boolean");
+                    throw valueCalculationError("At least one argument is not a boolean");
                 return Value(operation(v1.toBool(), v2.toBool()));
             });
     }
@@ -130,13 +121,13 @@ public:
     {
         const auto params = value.toString().split(L'x');
         if (params.size() != 2)
-            throw std::domain_error("Invalid rectangle size syntax");
+            throw valueCalculationError("Invalid rectangle size syntax");
 
         bool isOk1;
         bool isOk2;
         int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
         if (!isOk1 || !isOk2)
-            throw std::domain_error("Invalid rectangle size syntax: integers expected");
+            throw valueCalculationError("Invalid rectangle size syntax: integers expected");
         return result;
     }
 
@@ -190,8 +181,7 @@ public:
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
-                    // TODO: should throw some exception inherited from the common one for all rules.
-                    throw std::domain_error("Invalid duration: " + durationStr.toStdString());
+                    throw valueCalculationError("Invalid duration: " + durationStr.toStdString());
                 }
 
                 return Value(operation(
@@ -225,7 +215,6 @@ public:
                         totalValue += extract(value.toDouble(), durationS);
                     });
 
-                // TODO: should it be considered as an error?
                 if (divideByTime)
                     return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
 
@@ -381,17 +370,14 @@ void ExtraValueMonitor::setGenerator(ValueGenerator generator)
 
 api::metrics::Value ExtraValueMonitor::valueOrThrow() const
 {
-    if (!optional())
-        return m_generator();
-
     try
     {
         return m_generator();
     }
-    // TODO: should catch only rules related exceptions!
-    catch (const std::exception &e)
+    catch (const nullValueError&)
     {
-        NX_VERBOSE(this, "Ignoring exception as this value marked 'optional': %1", e.what());
+        if (!optional())
+            throw;
         return {};
     }
 }
