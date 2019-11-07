@@ -113,6 +113,7 @@ public:
     {
         bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
+        bool sendOptions = false;
     };
 
     static const QByteArray kPlayCommand;
@@ -186,6 +187,7 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
+    void setConfig(const Config& config);
 
     // RTP transport configured by user
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
@@ -278,7 +280,6 @@ public:
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
-    bool sendDescribe();
     bool sendOptions();
     bool sendKeepAlive();
     bool sendSetupIfNotPlaying();
