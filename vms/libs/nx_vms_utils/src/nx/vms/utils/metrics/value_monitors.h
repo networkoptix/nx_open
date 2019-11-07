@@ -11,7 +11,7 @@
 namespace nx::vms::utils::metrics {
 
 // NOTE: Inherited from std::runtime_error to have a constructor from a string.
-class metricsError: public std::runtime_error
+class MetricsError: public std::runtime_error
 {
     using std::runtime_error::runtime_error;
 };
@@ -46,7 +46,7 @@ public:
             NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
             return std::move(value);
         }
-        catch (const metricsError& e)
+        catch (const MetricsError& e)
         {
             NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
         }

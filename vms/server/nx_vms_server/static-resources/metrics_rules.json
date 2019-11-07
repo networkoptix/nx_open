@@ -255,6 +255,7 @@
                 "values": {
                     "transactionsPerSecond1m": {
                         "name": "Transactions/s",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "Transactions/s",
                         "calculate": "deltaAvg %transactionsPerSecond 1m",

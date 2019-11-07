@@ -4,19 +4,19 @@
 
 namespace nx::vms::utils::metrics {
 
-class ruleSyntaxError: public metricsError
+class RuleSyntaxError: public MetricsError
 {
-    using metricsError::metricsError;
+    using MetricsError::MetricsError;
 };
 
-class valueCalculationError: public metricsError
+class ValueCalculationError: public MetricsError
 {
-   using metricsError::metricsError;
+   using MetricsError::MetricsError;
 };
 
-class nullValueError: public valueCalculationError
+class NullValueError: public ValueCalculationError
 {
-    using valueCalculationError::valueCalculationError;
+    using ValueCalculationError::ValueCalculationError;
 };
 
 using ValueGenerator = std::function<api::metrics::Value()>;

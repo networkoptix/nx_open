@@ -38,7 +38,7 @@ public:
         if (m_parts.size() > index)
             return m_parts[index];
 
-        throw ruleSyntaxError("Missing parameter in formula: " + m_formula.toStdString());
+        throw RuleSyntaxError("Missing parameter in formula: " + m_formula.toStdString());
     }
 
     ValueMonitor* monitor(int index) const
@@ -47,7 +47,7 @@ public:
         if (id.startsWith(kVariableMark))
             return monitor(id.mid(kVariableMark.size()));
 
-        throw ruleSyntaxError("Expected parameter instead of value in formula: "
+        throw RuleSyntaxError("Expected parameter instead of value in formula: "
             + m_formula.toStdString());
     }
 
@@ -60,7 +60,7 @@ public:
             return m;
         }
 
-        throw ruleSyntaxError("Unknown value id: " + id.toStdString());
+        throw RuleSyntaxError("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }
@@ -85,7 +85,7 @@ public:
                 const Value v1 = getter1();
                 const Value v2 = getter2();
                 if (v1.isNull() || v2.isNull())
-                    throw nullValueError("At least one argument is missing");
+                    throw NullValueError("At least one argument is missing");
 
                 return Value(operation(std::move(v1), std::move(v2)));
             };
@@ -99,7 +99,7 @@ public:
             [operation](Value v1, Value v2)
             {
                 if (!v1.isDouble() || !v2.isDouble())
-                    throw valueCalculationError("At least one argument is not a number");
+                    throw ValueCalculationError("At least one argument is not a number");
                 return Value(operation(v1.toDouble(), v2.toDouble()));
             });
     }
@@ -112,7 +112,7 @@ public:
             [operation](Value v1, Value v2)
             {
                 if (!v1.isBool() || !v2.isBool())
-                    throw valueCalculationError("At least one argument is not a boolean");
+                    throw ValueCalculationError("At least one argument is not a boolean");
                 return Value(operation(v1.toBool(), v2.toBool()));
             });
     }
@@ -121,13 +121,13 @@ public:
     {
         const auto params = value.toString().split(L'x');
         if (params.size() != 2)
-            throw valueCalculationError("Invalid rectangle size syntax");
+            throw ValueCalculationError("Invalid rectangle size syntax");
 
         bool isOk1;
         bool isOk2;
         int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
         if (!isOk1 || !isOk2)
-            throw valueCalculationError("Invalid rectangle size syntax: integers expected");
+            throw ValueCalculationError("Invalid rectangle size syntax: integers expected");
         return result;
     }
 
@@ -181,7 +181,7 @@ public:
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
-                    throw valueCalculationError("Invalid duration: " + durationStr.toStdString());
+                    throw ValueCalculationError("Invalid duration: " + durationStr.toStdString());
                 }
 
                 return Value(operation(
@@ -305,7 +305,7 @@ public:
         if (auto generator = getDurationOperation())
             return generator;
 
-        throw ruleSyntaxError("Unsupported function: " + function().toStdString());
+        throw RuleSyntaxError("Unsupported function: " + function().toStdString());
     }
 
     bool isLocal() const { return m_isLocal; }
@@ -325,7 +325,7 @@ ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& m
     {
         return parseFormulaOrThrow(formula, monitors);
     }
-    catch (const ruleSyntaxError& error)
+    catch (const RuleSyntaxError& error)
     {
         NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formula '%1': %2", formula, error.what());
         return ValueGeneratorResult{nullptr, Scope::local};
@@ -374,7 +374,7 @@ api::metrics::Value ExtraValueMonitor::valueOrThrow() const
     {
         return m_generator();
     }
-    catch (const nullValueError&)
+    catch (const NullValueError&)
     {
         if (!optional())
             throw;
