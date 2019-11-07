@@ -1,5 +1,5 @@
 import QtQuick 2.11
-import QtQuick.Window 2.0
+import QtQuick.Window 2.11
 import Nx 1.0
 import Nx.Items 1.0
 import Nx.Controls 1.0
@@ -103,8 +103,12 @@ Window
         width: parent.width
         height: 58
 
+        implicitWidth: leftBottomControls.implicitWidth + rightBottomControls.implicitWidth + 48
+
         Row
         {
+            id: leftBottomControls
+
             height: parent.height
             x: 16
             spacing: 16
@@ -137,13 +141,15 @@ Window
                 text: qsTr("Reset")
                 iconUrl: "qrc:/skin/text_buttons/refresh.png"
                 leftPadding: 0
-                rightPadding: 2
+                rightPadding: 16
                 onClicked: editor.clear()
             }
         }
 
         Row
         {
+            id: rightBottomControls
+
             spacing: 8
             anchors
             {
@@ -174,6 +180,16 @@ Window
     }
 
     onVisibleChanged: updatePlayingState()
+
+    onScreenChanged:
+    {
+        // Minimum size setting does not work properly when screen is changed and new screen has
+        // another DPI. New unscaled size is not sent to a window manager.
+        minimumWidth = 0
+        minimumHeight = 0
+        minimumWidth = bottomPanel.implicitWidth
+        minimumHeight = 200
+    }
 
     function updatePlayingState()
     {
