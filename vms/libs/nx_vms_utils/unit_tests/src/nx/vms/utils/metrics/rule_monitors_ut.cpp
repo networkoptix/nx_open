@@ -33,7 +33,7 @@ private:
     std::map<QString, Watch<TestResource>> m_watches;
 };
 
-TEST_F(MetricsGenerators, ValueErrors)
+TEST_F(MetricsGenerators, RuleSyntaxErrors)
 {
     for (const auto& [formula, expectedError]: std::map<QString, QString>{
         {"str hello", "Unsupported function: str"},
@@ -47,11 +47,33 @@ TEST_F(MetricsGenerators, ValueErrors)
             parseFormulaOrThrow(formula, monitors);
             FAIL() << "Did not throw: "  << formula.toStdString();
         }
-        catch(const MetricsError& error)
+        catch(const RuleSyntaxError& error)
         {
             EXPECT_EQ(QString(error.what()), QString(expectedError)) << formula.toStdString();
         }
     }
+}
+
+TEST_F(MetricsGenerators, ValueErrors)
+{
+    const auto plusAB = parseFormulaOrThrow("add %a %b", monitors).generator;
+    const auto andAB = parseFormulaOrThrow("and %a %b", monitors).generator;
+    const auto resolutionGreaterThanAB =
+        parseFormulaOrThrow("resolutionGreaterThan %a %b", monitors).generator;
+
+    resource.update("a", "zorz");
+    resource.update("b", 7);
+
+    EXPECT_THROW(plusAB(), ValueCalculationError);
+    EXPECT_THROW(andAB(), ValueCalculationError);
+    EXPECT_THROW(resolutionGreaterThanAB(), ValueCalculationError);
+
+    resource.update("a", "7x7");
+    resource.update("b", "7x7");
+    EXPECT_NO_THROW(resolutionGreaterThanAB());
+
+    resource.update("b", "7x7.1");
+    EXPECT_THROW(resolutionGreaterThanAB(), ValueCalculationError);
 }
 
 TEST_F(MetricsGenerators, ValueBinary)
