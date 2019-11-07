@@ -44,20 +44,29 @@ QString getConsumptionText(const NetworkPortState& port)
         .arg(port.devicePowerConsumptionLimitWatts);
 }
 
-QString getPoweringStatus(const NetworkPortState& port)
+// TODO: fix colors
+ViewNodeData poweringStatusData(const NetworkPortState& port)
 {
+    ViewNodeDataBuilder builder;
     switch(port.poweringStatus)
     {
         case PoweringStatus::disconnected:
-            return PoESettingsTableView::tr("Disconnected");
+            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Disconnected"));
+            builder.withData(PoESettingsColumn::status, Qt::TextColorRole, QColor(Qt::darkRed));
+            break;
         case PoweringStatus::connected:
-            return PoESettingsTableView::tr("Connected");
+            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Connected"));
+            break;
         case PoweringStatus::powered:
-            return PoESettingsTableView::tr("Powered");
+            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Powered"));
+            builder.withData(PoESettingsColumn::status, Qt::TextColorRole, QColor(Qt::darkGreen));
+            break;
         default:
             NX_ASSERT(false, "Unexpected network port powering status!");
-            return PoESettingsTableView::tr("Unexpected");
+            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Unexpected"));
+            break;
     }
+    return builder.data();
 }
 
 Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
@@ -88,7 +97,7 @@ ViewNodeData dataFromPort(
             100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts)
 
         .withText(PoESettingsColumn::speed, getSpeed(port))
-        .withText(PoESettingsColumn::status, getPoweringStatus(port))
+        .withNodeData(poweringStatusData(port))
 
         .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
         .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)

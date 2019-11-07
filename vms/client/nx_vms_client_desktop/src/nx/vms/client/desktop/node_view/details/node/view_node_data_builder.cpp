@@ -125,6 +125,12 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withFlags(int column, Qt::ItemFlags fl
     return *this;
 }
 
+ViewNodeDataBuilder& ViewNodeDataBuilder::withNodeData(const ViewNodeData& data)
+{
+    m_data->applyData(data);
+    return *this;
+}
+
 ViewNodeData ViewNodeDataBuilder::data() const
 {
     return *m_data;

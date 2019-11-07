@@ -53,6 +53,8 @@ public:
     ViewNodeDataBuilder& withFlag(int column, Qt::ItemFlag flag, bool value = true);
     ViewNodeDataBuilder& withFlags(int column, Qt::ItemFlags flags);
 
+    ViewNodeDataBuilder& withNodeData(const ViewNodeData& data);
+
     ViewNodeData data() const;
 
 private:
