@@ -304,18 +304,18 @@ def _get_storages(api) -> List[Storage]:
             reply = api.get_storage_spaces()
         except Exception as e:
             raise exceptions.ServerApiError(
-                'Unable to get Server Storages via REST HTTP: request failed.',
+                "Unable to get Server Storages via REST HTTP: request failed.",
                 original_exception=e)
         if reply is None:
             raise exceptions.ServerApiError(
-                'Unable to get Server Storages via REST HTTP: invalid reply.')
+                "Unable to get Server Storages via REST HTTP: invalid reply.")
         if reply:
             storages = [Storage(item) for item in reply]
             if all(storage.initialized for storage in storages):
                 return storages
         time.sleep(3)
     raise exceptions.ServerApiError(
-        'Unable to get Server Storages via REST HTTP: not all Storages are initialized.')
+        "Unable to get Server Storages via REST HTTP: not all Storages are initialized.")
 
 
 _rtsp_perf_frame_regex = re.compile(
