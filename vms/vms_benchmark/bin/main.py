@@ -115,6 +115,8 @@ ini_definition = {
     "unloopViaTestcamera": {"type": "bool", "default": True},
     "reportingPeriodSeconds": {"type": "int", "default": 60},
     "addCamerasManually": {"type": "bool", "default": False},
+    "getStoragesMaxAttempts": {"type": "int", "default": 10},
+    "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
 }
 
 
@@ -181,7 +183,7 @@ def _check_storages(api, ini, camera_count):
         * ini['minimumArchiveFreeSpacePerCameraSeconds']
         * ini['archiveBitratePerCameraMbps'] * 1000 * 1000 // 8
     )
-    for storage in _get_storages(api):
+    for storage in _get_storages(api, ini):
         if storage.free_space >= storage.reserved_space + space_for_recordings_bytes:
             break
     else:
@@ -297,9 +299,10 @@ class Storage:
                 original_exception=e)
 
 
-def _get_storages(api) -> List[Storage]:
-    for attempt in range(1, 6):
-        logging.info(f"Try to get Storages, attempt #{attempt}...")
+def _get_storages(api, ini) -> List[Storage]:
+    for attempt in range(1, 1 + ini["getStoragesMaxAttempts"]):
+        attempt_str = "" if attempt == 0 else f", attempt #{attempt}"
+        logging.info(f"Try to get Storages{attempt_str}...")
         try:
             reply = api.get_storage_spaces()
         except Exception as e:
@@ -313,7 +316,7 @@ def _get_storages(api) -> List[Storage]:
             storages = [Storage(item) for item in reply]
             if all(storage.initialized for storage in storages):
                 return storages
-        time.sleep(3)
+        time.sleep(ini["getStoragesAttemptIntervalSeconds"])
     raise exceptions.ServerApiError(
         "Unable to get Server Storages via REST HTTP: not all Storages are initialized.")
 
@@ -994,7 +997,7 @@ def main(conf_file, ini_file, log_file):
         api = ServerApi(box.ip, vms.port, user=conf['vmsUser'], password=conf['vmsPassword'])
         _test_api(api, ini)
 
-        storages = _get_storages(api)
+        storages = _get_storages(api, ini)
         _stop_vms(vms)
         if not ini['unloopViaTestcamera']:
             _override_ini_config(vms, ini)
