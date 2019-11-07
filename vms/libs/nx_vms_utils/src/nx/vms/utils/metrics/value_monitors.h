@@ -27,47 +27,26 @@ using ValueFormatter = std::function<api::metrics::Value(const api::metrics::Val
 class NX_VMS_UTILS_API ValueMonitor
 {
 public:
-    explicit ValueMonitor(QString name, Scope scope): m_name(std::move(name)), m_scope(scope) {}
+    explicit ValueMonitor(QString name, Scope scope);
     virtual ~ValueMonitor() = default;
 
-    QString name() const { return m_name; }
+    QString name() const;
 
-    bool optional() const { return m_optional; }
-    void setOptional(bool isOptional) { m_optional = isOptional; }
+    bool optional() const;
+    void setOptional(bool isOptional);
 
-    Scope scope() const { return m_scope; }
-    void setScope(Scope scope) { m_scope = scope; }
+    Scope scope() const;
+    void setScope(Scope scope);
 
-    api::metrics::Value value() const noexcept
-    {
-        try
-        {
-            auto value = valueOrThrow();
-            NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
-            return std::move(value);
-        }
-        catch (const MetricsError& e)
-        {
-            NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
-        }
-        catch (const std::exception& e)
-        {
-            NX_DEBUG(this, "Failed to get value: %1", e.what());
-        }
-
-        return {};
-    }
+    api::metrics::Value value() const noexcept;
 
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
-    void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); }
-    api::metrics::Value formattedValue() const noexcept
-    {
-        return m_formatter ? m_formatter(value()) : value();
-    }
+    void setFormatter(ValueFormatter formatter);
+    api::metrics::Value formattedValue() const noexcept;
 
-    QString toString() const { return lm("%1(%2)").args(m_name, m_scope); }
-    QString idForToStringFromPtr() const { return name(); }
+    QString toString() const;
+    QString idForToStringFromPtr() const;
 
 protected:
     virtual api::metrics::Value valueOrThrow() const noexcept(false) = 0;
