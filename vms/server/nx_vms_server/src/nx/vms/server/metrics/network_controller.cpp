@@ -39,16 +39,18 @@ public:
         m_interface = std::move(iface);
     }
 
-    QJsonArray addressesJson() const
+    nx::vms::api::metrics::Value addressesJson() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         QJsonArray result;
         for (const auto& address: m_interface.addressEntries())
             result.append(address.ip().toString());
+        if (result.empty())
+            return {};
         return result;
     }
 
-    QString firstAddress() const
+    nx::vms::api::metrics::Value firstAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         const auto addresses = m_interface.addressEntries();
