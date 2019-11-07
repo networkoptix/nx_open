@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/vms/utils/transaction_data_to_string.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -14,7 +15,6 @@
 
 #include <rest/server/request_handler.h>
 #include <transaction/transaction.h>
-#include <transaction/transaction_debug_helpers.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <audit/audit_manager.h>
@@ -440,7 +440,7 @@ private:
 
         NX_DEBUG(
             this, "Received transaction %1 via ec2 http request. Data: %2",
-            command, debugString(requestData));
+            command, nx::vms::utils::toString(requestData));
 
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail

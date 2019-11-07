@@ -737,10 +737,7 @@ void QnStorageConfigWidget::applyChanges()
     for (const auto& storage: m_server->getStorages())
     {
         if (!newIdList.contains(storage->getId()))
-        {
             storagesToRemove.push_back(storage->getId());
-            resourcePool()->removeResource(storage);
-        }
     }
 
     if (!storagesToUpdate.empty())
