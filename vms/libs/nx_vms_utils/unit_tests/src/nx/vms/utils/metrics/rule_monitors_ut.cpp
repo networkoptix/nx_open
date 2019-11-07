@@ -20,6 +20,7 @@ public:
                 resource,
                 m_getters[id] = [id](const auto& r) { return r.current(id); },
                 m_watches[id] = [id](const auto& r, auto change) { return r.monitor(id, std::move(change)); });
+            monitors[id]->setOptional(true);
         }
     }
 
@@ -46,7 +47,7 @@ TEST_F(MetricsGenerators, ValueErrors)
             parseFormulaOrThrow(formula, monitors);
             FAIL() << "Did not throw: "  << formula.toStdString();
         }
-        catch(const std::logic_error& error)
+        catch(const MetricsError& error)
         {
             EXPECT_EQ(QString(error.what()), QString(expectedError)) << formula.toStdString();
         }
@@ -67,18 +68,18 @@ TEST_F(MetricsGenerators, ValueBinary)
     const auto notEqualAB = parseFormulaOrThrow("notEqual %a %b", monitors).generator;
     const auto greaterAB = parseFormulaOrThrow("greaterThan %a %b", monitors).generator;
 
-    EXPECT_EQ(plusAB(), api::metrics::Value());
-    EXPECT_EQ(minusAB(), api::metrics::Value());
-    EXPECT_EQ(equalAB(), api::metrics::Value());
-    EXPECT_EQ(notEqualAB(), api::metrics::Value());
-    EXPECT_EQ(greaterAB(), api::metrics::Value());
+    EXPECT_THROW(plusAB(), NullValueError);
+    EXPECT_THROW(minusAB(), NullValueError);
+    EXPECT_THROW(equalAB(), NullValueError);
+    EXPECT_THROW(notEqualAB(), NullValueError);
+    EXPECT_THROW(greaterAB(), NullValueError);
 
     resource.update("a", 7);
-    EXPECT_EQ(plusAB(), api::metrics::Value());
-    EXPECT_EQ(minusAB(), api::metrics::Value());
-    EXPECT_EQ(equalAB(), api::metrics::Value());
-    EXPECT_EQ(notEqualAB(), api::metrics::Value());
-    EXPECT_EQ(greaterAB(), api::metrics::Value());
+    EXPECT_THROW(plusAB(), NullValueError);
+    EXPECT_THROW(minusAB(), NullValueError);
+    EXPECT_THROW(equalAB(), NullValueError);
+    EXPECT_THROW(notEqualAB(), NullValueError);
+    EXPECT_THROW(greaterAB(), NullValueError);
 
     resource.update("b", 8);
     EXPECT_EQ(plusAB(), api::metrics::Value(15));
