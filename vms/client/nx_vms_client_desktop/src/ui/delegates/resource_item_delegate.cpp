@@ -289,7 +289,6 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
     /* Let the style calculate text rect so we can determine side paddings dictated by it: */
-    // TODO: #vkutin This doesn't work anymore.
     option.rect.setSize(QSize(10000, 20)); // some really big width and any nonzero height
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
 
@@ -311,14 +310,14 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         height = qMax(height, option.fontMetrics.height());
 
         /* Width of the main text: */
-        width += option.fontMetrics.width(baseName);
+        width += option.fontMetrics.size({}, baseName).width();
 
         if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extraInfo) + leftRightPadding;
+            width += option.fontMetrics.size({}, extraInfo).width() + leftRightPadding;
         }
 
         /* Add paddings: */
