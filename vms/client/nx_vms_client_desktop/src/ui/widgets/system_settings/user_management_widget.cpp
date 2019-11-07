@@ -168,7 +168,7 @@ public:
     LinkMetrics linkMetrics(const QStyleOptionViewItem &option) const
     {
         return LinkMetrics(
-            option.fontMetrics.width(m_linkText),
+            option.fontMetrics.size({}, m_linkText).width(),
             qnSkin->maximumSize(m_editIcon).width());
     }
 
