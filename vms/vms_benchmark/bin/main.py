@@ -91,6 +91,7 @@ ini_definition = {
     "testFileLowPeriodUs": {"type": "int", "range": [1, None], "default": 10000000},
     "testStreamFpsHigh": {"type": "int", "range": [1, 999], "default": 30},
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
+    "enableSecondaryStream": {"type": "bool", "default": True},
     "testcameraOutputFile": {"type": "str", "default": ""},
     "testcameraLocalInterface": {"type": "str", "default": ""},
     "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
@@ -128,6 +129,7 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
     test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
+    test_camera_runner.ini_enable_secondary_stream = ini['enableSecondaryStream']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
@@ -557,6 +559,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
             f"{total_archive_stream_count} archive stream(s)...")
 
         logging.info(f'Starting {test_camera_count} virtual camera(s)...')
+        if not ini['enableSecondaryStream']:
+            report('INI: Secondary stream is disabled.')
         ini_local_ip = ini['testcameraLocalInterface']
         test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=ini_local_ip if ini_local_ip else box.local_ip,
