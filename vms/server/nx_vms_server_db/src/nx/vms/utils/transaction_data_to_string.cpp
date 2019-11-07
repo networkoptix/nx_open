@@ -1,18 +1,18 @@
-#include "transaction_debug_helpers.h"
-#include "amend_transaction_data.h"
-#include "transaction_descriptor.h"
+#include "transaction_data_to_string.h"
+#include "transaction/amend_transaction_data.h"
+#include "transaction/transaction_descriptor.h"
 
 #include <nx/utils/url.h>
 
-namespace ec2 {
+namespace nx::vms::utils {
 
-QString debugString(const nx::vms::api::StorageData& data)
+QString toString(const nx::vms::api::StorageData& data)
 {
     const auto storageUrl = nx::utils::Url(data.url);
     auto storagePassword = storageUrl.password();
     if (!storagePassword.isNull())
     {
-        if (storagePassword != kHiddenPasswordFiller)
+        if (storagePassword != ec2::kHiddenPasswordFiller)
             storagePassword = "Not null";
     }
     else
