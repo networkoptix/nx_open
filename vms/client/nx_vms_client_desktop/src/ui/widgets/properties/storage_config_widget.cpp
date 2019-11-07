@@ -692,6 +692,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setBackup(storageData.isBackup);
             storage->setSpaceLimit(storageData.reservedSpace);
 
+            resourcePool()->addResource(storage);
             result << storage;
         }
     }
@@ -737,7 +738,10 @@ void QnStorageConfigWidget::applyChanges()
     for (const auto& storage: m_server->getStorages())
     {
         if (!newIdList.contains(storage->getId()))
+        {
             storagesToRemove.push_back(storage->getId());
+            resourcePool()->removeResource(storage);
+        }
     }
 
     if (!storagesToUpdate.empty())
