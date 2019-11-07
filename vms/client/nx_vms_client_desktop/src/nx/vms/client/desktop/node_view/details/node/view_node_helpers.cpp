@@ -96,7 +96,7 @@ bool checkable(const NodePtr& node, int column)
 
 bool checkable(const QModelIndex& index)
 {
-    return !index.data(Qt::CheckStateRole).isNull();
+    return checkable(nodeFromIndex(index), index.column());
 }
 
 bool checkable(const ViewNodeData& data, int column)

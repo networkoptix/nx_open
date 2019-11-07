@@ -46,14 +46,19 @@ void ResourceNodeViewItemDelegate::paint(
     const QStyleOptionViewItem& styleOption,
     const QModelIndex& index) const
 {
-    base_type::paint(painter, styleOption, index);
+    if (isResourceColumn(index))
+    {
+        QStyleOptionViewItem option(styleOption);
+        initStyleOption(&option, index);
 
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
-
-    paintItemText(painter, option, index, d->colors.mainText,
-        d->colors.extraText, qnGlobals->errorTextColor());
-    paintItemIcon(painter, option, index, QIcon::Normal);
+        paintItemText(painter, option, index, d->colors.mainText,
+            d->colors.extraText, qnGlobals->errorTextColor());
+        paintItemIcon(painter, option, index, QIcon::Normal);
+    }
+    else
+    {
+        base_type::paint(painter, styleOption, index);
+    }
 }
 
 const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
@@ -100,7 +105,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
 {
     auto option = styleOption;
     const auto style = option.widget ? option.widget->style() : QApplication::style();
-    auto baseColor = isValidNode(index) ? mainColor : invalidColor;
+    auto baseColor = isValidResourceNode(index) ? mainColor : invalidColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
         baseColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());

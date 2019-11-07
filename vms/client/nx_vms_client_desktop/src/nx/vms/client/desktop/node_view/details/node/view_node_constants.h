@@ -16,10 +16,13 @@ enum ViewDataProperty
 enum CustomViewNodeRole
 {
     firstCustomViewNodeRole = Qt::UserRole,
+
     progressRole = firstCustomViewNodeRole,
     useSwitchStyleForCheckboxRole,
 
     userChangesRoleOffset = Qt::UserRole + 1024,
+
+    lastViewNodeRole = userChangesRoleOffset + 1024
 };
 
 } // namespace details

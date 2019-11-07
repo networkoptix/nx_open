@@ -49,13 +49,13 @@ bool NodeViewInvalidDeviceFilterModel::filterAcceptsRow(
                 {
                     auto childIndex =
                         model->index(row, ResourceNodeViewColumn::resourceNameColumn, index);
-                    if (isValidNode(childIndex))
+                    if (isValidResourceNode(childIndex))
                         return false;
                 }
                 return true;
         };
 
-        if (!isValidNode(sourceIndex) || hasOnlyInvalidChildren(sourceIndex))
+        if (!isValidResourceNode(sourceIndex) || hasOnlyInvalidChildren(sourceIndex))
             return false;
     }
     return base_type::filterAcceptsRow(sourceRow, sourceParent);

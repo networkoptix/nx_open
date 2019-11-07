@@ -185,9 +185,10 @@ QVariant NodeViewModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     const int column = index.column();
-    return role == Qt::CheckStateRole
-        ? checkedState(index, true)
-        : node->data(column, role);
+    if (role != Qt::CheckStateRole)
+        return node->data(column, role);
+
+    return checkable(index) ? checkedState(index, true) : QVariant();
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const

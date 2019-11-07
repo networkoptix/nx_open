@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QHeaderView>
 
+#include <nx/vms/client/desktop/node_view/resource_node_view/details/resource_node_view_item_delegate.h>
 #include <utils/math/math.h>
 
 namespace {
@@ -74,6 +75,7 @@ PoESettingsTableView::PoESettingsTableView(QWidget* parent):
     base_type(PoESettingsColumn::count, parent),
     d(new Private())
 {
+    setItemDelegate(new node_view::ResourceNodeViewItemDelegate());
     setHeaderDataProvider(kHeaderDataProvider);
     setupHeader(this);
 }

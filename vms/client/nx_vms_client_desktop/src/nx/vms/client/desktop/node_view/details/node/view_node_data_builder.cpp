@@ -21,6 +21,12 @@ ViewNodeDataBuilder::ViewNodeDataBuilder(ViewNodeData& data):
 {
 }
 
+ViewNodeDataBuilder::ViewNodeDataBuilder(const ViewNodeData& data):
+    m_outerData(false),
+    m_data(new ViewNodeData(data))
+{
+}
+
 ViewNodeDataBuilder::~ViewNodeDataBuilder()
 {
     if (m_outerData)

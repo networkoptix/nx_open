@@ -5,6 +5,8 @@
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -24,21 +26,15 @@ using PoweringStatus = nx::vms::api::NetworkPortState::PoweringStatus;
 using NetworkPortState = nx::vms::api::NetworkPortState;
 
 static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
-
-QString getConnectedCamera(const NetworkPortState& port, const QnResourcePool& resourcePool)
-{
-    const auto resource = resourcePool.getResourceById(port.deviceId);
-    return resource
-        ? resource->getName()
-        : PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
-}
+static const QString kEmptyText =
+    PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
 
 QString getSpeed(const NetworkPortState& port)
 {
     return port.linkSpeedMbps > 0 ? QString("%1 Mbps").arg(port.linkSpeedMbps) : "-";
 }
 
-QString getConsumption(const NetworkPortState& port)
+QString getConsumptionText(const NetworkPortState& port)
 {
     if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
         return "0 W";
@@ -79,11 +75,14 @@ ViewNodeData dataFromPort(
     port.devicePowerConsumptionLimitWatts = 100; // tmp
     port.devicePowerConsumptionWatts = rand() % 100; // tmp
 
-    return ViewNodeDataBuilder()
-        .withText(PoESettingsColumn::port, QString::number(port.portNumber))
-        .withText(PoESettingsColumn::camera, getConnectedCamera(port, resourcePool))
+    const auto resource = resourcePool.getResourceById(port.deviceId);
+    const auto resourceNodeViewData =
+        getResourceNodeData(resource, PoESettingsColumn::camera, kEmptyText);
 
-        .withText(PoESettingsColumn::consumption, getConsumption(port))
+    return ViewNodeDataBuilder(resourceNodeViewData)
+        .withText(PoESettingsColumn::port, QString::number(port.portNumber))
+
+        .withText(PoESettingsColumn::consumption, getConsumptionText(port))
         .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
         .withData(PoESettingsColumn::consumption, progressRole,
             100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts)
@@ -105,10 +104,7 @@ NodePtr createPortNodes(
 
     const auto root = ViewNode::create();
     for (const auto& port: data.portStates)
-    {
         root->addChild(ViewNode::create(dataFromPort(port, resourcePool)));
-        break;
-    }
 
     return root;
 }

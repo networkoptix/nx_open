@@ -15,6 +15,8 @@ class NX_VMS_CLIENT_DESKTOP_API ViewNodeDataBuilder
 public:
     explicit ViewNodeDataBuilder();
     explicit ViewNodeDataBuilder(ViewNodeData& data);
+    explicit ViewNodeDataBuilder(const ViewNodeData& data);
+
     ~ViewNodeDataBuilder();
 
     ViewNodeDataBuilder& separator();
