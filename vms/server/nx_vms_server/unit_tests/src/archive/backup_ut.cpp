@@ -1,30 +1,10 @@
 #include <test_support/mediaserver_with_storage_fixture.h>
 #include <api/model/backup_status_reply.h>
+#include <nx/mediaserver/camera_mock.h>
 
 #include <gtest/gtest.h>
 
 namespace nx::vms::server::test {
-
-class TestCameraResource: public nx::vms::server::resource::Camera
-{
-public:
-    TestCameraResource(QnMediaServerModule* serverModule):
-        nx::vms::server::resource::Camera(serverModule)
-    {
-    }
-
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }
-    virtual QString getDriverName() const override { return "test"; }
-    virtual CameraDiagnostics::Result initializeCameraDriver() override
-    {
-        return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::noError);
-    }
-
-    virtual QString getUniqueId() const override
-    {
-        return getPhysicalId();
-    }
-};
 
 class FtArchiveBackup: public test_support::MediaserverWithStorageFixture
 {
@@ -65,7 +45,8 @@ protected:
             Qn::CameraBackupQuality::CameraBackup_Both);
         for (auto it = m_generatedArchive.cbegin(); it != m_generatedArchive.cend(); ++it)
         {
-            auto camera = QnVirtualCameraResourcePtr(new TestCameraResource(m_server->serverModule()));
+            auto camera = QnVirtualCameraResourcePtr(
+                new nx::vms::server::resource::test::CameraMock(m_server->serverModule()));
             camera->setIdUnsafe(QnUuid::createUuid());
             camera->setPhysicalId(it.key());
             camera->setBackupQualities(Qn::CameraBackupQuality::CameraBackup_Both);
