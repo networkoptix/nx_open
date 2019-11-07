@@ -157,7 +157,6 @@ if(withDesktopClient)
     set_target_properties(
         collect_qml_dependencies
         generate_client_update_package
-        create_nxtool_installer
         generate_client_debug_package
         PROPERTIES FOLDER distribution)
 endif()
