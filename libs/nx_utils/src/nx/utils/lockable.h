@@ -30,13 +30,13 @@ public:
     {
         if (m_mutex)
             m_mutex->unlock();
-    };
+    }
 
     ValueLocker& operator=(const ValueLocker& other) = delete;
     inline Value* operator->() { return m_value; }
     inline const Value* operator->() const { return m_value; }
-    inline ValueLocker& operator*() { return *m_value; }
-    inline const ValueLocker& operator*() const { return *m_value; }
+    inline Value& operator*() { return *m_value; }
+    inline const Value& operator*() const { return *m_value; }
 
 private:
     mutable QnMutex* m_mutex;
