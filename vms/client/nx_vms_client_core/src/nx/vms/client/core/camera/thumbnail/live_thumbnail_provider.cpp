@@ -89,6 +89,7 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
     request.streamSelectionMode =
         nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
     request.size.setHeight(m_thumbnailHeight);
+    request.rotation = m_rotation;
 
     thumbnailData.requestId = server->restConnection()->cameraThumbnailAsync(
         request, nx::utils::guarded(this, handleReply), m_decompressionThread);
@@ -107,6 +108,15 @@ void LiveThumbnailProvider::setThumbnailsHeight(int height)
 
     m_thumbnailHeight = height;
     emit thumbnailsHeightChanged();
+}
+
+void LiveThumbnailProvider::setRotation(int rotation)
+{
+    if (m_rotation == rotation)
+        return;
+
+    m_rotation = rotation;
+    emit rotationChanged();
 }
 
 void LiveThumbnailProvider::registerQmlType()

@@ -3,6 +3,7 @@ import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Dialogs 1.0
+import Nx.Core.Items 1.0
 
 LabeledItem
 {
@@ -23,45 +24,53 @@ LabeledItem
             implicitWidth: 120
             implicitHeight: 80
 
-            Image
+            VideoPositioner
             {
-                id: backgroundImage
                 anchors.fill: parent
-                fillMode: Image.PreserveAspectFit
+                item: backgroundImage
+                sourceSize: Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
+                videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
 
-                Connections
+                Image
                 {
-                    target: thumbnailProvider
+                    id: backgroundImage
 
-                    onThumbnailUpdated:
+                    Connections
                     {
-                        if (cameraId.toString() === settingsView.resourceId.toString())
-                            backgroundImage.source = thumbnailUrl
+                        target: thumbnailProvider
+                        ignoreUnknownSignals: true
+
+                        onThumbnailUpdated:
+                        {
+                            if (cameraId.toString() === settingsView.resourceId.toString())
+                                backgroundImage.source = thumbnailUrl
+                        }
+                    }
+
+                    Connections
+                    {
+                        target: settingsView
+
+                        onResourceIdChanged:
+                        {
+                            if (!thumbnailProvider)
+                                return
+
+                            if (settingsView.resourceId.isNull())
+                                return
+
+                            thumbnailProvider.refresh(settingsView.resourceId)
+                        }
                     }
                 }
 
-                Connections
+                FigurePreview
                 {
-                    target: settingsView
-
-                    onResourceIdChanged:
-                    {
-                        if (!thumbnailProvider)
-                            return
-
-                        if (settingsView.resourceId.isNull())
-                            return
-
-                        thumbnailProvider.refresh(settingsView.resourceId)
-                    }
+                    id: preview
+                    anchors.fill: backgroundImage.status === Image.Ready ? backgroundImage : parent
+                    visible: hasFigure
+                    rotation: backgroundImage.rotation
                 }
-            }
-
-            FigurePreview
-            {
-                id: preview
-                anchors.fill: parent
-                visible: hasFigure
             }
 
             Rectangle
