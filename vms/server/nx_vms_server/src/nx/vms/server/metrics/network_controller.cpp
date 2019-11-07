@@ -2,6 +2,7 @@
 
 #include <QJsonArray>
 
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/std/algorithm.h>
@@ -111,8 +112,7 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "server",
                 [this](const auto&)
                 {
-                    const auto server = resourcePool()->getResourceById(QnUuid(m_serverId));
-                    return Value(server->getName());
+                    return Value(resourcePool()->getOwnMediaServerOrThrow()->getName());
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(

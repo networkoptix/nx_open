@@ -67,9 +67,7 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
                 "version",
                 [pool](const auto&)
                 {
-                    if (auto server = pool->getOwnMediaServer())
-                        return Value(toString(server->getVersion()));
-                    return Value();
+                    return Value(toString(pool->getOwnMediaServerOrThrow()->getVersion()));
                 }
             )
         )
