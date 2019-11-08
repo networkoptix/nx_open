@@ -616,9 +616,7 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
             && state.devicesDescription.isWearable == CombinedValue::None
             && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::web),
-        state.isSingleCamera()
-            && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+    setPageVisible(int(CameraSettingsTab::web), state.canShowWebPage());
 
     setPageVisible(int(CameraSettingsTab::analytics),
         state.isSingleCamera() && !state.analytics.engines.empty());
