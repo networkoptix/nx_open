@@ -57,11 +57,8 @@ void CommandLog::startDbTransaction(
                 QnMutexLocker lock(&m_mutex);
                 getDbTransactionContext(lock, queryContext, systemId);
             }
-            const auto resultCode = dbOperationsFunc(queryContext);
-            if (resultCode != nx::sql::DBResult::ok)
-                return resultCode;
 
-            return saveActualSequence(queryContext, systemId);
+            return dbOperationsFunc(queryContext);
         },
         [lock = m_startedAsyncCallsCounter.getScopedIncrement(),
             onDbUpdateCompleted = std::move(onDbUpdateCompleted)](nx::sql::DBResult dbResult)
@@ -104,11 +101,15 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
         systemId, transactionSerializer->header(), transactionHash);
 
     // Saving transaction to the log.
-    const auto result = saveToDb(
+    auto result = saveToDb(
         queryContext,
         systemId,
         transactionHash,
         *transactionSerializer);
+    if (result != nx::sql::DBResult::ok)
+        return result;
+
+    result = saveActualSequence(queryContext, systemId);
     if (result != nx::sql::DBResult::ok)
         return result;
 

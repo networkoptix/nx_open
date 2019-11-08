@@ -32,6 +32,7 @@ CREATE INDEX idx_transaction_time
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
 
 /**
  * CLOUD-2633. Persistently save sequence of the last command.
@@ -48,6 +49,21 @@ CREATE UNIQUE INDEX idx_node_command_sequence_key
     ON node_command_sequence(system_id, peer_id);
 
 CREATE UNIQUE INDEX idx_node_command_sequence_peer
+    ON node_command_sequence(peer_id);
+
+)sql";
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * CLOUD-3903. Fix same sequence for every cluster.
+ * Making index idx_node_command_sequence_peer non-unique.
+ */
+static constexpr char kMakeCommandSequencePerCluster[] = R"sql(
+
+DROP INDEX idx_node_command_sequence_peer;
+
+CREATE INDEX idx_node_command_sequence_peer
     ON node_command_sequence(peer_id);
 
 )sql";

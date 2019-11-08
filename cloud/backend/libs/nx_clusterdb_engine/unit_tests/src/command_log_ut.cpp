@@ -175,25 +175,31 @@ protected:
         for (int i = 0; i < 3; ++i)
         {
             auto tran = prepareFromOtherPeerWithTimestampDiff(
+                m_clusterId,
                 std::chrono::milliseconds(1));
             tran.persistentInfo.timestamp.sequence = std::max<std::uint64_t>(
                 m_lastUsedSequence + 1,
                 tran.persistentInfo.timestamp.sequence + 1);
             m_lastUsedSequence = tran.persistentInfo.timestamp.sequence;
-            saveTransaction(tran);
+            saveTransaction(m_clusterId, tran);
         }
     }
 
     void whenGenerateTransactionLocally()
     {
+        whenGenerateTransactionLocally(m_clusterId);
+    }
+
+    void whenGenerateTransactionLocally(const std::string& clusterId)
+    {
         auto queryContext = getQueryContext();
         auto command = commandLog().prepareLocalTransaction(
             queryContext.get(),
-            m_clusterId.c_str(),
+            clusterId,
             command::SaveCustomer::code,
             m_commandData);
-        if (!m_initialCommand)
-            m_initialCommand = command;
+        if (!m_initialCommandByClusterId[clusterId])
+            m_initialCommandByClusterId[clusterId] = command;
 
         const auto commandHash = command::SaveCustomer::hash(command.params);
         auto commandSerializer = std::make_unique<
@@ -203,14 +209,15 @@ protected:
 
         commandLog().saveLocalTransaction(
             queryContext.get(),
-            m_clusterId.c_str(),
+            clusterId,
             commandHash,
             std::move(commandSerializer));
     }
 
     void assertTransactionIsPresent()
     {
-        const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
+        const std::vector<dao::TransactionLogRecord> allTransactions =
+            readAllTransactions(m_clusterId);
         ASSERT_EQ(1U, allTransactions.size());
 
         std::optional<Command<command::SaveCustomer::Data>> transaction =
@@ -218,16 +225,27 @@ protected:
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
 
-    void whenReceiveTransactionFromOtherPeerWithGreaterTimestamp()
+    void whenReceiveTransactionFromOtherPeerWithGreaterTimestamp(
+        std::string clusterId = std::string())
     {
         addTransactionFromOtherPeerWithTimestampDiff(
-            std::chrono::milliseconds(1));
+            std::chrono::hours(1),
+            clusterId);
     }
 
-    void assertTransactionIsReplaced()
+    void whenOtherPeerReplacesTransaction(const std::string& clusterId)
     {
-        const auto finalTransaction = getTransactionFromLog();
-        ASSERT_NE(*m_initialCommand, finalTransaction);
+        whenReceiveTransactionFromOtherPeerWithGreaterTimestamp(clusterId);
+        assertTransactionIsReplaced(clusterId);
+    }
+
+    void assertTransactionIsReplaced(std::string clusterId = std::string())
+    {
+        if (clusterId.empty())
+            clusterId = m_clusterId;
+
+        const auto finalTransaction = getTransactionFromLog(clusterId);
+        ASSERT_NE(*m_initialCommandByClusterId[clusterId], finalTransaction);
     }
 
     void assertTransactionAuthorIsLocalPeer()
@@ -251,7 +269,7 @@ protected:
     void assertTransactionIsNotReplaced()
     {
         const auto finalTransaction = getTransactionFromLog();
-        ASSERT_EQ(*m_initialCommand, finalTransaction);
+        ASSERT_EQ(*m_initialCommandByClusterId[m_clusterId], finalTransaction);
     }
 
     void whenAddTransactionLocallyWithGreaterSequence()
@@ -264,17 +282,17 @@ protected:
         auto queryContext = getQueryContext();
         auto transaction = commandLog().prepareLocalTransaction(
             queryContext.get(),
-            m_clusterId.c_str(),
+            m_clusterId,
             command::SaveCustomer::code,
             m_commandData);
         transaction.persistentInfo.sequence -= 2;
-        if (!m_initialCommand)
-            m_initialCommand = transaction;
+        if (!m_initialCommandByClusterId[m_clusterId])
+            m_initialCommandByClusterId[m_clusterId] = transaction;
 
         const auto resultCode = commandLog().checkIfNeededAndSaveToLog
             <command::SaveCustomer>(
                 queryContext.get(),
-                m_clusterId.c_str(),
+                m_clusterId,
                 clusterdb::engine::SerializableCommand<command::SaveCustomer>(
                     std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
@@ -282,8 +300,20 @@ protected:
 
     void assertMaxTimestampSequenceIsUsed()
     {
-        const auto timestamp = commandLog().generateTransactionTimestamp(m_clusterId.c_str());
+        const auto timestamp = commandLog().generateTransactionTimestamp(m_clusterId);
         ASSERT_EQ(m_lastUsedSequence, timestamp.sequence);
+    }
+
+    void assertNextCommandSequenceIs(const std::string& clusterId, int sequence)
+    {
+        auto queryContext = getQueryContext();
+        auto command = commandLog().prepareLocalTransaction(
+            queryContext.get(),
+            clusterId,
+            command::SaveCustomer::code,
+            m_commandData);
+
+        ASSERT_EQ(sequence, command.persistentInfo.sequence);
     }
 
 private:
@@ -294,7 +324,9 @@ private:
     command::SaveCustomer::Data m_commandData;
     std::shared_ptr<nx::sql::QueryContext> m_activeQuery;
     nx::sql::DbConnectionHolder m_dbConnectionHolder;
-    std::optional<Command<command::SaveCustomer::Data>> m_initialCommand;
+    std::map<
+        std::string /*clusterId*/,
+        std::optional<Command<command::SaveCustomer::Data>>> m_initialCommandByClusterId;
     std::uint64_t m_lastUsedSequence = 0;
 
     void init()
@@ -305,7 +337,7 @@ private:
 
         // Moving local peer sequence.
         // TODO: #ak Do it by generating commands and get rid of shiftLocalTransactionSequence method.
-        commandLog().shiftLocalTransactionSequence(m_clusterId.c_str(), 100);
+        commandLog().shiftLocalTransactionSequence(m_clusterId, 100);
     }
 
     std::shared_ptr<nx::sql::QueryContext> getQueryContext()
@@ -357,7 +389,8 @@ private:
         return std::nullopt;
     }
 
-    std::vector<dao::TransactionLogRecord> readAllTransactions()
+    std::vector<dao::TransactionLogRecord> readAllTransactions(
+        const std::string& clusterId)
     {
         nx::utils::promise<std::vector<dao::TransactionLogRecord>> transactionsReadPromise;
         auto completionHandler =
@@ -371,7 +404,7 @@ private:
             };
 
         commandLog().readTransactions(
-            m_clusterId.c_str(),
+            clusterId,
             ReadCommandsFilter::kEmptyFilter,
             completionHandler);
 
@@ -379,13 +412,19 @@ private:
     }
 
     void addTransactionFromOtherPeerWithTimestampDiff(
-        std::chrono::milliseconds timestampDiff)
+        std::chrono::milliseconds timestampDiff,
+        std::string clusterId = std::string())
     {
+        if (clusterId.empty())
+            clusterId = m_clusterId;
+
         saveTransaction(
-            prepareFromOtherPeerWithTimestampDiff(timestampDiff));
+            clusterId,
+            prepareFromOtherPeerWithTimestampDiff(clusterId, timestampDiff));
     }
 
     Command<command::SaveCustomer::Data> prepareFromOtherPeerWithTimestampDiff(
+        const std::string& clusterId,
         std::chrono::milliseconds timestampDiff)
     {
         Command<command::SaveCustomer::Data> transaction(
@@ -393,23 +432,25 @@ private:
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.persistentInfo.sequence = m_otherPeerSequence++;
         transaction.persistentInfo.timestamp =
-            m_initialCommand
-            ? m_initialCommand->persistentInfo.timestamp + timestampDiff
-            : commandLog().generateTransactionTimestamp(m_clusterId.c_str()) + timestampDiff;
+            m_initialCommandByClusterId[clusterId]
+            ? m_initialCommandByClusterId[clusterId]->persistentInfo.timestamp + timestampDiff
+            : commandLog().generateTransactionTimestamp(clusterId) + timestampDiff;
         transaction.params = m_commandData;
 
-        if (!m_initialCommand)
-            m_initialCommand = transaction;
+        if (!m_initialCommandByClusterId[clusterId])
+            m_initialCommandByClusterId[clusterId] = transaction;
 
         return transaction;
     }
 
-    void saveTransaction(Command<command::SaveCustomer::Data> command)
+    void saveTransaction(
+        const std::string& clusterId,
+        Command<command::SaveCustomer::Data> command)
     {
         auto queryContext = getQueryContext();
         const auto dbResult = commandLog().checkIfNeededAndSaveToLog<command::SaveCustomer>(
             queryContext.get(),
-            m_clusterId.c_str(),
+            clusterId,
             clusterdb::engine::UbjsonSerializedTransaction<command::SaveCustomer>(
                 std::move(command),
                 kCurrentProtoVersion));
@@ -417,9 +458,14 @@ private:
             << "Got " << toString(dbResult);
     }
 
-    Command<command::SaveCustomer::Data> getTransactionFromLog()
+    Command<command::SaveCustomer::Data> getTransactionFromLog(
+        std::string clusterId = std::string())
     {
-        const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
+        if (clusterId.empty())
+            clusterId = m_clusterId;
+
+        const std::vector<dao::TransactionLogRecord> allTransactions =
+            readAllTransactions(clusterId);
         NX_GTEST_ASSERT_EQ(1U, allTransactions.size());
 
         std::optional<Command<command::SaveCustomer::Data>> command =
@@ -494,6 +540,24 @@ TEST_F(CommandLogSameTransaction, max_timestamp_sequence_is_restored_after_resta
     addTransactionsWithIncreasingTimestampSequence();
     reinitialiseTransactionLog();
     assertMaxTimestampSequenceIsUsed();
+}
+
+TEST_F(CommandLogSameTransaction, persistent_command_sequence_is_per_cluster)
+{
+    const auto clusterId1 = QnUuid::createUuid().toStdString();
+    const auto clusterId2 = QnUuid::createUuid().toStdString();
+
+    whenGenerateTransactionLocally(clusterId1);
+    whenOtherPeerReplacesTransaction(clusterId1);
+
+    for (int i = 0; i < 3; ++i)
+        whenGenerateTransactionLocally(clusterId2);
+    whenOtherPeerReplacesTransaction(clusterId2);
+
+    reinitialiseTransactionLog();
+
+    assertNextCommandSequenceIs(clusterId1, 2);
+    assertNextCommandSequenceIs(clusterId2, 4);
 }
 
 //-------------------------------------------------------------------------------------------------
