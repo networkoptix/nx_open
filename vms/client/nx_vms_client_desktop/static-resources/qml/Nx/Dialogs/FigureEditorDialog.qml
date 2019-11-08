@@ -16,7 +16,7 @@ Window
     width: 600
     height: 400
 
-    color: ColorTheme.colors.dark7
+    color: ColorTheme.colors.dark3
 
     signal accepted()
 
@@ -95,13 +95,9 @@ Window
         }
     }
 
-    Item
+    DialogPanel
     {
         id: bottomPanel
-
-        anchors.bottom: parent.bottom
-        width: parent.width
-        height: 58
 
         implicitWidth: leftBottomControls.implicitWidth + rightBottomControls.implicitWidth + 48
 
