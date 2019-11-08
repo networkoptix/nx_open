@@ -86,6 +86,8 @@ QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype
         EventType::serverFailureEvent,
         EventType::serverConflictEvent,
         EventType::licenseIssueEvent,
+        EventType::poeOverBudgetEvent,
+        EventType::fanErrorEvent,
     };
 
     static const QList<EventType> successEvents{
