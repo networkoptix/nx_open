@@ -18,8 +18,6 @@ struct NodeViewModel::Private
 {
     Private(NodeViewModel* owner, int columnCount);
 
-    QModelIndex getModelIndex(const NodePtr& node, int column = 0);
-
     NodeViewModel* const q;
     const int columnCount;
     NodeViewState state;
@@ -32,19 +30,6 @@ NodeViewModel::Private::Private(
     q(owner),
     columnCount(columnCount)
 {
-}
-
-QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
-{
-    const auto parentNode = node ? node->parent() : NodePtr();
-    if (!parentNode) //< It is invisible root node.
-        return QModelIndex();
-
-    const auto parentIndex = parentNode->parent()
-        ? getModelIndex(parentNode, column)
-        : QModelIndex(); //< It is top-level node
-
-    return q->index(parentNode->indexOf(node), column, parentIndex);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -72,7 +57,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                 {
                     const auto parentPath = step.path;
                     const auto parentNode = d->state.nodeByPath(parentPath);
-                    const auto parentIndex = d->getModelIndex(parentNode);
+                    const auto parentIndex = index(parentNode);
                     const int row = parentNode->childrenCount();
                     return utils::SharedGuardPtr(
                         new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
@@ -100,7 +85,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                             const auto node = d->state.rootNode->nodeAt(path);
                             for (const auto column: rolesHash.keys())
                             {
-                                const auto nodeIndex = d->getModelIndex(node, column);
+                                const auto nodeIndex = index(node, column);
                                 emit dataChanged(nodeIndex, nodeIndex, rolesHash.value(column));
                             }
                         });
@@ -128,7 +113,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const
 {
     const auto node = d->state.nodeByPath(path);
-    return node ? d->getModelIndex(node, column) : QModelIndex();
+    return node ? index(node, column) : QModelIndex();
 }
 
 QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent) const
@@ -153,7 +138,7 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
     const bool rootOrFirstLevelNode = !parent || !parent->parent();
 
     // Parent is always index with first column.
-    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent());
+    return rootOrFirstLevelNode ? QModelIndex() : index(node->parent());
 }
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
@@ -196,6 +181,20 @@ Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
     const auto node = nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
 }
+
+QModelIndex NodeViewModel::index(const NodePtr& node, int column) const
+{
+    const auto parentNode = node ? node->parent() : NodePtr();
+    if (!parentNode) //< It is invisible root node.
+        return QModelIndex();
+
+    const auto parentIndex = parentNode->parent()
+        ? index(parentNode, column)
+        : QModelIndex(); //< It is top-level node
+
+    return index(parentNode->indexOf(node), column, parentIndex);
+}
+
 
 } // namespace details
 } // node_view

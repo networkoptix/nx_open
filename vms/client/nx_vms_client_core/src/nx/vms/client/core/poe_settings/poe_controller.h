@@ -35,7 +35,7 @@ public:
 
     using PortPoweringMode = nx::vms::api::NetworkPortWithPoweringMode;
     using PowerModes = QList<PortPoweringMode>;
-    void setPowered(const PowerModes& value);
+    void setPowerModes(const PowerModes& value);
 
 signals:
     void resourceIdChanged();

@@ -93,18 +93,6 @@ void PoEController::Private::update()
             BlockData data;
             if (QJson::deserialize(result.reply, &data))
                 setBlockData(data);
-
-            static int k = 0;
-            PowerModes modes;
-            ++k;
-            for (int i = 0; i != 8; ++i)
-            {
-                PortPoweringMode mode;
-                mode.portNumber = i + 1;
-                mode.poweringMode = k % 2 ? PortPoweringMode::PoweringMode::on : PortPoweringMode::PoweringMode::off;
-                modes.append(mode);
-            }
-            setPowered(modes);
         };
 
     updateTimer.stop();
@@ -121,7 +109,9 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
     const auto callback =
         [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
         {
+            qWarning() << "++++++++++ SUCCESS POST" << success << result.reply.toString();
         };
+
     connection->postJsonResult(
         kNvrAction, QnRequestParamList(), QJson::serialized(value), callback, QThread::currentThread());
 }
@@ -171,7 +161,7 @@ bool PoEController::autoUpdate() const
     return d->autoUpdate;
 }
 
-void PoEController::setPowered(const PowerModes& value)
+void PoEController::setPowerModes(const PowerModes& value)
 {
     d->setPowered(value);
 }

@@ -6,6 +6,7 @@
 #include "../details/node_view_state.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_data_builder.h"
 #include "../node_view/node_view_state_reducer.h"
 #include "../node_view/node_view_item_delegate.h"
 
@@ -66,9 +67,15 @@ using namespace details;
 struct TableNodeView::Private: public QObject
 {
     Private(TableNodeView* ownerd, int columnCount);
+    void updateCheckedIndices();
+    void setHasUserChanges(bool value);
+
     TableNodeView* const q;
     NodeViewStore store;
     TableNodeViewModel model;
+
+    bool hasUserChanges = false;
+    IndicesList checkedIndices;
 };
 
 TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
@@ -76,6 +83,38 @@ TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
     model(columnCount, &store)
 {
     connect(&store, &NodeViewStore::patchApplied, &model, &TableNodeViewModel::applyPatch);
+    connect(&store, &NodeViewStore::patchApplied, this, &Private::updateCheckedIndices);
+}
+
+void TableNodeView::Private::updateCheckedIndices()
+{
+    TableNodeView::IndicesList current;
+    forEachNode(store.state().rootNode,
+        [this, &current](const NodePtr& node)
+        {
+            const auto& data = node->data();
+            for (const int column: data.usedColumns())
+            {
+                if (data.hasData(column, makeUserActionRole(Qt::CheckStateRole)))
+                    current.append(model.index(node, column));
+            }
+        });
+
+    if (current == checkedIndices)
+        return;
+
+    checkedIndices = current;
+
+    setHasUserChanges(true);
+}
+
+void TableNodeView::Private::setHasUserChanges(bool value)
+{
+    if (hasUserChanges == value)
+        return;
+
+    hasUserChanges = value;
+    emit q->hasUserChangesChanged();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -107,6 +146,36 @@ const details::NodeViewState& TableNodeView::state() const
 void TableNodeView::setHeaderDataProvider(HeaderDataProvider&& provider)
 {
     d->model.setHeaderDataProvider(std::move(provider));
+}
+
+TableNodeView::IndicesList TableNodeView::userCheckChangedIndices() const
+{
+    return d->checkedIndices;
+}
+
+bool TableNodeView::hasUserChanges() const
+{
+    return !d->checkedIndices.isEmpty();
+}
+
+void TableNodeView::applyUserChanges()
+{
+    const auto kUserCheckStateRole = makeUserActionRole(Qt::CheckStateRole);
+    NodeViewStatePatch clearPatch;
+    for (const auto nodeIndex: userCheckChangedIndices())
+    {
+        const auto node = nodeFromIndex(nodeIndex);
+
+        const int column = nodeIndex.column();
+        clearPatch.addRemoveDataStep(node->path(), {{column, {kUserCheckStateRole}}});
+
+        const auto updateCheckedData = ViewNodeDataBuilder()
+            .withCheckedState(column, userCheckedState(node->data(), column)).data();
+
+        clearPatch.addUpdateDataStep(node->path(), updateCheckedData);
+    }
+
+    applyPatch(clearPatch);
 }
 
 const details::NodeViewStore& TableNodeView::store() const

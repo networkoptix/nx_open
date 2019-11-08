@@ -1,7 +1,8 @@
-#include "poe_settings_table_state_reducer.h"
+#include "poe_settings_reducer.h"
 
 #include "poe_settings_table_view.h"
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
@@ -52,14 +53,16 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
     {
         case PoweringStatus::disconnected:
             builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Disconnected"));
-            builder.withData(PoESettingsColumn::status, Qt::TextColorRole, QColor(Qt::darkRed));
+            builder.withData(
+                PoESettingsColumn::status, Qt::TextColorRole, colorTheme()->color("green_core"));
             break;
         case PoweringStatus::connected:
             builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Connected"));
             break;
         case PoweringStatus::powered:
             builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Powered"));
-            builder.withData(PoESettingsColumn::status, Qt::TextColorRole, QColor(Qt::darkGreen));
+            builder.withData(PoESettingsColumn::status, Qt::TextColorRole,
+                colorTheme()->color("green_core"));
             break;
         default:
             NX_ASSERT(false, "Unexpected network port powering status!");
@@ -77,13 +80,9 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
 }
 
 ViewNodeData dataFromPort(
-    const NetworkPortState& value,
+    const NetworkPortState& port,
     const QnResourcePool& resourcePool)
 {
-    auto port = value; // tmp
-    port.devicePowerConsumptionLimitWatts = 100; // tmp
-    port.devicePowerConsumptionWatts = rand() % 100; // tmp
-
     const auto resource = resourcePool.getResourceById(port.deviceId);
     const auto resourceNodeViewData =
         getResourceNodeData(resource, PoESettingsColumn::camera, kEmptyText);
@@ -101,6 +100,8 @@ ViewNodeData dataFromPort(
 
         .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
         .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
+
+        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber)
         .data();
 }
 
@@ -126,7 +127,7 @@ namespace settings {
 using namespace node_view;
 using namespace node_view::details;
 
-NodeViewStatePatch PoESettingsTableStateReducer::applyBlockDataChanges(
+NodeViewStatePatch PoESettingsReducer::applyBlockDataChanges(
     const node_view::details::NodeViewState& state,
     const nx::vms::api::NetworkBlockData& blockData,
     const QnResourcePool& resourcePool)

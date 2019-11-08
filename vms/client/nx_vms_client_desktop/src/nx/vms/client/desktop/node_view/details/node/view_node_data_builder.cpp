@@ -131,6 +131,12 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withNodeData(const ViewNodeData& data)
     return *this;
 }
 
+ViewNodeDataBuilder& ViewNodeDataBuilder::withProperty(int id, const QVariant& value)
+{
+    m_data->setProperty(id, value);
+    return *this;
+}
+
 ViewNodeData ViewNodeDataBuilder::data() const
 {
     return *m_data;

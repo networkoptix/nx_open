@@ -170,6 +170,24 @@ QString text(const QModelIndex& index)
     return index.data(Qt::DisplayRole).toString();
 }
 
+Qt::CheckState userCheckedState(const NodePtr& node, int column)
+{
+    return node ? userCheckedState(node->data(), column) : Qt::Unchecked;
+}
+
+Qt::CheckState userCheckedState(const ViewNodeData& data, int column)
+{
+    const auto userCheckRole = makeUserActionRole(Qt::CheckStateRole);
+    return data.hasData(column, userCheckRole)
+        ? data.data(column, userCheckRole).value<Qt::CheckState>()
+        : Qt::Unchecked;
+}
+
+Qt::CheckState userCheckedState(const QModelIndex& index)
+{
+    return userCheckedState(nodeFromIndex(index), index.column());
+}
+
 Qt::CheckState checkedState(
     const NodePtr& node,
     int column,

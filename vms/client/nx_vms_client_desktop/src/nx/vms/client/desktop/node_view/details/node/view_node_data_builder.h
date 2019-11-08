@@ -55,6 +55,8 @@ public:
 
     ViewNodeDataBuilder& withNodeData(const ViewNodeData& data);
 
+    ViewNodeDataBuilder& withProperty(int id, const QVariant& value);
+
     ViewNodeData data() const;
 
 private:

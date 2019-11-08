@@ -27,6 +27,17 @@ public:
         std::function<bool (int section, Qt::Orientation orientation, int role, QVariant& data)>;
     void setHeaderDataProvider(HeaderDataProvider&& provider);
 
+    using IndicesList = QList<QModelIndex>;
+
+    // The only supported user changes are checks. Generoc changes should be added.
+    IndicesList userCheckChangedIndices() const;
+
+    void applyUserChanges();
+    bool hasUserChanges() const;
+
+signals:
+    void hasUserChangesChanged() const;
+
 protected:
     const details::NodeViewStore& store() const;
 
