@@ -48,7 +48,7 @@ TEST(QnLogMessage, argCustom)
 
     testCustom(QLatin1String("234s"), std::chrono::seconds(234));
     testCustom(QLatin1String("342332ms"), std::chrono::milliseconds(342332));
-    testCustom(QLatin1String("25623usec"), std::chrono::microseconds(25623));
+    testCustom(QLatin1String("25623us"), std::chrono::microseconds(25623));
 
     testCustom(QLatin1String("Hello, world"), "Hello, world");
     testCustom(QLatin1String("Hello, world"), L"Hello, world");
