@@ -59,9 +59,19 @@ CREATE UNIQUE INDEX idx_node_command_sequence_peer
  * CLOUD-3903. Fix same sequence for every cluster.
  * Making index idx_node_command_sequence_peer non-unique.
  */
-static constexpr char kMakeCommandSequencePerCluster[] = R"sql(
+static constexpr char kDropBadCommandSequenceIndex_sqlite[] = R"sql(
 
 DROP INDEX idx_node_command_sequence_peer;
+
+)sql";
+
+static constexpr char kDropBadCommandSequenceIndex_mysql[] = R"sql(
+
+DROP INDEX idx_node_command_sequence_peer ON node_command_sequence;
+
+)sql";
+
+static constexpr char kMakeCommandSequencePerCluster[] = R"sql(
 
 CREATE INDEX idx_node_command_sequence_peer
     ON node_command_sequence(peer_id);

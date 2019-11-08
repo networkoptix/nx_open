@@ -14,6 +14,11 @@ StructureUpdater::StructureUpdater(
     // Registering update scripts.
     m_updater.addUpdateScript(kInitialDbStructure);
     m_updater.addUpdateScript(kSavePeerSequence);
+
+    m_updater.addUpdateScript({
+        {nx::sql::RdbmsDriverType::sqlite, QByteArray(kDropBadCommandSequenceIndex_sqlite)},
+        {nx::sql::RdbmsDriverType::mysql, QByteArray(kDropBadCommandSequenceIndex_mysql)}
+    });
     m_updater.addUpdateScript(kMakeCommandSequencePerCluster);
 
     // Performing update.
