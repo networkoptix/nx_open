@@ -6,7 +6,10 @@ VideoPositioner
     property alias mediaPlayer: video.mediaPlayer
     property alias videoOutput: video
 
-    sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
+    sourceSize: (video.implicitWidth > 0 && video.implicitHeight > 0)
+        ? Qt.size(video.implicitWidth, video.implicitHeight)
+        : Qt.size(width, height)
+
     videoRotation: resourceHelper ? resourceHelper.customRotation : 0
     customAspectRatio:
     {
