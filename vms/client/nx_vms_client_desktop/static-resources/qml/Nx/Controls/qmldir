@@ -10,6 +10,7 @@ ComboBox 1.0 ComboBox.qml
 CheckBox 1.0 CheckBox.qml
 GroupBox 1.0 GroupBox.qml
 Panel 1.0 Panel.qml
+DialogPanel 1.0 DialogPanel.qml
 ScrollView 1.0 ScrollView.qml
 ScrollBar 1.0 ScrollBar.qml
 Scrollable 1.0 Scrollable.qml
