@@ -50,6 +50,7 @@ Item
         drag.minimumY: 0
         drag.maximumY: grip.parent ? grip.parent.height : 0
         drag.axis: grip.axis
+        drag.threshold: 0
 
         drag.onActiveChanged:
         {
