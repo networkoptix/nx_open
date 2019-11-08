@@ -20,6 +20,8 @@ enum class QnLicenseErrorCode
     FutureLicense               /**< License type is unknown, may be license from future version. */
 };
 
+class QnPeerRuntimeInfo;
+
 class QnLicenseValidator: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -45,6 +47,11 @@ public:
      * Check if signature matches other fields, also check hardwareId and brand
      */
     virtual QnLicenseErrorCode validate(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
+
+    /**
+     * Return true to use different runtime info if the server is missing.
+     */
+    virtual bool overrideMissingRuntimeInfo(const QnLicensePtr& license, QnPeerRuntimeInfo& info) const;
 
     QString validationInfo(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 

@@ -787,6 +787,27 @@ public:
             std::bind(fn, this, value, time, std::placeholders::_1));
     }
 
+    template<class TargetType, class HandlerType>
+    int markVideoWallLicenseOverflow(bool value, qint64 time, TargetType* target, HandlerType handler)
+    {
+        return markVideoWallLicenseOverflow(
+            value,
+            time,
+            std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                    target,
+                    handler)));
+    }
+
+    ErrorCode markVideoWallLicenseOverflowSync(bool value, qint64 time)
+    {
+        int (AbstractMiscManager:: * fn)(bool, qint64, impl::SimpleHandlerPtr) =
+            &AbstractMiscManager::markVideoWallLicenseOverflow;
+
+        return impl::doSyncCall<impl::SimpleHandler>(
+            std::bind(fn, this, value, time, std::placeholders::_1));
+    }
+
     ErrorCode saveMiscParamSync(const nx::vms::api::MiscData& param)
     {
         int (AbstractMiscManager:: * fn)(const nx::vms::api::MiscData&, impl::SimpleHandlerPtr) =
@@ -880,6 +901,7 @@ protected:
         nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
+    virtual int markVideoWallLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     virtual int cleanupDatabase(
         bool cleanupDbObjects,
         bool cleanupTransactionLog,

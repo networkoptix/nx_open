@@ -49,6 +49,8 @@ struct NX_VMS_API RuntimeData: DataWithVersion
 
     QSet<QnUuid> activeAnalyticsEngines;
 
+    qint64 prematureVideoWallLicenseExperationDate = 0;
+
     /**
     * This operator must not be replaced with fusion implementation as it skips brand and
     * customization checking.
@@ -74,7 +76,8 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     (userId) \
     (flags) \
     (customization) \
-    (activeAnalyticsEngines)
+    (activeAnalyticsEngines) \
+    (prematureVideoWallLicenseExperationDate)
 
 } // namespace api
 } // namespace vms
