@@ -7,14 +7,13 @@
 
 #include <nx/sdk/ptr.h>
 
-#include <nx/utils/timed_guard.h>
-
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
 
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/error.h>
+#include <nx/vms/server/sdk_support/timed_guard.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/analytics/wrappers/string_builder.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
@@ -45,7 +44,7 @@ public:
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
-        nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::manifest);
+        sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::manifest);
 
         if (!NX_ASSERT(m_mainSdkObject))
             return std::nullopt;
@@ -96,11 +95,11 @@ protected:
         SdkMethod sdkMethod,
         const GenericError& error,
         ReturnType returnValue,
-        bool isCritical = false) const
+        bool shouldTriggerAssert = false) const
     {
         const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
 
-        if (isCritical)
+        if (shouldTriggerAssert)
             NX_ASSERT(false, stringBuilder.buildLogString());
         else
             NX_DEBUG(this, stringBuilder.buildLogString());
@@ -117,12 +116,12 @@ protected:
         SdkMethod sdkMethod,
         const sdk_support::Error& error,
         ReturnType returnValue,
-        bool isCritical = false) const
+        bool shouldTriggerAssert = false) const
     {
         if (!NX_ASSERT(!error.isOk()))
             return returnValue;
 
-        return handleGenericError(sdkMethod, error, returnValue, isCritical);
+        return handleGenericError(sdkMethod, error, returnValue, shouldTriggerAssert);
     }
 
     template<typename ReturnType>
@@ -130,9 +129,9 @@ protected:
         SdkMethod sdkMethod,
         const Violation& violation,
         ReturnType returnValue,
-        bool isCritical = false) const
+        bool shouldTriggerAssert = false) const
     {
-        return handleGenericError(sdkMethod, violation, returnValue, isCritical);
+        return handleGenericError(sdkMethod, violation, returnValue, shouldTriggerAssert);
     }
 
     void throwPluginEvent(
@@ -163,11 +162,11 @@ protected:
             Q_ARG(nx::vms::event::PluginDiagnosticEventPtr, pluginDiagnosticEvent));
     }
 
-    nx::utils::TimedGuard makeTimedGuard(
+    sdk_support::TimedGuard makeTimedGuard(
         SdkMethod sdkMethod,
         QString additionalInfo = QString()) const
     {
-        return nx::utils::TimedGuard(
+        return sdk_support::TimedGuard(
             sdkMethodTimeout(sdkMethod),
             [this, sdkMethod, additionalInfo = std::move(additionalInfo)]()
             {
@@ -175,7 +174,7 @@ protected:
                     sdkMethod,
                     {ViolationType::methodExecutionTookTooLong, std::move(additionalInfo)},
                     /*returnValue*/ nullptr,
-                    pluginsIni().isMethodTimeoutViolationCritical);
+                    pluginsIni().shouldMethodTimeoutViolationTriggerAnAssertion);
             });
     }
 

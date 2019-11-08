@@ -6,6 +6,7 @@
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
 #include <nx/p2p/transport/i_p2p_transport.h>
+#include <nx/vms/utils/transaction_data_to_string.h>
 
 namespace {
 
@@ -782,6 +783,9 @@ void ServerMessageBus::gotTransaction(
     const auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
     if (transactionDescriptor->isPersistent)
     {
+        NX_DEBUG(
+            this, "Received transaction %1 via transaction bus. Data: %2",
+            tran.command, nx::vms::utils::toString(tran.params));
         updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
         std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
         dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(

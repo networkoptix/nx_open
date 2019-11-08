@@ -13,7 +13,7 @@ namespace media_utils {
       ((const uint8_t*)(x))[1])
 #endif
 
-// TODO: Code duplication with "h264_utils.cpp".
+// TODO: Code duplication with "h264_mp4_to_annexb.cpp".
 /**
  * @param data data->context should not be null.
  */

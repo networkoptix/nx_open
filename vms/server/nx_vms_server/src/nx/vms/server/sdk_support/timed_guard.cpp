@@ -1,6 +1,6 @@
 #include "timed_guard.h"
 
-namespace nx::utils {
+namespace nx::vms::server::sdk_support {
 
 TimedGuard::TimedGuard(std::chrono::milliseconds timeout, std::function<void()> onExpired)
 {
@@ -9,7 +9,7 @@ TimedGuard::TimedGuard(std::chrono::milliseconds timeout, std::function<void()> 
 
 TimedGuard::~TimedGuard()
 {
-    m_timer.cancelSync();
+    m_timer.pleaseStopSync();
 }
 
-} // namespace nx::utils
+} // namespace nx::vms::server::sdk_support

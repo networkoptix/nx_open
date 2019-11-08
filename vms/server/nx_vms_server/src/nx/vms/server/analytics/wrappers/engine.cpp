@@ -75,7 +75,7 @@ SdkObjectDescription Engine::sdkObjectDescription() const
 
 void Engine::setEngineInfo(Ptr<const IEngineInfo> engineInfo)
 {
-    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::setEngineInfo);
+    sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::setEngineInfo);
 
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))
@@ -86,7 +86,7 @@ void Engine::setEngineInfo(Ptr<const IEngineInfo> engineInfo)
 
 bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
 {
-    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::isCompatible);
+    sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::isCompatible);
 
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))
@@ -108,7 +108,7 @@ bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
 
 wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr device)
 {
-    nx::utils::TimedGuard guard = makeTimedGuard(
+    sdk_support::TimedGuard guard = makeTimedGuard(
         SdkMethod::obtainDeviceAgent,
         lm("Device: %1 (%2)").args(device->getUserDefinedName(), device->getId()));
 
@@ -158,7 +158,7 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
 
 Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
 {
-    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::executeAction);
+    sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::executeAction);
 
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))
@@ -211,7 +211,7 @@ Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
 
 void Engine::setHandler(sdk::Ptr<sdk::analytics::IEngine::IHandler> handler)
 {
-    nx::utils::TimedGuard guard = makeTimedGuard(SdkMethod::setHandler);
+    sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::setHandler);
 
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))

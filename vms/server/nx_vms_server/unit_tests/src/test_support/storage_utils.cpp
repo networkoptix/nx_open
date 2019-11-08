@@ -761,7 +761,7 @@ public:
             if (!decoder)
             {
                 decoder = std::make_unique<QnFfmpegVideoDecoder>(
-                    DecoderConfig(), /*metrics*/ nullptr, video->compressionType, video);
+                    DecoderConfig(), /*metrics*/ nullptr, video);
             }
             QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
             decoder->decode(video, &outFrame);

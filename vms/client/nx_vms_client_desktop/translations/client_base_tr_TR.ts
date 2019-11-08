@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Sayfa...</translation>
     </message>
   </context>
   <context>
@@ -2968,7 +2968,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Yakalama çözünürlüğü tespit edilemedi</translation>
     </message>
   </context>
   <context>
@@ -5749,31 +5749,31 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>yerel</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optik</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>değiştir</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>ağ</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>bilinmeyen</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6474,7 +6474,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>Indiriliyor&lt;br&gt;başladı</translation>
     </message>
   </context>
   <context>
@@ -6619,7 +6619,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Kaldırılan kameradaki olay onaylanamıyor.</translation>
     </message>
   </context>
   <context>
@@ -10054,7 +10054,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Farklı kaydet...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10062,15 +10062,15 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Dosya kaydetme başarısız oldu</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 klasör yazma engellendi.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Dosyalar indiriliyor...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10078,15 +10078,15 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>İndirme durdurulsun mu?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Dosya İndirildi</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Dosya indirmesi başarısız</translation>
     </message>
   </context>
 </TS>
