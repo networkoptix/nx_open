@@ -30,7 +30,7 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         camera_args += ["--no-secondary"]
 
     if ini_enable_secondary_stream:
-        secondary_files_string = ';secondary-files="{ini_test_file_low_resolution}"'
+        secondary_files_string = f';secondary-files="{ini_test_file_low_resolution}"'
     else:
         secondary_files_string = ''
 
