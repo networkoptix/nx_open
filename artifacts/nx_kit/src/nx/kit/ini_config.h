@@ -33,7 +33,7 @@ namespace kit {
  * empty, the file is filled with default values and descriptions. The names of .ini files and
  * their values are printed to stderr (configurable), overridden values marked with "*".
  *
- * Usage example:
+ * Usage example, .h file:
  * <pre><code>
  *
  *     struct Ini: nx::kit::IniConfig
@@ -48,7 +48,14 @@ namespace kit {
  *         NX_INI_DOUBLE(1.0, myDouble, "Here 1.0 is the default value.");
  *     };
  *
- *     inline Ini& ini()
+ *     Ini& ini();
+ *
+ * </code></pre>
+ *
+ * Usage example, .cpp file:
+ * <pre><code>
+ *
+ *     Ini& ini()
  *     {
  *         static Ini ini;
  *         return ini;
@@ -58,6 +65,10 @@ namespace kit {
  *
  * In the code, use ini().<param-name> to access the values. Call ini().reload() when needed, e.g.
  * when certain activity starts or at regular intervals.
+ *
+ * Note that static function-local variable must not be in a header file as Windows dynamic linker
+ * does not perform vague linkage correctly that leads to duplicates of such variables defined in a
+ * header file used in more than one shared library.
  */
 class NX_KIT_API IniConfig
 {
