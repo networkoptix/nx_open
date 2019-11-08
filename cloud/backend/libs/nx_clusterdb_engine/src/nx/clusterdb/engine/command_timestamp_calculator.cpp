@@ -18,6 +18,8 @@ CommandTimestampCalculator::CommandTimestampCalculator(
                     std::chrono::steady_clock::now().time_since_epoch());
             };
     }
+
+    reset();
 }
 
 void CommandTimestampCalculator::init(Timestamp initialValue)
@@ -45,7 +47,7 @@ Timestamp CommandTimestampCalculator::calculateNextTimeStamp()
         newTime.ticks = (m_baseTime + m_relativeTimer.elapsed()).count();
         if (newTime > m_lastTimestamp)
         {
-            if (newTime > m_lastTimestamp + kTimeShiftDelta && 
+            if (newTime > m_lastTimestamp + kTimeShiftDelta &&
                 newTime > absoluteTime + kTimeShiftDelta)
             {
                 newTime -= kTimeShiftDelta; // try to reach absolute time
