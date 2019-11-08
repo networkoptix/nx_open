@@ -78,12 +78,12 @@ struct PluginsIniConfig: public nx::kit::IniConfig
 
     // --------------------------------------------------------------------------------------------
 
-    NX_INI_FLAG(1, isMethodTimeoutViolationCritical,
+    NX_INI_FLAG(1, shouldMethodTimeoutViolationTriggerAnAssertion,
         "If set an assertion is triggereed if method execution takes more time than the limits\n"
         "below. Otherwise debug-level message is written into the logs and a plugin event is\n"
         "triggered.");
 
-    NX_INI_INT(1, manifestSdkMethodTimeoutS,
+    NX_INI_INT(5, manifestSdkMethodTimeoutS,
         "Maximum duration of the `*::manifest` method execution in seconds.");
 
     NX_INI_INT(10, setSettingsSdkMethodTimeoutS,

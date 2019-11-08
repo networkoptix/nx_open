@@ -167,7 +167,7 @@ QString toString(const std::chrono::microseconds& value)
     if (value.count() % 1000 == 0)
         return toString(std::chrono::duration_cast<std::chrono::milliseconds>(value));
 
-    return QString(QLatin1String("%1usec")).arg(value.count());
+    return QString(QLatin1String("%1us")).arg(value.count());
 }
 
 QString toString(const std::chrono::nanoseconds &value)

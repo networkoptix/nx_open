@@ -121,7 +121,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
     {
         d->credentials = state.credentials;
 
-        if (!state.isSingleCamera() || state.singleCameraProperties.settingsUrlPath.isEmpty())
+        if (!state.canShowWebPage())
         {
             d->lastRequestUrl = QUrl();
             d->webWidget->reset();

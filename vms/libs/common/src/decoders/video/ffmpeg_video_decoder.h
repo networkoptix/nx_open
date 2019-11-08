@@ -35,7 +35,7 @@ public:
     QnFfmpegVideoDecoder(
         const DecoderConfig& config,
         nx::metrics::Storage* metrics,
-        AVCodecID codec, const QnConstCompressedVideoDataPtr& data);
+        const QnConstCompressedVideoDataPtr& data);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 

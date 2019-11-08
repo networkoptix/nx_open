@@ -314,10 +314,17 @@ void GraphicsWebEngineView::requestAuthenticationDialog(QObject* request, QWidge
 
     PasswordDialog dialog(parent);
 
+    QString text;
     if (request->property("type").toInt() == AuthenticationTypeProxy)
-        dialog.setCaption(request->property("proxyHost").toString());
+    {
+        text = tr("The proxy %1 requires a username and password.")
+            .arg(request->property("proxyHost").toString());
+    }
     else
-        dialog.setCaption(request->property("url").toString());
+    {
+        text = request->property("url").toString();
+    }
+    dialog.setText(text);
 
     if (dialog.exec() == QDialog::Accepted)
     {

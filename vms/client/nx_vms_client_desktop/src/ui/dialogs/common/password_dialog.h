@@ -25,6 +25,9 @@ public:
     QString caption() const;
     void setCaption(const QString& caption);
 
+    QString text() const;
+    void setText(const QString& text);
+
     QString username() const;
     QString password() const;
 

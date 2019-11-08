@@ -65,10 +65,10 @@ bool nodeRequiresChildren(
             if (node->resourceFlags().testFlag(Qn::server))
             {
                 const bool isLoggedIn = !accessController->user().isNull();
-                const bool isCustomUser =
-                    accessController->hasGlobalPermission(GlobalPermission::customUser);
+                const bool hasAccessAllMediaPermission =
+                    accessController->hasGlobalPermission(GlobalPermission::accessAllMedia);
 
-                if (isLoggedIn && isCustomUser)
+                if (isLoggedIn && !hasAccessAllMediaPermission)
                 {
                     const auto accessibleVia =
                         accessProvider->accessibleVia(accessController->user(), node->resource());

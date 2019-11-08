@@ -19,6 +19,7 @@ class LiveThumbnailProvider:
     Q_OBJECT
     Q_PROPERTY(int thumbnailsHeight READ thumbnailsHeight WRITE setThumbnailsHeight
         NOTIFY thumbnailsHeightChanged)
+    Q_PROPERTY(int rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
 
 public:
     LiveThumbnailProvider(QObject* parent = nullptr);
@@ -32,8 +33,12 @@ public:
     int thumbnailsHeight() const { return m_thumbnailHeight; }
     void setThumbnailsHeight(int height);
 
+    int rotation() const { return m_rotation; }
+    void setRotation(int rotation);
+
 signals:
     void thumbnailsHeightChanged();
+    void rotationChanged();
     void thumbnailUpdated(
         const QnUuid& cameraId, const QString& thumbnailId, const QUrl& thumbnailUrl);
 
@@ -52,6 +57,7 @@ private:
     QHash<QString, QPixmap> m_pixmapById;
     QThread* m_decompressionThread = nullptr;
     int m_thumbnailHeight = 240;
+    int m_rotation = -1;
 };
 
 } // namespace nx::vms::client::core

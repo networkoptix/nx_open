@@ -213,7 +213,9 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             if (!video || video->width < 1 || video->height < 1)
             {
                 QnFfmpegVideoDecoder decoder(
-                    m_config.decoderConfig, m_metrics, video->compressionType, video);
+                    m_config.decoderConfig,
+                    m_metrics,
+                    video);
                 QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();

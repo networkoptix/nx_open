@@ -301,6 +301,11 @@ QnRtspClient::QnRtspClient(
         m_tcpSock = nx::network::SocketFactory::createStreamSocket();
 }
 
+void QnRtspClient::setConfig(const Config& config)
+{
+    m_config = config;
+}
+
 QnRtspClient::~QnRtspClient()
 {
     stop();
@@ -418,7 +423,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         QnMutexLocker lock(&m_socketMutex);
         previousSocketHolder = std::move(m_tcpSock);
         m_tcpSock = nx::network::SocketFactory::createStreamSocket(isSslRequired);
-
     }
 
     m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
@@ -441,6 +445,13 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     {
         m_contentBase = m_url.toString();
         return CameraDiagnostics::NoErrorResult();
+    }
+
+    if (m_config.sendOptions && !sendOptions())
+    {
+        stop();
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(
+            url.toString(), targetAddress.port);
     }
 
     QByteArray response;
@@ -603,11 +614,6 @@ bool QnRtspClient::sendRequestInternal(nx::network::http::Request&& request)
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
-bool QnRtspClient::sendDescribe()
-{
-    return sendRequestInternal(createDescribeRequest());
-}
-
 bool QnRtspClient::sendOptions()
 {
     nx::network::http::Request request;
@@ -615,7 +621,13 @@ bool QnRtspClient::sendOptions()
     request.requestLine.url = m_url;
     request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
-    return sendRequestInternal(std::move(request));
+    QByteArray response;
+    if (!sendRequestAndReceiveResponse(std::move(request), response))
+    {
+        NX_ERROR(this, "OPTIONS request failed");
+        return false;
+    }
+    return true;
 }
 
 int QnRtspClient::getTrackCount(nx::streaming::Sdp::MediaType mediaType) const

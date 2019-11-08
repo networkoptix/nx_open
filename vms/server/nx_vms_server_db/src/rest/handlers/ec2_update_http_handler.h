@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/vms/utils/transaction_data_to_string.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -436,6 +437,10 @@ private:
                 finished = true;
                 m_cond.wakeAll();
             };
+
+        NX_DEBUG(
+            this, "Received transaction %1 via ec2 http request. Data: %2",
+            command, nx::vms::utils::toString(requestData));
 
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail

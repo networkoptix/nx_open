@@ -1,35 +1,70 @@
 import QtQuick 2.11
-import QtQuick.Window 2.0
+import QtQuick.Window 2.11
 import Nx 1.0
 import Nx.Items 1.0
 import Nx.Controls 1.0
+import Nx.Core 1.0
+import Nx.Media 1.0
+import Nx.Core.Items 1.0
 
 Window
 {
+    id: dialog
+
     modality: Qt.WindowModal
 
     width: 600
     height: 400
 
-    color: ColorTheme.colors.dark7
+    color: ColorTheme.colors.dark3
 
     signal accepted()
 
     property alias figureType: editor.figureType
     property int maxPolygonPoints: -1
 
-    property alias resourceId: editor.resourceId
+    property var resourceId
+
+    MediaResourceHelper
+    {
+        id: helper
+        resourceId: dialog.resourceId ? dialog.resourceId.toString() : ""
+    }
+
+    MediaPlayer
+    {
+        id: player
+
+        resourceId: helper.resourceId
+        audioEnabled: false
+
+        readonly property bool loaded: mediaStatus === MediaPlayer.MediaStatus.Loaded
+
+        onResourceIdChanged: video.videoOutput.clear()
+        onSourceChanged: updatePlayingState()
+    }
 
     Item
     {
         width: parent.width
         height: parent.height - bottomPanel.height
 
-        FigureEditor
+        MultiVideoPositioner
         {
-            id: editor
+            id: video
 
             anchors.fill: parent
+
+            resourceHelper: helper
+            mediaPlayer: player
+
+            FigureEditor
+            {
+                id: editor
+                anchors.fill: video.sourceSize.width > 0 && video.sourceSize.height > 0
+                    ? video.videoOutput : parent
+                rotation: video.videoRotation
+            }
         }
 
         Rectangle
@@ -60,16 +95,16 @@ Window
         }
     }
 
-    Item
+    DialogPanel
     {
         id: bottomPanel
 
-        anchors.bottom: parent.bottom
-        width: parent.width
-        height: 58
+        implicitWidth: leftBottomControls.implicitWidth + rightBottomControls.implicitWidth + 48
 
         Row
         {
+            id: leftBottomControls
+
             height: parent.height
             x: 16
             spacing: 16
@@ -102,13 +137,15 @@ Window
                 text: qsTr("Reset")
                 iconUrl: "qrc:/skin/text_buttons/refresh.png"
                 leftPadding: 0
-                rightPadding: 2
+                rightPadding: 16
                 onClicked: editor.clear()
             }
         }
 
         Row
         {
+            id: rightBottomControls
+
             spacing: 8
             anchors
             {
@@ -136,6 +173,26 @@ Window
                 width: Math.max(implicitWidth, 80)
             }
         }
+    }
+
+    onVisibleChanged: updatePlayingState()
+
+    onScreenChanged:
+    {
+        // Minimum size setting does not work properly when screen is changed and new screen has
+        // another DPI. New unscaled size is not sent to a window manager.
+        minimumWidth = 0
+        minimumHeight = 0
+        minimumWidth = bottomPanel.implicitWidth
+        minimumHeight = 200
+    }
+
+    function updatePlayingState()
+    {
+        if (visible)
+            player.playLive()
+        else
+            player.pause()
     }
 
     function serializeFigure()

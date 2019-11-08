@@ -213,7 +213,10 @@ class VmsScanner:
             if pid is None:
                 return None
             proc_status_filename = f'/proc/{pid}/status'
-            uid_str = device.eval(fr"cat {proc_status_filename} | grep -o 'Uid:\s\+[0-9]\+' | grep -o '[0-9]\+'")
+            uid_str = device.eval(
+                fr"cat {proc_status_filename} | grep -o 'Uid:\s\+[0-9]\+' | grep -o '[0-9]\+'",
+                su=True
+            )
             if uid_str is None:
                 raise exceptions.BoxCommandError(f"Cannot obtain uid of running Server.")
             try:
