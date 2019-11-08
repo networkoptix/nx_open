@@ -5754,7 +5754,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>ram</source>
-      <translation>RAM</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
@@ -5770,7 +5770,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>usb</source>
-      <translation>USB</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
@@ -6620,7 +6620,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Het is niet mogelijk een event te bevestigen op een verwijderde camera.</translation>
+      <translation>Het is niet mogelijk een evenement te bevestigen op een verwijderde camera.</translation>
     </message>
   </context>
   <context>
@@ -10070,7 +10070,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Bestanden worden gedownload...</translation>
+      <translation>Bestand downloaden...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
