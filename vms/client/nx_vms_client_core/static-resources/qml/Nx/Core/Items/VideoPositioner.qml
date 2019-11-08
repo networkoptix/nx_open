@@ -1,5 +1,4 @@
 import QtQuick 2.6
-import QtMultimedia 5.0
 import Nx 1.0
 import nx.client.core 1.0
 
