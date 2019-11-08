@@ -1,6 +1,383 @@
 {
     "capabilities": "deviceDependent",
-    "eventTypes": [
+    "objectTypes": 
+    [
+        {
+            "id": "nx.hanwha.ObjectDetection.Person",
+            "name": "Person"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection.Vehicle",
+            "name": "Vehicle"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection.Face",
+            "name": "Face"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection.LicensePlate",
+            "name": "LicensePlate"
+        }
+    ],
+    "deviceAgentSettingsModel": 
+    {
+        "type": "Settings",
+        "items": 
+        [
+            {
+                "type": "GroupBox",
+                "caption": "1 Shock detection settings",
+                "items": 
+                [
+                    {
+                        "type": "SpinBox",
+                        "name": "ShockDetection.DetectionLevel",
+                        "caption": "Detection level",
+                        "defaultValue": 50,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "ShockDetection.Sensitivity",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 0,
+                        "maxValue": 100
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "2 Motion detection settings",
+                "items": 
+                [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 1",
+                        "items": 
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.IncludeArea1.Area",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea1.DetectionLevel",
+                                "caption": "Detection level",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea1.Sensitivity",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea1.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 2",
+                        "items": 
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.IncludeArea2.Area",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea2.DetectionLevel",
+                                "caption": "Detection level",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea2.Sensitivity",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea2.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },    
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 3 ... 8",
+                        "items": 
+                        [
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Exclude areas",
+                        "items": 
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea1",
+                              "caption": "Exclude area 1"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea2",
+                              "caption": "Exclude area 2"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Size",
+                        "items": 
+                        [
+                            {
+                              "type": "BoxFigure",
+                              "name": "MotionDetection.MinimumSize",
+                              "caption": "Minimum",
+                              "value": { "points": [[0.48, 0.48], [0.52, 0.52]], "color": "#e040fb" }
+                            },
+                            {
+                              "type": "BoxFigure",
+                              "name": "MotionDetection.MaximumSize",
+                              "caption": "Maximum",
+                              "value": { "points": [[0.30, 0.30], [0.70, 0.70]], "color": "#e040fb" }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "3 Tampering detection",
+                "items": 
+                [
+                    {
+                        "type": "SpinBox",
+                        "name": "TamperingDetection.DetectionLevel",
+                        "caption": "Detection level",
+                        "defaultValue": 50,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "TamperingDetection.Sensitivity",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "TamperingDetection.MinimumDuration",
+                        "caption": "Minimum duration (s)",
+                        "defaultValue": 0,
+                        "minValue": 0,
+                        "maxValue": 5
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": "TamperingDetection.ExceptDarkImages",
+                        "caption": "Except dark images",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "4 Defocus detection",
+                "items": 
+                [
+                    {
+                        "type": "SpinBox",
+                        "name": "DefocusDetection.DetectionLevel",
+                        "caption": "Detection Level",
+                        "defaultValue": 20,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "DefocusDetection.Sensitivity",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "DefocusDetection.MinimumDuration",
+                        "caption": "Minimum Duration (s)",
+                        "defaultValue": 0,
+                        "minValue": 0,
+                        "maxValue": 5
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "AI Common Settings",
+                "items": 
+                [
+                    {
+                        "type": "SpinBox",
+                        "name": "AICommonSettings.Sensitivity",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Size",
+                        "items": 
+                        [
+                            {
+                              "type": "BoxFigure",
+                              "name": "AICommonSettings.MinimumSize",
+                              "caption": "Minimum",
+                              "value": { "points": [[0.48, 0.48], [0.52, 0.52]], "color": "#e040fb" }
+                            },
+                            {
+                              "type": "BoxFigure",
+                              "name": "AICommonSettings.MaximumSize",
+                              "caption": "Maximum",
+                              "value": { "points": [[0.30, 0.30], [0.70, 0.70]], "color": "#e040fb" }
+                            }
+                        ]
+                    }    
+                ]
+            },    
+            {
+                "type": "GroupBox",
+                "caption": "5 Object detection",
+                "items": 
+                [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Object",
+                        "items": 
+                        [
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.Person",
+                                "caption": "Person",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.Face",
+                                "caption": "Face",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.LicensePlate",
+                                "caption": "LicensePlate",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "ObjectDetection.MinimumDuration",
+                                "caption": "Minimum Duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    }, 
+                    {
+                        "type": "GroupBox",
+                        "caption": "Exclude areas",
+                        "items": 
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "name": "ObjectDetection.ExcludeArea1",
+                                "caption": "Exclude area 1"
+                            },
+                            {
+                                "type": "PolygonFigure",
+                                "name": "ObjectDetection.ExcludeArea2",
+                                "caption": "Exclude area 2"
+                            }
+                        ]
+                    }, 
+                    {
+                        "type": "GroupBox",
+                        "caption": "BestShot",
+                        "items": 
+                        [
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.BestShot.Person",
+                                "caption": "Person",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.BestShot.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.BestShot.Face",
+                                "caption": "Face",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "ObjectDetection.BestShot.LicensePlate",
+                                "caption": "LicensePlate",
+                                "defaultValue": false,
+                                "value": false
+                            }
+                        ]
+                    }    
+                ]
+            }
+        ]
+    },
+    "eventTypes": 
+    [
         {
             "id": "nx.hanwha.FaceDetection",
             "name": "Face detection",
@@ -213,7 +590,8 @@
             "groupId": "nx.hanwha.Queue"
         }
     ],
-    "groups": [
+    "groups": 
+    [
         {
             "id": "nx.hanwha.Queue",
             "name": "Queue"

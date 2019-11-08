@@ -391,7 +391,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
         m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), m_syncEndTimePoint);
         NX_VERBOSE(this, lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint));
-        for (const auto &chunkKey : *chunkKeyVector)
+        for (const auto &chunkKey: *chunkKeyVector)
         {
             auto err = copyChunk(chunkKey);
             if (err != CopyError::NoError && err != CopyError::SourceFileError)
@@ -417,9 +417,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         const auto needMoveOnCode = needMoveOn();
         if (needMoveOnCode != SyncCode::ok)
         {
-            NX_DEBUG(
-                this, "Interrupting backup because: '%1'",
-                toString(needMoveOnCode));
+            NX_DEBUG(this, "Interrupting backup because: '%1'", toString(needMoveOnCode));
             if (needMoveOnCode == SyncCode::wrongTime)
                 return vms::api::EventReason::backupEndOfPeriod;
             if (needMoveOnCode == SyncCode::wrongBackupType || needMoveOnCode == SyncCode::interrupted)

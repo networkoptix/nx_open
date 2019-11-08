@@ -61,7 +61,12 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "users",
-                [pool](const auto&) { return Value(pool->getResources<QnUserResource>().size()); }
+                [pool](const auto&)
+                {
+                    // Subtracting video wall user (see: addFakeVideowallUser),
+                    // avoid filtering for performance.
+                    return Value(pool->getResources<QnUserResource>().size() - 1);
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "version",

@@ -11,13 +11,7 @@
 #include <nx/vms/discovery/module_connector.h>
 #include <rest/server/json_rest_result.h>
 
-namespace nx {
-namespace vms {
-namespace discovery {
-namespace test {
-
-static const nx::network::HostAddress kLocalDnsHost("local-doman-name.com");
-static const nx::network::HostAddress kLocalCloudHost(QnUuid::createUuid().toSimpleString());
+namespace nx::vms::discovery::test {
 
 static const std::chrono::seconds kMaxWaitDelay(30);
 static const std::chrono::milliseconds kExpectNoChanesDelay(300);
@@ -270,7 +264,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector.newEndpoints({newLocalEndpoint}, id);
     expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
-    const DnsAlias dnsEndpoint(addMediaserver(id), "local-doman-name.com");
+    const DnsAlias dnsEndpoint(addMediaserver(id), "local-domain-name-1.com");
     const DnsAlias cloudEndpoint(addMediaserver(id), QnUuid::createUuid().toSimpleString());
 
     connector.newEndpoints({dnsEndpoint.alias, cloudEndpoint.alias}, id);
@@ -281,7 +275,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     removeMediaserver(dnsEndpoint.original);
     expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is the last possible option.
 
-    const DnsAlias newDnsEndpoint(addMediaserver(id), "local-doman-name.com");
+    const DnsAlias newDnsEndpoint(addMediaserver(id), "local-domain-name-2.com");
     connector.newEndpoints({newDnsEndpoint.alias}, id);
     expectConnect(id, newDnsEndpoint.alias);
 
@@ -353,7 +347,4 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
     expectConnect(secondId, secondEndpoint2); //< Switch to a single avaliable.
 }
 
-} // namespace test
-} // namespace discovery
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::discovery::test

@@ -200,22 +200,6 @@ static void remove(const QnStorageResourcePtr &storage)
 
 } // namespace
 
-namespace detail {
-
-void ScanDataManager::set(const QnStorageScanData& data)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_data = data;
-}
-
-QnStorageScanData ScanDataManager::get() const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_data;
-}
-
-} // namespace detail
-
 class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
@@ -1306,7 +1290,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
 
 QnStorageScanData QnStorageManager::rebuildInfo() const
 {
-    return m_scanDataManager.get();
+    return *m_scanData.lock();
 }
 
 QnServer::StoragePool QnStorageManager::getRole() const
@@ -1365,13 +1349,13 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 
 bool QnStorageManager::needToStopMediaScan() const
 {
-    return m_archiveIndexer->cancelled() && m_scanDataManager.get().state == Qn::RebuildState_FullScan;
+    return m_archiveIndexer->cancelled() && m_scanData.lock()->state == Qn::RebuildState_FullScan;
 }
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
     NX_ASSERT(data.totalProgress < 1.01, "invalid progress");
-    m_scanDataManager.set(data);
+    *m_scanData.lock() = data;
 }
 
 QStringList QnStorageManager::getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const
@@ -2019,22 +2003,27 @@ void QnStorageManager::clearSpace(bool forced)
 
     // 5. Cleanup motion
 
-    bool readyToDeleteMotion = (m_scanDataManager.get().state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
-    for (const QnStorageResourcePtr& storage : getAllStorages()) {
-        if (storage->getStatus() == Qn::Offline) {
+    bool readyToDeleteMotion = (m_scanData.lock()->state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
+    for (const QnStorageResourcePtr& storage: getAllStorages())
+    {
+        if (storage->getStatus() == Qn::Offline)
+        {
             readyToDeleteMotion = false; // offline storage may contain archive. do not delete motion so far
             break;
         }
 
     }
+
     if (readyToDeleteMotion)
     {
-        if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL) {
+        if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL)
+        {
             m_clearMotionTimer.restart();
             clearUnusedMetadata();
         }
     }
-    else {
+    else
+    {
         m_clearMotionTimer.restart();
     }
 
@@ -3211,7 +3200,7 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         QnMutexLocker lock(&m_mutexStorages);
         std::transform(m_storageRoots.cbegin(), m_storageRoots.cend(),
             std::back_inserter(allStorages), [](const auto& storage){ return storage; });
-        storageScanData = m_scanDataManager.get();
+        storageScanData = *m_scanData.lock();
     }
 
     Qn::StorageStatuses result = Qn::StorageStatus::none;

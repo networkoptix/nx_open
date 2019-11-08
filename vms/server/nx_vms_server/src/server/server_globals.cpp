@@ -13,5 +13,6 @@ QString QnServer::toString(StoragePool pool)
         case StoragePool::Normal: return "Normal";
     }
 
+    NX_ASSERT(false);
     return "";
 }

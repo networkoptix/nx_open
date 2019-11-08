@@ -22,6 +22,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/timer_manager.h>
 #include <set>
 #include <unordered_map>
@@ -59,21 +60,6 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 namespace nx::vms::server { class WritableStoragesHelper; }
-
-namespace detail {
-
-class ScanDataManager
-{
-public:
-    void set(const QnStorageScanData& data);
-    QnStorageScanData get() const;
-
-private:
-    mutable std::mutex m_mutex;
-    QnStorageScanData m_data;
-};
-
-} // namespace detail
 
 class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -348,7 +334,7 @@ private:
 
     QTimer m_timer;
 
-    detail::ScanDataManager m_scanDataManager;
+    mutable nx::utils::Lockable<QnStorageScanData> m_scanData;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;

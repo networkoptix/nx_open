@@ -49,7 +49,7 @@ QnStorageResourcePtr ServerForTests::addStorage(const QString& storageName)
     auto storageRes = commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
     while (!serverModule()->normalStorageManager()->hasStorage(storageRes))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    
+
     storageRes.dynamicCast<QnFileStorageResource>()->setMounted(true);
     storageRes->initOrUpdate();
     return storageRes;
