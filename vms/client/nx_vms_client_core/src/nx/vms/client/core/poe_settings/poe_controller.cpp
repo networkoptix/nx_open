@@ -2,6 +2,8 @@
 
 #include <QtCore/QTimer>
 
+#include <functional>
+
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
@@ -16,6 +18,8 @@ static constexpr auto kNvrAction = "/api/nvrNetworkBlock";
 
 namespace nx::vms::client::core {
 
+using namespace std::placeholders;
+
 static constexpr int kUpdateIntervalMs = 1000;
 
 struct PoEController::Private: public QObject
@@ -24,10 +28,11 @@ struct PoEController::Private: public QObject
 
     void updateTargetResource(const QnUuid& value);
     void setBlockData(const OptionalBlockData& value);
-    void update();
 
+    void handleReply(bool success, rest::Handle currentHandle, const QnJsonRestResult& result);
+    void update();
     void setPowered(const PoEController::PowerModes& value);
-    \
+
     PoEController* const q;
 
     rest::QnConnectionPtr connection;
@@ -71,34 +76,39 @@ void PoEController::Private::setBlockData(const OptionalBlockData& value)
     emit q->updated();
 }
 
+void PoEController::Private::handleReply(
+    bool success,
+    rest::Handle replyHandle,
+    const QnJsonRestResult& result)
+{
+    if (handle != replyHandle)
+        return; //< Most likely we cancelled request
+
+    handle = -1;
+
+    if (autoUpdate)
+        updateTimer.start();
+
+    if (!success || result.error != QnRestResult::NoError)
+        return;
+
+    BlockData data;
+    if (QJson::deserialize(result.reply, &data))
+        setBlockData(data);
+}
+
 void PoEController::Private::update()
 {
     if (!connection)
         return;
 
-    const auto callback =
-        [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
-        {
-            if (handle != currentHandle)
-                return;
-
-            handle = -1;
-
-            if (autoUpdate)
-                updateTimer.start();
-
-            if (!success || result.error != QnRestResult::NoError)
-                return;
-
-            BlockData data;
-            if (QJson::deserialize(result.reply, &data))
-                setBlockData(data);
-        };
-
     updateTimer.stop();
 
     handle = connection->getJsonResult(
-        kNvrAction, QnRequestParamList(), callback, QThread::currentThread());
+        kNvrAction,
+        QnRequestParamList(),
+        std::bind(&Private::handleReply, this, _1, _2, _3),
+        QThread::currentThread());
 }
 
 void PoEController::Private::setPowered(const PoEController::PowerModes& value)
@@ -106,14 +116,13 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
     if (!connection)
         return;
 
-    const auto callback =
-        [this](bool success, rest::Handle currentHandle, const QnJsonRestResult& result)
-        {
-            qWarning() << "++++++++++ SUCCESS POST" << success << result.reply.toString();
-        };
-
-    connection->postJsonResult(
-        kNvrAction, QnRequestParamList(), QJson::serialized(value), callback, QThread::currentThread());
+    updateTimer.stop();
+    handle = connection->postJsonResult(
+        kNvrAction,
+        QnRequestParamList(),
+        QJson::serialized(value),
+        std::bind(&Private::handleReply, this, _1, _2, _3),
+        QThread::currentThread());
 }
 
 //--------------------------------------------------------------------------------------------------
