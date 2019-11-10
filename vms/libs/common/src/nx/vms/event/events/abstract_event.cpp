@@ -191,8 +191,14 @@ bool requiresCameraResource(EventType eventType)
 // Check if server required for this event to setup a rule. Server selector will be displayed.
 bool requiresServerResource(EventType eventType)
 {
-    // TODO: #GDM #Business possibly will never be required.
-    return false;
+    switch (eventType)
+    {
+        case EventType::poeOverBudgetEvent:
+        case EventType::fanErrorEvent:
+            return true;
+        default:
+            return false;
+    }
 }
 
 // Check if camera required for this event to OCCUR.

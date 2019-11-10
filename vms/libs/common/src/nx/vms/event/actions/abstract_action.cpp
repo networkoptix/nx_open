@@ -190,7 +190,6 @@ bool allowsAggregation(ActionType actionType)
         case ActionType::playSoundAction:
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
-        case ActionType::buzzerAction:
             return false;
 
         default:

@@ -122,6 +122,9 @@ QSet<QnUuid> filterActionResources(
     if (vms::event::requiresUserResource(actionType))
         return filterSubjectIds(ids);
 
+    if (vms::event::requiresServerResource(actionType))
+        return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
+
     return QSet<QnUuid>();
 }
 
@@ -626,10 +629,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             break;
     }
 
-    // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
     QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
-    if (!vms::event::requiresCameraResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Servers);
 
     if (resources.size() == 1)
         return qnResIconCache->icon(resources.first());
@@ -637,7 +637,15 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (resources.isEmpty())
         return qnSkin->icon(lit("tree/buggy.png"));
 
-    return qnResIconCache->icon(QnResourceIconCache::Camera);
+    if (vms::event::requiresCameraResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::Camera);
+    else if (vms::event::requiresServerResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::Server);
+    else if (vms::event::requiresUserResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::User);
+
+    NX_ASSERT(false);
+    return qnResIconCache->icon(QnResourceIconCache::Unknown);
 }
 
 QSet<QnUuid> QnBusinessRuleViewModel::eventResources() const
@@ -1246,7 +1254,6 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
     }
 
     return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
-
 }
 
 QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
@@ -1318,26 +1325,46 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         case ActionType::execHttpRequestAction:
             return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
+
         default:
             break;
     }
 
-    // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-    if (!vms::event::requiresCameraResource(m_actionType))
-        return braced(tr("System"));
+    if (vms::event::requiresCameraResource(m_actionType))
+    {
+        QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+        if (cameras.size() == 1)
+            return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->extraInfoInTree());
 
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.size() == 1)
-        return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->extraInfoInTree());
+        if (cameras.isEmpty())
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
+                tr("Select at least one device"),
+                tr("Select at least one camera")
+            );
 
-    if (cameras.isEmpty())
-        return QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("Select at least one device"),
-            tr("Select at least one camera")
-        );
+        return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+    }
+    else if (vms::event::requiresServerResource(m_actionType))
+    {
+        QnMediaServerResourceList targetServers =
+            resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
-    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+        if (targetServers.isEmpty())
+            return tr("Select server");
+
+        const auto server = targetServers.first();
+        const auto camerasCount = resourcePool()->getAllCameras(server, true).size();
+
+        return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
+    }
+    else if (vms::event::requiresUserResource(m_actionType))
+    {
+        return braced(tr("User"));
+    }
+
+    NX_ASSERT(false);
+    return QString();
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const

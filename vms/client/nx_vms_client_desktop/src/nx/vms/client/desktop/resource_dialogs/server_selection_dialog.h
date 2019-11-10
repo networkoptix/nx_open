@@ -32,6 +32,8 @@ private:
 
     virtual ~ServerSelectionDialog() override;
 
+    bool isEmpty() const;
+
 private:
     struct Private;
     const QScopedPointer<Private> d;

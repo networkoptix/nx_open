@@ -125,6 +125,13 @@ bool ServerSelectionDialog::selectServers(
 {
     ServerSelectionDialog dialog(selectedServers, filterFunctor, infoMessage, parent);
 
+    if (dialog.isEmpty())
+    {
+        // TODO: #vbreus Query proper warning string.
+        QnMessageBox::warning(parent, tr("You do not have any servers"));
+        return false;
+    }
+
     if (dialog.exec() != QDialog::Accepted)
         return false;
 
@@ -159,6 +166,12 @@ ServerSelectionDialog::ServerSelectionDialog(
 
 ServerSelectionDialog::~ServerSelectionDialog()
 {
+}
+
+bool ServerSelectionDialog::isEmpty() const
+{
+    const auto rootNode = ui->filteredResourceSelectionWidget->view()->state().rootNode;
+    return rootNode.isNull() || rootNode->childrenCount() == 0;
 }
 
 } // namespace nx::vms::client::desktop
