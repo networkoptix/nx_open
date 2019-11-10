@@ -7,7 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
-#include <utils/common/delayed.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/resource/resource_holder.h>
 
 namespace {
@@ -32,11 +32,13 @@ struct PoEController::Private: public QObject
     void handleReply(bool success, rest::Handle currentHandle, const QnJsonRestResult& result);
     void update();
     void setPowered(const PoEController::PowerModes& value);
+    void setUpdatingModeHandle(rest::Handle value);
 
     PoEController* const q;
 
     rest::QnConnectionPtr connection;
     rest::Handle handle = -1;
+    rest::Handle updatingModeHandle = -1;
 
     ResourceHolder<QnMediaServerResource> serverHolder;
     bool autoUpdate = true;
@@ -84,7 +86,13 @@ void PoEController::Private::handleReply(
     if (handle != replyHandle)
         return; //< Most likely we cancelled request
 
-    handle = -1;
+
+    const nx::utils::ScopeGuard handleGuard(
+        [this]()
+        {
+            handle = -1;
+            setUpdatingModeHandle(-1);
+        });
 
     if (autoUpdate)
         updateTimer.start();
@@ -123,6 +131,18 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
         QJson::serialized(value),
         std::bind(&Private::handleReply, this, _1, _2, _3),
         QThread::currentThread());
+
+    setUpdatingModeHandle(handle);
+}
+
+void PoEController::Private::setUpdatingModeHandle(rest::Handle value)
+{
+    if (value == updatingModeHandle)
+        return;
+
+    updatingModeHandle = value;
+    q->updatingPoweringModesChanged();
+
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -173,6 +193,11 @@ bool PoEController::autoUpdate() const
 void PoEController::setPowerModes(const PowerModes& value)
 {
     d->setPowered(value);
+}
+
+bool PoEController::updatingPoweringModes() const
+{
+    return d->updatingModeHandle >= 0;
 }
 
 } // namespace nx::vms::client::core
