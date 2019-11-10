@@ -105,7 +105,7 @@ void TableNodeView::Private::updateCheckedIndices()
 
     checkedIndices = current;
 
-    setHasUserChanges(true);
+    setHasUserChanges(!checkedIndices.isEmpty());
 }
 
 void TableNodeView::Private::setHasUserChanges(bool value)
