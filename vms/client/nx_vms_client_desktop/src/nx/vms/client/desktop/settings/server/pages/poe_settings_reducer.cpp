@@ -127,7 +127,7 @@ namespace settings {
 using namespace node_view;
 using namespace node_view::details;
 
-NodeViewStatePatch PoESettingsReducer::applyBlockDataChanges(
+NodeViewStatePatch PoESettingsReducer::blockDataChanges(
     const node_view::details::NodeViewState& state,
     const nx::vms::api::NetworkBlockData& blockData,
     const QnResourcePool& resourcePool)
@@ -154,7 +154,6 @@ NodeViewStatePatch PoESettingsReducer::applyBlockDataChanges(
     }
     return result;
 }
-
 
 } // namespace settings
 } // namespace nx::vms::client::desktop

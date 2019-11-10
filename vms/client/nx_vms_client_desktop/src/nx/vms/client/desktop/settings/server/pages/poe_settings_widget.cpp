@@ -22,7 +22,9 @@ using Mode = PortMode::PoweringMode;
 struct PoESettingsWidget::Private: public QObject
 {
     Private(PoESettingsWidget* owner);
+
     void updateBlockData();
+    void updateAvailability();
 
     PoESettingsWidget* const q;
     Controller controller;
@@ -35,6 +37,9 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     ui.setupUi(owner);
 
     connect(&controller, &Controller::updated, this, &Private::updateBlockData);
+    connect(&controller, &Controller::updatingPoweringModesChanged,
+        this, &Private::updateAvailability);
+
     connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged,
         q, &PoESettingsWidget::hasChangesChanged);
     updateBlockData();
@@ -48,9 +53,18 @@ void PoESettingsWidget::Private::updateBlockData()
         ? optionalBlockData.value()
         : nx::vms::api::NetworkBlockData();
 
-    const auto patch = PoESettingsReducer::applyBlockDataChanges(
+    const auto patch = PoESettingsReducer::blockDataChanges(
         table->state(), blockData, *q->resourcePool());
     table->applyPatch(patch);
+}
+
+void PoESettingsWidget::Private::updateAvailability()
+{
+    const bool readOnly = controller.updatingPoweringModes();
+
+    q->setReadOnly(readOnly);
+    ui.poeTable->setEnabled(!readOnly);
+    ui.poeTotalsTable->setEnabled(!readOnly);
 }
 
 //--------------------------------------------------------------------------------------------------

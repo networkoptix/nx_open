@@ -14,7 +14,7 @@ class PoESettingsReducer
 public:
     static constexpr int kPortNumberProperty = node_view::lastResourceNodeViewProperty;
 
-    static node_view::details::NodeViewStatePatch applyBlockDataChanges(
+    static node_view::details::NodeViewStatePatch blockDataChanges(
         const node_view::details::NodeViewState& state,
         const nx::vms::api::NetworkBlockData& blockData,
         const QnResourcePool& resourcePool);
@@ -22,3 +22,4 @@ public:
 
 } // namespace settings
 } // namespace nx::vms::client::desktop
+
