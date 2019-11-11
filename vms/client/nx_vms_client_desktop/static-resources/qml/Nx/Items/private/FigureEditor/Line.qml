@@ -97,10 +97,8 @@ Figure
             {
                 arrowB.checked = !checked
             }
-            else if (allowedDirections === "any"
-                && !checked && !arrowB.checked)
+            else if (allowedDirections === "any" && !checked && !arrowB.checked)
             {
-                arrowA.checked = true
                 arrowB.checked = true
             }
         }
@@ -127,7 +125,6 @@ Figure
             else if (allowedDirections === "any" && !checked && !arrowA.checked)
             {
                 arrowA.checked = true
-                arrowB.checked = true
             }
         }
     }
