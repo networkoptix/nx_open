@@ -183,8 +183,9 @@ auto makeStorageProviders()
             "archiveLengthS",
             [](const auto& r)
             {
+                using namespace std::chrono;
                 const auto value = r->calendarDuration();
-                return value.count() > 0 ? Value(value) : Value();
+                return value.count() > 0 ? Value(duration_cast<seconds>(value)) : Value();
             }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
