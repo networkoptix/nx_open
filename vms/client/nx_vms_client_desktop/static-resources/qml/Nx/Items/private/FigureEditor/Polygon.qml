@@ -123,6 +123,7 @@ Figure
             color: figure.color
             x: F.absX(model.x, figure)
             y: F.absY(model.y, figure)
+            z: dragging ? 10 : 0
 
             property bool snappingEnabled: pointMakerInstrument.count > 3
 
