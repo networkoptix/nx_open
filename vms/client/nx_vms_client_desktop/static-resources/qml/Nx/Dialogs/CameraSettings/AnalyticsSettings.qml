@@ -5,6 +5,8 @@ import Nx.Utils 1.0
 import Nx.Controls 1.0
 import Nx.Controls.NavigationMenu 1.0
 import Nx.InteractiveSettings 1.0
+import nx.vms.client.core 1.0
+import Nx.Core 1.0
 
 Item
 {
@@ -30,6 +32,8 @@ Item
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
+            settingsView.resourceId = store.resourceId()
+            mediaResourceHelper.resourceId = store.resourceId().toString()
             var engineId = store.currentAnalyticsEngineId()
 
             if (engineId === currentEngineId)
@@ -73,6 +77,17 @@ Item
 
             alertBar.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
+    }
+
+    LiveThumbnailProvider
+    {
+        id: thumbnailProvider
+        rotation: 0
+    }
+
+    MediaResourceHelper
+    {
+        id: mediaResourceHelper
     }
 
     NavigationMenu

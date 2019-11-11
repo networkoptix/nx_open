@@ -34,6 +34,12 @@ public:
         return m_interface.name();
     }
 
+    QString humanReadableName() const
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        return m_interface.humanReadableName();
+    }
+
     void updateInterface(QNetworkInterface iface)
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
@@ -69,9 +75,14 @@ public:
     enum class Rate { in, out };
     api::metrics::Value load(Rate rate) const
     {
-        const auto load = serverModule()->platform()->monitor()->networkInterfaceLoad(name());
+        const auto name = humanReadableName();
+        const auto load =
+            serverModule()->platform()->monitor()->networkInterfaceLoad(name);
         if (!load)
+        {
+            NX_VERBOSE(this, "Error getting NIC load: NIC [%1] was not found", name);
             return api::metrics::Value();
+        }
         return api::metrics::Value(nx::utils::switch_(rate,
             Rate::in, [&]{ return load->bytesPerSecIn; },
             Rate::out, [&]{ return load->bytesPerSecOut; }));
@@ -103,17 +114,13 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->name()); }
+                "name", [](const auto& r) { return Value(r->humanReadableName()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "server",
-                [this](const auto&)
-                {
-                    return Value(resourcePool()->getOwnMediaServerOrThrow()->getName());
-                }
+                "server", [this](const auto&) { return m_serverId; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "state", [this](const auto& r) { return r->state(); }

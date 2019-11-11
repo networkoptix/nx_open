@@ -390,6 +390,8 @@ public:
         const QPointF& center,
         qreal degrees);
 
+    Q_INVOKABLE static bool isRotated90(qreal degrees);
+
     Q_INVOKABLE static QRectF encloseRotatedGeometry(
         const QRectF& enclosingGeometry,
         qreal aspectRatio,

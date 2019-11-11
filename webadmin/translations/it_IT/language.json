@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} interfaccia web"
     },
     "common": {
-        "voiceCommands": {
-            "search": "trova + [testo per la barra di ricerca]",
-            "pause": "pausa",
-            "help": "aiuto | mostra comandi",
-            "collapse all servers": "comprimi tutti i server",
-            "collapse server": "comprimi server + [nome server]",
-            "play": "riproduci",
-            "clear search": "cancella ricerca",
-            "live": "vai in live | mostra live",
-            "expand all servers": "espandere tutti i server",
-            "stop listening": "interrompere l'ascolto",
-            "expand server": "espandi server + [nome server]",
-            "view": "visualizza + [nome telecamera]"
-        },
-        "systemOffline": "Il sistema è offline",
         "cameraLinks": {
-            "copyToClipboard": "copia negli appunti",
             "highStream": "Flusso Primario",
-            "copyDefaultText": "copia",
-            "unknown": "Sconosciuto",
             "lowStream": "Flusso secondario",
             "transcoding": "Transcodifica",
+            "unknown": "Sconosciuto",
+            "copyToClipboard": "copia negli appunti",
+            "copyDefaultText": "copia",
             "copyActiveText": "copiato negli appunti"
         },
-        "searchCamPlaceholder": "Ricerca",
+        "systemOffline": "Il sistema è offline",
         "cameraStates": {
-            "noFormat": "Questo browser non supporta la riproduzione di video da questa telecamera.",
-            "ieWin10": "Si prega di utilizzare i browser Microsoft Edge o Google Chrome.",
-            "iosVideoTooLarge": "iOS non supporta video più grandi di FullHD (2MP: 1920x1080).",
+            "offline": "Offiline",
+            "error": "Errore",
             "unauthorized": "Autenticazione richiesta",
-            "ubuntuNX": "Questo browser non supporta i video da server basati su ARM. Per favore, utilizzare il browser Chromium.",
-            "ieNoWebm": "Si prega di installare <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>il codec WebM </a> per Internet Explorer.",
+            "noData": "Nessun dato",
+            "iosVideoTooLarge": "iOS non supporta video più grandi di FullHD (2MP: 1920x1080).",
+            "flashRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> per la riproduzione di video.",
             "flashOrWebmRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> o<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> per la riproduzione di video in Internet Explorer.",
             "noArmSupport": "Questo browser o dispositivo non supporta la riproduzione di video da server basati su ARM.",
-            "error": "Errore",
-            "offline": "Offiline",
-            "noData": "Nessun dato",
-            "flashRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> per la riproduzione di video."
+            "noFormat": "Questo browser non supporta la riproduzione di video da questa telecamera.",
+            "ieNoWebm": "Si prega di installare <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>il codec WebM </a> per Internet Explorer.",
+            "ieWin10": "Si prega di utilizzare i browser Microsoft Edge o Google Chrome.",
+            "ubuntuNX": "Questo browser non supporta i video da server basati su ARM. Per favore, utilizzare il browser Chromium."
+        },
+        "searchCamPlaceholder": "Ricerca",
+        "resolution": {
+            "auto": "Automatico",
+            "high": "Alta",
+            "low": "Basso"
         },
         "chromeCastWarning": "Chromecast richiede molte risorse e potrebbe causare problemi al suo server.",
-        "resolution": {
-            "high": "Alta",
-            "auto": "Automatico",
-            "low": "Basso"
+        "voiceCommands": {
+            "play": "riproduci",
+            "pause": "pausa",
+            "live": "vai in live | mostra live",
+            "view": "visualizza + [nome telecamera]",
+            "search": "trova + [testo per la barra di ricerca]",
+            "clear search": "cancella ricerca",
+            "expand server": "espandi server + [nome server]",
+            "collapse server": "comprimi server + [nome server]",
+            "expand all servers": "espandere tutti i server",
+            "collapse all servers": "comprimi tutti i server",
+            "stop listening": "interrompere l'ascolto",
+            "help": "aiuto | mostra comandi"
         }
     }
 }

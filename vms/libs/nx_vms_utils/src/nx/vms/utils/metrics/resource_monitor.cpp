@@ -1,5 +1,6 @@
 #include "resource_monitor.h"
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::vms::utils::metrics {
@@ -14,6 +15,7 @@ ResourceMonitor::ResourceMonitor(
 
 api::metrics::ResourceValues ResourceMonitor::values(Scope requestScope, bool formatted) const
 {
+    nx::utils::ElapsedTimer timer(/*started*/ true);
     api::metrics::ResourceValues values;
     size_t count = 0;
     for (const auto& [id, monitor]: m_monitors)
@@ -25,12 +27,14 @@ api::metrics::ResourceValues ResourceMonitor::values(Scope requestScope, bool fo
         }
     }
 
-    NX_VERBOSE(this, "Return %1 %2 values in %3 groups", count, requestScope, values.size());
+    NX_VERBOSE(this, "Return %1 %2 values in %3 groups in %4",
+        count, requestScope, values.size(), timer.elapsed());
     return values;
 }
 
 api::metrics::ResourceAlarms ResourceMonitor::alarms(Scope requestScope) const
 {
+    nx::utils::ElapsedTimer timer(/*started*/ true);
     api::metrics::ResourceAlarms resourceAlarms;
     size_t count = 0;
     for (const auto& [groupId, monitor]: m_monitors)
@@ -42,7 +46,7 @@ api::metrics::ResourceAlarms ResourceMonitor::alarms(Scope requestScope) const
         }
     }
 
-    NX_VERBOSE(this, "Return %1 %2 alarmed values", count, requestScope);
+    NX_VERBOSE(this, "Return %1 %2 alarmed values in %3", count, requestScope, timer.elapsed());
     return resourceAlarms;
 }
 

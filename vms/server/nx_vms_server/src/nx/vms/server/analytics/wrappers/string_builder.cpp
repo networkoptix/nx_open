@@ -42,6 +42,8 @@ static QString toHumanReadableString(ViolationType violation)
             return "Action result is inconsistent: more than one exclusive value returned";
         case ViolationType::invalidActionResultUrl:
             return "Action result contains invalid URL";
+        case ViolationType::methodExecutionTookTooLong:
+            return "Method execution took too long";
         default:
             NX_ASSERT(false);
             return QString("unknown violation");

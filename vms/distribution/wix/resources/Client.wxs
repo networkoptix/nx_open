@@ -83,6 +83,7 @@
                     <Directory Id="ClientQml" Name="qml"/>
                     <Directory Id="ClientFontsDir" Name="fonts"/>
                     <Directory Id="vox" Name="vox"/>
+                    <Directory Id="resources" Name="resources"/>
 
                     <Component Id="ClientExecutable">
                         <File Id="client.exe"
@@ -130,6 +131,7 @@
             <ComponentGroupRef Id="client_qt_mediaservice"/>
             <ComponentGroupRef Id="client_qt_audio"/>
             <ComponentGroupRef Id="vox"/>
+            <ComponentGroupRef Id="webengine_resources"/>
 
             <ComponentRef Id="NovFileAssociation"/>
 

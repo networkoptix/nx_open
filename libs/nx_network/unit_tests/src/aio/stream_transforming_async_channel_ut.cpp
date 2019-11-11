@@ -172,7 +172,6 @@ protected:
             &m_readBuffer,
             std::bind(&StreamTransformingAsyncChannel::onSomeBytesRead, this,
                 m_readCallSequence, _1, _2));
-        waitUntilReadHasBeenScheduledOnRawDataChannel();
     }
 
     void givenScheduledWrite()
@@ -190,7 +189,6 @@ protected:
         m_channel->sendAsync(
             m_inputData,
             std::bind(&StreamTransformingAsyncChannel::onBytesWritten, this, _1, _2));
-        waitUntilWriteHasBeenScheduledOnRawDataChannel();
     }
 
     void whenSendSomeData()
@@ -287,9 +285,12 @@ protected:
         return m_rawDataChannel;
     }
 
-    const std::unique_ptr<aio::StreamTransformingAsyncChannel>& channel() const
+    aio::StreamTransformingAsyncChannel& channel()
     {
-        return m_channel;
+        if (!m_channel)
+            createTransformingChannel();
+
+        return *m_channel;
     }
 
 private:
@@ -380,17 +381,41 @@ TEST_F(StreamTransformingAsyncChannel, read_write)
 
 //TEST_F(StreamTransformingAsyncChannel, read_originates_read_and_write_on_raw_channel)
 
-TEST_F(StreamTransformingAsyncChannel, cancel_read)
+TEST_F(StreamTransformingAsyncChannel, cancel_read_scheduled_from_non_aio_thread)
 {
     givenScheduledRead();
     whenCancelledRead();
     assertIoHasBeenProperlyCancelled();
 }
 
-TEST_F(StreamTransformingAsyncChannel, cancel_write)
+TEST_F(StreamTransformingAsyncChannel, cancel_read_scheduled_from_aio_thread)
+{
+    channel().executeInAioThreadSync(
+        [this]()
+        {
+            givenScheduledRead();
+            whenCancelledRead();
+        });
+
+    assertIoHasBeenProperlyCancelled();
+}
+
+TEST_F(StreamTransformingAsyncChannel, cancel_write_scheduled_from_non_aio_thread)
 {
     givenScheduledWrite();
     whenCancelledWrite();
+    assertIoHasBeenProperlyCancelled();
+}
+
+TEST_F(StreamTransformingAsyncChannel, cancel_write_scheduled_from_aio_thread)
+{
+    channel().executeInAioThreadSync(
+        [this]()
+        {
+            givenScheduledWrite();
+            whenCancelledWrite();
+        });
+
     assertIoHasBeenProperlyCancelled();
 }
 
@@ -438,7 +463,7 @@ protected:
         readBuffer.reserve(4*1024);
 
         nx::utils::promise<SystemError::ErrorCode> ioCompleted;
-        channel()->readSomeAsync(
+        channel().readSomeAsync(
             &readBuffer,
             [&ioCompleted](
                 SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)

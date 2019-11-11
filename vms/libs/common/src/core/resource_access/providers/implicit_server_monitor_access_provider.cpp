@@ -26,12 +26,8 @@ bool QnImplicitServerMonitorAccessProvider::calculateAccess(
     const QnResourcePtr& resource,
     nx::vms::api::GlobalPermissions globalPermissions) const
 {
-    NX_ASSERT(acceptable(subject, resource));
-    if (!acceptable(subject, resource))
+    if (!NX_ASSERT(acceptable(subject, resource)))
         return false;
 
-    if (resource->flags().testFlag(Qn::server))
-        return true;
-
-    return false;
+    return resource->hasFlags(Qn::server);
 }

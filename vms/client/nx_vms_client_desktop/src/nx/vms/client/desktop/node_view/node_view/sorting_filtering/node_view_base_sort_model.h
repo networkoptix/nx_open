@@ -17,13 +17,12 @@ public:
 
     virtual void setSourceModel(QAbstractItemModel* model) override;
 
-    enum FilterScope
-    {
-        AnyNodeFilterScope,
-        LeafNodeFilterScope
-    };
+    bool filteringEnabled() const;
+    void setFilteringEnabled(bool enabled);
 
-    void setFilter(const QString& filter, FilterScope scope = AnyNodeFilterScope);
+    QString filterString() const;
+    void setFilterString(const QString& string);
+
     using FilterFunctor =
         std::function<bool(const QModelIndex& index, const QString& filterString)>;
     void setFilterFunctor(FilterFunctor filterFunctor);

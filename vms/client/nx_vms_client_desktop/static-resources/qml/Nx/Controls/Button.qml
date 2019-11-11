@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
+import QtQuick.Controls.impl 2.4
 import Nx 1.0
 import nx.client.desktop 1.0
 
@@ -24,6 +25,9 @@ Button
 
     property bool showBackground: true
 
+    leftPadding: 16
+    rightPadding: 16
+
     implicitHeight: 28
 
     font.pixelSize: 13
@@ -40,20 +44,12 @@ Button
         value: enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3)
     }
 
-    Image
+    contentItem: IconLabel
     {
-        id: iconImage
+        anchors.centerIn: parent
 
-        anchors.fill: parent
-
-        visible: control.iconUrl.length
-
-        function nonEmptyIcon(target, base)
-        {
-            return target.length ? target : base
-        }
-
-        source:
+        text: control.text
+        icon.source:
         {
             if (control.pressed)
                 return nonEmptyIcon(control.pressedIconUrl, control.iconUrl)
@@ -61,6 +57,14 @@ Button
             return (control.hovered && control.hoveredIconUrl.length)
                 ? control.hoveredIconUrl
                 : control.iconUrl
+        }
+
+        font: control.font
+        color: control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
+
+        function nonEmptyIcon(target, base)
+        {
+            return target.length ? target : base
         }
     }
 
@@ -82,18 +86,5 @@ Button
             color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
             opacity: 0.5
         }
-    }
-
-    contentItem: Text
-    {
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-
-        leftPadding: 16
-        rightPadding: 16
-
-        text: control.text
-        font: control.font
-        color: control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
     }
 }

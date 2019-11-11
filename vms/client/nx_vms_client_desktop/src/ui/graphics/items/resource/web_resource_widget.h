@@ -1,11 +1,13 @@
 #pragma once
 
+#include <QtCore/QHash>
+#include <QtWebEngineWidgets/QWebEnginePage>
+
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/standard/graphics_web_view.h>
 
-class QWebPage;
-class QnGraphicsWebView;
 
-class QnWebResourceWidget : public QnResourceWidget
+class QnWebResourceWidget: public QnResourceWidget
 {
     Q_OBJECT
 
@@ -16,7 +18,9 @@ public:
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
-    QWebPage* page() const;
+    void triggerWebAction(QWebEnginePage::WebAction action);
+    bool isWebActionEnabled(QWebEnginePage::WebAction action);
+    QString webActionText(QWebEnginePage::WebAction action);
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
@@ -27,6 +31,7 @@ protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
 private:
+    void initWebActionText();
     void setupOverlays();
 
     virtual int calculateButtonsVisibility() const override;
@@ -34,5 +39,6 @@ private:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
 protected:
-    QnGraphicsWebView* const m_webView;
+    nx::vms::client::desktop::GraphicsWebEngineView* const m_webEngineView;
+    QHash<QWebEnginePage::WebAction, QString> m_webActionText;
 };

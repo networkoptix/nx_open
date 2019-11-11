@@ -2,10 +2,14 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWebKitWidgets/QGraphicsWebView>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <ui/style/nx_style.h>
+
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace NxUi {
 
@@ -41,13 +45,13 @@ QPalette createWebViewPalette(WebViewStyle style)
     return result;
 }
 
-void setupWebViewStyle(QWebView* webView, WebViewStyle style)
+void setupWebViewStyle(QWidget* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
 }
 
-void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
+void setupWebViewStyle(QGraphicsWidget* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
@@ -57,33 +61,59 @@ void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
 QString generateCssStyle()
 {
     const auto styleBase = QString::fromLatin1(R"css(
+    @font-face {
+        font-family: 'Roboto';
+        src: url('qrc:///fonts/Roboto-Regular.ttf') format('truetype');
+        font-style: normal;
+    }
     * {
-        color: %1;
+        color: {windowText};
         font-family: 'Roboto-Regular', 'Roboto';
-        font-weight: 400;
+        font-weight: 600;
         font-size: 13px;
         line-height: 16px;
     }
     body {
         padding-left: 0px;
         margin: 0px;
+        overscroll-behavior: none;
+        background-color: {window};
     }
     p {
         padding-left: 0px;
     }
     a {
-        color: %2;
+        color: {link};
         font-size: 13px;
     }
     a:hover {
-        color: %3;
-    })css");
+        color: {highlight};
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: {scrollbar-track};
+    }
+    ::-webkit-scrollbar-thumb {
+        background: {scrollbar-thumb};
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: {scrollbar-thumb-hover};
+    }
+    )css");
 
     const auto palette = qApp->palette();
-    const auto windowText = palette.color(QPalette::WindowText).name();
-    const auto highlight = palette.color(QPalette::Highlight).name();
-    const auto link = palette.color(QPalette::Link).name();
-    return styleBase.arg(windowText, link, highlight);
+
+    return QString(styleBase)
+        .replace("{windowText}", palette.color(QPalette::WindowText).name())
+        .replace("{window}", palette.color(QPalette::Window).name())
+        .replace("{link}", palette.color(QPalette::Link).name())
+        .replace("{highlight}", palette.color(QPalette::Highlight).name())
+        .replace("{scrollbar-track}", colorTheme()->color("dark9").name())
+        .replace("{scrollbar-thumb}", colorTheme()->color("dark13").name())
+        .replace("{scrollbar-thumb-hover}", colorTheme()->color("dark15").name())
+        .simplified();
 }
 
 } // namespace NxUi

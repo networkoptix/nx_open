@@ -3,11 +3,13 @@
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QFile>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <nx/utils/log/assert.h>
 #include <client_core/client_core_module.h>
+#include <ui/style/custom_style.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,6 +21,8 @@ InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
     ui->setupUi(this);
     ui->valuesTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->settingsTab->layout()->addWidget(m_settingsWidget);
+
+    setMonospaceFont(ui->manifestTextEdit);
 
     m_settingsWidget->setClearColor(palette().window().color());
     m_settingsWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -32,6 +36,10 @@ InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
 
     connect(ui->loadButton, &QPushButton::clicked, this,
         &InteractiveSettingsTestDialog::loadManifest);
+
+    QFile demoFile(":/test_data/interactive_settings_demo.json");
+    if (demoFile.open(QFile::ReadOnly))
+        ui->manifestTextEdit->setPlainText(QString::fromUtf8(demoFile.readAll()));
 
     loadManifest();
 }
@@ -47,7 +55,7 @@ void InteractiveSettingsTestDialog::loadManifest()
             m_settingsWidget->rootObject(),
             "loadModel",
             Qt::DirectConnection,
-            Q_ARG(QVariant, model.toVariantMap()),
+            Q_ARG(QVariant, model),
             Q_ARG(QVariant, {}));
 
         refreshValues();

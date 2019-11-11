@@ -143,7 +143,6 @@ CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnConstCompressedVi
         m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
             config,
             /*metrics*/ nullptr,
-            video->compressionType,
             video);
 
         m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.

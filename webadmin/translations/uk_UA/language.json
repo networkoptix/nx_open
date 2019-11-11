@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} веб-інтерфейс"
     },
     "common": {
-        "voiceCommands": {
-            "search": "знайти + [текст для панелі пошуку]",
-            "pause": "пауза",
-            "help": "допомога | показати команди",
-            "collapse all servers": "згорнути всі сервери",
-            "collapse server": "сховати сервер + [назва сервера]",
-            "play": "відтворити",
-            "clear search": "очистити вікно пошуку",
-            "live": "live | show me live",
-            "expand all servers": "розгорнути всі сервери",
-            "stop listening": "припинити прослуховування",
-            "expand server": "розширити сервер + [назва сервера]",
-            "view": "перегляд + [назва камери]"
-        },
-        "systemOffline": "Система знаходиться поза мережею",
         "cameraLinks": {
-            "copyToClipboard": "копіювати в буфер обміну",
             "highStream": "Висока якість",
-            "copyDefaultText": "копіювати",
-            "unknown": "Невідомий",
             "lowStream": "Низька якість",
             "transcoding": "Перекодування",
+            "unknown": "Невідомий",
+            "copyToClipboard": "копіювати в буфер обміну",
+            "copyDefaultText": "копіювати",
             "copyActiveText": "скопійовано до буфера обміну"
         },
-        "searchCamPlaceholder": "Пошук",
+        "systemOffline": "Система знаходиться поза мережею",
         "cameraStates": {
-            "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
-            "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
-            "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
+            "offline": "Поза мережею",
+            "error": "Помилка",
             "unauthorized": "Потрібна авторизація",
-            "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium.",
-            "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+            "noData": "Немає даних",
+            "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
+            "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео.",
             "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
             "noArmSupport": "Цей браузер або пристрій не підтримує відтворення відео з серверів на базі ARM.",
-            "error": "Помилка",
-            "offline": "Поза мережею",
-            "noData": "Немає даних",
-            "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео."
+            "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
+            "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+            "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
+            "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium."
+        },
+        "searchCamPlaceholder": "Пошук",
+        "resolution": {
+            "auto": "Автоматично",
+            "high": "Високий",
+            "low": "Низький"
         },
         "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
-        "resolution": {
-            "high": "Високий",
-            "auto": "Автоматично",
-            "low": "Низький"
+        "voiceCommands": {
+            "play": "відтворити",
+            "pause": "пауза",
+            "live": "live | show me live",
+            "view": "перегляд + [назва камери]",
+            "search": "знайти + [текст для панелі пошуку]",
+            "clear search": "очистити вікно пошуку",
+            "expand server": "розширити сервер + [назва сервера]",
+            "collapse server": "сховати сервер + [назва сервера]",
+            "expand all servers": "розгорнути всі сервери",
+            "collapse all servers": "згорнути всі сервери",
+            "stop listening": "припинити прослуховування",
+            "help": "допомога | показати команди"
         }
     }
 }

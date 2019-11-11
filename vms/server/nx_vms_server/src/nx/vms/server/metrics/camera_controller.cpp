@@ -68,7 +68,7 @@ auto makeInfoProviders()
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
             "server",
-            [](const auto& r) { return Value(r->getParentServer()->getName()); }
+            [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "type",
@@ -183,8 +183,9 @@ auto makeStorageProviders()
             "archiveLengthS",
             [](const auto& r)
             {
+                using namespace std::chrono;
                 const auto value = r->calendarDuration();
-                return value.count() > 0 ? Value(value) : Value();
+                return value.count() > 0 ? Value(duration_cast<seconds>(value)) : Value();
             }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
@@ -219,7 +220,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+                "name", [](const auto& r) { return Value(r->getUserDefinedName()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

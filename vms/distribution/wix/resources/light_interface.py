@@ -80,7 +80,6 @@ Environment variables:
 '''
 
 import os
-import subprocess
 import environment
 
 wix_pdb = 'distribution_wix.wixpdb'
@@ -98,14 +97,15 @@ def common_light_options():
     return ['-sval']
 
 
-def light_command(output_file, input_folder, extensions):
-    command = [light_executable(),
+def light_command(output_file, sources, extensions):
+    command = [
+        light_executable(),
         '-cc', light_cache_path, '-reusecab',
         '-loc', light_locale,
         '-out', output_file,
         '-pdbout', 'obj/{}'.format(wix_pdb),
-        '{}/*.wixobj'.format(input_folder)
-        ]
+    ]
+    command += sources
     command += common_light_options()
     for extension in extensions:
         command += ['-ext', '{0}.dll'.format(extension)]
@@ -113,5 +113,5 @@ def light_command(output_file, input_folder, extensions):
     return command
 
 
-def light(output_file, input_folder, extensions):
-    environment.execute_command(light_command(output_file, input_folder, extensions))
+def light(output_file, sources, extensions):
+    environment.execute_command(light_command(output_file, sources, extensions), verbose=True)

@@ -520,9 +520,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     const bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
     const bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
 
-    StreamIndex index = isSecondaryProvider ? StreamIndex::secondary : StreamIndex::primary;
-    m_streamMetricHelper.setStream(index);
-
     if (isVideo || isAudio)
     {
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -595,6 +592,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             m_isLive = false;
         }
+
+        StreamIndex index = isSecondaryProvider ? StreamIndex::secondary : StreamIndex::primary;
+        m_streamMetricHelper.setStream(index);
     }
 
     const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)

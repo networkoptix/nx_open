@@ -28,26 +28,17 @@ public:
     QByteArray authDigest;
     mutable QnMutex mutex;
     QnMutex connectionMtx;
-    std::atomic<int> newPort;
+    std::atomic<int> newPort{};
     QHostAddress serverAddress;
-    std::atomic<int> localPort;
-    bool useSSL;
-    int maxConnections;
-    bool ddosWarned;
-    SystemError::ErrorCode lastError;
+    std::atomic<int> localPort = 0;
+    bool useSSL = false;
+    int maxConnections = 0;
+    bool ddosWarned = false;
+    SystemError::ErrorCode lastError = SystemError::noError;
+    bool isStopped = false;
 
     static QByteArray defaultPage;
     static QString pathIgnorePrefix;
-
-    QnTcpListenerPrivate():
-        newPort(0),
-        localPort(0),
-        useSSL(false),
-        maxConnections(0),
-        ddosWarned(false),
-        lastError(SystemError::noError)
-    {
-    }
 };
 
 QByteArray QnTcpListenerPrivate::defaultPage;
@@ -112,6 +103,13 @@ QnTcpListener::~QnTcpListener()
     stop();
     destroyServerSocket();
     delete d_ptr;
+}
+
+void QnTcpListener::stop()
+{
+    Q_D(QnTcpListener);
+    d->isStopped = true;
+    QnLongRunnable::stop();
 }
 
 static const int kSocketAcceptTimeoutMs = 250;
@@ -385,6 +383,11 @@ void QnTcpListener::run()
 void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
     Q_D(QnTcpListener);
+    {
+        QnMutexLocker lock(&d->connectionMtx);
+        if (d->isStopped)
+            return;
+    }
 
     if (d->connections.size() > d->maxConnections)
     {

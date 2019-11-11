@@ -39,6 +39,8 @@ Plugin::Plugin(
 
 wrappers::EnginePtr Plugin::createEngine(const resource::AnalyticsEngineResourcePtr engineResource)
 {
+    sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::createEngine);
+
     const auto sdkPlugin = sdkObject();
     if (!NX_ASSERT(sdkPlugin))
         return nullptr;

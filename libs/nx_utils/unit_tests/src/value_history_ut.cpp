@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <QJsonValue>
+
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/random.h>
 #include <nx/utils/value_history.h>
 
 namespace nx::utils::test {
@@ -82,5 +86,56 @@ TEST(ValueHistoryTest, main)
     EXPECT_EQ(values(std::nullopt, Border::move()), "{ ( 40: 10 ) }");
     EXPECT_EQ(values(std::nullopt, Border::hardcode(0)), "{ ( 0: 10 ) }");
 }
+
+namespace {
+
+struct Times
+{
+    std::chrono::milliseconds maxAge;
+    std::chrono::milliseconds step;
+    std::chrono::milliseconds select;
+};
+
+class Performance: public testing::TestWithParam<Times> {};
+
+} // namespace
+
+TEST_P(Performance, ForEach)
+{
+    const auto& times = GetParam();
+    ValueHistory<QJsonValue> history(times.maxAge);
+    ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    for (std::chrono::milliseconds shift(0); shift <= times.maxAge; shift += times.step)
+    {
+        timeShift.applyRelativeShift(times.step);
+        history.update(nx::utils::random::number(0, 10000));
+    }
+
+    nx::utils::ElapsedTimer timer(/*started*/ true);
+    double sum(0);
+    size_t count(0);
+    std::chrono::milliseconds duration(0);
+    history.forEach(
+        times.select,
+        [&](const auto& value, const auto& valueDuration)
+        {
+            count += 1;
+            sum += value.toDouble();
+            duration += valueDuration;
+        },
+        ValueHistory<QJsonValue>::Border::keep());
+
+    NX_INFO(this, "Got %1 values in %2", count, timer.elapsed());
+    EXPECT_GT(double(count), double(times.select / times.step) * 0.9);
+    EXPECT_GT(sum / count, 0);
+    EXPECT_LT(sum / count, 10000);
+    EXPECT_GT(duration.count(), std::chrono::round<decltype(duration)>(times.select).count() * 0.9);
+}
+
+INSTANTIATE_TEST_CASE_P(ValueHistoryTest, Performance, ::testing::Values(
+   Times{std::chrono::hours(24), std::chrono::seconds(5), std::chrono::hours(24)},
+   Times{std::chrono::hours(24), std::chrono::seconds(5), std::chrono::hours(1)},
+   Times{std::chrono::hours(24), std::chrono::milliseconds(10), std::chrono::hours(1)}
+));
 
 } // namespace nx::utils::test

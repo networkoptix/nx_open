@@ -146,7 +146,7 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
     if (!firstIdx.isValid())
         return;
 
-    QList<int> screens = nx::gui::Screens::coveredBy(firstIdx.item().screenSnaps).toList();
+    QList<int> screens = screensCoveredByItem(firstIdx.item(), firstIdx.videowall()).toList();
     std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return;
@@ -1915,7 +1915,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     for (const auto& item: videoWall->items()->getItems())
     {
-        ScreenWidgetKey key(item.pcUuid, nx::gui::Screens::coveredBy(item.screenSnaps));
+        ScreenWidgetKey key(item.pcUuid, screensCoveredByItem(item, videoWall));
         itemGroups[key].append(QnVideoWallItemIndex(videoWall, item.uuid));
     }
 
@@ -3015,7 +3015,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
         QnVideoWallItemIndex firstIdx = indices.first();
         QnVideoWallResourcePtr videowall = firstIdx.videowall();
         QnVideoWallItem item = firstIdx.item();
-        QSet<int> screenIndices = nx::gui::Screens::coveredBy(item.screenSnaps);
+        QSet<int> screenIndices = screensCoveredByItem(item, videowall);
         if (!videowall->pcs()->hasItem(item.pcUuid))
             continue;
         QnVideoWallPcData pc = videowall->pcs()->getItem(item.pcUuid);
@@ -3201,7 +3201,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
         };
 
     auto findTargetWorkbenchItem =
-        [layout, &item]() -> QnWorkbenchItem*
+        [layout, &item, &videowall]() -> QnWorkbenchItem*
         {
             QnWorkbenchItem* currentItem = nullptr;
             for (auto workbenchItem: layout->items())
@@ -3219,8 +3219,8 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
 
                 if (other != indices.cend()
                     && (other->item().pcUuid == item.pcUuid)
-                    && (nx::gui::Screens::coveredBy(other->item().screenSnaps)
-                           == nx::gui::Screens::coveredBy(item.screenSnaps)))
+                    && (screensCoveredByItem(other->item(), videowall)
+                           == screensCoveredByItem(item, videowall)))
                 {
                     return workbenchItem;
                 }

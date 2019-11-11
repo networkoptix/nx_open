@@ -3,19 +3,6 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withDesktopClient)
-
-    find_package(Qt5
-        COMPONENTS
-            OpenGL
-            Svg
-            QuickWidgets
-            WebKit
-            WebKitWidgets)
-
-    if(LINUX)
-        find_package(Qt5 COMPONENTS X11Extras)
-    endif()
-
     if(WINDOWS)
         if(withMiniLauncher)
             add_subdirectory(minilauncher)

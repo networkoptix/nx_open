@@ -760,7 +760,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
-        [](const Camera& camera) { return camera->isCameraControlDisabled(); });
+        [](const Camera& camera) { return camera->isCameraControlDisabledInternal(); });
 
     fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
         [](const Camera& camera) { return camera->useBitratePerGop(); });

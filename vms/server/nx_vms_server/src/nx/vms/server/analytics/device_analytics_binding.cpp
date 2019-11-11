@@ -130,8 +130,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 
 bool DeviceAnalyticsBinding::hasAliveDeviceAgent() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return !!m_deviceAgent;
+    return m_started.load();
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)

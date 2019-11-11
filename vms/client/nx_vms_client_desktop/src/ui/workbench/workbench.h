@@ -163,6 +163,33 @@ public:
      */
     void setItem(Qn::ItemRole role, QnWorkbenchItem *item);
 
+    /**
+     * Requests downloading of QQuickWebEngineDownloadItem.
+     */
+    Q_INVOKABLE void requestDownload(QObject* item);
+
+    /**
+     * Requests showing an alert, a confirmation, or a prompt dialog from within JavaScript
+     * to the user.
+     */
+    Q_INVOKABLE void requestJavaScriptDialog(QObject* request);
+
+    /**
+     * Requests a dialog for providing authentication credentials required by proxies or
+     * HTTP servers.
+     */
+    Q_INVOKABLE void requestAuthenticationDialog(QObject* request);
+
+    /**
+     * Requests a dialog for letting the user choose a (new or existing) file or directory.
+     */
+    Q_INVOKABLE void requestFileDialog(QObject* request);
+
+    /**
+     * Requests a dialog for selecting a color by the user.
+     */
+    Q_INVOKABLE void requestColorDialog(QObject* request);
+
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);
 

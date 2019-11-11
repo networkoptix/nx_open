@@ -105,6 +105,8 @@ private:
     nx::utils::bstream::Converter* m_converter;
     nx::Buffer m_readBuffer;
     nx::Buffer m_encodedDataBuffer;
+    BasicPollable m_readScheduler;
+    BasicPollable m_sendScheduler;
     std::function<void(SystemError::ErrorCode, size_t)> m_userReadHandler;
     std::function<void(SystemError::ErrorCode, size_t)> m_userWriteHandler;
     std::unique_ptr<utils::bstream::AbstractInput> m_inputPipeline;

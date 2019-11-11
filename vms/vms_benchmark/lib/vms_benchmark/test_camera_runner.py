@@ -9,8 +9,11 @@ from vms_benchmark import exceptions
 ini_testcamera_bin: str
 ini_test_file_high_resolution: str
 ini_test_file_low_resolution: str
-ini_testcamera_debug: bool
-
+ini_testcamera_output_file: str
+ini_unloop_via_testcamera: bool
+ini_test_file_high_period_us: int
+ini_test_file_low_period_us: int
+ini_enable_secondary_stream: bool
 
 @contextmanager
 def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
@@ -19,15 +22,38 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         f"--local-interface={local_ip}",
         '--pts',
         f"--fps-primary", str(primary_fps),
-        f"--fps-secondary", str(secondary_fps),
-        f"files=\"{ini_test_file_high_resolution}\";secondary-files=\"{ini_test_file_low_resolution}\";count={count}",
     ]
 
-    opts = {}
+    if ini_enable_secondary_stream:
+        camera_args += [f"--fps-secondary", str(secondary_fps)]
+    else:
+        camera_args += ["--no-secondary"]
 
-    if not ini_testcamera_debug:
-        opts['stdout'] = subprocess.PIPE
-        opts['stderr'] = subprocess.PIPE
+    if ini_enable_secondary_stream:
+        secondary_files_string = f';secondary-files="{ini_test_file_low_resolution}"'
+    else:
+        secondary_files_string = ''
+
+    camera_args += [
+        f'files="{ini_test_file_high_resolution}"{secondary_files_string};count={count}'
+    ]
+
+    if ini_unloop_via_testcamera:
+        camera_args += [
+            "--unloop-pts",
+            "--shift-pts-primary-period-us", str(ini_test_file_high_period_us),
+        ]
+        if ini_enable_secondary_stream:
+            camera_args += ["--shift-pts-secondary-period-us", str(ini_test_file_low_period_us)]
+
+    opts = {}
+    if not ini_testcamera_output_file:
+        opts['stdout'] = subprocess.DEVNULL
+        opts['stderr'] = subprocess.DEVNULL
+    else:
+        output_fd = open(ini_testcamera_output_file, 'wb')
+        opts['stdout'] = output_fd
+        opts['stderr'] = output_fd
 
     ld_library_path = None
     if platform.system() == 'Linux':

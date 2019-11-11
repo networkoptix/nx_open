@@ -16,6 +16,7 @@ using namespace nx::common::metadata;
 
 namespace {
 
+/** @return Empty string on error, having logged the error message. */
 QString makeLogFileName(
     const QString& analyticsLoggingPath,
     const QString& logFilePrefix,
@@ -23,7 +24,7 @@ QString makeLogFileName(
     QnUuid engineId,
     nx::vms::api::StreamIndex streamIndex)
 {
-    if (analyticsLoggingPath.isEmpty())
+    if (!NX_ASSERT(!analyticsLoggingPath.isEmpty()))
         return QString();
 
     QString fileName = logFilePrefix;
@@ -135,14 +136,13 @@ MetadataLogger::MetadataLogger(
         streamIndex);
 
     if (logFileName.isEmpty())
-    {
-        NX_WARNING(this, "Unable to create output file %1 for logging", logFileName);
         return;
-    }
 
     m_outputFile.setFileName(logFileName);
-    if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Append))
-        NX_WARNING(this, "Unable to open output file %1 for logging", logFileName);
+    if (m_outputFile.open(QIODevice::WriteOnly | QIODevice::Append))
+        NX_INFO(this, "Logging metadata to file: %1", logFileName);
+    else
+        NX_WARNING(this, "Unable to open or create metadata log file: %1", logFileName);
 }
 
 MetadataLogger::~MetadataLogger()

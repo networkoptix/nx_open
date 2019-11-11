@@ -79,6 +79,7 @@ static void handleQtMessage(
     switch (type)
     {
         case QtWarningMsg:
+        case QtCriticalMsg:
             NX_WARNING(&context, message);
             break;
 
@@ -90,16 +91,8 @@ static void handleQtMessage(
             NX_VERBOSE(&context, message);
             break;
 
-        default: // QtCriticalMsg, QtFatalMsg and all unknown.
-            // WebEngine thinks it's critical.
-            if (message.contains("Refused to prefetch"))
-            {
-                NX_WARNING(&context, message);
-            }
-            else
-            {
-                assertFailure(/*isCritical*/ false, message);
-            }
+        default: // QtFatalMsg and all unknown.
+            assertFailure(/*isCritical*/ false, message);
             break;
     };
 

@@ -723,6 +723,12 @@ QPointF Geometry::rotated(const QPointF& point, const QPointF& center, qreal deg
     return transform.map(point);
 }
 
+bool Geometry::isRotated90(qreal degrees)
+{
+    const auto angle = (int) degrees;
+    return angle % 90 == 0 && angle % 180 != 0;
+}
+
 QRectF Geometry::encloseRotatedGeometry(
     const QRectF& enclosingGeometry, qreal aspectRatio, qreal rotation)
 {

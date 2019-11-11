@@ -6,10 +6,13 @@
 
 #include <common/common_module.h>
 
+#include <core/resource/videowall_resource.h>
+
 #include <client_core/client_core_module.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <client/client_installations_manager.h>
+#include <utils/screen_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -55,6 +58,18 @@ void setVideoWallAutorunEnabled(const QnUuid& videoWallUuid, bool value)
     arguments << QString::fromUtf8(url.toEncoded());
 
     nx::vms::utils::setAutoRunEnabled(key, path + L' ' + arguments.join(L' '), value);
+}
+
+QSet<int> screensCoveredByItem(const QnVideoWallItem& item, const QnVideoWallResourcePtr& videoWall)
+{
+    QList<QRect> screenGeometries;
+    if (NX_ASSERT(videoWall))
+    {
+        for (const auto& screen: videoWall->pcs()->getItem(item.pcUuid).screens)
+            screenGeometries << screen.desktopGeometry;
+    }
+
+    return nx::gui::Screens::coveredBy(item.screenSnaps, screenGeometries);
 }
 
 } // namespace nx::vms::client::desktop

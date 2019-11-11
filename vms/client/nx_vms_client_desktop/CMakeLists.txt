@@ -1,3 +1,15 @@
+find_package(Qt5
+    COMPONENTS
+        OpenGL
+        Svg
+        QuickWidgets
+        WebEngine
+        WebEngineWidgets)
+
+if(LINUX)
+    find_package(Qt5 COMPONENTS X11Extras)
+endif()
+
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
@@ -17,6 +29,10 @@ endif()
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+# Place Roboto font into resources so it can be loaded by Qt WebEngine.
+set(client_font_roboto_regular ${roboto_fonts_directory}/bin/fonts/Roboto-Regular.ttf)
+set_source_files_properties(${client_font_roboto_regular} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
+
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
@@ -33,15 +49,18 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
         "${nov_file_launcher_executable}"
+        "${client_font_roboto_regular}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS
-        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebKit Qt5::WebKitWidgets
+        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         Qt5::Svg
+        Qt5::WebEngine
+        Qt5::WebEngineWidgets
         nx_vms_client_core
         nx_speech_synthesizer
         nx_audio
@@ -92,19 +111,4 @@ endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
-endif()
-
-option(enableWebEngine "Enable Qt WebEngine support" OFF)
-mark_as_advanced(enableWebEngine)
-if(enableWebEngine)
-    find_package(Qt5
-        COMPONENTS
-            WebEngine
-            WebEngineWidgets)
-
-    target_compile_definitions(nx_vms_client_desktop
-        PRIVATE NX_ENABLE_WEBENGINE=1
-    )
-
-    target_link_libraries(nx_vms_client_desktop PUBLIC Qt5::WebEngine Qt5::WebEngineWidgets)
 endif()

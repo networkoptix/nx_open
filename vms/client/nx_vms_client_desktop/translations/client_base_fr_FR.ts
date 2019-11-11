@@ -983,6 +983,10 @@ pour afficher plus de signets</translation>
       <source>Unpin Calendar</source>
       <translation>Désépingler Calendrier</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation type="unfinished">Page...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2966,6 +2970,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Formats audio de 44,1kHz et 48kHz non pris en charge par le périphérique de capture audio. S.V.P, choisir un autre appareil audio ou &quot;aucun&quot; dans les paramètres d’enregistrement d’écran.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation type="unfinished">Could not detect capturing resolution</translation>
     </message>
   </context>
   <context>
@@ -5741,6 +5749,42 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Stores analytics data</source>
       <translation>Conserver les données d'analyse</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>Réservés</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation type="unfinished">local</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation type="unfinished">ram</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation type="unfinished">optical</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation type="unfinished">swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation type="unfinished">network</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation type="unfinished">usb</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation type="unfinished">unknown</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 To</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6433,6 +6477,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6568,6 +6619,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Échec de la fusion de %1 avec notre système.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
     </message>
   </context>
   <context>
@@ -9995,6 +10053,45 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     <message>
       <source>New Layout %1</source>
       <translation>Nouvelle mise en page %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation type="unfinished">Save File As...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>Échec du remplacement de fichier</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation type="unfinished">Failed to save file</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation type="unfinished">Downloading file...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Ouvrir le dossier contenant</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation type="unfinished">Stop file downloading?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation type="unfinished">File downloaded</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation type="unfinished">File downloading failed</translation>
     </message>
   </context>
 </TS>

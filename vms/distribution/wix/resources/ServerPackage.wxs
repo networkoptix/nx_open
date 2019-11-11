@@ -6,7 +6,7 @@
         <PackageGroup Id="ServerPackageGroup">
             <MsiPackage
                 Id="ServerPackage"
-                Name="$(var.ServerMsiName)"
+                Name="server"
                 SourceFile="$(var.ServerStrippedMsiFile)"
                 InstallCondition="InstallServerOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"

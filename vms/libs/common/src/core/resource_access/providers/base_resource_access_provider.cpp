@@ -119,7 +119,10 @@ void QnBaseResourceAccessProvider::afterUpdate()
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    return resource && resource->resourcePool() && subject.isValid();
+    return resource
+        && resource->resourcePool()
+        && !resource->hasFlags(Qn::removed)
+        && subject.isValid();
 }
 
 bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubject& subject) const

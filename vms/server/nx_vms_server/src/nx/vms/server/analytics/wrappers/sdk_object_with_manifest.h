@@ -3,6 +3,7 @@
 #include <QtCore/QMetaObject>
 
 #include <utils/common/synctime.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/sdk/ptr.h>
 
@@ -12,9 +13,12 @@
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/error.h>
+#include <nx/vms/server/sdk_support/timed_guard.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/analytics/wrappers/string_builder.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
+#include <nx/vms/server/analytics/wrappers/method_timeouts.h>
+
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -40,6 +44,8 @@ public:
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
+        sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::manifest);
+
         if (!NX_ASSERT(m_mainSdkObject))
             return std::nullopt;
 
@@ -88,10 +94,16 @@ protected:
     ReturnType handleGenericError(
         SdkMethod sdkMethod,
         const GenericError& error,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool shouldTriggerAssert = false) const
     {
         const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
-        NX_DEBUG(this, stringBuilder.buildLogString());
+
+        if (shouldTriggerAssert)
+            NX_ASSERT(false, stringBuilder.buildLogString());
+        else
+            NX_DEBUG(this, stringBuilder.buildLogString());
+
         throwPluginEvent(
             stringBuilder.buildPluginDiagnosticEventCaption(),
             stringBuilder.buildPluginDiagnosticEventDescription());
@@ -103,21 +115,23 @@ protected:
     ReturnType handleError(
         SdkMethod sdkMethod,
         const sdk_support::Error& error,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool shouldTriggerAssert = false) const
     {
         if (!NX_ASSERT(!error.isOk()))
             return returnValue;
 
-        return handleGenericError(sdkMethod, error, returnValue);
+        return handleGenericError(sdkMethod, error, returnValue, shouldTriggerAssert);
     }
 
     template<typename ReturnType>
     ReturnType handleViolation(
         SdkMethod sdkMethod,
         const Violation& violation,
-        ReturnType returnValue) const
+        ReturnType returnValue,
+        bool shouldTriggerAssert = false) const
     {
-        return handleGenericError(sdkMethod, violation, returnValue);
+        return handleGenericError(sdkMethod, violation, returnValue, shouldTriggerAssert);
     }
 
     void throwPluginEvent(
@@ -146,6 +160,22 @@ protected:
             "at_pluginDiagnosticEvent",
             Qt::QueuedConnection,
             Q_ARG(nx::vms::event::PluginDiagnosticEventPtr, pluginDiagnosticEvent));
+    }
+
+    sdk_support::TimedGuard makeTimedGuard(
+        SdkMethod sdkMethod,
+        QString additionalInfo = QString()) const
+    {
+        return sdk_support::TimedGuard(
+            sdkMethodTimeout(sdkMethod),
+            [this, sdkMethod, additionalInfo = std::move(additionalInfo)]()
+            {
+                handleViolation(
+                    sdkMethod,
+                    {ViolationType::methodExecutionTookTooLong, std::move(additionalInfo)},
+                    /*returnValue*/ nullptr,
+                    pluginsIni().shouldMethodTimeoutViolationTriggerAnAssertion);
+            });
     }
 
 private:

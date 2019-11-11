@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} webgrensesnitt"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "pause",
-            "help": "help | show commands",
-            "collapse all servers": "kollapse alle servere",
-            "collapse server": "collapse server + [server name]",
-            "play": "spill av",
-            "clear search": "nullstill søk",
-            "live": "go to live | show me live",
-            "expand all servers": "utvide alle servere",
-            "stop listening": "slutt å lytte",
-            "expand server": "utvider server + [servernavn]",
-            "view": "se + [kamera navn]"
-        },
-        "systemOffline": "System frakoblet",
         "cameraLinks": {
-            "copyToClipboard": "kopier til utklippstavle",
             "highStream": "Høy kvalitet",
-            "copyDefaultText": "kopier",
-            "unknown": "Ukjent",
             "lowStream": "Lav kvalitet",
             "transcoding": "Transkoding",
+            "unknown": "Ukjent",
+            "copyToClipboard": "kopier til utklippstavle",
+            "copyDefaultText": "kopier",
             "copyActiveText": "kopiert til utklippstavlen"
         },
-        "searchCamPlaceholder": "Søk",
+        "systemOffline": "System frakoblet",
         "cameraStates": {
-            "noFormat": "Denne nettleseren støtter ikke videoavspilling fra dette kameraet.",
-            "ieWin10": "Vennligst bruk Microsoft Edge- eller Google Chrome-nettlesere.",
-            "iosVideoTooLarge": "iOS støtter ikke video som er større enn fullHD (2MP: 1920x1080).",
+            "offline": "Frakoblet",
+            "error": "Feil",
             "unauthorized": "Autentisering kreves",
-            "ubuntuNX": "Denne nettleseren støtter ikke video fra ARM-baserte servere. Vennligst bruk Chromium-nettleseren i stedet.",
-            "ieNoWebm": "Vennligst installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+            "noData": "Ingen opptak",
+            "iosVideoTooLarge": "iOS støtter ikke video som er større enn fullHD (2MP: 1920x1080).",
+            "flashRequired": "Vennligst <a href='https://get.adobe.com/flashplayer/' target='_blank'>installer Adobe Flash</a> for å spille av videoer.",
             "flashOrWebmRequired": "Vennligst <a href='https://get.adobe.com/flashplayer/' target='_blank'>installer Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for å spille av video i Internet Explorer.",
             "noArmSupport": "Denne nettleseren eller enheten støtter ikke videoavspilling fra ARM-baserte servere.",
-            "error": "Feil",
-            "offline": "Frakoblet",
-            "noData": "Ingen opptak",
-            "flashRequired": "Vennligst <a href='https://get.adobe.com/flashplayer/' target='_blank'>installer Adobe Flash</a> for å spille av videoer."
+            "noFormat": "Denne nettleseren støtter ikke videoavspilling fra dette kameraet.",
+            "ieNoWebm": "Vennligst installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+            "ieWin10": "Vennligst bruk Microsoft Edge- eller Google Chrome-nettlesere.",
+            "ubuntuNX": "Denne nettleseren støtter ikke video fra ARM-baserte servere. Vennligst bruk Chromium-nettleseren i stedet."
+        },
+        "searchCamPlaceholder": "Søk",
+        "resolution": {
+            "auto": "Auto",
+            "high": "Høy",
+            "low": "Lav"
         },
         "chromeCastWarning": "Chromecast er ressursintensiv og kan forårsake problemer på serveren.",
-        "resolution": {
-            "high": "Høy",
-            "auto": "Auto",
-            "low": "Lav"
+        "voiceCommands": {
+            "play": "spill av",
+            "pause": "pause",
+            "live": "go to live | show me live",
+            "view": "se + [kamera navn]",
+            "search": "find + [text for searchbar]",
+            "clear search": "nullstill søk",
+            "expand server": "utvider server + [servernavn]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "utvide alle servere",
+            "collapse all servers": "kollapse alle servere",
+            "stop listening": "slutt å lytte",
+            "help": "help | show commands"
         }
     }
 }

@@ -109,7 +109,7 @@
                         "alarms": [{
                             "level": "error",
                             "condition": "notEqual %status Online",
-                            "text": "Status is %status"
+                            "text": "is %status"
                         }]
                     },
                     "offlineEvents": {
@@ -298,13 +298,19 @@
                 "values": {
                     "name": {
                         "display": "table|panel"
+                    },
+                    "thumbnail": {
+                        "display": "panel",
+                        "format": "thumbnail",
+                        "calculate": "const now"
                     }
                 }
             },
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "type": {
                         "display": "table|panel"
@@ -336,12 +342,12 @@
                             {
                                 "level": "warning",
                                 "condition": "equal %status Unauthorized",
-                                "text": "Status is %status"
+                                "text": "is %status"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Offline",
-                                "text": "Status is %status"
+                                "text": "is %status"
                             }
                         ]
                     },
@@ -492,7 +498,7 @@
                 "values": {
                     "archiveLengthS": {
                         "name": "Forecast",
-                        "description": "Archive Length Forecast",
+                        "description": "Archive Length",
                         "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
@@ -539,7 +545,8 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "type": {
                         "display": "table|panel"
@@ -623,7 +630,8 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "format": "resource"
                     },
                     "state": {
                         "display": "table|panel"

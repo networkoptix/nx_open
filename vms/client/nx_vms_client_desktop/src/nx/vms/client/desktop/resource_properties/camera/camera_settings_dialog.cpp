@@ -325,9 +325,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         d->advancedSettingsWidget,
         tr("Advanced"));
 
+    auto cameraWebPage = new CameraWebPageWidget(d->store, ui->tabWidget);
+    connect(this, &QDialog::finished, cameraWebPage, &CameraWebPageWidget::resetApplicationProxy);
     addPage(
         int(CameraSettingsTab::web),
-        new CameraWebPageWidget(d->store, ui->tabWidget),
+        cameraWebPage,
         tr("Web Page"));
 
     addPage(
@@ -614,9 +616,7 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
             && state.devicesDescription.isWearable == CombinedValue::None
             && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::web),
-        state.isSingleCamera()
-            && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+    setPageVisible(int(CameraSettingsTab::web), state.canShowWebPage());
 
     setPageVisible(int(CameraSettingsTab::analytics),
         state.isSingleCamera() && !state.analytics.engines.empty());
