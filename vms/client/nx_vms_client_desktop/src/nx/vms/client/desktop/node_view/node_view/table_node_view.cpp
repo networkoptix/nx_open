@@ -71,7 +71,7 @@ struct TableNodeView::Private: public QObject
     void setHasUserChanges(bool value);
 
     TableNodeView* const q;
-    NodeViewStore store;
+    NodeViewStorePtr store;
     TableNodeViewModel model;
 
     bool hasUserChanges = false;
@@ -80,16 +80,17 @@ struct TableNodeView::Private: public QObject
 
 TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
     q(owner),
-    model(columnCount, &store)
+    store(new NodeViewStore()),
+    model(columnCount, store.data())
 {
-    connect(&store, &NodeViewStore::patchApplied, &model, &TableNodeViewModel::applyPatch);
-    connect(&store, &NodeViewStore::patchApplied, this, &Private::updateCheckedIndices);
+    connect(store.data(), &NodeViewStore::patchApplied, &model, &TableNodeViewModel::applyPatch);
+    connect(store.data(), &NodeViewStore::patchApplied, this, &Private::updateCheckedIndices);
 }
 
 void TableNodeView::Private::updateCheckedIndices()
 {
     TableNodeView::IndicesList current;
-    forEachNode(store.state().rootNode,
+    forEachNode(store->state().rootNode,
         [this, &current](const NodePtr& node)
         {
             const auto& data = node->data();
@@ -135,12 +136,12 @@ TableNodeView::~TableNodeView()
 
 void TableNodeView::applyPatch(const details::NodeViewStatePatch& patch)
 {
-    d->store.applyPatch(patch);
+    d->store->applyPatch(patch);
 }
 
 const details::NodeViewState& TableNodeView::state() const
 {
-    return d->store.state();
+    return d->store->state();
 }
 
 void TableNodeView::setHeaderDataProvider(HeaderDataProvider&& provider)
@@ -160,32 +161,10 @@ bool TableNodeView::hasUserChanges() const
 
 void TableNodeView::applyUserChanges()
 {
-    const auto kUserCheckStateRole = makeUserActionRole(Qt::CheckStateRole);
-    NodeViewStatePatch clearPatch;
-    for (const auto nodeIndex: userCheckChangedIndices())
-    {
-        const auto node = nodeFromIndex(nodeIndex);
-
-        const int column = nodeIndex.column();
-        const auto& path = node->path();
-        clearPatch.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
-
-        const auto& data = node->data();
-        const auto userState = userCheckedState(data, column);
-        const auto currentState = checkedState(data, column);
-        if (userState == currentState)
-            continue;
-
-        const auto updateCheckedData = ViewNodeDataBuilder()
-            .withCheckedState(column, userState).data();
-
-        clearPatch.addUpdateDataStep(path, updateCheckedData);
-    }
-
-    applyPatch(clearPatch);
+    applyPatch(NodeViewStateReducer::applyUserChangesPatch(d->store->state()));
 }
 
-const details::NodeViewStore& TableNodeView::store() const
+const details::NodeViewStorePtr& TableNodeView::store()
 {
     return d->store;
 }
@@ -200,8 +179,8 @@ void TableNodeView::handleUserDataChangeRequested(
 
     const auto node = details::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
-    d->store.applyPatch(NodeViewStateReducer::setNodeChecked(
-        d->store.state(), node->path(), {index.column()}, checkedState, true));
+    d->store->applyPatch(NodeViewStateReducer::setNodeChecked(
+        d->store->state(), node->path(), {index.column()}, checkedState, true));
 
     static const QVector<int> kCheckStateRole(Qt::CheckStateRole, 1);
     d->model.dataChanged(index, index, kCheckStateRole);

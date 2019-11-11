@@ -81,9 +81,9 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
 
 ViewNodeData dataFromPort(
     const NetworkPortState& port,
-    const QnResourcePool& resourcePool)
+    QnResourcePool* resourcePool)
 {
-    const auto resource = resourcePool.getResourceById(port.deviceId);
+    const auto resource = resourcePool->getResourceById(port.deviceId);
     const auto resourceNodeViewData =
         getResourceNodeData(resource, PoESettingsColumn::camera, kEmptyText);
 
@@ -107,7 +107,7 @@ ViewNodeData dataFromPort(
 
 NodePtr createPortNodes(
     const nx::vms::api::NetworkBlockData& data,
-    const QnResourcePool& resourcePool)
+    QnResourcePool* resourcePool)
 {
     if (data.portStates.empty())
         return NodePtr();
@@ -127,17 +127,18 @@ namespace settings {
 using namespace node_view;
 using namespace node_view::details;
 
-NodeViewStatePatch PoESettingsReducer::blockDataChanges(
-    const node_view::details::NodeViewState& state,
-    const nx::vms::api::NetworkBlockData& blockData,
-    const QnResourcePool& resourcePool)
+NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
+    const NodeViewState& state,
+    const core::PoEController::OptionalBlockData& blockData,
+    QnResourcePool* resourcePool)
 {
-    if (!state.rootNode)
-        return NodeViewStatePatch::fromRootNode(createPortNodes(blockData, resourcePool));
+    // TODO: check for server switch.
 
     // It is supposed that ports are always ordered and their count is never changed.
 
-    // TODO: check for server switch.
+    const auto data = blockData ? blockData.value() : nx::vms::api::NetworkBlockData();
+    if (!state.rootNode)
+        return NodeViewStatePatch::fromRootNode(createPortNodes(data, resourcePool));
 
     NodeViewStatePatch result;
 
@@ -147,7 +148,7 @@ NodeViewStatePatch PoESettingsReducer::blockDataChanges(
         ViewNodeData forRemove;
         ViewNodeData forOverride;
         const auto source = node->data();
-        const auto target = dataFromPort(blockData.portStates[index++], resourcePool);
+        const auto target = dataFromPort(data.portStates[index++], resourcePool);
 
         const auto difference = source.difference(target);
         result.appendPatchStep({node->path(), difference.updateOperation});

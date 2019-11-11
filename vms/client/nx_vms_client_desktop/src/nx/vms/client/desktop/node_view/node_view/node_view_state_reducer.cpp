@@ -61,6 +61,41 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
     return patch;
 }
 
+details::NodeViewStatePatch NodeViewStateReducer::applyUserChangesPatch(
+    const details::NodeViewState& state)
+{
+    static const auto kUserCheckStateRole = makeUserActionRole(Qt::CheckStateRole);
+
+    NodeViewStatePatch result;
+
+    forEachNode(state.rootNode,
+        [&result](const NodePtr& node)
+        {
+            const auto& data = node->data();
+            for (const int column: data.usedColumns())
+            {
+                if (!data.hasData(column, makeUserActionRole(Qt::CheckStateRole)))
+                    continue;
+
+                const auto& path = node->path();
+                result.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
+
+                const auto& data = node->data();
+                const auto userState = userCheckedState(data, column);
+                const auto currentState = checkedState(data, column);
+                if (userState == currentState)
+                    continue;
+
+                const auto updateCheckedData = ViewNodeDataBuilder()
+                    .withCheckedState(column, userState).data();
+
+                result.addUpdateDataStep(path, updateCheckedData);
+            }
+        });
+
+    return result;
+}
+
 } // namespace node_view
 } // namespace nx::vms::client::desktop
 

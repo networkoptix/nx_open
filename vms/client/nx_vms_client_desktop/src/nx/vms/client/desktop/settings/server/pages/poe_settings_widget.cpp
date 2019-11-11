@@ -1,5 +1,7 @@
 #include "poe_settings_widget.h"
 
+#include "poe_settings_store.h"
+
 #include "ui_poe_settings_widget.h"
 
 #include <nx/vms/client/core/poe_settings/poe_controller.h>
@@ -25,37 +27,36 @@ struct PoESettingsWidget::Private: public QObject
 
     void updateBlockData();
     void updateAvailability();
+    void handlePatchApplied(const PoESettingsStatePatch& patch);
 
     PoESettingsWidget* const q;
     Controller controller;
     Ui::PoESettingsWidget ui;
+
+    PoESettingsStore store;
 };
 
 PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
-    q(owner)
+    q(owner),
+    store(owner)
 {
     ui.setupUi(owner);
 
-    connect(&controller, &Controller::updated, this, &Private::updateBlockData);
-    connect(&controller, &Controller::updatingPoweringModesChanged,
-        this, &Private::updateAvailability);
+    store.setStores(ui.poeTable->store(), ui.poeTable->store() /*<tmp*/);
+    connect(&store, &PoESettingsStore::patchApplied, this, &Private::handlePatchApplied);
 
-    connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged,
-        q, &PoESettingsWidget::hasChangesChanged);
+    connect(&controller, &Controller::updated, this, &Private::updateBlockData);
+    connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged, &store,
+        [this]() { store.setHasChanges(ui.poeTable->hasUserChanges()); });
+
     updateBlockData();
+//    connect(&controller, &Controller::updatingPoweringModesChanged,
+//        this, &Private::updateAvailability);
 }
 
 void PoESettingsWidget::Private::updateBlockData()
 {
-    const auto table = ui.poeTable;
-    const auto& optionalBlockData = controller.blockData();
-    const auto& blockData = optionalBlockData
-        ? optionalBlockData.value()
-        : nx::vms::api::NetworkBlockData();
-
-    const auto patch = PoESettingsReducer::blockDataChanges(
-        table->state(), blockData, *q->resourcePool());
-    table->applyPatch(patch);
+    store.updateBlocks(controller.blockData());
 }
 
 void PoESettingsWidget::Private::updateAvailability()
@@ -65,6 +66,12 @@ void PoESettingsWidget::Private::updateAvailability()
     q->setReadOnly(readOnly);
     ui.poeTable->setEnabled(!readOnly);
     ui.poeTotalsTable->setEnabled(!readOnly);
+}
+
+void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch& patch)
+{
+    if (patch.hasChanges)
+        emit q->hasChangesChanged();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -82,7 +89,7 @@ PoESettingsWidget::~PoESettingsWidget()
 
 bool PoESettingsWidget::hasChanges() const
 {
-    return d->ui.poeTable->hasUserChanges();
+    return d->store.state().hasChanges;
 }
 
 void PoESettingsWidget::loadDataToUi()
@@ -101,7 +108,7 @@ void PoESettingsWidget::applyChanges()
         modes.append(mode);
     }
 
-    d->ui.poeTable->applyUserChanges();
+    d->store.applyUserChanges();
     d->controller.setPowerModes(modes);
 }
 

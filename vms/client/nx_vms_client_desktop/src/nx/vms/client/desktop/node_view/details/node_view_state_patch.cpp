@@ -114,6 +114,11 @@ NodeViewStatePatch NodeViewStatePatch::clearNodeView()
     return patch;
 }
 
+bool NodeViewStatePatch::isEmpty() const
+{
+    return steps.empty();
+}
+
 NodeViewState&& NodeViewStatePatch::applyTo(
     NodeViewState&& state,
     const GetNodeOperationGuard& getOperationGuard) const

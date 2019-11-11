@@ -27,6 +27,9 @@ public:
         const details::ViewNodePath& path,
         bool expanded);
 
+    static details::NodeViewStatePatch applyUserChangesPatch(
+        const details::NodeViewState& state);
+
 private:
     NodeViewStateReducer() = default;
     ~NodeViewStateReducer() = default;

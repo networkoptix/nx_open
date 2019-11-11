@@ -35,11 +35,12 @@ public:
     void applyUserChanges();
     bool hasUserChanges() const;
 
+    const details::NodeViewStorePtr& store();
+
 signals:
     void hasUserChangesChanged() const;
 
 protected:
-    const details::NodeViewStore& store() const;
 
     /**
      * Implements basic item check functionality.

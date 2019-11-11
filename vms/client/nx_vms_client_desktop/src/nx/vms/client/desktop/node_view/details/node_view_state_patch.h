@@ -38,6 +38,8 @@ struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
     static NodeViewStatePatch clearNodeView();
 
+    bool isEmpty() const;
+
     using GetNodeOperationGuard = std::function<nx::utils::SharedGuardPtr (const PatchStep& step)>;
     NodeViewState&& applyTo(
         NodeViewState&& state,

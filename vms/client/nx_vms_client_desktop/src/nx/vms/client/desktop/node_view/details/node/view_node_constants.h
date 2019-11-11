@@ -20,9 +20,10 @@ enum CustomViewNodeRole
     progressRole = firstCustomViewNodeRole,
     useSwitchStyleForCheckboxRole,
 
-    userChangesRoleOffset = Qt::UserRole + 1024,
+    lastRole,
+    lastViewNodeRole = lastRole + 1024,
 
-    lastViewNodeRole = userChangesRoleOffset + 1024
+    userChangesRoleOffset = Qt::UserRole + 10000
 };
 
 } // namespace details
