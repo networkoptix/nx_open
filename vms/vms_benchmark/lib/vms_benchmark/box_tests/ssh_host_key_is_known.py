@@ -20,8 +20,11 @@ class SshHostKeyIsKnown:
             error_messages = re.split(r'[\r\n]+', stderr.getvalue().strip())
 
             def fail(reason):
-                logging.error('Obtaining host key failed: %s. Ssh reported:\n%r',
-                    reason, error_messages)
+                logging.error(
+                    'Obtaining host key failed: %s. Ssh reported:\n%r',
+                    reason,
+                    error_messages
+                )
                 raise SshHostKeyObtainingFailed("Unable to obtain ssh host key of the box.")
 
             host_key = None

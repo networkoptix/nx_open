@@ -306,8 +306,10 @@ class ServerApi:
         return 200 <= response.code < 300
 
     def get_archive_start_time_ms(self, camera_id: str) -> int:
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}"
-            f"/ec2/recordedTimePeriods?cameraId={camera_id}")
+        request = urllib.request.Request(
+            f"http://{self.ip}:{self.port}" +
+            f"/ec2/recordedTimePeriods?cameraId={camera_id}"
+        )
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))

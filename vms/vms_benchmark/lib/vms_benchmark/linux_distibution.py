@@ -25,9 +25,6 @@ class LinuxDistributionDetector:
                         f"Command `{command}` failed."
             )
 
-        os_name = None
-        os_family_name = None
-        os_version = None
         with_systemd = False
 
         res = device.get_file_content('/etc/os-release', su=True, stderr=None)

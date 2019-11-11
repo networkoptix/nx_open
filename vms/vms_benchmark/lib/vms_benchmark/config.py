@@ -43,8 +43,11 @@ class ConfigParser:
     def _process_env_vars(string):
         import re
         from os import environ
-        return re.sub(r"\$([a-zA-Z_][a-zA-Z_]+)",
-            lambda match: environ.get(match.group(1), ''), string)
+        return re.sub(
+            r"\$([a-zA-Z_][a-zA-Z_]+)",
+            lambda match: environ.get(match.group(1), ''),
+            string
+        )
 
     @staticmethod
     def _load_file(filename, is_file_optional) -> Optional[dict]:
