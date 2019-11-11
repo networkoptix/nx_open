@@ -219,7 +219,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+                "name", [](const auto& r) { return Value(r->getUserDefinedName()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
