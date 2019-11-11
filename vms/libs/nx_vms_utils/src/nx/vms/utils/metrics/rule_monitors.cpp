@@ -60,7 +60,7 @@ public:
             return m;
         }
 
-        throw RuleSyntaxError("Unknown value id: " + id.toStdString());
+        throw UnknownValueId("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }
@@ -99,7 +99,7 @@ public:
             [operation](Value v1, Value v2)
             {
                 if (!v1.isDouble() || !v2.isDouble())
-                    throw ValueCalculationError("At least one argument is not a number");
+                    throw FormulaCalculationError("At least one argument is not a number");
                 return Value(operation(v1.toDouble(), v2.toDouble()));
             });
     }
@@ -112,7 +112,7 @@ public:
             [operation](Value v1, Value v2)
             {
                 if (!v1.isBool() || !v2.isBool())
-                    throw ValueCalculationError("At least one argument is not a boolean");
+                    throw FormulaCalculationError("At least one argument is not a boolean");
                 return Value(operation(v1.toBool(), v2.toBool()));
             });
     }
@@ -121,13 +121,13 @@ public:
     {
         const auto params = value.toString().split(L'x');
         if (params.size() != 2)
-            throw ValueCalculationError("Invalid resolution size syntax");
+            throw FormulaCalculationError("Invalid resolution size syntax");
 
-        bool isOk1;
-        bool isOk2;
+        bool isOk1 = false;
+        bool isOk2 = false;
         int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
         if (!isOk1 || !isOk2)
-            throw ValueCalculationError("Invalid resolution size syntax: integers expected");
+            throw FormulaCalculationError("Invalid resolution size syntax: integers expected");
         return result;
     }
 
@@ -181,7 +181,7 @@ public:
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
-                    throw ValueCalculationError("Invalid duration: " + durationStr.toStdString());
+                    throw FormulaCalculationError("Invalid duration: " + durationStr.toStdString());
                 }
 
                 return Value(operation(

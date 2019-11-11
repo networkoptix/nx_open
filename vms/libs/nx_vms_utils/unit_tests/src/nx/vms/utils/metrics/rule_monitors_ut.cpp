@@ -64,16 +64,16 @@ TEST_F(MetricsGenerators, ValueErrors)
     resource.update("a", "zorz");
     resource.update("b", 7);
 
-    EXPECT_THROW(plusAB(), ValueCalculationError);
-    EXPECT_THROW(andAB(), ValueCalculationError);
-    EXPECT_THROW(resolutionGreaterThanAB(), ValueCalculationError);
+    EXPECT_THROW(plusAB(), FormulaCalculationError);
+    EXPECT_THROW(andAB(), FormulaCalculationError);
+    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
 
     resource.update("a", "7x7");
     resource.update("b", "7x7");
     EXPECT_NO_THROW(resolutionGreaterThanAB());
 
     resource.update("b", "7x7.1");
-    EXPECT_THROW(resolutionGreaterThanAB(), ValueCalculationError);
+    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
 }
 
 TEST_F(MetricsGenerators, ValueBinary)

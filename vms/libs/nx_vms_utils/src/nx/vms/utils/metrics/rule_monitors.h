@@ -4,19 +4,26 @@
 
 namespace nx::vms::utils::metrics {
 
+// General rules file parsing error.
 class RuleSyntaxError: public MetricsError
 {
     using MetricsError::MetricsError;
 };
 
-class ValueCalculationError: public MetricsError
+class UnknownValueId: public RuleSyntaxError
+{
+    using RuleSyntaxError::RuleSyntaxError;
+};
+
+// General formula calculation error in ExtraValueMonitor.
+class FormulaCalculationError: public MetricsError
 {
    using MetricsError::MetricsError;
 };
 
-class NullValueError: public ValueCalculationError
+class NullValueError: public FormulaCalculationError
 {
-    using ValueCalculationError::ValueCalculationError;
+    using FormulaCalculationError::FormulaCalculationError;
 };
 
 using ValueGenerator = std::function<api::metrics::Value()>;

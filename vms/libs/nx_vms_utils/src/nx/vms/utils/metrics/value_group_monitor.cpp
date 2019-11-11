@@ -103,14 +103,14 @@ void ValueGroupMonitor::updateExtraValue(
             monitor->setGenerator(std::move(formula.generator));
             monitor->setScope(formula.scope);
         }
-        catch (const std::invalid_argument& error)
+        catch (const UnknownValueId& error)
         {
             if (!skipOnMissingArgument) throw;
             NX_DEBUG(this, "Skip extra value %1: %2", parameterId, error.what());
             m_valueMonitors.erase(parameterId);
         }
     }
-    catch (const std::logic_error& error)
+    catch (const RuleSyntaxError& error)
     {
         NX_ASSERT(false, "Unable to add extra value %1: %2", parameterId, error.what());
         m_valueMonitors.erase(parameterId);
@@ -132,13 +132,13 @@ void ValueGroupMonitor::updateAlarms(
                     parseTemplate(alarmRule.text, m_valueMonitors)
                 ));
             }
-            catch (const std::invalid_argument& error)
+            catch (const UnknownValueId& error)
             {
                 if (!skipOnMissingArgument) throw;
                 NX_DEBUG(this, "Skip alarm monitor %1: %2", parameterId, error.what());
             }
         }
-        catch (const std::logic_error& error)
+        catch (const RuleSyntaxError& error)
         {
             NX_ASSERT(false, "Unable to add alarm monitor %1: %2", parameterId, error.what());
         }
