@@ -38,6 +38,10 @@ Figure
             Qt.point(mouseArea.mouseX - rectangle.x, mouseArea.mouseY - rectangle.y))
         item: mouseArea
         target: figure
+        minX: -rectangle.x
+        minY: -rectangle.y
+        maxX: width - (rectangle.x + rectangle.width)
+        maxY: height - (rectangle.y + rectangle.height)
     }
 
     Rectangle
