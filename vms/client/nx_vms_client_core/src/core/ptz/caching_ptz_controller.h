@@ -4,7 +4,11 @@
 
 #include <core/ptz/proxy_ptz_controller.h>
 
-class QnCachingPtzController: public QnProxyPtzController
+#include <utils/common/from_this_to_shared.h>
+
+class QnCachingPtzController:
+    public QnProxyPtzController,
+    public QnFromThisToShared<QnCachingPtzController>
 {
     Q_OBJECT
     using base_type = QnProxyPtzController;

@@ -985,7 +985,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>頁面...</translation>
     </message>
   </context>
   <context>
@@ -2944,7 +2944,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>無法偵測到擷取之解析度</translation>
     </message>
   </context>
   <context>
@@ -5709,15 +5709,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>網路</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>USB</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>未知</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6416,7 +6416,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>下載中&lt;br&gt;已啟動</translation>
     </message>
   </context>
   <context>
@@ -6560,7 +6560,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>無法確認被刪除攝影機上的事件。</translation>
     </message>
   </context>
   <context>
@@ -9927,7 +9927,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>另存檔案為…</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -9935,15 +9935,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>儲存檔案失敗</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>禁止寫入%1 檔案夾。</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>下載檔案中...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -9951,15 +9951,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>中止檔案下載?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>檔案已完成下載</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>檔案下載失敗</translation>
     </message>
   </context>
 </TS>

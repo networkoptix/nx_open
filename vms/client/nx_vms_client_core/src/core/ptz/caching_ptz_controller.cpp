@@ -285,17 +285,17 @@ bool QnCachingPtzController::initializeInternal()
 
 void QnCachingPtzController::initialize()
 {
-    QPointer<QnCachingPtzController> guard(this);
+    const auto guard = toSharedPointer();
 
     /**
      * Prevents calling "initialize" function on removed "this". Controller could be removed
      * from QnPtzControllerPool after signals of resource emitted but not delivered.
      */
     const auto safeInitialize =
-        [guard]()
+        [weakRef = guard.toWeakRef()]()
         {
-            if (guard)
-                guard->initializeInternal();
+            if (auto controller = weakRef.lock())
+                controller->initializeInternal();
         };
 
     connect(resource(), &QnResource::statusChanged, this, safeInitialize);
