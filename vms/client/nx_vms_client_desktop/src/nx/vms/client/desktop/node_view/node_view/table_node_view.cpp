@@ -167,12 +167,19 @@ void TableNodeView::applyUserChanges()
         const auto node = nodeFromIndex(nodeIndex);
 
         const int column = nodeIndex.column();
-        clearPatch.addRemoveDataStep(node->path(), {{column, {kUserCheckStateRole}}});
+        const auto& path = node->path();
+        clearPatch.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
+
+        const auto& data = node->data();
+        const auto userState = userCheckedState(data, column);
+        const auto currentState = checkedState(data, column);
+        if (userState == currentState)
+            continue;
 
         const auto updateCheckedData = ViewNodeDataBuilder()
-            .withCheckedState(column, userCheckedState(node->data(), column)).data();
+            .withCheckedState(column, userState).data();
 
-        clearPatch.addUpdateDataStep(node->path(), updateCheckedData);
+        clearPatch.addUpdateDataStep(path, updateCheckedData);
     }
 
     applyPatch(clearPatch);
