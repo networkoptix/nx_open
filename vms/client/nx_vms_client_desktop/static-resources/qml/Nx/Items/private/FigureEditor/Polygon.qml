@@ -14,8 +14,6 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count > 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
-    clip: true
-
     MouseArea
     {
         id: mouseArea
@@ -54,6 +52,10 @@ Figure
             Qt.point(F.relX(mouseArea.mouseX, mouseArea), F.relY(mouseArea.mouseY, mouseArea)))
         item: mouseArea
         target: figure
+        minX: -F.absX(pathUtil.boundingRect.x, mouseArea)
+        minY: -F.absY(pathUtil.boundingRect.y, mouseArea)
+        maxX: width - F.absX(pathUtil.boundingRect.x + pathUtil.boundingRect.width, mouseArea)
+        maxY: height - F.absY(pathUtil.boundingRect.y + pathUtil.boundingRect.height, mouseArea)
     }
 
     PathUtil

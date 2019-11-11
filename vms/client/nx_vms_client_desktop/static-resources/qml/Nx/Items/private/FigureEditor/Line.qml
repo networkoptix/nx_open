@@ -45,6 +45,10 @@ Figure
         pathHoverInstrument: hoverInstrument
         item: mouseArea
         target: figure
+        minX: -Math.min(pointMakerInstrument.startX, pointMakerInstrument.endX)
+        minY: -Math.min(pointMakerInstrument.startY, pointMakerInstrument.endY)
+        maxX: width - Math.max(pointMakerInstrument.startX, pointMakerInstrument.endX)
+        maxY: height - Math.max(pointMakerInstrument.startY, pointMakerInstrument.endY)
     }
 
     Rectangle
@@ -55,7 +59,8 @@ Figure
 
         x: pointMakerInstrument.startX
         y: pointMakerInstrument.startY - height / 2
-        width: F.distance(pointMakerInstrument.startX, pointMakerInstrument.startY, pointMakerInstrument.endX, pointMakerInstrument.endY)
+        width: F.distance(pointMakerInstrument.startX, pointMakerInstrument.startY,
+            pointMakerInstrument.endX, pointMakerInstrument.endY)
         height: 2
 
         transformOrigin: Item.Left
