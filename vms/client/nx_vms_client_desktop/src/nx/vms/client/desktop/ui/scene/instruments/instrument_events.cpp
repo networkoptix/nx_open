@@ -5,8 +5,9 @@ namespace ui {
 namespace scene {
 
 MouseEvent::MouseEvent(const QMouseEvent* event):
-    position(event->pos()),
-    globalPosition(event->globalPos()),
+    localPosition(event->localPos()),
+    windowPosition(event->windowPos()),
+    screenPosition(event->screenPos()),
     button(event->button()),
     buttons(event->buttons()),
     modifiers(event->modifiers())
