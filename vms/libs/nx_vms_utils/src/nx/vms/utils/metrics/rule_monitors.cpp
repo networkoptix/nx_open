@@ -117,17 +117,17 @@ public:
             });
     }
 
-    static int rect(Value value) noexcept(false)
+    static int square(Value value) noexcept(false)
     {
         const auto params = value.toString().split(L'x');
         if (params.size() != 2)
-            throw ValueCalculationError("Invalid rectangle size syntax");
+            throw ValueCalculationError("Invalid resolution size syntax");
 
         bool isOk1;
         bool isOk2;
         int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
         if (!isOk1 || !isOk2)
-            throw ValueCalculationError("Invalid rectangle size syntax: integers expected");
+            throw ValueCalculationError("Invalid resolution size syntax: integers expected");
         return result;
     }
 
@@ -149,7 +149,7 @@ public:
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
         if (function() == "resolutionGreaterThan")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return rect(v1) > rect(v2); });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return square(v1) > square(v2); });
 
         if (function() == "<" || function() == "lessThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
