@@ -1359,3 +1359,8 @@ void QnMotionEstimation::setChannelNum(int value)
 {
     m_channelNum = value;
 }
+
+void QnMotionEstimation::stop()
+{
+    m_decoder.reset();
+}

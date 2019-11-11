@@ -498,6 +498,13 @@ void QnLiveStreamProvider::processMetadata(
     }
 }
 
+void QnLiveStreamProvider::afterRun()
+{
+    QnAbstractMediaStreamDataProvider::afterRun();
+    for (auto& motionEstimation: m_motionEstimation)
+        motionEstimation->stop();
+}
+
 void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
 {
     if (m_totalAudioFrames++ == 0 &&    // only once
