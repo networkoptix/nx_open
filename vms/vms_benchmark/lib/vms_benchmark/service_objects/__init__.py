@@ -8,4 +8,4 @@ class BoxTestResult:
         return self.message % self.details if self.message and self.details else ""
 
 
-from .sudo_configured import SudoConfigured
+from .ssh_host_key_obtainer import SshHostKeyObtainer

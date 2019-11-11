@@ -56,6 +56,7 @@ from vms_benchmark.server_api import ServerApi
 from vms_benchmark import test_camera_runner, vms_scanner, box_connection, box_platform
 from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
+from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
@@ -959,7 +960,7 @@ def _connect_to_box(conf, conf_file):
         port=conf['boxSshPort'],
         conf_file=conf_file
     )
-    host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
     if host_key is not None:
         box.supply_host_key(host_key)
     box.obtain_connection_info()
