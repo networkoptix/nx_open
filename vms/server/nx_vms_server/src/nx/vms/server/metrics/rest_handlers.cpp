@@ -9,6 +9,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/network/abstract_server_connector.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/resource_access/resource_access_manager.h>
 
 namespace nx::vms::server::metrics {
 
@@ -22,6 +24,12 @@ static const QString kFormattedParam("formatted");
 
 static constexpr std::chrono::seconds kDefaultConnectTimeout(5);
 
+static bool hasAdminPermission(const QnRestConnectionProcessor* processor)
+{
+    return processor->commonModule()->resourceAccessManager()->hasGlobalPermission(
+        processor->accessRights(), GlobalPermission::admin);
+}
+
 LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller):
     m_controller(controller)
 {
@@ -29,6 +37,9 @@ LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller)
 
 JsonRestResponse LocalRestHandler::executeGet(const JsonRestRequest& request)
 {
+    if (!hasAdminPermission(request.owner))
+        return nx::network::http::StatusCode::forbidden;
+
     using utils::metrics::Scope;
     const Scope scope = request.params.contains(kSystemParam) ? Scope::system : Scope::local;
 
@@ -54,6 +65,9 @@ SystemRestHandler::SystemRestHandler(
 
 JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
 {
+    if (!hasAdminPermission(request.owner))
+        return nx::network::http::StatusCode::forbidden;
+
     if (request.path.endsWith(kRulesApi))
          return JsonRestResponse(m_controller->rules());
 
