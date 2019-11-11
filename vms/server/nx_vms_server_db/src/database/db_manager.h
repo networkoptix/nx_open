@@ -591,6 +591,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LicenseOverflowData>&);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::VideoWallLicenseOverflowData>&);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::CleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(
@@ -851,6 +852,7 @@ namespace detail
         int m_adminUserInternalID;
         nx::vms::api::ResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
+        bool m_videoWallLicenseOverflowMarked;
         QnUuid m_dbInstanceId;
         std::atomic<bool> m_initialized;
         /*

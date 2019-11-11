@@ -4,6 +4,7 @@
 #include <transaction/transaction.h>
 
 #include <nx/vms/api/data/license_overflow_data.h>
+#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx/vms/api/data/system_id_data.h>
 
 namespace ec2 {
@@ -111,7 +112,7 @@ int QnMiscManager<QueryProcessorType>::markVideoWallLicenseOverflow(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    nx::vms::api::LicenseOverflowData params;
+    nx::vms::api::VideoWallLicenseOverflowData params;
     params.value = value;
     params.time = time;
 

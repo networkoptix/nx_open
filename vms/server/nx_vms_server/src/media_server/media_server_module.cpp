@@ -252,7 +252,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     m_unusedWallpapersWatcher = store(new nx::vms::server::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::vms::server::LicenseWatcher(commonModule()));
-    m_videoWallLicenseWatcher = store(new nx::vms::server::VideoWallLicenseWatcher(commonModule()));
+    m_videoWallLicenseWatcher = store(new nx::vms::server::VideoWallLicenseWatcher(this));
 
     m_eventMessageBus = store(new nx::vms::server::event::EventMessageBus(commonModule()));
 

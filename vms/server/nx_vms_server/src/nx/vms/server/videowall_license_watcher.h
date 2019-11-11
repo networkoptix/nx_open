@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QtCore/QTimer>
 
-#include <common/common_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx_ec/data/api_fwd.h>
 
@@ -14,13 +14,13 @@ namespace vms::server {
  * Periodically check validity of VideoWall licenses and update runtime info
  * with the timestamp when VideoWall licenses became invalid/
  */
-class VideoWallLicenseWatcher: public QObject, public /*mixin*/ QnCommonModuleAware
+class VideoWallLicenseWatcher: public QObject, public /*mixin*/ ServerModuleAware
 {
     Q_OBJECT
-    using base_type = QnCommonModuleAware;
+    using base_type = ServerModuleAware;
 
 public:
-    VideoWallLicenseWatcher(QnCommonModule* commonModule);
+    VideoWallLicenseWatcher(QnMediaServerModule* serverModule);
     virtual ~VideoWallLicenseWatcher();
 
     void start();
@@ -36,6 +36,7 @@ private slots:
 private:
     QTimer m_licenseTimer;
     int m_tooManyVideoWallsCounter = 0;
+    std::chrono::milliseconds m_videoWallStopTime;
 };
 
 } // namespace mediaserverm_previousData

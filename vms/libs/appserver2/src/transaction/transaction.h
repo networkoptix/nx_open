@@ -1187,7 +1187,7 @@ APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2010, markVideoWallLicenseOverflow, nx::vms::api::LicenseOverflowData, \
+APPLY(2010, markVideoWallLicenseOverflow, nx::vms::api::VideoWallLicenseOverflowData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \

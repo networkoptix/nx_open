@@ -1,20 +1,11 @@
 #include "videowall_license_validator.h"
 
-#include <chrono>
-
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 #include <licensing/license.h>
 #include <utils/common/synctime.h>
 
-using namespace std::chrono;
 using namespace nx::vms::client::desktop::license;
-
-namespace {
-
-constexpr auto kVideoWallOverflowTimeout = 7 * 24h;
-
-} // namespace
 
 bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(const QnLicensePtr& license, QnPeerRuntimeInfo& info) const
 {
@@ -27,11 +18,11 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(const QnLicensePtr& l
     if (commonInfo.data.prematureVideoWallLicenseExperationDate == 0)
         return false;
 
-    // Video Wall license should remain valid within kVideoWallOverflowTimeout since the server went offline,
-    // so override runtime info from missing server with runtime info from common module.
-    // If we are outside of the allowed timeframe then just report the missing runtime info.
-    const auto delta = qnSyncTime->currentMSecsSinceEpoch() - commonInfo.data.prematureVideoWallLicenseExperationDate;
-    const bool stillValid = delta < duration_cast<milliseconds>(kVideoWallOverflowTimeout).count();
+    // Video Wall license should remain valid before prematureVideoWallLicenseExperationDate,
+    // so we nend to override runtime info from missing server with runtime info from common module.
+    // If we reached the expiration date then just report that runtime info is missing.
+    const bool stillValid =
+        qnSyncTime->currentMSecsSinceEpoch() < commonInfo.data.prematureVideoWallLicenseExperationDate;
 
     if (stillValid)
         info = commonInfo;
