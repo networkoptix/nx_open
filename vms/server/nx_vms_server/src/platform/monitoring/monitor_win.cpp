@@ -19,6 +19,7 @@
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <tlhelp32.h>
+#include <psapi.h>
 
 #ifdef _MSC_VER
 #   pragma comment(lib, "pdh.lib")
@@ -654,4 +655,12 @@ int QnWindowsMonitor::thisProcessThreads()
 
     CloseHandle(handle);
     return counter;
+}
+
+quint64 QnWindowsMonitor::thisProcessRamUsageBytes()
+{
+    PROCESS_MEMORY_COUNTERS counters;
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
+        return counters.WorkingSetSize;
+    return 0;
 }
