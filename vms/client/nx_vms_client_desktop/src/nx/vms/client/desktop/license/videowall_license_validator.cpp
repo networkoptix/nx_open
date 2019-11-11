@@ -7,7 +7,8 @@
 
 using namespace nx::vms::client::desktop::license;
 
-bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(const QnLicensePtr& license, QnPeerRuntimeInfo& info) const
+bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
+    const QnLicensePtr& license, QnPeerRuntimeInfo& info) const
 {
     if (license->type() != Qn::LC_VideoWall)
         return false;
@@ -15,14 +16,14 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(const QnLicensePtr& l
     const auto& manager = runtimeInfoManager();
     auto commonInfo = manager->items()->getItem(commonModule()->remoteGUID());
 
-    if (commonInfo.data.prematureVideoWallLicenseExperationDate == 0)
+    if (commonInfo.data.prematureVideoWallLicenseExpirationDate == 0)
         return false;
 
-    // Video Wall license should remain valid before prematureVideoWallLicenseExperationDate,
-    // so we nend to override runtime info from missing server with runtime info from common module.
+    // Video Wall license should remain valid before prematureVideoWallLicenseExpirationDate, so
+    // we need to override runtime info from missing server with runtime info from common module.
     // If we reached the expiration date then just report that runtime info is missing.
     const bool stillValid =
-        qnSyncTime->currentMSecsSinceEpoch() < commonInfo.data.prematureVideoWallLicenseExperationDate;
+        qnSyncTime->currentMSecsSinceEpoch() < commonInfo.data.prematureVideoWallLicenseExpirationDate;
 
     if (stillValid)
         info = commonInfo;

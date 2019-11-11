@@ -27,8 +27,8 @@ public:
     void stop();
 
 private:
-    void updateRuntimeInfoAfterVideoWallLicenseOverflowTransaction(
-        qint64 prematureVideoWallLicenseExperationDate);
+    void syncLicenseOverflowTime(qint64 licenseOverflowTime);
+    void updateRuntimeInfoAfterVideoWallLicenseOverflowTransaction(qint64 expirationDate);
 
 private slots:
     void at_checkLicenses();

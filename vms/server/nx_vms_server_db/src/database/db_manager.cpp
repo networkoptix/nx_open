@@ -904,8 +904,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
             localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-        if (localInfo.data.prematureVideoWallLicenseExperationDate != videoWallLicenseOverflowTime)
-            localInfo.data.prematureVideoWallLicenseExperationDate = videoWallLicenseOverflowTime;
+        if (localInfo.data.prematureVideoWallLicenseExpirationDate != videoWallLicenseOverflowTime)
+            localInfo.data.prematureVideoWallLicenseExpirationDate = videoWallLicenseOverflowTime;
         runtimeInfoManager->updateLocalItem(localInfo);
     } // end of DB update
 
