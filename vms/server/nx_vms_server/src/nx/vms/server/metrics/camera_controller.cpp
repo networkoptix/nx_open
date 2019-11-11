@@ -39,15 +39,9 @@ void CameraController::start()
             {
                 if (camera->hasFlags(Qn::desktop_camera))
                     return; //< Ignore desktop cameras.
-                const auto addOrUpdate =
-                    [this, camera]()
-                    {
-                        add(camera, camera->getId(), (camera->getParentId() == moduleGUID())
-                            ? utils::metrics::Scope::local
-                            : utils::metrics::Scope::system);
-                    };
 
-                connect(camera, &QnResource::parentIdChanged, addOrUpdate);
+                const auto addOrUpdate = [this, camera]() { add(camera, moduleGUID()); };
+                QObject::connect(camera, &QnResource::parentIdChanged, addOrUpdate);
                 addOrUpdate();
             }
         });

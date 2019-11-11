@@ -21,7 +21,7 @@ public:
 
 protected:
     ResourceType* add(ResourceType resource, QString id, Scope scope);
-    ResourceType* add(ResourceType resource, QnUuid id, Scope scope);
+    ResourceType* add(ResourceType resource, const QnUuid& localId);
 
     using ResourceController::remove;
     bool remove(QnUuid id);
@@ -100,9 +100,13 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
 
 template<typename ResourceType>
 ResourceType* ResourceControllerImpl<ResourceType>::add(
-    ResourceType resource, QnUuid id, Scope scope)
+    ResourceType resource, const QnUuid& localId)
 {
-    return add(std::move(resource), id.toSimpleString(), scope);
+    return add(
+        std::move(resource), resource->getId().toSimpleString(),
+        (resource->getId() == localId || resource->getParentId() == localId)
+            ? utils::metrics::Scope::local
+            : utils::metrics::Scope::system);
 }
 
 template<typename ResourceType>
