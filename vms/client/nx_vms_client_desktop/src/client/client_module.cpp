@@ -712,6 +712,12 @@ void QnClientModule::initWebEngine()
     qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
     QtWebEngine::initialize();
 
+    const auto settings = QWebEngineSettings::defaultSettings();
+    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+    // TODO: Add ini parameters for WebEngine attributes
+    //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
+    //settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
+
     if (!nx::utils::AppInfo::isMacOsX())
     {
         if (!originalLibraryPath.isEmpty())
@@ -719,12 +725,6 @@ void QnClientModule::initWebEngine()
         else
             qunsetenv(libraryPathVariable);
     }
-
-    const auto settings = QWebEngineSettings::defaultSettings();
-    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
-    // TODO: Add ini parameters for WebEngine attributes
-    //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
-    //settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
 }
 
 void QnClientModule::initLocalResources()
