@@ -126,7 +126,6 @@ Window
                     "#ff4081"
                 ]
 
-                color: editor.color
                 onColorChanged: editor.color = color
             }
 
@@ -205,5 +204,6 @@ Window
         editor.deserialize(json)
         if (!editor.hasFigure)
             editor.color = palette.colors[Math.floor(Math.random() * palette.colors.length)]
+        palette.color = editor.color
     }
 }
