@@ -880,5 +880,5 @@ bool QnFanErrorPolicy::isServerValid(const QnMediaServerResourcePtr& server)
 
 QString QnFanErrorPolicy::infoText()
 {
-    return tr("Servers that support FAN diagnostic");
+    return tr("Servers that support fan diagnostic");
 }
