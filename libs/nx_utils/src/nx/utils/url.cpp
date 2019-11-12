@@ -623,7 +623,7 @@ QString hidePassword(const QString& urlStr)
 
     nx::utils::Url url(urlStr);
     if (url.isValid())
-        url.toDisplayString();
+        return url.toDisplayString();
 
     return urlStr;
 }

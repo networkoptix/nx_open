@@ -540,7 +540,7 @@ public:
 
         for (const auto& storage : storagesToTest())
         {
-            NX_DEBUG(this, "Testing storage %1", storage->getUrl());
+            NX_DEBUG(this, "Testing storage %1", nx::utils::url::hidePassword(storage->getUrl()));
             if (needToStop())
                 return;
 
@@ -556,7 +556,7 @@ public:
                     m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
 
-            NX_DEBUG(this, "Testing storage %1 done", storage->getUrl());
+            NX_DEBUG(this, "Testing storage %1 done", nx::utils::url::hidePassword(storage->getUrl()));
         }
 
         m_owner->testStoragesDone();
@@ -2022,7 +2022,7 @@ void QnStorageManager::forciblyClearAnalyticsEvents()
             {
                 NX_WARNING(this, "Free space on the analytics storage %1 has reached %2(Gb). "
                     "Remove extra data from the analytics database.",
-                    storage->getUrl(), freeSpace / 1e9);
+                    nx::utils::url::hidePassword(storage->getUrl()), freeSpace / 1e9);
                 m_analyticsEventsStorage->markDataAsDeprecated(
                     QnUuid(), //< Any camera
                     minDatabaseTime + kAnalyticsDataCleanupStep);

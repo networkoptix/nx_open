@@ -149,6 +149,26 @@ TEST(Url, fromUserInput)
     expectEq("ya.ru/index.html", "http://ya.ru/index.html");
 }
 
+TEST(Url, hidePassword)
+{
+    nx::kit::IniConfig::Tweaks iniTweaks;
+    iniTweaks.set(&nx::utils::ini().showPasswordsInLogs, false);
+
+    EXPECT_EQ(
+        url::hidePassword("smb://auth_test:qweasd123@qanas/auth_test"),
+        "smb://auth_test@qanas/auth_test");
+}
+
+TEST(Url, hidePassword_debug)
+{
+    nx::kit::IniConfig::Tweaks iniTweaks;
+    iniTweaks.set(&nx::utils::ini().showPasswordsInLogs, true);
+
+    EXPECT_EQ(
+        url::hidePassword("smb://auth_test:qweasd123@qanas/auth_test"),
+        "smb://auth_test:qweasd123@qanas/auth_test");
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx
