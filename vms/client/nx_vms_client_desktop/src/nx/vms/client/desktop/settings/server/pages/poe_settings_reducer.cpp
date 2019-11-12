@@ -10,11 +10,11 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/api/data/network_block_data.h>
 #include <nx/utils/math/fuzzy.h>
-
 
 namespace {
 
@@ -84,8 +84,11 @@ ViewNodeData dataFromPort(
     QnResourcePool* resourcePool)
 {
     const auto resource = resourcePool->getResourceById(port.deviceId);
+    const auto extraText = resource
+        ? QnResourceDisplayInfo(resource).extraInfo()
+        : kEmptyText;
     const auto resourceNodeViewData =
-        getResourceNodeData(resource, PoESettingsColumn::camera, kEmptyText);
+        getResourceNodeData(resource, PoESettingsColumn::camera, extraText);
 
     return ViewNodeDataBuilder(resourceNodeViewData)
         .withText(PoESettingsColumn::port, QString::number(port.portNumber))

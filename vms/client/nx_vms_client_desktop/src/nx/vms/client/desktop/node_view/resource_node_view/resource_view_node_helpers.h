@@ -14,7 +14,7 @@ bool isResourceColumn(const QModelIndex& index);
 details::ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
     int resourceColumn,
-    const QString& emptyText = QString());
+    const QString& extraText);
 
 details::NodePtr createResourceNode(
     const QnResourcePtr& resource,

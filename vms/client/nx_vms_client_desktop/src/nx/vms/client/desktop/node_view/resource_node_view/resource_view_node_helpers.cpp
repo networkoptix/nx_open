@@ -28,7 +28,7 @@ ViewNodeData getResourceNodeDataInternal(
     bool checkable,
     int primaryColumn)
 {
-    auto data = getResourceNodeData(resource, primaryColumn);
+    auto data = getResourceNodeData(resource, primaryColumn, QString());
     if (checkable)
         ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
 
@@ -89,7 +89,7 @@ bool isResourceColumn(const QModelIndex& index)
 ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
     int resourceColumn,
-    const QString& emptyText)
+    const QString& extraText)
 {
     if (!resource)
     {
@@ -104,7 +104,7 @@ ViewNodeData getResourceNodeData(
             }();
 
         return ViewNodeDataBuilder()
-            .withData(resourceColumn, resourceExtraTextRole, emptyText)
+            .withData(resourceColumn, resourceExtraTextRole, extraText)
             .withData(resourceColumn, resourceColumnRole, true)
             .withIcon(resourceColumn, kTransparentIcon);
     }
@@ -113,6 +113,7 @@ ViewNodeData getResourceNodeData(
     auto data = ViewNodeDataBuilder()
         .withData(resourceColumn, resourceColumnRole, true)
         .withText(resourceColumn, resource->getName())
+        .withData(resourceColumn, resourceExtraTextRole, extraText)
         .withIcon(resourceColumn, qnResIconCache->icon(resource))
         .withData(resourceColumn, cameraExtraStatusRole,
             QVariant::fromValue(getCameraExtraStatus(camera)))
