@@ -40,6 +40,8 @@ public:
 
     void setBlockUi(bool value);
 
+    void setPreloaderVisible(bool value);
+
     void applyUserChanges();
 
 signals:

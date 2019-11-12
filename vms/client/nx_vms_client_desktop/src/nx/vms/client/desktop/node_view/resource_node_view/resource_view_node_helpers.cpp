@@ -93,7 +93,7 @@ ViewNodeData getResourceNodeData(
 {
     if (!resource)
     {
-        // TODO: Remove me. Get how to draw item without icon at thee same level as with icon.
+        // TODO: Remove me. Get how to draw item without icon at the same level as with icon.
         // Used in PoE settings dialog. Brokes nothing. Temporary decision.
         static const auto kTransparentIcon =
             []()

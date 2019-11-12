@@ -20,10 +20,13 @@ using Controller = core::PoEController;
 using PortMode = nx::vms::api::NetworkPortWithPoweringMode;
 using Mode = PortMode::PoweringMode;
 
-
 struct PoESettingsWidget::Private: public QObject
 {
     Private(PoESettingsWidget* owner);
+
+    void updateWarningLabel();
+    void updatePreloaderVisibility();
+    void updateUiBlock();
 
     void updateBlockData();
     void handlePatchApplied(const PoESettingsStatePatch& patch);
@@ -40,7 +43,10 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     store(owner)
 {
     ui.setupUi(owner);
-    ui.poeOverBudgetWarningLabel->setVisible(false);
+
+    updateWarningLabel();
+    updatePreloaderVisibility();
+    updateUiBlock();
 
     store.setStores(ui.poeTable->store(), ui.totalsTable->store());
     connect(&store, &PoESettingsStore::patchApplied, this, &Private::handlePatchApplied);
@@ -48,10 +54,32 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     connect(&controller, &Controller::updated, this, &Private::updateBlockData);
     connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged, &store,
         [this]() { store.setHasChanges(ui.poeTable->hasUserChanges()); });
+    connect(&controller, &Controller::initialUpdateInProgressChanged, &store,
+        [this]() { store.setPreloaderVisible(controller.initialUpdateInProgress()); });
     connect(&controller, &Controller::updatingPoweringModesChanged, &store,
         [this]() { store.setBlockUi(controller.updatingPoweringModes()); });
 
     updateBlockData();
+}
+
+void PoESettingsWidget::Private::updateWarningLabel()
+{
+    ui.poeOverBudgetWarningLabel->setVisible(store.state().showPoEOverBudgetWarning);
+}
+
+void PoESettingsWidget::Private::updatePreloaderVisibility()
+{
+    ui.stackedWidget->setCurrentWidget(store.state().showPreloader
+        ? ui.preloaderPage
+        : ui.poeSettingsPage);
+}
+
+void PoESettingsWidget::Private::updateUiBlock()
+{
+    const bool blockUi = store.state().blockUi;
+    q->setReadOnly(blockUi);
+    ui.poeTable->setEnabled(!blockUi);
+    ui.totalsTable->setEnabled(!blockUi);
 }
 
 void PoESettingsWidget::Private::updateBlockData()
@@ -65,15 +93,13 @@ void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch&
         emit q->hasChangesChanged();
 
     if (patch.showPoEOverBudgetWarning)
-        ui.poeOverBudgetWarningLabel->setVisible(patch.showPoEOverBudgetWarning.value());
+        updateWarningLabel();
+
+    if (patch.showPreloader)
+        updatePreloaderVisibility();
 
     if (patch.blockUi)
-    {
-        const bool blockUi = patch.blockUi.value();
-        q->setReadOnly(blockUi);
-        ui.poeTable->setEnabled(!blockUi);
-        ui.totalsTable->setEnabled(!blockUi);
-    }
+        updateUiBlock();
 }
 
 //--------------------------------------------------------------------------------------------------

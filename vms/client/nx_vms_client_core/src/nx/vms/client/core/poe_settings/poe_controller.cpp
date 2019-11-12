@@ -26,6 +26,8 @@ struct PoEController::Private: public QObject
 {
     Private(PoEController* q);
 
+    void setInitialUpdateInProgress(bool value);
+    void setBlockData(const BlockData& data);
     void updateTargetResource(const QnUuid& value);
     void handleReply(bool success, rest::Handle currentHandle, const QnJsonRestResult& result);
     void update();
@@ -40,6 +42,7 @@ struct PoEController::Private: public QObject
 
     ResourceHolder<QnMediaServerResource> serverHolder;
     bool autoUpdate = true;
+    bool initialUpdateInProgress = false;
     PoEController::BlockData blockData;
     QTimer updateTimer;
 };
@@ -49,6 +52,24 @@ PoEController::Private::Private(PoEController* q):
 {
     updateTimer.setInterval(kUpdateIntervalMs);
     connect(&updateTimer, &QTimer::timeout, this, &Private::update);
+}
+
+void PoEController::Private::setInitialUpdateInProgress(bool value)
+{
+    if (value == initialUpdateInProgress)
+        return;
+
+    initialUpdateInProgress = value;
+    emit q->initialUpdateInProgressChanged();
+}
+
+void PoEController::Private::setBlockData(const BlockData& data)
+{
+    if (data == blockData)
+        return;
+
+    blockData = data;
+    emit q->updated();
 }
 
 void PoEController::Private::updateTargetResource(const QnUuid& value)
@@ -67,6 +88,8 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
     }
 
     connection = server->restConnection();
+    setInitialUpdateInProgress(true);
+    setBlockData(BlockData());
     update();
 }
 
@@ -78,7 +101,7 @@ void PoEController::Private::handleReply(
     if (handle != replyHandle)
         return; //< Most likely we cancelled request
 
-
+    setInitialUpdateInProgress(false);
     const nx::utils::ScopeGuard handleGuard(
         [this]()
         {
@@ -92,8 +115,7 @@ void PoEController::Private::handleReply(
     if (!success || result.error != QnRestResult::NoError)
         return;
 
-    blockData = QJson::deserialized<nx::vms::api::NetworkBlockData>(result.reply);
-    emit q->updated();
+    setBlockData(QJson::deserialized<nx::vms::api::NetworkBlockData>(result.reply));
 }
 
 void PoEController::Private::update()
@@ -184,6 +206,11 @@ bool PoEController::autoUpdate() const
 void PoEController::setPowerModes(const PowerModes& value)
 {
     d->setPowered(value);
+}
+
+bool PoEController::initialUpdateInProgress() const
+{
+    return d->initialUpdateInProgress;
 }
 
 bool PoEController::updatingPoweringModes() const

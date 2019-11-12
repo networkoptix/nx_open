@@ -41,6 +41,9 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
     if (patch.hasChanges)
         state.hasChanges = patch.hasChanges.value();
 
+    if (patch.showPreloader)
+        state.showPreloader = patch.showPreloader.value();
+
     if (patch.showPoEOverBudgetWarning)
         state.showPoEOverBudgetWarning = patch.showPoEOverBudgetWarning.value();
 
@@ -104,6 +107,14 @@ void PoESettingsStore::setBlockUi(bool value)
 {
     PoESettingsStatePatch patch;
     patch.blockUi = PoESettingsReducer::blockUiChanges(d->state, value);
+
+    d->applyPatch(patch);
+}
+
+void PoESettingsStore::setPreloaderVisible(bool value)
+{
+    PoESettingsStatePatch patch;
+    patch.showPreloader = PoESettingsReducer::showPreloaderChanges(d->state, value);
 
     d->applyPatch(patch);
 }

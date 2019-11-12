@@ -20,6 +20,8 @@ class PoEController: public QObject, public QnConnectionContextAware
         NOTIFY resourceIdChanged)
     Q_PROPERTY(bool autoUpdate READ autoUpdate WRITE setAutoUpdate
         NOTIFY autoUpdateChanged)
+    Q_PROPERTY(bool initialUpdateInProgress READ initialUpdateInProgress
+        NOTIFY initialUpdateInProgressChanged)
     Q_PROPERTY(bool updatingPoweringModes READ updatingPoweringModes
         NOTIFY updatingPoweringModesChanged)
 public:
@@ -39,6 +41,7 @@ public:
     using PowerModes = QList<PortPoweringMode>;
     void setPowerModes(const PowerModes& value);
 
+    bool initialUpdateInProgress() const;
     bool updatingPoweringModes() const;
 
 signals:
@@ -46,6 +49,7 @@ signals:
     void autoUpdateChanged();
     void updated();
     void updatingPoweringModesChanged();
+    void initialUpdateInProgressChanged();
 
 private:
     struct Private;

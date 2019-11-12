@@ -135,8 +135,6 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     const nx::vms::api::NetworkBlockData& data,
     QnResourcePool* resourcePool)
 {
-    // TODO: check for server switch.
-
     // It is supposed that ports are always ordered and their count is never changed.
 
     if (!state.rootNode)
@@ -213,6 +211,13 @@ PoESettingsStatePatch::BoolOptional PoESettingsReducer::blockUiChanges(
     const bool blockUi)
 {
     return blockUi == state.blockUi ? PoESettingsStatePatch::BoolOptional() : blockUi;
+}
+
+PoESettingsStatePatch::BoolOptional PoESettingsReducer::showPreloaderChanges(
+    const PoESettingsState& state,
+        const bool value)
+{
+    return value == state.showPreloader ? PoESettingsStatePatch::BoolOptional() : value;
 }
 
 } // namespace settings

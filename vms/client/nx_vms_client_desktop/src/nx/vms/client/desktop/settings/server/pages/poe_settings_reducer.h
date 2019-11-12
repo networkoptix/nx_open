@@ -31,6 +31,10 @@ public:
     static PoESettingsStatePatch::BoolOptional blockUiChanges(
         const PoESettingsState& state,
         const bool blockUi);
+
+    static PoESettingsStatePatch::BoolOptional showPreloaderChanges(
+        const PoESettingsState& state,
+        const bool value);
 };
 
 } // namespace settings
