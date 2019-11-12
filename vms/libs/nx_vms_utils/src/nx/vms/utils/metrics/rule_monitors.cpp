@@ -404,7 +404,6 @@ AlarmMonitor::AlarmMonitor(
 
 std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
-    // TODO: Write tests and check that it works
     try {
         if (!m_condition().toBool())
             return std::nullopt;

@@ -76,6 +76,32 @@ TEST_F(MetricsGenerators, ValueErrors)
     EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
 }
 
+TEST_F(MetricsGenerators, AlarmErrors)
+{
+    static const char* kAlarmText = "I am an alarm text!";
+    static const char* kErrorMessage = "I am an awful error!";
+
+    bool shouldThrow = false;
+    const auto valueGenerator = [&shouldThrow]()
+    {
+        if (shouldThrow) throw MetricsError(kErrorMessage);
+        return api::metrics::Value(true);
+    };
+
+    AlarmMonitor monitor(
+        "id",
+        nx::vms::api::metrics::AlarmLevel::error,
+        {valueGenerator, Scope::local},
+        [](){ return kAlarmText; });
+
+    const auto alarm = monitor.alarm();
+    EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
+    EXPECT_EQ(alarm->text, kAlarmText);
+
+    shouldThrow = true;
+    EXPECT_DEATH(monitor.alarm(), kErrorMessage);
+}
+
 TEST_F(MetricsGenerators, ValueBinary)
 {
     const auto helloWorld = parseFormulaOrThrow("const HelloWorld", monitors).generator;
