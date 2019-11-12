@@ -37,6 +37,9 @@ using namespace nx::vms::client::desktop::ui;
 
 struct QnServerSettingsDialog::Private
 {
+    void updatePoESettingsPageVisibility();
+
+    QnServerSettingsDialog* const q;
     QnMediaServerResourcePtr server;
     const QPointer<ServerSettingsDialogStore> store;
     const QPointer<ServerPluginDataWatcher> pluginDataWatcher;
@@ -49,6 +52,7 @@ struct QnServerSettingsDialog::Private
     QLabel* const webPageLink;
 
     Private(QnServerSettingsDialog* q):
+        q(q),
         store(new ServerSettingsDialogStore(q)),
         pluginDataWatcher(new ServerPluginDataWatcher(store, q)),
         generalPage(new QnServerSettingsWidget(q)),
@@ -82,6 +86,15 @@ struct QnServerSettingsDialog::Private
     };
 };
 
+void QnServerSettingsDialog::Private::updatePoESettingsPageVisibility()
+{
+    q->setPageVisible(
+        PoEPage,
+        server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPoeManagementCapability));
+}
+
+//--------------------------------------------------------------------------------------------------
+
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
@@ -94,6 +107,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(StorageManagmentPage, d->storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
     addPage(PoEPage, d->poeSettingsPage, tr("PoE"));
+    d->updatePoESettingsPageVisibility();
 
     if (ini().pluginInformationInServerSettings)
         addPage(PluginsPage, new Private::PluginSettingsAdapter(d.get()), tr("Plugins"));
@@ -186,6 +200,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
 
     loadDataToUi();
     updateWebPageLink();
+    d->updatePoESettingsPageVisibility();
 }
 
 void QnServerSettingsDialog::retranslateUi()

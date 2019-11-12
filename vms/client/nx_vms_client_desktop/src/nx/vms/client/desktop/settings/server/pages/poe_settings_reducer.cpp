@@ -142,7 +142,6 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
 
     NodeViewStatePatch result;
 
-
     if (data.portStates.empty())
         return NodeViewStatePatch::clearNodeViewPatch();
 
