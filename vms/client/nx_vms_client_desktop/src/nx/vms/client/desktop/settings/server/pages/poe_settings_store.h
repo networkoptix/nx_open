@@ -8,7 +8,7 @@
 #include <nx/utils/impl_ptr.h>
 
 class QnCommonModuleAware;
-namespace nx::vms::api { class NetworkBlockData; };
+namespace nx::vms::api { struct NetworkBlockData; };
 
 namespace nx::vms::client::desktop {
 

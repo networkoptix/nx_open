@@ -19,8 +19,8 @@ struct PoESettingsStore::Private
 
     PoESettingsStore* const q;
     QnResourcePool* const pool;
-    node_view::details::NodeViewStorePtr blockTableStore;
-    node_view::details::NodeViewStorePtr totalsTableStore;
+    node_view::details::NodeViewStorePtr blockStore;
+    node_view::details::NodeViewStorePtr totalsStore;
     PoESettingsState state;
 };
 
@@ -32,8 +32,11 @@ PoESettingsStore::Private::Private(PoESettingsStore* store, QnCommonModuleAware*
 
 void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
 {
-    if (blockTableStore)
-        blockTableStore->applyPatch(patch.blockPatch);
+    if (blockStore)
+        blockStore->applyPatch(patch.blockPatch);
+
+    if (totalsStore)
+        totalsStore->applyPatch(patch.totalsPatch);
 
     if (patch.hasChanges)
         state.hasChanges = patch.hasChanges.value();
@@ -43,7 +46,6 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
 
     if (patch.blockUi)
         state.blockUi = patch.blockUi.value();
-    // TODO: all other stuff
 
     emit q->patchApplied(patch);
 }
@@ -64,8 +66,8 @@ void PoESettingsStore::setStores(
     const node_view::details::NodeViewStorePtr& blockTableStore,
     const node_view::details::NodeViewStorePtr& totalsTableStore)
 {
-    d->blockTableStore = blockTableStore;
-    d->totalsTableStore = totalsTableStore;
+    d->blockStore = blockTableStore;
+    d->totalsStore = totalsTableStore;
 }
 
 const PoESettingsState& PoESettingsStore::state() const
@@ -77,10 +79,10 @@ void PoESettingsStore::updateBlocks(const nx::vms::api::NetworkBlockData& data)
 {
     PoESettingsStatePatch patch;
     patch.blockPatch = PoESettingsReducer::blockDataChangesPatch(
-        d->blockTableStore->state(), data, d->pool);
+        d->blockStore->state(), data, d->pool);
 
     patch.totalsPatch = PoESettingsReducer::totalsDataChangesPatch(
-        d->totalsTableStore->state(), data);
+        d->totalsStore->state(), data);
 
     patch.showPoEOverBudgetWarning = PoESettingsReducer::poeOverBudgetChanges(d->state, data);
 
@@ -110,7 +112,7 @@ void PoESettingsStore::applyUserChanges()
 {
     PoESettingsStatePatch patch;
     patch.blockPatch = node_view::NodeViewStateReducer::applyUserChangesPatch(
-        d->blockTableStore->state());
+        d->blockStore->state());
 
     d->applyPatch(patch);
 }

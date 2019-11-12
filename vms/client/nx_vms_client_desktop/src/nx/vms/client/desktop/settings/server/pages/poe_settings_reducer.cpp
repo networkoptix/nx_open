@@ -144,7 +144,6 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     int index = 0;
     for (const auto node: state.rootNode->children())
     {
-        ViewNodeData forRemove;
         ViewNodeData forOverride;
         const auto source = node->data();
         const auto target = dataFromPort(data.portStates[index++], resourcePool);
@@ -159,8 +158,42 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
     const node_view::details::NodeViewState& state,
     const nx::vms::api::NetworkBlockData& data)
 {
-    NodeViewStatePatch patch;
-    return patch;
+    NodeViewStatePatch result;
+    const double consumption =
+        [data]()
+        {
+            double total = 0;
+            for (const auto port: data.portStates)
+                total += port.devicePowerConsumptionWatts;
+            return total;
+        }();
+
+    const auto text = QString("%1 W/%2 W").arg(consumption).arg(data.upperPowerLimitWatts);
+
+    const auto color = consumption > data.upperPowerLimitWatts
+        ? colorTheme()->color("red_l2")
+        : colorTheme()->color("light4");
+
+    const auto nodeData = ViewNodeDataBuilder()
+        .withText(PoESettingsColumn::consumption, text)
+        .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
+        .withData(PoESettingsColumn::consumption, Qt::TextColorRole, color)
+        .data();
+
+    if (state.rootNode)
+    {
+        const auto child = state.rootNode->children().first();
+        const auto difference = child->data().difference(nodeData);
+        result.appendPatchStep({child->path(), difference.updateOperation});
+    }
+    else
+    {
+        const auto root = ViewNode::create();
+        root->addChild(ViewNode::create(nodeData));
+        return NodeViewStatePatch::fromRootNode(root);
+    }
+
+    return result;
 }
 
 PoESettingsStatePatch::BoolOptional PoESettingsReducer::poeOverBudgetChanges(

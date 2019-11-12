@@ -5,7 +5,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/vms/client/desktop/settings/server/pages/poe_settings_state.h>
 
-namespace nx::vms::api { class NetworkBlockData; }
+namespace nx::vms::api { struct NetworkBlockData; }
 
 namespace nx::vms::client::desktop {
 namespace settings {
