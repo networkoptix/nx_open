@@ -697,7 +697,6 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
-    NX_CRITICAL(m_platform);
     return m_platform;
 }
 

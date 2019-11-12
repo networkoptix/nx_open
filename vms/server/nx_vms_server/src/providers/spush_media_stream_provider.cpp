@@ -274,7 +274,7 @@ void CLServerPushStreamReader::beforeRun()
 
 void CLServerPushStreamReader::afterRun()
 {
-    QnAbstractMediaStreamDataProvider::afterRun();
+    QnLiveStreamProvider::afterRun();
     m_camera->disconnect(this);
 }
 

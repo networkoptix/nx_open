@@ -27,7 +27,7 @@ void SystemResourceController::start()
                 remove(*m_lastId);
 
             m_lastId = globalSettings()->localSystemId();
-            add(nullptr, *m_lastId, utils::metrics::Scope::system);
+            add(nullptr, m_lastId->toSimpleString(), utils::metrics::Scope::system);
         });
 }
 

@@ -39,15 +39,9 @@ void CameraController::start()
             {
                 if (camera->hasFlags(Qn::desktop_camera))
                     return; //< Ignore desktop cameras.
-                const auto addOrUpdate =
-                    [this, camera]()
-                    {
-                        add(camera, camera->getId(), (camera->getParentId() == moduleGUID())
-                            ? utils::metrics::Scope::local
-                            : utils::metrics::Scope::system);
-                    };
 
-                connect(camera, &QnResource::parentIdChanged, addOrUpdate);
+                const auto addOrUpdate = [this, camera]() { add(camera, moduleGUID()); };
+                QObject::connect(camera, &QnResource::parentIdChanged, addOrUpdate);
                 addOrUpdate();
             }
         });
@@ -183,8 +177,9 @@ auto makeStorageProviders()
             "archiveLengthS",
             [](const auto& r)
             {
+                using namespace std::chrono;
                 const auto value = r->calendarDuration();
-                return value.count() > 0 ? Value(value) : Value();
+                return value.count() > 0 ? Value(duration_cast<seconds>(value)) : Value();
             }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
@@ -219,7 +214,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+                "name", [](const auto& r) { return Value(r->getUserDefinedName()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

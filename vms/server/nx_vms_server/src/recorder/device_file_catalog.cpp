@@ -260,7 +260,10 @@ milliseconds DeviceFileCatalog::calendarDuration(int storageIndex) const
     QnMutexLocker lk(&m_mutex);
     if (m_chunks.empty())
         return milliseconds(0);
-    return milliseconds(m_chunks.rbegin()->endTimeMs() - m_chunks.begin()->startTimeMs);
+    qint64 endTimeMs = m_chunks.rbegin()->endTimeMs();
+    if (endTimeMs == DATETIME_NOW)
+        endTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    return milliseconds(endTimeMs - m_chunks.begin()->startTimeMs);
 }
 
 void DeviceFileCatalog::addChunks(const nx::vms::server::ChunksDeque& chunks)
