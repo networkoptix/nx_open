@@ -45,7 +45,8 @@ api::metrics::Value ValueMonitor::value() const noexcept
     }
     catch (const std::exception& e)
     {
-        NX_DEBUG(this, "Failed to get value: %1", e.what());
+        // TODO: should catch non-critical wrapped exceptions before this and log them!
+        NX_ASSERT(false, "Unexpected general error when calculating metric %1: %2", this, e.what());
     }
 
     // TODO: Should we return error to the user if it occures?

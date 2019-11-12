@@ -416,7 +416,8 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     }
     catch (const std::exception& e)
     {
-        NX_DEBUG(this, "Failed to get metric value for alarm: %1", e.what());
+        // TODO: should catch non-critical wrapped exceptions before this and log them!
+        NX_ASSERT(false, "Unexpected general error when checkin alaram %1: %2", this, e.what());
     }
 
     // TODO: Should we return error to the user if it occures?
