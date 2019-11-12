@@ -127,8 +127,7 @@ bool ServerSelectionDialog::selectServers(
 
     if (dialog.isEmpty())
     {
-        // TODO: #vbreus Query proper warning string.
-        QnMessageBox::warning(parent, tr("You do not have any servers"));
+        QnMessageBox::warning(parent, tr("There are no compatible servers"));
         return false;
     }
 
