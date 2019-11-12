@@ -6,6 +6,7 @@ Item
 
     property bool ghost: false
     property color color: "black"
+    property color ghostColor: "white"
     property color borderColor: "white"
     property int axis: Drag.XAndYAxis
     property bool hoverEnabled: true
@@ -27,11 +28,11 @@ Item
         x: -width / 2
         y: -height / 2
 
-        color: grip.color
+        color: ghost ? ghostColor : grip.color
         border.color: ghost ? "transparent" : grip.borderColor
         border.width: 1
 
-        opacity: ghost ? 0.5 : 1.0
+        opacity: ghost ? 0.7 : 1.0
     }
 
     MouseArea
