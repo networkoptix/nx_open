@@ -712,8 +712,9 @@ void QnClientModule::initWebEngine()
     qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
     QtWebEngine::initialize();
 
-    const auto settings = QWebEngineSettings::defaultSettings();
-    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+    //const auto settings = QWebEngineSettings::defaultSettings();
+    //settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+
     // TODO: Add ini parameters for WebEngine attributes
     //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
     //settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
