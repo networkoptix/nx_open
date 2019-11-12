@@ -283,7 +283,7 @@ TEST_F(MetricsGenerators, ValueSpike)
 TEST_F(MetricsGenerators, Text)
 {
     const auto error = parseTemplate("x = %x", monitors);
-    EXPECT_EQ(error(), "x = {x IS NOT FOUND}");
+    EXPECT_DEATH(error(), "is not found");
 
     const auto values = parseTemplate("a = %a, b = %b", monitors);
     resource.update("a", 7);
