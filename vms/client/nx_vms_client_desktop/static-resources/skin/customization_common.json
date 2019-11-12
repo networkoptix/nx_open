@@ -321,7 +321,7 @@
 
     "QnRecordingStatsItemDelegate": {
         "colors": {
-            "chartBackground": "brand_d3",
+            "chartBackground": "brand_core.setAlpha(40)",
             "chartForeground": "light10",
             "foreignForeground": "dark17",
             "totalForeground": "light4"
