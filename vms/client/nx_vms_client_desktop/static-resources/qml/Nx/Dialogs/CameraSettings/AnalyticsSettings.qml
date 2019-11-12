@@ -75,7 +75,7 @@ Item
                 settingsView.loadModel({}, {})
             }
 
-            alertBar.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
+            banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
     }
 
@@ -95,7 +95,7 @@ Item
         id: menu
 
         width: 240
-        height: parent.height - alertBar.height
+        height: parent.height - banner.height
 
         Repeater
         {
@@ -116,7 +116,7 @@ Item
         x: menu.width + 16
         y: 16
         width: parent.width - x - 16
-        height: parent.height - 16 - alertBar.height
+        height: parent.height - 16 - banner.height
         spacing: 16
 
         enabled: !loading
@@ -195,18 +195,18 @@ Item
         {
             top: parent.top
             right: parent.right
-            bottom: alertBar.top
+            bottom: banner.top
         }
     }
 
-    AlertBar
+    Banner
     {
-        id: alertBar
+        id: banner
 
         height: visible ? implicitHeight : 0
         visible: false
         anchors.bottom: parent.bottom
-        label.text: qsTr("Camera analytics will work only when camera is being viewed."
+        text: qsTr("Camera analytics will work only when camera is being viewed."
             + " Enable recording to make it work all the time.")
     }
 }
