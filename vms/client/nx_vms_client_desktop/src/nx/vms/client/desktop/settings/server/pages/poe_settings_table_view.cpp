@@ -46,19 +46,6 @@ const auto kHeaderDataProvider =
         }
     };
 
-void setupHeader(QTableView* view)
-{
-    static constexpr int kMinimumColumnWidth = 110;
-
-    const auto header = new QHeaderView(Qt::Horizontal, view);
-    view->setHorizontalHeader(header);
-
-    header->setSectionsClickable(true);
-    header->setMinimumSectionSize(kMinimumColumnWidth);
-    header->setSectionResizeMode(QHeaderView::Fixed);
-    header->setSectionResizeMode(PoESettingsColumn::camera, QHeaderView::Stretch);
-    header->setDefaultAlignment(Qt::AlignLeft);
-}
 
 } // namespace
 
@@ -82,6 +69,20 @@ PoESettingsTableView::PoESettingsTableView(QWidget* parent):
 
 PoESettingsTableView::~PoESettingsTableView()
 {
+}
+
+void PoESettingsTableView::setupHeader(QTableView* view)
+{
+    static constexpr int kMinimumColumnWidth = 110;
+
+    const auto header = new QHeaderView(Qt::Horizontal, view);
+    view->setHorizontalHeader(header);
+
+    header->setSectionsClickable(true);
+    header->setMinimumSectionSize(kMinimumColumnWidth);
+    header->setSectionResizeMode(QHeaderView::Fixed);
+    header->setSectionResizeMode(PoESettingsColumn::camera, QHeaderView::Stretch);
+    header->setDefaultAlignment(Qt::AlignLeft);
 }
 
 } // namespace settings

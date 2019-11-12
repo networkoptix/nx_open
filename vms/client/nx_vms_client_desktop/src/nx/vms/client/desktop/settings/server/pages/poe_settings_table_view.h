@@ -29,6 +29,8 @@ public:
     PoESettingsTableView(QWidget* parent = nullptr);
     virtual ~PoESettingsTableView() override;
 
+    static void setupHeader(QTableView* view);
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

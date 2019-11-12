@@ -70,6 +70,9 @@
        </property>
        <item>
         <layout class="QVBoxLayout" name="poeSettingsLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="leftMargin">
           <number>16</number>
          </property>
@@ -132,7 +135,7 @@
           </widget>
          </item>
          <item>
-          <widget class="nx::vms::client::desktop::settings::PoESettingsTableView" name="totalsTable">
+          <widget class="nx::vms::client::desktop::settings::TotalsPoESettingsTableView" name="totalsTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -144,9 +147,6 @@
              <width>16777215</width>
              <height>34</height>
             </size>
-           </property>
-           <property name="mouseTracking">
-            <bool>true</bool>
            </property>
            <property name="contextMenuPolicy">
             <enum>Qt::CustomContextMenu</enum>
@@ -199,9 +199,6 @@
            <property name="cornerButtonEnabled">
             <bool>false</bool>
            </property>
-           <attribute name="horizontalHeaderVisible">
-            <bool>false</bool>
-           </attribute>
            <attribute name="horizontalHeaderHighlightSections">
             <bool>false</bool>
            </attribute>
@@ -258,6 +255,11 @@
    <class>nx::vms::client::desktop::settings::PoESettingsTableView</class>
    <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
    <header location="global">nx/vms/client/desktop/settings/server/pages/poe_settings_table_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::settings::TotalsPoESettingsTableView</class>
+   <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
+   <header location="global">nx/vms/client/desktop/settings/server/pages/totals_poe_settings_table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

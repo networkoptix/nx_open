@@ -9,6 +9,7 @@ enum ViewDataProperty
     isSeparatorProperty,
     isExpandedProperty,
     groupSortOrderProperty,
+    hoverableProperty, //< Items are hoverable by default, but you can turn it off.
 
     lastNodeViewProperty = 128 //< All other properties should start at least from this value.
 };

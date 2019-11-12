@@ -181,6 +181,7 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
         .withText(PoESettingsColumn::consumption, text)
         .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
         .withData(PoESettingsColumn::consumption, Qt::TextColorRole, color)
+        .withProperty(hoverableProperty, false)
         .data();
 
     if (!state.rootNode)

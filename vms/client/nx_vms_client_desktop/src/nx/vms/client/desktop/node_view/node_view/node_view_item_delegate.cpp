@@ -109,6 +109,9 @@ void NodeViewItemDelegate::initStyleOption(
         option->state |= QStyle::State_On;
     else
         option->state |= QStyle::State_Off;
+
+    if (!hoverable(index))
+        option->state &= ~QStyle::State_MouseOver;
 }
 
 const NodeViewStatsColors& NodeViewItemDelegate::colors() const

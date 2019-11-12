@@ -53,10 +53,7 @@ NodePtr nodeFromIndex(const QModelIndex& index)
 
     const auto targetIndex = getLeafIndex(index);
     if (!qobject_cast<const details::NodeViewModel*>(targetIndex.model()))
-    {
-        NX_ASSERT(false, "Can't deduce index of NodeViewModel!");
         return NodePtr();
-    }
 
     return index.isValid()
         ? static_cast<ViewNode*>(targetIndex.internalPointer())->sharedFromThis()
@@ -102,6 +99,21 @@ bool checkable(const QModelIndex& index)
 bool checkable(const ViewNodeData& data, int column)
 {
     return !data.data(column, Qt::CheckStateRole).isNull();
+}
+
+bool hoverable(const NodePtr& node)
+{
+    return node && hoverable(node->data());
+}
+
+bool hoverable(const ViewNodeData& data)
+{
+    return !data.hasProperty(hoverableProperty) || data.property(hoverableProperty).toBool();
+}
+
+bool hoverable(const QModelIndex& index)
+{
+    return hoverable(nodeFromIndex(index));
 }
 
 bool isSeparator(const ViewNodeData& data)

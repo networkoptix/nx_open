@@ -47,6 +47,10 @@ NX_VMS_CLIENT_DESKTOP_API bool checkable(const NodePtr& node, int column);
 NX_VMS_CLIENT_DESKTOP_API bool checkable(const ViewNodeData& data, int column);
 NX_VMS_CLIENT_DESKTOP_API bool checkable(const QModelIndex& index);
 
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const NodePtr& node);
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const ViewNodeData& data);
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const QModelIndex& index);
+
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const NodePtr& node, int column);
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const ViewNodeData& data, int column);
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const QModelIndex& index);
