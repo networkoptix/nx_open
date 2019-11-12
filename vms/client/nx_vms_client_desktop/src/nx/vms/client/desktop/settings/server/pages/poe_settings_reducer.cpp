@@ -156,5 +156,22 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     return result;
 }
 
+PoESettingsStatePatch::BoolOptional PoESettingsReducer::poeOverBudgetChanges(
+    const PoESettingsState& state,
+    const core::PoEController::OptionalBlockData& blockData)
+{
+    const bool showWarning = blockData && blockData.value().isInPoeOverBudgetMode;
+    return showWarning == state.showPoEOverBudgetWarning
+        ? PoESettingsStatePatch::BoolOptional()
+        : showWarning;
+}
+
+PoESettingsStatePatch::BoolOptional PoESettingsReducer::blockUiChanges(
+    const PoESettingsState& state,
+    const bool blockUi)
+{
+    return blockUi == state.blockUi ? PoESettingsStatePatch::BoolOptional() : blockUi;
+}
+
 } // namespace settings
 } // namespace nx::vms::client::desktop

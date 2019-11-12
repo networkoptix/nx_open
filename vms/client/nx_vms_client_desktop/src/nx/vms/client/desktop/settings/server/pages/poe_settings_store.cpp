@@ -36,10 +36,13 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
         blockTableStore->applyPatch(patch.blockPatch);
 
     if (patch.hasChanges)
-    {
         state.hasChanges = patch.hasChanges.value();
-    }
 
+    if (patch.showPoEOverBudgetWarning)
+        state.showPoEOverBudgetWarning = patch.showPoEOverBudgetWarning.value();
+
+    if (patch.blockUi)
+        state.blockUi = patch.blockUi.value();
     // TODO: all other stuff
 
     emit q->patchApplied(patch);
@@ -72,21 +75,32 @@ const PoESettingsState& PoESettingsStore::state() const
 
 void PoESettingsStore::updateBlocks(const core::PoEController::OptionalBlockData& blockData)
 {
-    const auto& blockState = d->blockTableStore->state();
     PoESettingsStatePatch patch;
+
+    const auto& blockState = d->blockTableStore->state();
     patch.blockPatch = PoESettingsReducer::blockDataChangesPatch(
         blockState, blockData, d->pool);
+
+    patch.showPoEOverBudgetWarning = PoESettingsReducer::poeOverBudgetChanges(d->state, blockData);
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::setHasChanges(bool hasChanges)
+void PoESettingsStore::setHasChanges(bool value)
 {
-    if (d->state.hasChanges == hasChanges)
+    if (d->state.hasChanges == value)
         return;
 
     PoESettingsStatePatch patch;
-    patch.hasChanges = hasChanges;
+    patch.hasChanges = value;
+
+    d->applyPatch(patch);
+}
+
+void PoESettingsStore::setBlockUi(bool value)
+{
+    PoESettingsStatePatch patch;
+    patch.blockUi = PoESettingsReducer::blockUiChanges(d->state, value);
 
     d->applyPatch(patch);
 }

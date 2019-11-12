@@ -10,7 +10,7 @@ namespace settings {
 struct PoESettingsState
 {
     bool showPoEOverBudgetWarning = false;
-    bool blockOperations = false;
+    bool blockUi = false;
     bool hasChanges = false;
 };
 
@@ -18,7 +18,7 @@ struct PoESettingsStatePatch
 {
     using BoolOptional = std::optional<bool>;
     BoolOptional showPoEOverBudgetWarning;
-    BoolOptional blockOperations;
+    BoolOptional blockUi;
     BoolOptional hasChanges = false;
     node_view::details::NodeViewStatePatch blockPatch;
     node_view::details::NodeViewStatePatch totalsPatch;

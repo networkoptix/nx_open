@@ -141,8 +141,8 @@ void PoEController::Private::setUpdatingModeHandle(rest::Handle value)
         return;
 
     updatingModeHandle = value;
-    q->updatingPoweringModesChanged();
 
+    q->updatingPoweringModesChanged();
 }
 
 //--------------------------------------------------------------------------------------------------

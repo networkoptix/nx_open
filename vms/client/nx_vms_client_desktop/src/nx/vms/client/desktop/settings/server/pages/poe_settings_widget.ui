@@ -181,7 +181,7 @@
     </layout>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="powerLimitExceededWarningLabel" native="true">
+    <widget class="nx::vms::client::desktop::AlertBar" name="poeOverBudgetWarningLabel" native="true">
      <property name="text" stdset="0">
       <string>Attention! Power limit exceeded</string>
      </property>

@@ -36,7 +36,9 @@ public:
 
     void updateBlocks(const core::PoEController::OptionalBlockData& blockData);
 
-    void setHasChanges(bool hasChanges);
+    void setHasChanges(bool value);
+
+    void setBlockUi(bool value);
 
     void applyUserChanges();
 

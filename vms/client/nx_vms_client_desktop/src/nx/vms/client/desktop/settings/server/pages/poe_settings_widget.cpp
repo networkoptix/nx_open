@@ -26,7 +26,6 @@ struct PoESettingsWidget::Private: public QObject
     Private(PoESettingsWidget* owner);
 
     void updateBlockData();
-    void updateAvailability();
     void handlePatchApplied(const PoESettingsStatePatch& patch);
 
     PoESettingsWidget* const q;
@@ -48,10 +47,11 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     connect(&controller, &Controller::updated, this, &Private::updateBlockData);
     connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged, &store,
         [this]() { store.setHasChanges(ui.poeTable->hasUserChanges()); });
+    connect(&controller, &Controller::updatingPoweringModesChanged, &store,
+        [this]() { store.setBlockUi(controller.updatingPoweringModes()); });
 
     updateBlockData();
-//    connect(&controller, &Controller::updatingPoweringModesChanged,
-//        this, &Private::updateAvailability);
+    ui.poeOverBudgetWarningLabel->setVisible(false);
 }
 
 void PoESettingsWidget::Private::updateBlockData()
@@ -59,19 +59,21 @@ void PoESettingsWidget::Private::updateBlockData()
     store.updateBlocks(controller.blockData());
 }
 
-void PoESettingsWidget::Private::updateAvailability()
-{
-    const bool readOnly = controller.updatingPoweringModes();
-
-    q->setReadOnly(readOnly);
-    ui.poeTable->setEnabled(!readOnly);
-    ui.poeTotalsTable->setEnabled(!readOnly);
-}
-
 void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch& patch)
 {
     if (patch.hasChanges)
         emit q->hasChangesChanged();
+
+    if (patch.showPoEOverBudgetWarning)
+        ui.poeOverBudgetWarningLabel->setVisible(patch.showPoEOverBudgetWarning.value());
+
+    if (patch.blockUi)
+    {
+        const bool blockUi = patch.blockUi.value();
+        q->setReadOnly(blockUi);
+        ui.poeTable->setEnabled(!blockUi);
+        ui.poeTotalsTable->setEnabled(!blockUi);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
