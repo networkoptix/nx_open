@@ -1,11 +1,36 @@
 function(nx_vcs_changeset dir var)
+    # hg yields such changeset if .hg dir exists but hg does not detect a repo there.
+    set(_unknown_changeset "000000000000")
+
+    set(${var} ${unknown_changeset})
+    set(_reason "")
+
     if(EXISTS ${dir}/.hg/)
         _hg_changeset(${dir} ${var})
     elseif(EXISTS ${dir}/.git/)
         _git_changeset(${dir} ${var})
     else()
-        message(WARNING "Can't get changeset: not found any VCS")
+        set(_reason "VCS not detected")
     endif()
+    
+    if(_reason STREQUAL "")
+        set(_reason "Failed quering repository")
+    endif()
+    
+    set(_changeset_file ${dir}/changeset.txt)
+    if(${var} STREQUAL ${_unknown_changeset} AND EXISTS ${_changeset_file})
+        file(READ ${_changeset_file} ${var}) #< On error, ${var} retains _unknown_changeset.
+        if(${var} STREQUAL ${_unknown_changeset})
+                set(_reason "Failed to read ${_changeset_file}")
+        else()
+            message(STATUS "ATTENTION: Using changeset from ${_changeset_file}: ${${var}}")
+        endif()
+    endif()
+    
+    if(${var} STREQUAL ${_unknown_changeset})
+        message(WARNING "Can't get changeset: ${_reason}; assuming ${${var}}.")
+    endif()
+    
     set(${var} ${${var}} PARENT_SCOPE)
 endfunction()
 

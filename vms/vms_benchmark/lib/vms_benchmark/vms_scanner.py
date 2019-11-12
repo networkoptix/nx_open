@@ -133,7 +133,10 @@ class VmsScanner:
     def scan(device, linux_distribution):
 
         if linux_distribution.with_systemd:
-            systemd_scripts = device.eval('systemctl list-unit-files --type=service "*"-mediaserver.service', stderr=None)
+            systemd_scripts = device.eval(
+                'systemctl list-unit-files --type=service "*"-mediaserver.service',
+                stderr=None
+            )
 
             if not systemd_scripts:
                 return None
