@@ -77,11 +77,14 @@ void TunnelValidator::stopWhileInAioThread()
 
 bool TunnelValidator::relaySupportsKeepAlive() const
 {
-    if (m_relayProtocolVersion.empty() ||
+    if (!m_relayProtocolVersion.empty() &&
         nx::utils::SoftwareVersion(m_relayProtocolVersion.c_str()) < nx::utils::SoftwareVersion(0, 1))
     {
         return false;
     }
+
+    // NOTE: Considering empty protocol to be result of a firewall misbehavior.
+    // Currently, every running relay supports keep-alive.
 
     return true;
 }
