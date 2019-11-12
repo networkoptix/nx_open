@@ -69,7 +69,7 @@ import threading
 
 conf_definition = {
     "boxHostnameOrIp": {"type": "str"},
-    "boxLogin": {"type": "str", "default": ""},
+    "boxLogin": {"type": "str"},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
     "vmsUser": {"type": "str"},
@@ -81,6 +81,10 @@ conf_definition = {
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
 }
+
+# On Windows plink tool is used and this tool doesn't support the fallback to default for the SSH login.
+if platform.system() != "Windows":
+    conf_definition["boxLogin"]["default"] = ""
 
 
 ini_definition = {
@@ -963,6 +967,15 @@ def _connect_to_box(conf, conf_file):
     host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
     if host_key is not None:
         box.supply_host_key(host_key)
+
+    try:
+        box.sh('true', exc=True)
+    except exceptions.BoxCommandError as e:
+        raise exceptions.SshConnectionError(
+            "Can't connect to the box via SSH: check SSH configuration settings (host, login, password and so on).",
+            original_exception=e
+        )
+
     box.obtain_connection_info()
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
