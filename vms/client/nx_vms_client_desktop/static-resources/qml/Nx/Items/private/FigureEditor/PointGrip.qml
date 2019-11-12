@@ -18,6 +18,7 @@ Item
     readonly property bool dragging: mouseArea.drag.active
     signal dragStarted()
     signal moved()
+    signal clicked(int button)
 
     Rectangle
     {
@@ -43,7 +44,7 @@ Item
         width: 12
         height: 12
 
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: grip.enabled && grip.hoverEnabled
 
         drag.minimumX: 0
@@ -64,16 +65,20 @@ Item
             if (!grip.parent)
                 return
 
-            drag.target = grip
+            if (mouse.button === Qt.LeftButton)
+                drag.target = grip
         }
 
         onReleased:
         {
-            drag.target = undefined
+            if (mouse.button === Qt.LeftButton)
+                drag.target = undefined
         }
 
         onMouseXChanged: processMove(mouse)
         onMouseYChanged: processMove(mouse)
+
+        onClicked: grip.clicked(mouse.button)
 
         function processMove(mouse)
         {

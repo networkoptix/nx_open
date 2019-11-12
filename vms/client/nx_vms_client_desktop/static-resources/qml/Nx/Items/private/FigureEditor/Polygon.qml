@@ -2,6 +2,7 @@ import QtQuick 2.10
 import QtQml 2.3
 import nx.vms.client.core 1.0
 import Nx 1.0
+import Qt.labs.platform 1.0
 
 import "../figure_utils.js" as F
 
@@ -177,6 +178,15 @@ Figure
                     hoverInstrument.clear()
                 }
             }
+
+            onClicked:
+            {
+                if (button === Qt.RightButton)
+                {
+                    pointMenu.pointIndex = index
+                    pointMenu.open()
+                }
+            }
         }
     }
 
@@ -207,6 +217,25 @@ Figure
         }
 
         onMoved: pointMakerInstrument.setPoint(pointIndex, Qt.point(x, y))
+    }
+
+    Menu
+    {
+        id: pointMenu
+
+        property int pointIndex
+
+        MenuItem
+        {
+            text: qsTr("Delete")
+            onTriggered:
+            {
+                if (pointMenu.pointIndex <= 0 || pointMakerInstrument.count <= 3)
+                    return
+
+                pointMakerInstrument.removePoint(pointMenu.pointIndex)
+            }
+        }
     }
 
     onColorChanged: canvas.requestPaint()
