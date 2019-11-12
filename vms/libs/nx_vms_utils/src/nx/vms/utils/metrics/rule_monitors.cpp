@@ -206,7 +206,6 @@ public:
                 forEach(
                     [&](const Value& value, std::chrono::milliseconds duration)
                     {
-                        // TODO: should it be considered as an error?
                         if (value == Value())
                             return;
 
@@ -342,11 +341,12 @@ ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMoni
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
 {
     const auto value =
-        [monitors = &monitors](const QString& name) -> QString
+        [template_, monitors = &monitors](const QString& name) -> QString
         {
             if (const auto it = monitors->find(name); it != monitors->end())
                 return it->second->formattedValue().toVariant().toString();
 
+            NX_ASSERT(false, "Value [%1] is not found for template [%2]", name, template_);
             return nx::utils::log::makeMessage("{%1 IS NOT FOUND}", name);
         };
 
@@ -403,7 +403,6 @@ AlarmMonitor::AlarmMonitor(
 std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
     // TODO: implement idForToString?
-    // TODO: shoudl write exceptions for formatters?
     // TODO: should I add optional here too? Should we catch NullValueError separately?
     // TODO: Write tests and check that it works
     try {
@@ -414,12 +413,11 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     }
     catch (const MetricsError& e)
     {
-        // TODO: check error messages
-        NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
+        NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
     }
     catch (const std::exception& e)
     {
-        NX_DEBUG(this, "Failed to get value for alarm: %1", e.what());
+        NX_DEBUG(this, "Failed to get metric value for alarm: %1", e.what());
     }
 
     // TODO: Should we return error to the user if it occures?
