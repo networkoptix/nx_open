@@ -44,7 +44,7 @@ ResourceSelectionNodeView::Private::Private(
     const ColumnSet& selectionColumns)
     :
     q(owner),
-    itemDelegate(owner, selectionColumns)
+    itemDelegate(selectionColumns)
 {
 }
 
@@ -53,16 +53,17 @@ void ResourceSelectionNodeView::Private::handlePatchApplied(const NodeViewStateP
     auto& model = q->sourceModel();
     for (const auto step: patch.steps)
     {
-        if (step.operation != ChangeNodeOperation)
+        if (step.operationData.operation == removeDataOperation)
             continue;
 
-        const auto hasOtherChange = step.data.hasDataForColumn(resourceNameColumn);
+        const auto& data = step.operationData.data.value<ViewNodeData>();
+        const auto hasOtherChange = data.hasDataForColumn(resourceNameColumn);
         if (hasOtherChange)
             continue;
 
-        const bool hasCheckChange = checkable(step.data, resourceCheckColumn)
-            && step.data.hasDataForColumn(resourceCheckColumn);
-        if (!hasCheckChange && !step.data.hasProperty(selectedChildrenCountProperty))
+        const bool hasCheckChange = checkable(data, resourceCheckColumn)
+            && data.hasDataForColumn(resourceCheckColumn);
+        if (!hasCheckChange && !data.hasProperty(selectedChildrenCountProperty))
             continue;
 
         const auto index = model.index(step.path, resourceNameColumn);

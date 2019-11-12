@@ -326,8 +326,8 @@ QByteArray serialized(const T& value)
  * @param[out] success Deserialization status.
  * @return Deserialization target.
  */
-template<class T>
-T deserialized(const QByteArray& value, const T& defaultValue, bool* success)
+template<class T, class S>
+T deserialized(const S& value, const T& defaultValue, bool* success)
 {
     T target;
     const bool result = QJson::deserialize(value, &target);

@@ -2,25 +2,29 @@
 
 #include <QtWidgets/QStyledItemDelegate>
 
-class QTreeView;
+#include <client/client_color_types.h>
+#include <ui/customization/customized.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class NodeViewItemDelegate: public QStyledItemDelegate
+class NodeViewItemDelegate: public Customized<QStyledItemDelegate>
 {
     Q_OBJECT
-    using base_type = QStyledItemDelegate;
+    using base_type = Customized<QStyledItemDelegate>;
+
+    Q_PROPERTY(NodeViewStatsColors colors READ colors WRITE setColors)
 
 public:
-    NodeViewItemDelegate(QTreeView* owner, QObject* parent = nullptr);
-
-    QTreeView* owner() const;
+    NodeViewItemDelegate(QObject* parent = nullptr);
 
     virtual void paint(
         QPainter* painter,
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const override;
+
+    const NodeViewStatsColors& colors() const;
+    void setColors(const NodeViewStatsColors& value);
 
 protected:
     virtual void initStyleOption(
@@ -28,8 +32,9 @@ protected:
         const QModelIndex& index) const override;
 
 private:
-    QTreeView* const m_owner;
+    NodeViewStatsColors m_colors;
 };
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
+

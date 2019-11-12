@@ -1,9 +1,10 @@
 #pragma once
 
+#include "view_node_fwd.h"
+#include  "../node_view_state_patch.h"
+
 #include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
-
-#include "view_node_fwd.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -16,6 +17,8 @@ namespace details {
  */
 class NX_VMS_CLIENT_DESKTOP_API ViewNodeData
 {
+public:
+
 public:
     ViewNodeData();
     ViewNodeData(const ViewNodeData& other);
@@ -33,11 +36,12 @@ public:
     /**
      * Data represents raw QVariant values for specified column/role. Used directly in model.
      */
-    QVariant data(int column, int role) const;
-    void setData(int column, int role, const QVariant& data);
-    void removeData(int column, int role);
-    bool hasDataForColumn(int column) const;
-    bool hasData(int column, int role) const;
+    QVariant data(Column column, Role role) const;
+    void setData(Column column, Role role, const QVariant& data);
+    void removeData(Column column, Role role);
+    void removeData(const ColumnRoleHash& rolesHash);
+    bool hasDataForColumn(Column column) const;
+    bool hasData(Column column, Role role) const;
 
     /**
      * Property represents generic data that applies to whole node.
@@ -50,21 +54,32 @@ public:
     /**
      * Returns list of columns for which instance has specified data values.
      */
-    using Columns = QList<int>;
-    Columns usedColumns() const;
+    ColumnSet usedColumns() const;
 
     /**
      * Returns list of roles for specified column for which instance has specified data values.
      */
-    using Roles = QVector<int>;
-    Roles rolesForColumn(int column) const;
+    RoleVector rolesForColumn(Column column) const;
 
     /**
      * Flag is direct representation of visual item flag.
      */
-    Qt::ItemFlags flags(int column) const;
-    void setFlag(int column, Qt::ItemFlag flag, bool value = true);
-    void setFlags(int column, Qt::ItemFlags flags);
+    Qt::ItemFlags flags(Column column) const;
+    void setFlag(Column column, Qt::ItemFlag flag, bool value = true);
+    void setFlags(Column column, Qt::ItemFlags flags);
+
+    // TODO: 4.2 #ynikitenkov Develop unit tests.
+
+    struct DifferenceData
+    {
+        OperationData removeOperation;
+        OperationData updateOperation;
+    };
+
+    /**
+     * Returns operations witch should be applied to current data to become "other" one.
+     */
+    DifferenceData difference(const ViewNodeData& other) const;
 
 private:
     struct Private;
@@ -74,3 +89,5 @@ private:
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::node_view::details::ViewNodeData)

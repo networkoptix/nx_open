@@ -20,7 +20,7 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
 {
     ui->setupUi(this);
     ui->resourcesTree->setUniformRowHeights(true);
-    ui->resourcesTree->setSizeAdjustPolicy(node_view::NodeView::AdjustToContents);
+    ui->resourcesTree->setSizeAdjustPolicy(node_view::TreeNodeView::AdjustToContents);
     ui->scrollArea->installEventFilter(this); //< Adjust to viewport width horizontally.
 
     ui->detailsArea->setVisible(false);

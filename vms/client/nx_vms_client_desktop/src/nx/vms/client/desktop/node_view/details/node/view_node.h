@@ -2,6 +2,7 @@
 
 #include "view_node_fwd.h"
 #include "view_node_path.h"
+#include "view_node_data.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -42,8 +43,11 @@ public:
 
     NodePtr parent() const;
 
-    const ViewNodeData& nodeData() const;
+    const ViewNodeData& data() const;
+
     void applyNodeData(const ViewNodeData& data);
+
+    void removeNodeData(const ColumnRoleHash& roleHash);
 
 private:
     ViewNode(const ViewNodeData& data);

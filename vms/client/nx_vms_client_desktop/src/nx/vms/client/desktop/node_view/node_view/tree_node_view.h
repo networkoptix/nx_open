@@ -10,14 +10,14 @@ class QSortFilterProxyModel;
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class NodeView: public Connective<TreeView>
+class TreeNodeView: public Connective<TreeView>
 {
     Q_OBJECT
     using base_type = Connective<TreeView>;
 
 public:
-    NodeView(int columnCount, QWidget* parent = nullptr);
-    virtual ~NodeView() override;
+    TreeNodeView(int columnCount, QWidget* parent = nullptr);
+    virtual ~TreeNodeView() override;
 
     void setProxyModel(QSortFilterProxyModel* proxy);
 
@@ -29,7 +29,7 @@ public:
 
 protected:
     const details::NodeViewStore& store() const;
-    details::NodeViewModel& sourceModel() const;
+    details::NodeViewModel& sourceModel();
 
     /**
      * Implements basic item check functionality.

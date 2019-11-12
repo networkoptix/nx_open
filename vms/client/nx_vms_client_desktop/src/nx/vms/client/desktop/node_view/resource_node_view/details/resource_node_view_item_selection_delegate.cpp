@@ -21,11 +21,10 @@ namespace node_view {
 using namespace details;
 
 ResourceNodeViewItemSelectionDelegate::ResourceNodeViewItemSelectionDelegate(
-    QTreeView* owner,
     const ColumnSet& selectionColumns,
     QObject* parent)
     :
-    base_type(owner, parent),
+    base_type(parent),
     m_selectionColumns(selectionColumns)
 {
 }

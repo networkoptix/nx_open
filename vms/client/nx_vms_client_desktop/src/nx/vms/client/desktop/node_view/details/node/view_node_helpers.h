@@ -6,6 +6,8 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
+int makeUserActionRole(int initialRole, bool isUserAction = true);
+
 NX_VMS_CLIENT_DESKTOP_API NodePtr nodeFromIndex(const QModelIndex& index);
 
 using ForEachNodeCallback = std::function<void (const NodePtr& node)>;
@@ -19,6 +21,14 @@ NX_VMS_CLIENT_DESKTOP_API bool expanded(const QModelIndex& index);
 NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const NodePtr& node);
 NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const ViewNodeData& data);
 NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const QModelIndex& index);
+
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const NodePtr& node, int column);
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const ViewNodeData& data, int column);
+NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const QModelIndex& index);
+
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const NodePtr& node, int column);
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const ViewNodeData& data, int column);
+NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const QModelIndex& index);
 
 /**
 * Assuming that the sort order is ascending, nodes with lesser group sort order property will go
@@ -37,9 +47,27 @@ NX_VMS_CLIENT_DESKTOP_API bool checkable(const NodePtr& node, int column);
 NX_VMS_CLIENT_DESKTOP_API bool checkable(const ViewNodeData& data, int column);
 NX_VMS_CLIENT_DESKTOP_API bool checkable(const QModelIndex& index);
 
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(const QModelIndex& index);
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const NodePtr& node);
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const ViewNodeData& data);
+NX_VMS_CLIENT_DESKTOP_API bool hoverable(const QModelIndex& index);
+
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const NodePtr& node, int column);
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const ViewNodeData& data, int column);
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const QModelIndex& index);
+
+// TODO: Get rid of isUSerAction when it is supported in tree node view. TODO: do we need it anyway?
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
+    const NodePtr& node,
+    int column,
+    bool isUserAction = false);
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
+    const ViewNodeData& data,
+    int column,
+    bool isUserAction = false);
+
+NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
+    const QModelIndex& index,
+    bool isUserAction = false);
 
 NX_VMS_CLIENT_DESKTOP_API NodePtr createSimpleNode(
     const QString& caption,
