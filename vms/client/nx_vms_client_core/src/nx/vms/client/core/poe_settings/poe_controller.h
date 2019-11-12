@@ -33,8 +33,7 @@ public:
     bool autoUpdate() const;
 
     using BlockData = nx::vms::api::NetworkBlockData;
-    using OptionalBlockData = std::optional<BlockData>;
-    OptionalBlockData blockData() const;
+    const BlockData& blockData() const;
 
     using PortPoweringMode = nx::vms::api::NetworkPortWithPoweringMode;
     using PowerModes = QList<PortPoweringMode>;

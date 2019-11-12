@@ -87,7 +87,7 @@
       </widget>
      </item>
      <item>
-      <widget class="nx::vms::client::desktop::TableView" name="poeTotalsTable">
+      <widget class="nx::vms::client::desktop::settings::PoESettingsTableView" name="totalsTable">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>

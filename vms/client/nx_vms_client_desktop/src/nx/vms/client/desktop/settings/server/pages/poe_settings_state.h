@@ -19,7 +19,7 @@ struct PoESettingsStatePatch
     using BoolOptional = std::optional<bool>;
     BoolOptional showPoEOverBudgetWarning;
     BoolOptional blockUi;
-    BoolOptional hasChanges = false;
+    BoolOptional hasChanges;
     node_view::details::NodeViewStatePatch blockPatch;
     node_view::details::NodeViewStatePatch totalsPatch;
 };

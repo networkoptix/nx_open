@@ -40,8 +40,9 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     store(owner)
 {
     ui.setupUi(owner);
+    ui.poeOverBudgetWarningLabel->setVisible(false);
 
-    store.setStores(ui.poeTable->store(), ui.poeTable->store() /*<tmp*/);
+    store.setStores(ui.poeTable->store(), ui.totalsTable->store());
     connect(&store, &PoESettingsStore::patchApplied, this, &Private::handlePatchApplied);
 
     connect(&controller, &Controller::updated, this, &Private::updateBlockData);
@@ -51,7 +52,6 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
         [this]() { store.setBlockUi(controller.updatingPoweringModes()); });
 
     updateBlockData();
-    ui.poeOverBudgetWarningLabel->setVisible(false);
 }
 
 void PoESettingsWidget::Private::updateBlockData()
@@ -72,7 +72,7 @@ void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch&
         const bool blockUi = patch.blockUi.value();
         q->setReadOnly(blockUi);
         ui.poeTable->setEnabled(!blockUi);
-        ui.poeTotalsTable->setEnabled(!blockUi);
+        ui.totalsTable->setEnabled(!blockUi);
     }
 }
 

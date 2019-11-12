@@ -5,10 +5,10 @@
 #include <QtCore/QObject>
 
 #include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
-#include <nx/vms/client/core/poe_settings/poe_controller.h>
 #include <nx/utils/impl_ptr.h>
 
 class QnCommonModuleAware;
+namespace nx::vms::api { class NetworkBlockData; };
 
 namespace nx::vms::client::desktop {
 
@@ -34,7 +34,7 @@ public:
 
     const PoESettingsState& state() const;
 
-    void updateBlocks(const core::PoEController::OptionalBlockData& blockData);
+    void updateBlocks(const nx::vms::api::NetworkBlockData& data);
 
     void setHasChanges(bool value);
 

@@ -1,10 +1,11 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/poe_settings/poe_controller.h>
 #include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/vms/client/desktop/settings/server/pages/poe_settings_state.h>
+
+namespace nx::vms::api { class NetworkBlockData; }
 
 namespace nx::vms::client::desktop {
 namespace settings {
@@ -16,12 +17,16 @@ public:
 
     static node_view::details::NodeViewStatePatch blockDataChangesPatch(
         const node_view::details::NodeViewState& state,
-        const core::PoEController::OptionalBlockData& blockData,
+        const nx::vms::api::NetworkBlockData& data,
         QnResourcePool* resourcePool);
+
+    static node_view::details::NodeViewStatePatch totalsDataChangesPatch(
+        const node_view::details::NodeViewState& state,
+        const nx::vms::api::NetworkBlockData& data);
 
     static PoESettingsStatePatch::BoolOptional poeOverBudgetChanges(
         const PoESettingsState& state,
-        const core::PoEController::OptionalBlockData& blockData);
+        const nx::vms::api::NetworkBlockData& data);
 
     static PoESettingsStatePatch::BoolOptional blockUiChanges(
         const PoESettingsState& state,

@@ -73,15 +73,16 @@ const PoESettingsState& PoESettingsStore::state() const
     return d->state;
 }
 
-void PoESettingsStore::updateBlocks(const core::PoEController::OptionalBlockData& blockData)
+void PoESettingsStore::updateBlocks(const nx::vms::api::NetworkBlockData& data)
 {
     PoESettingsStatePatch patch;
-
-    const auto& blockState = d->blockTableStore->state();
     patch.blockPatch = PoESettingsReducer::blockDataChangesPatch(
-        blockState, blockData, d->pool);
+        d->blockTableStore->state(), data, d->pool);
 
-    patch.showPoEOverBudgetWarning = PoESettingsReducer::poeOverBudgetChanges(d->state, blockData);
+    patch.totalsPatch = PoESettingsReducer::totalsDataChangesPatch(
+        d->totalsTableStore->state(), data);
+
+    patch.showPoEOverBudgetWarning = PoESettingsReducer::poeOverBudgetChanges(d->state, data);
 
     d->applyPatch(patch);
 }

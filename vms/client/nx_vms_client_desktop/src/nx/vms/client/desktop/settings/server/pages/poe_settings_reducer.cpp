@@ -129,14 +129,13 @@ using namespace node_view::details;
 
 NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     const NodeViewState& state,
-    const core::PoEController::OptionalBlockData& blockData,
+    const nx::vms::api::NetworkBlockData& data,
     QnResourcePool* resourcePool)
 {
     // TODO: check for server switch.
 
     // It is supposed that ports are always ordered and their count is never changed.
 
-    const auto data = blockData ? blockData.value() : nx::vms::api::NetworkBlockData();
     if (!state.rootNode)
         return NodeViewStatePatch::fromRootNode(createPortNodes(data, resourcePool));
 
@@ -156,14 +155,21 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     return result;
 }
 
+node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatch(
+    const node_view::details::NodeViewState& state,
+    const nx::vms::api::NetworkBlockData& data)
+{
+    NodeViewStatePatch patch;
+    return patch;
+}
+
 PoESettingsStatePatch::BoolOptional PoESettingsReducer::poeOverBudgetChanges(
     const PoESettingsState& state,
-    const core::PoEController::OptionalBlockData& blockData)
+    const nx::vms::api::NetworkBlockData& data)
 {
-    const bool showWarning = blockData && blockData.value().isInPoeOverBudgetMode;
-    return showWarning == state.showPoEOverBudgetWarning
+    return data.isInPoeOverBudgetMode == state.showPoEOverBudgetWarning
         ? PoESettingsStatePatch::BoolOptional()
-        : showWarning;
+        : data.isInPoeOverBudgetMode;
 }
 
 PoESettingsStatePatch::BoolOptional PoESettingsReducer::blockUiChanges(

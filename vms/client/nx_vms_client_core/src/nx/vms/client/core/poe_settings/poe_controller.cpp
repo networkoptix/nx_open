@@ -20,15 +20,13 @@ namespace nx::vms::client::core {
 
 using namespace std::placeholders;
 
-static constexpr int kUpdateIntervalMs = 8000;
+static constexpr int kUpdateIntervalMs = 1000;
 
 struct PoEController::Private: public QObject
 {
     Private(PoEController* q);
 
     void updateTargetResource(const QnUuid& value);
-    void setBlockData(const OptionalBlockData& value);
-
     void handleReply(bool success, rest::Handle currentHandle, const QnJsonRestResult& result);
     void update();
     void setPowered(const PoEController::PowerModes& value);
@@ -42,7 +40,7 @@ struct PoEController::Private: public QObject
 
     ResourceHolder<QnMediaServerResource> serverHolder;
     bool autoUpdate = true;
-    PoEController::OptionalBlockData blockData;
+    PoEController::BlockData blockData;
     QTimer updateTimer;
 };
 
@@ -72,12 +70,6 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
     update();
 }
 
-void PoEController::Private::setBlockData(const OptionalBlockData& value)
-{
-    blockData = value;
-    emit q->updated();
-}
-
 void PoEController::Private::handleReply(
     bool success,
     rest::Handle replyHandle,
@@ -100,9 +92,8 @@ void PoEController::Private::handleReply(
     if (!success || result.error != QnRestResult::NoError)
         return;
 
-    BlockData data;
-    if (QJson::deserialize(result.reply, &data))
-        setBlockData(data);
+    blockData = QJson::deserialized<nx::vms::api::NetworkBlockData>(result.reply);
+    emit q->updated();
 }
 
 void PoEController::Private::update()
@@ -167,7 +158,7 @@ QnUuid PoEController::resourceId() const
     return d->serverHolder.resourceId();
 }
 
-PoEController::OptionalBlockData PoEController::blockData() const
+const PoEController::BlockData& PoEController::blockData() const
 {
     return d->blockData;
 }
