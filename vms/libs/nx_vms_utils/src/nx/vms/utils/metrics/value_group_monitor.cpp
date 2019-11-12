@@ -127,6 +127,7 @@ void ValueGroupMonitor::updateAlarms(
             try
             {
                 m_alarmMonitors[parameterId].push_back(std::make_unique<AlarmMonitor>(
+                    parameterId,
                     alarmRule.level,
                     parseFormulaOrThrow(alarmRule.condition, m_valueMonitors),
                     parseTemplate(alarmRule.text, m_valueMonitors)

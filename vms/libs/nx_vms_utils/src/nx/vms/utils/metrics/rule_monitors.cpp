@@ -389,10 +389,12 @@ void ExtraValueMonitor::forEach(
 }
 
 AlarmMonitor::AlarmMonitor(
+    QString parentParameterId,
     api::metrics::AlarmLevel level,
     ValueGeneratorResult condition,
     TextGenerator text)
 :
+    m_parentParameterId(std::move(parentParameterId)),
     m_scope(condition.scope),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
@@ -402,8 +404,6 @@ AlarmMonitor::AlarmMonitor(
 
 std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
-    // TODO: implement idForToString?
-    // TODO: should I add optional here too? Should we catch NullValueError separately?
     // TODO: Write tests and check that it works
     try {
         if (!m_condition().toBool())
@@ -422,6 +422,11 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 
     // TODO: Should we return error to the user if it occures?
     return std::nullopt;
+}
+
+QString AlarmMonitor::idForToStringFromPtr() const
+{
+    return m_parentParameterId;
 }
 
 } // namespace nx::vms::utils::metrics
