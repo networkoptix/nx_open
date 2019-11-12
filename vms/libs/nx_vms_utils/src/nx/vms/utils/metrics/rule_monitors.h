@@ -26,6 +26,7 @@ class NullValueError: public FormulaCalculationError
     using FormulaCalculationError::FormulaCalculationError;
 };
 
+// NOTE: Generators are allowed to throw exceptions!
 using ValueGenerator = std::function<api::metrics::Value()>;
 
 struct ValueGeneratorResult
@@ -34,9 +35,12 @@ struct ValueGeneratorResult
     Scope scope = Scope::local;
 };
 
-NX_VMS_UTILS_API ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& monitors);
-NX_VMS_UTILS_API ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors);
+NX_VMS_UTILS_API ValueGeneratorResult parseFormula(
+    const QString& formula, const ValueMonitors& monitors);
+NX_VMS_UTILS_API ValueGeneratorResult parseFormulaOrThrow(
+    const QString& formula, const ValueMonitors& monitors);
 
+// NOTE: Generators are allowed to throw exceptions!
 using TextGenerator = std::function<QString()>;
 
 NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors);
@@ -59,7 +63,7 @@ private:
 };
 
 /**
- * Generates alarm of condition is triggered.
+ * Generates alarm if condition is triggered.
  */
 class NX_VMS_UTILS_API AlarmMonitor
 {
@@ -76,7 +80,7 @@ private:
     const Scope m_scope = Scope::local;
     const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;
-    const TextGenerator m_text;
+    const TextGenerator m_textGenerator;
 };
 
 using AlarmMonitors = std::map<QString, std::vector<std::unique_ptr<AlarmMonitor>>>;

@@ -396,16 +396,34 @@ AlarmMonitor::AlarmMonitor(
     m_scope(condition.scope),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
-    m_text(std::move(text))
+    m_textGenerator(std::move(text))
 {
 }
 
 std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
-    if (!m_condition().toBool())
-        return std::nullopt;
+    // TODO: implement idForToString?
+    // TODO: shoudl write exceptions for formatters?
+    // TODO: should I add optional here too? Should we catch NullValueError separately?
+    // TODO: Write tests and check that it works
+    try {
+        if (!m_condition().toBool())
+            return std::nullopt;
 
-    return api::metrics::Alarm{m_level, m_text()};
+        return api::metrics::Alarm{m_level, m_textGenerator()};
+    }
+    catch (const MetricsError& e)
+    {
+        // TODO: check error messages
+        NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, "Failed to get value for alarm: %1", e.what());
+    }
+
+    // TODO: Should we return error to the user if it occures?
+    return std::nullopt;
 }
 
 } // namespace nx::vms::utils::metrics

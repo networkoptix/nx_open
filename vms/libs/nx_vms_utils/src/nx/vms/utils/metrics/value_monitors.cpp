@@ -48,6 +48,7 @@ api::metrics::Value ValueMonitor::value() const noexcept
         NX_DEBUG(this, "Failed to get value: %1", e.what());
     }
 
+    // TODO: Should we return error to the user if it occures?
     return {};
 }
 
