@@ -38,7 +38,7 @@ LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller)
 JsonRestResponse LocalRestHandler::executeGet(const JsonRestRequest& request)
 {
     if (!hasAdminPermission(request.owner))
-        return nx::network::http::StatusCode::forbidden;
+        return JsonRestResponse(nx::network::http::StatusCode::forbidden, QnJsonRestResult::Forbidden);
 
     using utils::metrics::Scope;
     const Scope scope = request.params.contains(kSystemParam) ? Scope::system : Scope::local;
@@ -66,7 +66,7 @@ SystemRestHandler::SystemRestHandler(
 JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
 {
     if (!hasAdminPermission(request.owner))
-        return nx::network::http::StatusCode::forbidden;
+        return JsonRestResponse(nx::network::http::StatusCode::forbidden, QnJsonRestResult::Forbidden);
 
     if (request.path.endsWith(kRulesApi))
          return JsonRestResponse(m_controller->rules());
