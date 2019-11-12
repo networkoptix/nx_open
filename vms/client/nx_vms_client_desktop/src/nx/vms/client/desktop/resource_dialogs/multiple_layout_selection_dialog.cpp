@@ -231,7 +231,7 @@ void MultipleLayoutSelectionDialog::Private::reloadViewData()
         ? createAllLayoutsPatch(data, pool)
         : createUserLayouts(currentUser, data[currentUser->getId()], pool);
     if (view->state().rootNode)
-        view->applyPatch(NodeViewStatePatch::clearNodeView());
+        view->applyPatch(NodeViewStatePatch::clearNodeViewPatch());
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));
     view->setLeafResourcesSelected(selectedLayouts, true);
 

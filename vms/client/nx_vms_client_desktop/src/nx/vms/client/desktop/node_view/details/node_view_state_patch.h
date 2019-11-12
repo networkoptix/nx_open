@@ -36,7 +36,7 @@ using PatchStepList = std::vector<PatchStep>;
 struct NX_VMS_CLIENT_DESKTOP_API NodeViewStatePatch
 {
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
-    static NodeViewStatePatch clearNodeView();
+    static NodeViewStatePatch clearNodeViewPatch();
 
     bool isEmpty() const;
 

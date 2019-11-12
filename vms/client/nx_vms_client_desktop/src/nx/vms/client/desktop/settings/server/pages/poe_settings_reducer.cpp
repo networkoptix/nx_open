@@ -142,6 +142,10 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
 
     NodeViewStatePatch result;
 
+
+    if (data.portStates.empty())
+        return NodeViewStatePatch::clearNodeViewPatch();
+
     int index = 0;
     for (const auto node: state.rootNode->children())
     {
@@ -159,7 +163,6 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
     const node_view::details::NodeViewState& state,
     const nx::vms::api::NetworkBlockData& data)
 {
-    NodeViewStatePatch result;
     const double consumption =
         [data]()
         {
@@ -181,19 +184,20 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
         .withData(PoESettingsColumn::consumption, Qt::TextColorRole, color)
         .data();
 
-    if (state.rootNode)
-    {
-        const auto child = state.rootNode->children().first();
-        const auto difference = child->data().difference(nodeData);
-        result.appendPatchStep({child->path(), difference.updateOperation});
-    }
-    else
+    if (!state.rootNode)
     {
         const auto root = ViewNode::create();
         root->addChild(ViewNode::create(nodeData));
         return NodeViewStatePatch::fromRootNode(root);
     }
 
+    if (data.portStates.empty())
+        return NodeViewStatePatch::clearNodeViewPatch();
+
+    NodeViewStatePatch result;
+    const auto child = state.rootNode->children().first();
+    const auto difference = child->data().difference(nodeData);
+    result.appendPatchStep({child->path(), difference.updateOperation});
     return result;
 }
 

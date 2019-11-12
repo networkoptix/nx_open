@@ -288,7 +288,7 @@ void CameraSelectionDialog::Private::reloadViewData()
     const auto view = q->ui->filteredResourceSelectionWidget->view();
 
     if (view->state().rootNode)
-        view->applyPatch(NodeViewStatePatch::clearNodeView());
+        view->applyPatch(NodeViewStatePatch::clearNodeViewPatch());
 
     const auto root = createCamerasTree(showInvalidCameras, data, q->resourcePool());
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));

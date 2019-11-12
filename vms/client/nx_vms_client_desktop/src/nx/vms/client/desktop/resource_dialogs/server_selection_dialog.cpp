@@ -111,7 +111,7 @@ void ServerSelectionDialog::Private::reloadViewData()
     const auto resourcePool = q->resourcePool();
 
     if (view->state().rootNode)
-        view->applyPatch(NodeViewStatePatch::clearNodeView());
+        view->applyPatch(NodeViewStatePatch::clearNodeViewPatch());
     view->applyPatch(NodeViewStatePatch::fromRootNode(createServersRoot(servers, resourcePool)));
 
     view->setLeafResourcesSelected(selectedServersIds, true);

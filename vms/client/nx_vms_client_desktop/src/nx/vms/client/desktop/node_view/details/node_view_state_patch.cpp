@@ -107,7 +107,7 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
     return patch;
 }
 
-NodeViewStatePatch NodeViewStatePatch::clearNodeView()
+NodeViewStatePatch NodeViewStatePatch::clearNodeViewPatch()
 {
     NodeViewStatePatch patch;
     patch.addRemovalStep(ViewNodePath());
