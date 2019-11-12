@@ -7,6 +7,8 @@
 
 #include <core/resource_management/resource_pool.h>
 
+#include <utils/common/delete_later.h>
+
 QnClientPtzControllerPool::QnClientPtzControllerPool(QObject* parent):
     base_type(parent)
 {
@@ -62,10 +64,9 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
     if (!camera || !camera->isPtzSupported())
         return {};
 
-    QnPtzControllerPtr controller;
-    controller.reset(new QnRemotePtzController(camera));
-    controller.reset(new QnCachingPtzController(controller));
-    return controller;
+    QnPtzControllerPtr baseController(new QnRemotePtzController(camera));
+    QnPtzControllerPtr result(new QnCachingPtzController(baseController), &qnDeleteLater);
+    return result;
 }
 
 void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
