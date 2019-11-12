@@ -163,22 +163,8 @@ void applyRecommendedBackgroundSize(State& state)
     state.background.height.setValue(height);
 }
 
-int findFreeLogicalId(const QnLayoutResourcePtr& layout)
+int findFreeLogicalId(const std::set<int>& usedValues)
 {
-    if (!layout->resourcePool())
-        return 1;
-
-    auto layouts = layout->resourcePool()->getResources<QnLayoutResource>();
-    std::set<int> usedValues;
-    for (const auto& other: layouts)
-    {
-        if (other == layout)
-            continue;
-        const auto id = other->logicalId();
-        if (id > 0)
-            usedValues.insert(id);
-    }
-
     int previousValue = 0;
     for (auto value: usedValues)
     {
@@ -249,7 +235,6 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     trace(state, "loadLayout");
     state.locked = layout->locked();
     state.logicalId = layout->logicalId();
-    state.reservedLogicalId = findFreeLogicalId(layout);
     state.isLocalFile = layout->isFile();
 
     state.fixedSize = layout->fixedSize();
@@ -292,6 +277,13 @@ State LayoutSettingsDialogStateReducer::setLogicalId(State state, int value)
     return state;
 }
 
+State LayoutSettingsDialogStateReducer::setOtherLogicalIds(State state, const std::set<int>& value)
+{
+    trace(state, "setOtherLogicalIds");
+    state.otherLogicalIds = value;
+    return state;
+}
+
 State LayoutSettingsDialogStateReducer::resetLogicalId(State state)
 {
     trace(state, "resetLogicalId");
@@ -302,7 +294,7 @@ State LayoutSettingsDialogStateReducer::resetLogicalId(State state)
 State LayoutSettingsDialogStateReducer::generateLogicalId(State state)
 {
     trace(state, "generateLogicalId");
-    state.logicalId = state.reservedLogicalId;
+    state.logicalId = findFreeLogicalId(state.otherLogicalIds);
     return state;
 }
 
