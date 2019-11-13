@@ -42,11 +42,7 @@ Controller::Controller(const conf::Settings& settings):
         NX_INFO(this, lit("STUN Server is running without cloud (debug mode)"));
 }
 
-Controller::~Controller()
-{
-    m_cloudConnectProcessor.stop();
-    m_listeningPeerDb.stop();
-}
+Controller::~Controller() = default;
 
 MediaserverEndpointTester& Controller::mediaserverEndpointTester()
 {
