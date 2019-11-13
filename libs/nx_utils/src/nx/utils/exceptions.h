@@ -11,7 +11,7 @@ namespace nx::utils {
  * Catches ORIGINAL_EXCEPTION thrown by EXPRESSION, wraps it and rethrows std::nested_exception
  * inherited from NEW_EXCEPTION with message MESSAGE.
  */
-#define WRAP_EXCEPTION(EXPRESSION, ORIGINAL_EXCEPTION, NEW_EXCEPTION, MESSAGE)  \
+#define WRAP_EXCEPTION(EXPRESSION, ORIGINAL_EXCEPTION, NEW_EXCEPTION, MESSAGE) \
 do { \
     try \
     { \

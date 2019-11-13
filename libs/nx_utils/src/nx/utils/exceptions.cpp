@@ -2,7 +2,6 @@
 
 namespace nx::utils {
 
-// TODO: write tests
 std::string unwrapNestedErrors(const std::exception& e, std::string whats)
 {
     if (whats.size() > 0)
