@@ -47,13 +47,18 @@ else()
     set(ios_sources)
 endif()
 
+set(custom_resources_dir "${customization_dir}/mobile_client/resources")
+if (NOT EXISTS "${custom_resources_dir}")
+    set(custom_resources_dir "")
+endif()
+
 set(target_args
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
         ${ios_sources}
     ADDITIONAL_RESOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/skins/${defaultSkin}
-        "${customization_dir}/mobile_client/resources"
+        "${custom_resources_dir}"
     OTHER_SOURCES
         ${QML_FILES}
         ${resources}
