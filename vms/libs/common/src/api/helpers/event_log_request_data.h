@@ -18,6 +18,7 @@ struct QnEventLogFilterData
     QString eventSubtype;
     nx::vms::api::ActionType actionType = nx::vms::api::ActionType::undefinedAction;
     QnUuid ruleId;
+    QString text;
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;

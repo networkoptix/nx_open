@@ -29,6 +29,7 @@
 #include <common/common_module.h>
 
 #include <nx/vms/server/database/update_helpers/update_analytics_records_helper.h>
+#include <nx/vms/event/strings_helper.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
@@ -908,6 +909,7 @@ vms::event::ActionDataList QnServerDb::getActions(
     Qt::SortOrder order,
     int limit) const
 {
+    nx::vms::event::StringsHelper stringsHelper(serverModule()->commonModule());
     vms::event::ActionDataList result;
     QString requestStr = getRequestStr(request, order, limit);
 
@@ -929,11 +931,23 @@ vms::event::ActionDataList QnServerDb::getActions(
     {
         vms::event::ActionData actionData;
 
+        actionData.eventParams = QnUbjson::deserialized<vms::event::EventParameters>(
+            query.value(runtimeParamIdx).toByteArray());
+        if (!request.text.isEmpty())
+        {
+            const auto details = stringsHelper.eventDetails(actionData.eventParams);
+            bool found = std::any_of(details.cbegin(), details.cend(),
+                [&request](const QString& data)
+            {
+                return data.contains(request.text, Qt::CaseInsensitive);
+            });
+            if (!found)
+                continue;
+        }
+
         actionData.actionType = (vms::api::ActionType) query.value(actionTypeIdx).toInt();
         actionData.actionParams = QnUbjson::deserialized<vms::event::ActionParameters>(
             query.value(actionParamIdx).toByteArray());
-        actionData.eventParams = QnUbjson::deserialized<vms::event::EventParameters>(
-            query.value(runtimeParamIdx).toByteArray());
         actionData.businessRuleId = QnUuid::fromRfc4122(
             query.value(businessRuleIdx).toByteArray());
         actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
