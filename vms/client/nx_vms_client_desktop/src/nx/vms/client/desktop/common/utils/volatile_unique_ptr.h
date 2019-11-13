@@ -6,7 +6,7 @@ namespace nx::vms::client::desktop {
 
 /**
  * This is an unique pointer to a QObject that can be destroyed elsewhere.
- * While this semantic is not the best in the sense of clean memory management,
+ * While this semantic is not the best in the sense of clear memory management,
  * it's quite convenient for transient objects like animations or single-shot timers
  * if we need to track them and probably delete early.
  */
