@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtCore/QAbstractAnimation>
 #include <QtCore/QPointer>
 
 namespace nx::vms::client::desktop {
