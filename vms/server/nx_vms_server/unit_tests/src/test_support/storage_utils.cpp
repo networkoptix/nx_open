@@ -110,9 +110,35 @@ QnStorageResourcePtr addStorage(
         " and to the Mediaserver resource pool",
         path, storageRole, storageManager->getRole());
 
-    storageManager->onNewResource(storage);
-    storageManager->initDone();
+    const auto waitForStorageWithPred =
+        [](auto storageManager, auto pred)
+        {
+            while (true)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                const auto allStorages = storageManager->getStorages();
+                if (std::any_of(allStorages.cbegin(), allStorages.cend(), pred))
+                    break;
+            }
+
+        };
+
     server->commonModule()->resourcePool()->addResource(storage);
+    waitForStorageWithPred(
+        storageManager, [&path](const auto& storage) { return storage->getUrl() == path; });
+
+    storageManager->initDone();
+    waitForStorageWithPred(
+        storageManager,
+        [&path](const auto& storage)
+        {
+            return storage->getUrl() == path && storage->getStatus() == Qn::Online;
+        });
+
+    NX_DEBUG(
+        typeid(TestFileStorage),
+        "TestStorage '%1', pool: '%2' successfully added to the '%3' StorageManager storage pool",
+        path, storageRole, storageManager->getRole());
 
     return storage;
 }
