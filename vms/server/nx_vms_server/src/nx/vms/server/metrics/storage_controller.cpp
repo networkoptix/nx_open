@@ -56,15 +56,14 @@ static Value ioRate(const Resource& resource, std::atomic<qint64> StorageResourc
 
 static auto transactionsPerSecond(const Resource& storage)
 {
-    const auto resourcePool = storage->commonModule()->resourcePool();
-    const auto ownMediaServer = resourcePool->getOwnMediaServer();
-    if (!ownMediaServer || ownMediaServer->metadataStorageId() != storage->getId())
+    const auto ownMediaServer = storage->commonModule()->resourcePool()->getOwnMediaServerOrThrow();
+    if (ownMediaServer->metadataStorageId() != storage->getId())
         return Value();
     auto statistics = storage->serverModule()->analyticsEventsStorage()->statistics();
     if (!statistics)
         return Value();
-    return Value(statistics->requestsSucceeded
-        / (double)duration_cast<seconds>(statistics->statisticalPeriod).count());
+    const auto durationS = (double) duration_cast<seconds>(statistics->statisticalPeriod).count();
+    return Value(statistics->requestsSucceeded / durationS);
 }
 
 static auto infoGroupProvider()

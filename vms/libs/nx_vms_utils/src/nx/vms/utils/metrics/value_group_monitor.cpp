@@ -1,7 +1,5 @@
 #include "value_group_monitor.h"
 
-#include <nx/utils/log/log.h>
-
 #include "rule_monitors.h"
 
 namespace nx::vms::utils::metrics {
@@ -22,7 +20,8 @@ api::metrics::ValueGroup ValueGroupMonitor::values(Scope requiredScope, bool for
         if (requiredScope == Scope::local && monitor->scope() == Scope::system)
             continue;
 
-        if (auto value = formatted ? monitor->formattedValue() : monitor->value(); !value.isNull())
+        auto value = formatted ? monitor->formattedValue() : monitor->value();
+        if (!value.isNull())
             values[id] = std::move(value);
     }
 
@@ -66,7 +65,7 @@ void ValueGroupMonitor::setRules(
     for (const auto& [id, rule]: rules)
     {
         if (!rule.calculate.isEmpty())
-            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>());
+            m_valueMonitors.emplace(id, std::make_unique<ExtraValueMonitor>(id));
 
         NX_ASSERT(m_valueMonitors.count(id) || skipOnMissingArgument, "Unknown id in rules: %1", id);
     }
@@ -81,6 +80,9 @@ void ValueGroupMonitor::setRules(
         const auto rule = rules.find(id);
         monitor->setFormatter(api::metrics::makeFormatter(
             rule != rules.end() ? rule->second.format : QString()));
+
+        if (rule != rules.end())
+            monitor->setOptional(rule->second.isOptional);
     }
 
     m_alarmMonitors.clear();
@@ -101,14 +103,14 @@ void ValueGroupMonitor::updateExtraValue(
             monitor->setGenerator(std::move(formula.generator));
             monitor->setScope(formula.scope);
         }
-        catch (const std::invalid_argument& error)
+        catch (const UnknownValueId& error)
         {
             if (!skipOnMissingArgument) throw;
             NX_DEBUG(this, "Skip extra value %1: %2", parameterId, error.what());
             m_valueMonitors.erase(parameterId);
         }
     }
-    catch (const std::logic_error& error)
+    catch (const RuleSyntaxError& error)
     {
         NX_ASSERT(false, "Unable to add extra value %1: %2", parameterId, error.what());
         m_valueMonitors.erase(parameterId);
@@ -125,18 +127,19 @@ void ValueGroupMonitor::updateAlarms(
             try
             {
                 m_alarmMonitors[parameterId].push_back(std::make_unique<AlarmMonitor>(
+                    parameterId,
                     alarmRule.level,
                     parseFormulaOrThrow(alarmRule.condition, m_valueMonitors),
                     parseTemplate(alarmRule.text, m_valueMonitors)
                 ));
             }
-            catch (const std::invalid_argument& error)
+            catch (const UnknownValueId& error)
             {
                 if (!skipOnMissingArgument) throw;
                 NX_DEBUG(this, "Skip alarm monitor %1: %2", parameterId, error.what());
             }
         }
-        catch (const std::logic_error& error)
+        catch (const RuleSyntaxError& error)
         {
             NX_ASSERT(false, "Unable to add alarm monitor %1: %2", parameterId, error.what());
         }

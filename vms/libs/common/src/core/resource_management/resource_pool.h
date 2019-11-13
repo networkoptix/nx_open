@@ -185,7 +185,9 @@ public:
 
     // Never returns fake servers.
     QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
     QnMediaServerResourcePtr getOwnMediaServer() const;
+    QnMediaServerResourcePtr getOwnMediaServerOrThrow() const;
 
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 

@@ -4,10 +4,17 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/value_history.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/log/log.h>
 
 #include "resource_description.h"
 
 namespace nx::vms::utils::metrics {
+
+// NOTE: Inherited from std::runtime_error to have a constructor from a string.
+class MetricsError: public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
 
 using Border = nx::utils::ValueHistory<api::metrics::Value>::Border;
 using Duration = std::chrono::milliseconds;
@@ -20,20 +27,34 @@ using ValueFormatter = std::function<api::metrics::Value(const api::metrics::Val
 class NX_VMS_UTILS_API ValueMonitor
 {
 public:
-    explicit ValueMonitor(Scope scope): m_scope(scope) {}
+    explicit ValueMonitor(QString name, Scope scope);
     virtual ~ValueMonitor() = default;
 
-    Scope scope() const { return m_scope; }
-    void setScope(Scope scope) { m_scope = scope; }
+    QString name() const;
 
-    virtual api::metrics::Value value() const = 0;
+    bool optional() const;
+    void setOptional(bool isOptional);
+
+    Scope scope() const;
+    void setScope(Scope scope);
+
+    api::metrics::Value value() const noexcept;
+
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
-    void setFormatter(ValueFormatter formatter) { m_formatter = std::move(formatter); };
-    api::metrics::Value formattedValue() const { return m_formatter ? m_formatter(value()) : value(); }
+    void setFormatter(ValueFormatter formatter);
+    api::metrics::Value formattedValue() const noexcept;
+
+    QString toString() const;
+    QString idForToStringFromPtr() const;
+
+protected:
+    virtual api::metrics::Value valueOrThrow() const noexcept(false) = 0;
 
 private:
+    QString m_name; // TODO: better to have full name?
     Scope m_scope = Scope::local;
+    bool m_optional = false;
     ValueFormatter m_formatter;
 };
 
@@ -54,11 +75,17 @@ template<typename ResourceType>
 class RuntimeValueMonitor: public ValueMonitor
 {
 public:
-    RuntimeValueMonitor(Scope scope, const ResourceType& resource, const Getter<ResourceType>& getter);
-    api::metrics::Value value() const override;
+    RuntimeValueMonitor(
+        QString name,
+        Scope scope,
+        const ResourceType& resource,
+        const Getter<ResourceType>& getter);
+
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
 protected:
+    virtual api::metrics::Value valueOrThrow() const override;
+
     const ResourceType& m_resource;
     const Getter<ResourceType>& m_getter;
 };
@@ -71,13 +98,16 @@ class ValueHistoryMonitor: public RuntimeValueMonitor<ResourceType>
 {
 public:
     ValueHistoryMonitor(
+        QString name,
         Scope scope,
         const ResourceType& resource,
         const Getter<ResourceType>& getter,
         const Watch<ResourceType>& watch);
 
-    api::metrics::Value value() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
+
+protected:
+    virtual api::metrics::Value valueOrThrow() const override;
 
 private:
     void updateValue();
@@ -91,18 +121,19 @@ private:
 
 template<typename ResourceType>
 RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
+    QString name,
     Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter)
 :
-    ValueMonitor(scope),
+    ValueMonitor(std::move(name), scope),
     m_resource(resource),
     m_getter(getter)
 {
 }
 
 template<typename ResourceType>
-api::metrics::Value RuntimeValueMonitor<ResourceType>::value() const
+api::metrics::Value RuntimeValueMonitor<ResourceType>::valueOrThrow() const
 {
     return m_getter(m_resource);
 }
@@ -116,19 +147,20 @@ void RuntimeValueMonitor<ResourceType>::forEach(
 
 template<typename ResourceType>
 ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
+    QString name,
     Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter,
     const Watch<ResourceType>& watch)
 :
-    RuntimeValueMonitor<ResourceType>(scope, resource, getter),
+    RuntimeValueMonitor<ResourceType>(std::move(name), scope, resource, getter),
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     updateValue();
 }
 
 template<typename ResourceType>
-api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const
+api::metrics::Value ValueHistoryMonitor<ResourceType>::valueOrThrow() const
 {
     return m_history.current();
 }

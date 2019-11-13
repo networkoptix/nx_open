@@ -72,10 +72,7 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
                 "version",
                 [pool](const auto&)
                 {
-                    const auto guid = pool->commonModule()->moduleGUID();
-                    if (auto server = pool->getResourceById<QnMediaServerResource>(guid))
-                        return Value(toString(server->getVersion()));
-                    return Value();
+                    return Value(toString(pool->getOwnMediaServerOrThrow()->getVersion()));
                 }
             )
         )
