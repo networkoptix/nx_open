@@ -6,6 +6,7 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QNetworkInterface>
 #include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWebEngineCore/QWebEngineCookieStore>
 
@@ -31,6 +32,22 @@ const QString kUserAgentForCameraPage(
     " AppleWebKit/534.34 (KHTML, like Gecko)"
     "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
 
+// QWebEngine does not want to connect to localhost server through localhost proxy,
+// so let's try to find another address in that case.
+QString getNonLocalAddress(const QString& host)
+{
+    if (!QHostAddress(host).isLoopback())
+        return host;
+
+    for (const QHostAddress& address: QNetworkInterface::allAddresses())
+    {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol && !address.isLoopback())
+            return address.toString();
+    }
+
+    return host;
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -43,6 +60,7 @@ struct CameraWebPageWidget::Private
 
     CameraSettingsDialogState::Credentials credentials;
     QUrl lastRequestUrl;
+    QnUuid lastCameraId;
     bool loadNeeded = false;
 
     QnMutex mutex;
@@ -124,6 +142,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         if (!state.canShowWebPage())
         {
             d->lastRequestUrl = QUrl();
+            d->lastCameraId = {};
             d->webWidget->reset();
             d->loadNeeded = false;
             return;
@@ -134,15 +153,17 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
         const auto targetUrl = nx::network::url::Builder()
             .setScheme(nx::network::http::kUrlSchemeName)
-            .setHost(currentServerUrl.host())
+            .setHost(getNonLocalAddress(currentServerUrl.host()))
             .setPort(currentServerUrl.port())
             .setPath(state.singleCameraProperties.settingsUrlPath)
             .setUserName(d->credentials.login())
             .setPassword(d->credentials.password()).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
+        const auto cameraId = QnUuid(state.singleCameraProperties.id);
+
         QNetworkCookie cameraCookie(
-            Qn::CAMERA_GUID_HEADER_NAME, QnUuid(state.singleCameraProperties.id).toByteArray());
+            Qn::CAMERA_GUID_HEADER_NAME, cameraId.toByteArray());
         QUrl origin(targetUrl);
         origin.setUserName(QString());
         origin.setPassword(QString());
@@ -176,17 +197,17 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         const auto gatewayAddress = gateway->endpoint();
         QNetworkProxy gatewayProxy(
             QNetworkProxy::HttpProxy,
-            gatewayAddress.address.toString(), gatewayAddress.port,
-            currentServerUrl.userName(), currentServerUrl.password());
+            gatewayAddress.address.toString(), gatewayAddress.port);
 
         QNetworkProxy::setApplicationProxy(gatewayProxy);
 
-        if (d->lastRequestUrl == targetUrl)
+        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCameraId)
             return;
 
         NX_VERBOSE(this, "Loading state with request [%1] via proxy [%2:%3]",
             targetUrl, gatewayAddress.address.toString(), gatewayAddress.port);
         d->lastRequestUrl = targetUrl;
+        d->lastCameraId = cameraId;
         d->webWidget->reset();
     }
 
