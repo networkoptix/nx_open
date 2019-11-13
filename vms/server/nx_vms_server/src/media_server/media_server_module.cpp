@@ -386,6 +386,7 @@ void QnMediaServerModule::stop()
     #endif
 
     m_streamingChunkTranscoder->stop();
+    m_eventConnector->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
