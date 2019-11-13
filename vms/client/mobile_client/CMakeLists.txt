@@ -53,6 +53,7 @@ set(target_args
         ${ios_sources}
     ADDITIONAL_RESOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/skins/${defaultSkin}
+        "${customization_dir}/mobile_client/resources"
     OTHER_SOURCES
         ${QML_FILES}
         ${resources}
