@@ -659,7 +659,7 @@
                     },
                     "inBps1m": {
                         "name": "IN Rate",
-                        "isOptional": false,
+                        "isOptional": true,
                         "format": "kbps",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
@@ -667,7 +667,7 @@
                     },
                     "outBps1m": {
                         "name": "OUT Rate",
-                        "isOptional": false,
+                        "isOptional": true,
                         "format": "kbps",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",
