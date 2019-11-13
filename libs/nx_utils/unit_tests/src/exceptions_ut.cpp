@@ -6,8 +6,9 @@ namespace nx::utils::test {
 
 using namespace std;
 
-TEST(Exceptions, Unwrap)
+TEST(Exceptions, Wrapping)
 {
+    EXPECT_EQ(7, WRAP_EXCEPTION(3 + 4, runtime_error, logic_error, ""));
     EXPECT_EQ(unwrapNestedErrors(runtime_error("I am an error!")), "I am an error!");
 
     try

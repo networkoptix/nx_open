@@ -12,15 +12,16 @@ namespace nx::utils {
  * inherited from NEW_EXCEPTION with message MESSAGE.
  */
 #define WRAP_EXCEPTION(EXPRESSION, ORIGINAL_EXCEPTION, NEW_EXCEPTION, MESSAGE) \
-do { \
+[&]() \
+{ \
     try \
     { \
-        EXPRESSION; \
+        return EXPRESSION; \
     } catch (const ORIGINAL_EXCEPTION&)  \
     { \
         std::throw_with_nested(NEW_EXCEPTION(MESSAGE)); \
     } \
-} while(false)
+}()
 
 /**
  * Unwraps std::nested_exceptions and creates the string: "ex1.what(): ex2.what(): ..."
