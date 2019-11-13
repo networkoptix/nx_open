@@ -13,15 +13,16 @@
 
 namespace {
 
-static const QString kCameraIdParam = lit("cameraId");
-static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
-static const QString kStartPeriodParam = lit("from");
-static const QString kEndPeriodParam = lit("to");
-static const QString kEventTypeParam = lit("event_type");
-static const QString kEventSubtypeParam = lit("event_subtype");
-static const QString kActionTypeParam = lit("action_type");
-static const QString kRuleIdParam = lit("brule_id");
-static const QString kFormatParam(lit("format"));
+static const QString kCameraIdParam = "cameraId";
+static const QString kDeprecatedPhysicalIdParam = "physicalId";
+static const QString kStartPeriodParam = "from";
+static const QString kEndPeriodParam = "to";
+static const QString kEventTypeParam = "event_type";
+static const QString kEventSubtypeParam = "event_subtype";
+static const QString kActionTypeParam = "action_type";
+static const QString kRuleIdParam = "brule_id";
+static const QString kFormatParam = "format";
+static const QString kTextParam = "text";
 
 static constexpr int kInvalidStartTime = -1;
 
@@ -57,6 +58,7 @@ void QnEventLogFilterData::loadFromParams(QnResourcePool* resourcePool,
         actionType);
 
     ruleId = QnLexical::deserialized<QnUuid>(params.value(kRuleIdParam));
+    text = params.value(kTextParam);
 }
 
 QnRequestParamList QnEventLogFilterData::toParams() const
@@ -79,6 +81,9 @@ QnRequestParamList QnEventLogFilterData::toParams() const
 
     if (actionType != nx::vms::api::ActionType::undefinedAction)
         result.insert(kActionTypeParam, QnLexical::serialized(actionType));
+
+    if (!text.isEmpty())
+        result.insert(kTextParam, text);
 
     if (!ruleId.isNull())
         result.insert(kRuleIdParam, QnLexical::serialized(ruleId));

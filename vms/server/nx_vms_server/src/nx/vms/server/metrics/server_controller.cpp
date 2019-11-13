@@ -60,11 +60,7 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-            {
-                add(server.get(), server->getId(), (server->getId() == moduleGUID())
-                    ? utils::metrics::Scope::local
-                    : utils::metrics::Scope::system);
-            }
+                add(server.get(), moduleGUID());
         });
 
     QObject::connect(

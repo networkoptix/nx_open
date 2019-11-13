@@ -31,6 +31,11 @@ EventConnector::EventConnector(QnMediaServerModule* serverModule):
 
 EventConnector::~EventConnector()
 {
+    stop();
+}
+
+void EventConnector::stop()
+{
     m_thread->quit();
     m_thread->wait();
 }

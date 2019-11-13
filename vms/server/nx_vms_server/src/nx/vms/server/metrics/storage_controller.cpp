@@ -31,11 +31,11 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceAdded,
         [this](const QnResourcePtr& resource)
         {
-            // TODO: Consider to add system storages as well.
-            if (const auto storage = resource.dynamicCast<StorageResource>();
-                storage && storage->getParentId() == serverModule()->commonModule()->moduleGUID())
+            if (const auto storage = resource.dynamicCast<StorageResource>().get())
             {
-                add(storage.get(), storage->getId(), utils::metrics::Scope::local);
+                const auto addOrUpdate = [this, storage]() { add(storage, moduleGUID()); };
+                QObject::connect(storage, &QnResource::parentIdChanged, addOrUpdate);
+                addOrUpdate();
             }
         });
 
@@ -43,11 +43,8 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto storage = resource.dynamicCast<QnStorageResource>();
-                storage && storage->getParentId() == serverModule()->commonModule()->moduleGUID())
-            {
+            if (const auto storage = resource.dynamicCast<QnStorageResource>())
                 remove(storage->getId());
-            }
         });
 }
 

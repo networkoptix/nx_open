@@ -66,6 +66,8 @@ using namespace std::chrono;
 
 namespace {
 
+constexpr int kUpdateDelayMs = 1000;
+
 enum EventListRoles
 {
     EventTypeRole = Qt::UserRole + 1,
@@ -212,6 +214,12 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
+    connect(ui->textFilter, &QLineEdit::textChanged,
+        this, &QnEventLogDialog::updateDataDelayed);
+    m_delayUpdateTimer.setSingleShot(true);
+    m_delayUpdateTimer.setInterval(kUpdateDelayMs);
+    connect(&m_delayUpdateTimer, &QTimer::timeout, this, &QnEventLogDialog::updateData);
+
     ItemViewAutoHider::create(ui->gridEvents, tr("No events"));
 
     reset();
@@ -355,8 +363,15 @@ void QnEventLogDialog::reset()
     setEventType(EventType::anyEvent);
     setCameraList(QSet<QnUuid>());
     setActionType(ActionType::undefinedAction);
+    setText(QString());
     ui->dateRangeWidget->reset();
     enableUpdateData();
+}
+
+void QnEventLogDialog::updateDataDelayed()
+{
+    m_delayUpdateTimer.stop();
+    m_delayUpdateTimer.start();
 }
 
 void QnEventLogDialog::updateData()
@@ -367,7 +382,7 @@ void QnEventLogDialog::updateData()
         return;
     }
     m_updateDisabled = true;
-
+    m_delayUpdateTimer.stop();
     EventType eventType = ::eventType(ui->eventComboBox->currentIndex());
     bool serverIssue = parentEvent(eventType) == EventType::anyServerEvent
         || eventType == EventType::anyServerEvent;
@@ -391,7 +406,8 @@ void QnEventLogDialog::updateData()
         ui->dateRangeWidget->endTimeMs(),
         eventType,
         analyticsEventTypeId,
-        actionType);
+        actionType,
+        ui->textFilter->text());
 
     // update UI
 
@@ -415,7 +431,8 @@ void QnEventLogDialog::query(qint64 fromMsec,
     qint64 toMsec,
     EventType eventType,
     const nx::analytics::EventTypeId& analyticsEventTypeId,
-    ActionType actionType)
+    ActionType actionType,
+    const QString& text)
 {
     m_requests.clear();
     m_allEvents.clear();
@@ -426,6 +443,7 @@ void QnEventLogDialog::query(qint64 fromMsec,
     request.filter.eventType = eventType;
     request.filter.eventSubtype = analyticsEventTypeId;
     request.filter.actionType = actionType;
+    request.filter.text = text;
 
     QPointer<QnEventLogDialog> guard(this);
     auto callback =
@@ -602,6 +620,11 @@ void QnEventLogDialog::setActionType(ActionType value)
             break;
         }
     }
+}
+
+void QnEventLogDialog::setText(const QString& text)
+{
+    ui->textFilter->setText(text);
 }
 
 void QnEventLogDialog::at_filterAction_triggered()
