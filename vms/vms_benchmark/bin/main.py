@@ -9,6 +9,7 @@ import sys
 import time
 import uuid
 from typing import List, Tuple, Optional
+from io import StringIO
 
 from vms_benchmark.camera import Camera
 
@@ -72,6 +73,7 @@ conf_definition = {
     "boxLogin": {"type": "str"},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
+    "boxSshKey": {"type": "str", "default": None},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "virtualCameraCount": {"type": "intList", "range": [1, 999]},
@@ -959,10 +961,10 @@ def _connect_to_box(conf, conf_file):
             )
     box = BoxConnection(
         host=conf['boxHostnameOrIp'],
-        login=conf.get('boxLogin', None),
+        login=conf['boxLogin'],
         password=password,
+        ssh_key=conf['boxSshKey'],
         port=conf['boxSshPort'],
-        conf_file=conf_file
     )
     host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
     if host_key is not None:

@@ -33,11 +33,11 @@ class ConfigParser:
 
         if type_ not in ['str', 'int', 'bool', 'float', 'intList']:
             raise InvalidConfigDefinition(
-                f'Invalid type {type!r} in option {name!r} definition for {filename!r}.')
+                f'Invalid type {type_!r} in option {name!r} definition for {filename!r}.')
 
         if type_ not in ['int', 'intList', 'float'] and 'range' in option_definition:
             raise InvalidConfigDefinition(
-                f'Range specified for {type!r} option {name!r} definition for {filename!r}.')
+                f'Range specified for {type_!r} option {name!r} definition for {filename!r}.')
 
     @staticmethod
     def _process_env_vars(string):
@@ -71,12 +71,10 @@ class ConfigParser:
                 continue
             equals_pos = line.find('=')
             if equals_pos == -1:
-                raise InvalidConfigFileContent(
-                    f'Missing "=" in {filename!r}, line {line_number}.')
+                raise InvalidConfigFileContent(f'Missing "=" in {filename!r}, line {line_number}.')
             name = line[:equals_pos].strip()
             if not name:
-                raise InvalidConfigFileContent(
-                    f'Missing option name in {filename!r}, line {line_number}.')
+                raise InvalidConfigFileContent(f'Missing option name in {filename!r}, line {line_number}.')
             if name in options:
                 raise InvalidConfigFileContent(
                     f'Duplicate option {name!r} in {filename!r}, line {line_number}.')
@@ -108,8 +106,7 @@ class ConfigParser:
                     value, filename, name, option_definition['type'], range_)
             else:
                 if 'default' not in option_definition:
-                    raise ConfigOptionNotFound(
-                        f"Mandatory option {name!r} is not defined in {filename!r}.")
+                    raise ConfigOptionNotFound(f"Mandatory option {name!r} is not defined in {filename!r}.")
                 options[name] = option_definition['default']
 
     @staticmethod
@@ -126,8 +123,7 @@ class ConfigParser:
             if type_ == "str":
                 return ConfigParser._str_value(value)
         except ValueError as e:
-            raise InvalidConfigOption(
-                f"Invalid option {name!r} value {value!r} in {filename!r}: {e}")
+            raise InvalidConfigOption(f"Invalid option {name!r} value {value!r} in {filename!r}: {e}")
         raise InvalidConfigDefinition(
             f"Unexpected type {type_!r} in option {name!r} in the definition for {filename!r}.")
 
@@ -146,8 +142,7 @@ class ConfigParser:
             return True
         if value in ('false', 'False', 'no', 'No', '0'):
             return False
-        raise ValueError(
-            'Expected one of: true, yes, 1, false, no, 0 (case-insensitive).')
+        raise ValueError('Expected one of: true, yes, 1, false, no, 0 (case-insensitive).')
 
     @staticmethod
     def _int_list_value(value: str, range_: Optional[list]) -> List[int]:
