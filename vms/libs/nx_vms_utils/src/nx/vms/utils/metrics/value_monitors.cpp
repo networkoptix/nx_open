@@ -18,6 +18,7 @@ bool ValueMonitor::optional() const
 
 void ValueMonitor::setOptional(bool isOptional)
 {
+    NX_VERBOSE(this, "setOptional: %1: %2", m_name, isOptional);
     m_optional = isOptional;
 }
 
