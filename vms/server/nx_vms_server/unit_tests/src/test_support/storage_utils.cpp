@@ -120,7 +120,6 @@ QnStorageResourcePtr addStorage(
                 if (std::any_of(allStorages.cbegin(), allStorages.cend(), pred))
                     break;
             }
-
         };
 
     server->commonModule()->resourcePool()->addResource(storage);
