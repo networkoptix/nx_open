@@ -39,13 +39,16 @@ api::metrics::Value ValueMonitor::value() const noexcept
         NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
         return std::move(value);
     }
+    catch (const ExpectedError& e)
+    {
+        NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
+    }
     catch (const MetricsError& e)
     {
         NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
     }
     catch (const std::exception& e)
     {
-        // TODO: should catch non-critical wrapped exceptions before this and log them!
         NX_ASSERT(false, "Unexpected general error when calculating metric %1: %2", this, e.what());
     }
 

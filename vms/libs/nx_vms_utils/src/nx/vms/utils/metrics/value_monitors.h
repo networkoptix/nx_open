@@ -4,6 +4,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/value_history.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/exceptions.h>
 #include <nx/utils/log/log.h>
 
 #include "resource_description.h"
@@ -15,6 +16,14 @@ class MetricsError: public std::runtime_error
 {
     using std::runtime_error::runtime_error;
 };
+
+class ExpectedError: public MetricsError
+{
+    using MetricsError::MetricsError;
+};
+
+#define EXPECTED_ERROR(EXPRESSION, EXCEPTION) \
+    WRAP_EXCEPTION(EXPRESSION, EXCEPTION, ExpectedError, "")
 
 using Border = nx::utils::ValueHistory<api::metrics::Value>::Border;
 using Duration = std::chrono::milliseconds;

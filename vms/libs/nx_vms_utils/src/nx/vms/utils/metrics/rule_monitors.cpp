@@ -410,14 +410,17 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 
         return api::metrics::Alarm{m_level, m_textGenerator()};
     }
+    catch (const ExpectedError& e)
+    {
+        NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
+    }
     catch (const MetricsError& e)
     {
         NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
     }
     catch (const std::exception& e)
     {
-        // TODO: should catch non-critical wrapped exceptions before this and log them!
-        NX_ASSERT(false, "Unexpected general error when checkin alaram %1: %2", this, e.what());
+        NX_ASSERT(false, "Unexpected general error when checkin alarm %1: %2", this, e.what());
     }
 
     // TODO: Should we return error to the user if it occures?
