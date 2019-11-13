@@ -128,7 +128,6 @@ void PoESettingsStore::applyUserChanges()
     d->applyPatch(patch);
 }
 
-
 } // namespace settings
 } // namespace nx::vms::client::desktop
 

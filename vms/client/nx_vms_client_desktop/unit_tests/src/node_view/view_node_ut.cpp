@@ -54,8 +54,8 @@ TEST(ViewNodeTest, generic_data_test)
     ASSERT_TRUE(data.data(secondTestColumn, testIdRole).isNull());
 
     // Checks used columns and roles.
-    ASSERT_TRUE(data.usedColumns() == ViewNodeData::Columns({firstTestColumn}));
-    ASSERT_TRUE(data.rolesForColumn(firstTestColumn) == ViewNodeData::Roles({testIdRole}));
+    ASSERT_TRUE(data.usedColumns() == ColumnSet({firstTestColumn}));
+    ASSERT_TRUE(data.rolesForColumn(firstTestColumn) == RoleVector({testIdRole}));
     ASSERT_TRUE(data.rolesForColumn(secondTestColumn).isEmpty());
     ASSERT_TRUE(data.hasDataForColumn(firstTestColumn));
     ASSERT_FALSE(data.hasDataForColumn(secondTestColumn));

@@ -37,4 +37,3 @@ private:
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

@@ -46,7 +46,6 @@ const auto kHeaderDataProvider =
         }
     };
 
-
 } // namespace
 
 namespace nx::vms::client::desktop {

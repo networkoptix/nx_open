@@ -39,7 +39,7 @@ namespace QJson {
 template<class T>
 QByteArray serialized(const T& value);
 
-template<class T, class S = QByteArray>
-T deserialized(const S& value, const T& defaultValue = T(), bool* success = nullptr);
+template<class T>
+T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr);
 
 } // namespace QJson

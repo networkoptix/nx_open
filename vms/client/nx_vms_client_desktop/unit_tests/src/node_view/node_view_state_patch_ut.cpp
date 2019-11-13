@@ -29,7 +29,7 @@ NodePtr createTestTree()
 }
 
 NodeViewStatePatch::GetNodeOperationGuard createCheckAllPathsGuard(
-    NodeViewStatePatch::PatchStepList& steps,
+    PatchStepList& steps,
     PatchStepOperation operation)
 {
     return
@@ -38,7 +38,7 @@ NodeViewStatePatch::GetNodeOperationGuard createCheckAllPathsGuard(
             return nx::utils::makeSharedGuard(
                 [step, operation, &steps]()
                 {
-                    ASSERT_TRUE(step.operation == operation);
+                    ASSERT_TRUE(step.operationData.operation == operation);
                     const auto it = std::find_if(steps.begin(), steps.end(),
                         [path = step.path](const PatchStep& patchStep)
                         {
@@ -94,7 +94,7 @@ TEST(NodeViewStatePatchTest, simple_add_node)
 
     ASSERT_TRUE(patch.steps.size() == 1);
     ASSERT_TRUE(patch.steps.front().path == ViewNodePath());
-    ASSERT_TRUE(patch.steps.front().operation == AppendNodeOperation);
+    ASSERT_TRUE(patch.steps.front().operationData.operation == appendNodeOperation);
 
     NodeViewState state;
     state = patch.applyTo(std::move(state));
@@ -106,12 +106,12 @@ TEST(NodeViewStatePatchTest, simple_add_node)
 TEST(NodeViewStatePatchTest, change_node)
 {
     NodeViewStatePatch patch;
-    patch.addChangeStep(ViewNodePath(),
+    patch.addUpdateDataStep(ViewNodePath(),
         ViewNodeDataBuilder().withText(kDefaultTextColumn, kAnotherNodeText));
 
     ASSERT_TRUE(patch.steps.size() == 1);
     ASSERT_TRUE(patch.steps.front().path == ViewNodePath());
-    ASSERT_TRUE(patch.steps.front().operation == ChangeNodeOperation);
+    ASSERT_TRUE(patch.steps.front().operationData.operation == updateDataOperation);
 
     NodeViewState state;
     state.rootNode = createSimpleNode(kNodeText);
@@ -128,7 +128,7 @@ TEST(NodeViewStatePatchTest, simple_remove_node)
 
     ASSERT_TRUE(patch.steps.size() == 1);
     ASSERT_TRUE(patch.steps.front().path == ViewNodePath());
-    ASSERT_TRUE(patch.steps.front().operation == RemoveNodeOperation);
+    ASSERT_TRUE(patch.steps.front().operationData.operation == removeNodeOperation);
 
     NodeViewState state;
     state.rootNode = createSimpleNode(kNodeText);
@@ -172,7 +172,7 @@ TEST(NodeViewStatePatchTest, append_guard)
 
     NodeViewState state;
     state = createTreePatch.applyTo(std::move(state),
-        createCheckAllPathsGuard(appendNodeSteps, AppendNodeOperation));
+        createCheckAllPathsGuard(appendNodeSteps, appendNodeOperation));
 
     ASSERT_TRUE(appendNodeSteps.empty());
 }
@@ -189,13 +189,13 @@ TEST(NodeViewStatePatchTest, change_guard)
     details::forEachNode(state.rootNode,
         [&changeTextPatch](const NodePtr& node)
         {
-            changeTextPatch.addChangeStep(node->path(),
+            changeTextPatch.addUpdateDataStep(node->path(),
                 ViewNodeDataBuilder().withText(kDefaultTextColumn, kNodeText));
         });
 
     auto changeSteps = changeTextPatch.steps;
     state = changeTextPatch.applyTo(std::move(state),
-        createCheckAllPathsGuard(changeSteps, ChangeNodeOperation));
+        createCheckAllPathsGuard(changeSteps, updateDataOperation));
 
     ASSERT_TRUE(changeSteps.empty());
 
@@ -227,7 +227,7 @@ TEST(NodeViewStatePatchTest, remove_guard)
             return nx::utils::makeSharedGuard(
                 [&testTree, &removeGuardCallCount, step]()
                 {
-                    ASSERT_TRUE(step.operation == RemoveNodeOperation);
+                    ASSERT_TRUE(step.operationData.operation == removeNodeOperation);
                     testTree->nodeAt(step.path.parentPath())->removeChild(step.path.lastIndex());
                     ++removeGuardCallCount;
                 });

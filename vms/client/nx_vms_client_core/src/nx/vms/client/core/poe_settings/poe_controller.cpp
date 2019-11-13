@@ -20,7 +20,7 @@ namespace nx::vms::client::core {
 
 using namespace std::placeholders;
 
-static constexpr int kUpdateIntervalMs = 1000;
+static constexpr int kUpdateIntervalMs = 3000;
 
 struct PoEController::Private: public QObject
 {
@@ -33,6 +33,7 @@ struct PoEController::Private: public QObject
     void update();
     void setPowered(const PoEController::PowerModes& value);
     void setUpdatingModeHandle(rest::Handle value);
+    void resetHandles();
 
     PoEController* const q;
 
@@ -83,7 +84,7 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
         // Cleanup.
         connection.reset();
         updateTimer.stop();
-        handle = -1;
+        resetHandles();
         return;
     }
 
@@ -102,12 +103,7 @@ void PoEController::Private::handleReply(
         return; //< Most likely we cancelled request
 
     setInitialUpdateInProgress(false);
-    const nx::utils::ScopeGuard handleGuard(
-        [this]()
-        {
-            handle = -1;
-            setUpdatingModeHandle(-1);
-        });
+    const nx::utils::ScopeGuard handleGuard([this]() { resetHandles(); });
 
     if (autoUpdate)
         updateTimer.start();
@@ -115,7 +111,8 @@ void PoEController::Private::handleReply(
     if (!success || result.error != QnRestResult::NoError)
         return;
 
-    setBlockData(QJson::deserialized<nx::vms::api::NetworkBlockData>(result.reply));
+    BlockData data;
+    setBlockData(QJson::deserialize(result.reply, &data) ? data : BlockData());
 }
 
 void PoEController::Private::update()
@@ -158,6 +155,12 @@ void PoEController::Private::setUpdatingModeHandle(rest::Handle value)
     q->updatingPoweringModesChanged();
 }
 
+void PoEController::Private::resetHandles()
+{
+    setUpdatingModeHandle(-1);
+    handle = -1;
+}
+
 //--------------------------------------------------------------------------------------------------
 
 PoEController::PoEController(QObject* parent):
@@ -193,9 +196,13 @@ void PoEController::setAutoUpdate(bool value)
     d->autoUpdate = value;
 
     if (d->autoUpdate)
+    {
         d->update();
+    }
     else
+    {
         d->updateTimer.stop();
+    }
 }
 
 bool PoEController::autoUpdate() const

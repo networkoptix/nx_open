@@ -55,7 +55,6 @@ NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const NodePtr& node, i
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const ViewNodeData& data, int column);
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const QModelIndex& index);
 
-// TODO: Get rid of isUSerAction when it is supported in tree node view. TODO: do we need it anyway?
 NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
     const NodePtr& node,
     int column,

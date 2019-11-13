@@ -122,6 +122,7 @@ bool PoESettingsWidget::hasChanges() const
 
 void PoESettingsWidget::loadDataToUi()
 {
+    qWarning() << "<<<<<<<<<<<<<";
 }
 
 void PoESettingsWidget::applyChanges()
