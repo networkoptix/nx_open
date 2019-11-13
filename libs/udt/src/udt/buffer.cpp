@@ -276,17 +276,8 @@ void CSndBuffer::increase()
     int unitsize = m_pBuffer->m_iSize;
 
     // new physical buffer
-    Buffer* nbuf = NULL;
-    try
-    {
-        nbuf = new Buffer;
-        nbuf->m_pcData = new char[unitsize * m_iMSS];
-    }
-    catch (...)
-    {
-        delete nbuf;
-        throw CUDTException(3, 2, 0);
-    }
+    Buffer* nbuf = new Buffer;
+    nbuf->m_pcData = new char[unitsize * m_iMSS];
     nbuf->m_iSize = unitsize;
     nbuf->m_pNext = NULL;
 
@@ -297,16 +288,8 @@ void CSndBuffer::increase()
     p->m_pNext = nbuf;
 
     // new packet blocks
-    Block* nblk = NULL;
-    try
-    {
-        nblk = new Block;
-    }
-    catch (...)
-    {
-        delete nblk;
-        throw CUDTException(3, 2, 0);
-    }
+    Block* nblk = new Block;
+
     Block* pb = nblk;
     for (int i = 1; i < unitsize; ++i)
     {
@@ -360,21 +343,21 @@ CRcvBuffer::~CRcvBuffer()
     delete[] m_pUnit;
 }
 
-int CRcvBuffer::addData(CUnit* unit, int offset)
+bool CRcvBuffer::addData(CUnit* unit, int offset)
 {
     int pos = (m_iLastAckPos + offset) % m_iSize;
     if (offset > m_iMaxPos)
         m_iMaxPos = offset;
 
     if (NULL != m_pUnit[pos])
-        return -1;
+        return false;
 
     m_pUnit[pos] = unit;
 
     unit->m_iFlag = 1;
     ++m_pUnitQueue->m_iCount;
 
-    return 0;
+    return true;
 }
 
 int CRcvBuffer::readBuffer(char* data, int len)
