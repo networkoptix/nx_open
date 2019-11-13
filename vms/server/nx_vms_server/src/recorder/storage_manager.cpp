@@ -1429,10 +1429,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == moduleGUID())
     {
         if (checkIfMyStorage(storage))
-        {
-            updateMountedStatus(storage);
             addStorage(storage);
-        }
     }
 }
 
