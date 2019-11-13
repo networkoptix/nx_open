@@ -76,16 +76,12 @@ public:
     api::metrics::Value load(Rate rate) const
     {
         const auto name = humanReadableName();
-        const auto load =
-            serverModule()->platform()->monitor()->networkInterfaceLoad(name);
-        if (!load)
-        {
-            NX_VERBOSE(this, "Error getting NIC load: NIC [%1] was not found", name);
-            return api::metrics::Value();
-        }
+        const auto load = EXPECTED_ERROR(
+            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(name),
+            std::invalid_argument, "Error getting NIC load");
         return api::metrics::Value(nx::utils::switch_(rate,
-            Rate::in, [&]{ return load->bytesPerSecIn; },
-            Rate::out, [&]{ return load->bytesPerSecOut; }));
+            Rate::in, [&]{ return load.bytesPerSecIn; },
+            Rate::out, [&]{ return load.bytesPerSecOut; }));
     }
 
     QnCommonModule* commonModule() const { return serverModule()->commonModule(); }
