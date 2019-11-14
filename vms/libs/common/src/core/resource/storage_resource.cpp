@@ -149,18 +149,12 @@ float QnStorageResource::getAvarageWritingUsage() const
 void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     NX_ASSERT(
-        other->getParentId() == getParentId(),
-        "Abnormal storage resource update. This parentId = %1, other parentId = %2",
-        getParentId(), other->getParentId());
-
-    QString oldUrl = getUrl();
-    if (other->getUrl() == getUrl())
-        NX_DEBUG(this, "Storage::update: urls differ. Keeping the old one.");
+        other->getParentId() == getParentId() && other->getUrl() == getUrl(),
+        "Abnormal storage resource update. This parentId: %1, other parentId: %2"
+        "This url: %3, other url: %4",
+        getParentId(), other->getParentId(), getUrl(), other->getUrl());
 
     base_type::updateInternal(other, notifiers);
-    // #TODO: #akulikov. Come up with a more robust solution.
-    setUrl(oldUrl);
-
     QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());
     if (localOther)
     {

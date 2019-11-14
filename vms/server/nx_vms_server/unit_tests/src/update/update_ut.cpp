@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <test_support/mediaserver_launcher.h>
+#include <test_support/user_utils.h>
 #include <transaction/message_bus_adapter.h>
 #include <api/test_api_requests.h>
 #include <api/global_settings.h>
@@ -236,34 +237,6 @@ protected:
     void whenPeerGoesOffline(int peerIndex)
     {
         m_peers[peerIndex]->stop();
-    }
-
-    vms::api::UserDataEx createUser(GlobalPermission permissions, const QString& name)
-    {
-        vms::api::UserDataEx userData;
-        userData.permissions = permissions;
-        userData.name = name;
-        userData.password = "password";
-
-        NX_GTEST_WRAP(NX_TEST_API_POST(peer(0), "/ec2/saveUser", userData));
-
-        return userData;
-    }
-
-    vms::api::UserDataEx getOwner()
-    {
-        vms::api::UserDataList userDataList;
-        NX_GTEST_WRAP(NX_TEST_API_GET(peer(0), "/ec2/getUsers", &userDataList));
-
-        const auto ownerIt = std::find_if(userDataList.cbegin(), userDataList.cend(),
-            [](const auto& userData) { return userData.name == "admin"; });
-
-        NX_GTEST_ASSERT_NE(userDataList.cend(), ownerIt);
-        vms::api::UserDataEx result;
-        result.name = "admin";
-        result.password = "admin";
-
-        return result;
     }
 
     void assertForbiddenStatus(
@@ -912,10 +885,10 @@ TEST_F(FtUpdates, UpdateRequestsAreRestrictedToAdminOnly)
     };
 
     const std::vector<UserDataWithExpectedForbiddenStatus> userDataWithExpectedResults = {
-        { createUser(GlobalPermission::advancedViewerPermissions, "viewer"), forbidden(true) },
-        { createUser(GlobalPermission::accessAllMedia, "access"), forbidden(true) },
-        { createUser(GlobalPermission::admin, "administrator"), forbidden(false) },
-        { getOwner(), forbidden(false) }
+        { test_support::createUser(peer(0), GlobalPermission::advancedViewerPermissions, "viewer"), forbidden(true) },
+        { test_support::createUser(peer(0), GlobalPermission::accessAllMedia, "access"), forbidden(true) },
+        { test_support::createUser(peer(0), GlobalPermission::admin, "administrator"), forbidden(false) },
+        { test_support::getOwner(peer(0)), forbidden(false) }
     };
 
     for (const auto& userDataToCheck: userDataWithExpectedResults)
