@@ -651,12 +651,6 @@
             "rates": {
                 "name": "I/O Rates",
                 "values": {
-                    "inBps": {
-                        "isOptional": true
-                    },
-                    "outBps": {
-                        "isOptional": true
-                    },
                     "inBps1m": {
                         "name": "IN Rate",
                         "isOptional": true,

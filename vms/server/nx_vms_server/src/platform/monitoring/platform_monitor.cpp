@@ -13,7 +13,7 @@ PlatformMonitor::NetworkLoad PlatformMonitor::networkInterfaceLoadOrThrow(
     auto interfaceLoad = nx::utils::find_if(totalLoad,
         [interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
     if (interfaceLoad == nullptr)
-        throw std::invalid_argument("Inetrface [" + interfaceName.toStdString() + "] not found");
+        throw std::invalid_argument("Interface [" + interfaceName.toStdString() + "] not found");
 
     return *interfaceLoad;
 }
