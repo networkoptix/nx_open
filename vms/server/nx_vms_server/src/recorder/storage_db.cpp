@@ -318,9 +318,8 @@ bool QnStorageDb::startDbFile()
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
-    NX_INFO(this, lit("Loading chunks from DB. storage: %1, file: %2")
-            .arg(m_storage->getUrl())
-            .arg(m_dbFileName));
+    NX_INFO(this, "Loading chunks from DB. storage: %1, file: %2",
+        nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
 
     nx::utils::promise<void> readyPromise;
     auto readyFuture = readyPromise.get_future();
@@ -330,19 +329,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
         {
             if (success)
             {
-                NX_INFO(
-                    this,
-                    lit("finished loading chunks from DB. storage: %1, file: %2")
-                    .arg(m_storage->getUrl())
-                    .arg(m_dbFileName));
+                NX_INFO(this, "Finished loading chunks from DB. storage: %1, file: %2",
+                    nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
             }
             else
             {
-                NX_WARNING(
-                    this,
-                    lit("loading chunks from DB failed. storage: %1, file: %2")
-                    .arg(m_storage->getUrl())
-                    .arg(m_dbFileName));
+                NX_WARNING(this, "Loading chunks from DB failed. storage: %1, file: %2",
+                    nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
             }
 
             readyPromise.set_value();
