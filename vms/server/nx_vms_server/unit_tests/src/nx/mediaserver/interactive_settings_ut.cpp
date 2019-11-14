@@ -14,11 +14,6 @@ static void PrintTo(const QJsonObject& object, ::std::ostream* os)
     *os << QJsonDocument(object).toJson().toStdString();
 }
 
-static void PrintTo(const QVariantMap& map, ::std::ostream* os)
-{
-    *os << QJsonDocument(QJsonObject::fromVariantMap(map)).toJson().toStdString();
-}
-
 namespace nx::vms::server::interactive_settings::test {
 
 namespace {
@@ -79,7 +74,8 @@ TEST(InteractiveSettings, simpleSerialization)
     ASSERT_EQ(actualModel, expectedModel);
 
     const auto actualValues = engine.values();
-    const auto expectedValues = engine.settingsItem()->property(kValuesProperty).toMap();
+    const auto expectedValues = QJsonObject::fromVariantMap(
+        engine.settingsItem()->property(kValuesProperty).toMap());
     ASSERT_EQ(actualValues, expectedValues);
 }
 
@@ -103,7 +99,8 @@ TEST(InteractiveSettings, valuesSerialization)
     ASSERT_EQ(result.code, QmlEngine::ErrorCode::ok);
 
     const auto actualValues = engine.values();
-    const auto expectedValues = engine.settingsItem()->property(kValuesProperty).toMap();
+    const auto expectedValues = QJsonObject::fromVariantMap(
+        engine.settingsItem()->property(kValuesProperty).toMap());
 
     ASSERT_EQ(actualValues, expectedValues);
 }
@@ -119,7 +116,7 @@ TEST(InteractiveSettings, dependentProperty)
         engine.settingsItem()->property(kSerializedModelProperty).toMap());
     ASSERT_EQ(actualModel, expectedModel);
 
-    engine.applyValues(QVariantMap{{"master", true}});
+    engine.applyValues(QJsonObject{{"master", true}});
 
     const auto changedModel = engine.serializeModel();
     const auto expectedChangedModel = QJsonObject::fromVariantMap(
@@ -136,7 +133,7 @@ TEST(InteractiveSettings, tryValues)
     ASSERT_EQ(result.code, QmlEngine::ErrorCode::ok);
 
     const auto originalValues = engine.values();
-    const auto [model, changedValues] = engine.tryValues(QVariantMap{{"number", 32}});
+    const auto [model, changedValues] = engine.tryValues(QJsonObject{{"number", 32}});
     const auto restoredValues = engine.values();
 
     ASSERT_NE(originalValues, changedValues);
@@ -149,11 +146,13 @@ TEST(InteractiveSettings, rangeCheck)
     const auto result = engine.loadModelFromFile(kTestDataPath + "RangeCheck.qml");
     ASSERT_EQ(result.code, QmlEngine::ErrorCode::ok);
 
-    const auto testValues = engine.settingsItem()->property(kTestValuesProperty).toMap();
+    const auto testValues = QJsonObject::fromVariantMap(
+        engine.settingsItem()->property(kTestValuesProperty).toMap());
     engine.applyValues(testValues);
 
     const auto actualValues = engine.values();
-    const auto expectedValues = engine.settingsItem()->property(kValuesProperty).toMap();
+    const auto expectedValues = QJsonObject::fromVariantMap(
+        engine.settingsItem()->property(kValuesProperty).toMap());
 
     ASSERT_EQ(actualValues, expectedValues);
 }

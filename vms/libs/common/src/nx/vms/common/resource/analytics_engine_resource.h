@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QVariantMap>
+#include <QtCore/QJsonObject>
 
 #include <core/resource/resource.h>
 #include <nx/utils/value_cache.h>
@@ -29,8 +29,8 @@ public:
     api::analytics::EngineManifest manifest() const;
     void setManifest(const api::analytics::EngineManifest& manifest);
 
-    virtual QVariantMap settingsValues() const;
-    virtual void setSettingsValues(const QVariantMap& values);
+    virtual QJsonObject settingsValues() const;
+    virtual void setSettingsValues(const QJsonObject& values);
     virtual QString idForToStringFromPtr() const override;
 
     AnalyticsPluginResourcePtr plugin() const;

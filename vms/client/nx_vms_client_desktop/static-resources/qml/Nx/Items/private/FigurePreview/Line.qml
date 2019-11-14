@@ -58,7 +58,7 @@ Item
         {
             color = figureJson.color
             points = figureJson.points
-            direction = figureJson.direction
+            direction = figureJson.direction || ""
             if (!points)
                 points = []
         }

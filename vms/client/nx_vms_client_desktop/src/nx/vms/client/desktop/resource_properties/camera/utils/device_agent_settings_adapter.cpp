@@ -117,7 +117,7 @@ void DeviceAgentSettingsAdapter::refreshSettings(const QnUuid& engineId, bool fo
                 if (!success)
                     return;
 
-                d->store->resetDeviceAgentSettingsValues(engineId, result.values.toVariantMap());
+                d->store->resetDeviceAgentSettingsValues(engineId, result.values);
             }),
         thread());
 
@@ -153,7 +153,7 @@ void DeviceAgentSettingsAdapter::applySettings()
         const auto handle = server->restConnection()->setDeviceAnalyticsSettings(
             d->camera,
             engine,
-            QJsonObject::fromVariantMap(it->get()),
+            it->get(),
             nx::utils::guarded(this,
                 [this, engineId = it.key()](
                     bool success,
@@ -169,9 +169,7 @@ void DeviceAgentSettingsAdapter::applySettings()
                     if (!success)
                         return;
 
-                    d->store->resetDeviceAgentSettingsValues(
-                        engineId,
-                        result.values.toVariantMap());
+                    d->store->resetDeviceAgentSettingsValues(engineId, result.values);
                 }),
             thread());
 

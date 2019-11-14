@@ -33,10 +33,10 @@ static bool isAliveStatus(Qn::ResourceStatus status)
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
 }
 
-static QVariantMap mergeWithDbAndDefaultSettings(
+static QJsonObject mergeWithDbAndDefaultSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
-    const QVariantMap& settingsFromUser)
+    const QJsonObject& settingsFromUser)
 {
     const auto engineManifest = engine->manifest();
     interactive_settings::JsonEngine jsonEngine;
@@ -143,10 +143,10 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
     }
 }
 
-void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariantMap& settings)
+void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObject& settings)
 {
     QnUuid analyticsEngineId(engineId);
-    const QVariantMap effectiveSettings = prepareSettings(analyticsEngineId, settings);
+    const QJsonObject effectiveSettings = prepareSettings(analyticsEngineId, settings);
     m_device->setDeviceAgentSettingsValues(analyticsEngineId, effectiveSettings);
 
     std::shared_ptr<DeviceAnalyticsBinding> binding;
@@ -160,9 +160,9 @@ void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariant
     binding->setSettings(effectiveSettings);
 }
 
-QVariantMap DeviceAnalyticsContext::prepareSettings(
+QJsonObject DeviceAnalyticsContext::prepareSettings(
     const QnUuid& engineId,
-    const QVariantMap& settings)
+    const QJsonObject& settings)
 {
     using namespace nx::sdk;
     const auto engine = serverModule()
@@ -177,7 +177,7 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
         return {};
     }
 
-    std::optional<QVariantMap> effectiveSettings;
+    std::optional<QJsonObject> effectiveSettings;
     if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for a DeviceAgent from the file. "
@@ -203,12 +203,12 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
     return *effectiveSettings;
 }
 
-std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromFile(
+std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromFile(
     const resource::AnalyticsEngineResourcePtr& engine) const
 {
     using namespace nx::vms::server::sdk_support;
 
-    std::optional<QVariantMap> result = loadSettingsFromSpecificFile(
+    std::optional<QJsonObject> result = loadSettingsFromSpecificFile(
         engine,
         FilenameGenerationOption::engineSpecific | FilenameGenerationOption::deviceSpecific);
 
@@ -226,7 +226,7 @@ std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromFile(
     return loadSettingsFromSpecificFile(engine, FilenameGenerationOptions());
 }
 
-std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
+std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
     const resource::AnalyticsEngineResourcePtr& engine,
     sdk_support::FilenameGenerationOptions filenameGenerationOptions) const
 {
@@ -245,10 +245,10 @@ std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
     if (!settingsString)
         return std::nullopt;
 
-    return sdk_support::toQVariantMap(*settingsString);
+    return sdk_support::toQJsonObject(*settingsString);
 }
 
-QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
+QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
     std::shared_ptr<DeviceAnalyticsBinding> binding;
     QnUuid analyticsEngineId(engineId);
@@ -267,7 +267,7 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
             "Unable to access the Engine %1 while getting a DeviceAgent settings",
             analyticsEngineId);
 
-        return QVariantMap();
+        return {};
     }
 
     interactive_settings::JsonEngine jsonEngine;
@@ -282,7 +282,7 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
         return jsonEngine.values();
     }
 
-    const QVariantMap pluginSideSettings = binding->getSettings();
+    const QJsonObject pluginSideSettings = binding->getSettings();
     jsonEngine.applyValues(pluginSideSettings);
     return jsonEngine.values();
 }

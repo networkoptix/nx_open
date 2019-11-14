@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore/QList>
-#include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
 #include <nx/vms/api/analytics/manifest_error.h>

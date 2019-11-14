@@ -3,6 +3,7 @@
 #include <optional>
 
 #include <nx/sdk/ptr.h>
+#include <nx/sdk/i_settings_response.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/to_string.h>
 
@@ -13,6 +14,7 @@
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 
 #include <nx/vms/server/analytics/wrappers/types.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/sdk_support/error.h>
@@ -114,38 +116,10 @@ public:
     }
 
 private:
-    sdk::Ptr<const sdk::IStringMap> prepareSettings(const sdk_support::SettingMap& settings) const
-    {
-        const auto sdkSettings = sdk::makePtr<sdk::StringMap>();
-        for (const auto [key, value]: nx::utils::constKeyValueRange(settings))
-            sdkSettings->setItem(key.toStdString(), value.toString().toStdString());
-
-        if (!m_debugSettings.outputPath.isEmpty())
-        {
-            const auto baseFilename = m_sdkObjectDescription.baseInputOutputFilename();
-            const auto absoluteFilename = sdk_support::debugFileAbsolutePath(
-                m_debugSettings.outputPath,
-                baseFilename + "_effective_settings.json");
-
-            sdk_support::dumpStringToFile(
-                m_debugSettings.logTag,
-                absoluteFilename,
-                QString::fromStdString(sdk::toJsonString(sdkSettings.get())));
-        }
-
-        return sdkSettings;
-    }
-
+    sdk::Ptr<const sdk::IStringMap> prepareSettings(const sdk_support::SettingMap& settings) const;
     QString buildSettingsErrorString(
         const sdk_support::ErrorMap& errors,
-        const QString& prefix) const
-    {
-        QString result = prefix;
-        for (const auto [key, value]: nx::utils::constKeyValueRange(errors))
-            result += key + ": " + value + ";\n";
-
-        return result;
-    }
+        const QString& prefix) const;
 
 private:
     DebugSettings m_debugSettings;
