@@ -70,6 +70,7 @@ class NX_VMS_UTILS_API AlarmMonitor
 public:
     AlarmMonitor(
         QString parentParameterId,
+        bool isOptional,
         api::metrics::AlarmLevel level,
         ValueGeneratorResult condition,
         TextGenerator text);
@@ -81,6 +82,7 @@ public:
 
 private:
     const QString m_parentParameterId;
+    const bool m_optional = false;
     const Scope m_scope = Scope::local;
     const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;

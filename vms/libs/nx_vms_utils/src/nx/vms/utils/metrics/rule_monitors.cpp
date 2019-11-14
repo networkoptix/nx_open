@@ -390,11 +390,13 @@ void ExtraValueMonitor::forEach(
 
 AlarmMonitor::AlarmMonitor(
     QString parentParameterId,
+    bool isOptional,
     api::metrics::AlarmLevel level,
     ValueGeneratorResult condition,
     TextGenerator text)
 :
     m_parentParameterId(std::move(parentParameterId)),
+    m_optional(isOptional),
     m_scope(condition.scope),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
@@ -413,6 +415,10 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     catch (const ExpectedError& e)
     {
         NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
+    }
+    catch (const NullValueError& e)
+    {
+        NX_ASSERT(m_optional, "Value %1 is not optional: %2", this, e.what());
     }
     catch (const MetricsError& e)
     {

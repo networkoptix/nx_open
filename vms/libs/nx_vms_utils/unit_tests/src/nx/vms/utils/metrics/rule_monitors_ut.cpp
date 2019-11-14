@@ -90,6 +90,7 @@ TEST_F(MetricsGenerators, AlarmErrors)
 
     AlarmMonitor monitor(
         "id",
+        /*isOptional*/ false,
         nx::vms::api::metrics::AlarmLevel::error,
         {valueGenerator, Scope::local},
         [](){ return kAlarmText; });
