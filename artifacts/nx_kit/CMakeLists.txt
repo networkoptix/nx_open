@@ -71,7 +71,6 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/W4 /WX)
 endif()
 
-
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)
     enable_testing()
