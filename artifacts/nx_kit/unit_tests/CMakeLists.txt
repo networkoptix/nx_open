@@ -10,8 +10,6 @@ set(disabled_ini_config_ut_files
     ../src/nx/kit/test.cpp
     ../src/nx/kit/utils.h
     ../src/nx/kit/utils.cpp
-    ../src/nx/kit/output_redirector.h
-    ../src/nx/kit/output_redirector.cpp
     src/ini_config_ut.cpp
     src/disabled_ini_config_ut.h
     src/disabled_ini_config_ut.cpp
