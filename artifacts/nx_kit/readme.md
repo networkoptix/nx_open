@@ -5,8 +5,7 @@
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-`nx_kit` is a kit of pure C99/C++11 platform-agnostic utils written by Network Optix (Nx) and used
-across various Nx projects.
+`nx_kit` is a kit of pure C99/C++11 platform-agnostic utils used across various projects.
 
 This kit does not use any non-standard libraries. There is a mention of Qt but only conditional: if
 Qt is used by a project which uses nx_kit, additional convenience (e.g. supporting certain Qt types
@@ -30,6 +29,12 @@ Currently, the following units are included into `nx_kit`:
 
 - `nx::kit::utils` - `nx/kit/utils.h`
    Simple utilities used by other `nx_kit` units.
+
+- `nx::kit::Json` - `nx/kit/json11.h`
+  Json parser/writer "Json11" originally written by DropBox: https://github.com/dropbox/json11
+  Its source code (without additional unneeded files) is located unchanged in `nx_kit/src/json11`,
+  but should be used via `nx/kit/json11.h` wrapper which puts `class Json` into `namespace nx::kit`
+  and makes it exported from nx_kit dynamic library.
 
 ---------------------------------------------------------------------------------------------------
 ## Building

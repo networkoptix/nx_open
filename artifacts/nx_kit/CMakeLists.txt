@@ -28,6 +28,8 @@ set(nx_kit_files
     src/nx/kit/output_redirector.cpp
     src/nx/kit/test.h
     src/nx/kit/test.cpp
+    src/nx/kit/json.h
+    src/nx/kit/json.cpp
     src/ini_config_c.h
     src/ini_config_c_impl.h
 )
