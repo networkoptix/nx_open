@@ -283,7 +283,7 @@
                         "calculate": "deltaAvg %thumbnails 1m",
                         "insert": "thumbnails"
                     },
-                    "plugins": {
+                    "activePlugins": {
                         "name": "Active Plugins",
                         "isOptional": true,
                         "display": "panel"
