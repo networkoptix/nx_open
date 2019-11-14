@@ -186,9 +186,14 @@ void QnUniversalRequestProcessor::run()
             if (hasSecurityIssue())
                 return;
 
-            auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
-            if (const auto redirect = owner->processorPool()->getRedirectRule(
-                    d->request.requestLine.url.path()))
+            const bool needProxy =
+                nx::vms::network::ProxyConnectionProcessor::isStandardProxyNeeded(
+                    commonModule(), d->request);
+
+            auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
+            if (const auto redirect = needProxy
+                    ? boost::none
+                    : owner->processorPool()->getRedirectRule(d->request.requestLine.url.path()))
             {
                 QByteArray contentType;
                 int code = redirectTo(redirect->toUtf8(), contentType);

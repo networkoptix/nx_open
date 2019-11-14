@@ -44,8 +44,8 @@ public:
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
-    void setSettings(const QString& engineId, const QVariantMap& settings);
-    QVariantMap getSettings(const QString& engineId) const;
+    void setSettings(const QString& engineId, const QJsonObject& settings);
+    QJsonObject getSettings(const QString& engineId) const;
 
     // @return map Engine id -> has alive DeviceAgent
     std::map<QnUuid, bool> bindingStatuses() const;
@@ -77,11 +77,11 @@ private:
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
-    QVariantMap prepareSettings(const QnUuid& engineId, const QVariantMap& settings);
-    std::optional<QVariantMap> loadSettingsFromFile(
+    QJsonObject prepareSettings(const QnUuid& engineId, const QJsonObject& settings);
+    std::optional<QJsonObject> loadSettingsFromFile(
         const resource::AnalyticsEngineResourcePtr& engine) const;
 
-    std::optional<QVariantMap> loadSettingsFromSpecificFile(
+    std::optional<QJsonObject> loadSettingsFromSpecificFile(
         const resource::AnalyticsEngineResourcePtr& engine,
         sdk_support::FilenameGenerationOptions filenameGenerationOptions) const;
 

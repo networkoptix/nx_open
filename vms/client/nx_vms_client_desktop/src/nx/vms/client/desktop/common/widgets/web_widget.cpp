@@ -1,6 +1,7 @@
 #include "web_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWebEngineWidgets/QWebEngineHistory>
 
 #include <ui/style/webview_style.h>
 
@@ -70,6 +71,8 @@ void WebWidget::load(const QUrl& url)
 void WebWidget::reset()
 {
     m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
+    m_webEngineView->page()->profile()->clearHttpCache();
+    m_webEngineView->page()->history()->clear();
     m_webEngineView->load(QUrl());
 }
 

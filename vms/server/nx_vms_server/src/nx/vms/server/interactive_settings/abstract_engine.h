@@ -1,8 +1,6 @@
 #pragma once
 
-#include <QtCore/QPointer>
 #include <QtCore/QJsonObject>
-#include <QtCore/QVariantMap>
 
 namespace nx::vms::server::interactive_settings {
 
@@ -56,17 +54,17 @@ public:
     /**
      * @return Map from value name to a typed value.
      */
-    QVariantMap values() const;
+    QJsonObject values() const;
 
     /**
      * @param values Map from value map to either a typed value or a string value representation.
      */
-    void applyValues(const QVariantMap& values) const;
+    void applyValues(const QJsonObject& values) const;
 
     struct ModelAndValues
     {
         QJsonObject model;
-        QVariantMap values;
+        QJsonObject values;
     };
 
     /**
@@ -74,7 +72,7 @@ public:
      * finally rolls back the changes to the stored model and values.
      * @param values Map from value map to either a typed value or a string value representation.
      */
-    ModelAndValues tryValues(const QVariantMap& values) const;
+    ModelAndValues tryValues(const QJsonObject& values) const;
 
 protected:
     components::Settings* settingsItem() const;

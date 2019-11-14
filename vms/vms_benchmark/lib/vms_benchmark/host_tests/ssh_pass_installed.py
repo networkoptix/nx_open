@@ -4,7 +4,8 @@ from vms_benchmark.host_tests import HostTestResult
 
 
 class SshPassInstalled:
-    def call(self):
+    @staticmethod
+    def call():
         if os.system('which sshpass >/dev/null 2>&1') != 0:
             return HostTestResult(
                 success=False,

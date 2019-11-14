@@ -76,7 +76,7 @@ void GenericResourceTreeModelNode::handleAccessChanged(
     if (!context()->user() || subject.user() != context()->user())
         return;
 
-    if (resourceAccessProvider()->hasAccess(subject, resource))
+    if (m_isAcceptableCheck(model(), resource))
     {
         if (const auto node = tryEnsureResourceNode(resource))
             node->update();

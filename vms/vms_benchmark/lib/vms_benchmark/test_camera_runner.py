@@ -15,6 +15,7 @@ ini_test_file_high_period_us: int
 ini_test_file_low_period_us: int
 ini_enable_secondary_stream: bool
 
+
 @contextmanager
 def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     camera_args = [

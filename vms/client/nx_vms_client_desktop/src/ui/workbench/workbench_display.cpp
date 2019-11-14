@@ -594,6 +594,8 @@ void QnWorkbenchDisplay::initSceneView()
         const auto hackInit =
             [this, connection, viewport]()
             {
+                if (!NX_ASSERT(viewport->context(), "QOpenGLWidget::aboutToCompose with no context"))
+                    return;
                 auto cache = QOpenGLTextureCache::cacheForContext(viewport->context());
                 auto cacheHack = reinterpret_cast<QnOpenGLTextureCacheHack*>(cache);
                 cacheHack->m_cache.setMaxCost(2 * 1024 * 1024);

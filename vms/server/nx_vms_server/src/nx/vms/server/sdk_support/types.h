@@ -4,12 +4,12 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMap>
-#include <QtCore/QVariantMap>
+#include <QtCore/QJsonObject>
 
 namespace nx::vms::server::sdk_support {
 
 using ErrorMap = QMap<QString, QString>;
-using SettingMap = QVariantMap;
+using SettingMap = QJsonObject;
 
 struct SettingsResponse
 {

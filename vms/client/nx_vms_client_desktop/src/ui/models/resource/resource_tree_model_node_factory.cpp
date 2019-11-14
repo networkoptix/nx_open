@@ -47,10 +47,19 @@ bool isAcceptableForModelServer(
     const QnResourcePtr& resource)
 {
     const auto context = model->context();
-    return model->scope() == QnResourceTreeModel::FullScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
-        && resource->hasFlags(Qn::server)
-        && !resource->hasFlags(Qn::fake);
+
+    if (model->scope() != QnResourceTreeModel::FullScope
+        || !resource->hasFlags(Qn::server)
+        || resource->hasFlags(Qn::fake))
+    {
+        return false;
+    }
+
+    const auto accessibleVia =
+        context->resourceAccessProvider()->accessibleVia(context->user(), resource);
+
+    return (accessibleVia != QnAbstractResourceAccessProvider::Source::none)
+        && (accessibleVia != QnAbstractResourceAccessProvider::Source::implicitMonitorAccess);
 }
 
 bool isAcceptableForModelUser(

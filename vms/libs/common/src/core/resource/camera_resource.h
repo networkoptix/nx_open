@@ -141,11 +141,11 @@ public:
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
-    QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
-    void setDeviceAgentSettingsValues(const QHash<QnUuid, QVariantMap>& settingsValues);
+    QHash<QnUuid, QJsonObject> deviceAgentSettingsValues() const;
+    void setDeviceAgentSettingsValues(const QHash<QnUuid, QJsonObject>& settingsValues);
 
-    QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
-    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
+    QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
+    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& settingsValues);
 
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
         const QnUuid& engineId) const;
