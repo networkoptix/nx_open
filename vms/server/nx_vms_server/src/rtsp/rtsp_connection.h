@@ -82,7 +82,6 @@ public:
     void resetTrackTiming();
     bool isTcpMode() const;
     QnMediaResourcePtr getResource() const;
-    bool isLiveDP(QnAbstractStreamDataProvider* dp);
 
     void setQuality(MediaQuality quality);
     bool isSecondaryLiveDPSupported() const;
@@ -138,7 +137,6 @@ private:
         nx::vms::api::StreamDataFilters oldFilters) const;
     bool applyUrlParams();
     void waitForResourceInitializing(const QnNetworkResourcePtr& resource);
-
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

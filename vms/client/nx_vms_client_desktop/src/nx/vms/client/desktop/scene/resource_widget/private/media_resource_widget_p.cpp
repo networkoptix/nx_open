@@ -228,6 +228,8 @@ void MediaResourceWidgetPrivate::setAnalyticsEnabledInStream(bool enabled)
 
     setStreamDataFilter(nx::vms::api::StreamDataFilter::objectDetection, enabled);
 
+    // This buffering is moved to the server side. See class PutInOrderDataProvider.
+#if 0
     // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
     // fill in the video buffer on succeeding analytics mode activations. But it looks like this
     // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
@@ -236,6 +238,7 @@ void MediaResourceWidgetPrivate::setAnalyticsEnabledInStream(bool enabled)
         : milliseconds::zero();
 
     display()->camDisplay()->setForcedVideoBufferLength(forcedVideoBufferLength);
+#endif
 }
 
 void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
