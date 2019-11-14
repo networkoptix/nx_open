@@ -1,6 +1,7 @@
 #include "node_view_item_delegate.h"
 
 #include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_constants.h"
 
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
@@ -109,7 +110,6 @@ void NodeViewItemDelegate::initStyleOption(
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
 
-
     if (option->checkState == Qt::Checked)
         option->state |= QStyle::State_On;
     else
@@ -117,6 +117,10 @@ void NodeViewItemDelegate::initStyleOption(
 
     if (!hoverable(index))
         option->state &= ~QStyle::State_MouseOver;
+
+    const auto useItalicFont = index.data(useItalicFontRole);
+    if (useItalicFont.isValid())
+        option->font.setItalic(useItalicFont.toBool());
 }
 
 const NodeViewStatsColors& NodeViewItemDelegate::colors() const

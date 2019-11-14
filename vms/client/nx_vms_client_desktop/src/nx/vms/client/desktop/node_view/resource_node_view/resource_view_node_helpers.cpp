@@ -93,20 +93,8 @@ ViewNodeData getResourceNodeData(
 {
     if (!resource)
     {
-        // TODO: Remove me. Get how to draw item without icon at the same level as with icon.
-        // Used in PoE settings dialog. Brokes nothing. Temporary decision.
-        static const auto kTransparentIcon =
-            []()
-            {
-                QPixmap pixmap(QSize(24, 24));
-                pixmap.fill(Qt::transparent);
-                return QIcon(pixmap);
-            }();
-
-        return ViewNodeDataBuilder()
-            .withData(resourceColumn, resourceExtraTextRole, extraText)
-            .withData(resourceColumn, resourceColumnRole, true)
-            .withIcon(resourceColumn, kTransparentIcon);
+        NX_ASSERT(false, "Can't create node data for empty resource!");
+        return ViewNodeData();
     }
 
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();

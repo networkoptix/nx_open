@@ -21,6 +21,8 @@ enum CustomViewNodeRole
     progressRole = firstCustomViewNodeRole,
     useSwitchStyleForCheckboxRole,
 
+    useItalicFontRole,
+
     lastRole,
     lastViewNodeRole = lastRole + 1024,
 

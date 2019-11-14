@@ -27,8 +27,6 @@ using PoweringStatus = nx::vms::api::NetworkPortState::PoweringStatus;
 using NetworkPortState = nx::vms::api::NetworkPortState;
 
 static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
-static const QString kEmptyText =
-    PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
 
 QString getSpeed(const NetworkPortState& port)
 {
@@ -45,7 +43,6 @@ QString getConsumptionText(const NetworkPortState& port)
         .arg(port.devicePowerConsumptionLimitWatts);
 }
 
-// TODO: fix colors
 ViewNodeData poweringStatusData(const NetworkPortState& port)
 {
     ViewNodeDataBuilder builder;
@@ -79,16 +76,43 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
         : Qt::Checked;
 }
 
+ViewNodeData wrongResourceNodeData(bool isUnknownDevice)
+{
+    static const QString kEmptyText =
+        PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
+    static const QString kUnknownDeviceText =
+        PoESettingsTableView::tr("<Unknown>", "In meaning 'Unknown device");
+
+    static const auto kTransparentIcon =
+        []()
+        {
+            QPixmap pixmap(QSize(24, 24));
+            pixmap.fill(Qt::transparent);
+            return QIcon(pixmap);
+        }();
+
+    const auto extraText = isUnknownDevice ? kUnknownDeviceText : kEmptyText;
+    ViewNodeDataBuilder builder;
+
+    builder
+        .withData(PoESettingsColumn::camera, resourceExtraTextRole, extraText)
+        .withData(PoESettingsColumn::camera, resourceColumnRole, true)
+        .withData(PoESettingsColumn::camera, useItalicFontRole, true)
+        .withIcon(PoESettingsColumn::camera, kTransparentIcon).data();
+
+    if (isUnknownDevice)
+        builder.withData(PoESettingsColumn::camera, Qt::TextColorRole, colorTheme()->color("light10"));
+    return builder;
+}
+
 ViewNodeData dataFromPort(
     const NetworkPortState& port,
     QnResourcePool* resourcePool)
 {
     const auto resource = resourcePool->getResourceById(port.deviceId);
-    const auto extraText = resource
-        ? QnResourceDisplayInfo(resource).extraInfo()
-        : kEmptyText;
-    const auto resourceNodeViewData =
-        getResourceNodeData(resource, PoESettingsColumn::camera, extraText);
+    const auto resourceNodeViewData = resource
+        ? getResourceNodeData(resource, PoESettingsColumn::camera, QnResourceDisplayInfo(resource).extraInfo())
+        : wrongResourceNodeData(!port.macAddress.isEmpty());
 
     return ViewNodeDataBuilder(resourceNodeViewData)
         .withText(PoESettingsColumn::port, QString::number(port.portNumber))

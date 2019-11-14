@@ -51,8 +51,13 @@ void ResourceNodeViewItemDelegate::paint(
         QStyleOptionViewItem option(styleOption);
         initStyleOption(&option, index);
 
-        paintItemText(painter, option, index, d->colors.mainText,
-            d->colors.extraText, qnGlobals->errorTextColor());
+        const auto color = index.data(Qt::TextColorRole);
+        const bool useCustomColor = color.isValid();
+        const auto textColor = useCustomColor ? color.value<QColor>() : d->colors.mainText;
+        const auto extraColor = useCustomColor ? textColor : d->colors.extraText;
+        const auto errorColor = useCustomColor ? textColor : qnGlobals->errorTextColor();
+
+        paintItemText(painter, option, index, textColor, extraColor, errorColor);
         paintItemIcon(painter, option, index, QIcon::Normal);
     }
     else
@@ -97,13 +102,12 @@ void ResourceNodeViewItemDelegate::initStyleOption(
 
 void ResourceNodeViewItemDelegate::paintItemText(
     QPainter* painter,
-    const QStyleOptionViewItem& styleOption,
+    QStyleOptionViewItem& option,
     const QModelIndex& index,
     const QColor& mainColor,
     const QColor& extraColor,
     const QColor& invalidColor) const
 {
-    auto option = styleOption;
     const auto style = option.widget ? option.widget->style() : QApplication::style();
     auto baseColor = isValidResourceNode(index) ? mainColor : invalidColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))

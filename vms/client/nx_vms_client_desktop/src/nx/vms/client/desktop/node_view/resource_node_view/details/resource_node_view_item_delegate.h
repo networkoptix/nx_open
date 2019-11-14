@@ -37,7 +37,7 @@ protected:
 
     void paintItemText(
         QPainter* painter,
-        const QStyleOptionViewItem& option,
+        QStyleOptionViewItem& option,
         const QModelIndex& index,
         const QColor& mainColor,
         const QColor& extraColor,
