@@ -56,7 +56,7 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
         disconnected,
 
         /**%apidoc
-         * Device is connected bu doesn't require power supply.
+         * Device is connected but doesn't require power supply.
          */
         connected,
 
@@ -70,6 +70,11 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
      * Id of the connected device (if any), zero UUID otherwise.
      */
     QnUuid deviceId;
+
+    /**%apidoc
+     * MAC address of the connected device.
+     */
+    QString macAddress;
 
     /**%apidoc
      * Current real device power consumption in watts.
@@ -97,6 +102,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NetworkPortState::PoweringStatus);
     (portNumber) \
     (poweringMode) \
     (deviceId) \
+    (macAddress) \
     (devicePowerConsumptionWatts) \
     (devicePowerConsumptionLimitWatts) \
     (linkSpeedMbps) \
@@ -130,10 +136,10 @@ struct NX_VMS_API NetworkBlockData
     bool isInPoeOverBudgetMode = false;
 };
 #define nx_vms_api_NetworkBlockData_Fields \
-    (portStates) \
     (upperPowerLimitWatts) \
     (lowerPowerLimitWatts) \
-    (isInPoeOverBudgetMode)
+    (isInPoeOverBudgetMode) \
+    (portStates)
 
 QN_FUSION_DECLARE_FUNCTIONS(NetworkBlockData, (json)(eq), NX_VMS_API);
 
