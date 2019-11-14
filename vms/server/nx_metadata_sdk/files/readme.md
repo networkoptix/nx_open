@@ -10,7 +10,7 @@ under the terms of Mozilla Public License 2.0: www.mozilla.org/MPL/2.0/, with th
 exception of certain files which may be licensed under the terms of other open-source licenses
 explicitly referenced in those files.
 
-See the license texts in `license_*.md` files in the root directory of this package.
+See the license texts in `licenses` directory located in the root directory of this package.
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
