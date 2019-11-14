@@ -60,6 +60,7 @@ add_executable(nx_kit_ut
     src/ini_config_c_usage.h
     src/ini_config_c_usage.c
     src/ini_config_c_ut.cpp
+    src/json_ut.cpp
     src/main.cpp
 )
 
