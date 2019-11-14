@@ -187,7 +187,9 @@ api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const noexcept
 template<typename ResourceType>
 void ValueHistoryMonitor<ResourceType>::updateValue()
 {
-    return m_history.update(ValueMonitor::value());
+    const auto value = ValueMonitor::value();
+    if (!value.isNull())
+        m_history.update(value);
 }
 
 } // namespace nx::vms::utils::metrics
