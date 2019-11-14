@@ -327,8 +327,8 @@ private:
         NX_TEST_API_POST(m_peers[0].get(), "/ec2/startUpdate", m_updateInformation);
     }
 
-    void issueInstallUpdateRequest(bool hasPeers, const QList<QnUuid>& participants,
-        QnRestResult::Error expectedRestResult)
+    void issueInstallUpdateRequest(
+        bool hasPeers, const QList<QnUuid>& participants, QnRestResult::Error expectedRestResult)
     {
         QByteArray responseBuffer;
         QString path = "/api/installUpdate";
@@ -354,7 +354,7 @@ private:
             if (expectedRestResult != installResponse.error)
             {
                 NX_DEBUG(
-                    this, "Waiting for  install request to return expected result:",
+                    this, "Waiting for  install request to return expected result: %1",
                     expectedRestResult);
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
