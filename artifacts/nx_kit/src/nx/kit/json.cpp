@@ -15,11 +15,10 @@
 
 namespace nx {
 namespace kit {
+namespace detail {
+    
+#include "../../json11/json11.cpp" //< Original Json11 .cpp.
 
-namespace detail
-{
-    #include "../../json11/json11.cpp" //< Original Json11 .cpp.
-}
-
+} // namespace detail
 } // namespace kit
 } // namespace nx
