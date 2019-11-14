@@ -45,6 +45,7 @@ Yunhong Gu, last updated 01/27/2011
 
 #include "udt.h"
 #include "packet.h"
+#include "result.h"
 #include "socket_addresss.h"
 
 
@@ -55,23 +56,8 @@ public:
     UdpChannel(int version);
     ~UdpChannel();
 
-    // Functionality:
-    //    Open a UDP channel.
-    // Parameters:
-    //    0) [in] addr: The local address that UDP will use. Pass NULL to auto-assign address.
-    // Returned value:
-    //    None.
-
-    void open(const std::optional<detail::SocketAddress>& addr);
-
-    // Functionality:
-    //    Open a UDP channel based on an existing UDP socket.
-    // Parameters:
-    //    0) [in] udpsock: UDP socket descriptor.
-    // Returned value:
-    //    None.
-
-    void open(UDPSOCKET udpsock);
+    Result<> open(const std::optional<detail::SocketAddress>& localAddrToUse);
+    Result<> open(UDPSOCKET udpsock);
 
     // Functionality:
     //    Get the UDP sending buffer size.
@@ -135,7 +121,7 @@ public:
     // Returned value:
     //    Actual size of data sent.
 
-    int sendto(const detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet) const;
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -145,12 +131,12 @@ public:
     // Returned value:
     //    Actual size of data received.
 
-    int recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
 
-    int shutdown();
+    Result<> shutdown();
 
 private:
-    void setUDPSockOpt();
+    Result<> setUDPSockOpt();
 
 private:
     int m_iIPversion;                    // IP version

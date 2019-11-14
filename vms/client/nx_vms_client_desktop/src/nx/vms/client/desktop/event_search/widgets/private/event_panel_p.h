@@ -6,6 +6,8 @@
 
 #include <common/common_globals.h>
 
+#include <nx/utils/scoped_connections.h>
+
 class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
@@ -68,6 +70,8 @@ private:
 
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;
+
+    nx::utils::ScopedConnections m_connections; //< Connections that should be guarded.
 };
 
 } // namespace nx::vms::client::desktop
