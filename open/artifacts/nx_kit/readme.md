@@ -15,20 +15,20 @@ of the familiar platforms, additional convenience or customized behavior is offe
 
 Currently, the following units are included into `nx_kit`:
 
-- `nx::kit::IniConfig` - `ini_config.h`
+- `nx::kit::IniConfig` - `nx/kit/ini_config.h`
    A mechanism for configuration variables that can alter the behavior of the code for the purpose
    of debugging and experimenting, with insignificant performance overhead. The default (initial)
    values are defined in the code and lead to the nominal behavior, which can be overridden by
    creating ini files (with name=value lines) in the system temp directory (or /sdcard on Android).
 
-- `nx::kit::debug` - `debug.h`
+- `nx::kit::debug` - `nx/kit/debug.h`
    Utilities for debugging: measuring execution time and FPS, logging values and messages, etc.
 
-- `nx::kit::test` - `test.h`
+- `nx::kit::test` - `nx/kit/test.h`
    A rudimentary standalone unit testing framework designed to mimic Google Test to a certain
    degree. Used for the unit tests for `ini_config`, `debug` and `utils` units of `nx_kit`.
 
-- `nx::kit::utils` - `utils.h`
+- `nx::kit::utils` - `nx/kit/utils.h`
    Simple utilities used by other `nx_kit` units.
 
 ---------------------------------------------------------------------------------------------------
