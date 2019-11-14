@@ -8,12 +8,12 @@ using namespace std;
 
 TEST(Exceptions, Wrapping)
 {
-    EXPECT_EQ(7, WRAP_EXCEPTION(3 + 4, runtime_error, logic_error, ""));
+    EXPECT_EQ(7, NX_WRAP_EXCEPTION(3 + 4, runtime_error, logic_error, ""));
     EXPECT_EQ(unwrapNestedErrors(runtime_error("I am an error!")), "I am an error!");
 
     try
     {
-        WRAP_EXCEPTION(throw runtime_error("I am an error!"), runtime_error, logic_error, "");
+        NX_WRAP_EXCEPTION(throw runtime_error("I am an error!"), runtime_error, logic_error, "");
     }
     catch (const logic_error& e)
     {
@@ -22,11 +22,15 @@ TEST(Exceptions, Wrapping)
 
     try
     {
-        WRAP_EXCEPTION(throw runtime_error("I am an error!"), runtime_error, logic_error, "Zorz");
+        NX_WRAP_EXCEPTION(NX_WRAP_EXCEPTION(NX_WRAP_EXCEPTION(throw runtime_error("I am an error!"),
+            runtime_error, logic_error, "Higher level error"),
+            logic_error, runtime_error, "Very high level error"),
+            runtime_error, logic_error, "Ultra high level error");
     }
     catch (const logic_error& e)
     {
-        EXPECT_EQ(unwrapNestedErrors(e), "Zorz: I am an error!");
+        EXPECT_EQ(unwrapNestedErrors(e),
+            "Ultra high level error: Very high level error: Higher level error: I am an error!");
     }
 }
 

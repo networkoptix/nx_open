@@ -22,8 +22,8 @@ class ExpectedError: public MetricsError
     using MetricsError::MetricsError;
 };
 
-#define EXPECTED_ERROR(EXPRESSION, EXCEPTION, MESSAGE) \
-    WRAP_EXCEPTION(EXPRESSION, EXCEPTION, nx::vms::utils::metrics::ExpectedError, MESSAGE)
+#define NX_METRICS_EXPECTED_ERROR(EXPRESSION, EXCEPTION, MESSAGE) \
+    NX_WRAP_EXCEPTION(EXPRESSION, EXCEPTION, nx::vms::utils::metrics::ExpectedError, MESSAGE)
 
 using Border = nx::utils::ValueHistory<api::metrics::Value>::Border;
 using Duration = std::chrono::milliseconds;

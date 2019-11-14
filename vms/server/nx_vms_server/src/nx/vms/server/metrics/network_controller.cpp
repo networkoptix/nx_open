@@ -76,7 +76,7 @@ public:
     api::metrics::Value load(Rate rate) const
     {
         const auto name = humanReadableName();
-        const auto load = EXPECTED_ERROR(
+        const auto load = NX_METRICS_EXPECTED_ERROR(
             serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(name),
             std::invalid_argument, "Error getting NIC load");
         return api::metrics::Value(nx::utils::switch_(rate,
