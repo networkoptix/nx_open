@@ -15,6 +15,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/exceptions.h>
 
 //-------------------------------------------------------------------------------------------------
 // General.
@@ -33,6 +34,14 @@ QString toStringSfinae(const T& value, decltype(&T::toString))
 }
 
 template<typename T>
+QString toStringSfinae(
+    const T& value,
+    std::enable_if_t<std::is_base_of<std::exception, T>::value>*)
+{
+    return QString::fromStdString(nx::utils::unwrapNestedErrors(value));
+}
+
+template<typename T>
 QString toStringSfinae(const T& value, ...)
 {
     QString result;
@@ -44,7 +53,7 @@ QString toStringSfinae(const T& value, ...)
 template<typename T>
 QString toString(const T& value)
 {
-    return toStringSfinae(value, 0);
+    return toStringSfinae(value, nullptr);
 }
 
 NX_UTILS_API QString toString(const std::type_info& value);
