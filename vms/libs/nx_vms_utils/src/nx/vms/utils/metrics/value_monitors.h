@@ -47,7 +47,7 @@ public:
     Scope scope() const;
     void setScope(Scope scope);
 
-    api::metrics::Value value() const noexcept;
+    virtual api::metrics::Value value() const noexcept;
 
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
@@ -94,7 +94,6 @@ public:
 
 protected:
     virtual api::metrics::Value valueOrThrow() const override;
-    api::metrics::Value runGetterOrThrow() const;
 
 private:
     const ResourceType& m_resource;
@@ -117,8 +116,7 @@ public:
 
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
-protected:
-    virtual api::metrics::Value valueOrThrow() const override;
+    virtual api::metrics::Value value() const noexcept override;
 
 private:
     void updateValue();
@@ -145,12 +143,6 @@ RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
 
 template<typename ResourceType>
 api::metrics::Value RuntimeValueMonitor<ResourceType>::valueOrThrow() const
-{
-    return runGetterOrThrow();
-}
-
-template<typename ResourceType>
-api::metrics::Value RuntimeValueMonitor<ResourceType>::runGetterOrThrow() const
 {
     return m_getter(m_resource);
 }
@@ -180,14 +172,6 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
 }
 
 template<typename ResourceType>
-api::metrics::Value ValueHistoryMonitor<ResourceType>::valueOrThrow() const
-{
-    // TODO: should override value() instead of valueOrThrow() to return from history.
-    //    return m_history.current();
-    return this->runGetterOrThrow();
-}
-
-template<typename ResourceType>
 void ValueHistoryMonitor<ResourceType>::forEach(
     Duration maxAge, const ValueIterator& iterator, Border border) const
 {
@@ -195,9 +179,15 @@ void ValueHistoryMonitor<ResourceType>::forEach(
 }
 
 template<typename ResourceType>
+api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const noexcept
+{
+    return m_history.current();
+}
+
+template<typename ResourceType>
 void ValueHistoryMonitor<ResourceType>::updateValue()
 {
-    return m_history.update(this->value());
+    return m_history.update(ValueMonitor::value());
 }
 
 } // namespace nx::vms::utils::metrics
