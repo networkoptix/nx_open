@@ -90,6 +90,11 @@ void NodeViewItemDelegate::paint(
 
     tryDrawProgressBackground(painter, option, m_colors.chartColor, index);
 
+    // Sets opacity if disabled.
+    QnScopedPainterOpacityRollback opacityRollback(painter);
+    if (!option.state.testFlag(QStyle::State_Enabled))
+        painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+
     base_type::paint(painter, styleOption, index);
 }
 
