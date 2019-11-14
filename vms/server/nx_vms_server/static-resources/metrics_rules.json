@@ -26,7 +26,7 @@
                         "display": "panel",
                         "alarms": [{
                             "level": "warning",
-                            "condition": "greaterOrEqual %servers %recommendedMaxCameras",
+                            "condition": "greaterOrEqual %cameras %recommendedMaxCameras",
                             "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
                             }]
                         },
