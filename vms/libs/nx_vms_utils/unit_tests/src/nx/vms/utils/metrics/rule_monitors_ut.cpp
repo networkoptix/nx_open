@@ -80,11 +80,12 @@ TEST_F(MetricsGenerators, AlarmErrors)
 {
     static const char* kAlarmText = "I am an alarm text!";
     static const char* kErrorMessage = "I am an awful error!";
+    static const char* kNullErrorMessage = "I am completely null!";
 
-    bool shouldThrow = false;
-    const auto valueGenerator = [&shouldThrow]()
+    std::exception_ptr errorToThrow = nullptr;
+    const auto valueGenerator = [&errorToThrow]()
     {
-        if (shouldThrow) throw MetricsError(kErrorMessage);
+        if (errorToThrow != nullptr) std::rethrow_exception(errorToThrow);
         return api::metrics::Value(true);
     };
 
@@ -99,8 +100,20 @@ TEST_F(MetricsGenerators, AlarmErrors)
     EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
     EXPECT_EQ(alarm->text, kAlarmText);
 
-    shouldThrow = true;
+    errorToThrow = std::make_exception_ptr(MetricsError(kErrorMessage));
     EXPECT_DEATH(monitor.alarm(), kErrorMessage);
+
+    errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
+    EXPECT_DEATH(monitor.alarm(), kNullErrorMessage);
+
+    errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
+    AlarmMonitor monitor2(
+        "id",
+        /*isOptional*/ true,
+        nx::vms::api::metrics::AlarmLevel::error,
+        {valueGenerator, Scope::local},
+        [](){ return kAlarmText; });
+    EXPECT_EQ(monitor2.alarm(), std::nullopt);
 }
 
 TEST_F(MetricsGenerators, ValueBinary)
