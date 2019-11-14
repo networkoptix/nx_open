@@ -10,6 +10,7 @@ TEST(Exceptions, Wrapping)
 {
     EXPECT_EQ(7, NX_WRAP_EXCEPTION(3 + 4, runtime_error, logic_error, ""));
     EXPECT_EQ(unwrapNestedErrors(runtime_error("I am an error!")), "I am an error!");
+    EXPECT_EQ(toString(runtime_error("I am an error!")), "I am an error!");
 
     try
     {
@@ -18,6 +19,7 @@ TEST(Exceptions, Wrapping)
     catch (const logic_error& e)
     {
         EXPECT_EQ(unwrapNestedErrors(e), "I am an error!");
+        EXPECT_EQ(toString(e), "I am an error!");
     }
 
     try
@@ -30,6 +32,8 @@ TEST(Exceptions, Wrapping)
     catch (const logic_error& e)
     {
         EXPECT_EQ(unwrapNestedErrors(e),
+            "Ultra high level error: Very high level error: Higher level error: I am an error!");
+        EXPECT_EQ(toString(e),
             "Ultra high level error: Very high level error: Higher level error: I am an error!");
     }
 }

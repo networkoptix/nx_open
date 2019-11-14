@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <string>
+#include <QString>
 
 namespace nx::utils {
 
@@ -26,5 +27,7 @@ namespace nx::utils {
  * Unwraps std::nested_exceptions and creates the string: "ex1.what(): ex2.what(): ..."
  */
 std::string NX_UTILS_API unwrapNestedErrors(const std::exception& e, std::string whats = {});
+
+std::string toString(const std::exception& e);
 
 } // namespace nx::utils
