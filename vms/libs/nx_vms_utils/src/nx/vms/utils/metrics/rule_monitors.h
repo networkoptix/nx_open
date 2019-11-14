@@ -5,45 +5,30 @@
 namespace nx::vms::utils::metrics {
 
 // General rules file parsing error.
-class RuleSyntaxError: public MetricsError
-{
-    using MetricsError::MetricsError;
-};
-
-class UnknownValueId: public RuleSyntaxError
-{
-    using RuleSyntaxError::RuleSyntaxError;
-};
+class RuleSyntaxError: public MetricsError { using MetricsError::MetricsError; };
+class UnknownValueId: public RuleSyntaxError { using RuleSyntaxError::RuleSyntaxError; };
 
 // General formula calculation error in ExtraValueMonitor.
-class FormulaCalculationError: public MetricsError
-{
-   using MetricsError::MetricsError;
-};
-
+class FormulaCalculationError: public MetricsError { using MetricsError::MetricsError; };
 class NullValueError: public FormulaCalculationError
 {
     using FormulaCalculationError::FormulaCalculationError;
 };
 
 // NOTE: Generators are allowed to throw exceptions!
+using TextGenerator = std::function<QString()>;
 using ValueGenerator = std::function<api::metrics::Value()>;
-
 struct ValueGeneratorResult
 {
     ValueGenerator generator;
     Scope scope = Scope::local;
 };
 
+NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors);
 NX_VMS_UTILS_API ValueGeneratorResult parseFormula(
     const QString& formula, const ValueMonitors& monitors);
 NX_VMS_UTILS_API ValueGeneratorResult parseFormulaOrThrow(
     const QString& formula, const ValueMonitors& monitors);
-
-// NOTE: Generators are allowed to throw exceptions!
-using TextGenerator = std::function<QString()>;
-
-NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors);
 
 /**
  * Calculates value for monitoring.
