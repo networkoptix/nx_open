@@ -57,7 +57,7 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
         case PoweringStatus::disconnected:
             builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Disconnected"));
             builder.withData(
-                PoESettingsColumn::status, Qt::TextColorRole, colorTheme()->color("green_core"));
+                PoESettingsColumn::status, Qt::TextColorRole, colorTheme()->color("dark13"));
             break;
         case PoweringStatus::connected:
             builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Connected"));
