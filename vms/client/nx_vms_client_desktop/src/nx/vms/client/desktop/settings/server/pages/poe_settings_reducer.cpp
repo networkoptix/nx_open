@@ -33,14 +33,20 @@ QString getSpeed(const NetworkPortState& port)
     return port.linkSpeedMbps > 0 ? QString("%1 Mbps").arg(port.linkSpeedMbps) : "-";
 }
 
+QString consumptionValue(double value)
+{
+    return QString::number(value, 'f', 1);
+}
+
 QString getConsumptionText(const NetworkPortState& port)
 {
+    qWarning() << port.devicePowerConsumptionWatts << port.devicePowerConsumptionWatts;
     if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
         return "0 W";
 
     return QString("%1 W / %2 W")
-        .arg(port.devicePowerConsumptionWatts)
-        .arg(port.devicePowerConsumptionLimitWatts);
+        .arg(consumptionValue(port.devicePowerConsumptionWatts))
+        .arg(consumptionValue(port.devicePowerConsumptionLimitWatts));
 }
 
 ViewNodeData poweringStatusData(const NetworkPortState& port)
@@ -76,12 +82,12 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
         : Qt::Checked;
 }
 
-ViewNodeData wrongResourceNodeData(bool isUnknownDevice)
+ViewNodeData wrongResourceNodeData(const QString macAddress)
 {
     static const QString kEmptyText =
         PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
     static const QString kUnknownDeviceText =
-        PoESettingsTableView::tr("<Unknown>", "In meaning 'Unknown device");
+        PoESettingsTableView::tr("<Unknown device %1>", "In meaning 'Unknown device', %1 is system info");
 
     static const auto kTransparentIcon =
         []()
@@ -91,7 +97,10 @@ ViewNodeData wrongResourceNodeData(bool isUnknownDevice)
             return QIcon(pixmap);
         }();
 
-    const auto extraText = isUnknownDevice ? kUnknownDeviceText : kEmptyText;
+    const bool isUnknownDevice = !macAddress.isEmpty();
+    const auto extraText = isUnknownDevice
+        ? kUnknownDeviceText.arg(macAddress)
+        : kEmptyText;
     ViewNodeDataBuilder builder;
 
     builder
@@ -112,15 +121,15 @@ ViewNodeData dataFromPort(
     const auto resource = resourcePool->getResourceById(port.deviceId);
     const auto resourceNodeViewData = resource
         ? getResourceNodeData(resource, PoESettingsColumn::camera, QnResourceDisplayInfo(resource).extraInfo())
-        : wrongResourceNodeData(!port.macAddress.isEmpty());
+        : wrongResourceNodeData(port.macAddress);
 
-    return ViewNodeDataBuilder(resourceNodeViewData)
+    ViewNodeDataBuilder builder(resourceNodeViewData);
+
+    builder
         .withText(PoESettingsColumn::port, QString::number(port.portNumber))
 
         .withText(PoESettingsColumn::consumption, getConsumptionText(port))
         .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
-        .withData(PoESettingsColumn::consumption, progressRole,
-            100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts)
 
         .withText(PoESettingsColumn::speed, getSpeed(port))
         .withNodeData(poweringStatusData(port))
@@ -128,8 +137,15 @@ ViewNodeData dataFromPort(
         .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
         .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
 
-        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber)
-        .data();
+        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber);
+
+    if (!qFuzzyIsNull(port.devicePowerConsumptionLimitWatts) &&
+        port.devicePowerConsumptionWatts < port.devicePowerConsumptionLimitWatts)
+    {
+        builder.withData(PoESettingsColumn::consumption, progressRole,
+            100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts);
+    }
+    return builder.data();
 }
 
 NodePtr createPortNodes(
@@ -195,7 +211,9 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
             return total;
         }();
 
-    const auto text = QString("%1 W/%2 W").arg(consumption).arg(data.upperPowerLimitWatts);
+    const auto text = QString("%1 W/%2 W")
+        .arg(consumptionValue(consumption))
+        .arg(consumptionValue(data.upperPowerLimitWatts));
 
     const auto color = consumption > data.upperPowerLimitWatts
         ? colorTheme()->color("red_l2")
