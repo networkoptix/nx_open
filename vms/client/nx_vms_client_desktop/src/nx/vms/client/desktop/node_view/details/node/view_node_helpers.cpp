@@ -138,7 +138,7 @@ qreal progressValue(const NodePtr& node, int column)
 
 qreal progressValue(const ViewNodeData& data, int column)
 {
-    return data.data(column, progressRole).toFloat();
+    return data.hasData(column, progressRole) ? data.data(column, progressRole).toFloat() : -1;
 }
 
 qreal progressValue(const QModelIndex& index)

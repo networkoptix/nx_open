@@ -47,13 +47,13 @@ void tryDrawProgressBackground(
     const QModelIndex& index)
 {
     const auto progress = progressValue(index);
-    if (progress <= 0)
+    if (progress < 0)
         return;
 
     const QnScopedPainterPenRollback penRollback(painter, chartColor);
     const QnScopedPainterBrushRollback brushRollback(painter, chartColor);
     auto rect = option.rect.adjusted(style::Metrics::kStandardPadding, 1, -1, -1);
-    rect.setWidth(rect.width() * progress / 100.0);
+    rect.setWidth(qFuzzyIsNull(progress) ? 2 : rect.width() * progress / 100.0);
     painter->drawRect(rect);
 }
 

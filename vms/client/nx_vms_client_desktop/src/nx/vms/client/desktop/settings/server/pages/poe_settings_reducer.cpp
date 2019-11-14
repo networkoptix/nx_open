@@ -15,6 +15,7 @@
 
 #include <nx/vms/api/data/network_block_data.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/mac_address.h>
 
 namespace {
 
@@ -40,7 +41,6 @@ QString consumptionValue(double value)
 
 QString getConsumptionText(const NetworkPortState& port)
 {
-    qWarning() << port.devicePowerConsumptionWatts << port.devicePowerConsumptionWatts;
     if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
         return "0 W";
 
@@ -87,7 +87,7 @@ ViewNodeData wrongResourceNodeData(const QString macAddress)
     static const QString kEmptyText =
         PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
     static const QString kUnknownDeviceText =
-        PoESettingsTableView::tr("<Unknown device %1>", "In meaning 'Unknown device', %1 is system info");
+        PoESettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
 
     static const auto kTransparentIcon =
         []()
@@ -97,7 +97,7 @@ ViewNodeData wrongResourceNodeData(const QString macAddress)
             return QIcon(pixmap);
         }();
 
-    const bool isUnknownDevice = !macAddress.isEmpty();
+    const bool isUnknownDevice = !nx::utils::MacAddress(macAddress).isNull();
     const auto extraText = isUnknownDevice
         ? kUnknownDeviceText.arg(macAddress)
         : kEmptyText;
@@ -114,6 +114,16 @@ ViewNodeData wrongResourceNodeData(const QString macAddress)
     return builder;
 }
 
+double progressValue(const NetworkPortState& port)
+{
+    if (!qFuzzyIsNull(port.devicePowerConsumptionLimitWatts) &&
+        port.devicePowerConsumptionWatts < port.devicePowerConsumptionLimitWatts)
+    {
+        return 100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts;
+    }
+    return 0;
+
+}
 ViewNodeData dataFromPort(
     const NetworkPortState& port,
     QnResourcePool* resourcePool)
@@ -123,9 +133,7 @@ ViewNodeData dataFromPort(
         ? getResourceNodeData(resource, PoESettingsColumn::camera, QnResourceDisplayInfo(resource).extraInfo())
         : wrongResourceNodeData(port.macAddress);
 
-    ViewNodeDataBuilder builder(resourceNodeViewData);
-
-    builder
+    return ViewNodeDataBuilder(resourceNodeViewData)
         .withText(PoESettingsColumn::port, QString::number(port.portNumber))
 
         .withText(PoESettingsColumn::consumption, getConsumptionText(port))
@@ -137,15 +145,8 @@ ViewNodeData dataFromPort(
         .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
         .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
 
-        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber);
-
-    if (!qFuzzyIsNull(port.devicePowerConsumptionLimitWatts) &&
-        port.devicePowerConsumptionWatts < port.devicePowerConsumptionLimitWatts)
-    {
-        builder.withData(PoESettingsColumn::consumption, progressRole,
-            100 * port.devicePowerConsumptionWatts / port.devicePowerConsumptionLimitWatts);
-    }
-    return builder.data();
+        .withData(PoESettingsColumn::consumption, progressRole, progressValue(port))
+        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber).data();
 }
 
 NodePtr createPortNodes(
