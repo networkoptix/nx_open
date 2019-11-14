@@ -112,6 +112,12 @@ auto makeAvailabilityProviders()
     );
 }
 
+static void operator *= (QSize& left, const QSize& right)
+{
+    left.setWidth(left.width() * right.width());
+    left.setHeight(left.height() * right.height());
+}
+
 auto makeStreamProviders(StreamIndex streamIndex)
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
@@ -120,7 +126,12 @@ auto makeStreamProviders(StreamIndex streamIndex)
             [streamIndex](const auto& r)
             {
                 if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
-                    return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
+                {
+                    auto resolution = p->resolution;
+                    if (auto layout = r->getVideoLayout())
+                        resolution *= layout->size();
+                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                }
                 return Value();
             }
         ),
