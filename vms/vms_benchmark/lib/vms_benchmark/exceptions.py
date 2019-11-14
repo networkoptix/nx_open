@@ -84,3 +84,7 @@ class InsufficientResourcesError(VmsBenchmarkError):
 
 class HostOperationError(VmsBenchmarkError):
     pass
+
+
+class ConfigOptionsRestrictionError(VmsBenchmarkError):
+    pass
