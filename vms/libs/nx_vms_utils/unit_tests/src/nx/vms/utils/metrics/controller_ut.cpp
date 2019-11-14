@@ -8,6 +8,8 @@
 
 namespace nx::vms::utils::metrics::test {
 
+using Value = api::metrics::Value;
+
 static const QByteArray kRules(R"json({
     "tests": {
         "name": "Test Resources",
@@ -179,11 +181,11 @@ public:
 
                 auto group1 = local1["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
-                EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.001 KB") : api::metrics::Value(1));
+                EXPECT_EQ(group1["i"], formatted ? Value("0 KB") : Value(1));
                 EXPECT_EQ(group1["t"], "first of 0");
                 if (includeRules)
                 {
-                    EXPECT_EQ(group1["ip"], 2);
+                    EXPECT_EQ(group1["ip"], formatted ? Value("2") : Value(2));
                     if (scope == Scope::system)
                     {
                         EXPECT_EQ(group1["c"], "hello");
@@ -194,11 +196,11 @@ public:
                 {
                     auto group2 = local1["g2"];
                     ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
-                    EXPECT_EQ(group2["i"], 2);
+                    EXPECT_EQ(group2["i"], formatted ? Value("2") : Value(2));
                     EXPECT_EQ(group2["t"], "second of 0");
                     if (includeRules)
                     {
-                        EXPECT_EQ(group2["im"], 1);
+                        EXPECT_EQ(group2["im"], formatted ? Value("1") : Value(1));
                     }
                 }
             }
@@ -210,11 +212,11 @@ public:
 
                 auto group1 = local2["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
-                EXPECT_EQ(group1["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
+                EXPECT_EQ(group1["i"], formatted ? Value("0.02 KB") : Value(21));
                 EXPECT_EQ(group1["t"], "first of 2");
                 if (includeRules)
                 {
-                    EXPECT_EQ(group1["ip"], 22);
+                    EXPECT_EQ(group1["ip"], formatted ? Value("22") : Value(22));
                     if (scope == Scope::system)
                     {
                         EXPECT_EQ(group1["c"], "hello");
@@ -224,11 +226,11 @@ public:
                 if (scope == Scope::system)
                 {
                     auto group2 = local2["g2"];
-                    EXPECT_EQ(group2["i"], 22);
+                    EXPECT_EQ(group2["i"], formatted ? Value("22") : Value(22));
                     EXPECT_EQ(group2["t"], "second of 2");
                     if (includeRules)
                     {
-                        EXPECT_EQ(group2["im"], 21);
+                        EXPECT_EQ(group2["im"], formatted ? Value("21") : Value(21));
                     }
                 }
             }
@@ -240,7 +242,7 @@ public:
 
                 auto group2 = remote["g2"];
                 ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
-                EXPECT_EQ(group2["i"], 12);
+                EXPECT_EQ(group2["i"], formatted ? Value("12") : Value(12));
                 EXPECT_EQ(group2["t"], "second of 1");
             }
         }
@@ -255,11 +257,11 @@ public:
             ASSERT_EQ(testResources.size(), scope == Scope::system ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            EXPECT_EQ(local1["g1"]["i"], formatted ? api::metrics::Value("1 KB") : api::metrics::Value(1024));
+            EXPECT_EQ(local1["g1"]["i"], formatted ? Value("1 KB") : Value(1024));
             EXPECT_EQ(local1["g1"]["t"], "first of 0");
             if (includeRules)
             {
-                EXPECT_EQ(local1["g1"]["ip"], 1025);
+                EXPECT_EQ(local1["g1"]["ip"], formatted ? Value("1025") : Value(1025));
                 if (scope == Scope::system)
                 {
                     EXPECT_EQ(local1["g1"]["c"], "hello");
@@ -267,16 +269,16 @@ public:
             }
             if (scope == Scope::system)
             {
-                EXPECT_EQ(local1["g2"]["i"], 2);
+                EXPECT_EQ(local1["g2"]["i"], formatted ? Value("2") : Value(2));
                 EXPECT_EQ(local1["g2"]["t"], "second of 0");
             }
 
             auto local2 = testResources["R2"];
-            EXPECT_EQ(local2["g1"]["i"], formatted ? api::metrics::Value("0.021 KB") : api::metrics::Value(21));
+            EXPECT_EQ(local2["g1"]["i"], formatted ? Value("0.02 KB") : Value(21));
             EXPECT_EQ(local2["g1"]["t"], "first of 2");
             if (includeRules)
             {
-                EXPECT_EQ(local2["g1"]["ip"], 22);
+                EXPECT_EQ(local2["g1"]["ip"], formatted ? Value("22") : Value(22));
                 if (scope == Scope::system)
                 {
                     EXPECT_EQ(local2["g1"]["c"], "hello");
@@ -284,7 +286,7 @@ public:
             }
             if (scope == Scope::system)
             {
-                EXPECT_EQ(local2["g2"]["i"], 22);
+                EXPECT_EQ(local2["g2"]["i"], formatted ? Value("22") : Value(22));
                 EXPECT_EQ(local2["g2"]["t"], "second of 2");
             }
 
@@ -295,11 +297,11 @@ public:
 
                 auto group2 = remote["g2"];
                 ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
-                EXPECT_EQ(group2["i"], 12);
+                EXPECT_EQ(group2["i"], formatted ? Value("12") : Value(12));
                 EXPECT_EQ(group2["t"], "hello");
                 if (includeRules)
                 {
-                    EXPECT_EQ(group2["im"], 11);
+                    EXPECT_EQ(group2["im"], formatted ? Value("11") : Value(11));
                 }
             }
         }
@@ -331,16 +333,16 @@ public:
             EXPECT_EQ(alarms.size(), 1);
             EXPECT_EQ(alarms["tests"].size(), (scope == Scope::system) ? 3 : 2);
 
-            EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.146 KB (>100), ip = 151");
+            EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.15 KB (>100), ip = 151");
             if (scope == Scope::system)
             {
                 EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
                 EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
-                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0 KB (<0), ip = -1");
             }
             else
             {
-                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0.002 KB (<0), ip = -1");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0 KB (<0), ip = -1");
             }
         }
 

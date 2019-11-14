@@ -70,16 +70,20 @@ std::function<Value(const Value&)> numericFormatter(const QString& units, Conver
             if (!value.isDouble())
                 return value;
 
-            const auto data = qRound64(convert(value.toDouble()) * 1000);
-            const auto sign = data < 0 ? "-" : "";
-            const auto integral = std::abs(data) / 1000;
-            const auto fraction = std::abs(data) % 1000;
-            if (integral < 1000 && fraction != 0)
-                value = QString("%1%2.%3").arg(sign).arg(integral).arg(fraction, 3, 10, QChar('0'));
+            const auto number = convert(value.toDouble());
+            QString string;
+            if (std::abs(number) > 10)
+            {
+                string = QString::number(number, 'f', 0);
+            }
             else
-                value = data / 1000;
+            {
+                string = QString::number(number, 'f', 2);
+                while (string.endsWith('0')) string.chop(1);
+                if (string.endsWith('.')) string.chop(1);
+            }
 
-            return units.isEmpty() ? value : Value(value.toVariant().toString() + " " + units);
+            return Value(units.isEmpty() ? string : (string + " " + units));
         };
 }
 
