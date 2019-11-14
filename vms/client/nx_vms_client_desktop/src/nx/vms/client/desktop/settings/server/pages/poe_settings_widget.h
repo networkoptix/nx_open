@@ -22,6 +22,8 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
+    void setAutoUpdate(bool value);
+
 public:
     void setServerId(const QnUuid& value);
 

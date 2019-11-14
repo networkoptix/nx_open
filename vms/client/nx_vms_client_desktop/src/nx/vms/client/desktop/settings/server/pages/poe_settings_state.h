@@ -9,6 +9,7 @@ namespace settings {
 
 struct PoESettingsState
 {
+    bool autoUpdates = true;
     bool showPreloader = true;
     bool showPoEOverBudgetWarning = false;
     bool blockUi = false;
@@ -18,6 +19,7 @@ struct PoESettingsState
 struct PoESettingsStatePatch
 {
     using BoolOptional = std::optional<bool>;
+    BoolOptional autoUpdates;
     BoolOptional showPoEOverBudgetWarning;
     BoolOptional showPreloader;
     BoolOptional blockUi;

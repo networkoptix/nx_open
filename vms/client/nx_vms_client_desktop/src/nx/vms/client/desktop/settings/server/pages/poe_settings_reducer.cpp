@@ -224,5 +224,12 @@ PoESettingsStatePatch::BoolOptional PoESettingsReducer::showPreloaderChanges(
     return value == state.showPreloader ? PoESettingsStatePatch::BoolOptional() : value;
 }
 
+PoESettingsStatePatch::BoolOptional PoESettingsReducer::autoUpdatesChanges(
+    const PoESettingsState& state,
+    const bool value)
+{
+    return value == state.autoUpdates ? PoESettingsStatePatch::BoolOptional() : value;
+}
+
 } // namespace settings
 } // namespace nx::vms::client::desktop

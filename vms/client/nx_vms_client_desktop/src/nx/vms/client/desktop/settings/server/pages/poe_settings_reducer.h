@@ -35,6 +35,10 @@ public:
     static PoESettingsStatePatch::BoolOptional showPreloaderChanges(
         const PoESettingsState& state,
         const bool value);
+
+    static PoESettingsStatePatch::BoolOptional autoUpdatesChanges(
+        const PoESettingsState& state,
+        const bool value);
 };
 
 } // namespace settings

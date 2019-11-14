@@ -100,6 +100,9 @@ void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch&
 
     if (patch.blockUi)
         updateUiBlock();
+
+    if (patch.autoUpdates)
+        controller.setAutoUpdate(patch.autoUpdates.value());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -122,7 +125,6 @@ bool PoESettingsWidget::hasChanges() const
 
 void PoESettingsWidget::loadDataToUi()
 {
-    qWarning() << "<<<<<<<<<<<<<";
 }
 
 void PoESettingsWidget::applyChanges()
@@ -144,6 +146,11 @@ void PoESettingsWidget::applyChanges()
 void PoESettingsWidget::setServerId(const QnUuid& value)
 {
     d->controller.setResourceId(value);
+}
+
+void PoESettingsWidget::setAutoUpdate(bool value)
+{
+    d->store.setAutoUpdates(value);
 }
 
 } // namespace settings

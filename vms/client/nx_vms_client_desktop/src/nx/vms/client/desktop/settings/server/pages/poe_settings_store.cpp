@@ -50,6 +50,9 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
     if (patch.blockUi)
         state.blockUi = patch.blockUi.value();
 
+    if (patch.autoUpdates)
+        state.autoUpdates = patch.autoUpdates.value();
+
     emit q->patchApplied(patch);
 }
 
@@ -115,6 +118,14 @@ void PoESettingsStore::setPreloaderVisible(bool value)
 {
     PoESettingsStatePatch patch;
     patch.showPreloader = PoESettingsReducer::showPreloaderChanges(d->state, value);
+
+    d->applyPatch(patch);
+}
+
+void PoESettingsStore::setAutoUpdates(bool value)
+{
+    PoESettingsStatePatch patch;
+    patch.autoUpdates = PoESettingsReducer::autoUpdatesChanges(d->state, value);
 
     d->applyPatch(patch);
 }

@@ -78,8 +78,10 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
     if (!serverHolder.setResourceId(value))
         return;
 
+    setBlockData(BlockData());
+
     const auto server = serverHolder.resource();
-    if (!server)
+    if (!server || !server->getServerFlags().testFlag(api::SF_HasPoeManagementCapability))
     {
         // Cleanup.
         connection.reset();
@@ -90,7 +92,6 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
 
     connection = server->restConnection();
     setInitialUpdateInProgress(true);
-    setBlockData(BlockData());
     update();
 }
 
@@ -100,7 +101,7 @@ void PoEController::Private::handleReply(
     const QnJsonRestResult& result)
 {
     if (handle != replyHandle)
-        return; //< Most likely we cancelled request
+        return; //< We just cancelled the request.
 
     setInitialUpdateInProgress(false);
     const nx::utils::ScopeGuard handleGuard([this]() { resetHandles(); });

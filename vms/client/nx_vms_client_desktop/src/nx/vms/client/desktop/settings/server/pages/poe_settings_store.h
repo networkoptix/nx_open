@@ -42,6 +42,8 @@ public:
 
     void setPreloaderVisible(bool value);
 
+    void setAutoUpdates(bool value);
+
     void applyUserChanges();
 
 signals:

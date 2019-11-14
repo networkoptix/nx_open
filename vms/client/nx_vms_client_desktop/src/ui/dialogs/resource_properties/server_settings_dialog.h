@@ -36,6 +36,7 @@ protected:
     virtual void showEvent(QShowEvent* event) override;
 
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+    virtual bool event(QEvent* event) override;
 
 private:
     void updateWebPageLink();

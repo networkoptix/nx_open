@@ -243,6 +243,19 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
     return QDialogButtonBox::Cancel;
 }
 
+bool QnServerSettingsDialog::event(QEvent* e)
+{
+    const auto type = e->type();
+    switch(type)
+    {
+        case QEvent::Hide: // Fallthrough.
+        case QEvent::Show:
+            d->poeSettingsPage->setAutoUpdate(type == QEvent::Show);
+            break;
+    }
+    return base_type::event(e);
+}
+
 void QnServerSettingsDialog::updateWebPageLink()
 {
     bool allowed = d->server && !nx::network::isCloudServer(d->server);
