@@ -5,10 +5,10 @@
 #include <functional>
 
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/client/core/resource/resource_holder.h>
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/core/resource/resource_holder.h>
 
 namespace {
 
@@ -46,10 +46,17 @@ struct PoEController::Private: public QObject
     bool initialUpdateInProgress = false;
     PoEController::BlockData blockData;
     QTimer updateTimer;
+    using Handler = std::function<void (bool success, rest::Handle handle, const QnJsonRestResult& result)>;
+    const Handler handleReplyCallback;
 };
 
 PoEController::Private::Private(PoEController* q):
-    q(q)
+    q(q),
+    handleReplyCallback(nx::utils::guarded(this,
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            handleReply(success, handle, result);
+        }))
 {
     updateTimer.setInterval(kUpdateIntervalMs);
     connect(&updateTimer, &QTimer::timeout, this, &Private::update);
@@ -126,7 +133,7 @@ void PoEController::Private::update()
     handle = connection->getJsonResult(
         kNvrAction,
         QnRequestParamList(),
-        std::bind(&Private::handleReply, this, _1, _2, _3),
+        handleReplyCallback,
         QThread::currentThread());
 }
 
@@ -140,7 +147,7 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
         kNvrAction,
         QnRequestParamList(),
         QJson::serialized(value),
-        std::bind(&Private::handleReply, this, _1, _2, _3),
+        handleReplyCallback,
         QThread::currentThread());
 
     setUpdatingModeHandle(handle);
