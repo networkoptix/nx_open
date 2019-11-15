@@ -10,6 +10,7 @@ Figure
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
     property string allowedDirections: "any"
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
 
     MouseArea
     {
@@ -132,6 +133,22 @@ Figure
                 arrowA.checked = true
             }
         }
+    }
+
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start line.")
+        }
+        else
+        {
+            if (allowedDirections !== "none")
+                return qsTr("Click arrows to toggle the desired directions.")
+        }
+
+        return ""
     }
 
     function startCreation()

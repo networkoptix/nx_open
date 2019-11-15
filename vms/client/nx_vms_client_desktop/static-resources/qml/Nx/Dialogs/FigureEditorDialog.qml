@@ -67,31 +67,12 @@ Window
             }
         }
 
-        Rectangle
+        Banner
         {
-            visible: !editor.hasFigure
+            visible: text !== ""
             anchors.bottom: parent.bottom
-            width: parent.width
-            height: 32
-            color: ColorTheme.colors.brand_d6
-
-            Text
-            {
-                anchors.fill: parent
-                verticalAlignment: Text.AlignVCenter
-                leftPadding: 16
-                color: ColorTheme.buttonText
-                text:
-                {
-                    if (figureType === "line")
-                        return qsTr("Click on screen to add line")
-                    else if (figureType === "box")
-                        return qsTr("Click on screen to add box")
-                    else if (figureType === "polygon")
-                        return qsTr("Click on screen to add polygon")
-                    return ""
-                }
-            }
+            text: editor.hint
+            style: editor.hintStyle
         }
     }
 
@@ -133,7 +114,7 @@ Window
             {
                 anchors.verticalCenter: parent.verticalCenter
                 flat: true
-                text: qsTr("Reset")
+                text: qsTr("Clear")
                 iconUrl: "qrc:/skin/text_buttons/refresh.png"
                 leftPadding: 0
                 rightPadding: 16
@@ -163,6 +144,7 @@ Window
                     accepted()
                 }
                 width: Math.max(implicitWidth, 80)
+                enabled: editor.figureAcceptable
             }
 
             Button

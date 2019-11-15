@@ -9,6 +9,7 @@ Item
     property color outlineColor: "white"
     property real padding: 8
     property bool checked: false
+    property alias hovered: mouseArea.containsMouse
 
     property real x1
     property real y1
@@ -57,8 +58,13 @@ Item
 
         MouseArea
         {
+            id: mouseArea
+
             anchors.fill: parent
             anchors.leftMargin: padding
+
+            hoverEnabled: true
+
             onClicked:
             {
                 arrow.checked = !arrow.checked

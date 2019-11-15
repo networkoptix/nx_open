@@ -2,6 +2,7 @@ import QtQuick 2.10
 import QtQml 2.3
 import nx.vms.client.core 1.0
 import Nx 1.0
+import Nx.Controls 1.0
 import Qt.labs.platform 1.0
 
 import "../figure_utils.js" as F
@@ -14,6 +15,8 @@ Figure
     property real snapDistance: 8
     readonly property bool hasFigure: pointMakerInstrument.count > 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
+    acceptable: !pathUtil.hasSelfIntersections
+        && (!pointMakerInstrument.enabled || pointMakerInstrument.count === 0)
 
     MouseArea
     {
@@ -62,6 +65,7 @@ Figure
     PathUtil
     {
         id: pathUtil
+        property bool hasSelfIntersections: false
     }
 
     Connections
@@ -128,7 +132,7 @@ Figure
             y: F.absY(model.y, figure)
             z: dragging ? 10 : 0
 
-            property bool snappingEnabled: pointMakerInstrument.count > 3
+            property bool snappingEnabled: true
 
             function snapPoints()
             {
@@ -166,7 +170,12 @@ Figure
 
                     var snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
                     if (snapPointIndex !== -1)
-                        pointMakerInstrument.removePoint(index)
+                    {
+                        if (pointMakerInstrument.count > 3)
+                            pointMakerInstrument.removePoint(index)
+                        else
+                            startCreation()
+                    }
                 }
             }
 
@@ -223,19 +232,58 @@ Figure
     {
         id: pointMenu
 
-        property int pointIndex
+        property int pointIndex: -1
 
         MenuItem
         {
             text: qsTr("Delete")
             onTriggered:
             {
-                if (pointMenu.pointIndex <= 0 || pointMakerInstrument.count <= 3)
+                if (pointMenu.pointIndex < 0)
                     return
 
-                pointMakerInstrument.removePoint(pointMenu.pointIndex)
+                if (pointMakerInstrument.count > 3)
+                    pointMakerInstrument.removePoint(pointMenu.pointIndex)
+                else
+                    startCreation()
+
             }
         }
+
+        onVisibleChanged:
+        {
+            if (!visible)
+                pointMenu.pointIndex = -1
+        }
+    }
+
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count > 0)
+            {
+                if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
+                    return qsTr("Maximum points count is reached.")
+            }
+            else
+            {
+                return qsTr("Click on video to start polygon.")
+            }
+        }
+        else
+        {
+            if (pathUtil.hasSelfIntersections)
+                return qsTr("Polygon is not valid. Remove self-intersections to proceed.")
+        }
+
+        return ""
+    }
+    hintStyle:
+    {
+        if (!pointMakerInstrument.enabled && pathUtil.hasSelfIntersections)
+            return Banner.Style.Error
+        return Banner.Style.Info
     }
 
     onColorChanged: canvas.requestPaint()
@@ -243,6 +291,7 @@ Figure
     function refresh()
     {
         pathUtil.points = pointMakerInstrument.getRelativePoints()
+        pathUtil.hasSelfIntersections = pathUtil.checkSelfIntersections()
         canvas.requestPaint()
     }
 

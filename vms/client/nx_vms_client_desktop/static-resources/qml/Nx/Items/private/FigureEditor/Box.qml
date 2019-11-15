@@ -11,6 +11,8 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count === 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
+
     MouseArea
     {
         id: mouseArea
@@ -204,6 +206,16 @@ Figure
                 setValue(pointMakerInstrument.endY)
             return valid
         }
+    }
+
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start box.")
+        }
+        return ""
     }
 
     function startCreation()
