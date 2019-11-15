@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <ostream>
 
 #include <nx/network/aio/basic_pollable.h>
 
@@ -17,6 +18,11 @@ enum class ResultCode
 };
 
 NX_NETWORK_API std::string toString(ResultCode);
+
+inline std::ostream& operator<<(std::ostream& os, ResultCode value)
+{
+    return os << toString(value);
+}
 
 struct NX_NETWORK_API OpenTunnelResult
 {
