@@ -328,6 +328,7 @@ public:
 class PolygonFigure: public ValueItem
 {
     Q_OBJECT
+    Q_PROPERTY(int maxPoints READ maxPoints WRITE setMaxPoints NOTIFY maxPointsChanged)
 
 public:
     PolygonFigure(QObject* parent = nullptr);
