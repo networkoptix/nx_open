@@ -16,7 +16,7 @@ std::string unwrapNestedErrors(const std::exception& e, std::string whats)
     {
        return unwrapNestedErrors(e, std::move(whats));
     }
-    return std::move(whats);
+    return whats;
 }
 
 } // namespace nx::utils
