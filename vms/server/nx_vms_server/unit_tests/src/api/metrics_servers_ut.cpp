@@ -86,7 +86,7 @@ TEST_F(MetricsServersApi, oneServer)
     EXPECT_EQ(startValues["activity"]["actionsTriggered"], 0);
     EXPECT_EQ(startValues["activity"]["apiCalls1m"], 0);
     EXPECT_EQ(startValues["activity"]["thumbnails1m"], 0);
-    EXPECT_EQ(startValues["activity"]["plugins"], api::metrics::Value());
+    EXPECT_EQ(startValues["activity"]["activePlugins"], api::metrics::Value());
 
     auto startAlarms = getFlat<SystemAlarms>("/ec2/metrics/alarms");
     startAlarms = nx::utils::copy_if(

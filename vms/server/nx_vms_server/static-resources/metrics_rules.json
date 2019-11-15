@@ -27,7 +27,7 @@
                         "display": "panel",
                         "alarms": [{
                             "level": "warning",
-                            "condition": "greaterOrEqual %servers %recommendedMaxCameras",
+                            "condition": "greaterOrEqual %cameras %recommendedMaxCameras",
                             "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
                             }]
                         },
@@ -256,6 +256,7 @@
                 "values": {
                     "transactionsPerSecond1m": {
                         "name": "Transactions/s",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "Transactions/s",
                         "calculate": "deltaAvg %transactionsPerSecond 1m",
@@ -282,8 +283,9 @@
                         "calculate": "deltaAvg %thumbnails 1m",
                         "insert": "thumbnails"
                     },
-                    "plugins": {
+                    "activePlugins": {
                         "name": "Active Plugins",
+                        "isOptional": true,
                         "display": "panel"
                     }
                 }
@@ -404,15 +406,26 @@
                 "values": {
                     "resolution": {
                         "name": "Resolution",
+                        "isOptional": true,
                         "display": "table|panel"
+                    },
+                    "targetFps": {
+                        "name": "Target FPS",
+                        "isOptional": true,
+                        "display": "panel"
                     },
                     "actualFps": {
                         "name": "Actual FPS",
+                        "isOptional": true,
                         "display": "panel"
+                    },
+                    "fpsDelta": {
+                        "isOptional": true
                     },
                     "fpsDeltaAverage": {
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
+                        "isOptional": true,
                         "display": "panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
@@ -431,6 +444,7 @@
                     },
                     "actualBitrateBps": {
                         "name": "Bitrate",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "KBps"
                     }
@@ -441,6 +455,7 @@
                 "values": {
                     "resolution": {
                         "name": "Resolution",
+                        "isOptional": true,
                         "display": "table|panel",
                         "alarms": [
                             {
@@ -450,19 +465,30 @@
                             }
                         ]
                     },
+                    "targetFps": {
+                        "name": "Target FPS",
+                        "isOptional": true,
+                        "display": "panel"
+                    },
                     "actualFps": {
                         "name": "Actual FPS",
+                        "isOptional": true,
                         "display": "panel"
+                    },
+                    "fpsDelta": {
+                        "isOptional": true
                     },
                     "fpsDeltaAverage": {
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
+                        "isOptional": true,
                         "display": "panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
                     "actualBitrateBps": {
                         "name": "Bitrate",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "KBps"
                     }
@@ -474,20 +500,24 @@
                     "archiveLengthS": {
                         "name": "Forecast",
                         "description": "Archive Length",
+                        "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
                     },
                     "recordingBitrateBps": {
                         "name": "Recording Bitrate (5min)",
+                        "isOptional": true,
                         "display": "table|panel",
                         "format": "KBps"
                     },
                     "isArchiveTooSmall": {
+                        "isOptional": true,
                         "calculate": "greaterThan %minArchiveLengthS %archiveLengthS"
                     },
                     "minArchiveLengthS": {
                         "name": "Min Archive length",
                         "description": "Minimum Archive Length",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "durationS",
                         "alarms": [
@@ -557,6 +587,7 @@
                 "transactionsPerSecond": {
                         "name": "Transactions/s",
                         "description": "Analytics DB transactions per second",
+                        "isOptional": true,
                         "display": "panel",
                         "format": "Transactions/s"
                     }
@@ -608,10 +639,12 @@
                     },
                     "firstIp": {
                         "name": "IP",
+                        "isOptional": true,
                         "display": "table|panel"
                     },
                     "ipList": {
                         "name": "Other IP addresses",
+                        "isOptional": true,
                         "display": "panel"
                     }
                 }
@@ -619,8 +652,15 @@
             "rates": {
                 "name": "I/O Rates",
                 "values": {
+                    "inBps": {
+                        "isOptional": true
+                    },
+                    "outBps": {
+                        "isOptional": true
+                    },
                     "inBps1m": {
                         "name": "IN Rate",
+                        "isOptional": true,
                         "format": "kbps",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
@@ -628,6 +668,7 @@
                     },
                     "outBps1m": {
                         "name": "OUT Rate",
+                        "isOptional": true,
                         "format": "kbps",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",

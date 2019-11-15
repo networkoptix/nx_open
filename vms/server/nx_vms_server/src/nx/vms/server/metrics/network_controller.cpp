@@ -2,6 +2,7 @@
 
 #include <QJsonArray>
 
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/std/algorithm.h>
@@ -45,16 +46,18 @@ public:
         m_interface = std::move(iface);
     }
 
-    QJsonArray addressesJson() const
+    nx::vms::api::metrics::Value addressesJson() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         QJsonArray result;
         for (const auto& address: m_interface.addressEntries())
             result.append(address.ip().toString());
+        if (result.empty())
+            return {};
         return result;
     }
 
-    QString firstAddress() const
+    nx::vms::api::metrics::Value firstAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         const auto addresses = m_interface.addressEntries();
@@ -73,16 +76,12 @@ public:
     api::metrics::Value load(Rate rate) const
     {
         const auto name = humanReadableName();
-        const auto load =
-            serverModule()->platform()->monitor()->networkInterfaceLoad(name);
-        if (!load)
-        {
-            NX_VERBOSE(this, "Error getting NIC load: NIC [%1] was not found", name);
-            return api::metrics::Value();
-        }
+        const auto load = NX_METRICS_EXPECTED_ERROR(
+            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(name),
+            std::invalid_argument, "Error getting NIC load");
         return api::metrics::Value(nx::utils::switch_(rate,
-            Rate::in, [&]{ return load->bytesPerSecIn; },
-            Rate::out, [&]{ return load->bytesPerSecOut; }));
+            Rate::in, [&]{ return load.bytesPerSecIn; },
+            Rate::out, [&]{ return load.bytesPerSecOut; }));
     }
 
     QnCommonModule* commonModule() const { return serverModule()->commonModule(); }

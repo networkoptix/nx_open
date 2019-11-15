@@ -42,6 +42,7 @@ public:
     void setCameraList(const QnUuidSet& ids);
     void setActionType(nx::vms::api::ActionType value);
     void setEventType(nx::vms::api::EventType value);
+    void setText(const QString& text);
 
 protected:
     void setVisible(bool value) override;
@@ -52,6 +53,7 @@ private:
 
     void reset();
     void updateData();
+    void updateDataDelayed();
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButton_clicked();
@@ -78,7 +80,8 @@ private:
         qint64 toMsec,
         nx::vms::api::EventType eventType,
         const nx::analytics::EventTypeId& analyticsEventTypeId,
-        nx::vms::api::ActionType actionType);
+        nx::vms::api::ActionType actionType,
+        const QString& text);
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
@@ -102,4 +105,5 @@ private:
     Qt::MouseButton m_lastMouseButton;
 
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    QTimer m_delayUpdateTimer;
 };

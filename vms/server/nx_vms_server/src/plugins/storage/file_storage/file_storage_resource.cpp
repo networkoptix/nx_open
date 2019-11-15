@@ -934,6 +934,7 @@ bool QnFileStorageResource::isLocal()
 void QnFileStorageResource::setMounted(bool value)
 {
     QnMutexLocker lock(&m_mutex);
+    NX_VERBOSE(this, "Mounted state changed from %1 to %2", m_isMounted, value);
     m_isMounted = value;
 }
 

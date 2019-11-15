@@ -258,12 +258,12 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "plugins",
+            "activePlugins",
             [this](const auto&)
             {
                 QStringList result;
                 for (const auto& value: serverModule()->pluginManager()->metrics())
-                    result.push_back(value.name);
+                    result.push_back(lm("%1. %2").args(result.size() + 1, value.name));
                 return result.isEmpty() ? Value() : Value(result.join(L'\n'));
             }
         )

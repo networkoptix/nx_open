@@ -58,10 +58,12 @@ extern "C"
 #include <api/helpers/camera_id_helper.h>
 #include <api/global_settings.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/vms/server/put_in_order_data_provider.h>
 
 class QnTcpListener;
 
 using namespace nx::vms::api;
+using namespace nx::vms::server;
 
 namespace {
 
@@ -164,7 +166,7 @@ public:
     {
     }
 
-    QnAbstractMediaStreamDataProviderPtr getCurrentDP()
+    QnAbstractStreamDataProviderPtr getCurrentDP()
     {
         if (playbackMode == PlaybackMode::ThumbNails)
             return thumbnailsDP;
@@ -193,6 +195,8 @@ public:
         if (thumbnailsDP)
             thumbnailsDP->removeDataProcessor(dataProcessor);
         archiveDP.clear();
+        liveDpHi.clear();
+        liveDpLow.clear();
         archiveDpOpened = false;
         delete dataProcessor;
         dataProcessor = 0;
@@ -210,8 +214,8 @@ public:
     }
 
     nx::rtsp::StreamParams params;
-    QnLiveStreamProviderPtr liveDpHi;
-    QnLiveStreamProviderPtr liveDpLow;
+    QnAbstractStreamDataProviderPtr liveDpHi;
+    QnAbstractStreamDataProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     bool archiveDpOpened = false;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
@@ -351,12 +355,6 @@ QnMediaResourcePtr QnRtspConnectionProcessor::getResource() const
 
 }
 
-bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
-{
-    Q_D(QnRtspConnectionProcessor);
-    return dp == d->liveDpHi || dp == d->liveDpLow;
-}
-
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
@@ -472,7 +470,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
+    auto currentDP = d->getCurrentDP();
 
     QnConstResourceVideoLayoutPtr layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->channelCount() : -1;
@@ -840,7 +838,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
 
     int trackId = extractTrackId(d->request.requestLine.url.toString());
 
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
+    auto currentDP = d->getCurrentDP();
 
     QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->channelCount()) {
@@ -960,6 +958,16 @@ void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResou
     }
 }
 
+QnAbstractStreamDataProviderPtr initLiveProvider(
+    QnVideoCameraPtr camera, QnServer::ChunksCatalog quality)
+{
+    QnLiveStreamProviderPtr cameraProvider = camera->getLiveReader(quality);
+
+    auto reorderingDataProvider = PutInOrderDataProviderPtr(
+        new PutInOrderDataProvider(cameraProvider, std::chrono::milliseconds(64)));
+    return reorderingDataProvider;
+}
+
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -1012,8 +1020,9 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
-            d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized())
+        {
+            d->liveDpHi = initLiveProvider(camera, QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 Qn::directConnect(
                     d->liveDpHi->getResource().data(),
@@ -1039,9 +1048,8 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
-            int fps = d->liveDpHi->getLiveParams().fps;
-            if (cameraRes->hasDualStreaming() && cameraRes->isEnoughFpsToRunSecondStream(fps))
-                d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+            if (cameraRes->hasDualStreaming())
+                d->liveDpLow = initLiveProvider(camera, QnServer::LowQualityCatalog);
         }
         if (d->liveDpLow) {
             d->liveDpLow->addDataProcessor(d->dataProcessor);
@@ -1277,7 +1285,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         //    d->thumbnailsDP->stop();
     }
 
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
+    auto currentDP = d->getCurrentDP();
 
     if (d->useProprietaryFormat)
         addResponseRangeHeader();

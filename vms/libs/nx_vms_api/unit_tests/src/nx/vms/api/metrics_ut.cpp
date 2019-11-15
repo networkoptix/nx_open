@@ -477,20 +477,20 @@ TEST(Metrics, Formatting)
     #define EXPECT_FORMAT(FORMAT, VALUE, RESULT) \
         EXPECT_EQ(makeFormatter(FORMAT)(Value(VALUE)), Value(RESULT))
 
-    EXPECT_FORMAT("", 100.0, 100);
+    EXPECT_FORMAT("", 100.0, "100");
     EXPECT_FORMAT("pixels", 100.0, "100 pixels");
 
-    EXPECT_FORMAT("KB", 100.0, "0.098 KB");
-    EXPECT_FORMAT("KB", 5000.0, "4.883 KB");
+    EXPECT_FORMAT("KB", 100.0, "0.1 KB");
+    EXPECT_FORMAT("KB", 5000.0, "4.88 KB");
     EXPECT_FORMAT("KB", 5000555.0, "4883 KB");
 
     EXPECT_FORMAT("MB", 100.0, "0 MB");
-    EXPECT_FORMAT("MB", 6000666.0, "5.723 MB");
-    EXPECT_FORMAT("MB", 6000666000.0, "5722 MB");
+    EXPECT_FORMAT("MB", 6000666.0, "5.72 MB");
+    EXPECT_FORMAT("MB", 6000666000.0, "5723 MB");
 
     EXPECT_FORMAT("KBps", 5000555.0, "4883 KBps");
-    EXPECT_FORMAT("MPix/s", 6000666000.0, "6000 MPix/s");
-    EXPECT_FORMAT("Gbps", 7000777000.0, "56.006 Gbps");
+    EXPECT_FORMAT("MPix/s", 6000666000.0, "6001 MPix/s");
+    EXPECT_FORMAT("Gbps", 7000777000.0, "56 Gbps");
 
     EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
     EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");

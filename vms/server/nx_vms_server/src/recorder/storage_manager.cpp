@@ -1428,7 +1428,6 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
-        updateMountedStatus(storage);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }

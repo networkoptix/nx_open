@@ -15,10 +15,12 @@ public:
         for (const auto& id: {"a", "b"})
         {
             monitors[id] = std::make_unique<ValueHistoryMonitor<TestResource>>(
+                id,
                 Scope::local,
                 resource,
                 m_getters[id] = [id](const auto& r) { return r.current(id); },
                 m_watches[id] = [id](const auto& r, auto change) { return r.monitor(id, std::move(change)); });
+            monitors[id]->setOptional(true);
         }
     }
 
@@ -31,7 +33,7 @@ private:
     std::map<QString, Watch<TestResource>> m_watches;
 };
 
-TEST_F(MetricsGenerators, ValueErrors)
+TEST_F(MetricsGenerators, RuleSyntaxErrors)
 {
     for (const auto& [formula, expectedError]: std::map<QString, QString>{
         {"str hello", "Unsupported function: str"},
@@ -45,11 +47,73 @@ TEST_F(MetricsGenerators, ValueErrors)
             parseFormulaOrThrow(formula, monitors);
             FAIL() << "Did not throw: "  << formula.toStdString();
         }
-        catch(const std::logic_error& error)
+        catch(const RuleSyntaxError& error)
         {
             EXPECT_EQ(QString(error.what()), QString(expectedError)) << formula.toStdString();
         }
     }
+}
+
+TEST_F(MetricsGenerators, ValueErrors)
+{
+    const auto plusAB = parseFormulaOrThrow("add %a %b", monitors).generator;
+    const auto andAB = parseFormulaOrThrow("and %a %b", monitors).generator;
+    const auto resolutionGreaterThanAB =
+        parseFormulaOrThrow("resolutionGreaterThan %a %b", monitors).generator;
+
+    resource.update("a", "zorz");
+    resource.update("b", 7);
+
+    EXPECT_THROW(plusAB(), FormulaCalculationError);
+    EXPECT_THROW(andAB(), FormulaCalculationError);
+    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
+
+    resource.update("a", "7x7");
+    resource.update("b", "7x7");
+    EXPECT_NO_THROW(resolutionGreaterThanAB());
+
+    resource.update("b", "7x7.1");
+    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
+}
+
+TEST_F(MetricsGenerators, AlarmErrors)
+{
+    static const char* kAlarmText = "I am an alarm text!";
+    static const char* kErrorMessage = "I am an awful error!";
+    static const char* kNullErrorMessage = "I am completely null!";
+
+    std::exception_ptr errorToThrow = nullptr;
+    const auto valueGenerator = [&errorToThrow]()
+    {
+        if (errorToThrow != nullptr) std::rethrow_exception(errorToThrow);
+        return api::metrics::Value(true);
+    };
+
+    AlarmMonitor monitor(
+        "id",
+        /*isOptional*/ false,
+        nx::vms::api::metrics::AlarmLevel::error,
+        {valueGenerator, Scope::local},
+        [](){ return kAlarmText; });
+
+    const auto alarm = monitor.alarm();
+    EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
+    EXPECT_EQ(alarm->text, kAlarmText);
+
+    errorToThrow = std::make_exception_ptr(MetricsError(kErrorMessage));
+    EXPECT_DEATH(monitor.alarm(), kErrorMessage);
+
+    errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
+    EXPECT_DEATH(monitor.alarm(), kNullErrorMessage);
+
+    errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
+    AlarmMonitor monitor2(
+        "id",
+        /*isOptional*/ true,
+        nx::vms::api::metrics::AlarmLevel::error,
+        {valueGenerator, Scope::local},
+        [](){ return kAlarmText; });
+    EXPECT_EQ(monitor2.alarm(), std::nullopt);
 }
 
 TEST_F(MetricsGenerators, ValueBinary)
@@ -66,18 +130,18 @@ TEST_F(MetricsGenerators, ValueBinary)
     const auto notEqualAB = parseFormulaOrThrow("notEqual %a %b", monitors).generator;
     const auto greaterAB = parseFormulaOrThrow("greaterThan %a %b", monitors).generator;
 
-    EXPECT_EQ(plusAB(), api::metrics::Value());
-    EXPECT_EQ(minusAB(), api::metrics::Value());
-    EXPECT_EQ(equalAB(), api::metrics::Value());
-    EXPECT_EQ(notEqualAB(), api::metrics::Value());
-    EXPECT_EQ(greaterAB(), api::metrics::Value());
+    EXPECT_THROW(plusAB(), NullValueError);
+    EXPECT_THROW(minusAB(), NullValueError);
+    EXPECT_THROW(equalAB(), NullValueError);
+    EXPECT_THROW(notEqualAB(), NullValueError);
+    EXPECT_THROW(greaterAB(), NullValueError);
 
     resource.update("a", 7);
-    EXPECT_EQ(plusAB(), api::metrics::Value());
-    EXPECT_EQ(minusAB(), api::metrics::Value());
-    EXPECT_EQ(equalAB(), api::metrics::Value());
-    EXPECT_EQ(notEqualAB(), api::metrics::Value());
-    EXPECT_EQ(greaterAB(), api::metrics::Value());
+    EXPECT_THROW(plusAB(), NullValueError);
+    EXPECT_THROW(minusAB(), NullValueError);
+    EXPECT_THROW(equalAB(), NullValueError);
+    EXPECT_THROW(notEqualAB(), NullValueError);
+    EXPECT_THROW(greaterAB(), NullValueError);
 
     resource.update("b", 8);
     EXPECT_EQ(plusAB(), api::metrics::Value(15));
@@ -259,7 +323,7 @@ TEST_F(MetricsGenerators, ValueSpike)
 TEST_F(MetricsGenerators, Text)
 {
     const auto error = parseTemplate("x = %x", monitors);
-    EXPECT_EQ(error(), "x = {x IS NOT FOUND}");
+    EXPECT_DEATH(error(), "is not found");
 
     const auto values = parseTemplate("a = %a, b = %b", monitors);
     resource.update("a", 7);

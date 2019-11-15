@@ -1,0 +1,207 @@
+#include "put_in_order_data_provider.h"
+
+namespace nx::vms::server {
+
+using namespace std::chrono;
+
+static const float kExtraBufferSizeCoeff = 1.5;
+static std::chrono::microseconds kJitterAggregationPeriod = 1s;
+
+static const std::chrono::milliseconds kMinExtraBufferSize = 34ms;
+
+static milliseconds toMs(microseconds value)
+{
+    return duration_cast<milliseconds>(value);
+}
+
+// ------------------------- ProxyDataProvider -------------------------------
+
+ProxyDataProvider::ProxyDataProvider(const QnAbstractStreamDataProviderPtr& provider):
+    QnAbstractStreamDataProvider(provider->getResource()),
+    m_provider(provider)
+{
+}
+
+bool ProxyDataProvider::dataCanBeAccepted() const
+{
+    return m_provider->dataCanBeAccepted();
+}
+
+bool ProxyDataProvider::isReverseMode() const
+{
+    return m_provider->isReverseMode();
+}
+
+void ProxyDataProvider::disconnectFromResource()
+{
+    return m_provider->disconnectFromResource();
+}
+
+void ProxyDataProvider::setRole(Qn::ConnectionRole role)
+{
+    m_provider->setRole(role);
+}
+
+QnConstResourceVideoLayoutPtr ProxyDataProvider::getVideoLayout() const
+{
+    return m_provider->getVideoLayout();
+}
+
+bool ProxyDataProvider::hasVideo() const
+{
+    return m_provider->hasVideo();
+}
+
+bool ProxyDataProvider::needConfigureProvider() const
+{
+    QnMutexLocker mutex(&m_mutex);
+    for (auto processor: m_dataprocessors)
+    {
+        if (processor->needConfigureProvider())
+            return true;
+    }
+    return false;
+}
+
+void ProxyDataProvider::startIfNotRunning()
+{
+    m_provider->startIfNotRunning();
+}
+
+void ProxyDataProvider::start(Priority /*priority*/)
+{
+    // This class hasn't own thread.
+    m_provider->addDataProcessor(this);
+}
+
+void ProxyDataProvider::stop()
+{
+    m_provider->removeDataProcessor(this);
+}
+
+QnSharedResourcePointer<QnAbstractVideoCamera> ProxyDataProvider::getOwner() const
+{
+    return m_provider->getOwner();
+}
+
+// ------------------- PutInOrderDataProvider -------------------------
+
+PutInOrderDataProvider::PutInOrderDataProvider(
+    const QnAbstractStreamDataProviderPtr& provider,
+    microseconds initialQueueDuration,
+    microseconds minQueueDuration,
+    microseconds maxQueueDuration,
+    BufferingPolicy policy)
+    :
+    ProxyDataProvider(provider),
+    m_queueDuration(initialQueueDuration),
+    m_minQueueDuration(minQueueDuration),
+    m_maxQueueDuration(maxQueueDuration),
+    m_policy(policy)
+{
+    start();
+    m_timer.restart();
+}
+
+PutInOrderDataProvider::~PutInOrderDataProvider()
+{
+    stop();
+}
+
+void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
+{
+    auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    if (!media)
+        return;
+
+    updateBufferSize(data);
+
+    const auto itr = std::upper_bound(m_dataQueue.begin(), m_dataQueue.end(), media,
+        [](const QnAbstractMediaDataPtr& left, const QnAbstractMediaDataPtr& right)
+        {
+            return left->timestamp < right->timestamp;
+        });
+
+    m_dataQueue.insert(itr, media);
+
+    const auto keepDataToTime = (*m_dataQueue.rbegin())->timestamp - m_queueDuration.count();
+    while (!m_dataQueue.empty() && (*m_dataQueue.begin())->timestamp < keepDataToTime)
+    {
+        auto data = std::move(m_dataQueue.front());
+        QnAbstractStreamDataProvider::putData(data);
+        m_lastOutputTime = data->timestamp;
+        m_dataQueue.pop_front();
+    }
+}
+
+void PutInOrderDataProvider::updateBufferSize(const QnAbstractDataPacketPtr& data)
+{
+    auto multiply = [](microseconds value, float coeff)
+    {
+        return microseconds(int(value.count() * coeff));
+    };
+
+    if (m_dataQueue.empty())
+        return;
+
+    const auto lastTime = (*m_dataQueue.rbegin())->timestamp;
+
+    const microseconds jitter = microseconds(std::max(0LL, lastTime - data->timestamp));
+    if (jitter == microseconds::zero())
+        return;
+
+    const microseconds currentTime = m_timer.elapsed();
+    if (!m_lastJitter.empty() &&
+        currentTime - m_lastJitter.last().timestamp < kJitterAggregationPeriod)
+    {
+        if (jitter > m_lastJitter.last().jitter)
+        {
+            m_lastJitter.last().jitter = jitter;
+            m_lastJitter.update();
+        }
+    }
+    else
+    {
+        m_lastJitter.push_back({currentTime, jitter});
+    }
+
+    bool isJitterQueueFull = false;
+    while (m_lastJitter.front().timestamp < currentTime - kJitterBufferSize)
+    {
+        isJitterQueueFull = true;
+        m_lastJitter.pop_front();
+    }
+
+    const microseconds maxJitter= m_lastJitter.top().jitter;
+    NX_VERBOSE(this, "Time=%1, jitter: %2, maxJitter=%3",
+        toMs(microseconds(data->timestamp)), toMs(jitter), toMs(maxJitter));
+
+    const auto keepDataToTime = (*m_dataQueue.rbegin())->timestamp - m_queueDuration.count();
+    if (data->timestamp < keepDataToTime)
+    {
+        // Increase queue size if need
+        auto newValue = std::min(multiply(jitter, kExtraBufferSizeCoeff), m_maxQueueDuration);
+        if (m_queueDuration != newValue)
+        {
+            NX_DEBUG(this, "Increase queue duration from %1 to %2", toMs(m_queueDuration), toMs(newValue));
+                m_queueDuration = newValue;
+        }
+    }
+
+    const auto testJitter = multiply(maxJitter, kExtraBufferSizeCoeff);
+    if (isJitterQueueFull
+        && m_policy == BufferingPolicy::increaseAndDescrease
+        && testJitter < m_queueDuration)
+    {
+        auto newValue = std::max(testJitter, m_minQueueDuration);
+        if (m_queueDuration != newValue)
+        {
+            NX_DEBUG(this, "decrease queue duration from %1 to %2. History size %3",
+                toMs(m_queueDuration), toMs(newValue),
+                toMs(m_lastJitter.last().timestamp - m_lastJitter.front().timestamp));
+            m_queueDuration = newValue;
+        }
+    }
+}
+
+} // namespace nx::vms::server

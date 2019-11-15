@@ -40,7 +40,20 @@ class MotionArchive: public MediaServerModuleFixture
           motion->dataProvider = m_dataProviderStub.get();
 
           auto baseDateMs =
-              QDateTime::fromString("2017-12-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
+              QDateTime::fromString("2017-12-31T23:50:00", Qt::ISODate).toMSecsSinceEpoch();
+
+          motion->timestamp = (baseDateMs + (kSteps-1) * kDeltaMs)  * 1000LL; //< Data in the future.
+          serverModule().motionHelper()->saveToArchive(motion);
+
+          motion->timestamp = (baseDateMs) * 1000LL;
+          serverModule().motionHelper()->saveToArchive(motion);
+
+          for (int i = 1; i <= kSteps; ++i)
+          {
+            motion->timestamp = (baseDateMs + (kSteps-i) * kDeltaMs) * 1000LL; //< Data in the future.
+            serverModule().motionHelper()->saveToArchive(motion);
+          }
+
           for (qint64 i = 0; i < kSteps; ++i)
           {
               qint64 valueMs = baseDateMs + i * kDeltaMs;

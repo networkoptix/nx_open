@@ -356,6 +356,14 @@ QnMediaServerResourcePtr QnResourcePool::getOwnMediaServer() const
     return getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
 }
 
+QnMediaServerResourcePtr QnResourcePool::getOwnMediaServerOrThrow() const
+{
+    const auto server = getOwnMediaServer();
+    if (!server)
+        throw std::logic_error("Failed to find own resource entity");
+    return server;
+}
+
 QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus status) const
 {
     QnMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
