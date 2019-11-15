@@ -14,6 +14,13 @@ class RelayTunnelValidator:
 {
     using base_type = ::testing::Test;
 
+public:
+    ~RelayTunnelValidator()
+    {
+        if (m_validator)
+            m_validator->pleaseStopSync();
+    }
+
 protected:
     virtual void SetUp() override
     {
