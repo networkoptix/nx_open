@@ -639,9 +639,9 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
 
     if (vms::event::requiresCameraResource(m_actionType))
         return qnResIconCache->icon(QnResourceIconCache::Camera);
-    else if (vms::event::requiresServerResource(m_actionType))
+    if (vms::event::requiresServerResource(m_actionType))
         return qnResIconCache->icon(QnResourceIconCache::Server);
-    else if (vms::event::requiresUserResource(m_actionType))
+    if (vms::event::requiresUserResource(m_actionType))
         return qnResIconCache->icon(QnResourceIconCache::User);
 
     NX_ASSERT(false);
@@ -1345,7 +1345,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
     }
-    else if (vms::event::requiresServerResource(m_actionType))
+    if (vms::event::requiresServerResource(m_actionType))
     {
         QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
@@ -1358,7 +1358,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
     }
-    else if (vms::event::requiresUserResource(m_actionType))
+    if (vms::event::requiresUserResource(m_actionType))
     {
         return braced(tr("User"));
     }

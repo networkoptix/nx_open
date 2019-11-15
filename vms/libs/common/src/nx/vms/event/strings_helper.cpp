@@ -101,11 +101,11 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::serverConflictEvent:    return tr("Server Conflict");
         case EventType::serverStartEvent:       return tr("Server Started");
         case EventType::licenseIssueEvent:      return tr("License Issue");
-        case EventType::backupFinishedEvent:    return tr("Archive backup finished");
+        case EventType::backupFinishedEvent:    return tr("Archive Backup Finished");
         case EventType::analyticsSdkEvent:      return tr("Analytics Event");
         case EventType::pluginDiagnosticEvent:  return tr("Plugin Diagnostic Event");
-        case EventType::poeOverBudgetEvent:     return tr("PoE over budget");
-        case EventType::fanErrorEvent:          return tr("Fan error");
+        case EventType::poeOverBudgetEvent:     return tr("PoE over Budget");
+        case EventType::fanErrorEvent:          return tr("Fan Error");
 
         case EventType::anyServerEvent:         return tr("Any Server Issue");
         case EventType::anyEvent:               return tr("Any Event");
