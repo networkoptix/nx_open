@@ -1,6 +1,6 @@
 {
     "capabilities": "deviceDependent",
-    "objectTypes": 
+    "objectTypes":
     [
         {
             "id": "nx.hanwha.ObjectDetection.Person",
@@ -19,20 +19,26 @@
             "name": "LicensePlate"
         }
     ],
-    "deviceAgentSettingsModel": 
+    "deviceAgentSettingsModel":
     {
         "type": "Settings",
-        "items": 
+        "items":
         [
             {
                 "type": "GroupBox",
                 "caption": "1 Shock detection settings",
-                "items": 
+                "items":
                 [
                     {
+                        "type": "CheckBox",
+                        "name": "ShockDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
                         "type": "SpinBox",
-                        "name": "ShockDetection.DetectionLevel",
-                        "caption": "Detection level",
+                        "name": "ShockDetection.ThresholdLevel",
+                        "caption": "Level of detection",
                         "defaultValue": 50,
                         "minValue": 0,
                         "maxValue": 100
@@ -50,12 +56,18 @@
             {
                 "type": "GroupBox",
                 "caption": "2 Motion detection settings",
-                "items": 
+                "items":
                 [
+                    {
+                        "type": "CheckBox",
+                        "name": "MotionDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
                     {
                         "type": "GroupBox",
                         "caption": "Include area 1",
-                        "items": 
+                        "items":
                         [
                             {
                               "type": "PolygonFigure",
@@ -64,8 +76,8 @@
                             },
                             {
                                 "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea1.DetectionLevel",
-                                "caption": "Detection level",
+                                "name": "MotionDetection.IncludeArea1.ThresholdLevel",
+                                "caption": "Level of detection",
                                 "defaultValue": 50,
                                 "minValue": 0,
                                 "maxValue": 100
@@ -91,7 +103,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Include area 2",
-                        "items": 
+                        "items":
                         [
                             {
                               "type": "PolygonFigure",
@@ -100,8 +112,8 @@
                             },
                             {
                                 "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea2.DetectionLevel",
-                                "caption": "Detection level",
+                                "name": "MotionDetection.IncludeArea2.ThresholdLevel",
+                                "caption": "Level of detection",
                                 "defaultValue": 50,
                                 "minValue": 0,
                                 "maxValue": 100
@@ -123,18 +135,18 @@
                                 "maxValue": 5
                             }
                         ]
-                    },    
+                    },
                     {
                         "type": "GroupBox",
                         "caption": "Include area 3 ... 8",
-                        "items": 
+                        "items":
                         [
                         ]
                     },
                     {
                         "type": "GroupBox",
                         "caption": "Exclude areas",
-                        "items": 
+                        "items":
                         [
                             {
                               "type": "PolygonFigure",
@@ -151,7 +163,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Size",
-                        "items": 
+                        "items":
                         [
                             {
                               "type": "BoxFigure",
@@ -172,19 +184,25 @@
             {
                 "type": "GroupBox",
                 "caption": "3 Tampering detection",
-                "items": 
+                "items":
                 [
                     {
+                        "type": "CheckBox",
+                        "name": "TamperingDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
                         "type": "SpinBox",
-                        "name": "TamperingDetection.DetectionLevel",
-                        "caption": "Detection level",
+                        "name": "TamperingDetection.ThresholdLevel",
+                        "caption": "Level of detection",
                         "defaultValue": 50,
                         "minValue": 0,
                         "maxValue": 100
                     },
                     {
                         "type": "SpinBox",
-                        "name": "TamperingDetection.Sensitivity",
+                        "name": "TamperingDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
                         "minValue": 0,
@@ -210,12 +228,18 @@
             {
                 "type": "GroupBox",
                 "caption": "4 Defocus detection",
-                "items": 
+                "items":
                 [
                     {
+                        "type": "CheckBox",
+                        "name": "DefocusDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
                         "type": "SpinBox",
-                        "name": "DefocusDetection.DetectionLevel",
-                        "caption": "Detection Level",
+                        "name": "DefocusDetection.ThresholdLevel",
+                        "caption": "Level of detection",
                         "defaultValue": 20,
                         "minValue": 0,
                         "maxValue": 100
@@ -241,7 +265,7 @@
             {
                 "type": "GroupBox",
                 "caption": "AI Common Settings",
-                "items": 
+                "items":
                 [
                     {
                         "type": "SpinBox",
@@ -254,7 +278,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Size",
-                        "items": 
+                        "items":
                         [
                             {
                               "type": "BoxFigure",
@@ -269,18 +293,24 @@
                               "value": { "points": [[0.30, 0.30], [0.70, 0.70]], "color": "#e040fb" }
                             }
                         ]
-                    }    
+                    }
                 ]
-            },    
+            },
             {
                 "type": "GroupBox",
-                "caption": "5 Object detection",
-                "items": 
+                "caption": "5 Object detection [AI]",
+                "items":
                 [
+                    {
+                        "type": "CheckBox",
+                        "name": "ObjectDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
                     {
                         "type": "GroupBox",
                         "caption": "Object",
-                        "items": 
+                        "items":
                         [
                             {
                                 "type": "CheckBox",
@@ -306,7 +336,7 @@
                             {
                                 "type": "CheckBox",
                                 "name": "ObjectDetection.LicensePlate",
-                                "caption": "LicensePlate",
+                                "caption": "License plate",
                                 "defaultValue": false,
                                 "value": false
                             },
@@ -319,11 +349,11 @@
                                 "maxValue": 5
                             }
                         ]
-                    }, 
+                    },
                     {
                         "type": "GroupBox",
                         "caption": "Exclude areas",
-                        "items": 
+                        "items":
                         [
                             {
                                 "type": "PolygonFigure",
@@ -336,11 +366,11 @@
                                 "caption": "Exclude area 2"
                             }
                         ]
-                    }, 
+                    },
                     {
                         "type": "GroupBox",
                         "caption": "BestShot",
-                        "items": 
+                        "items":
                         [
                             {
                                 "type": "CheckBox",
@@ -371,12 +401,102 @@
                                 "value": false
                             }
                         ]
-                    }    
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "6 IVA(Intelligent Video Analytics) [AI]",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": "IVA.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "7 Audio detection",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": "AudioDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "AudioDetection.ThresholdLevel",
+                        "caption": "Level of detection",
+                        "defaultValue": 50,
+                        "minValue": 0,
+                        "maxValue": 100
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "8 Sound classification",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": "SoundClassification.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "SoundClassification.ThresholdLevel",
+                        "caption": "Level of classification",
+                        "defaultValue": 50,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Categories",
+                        "items":
+                        [
+                            {
+                                "type": "CheckBox",
+                                "name": "SoundClassification.Scream",
+                                "caption": "Scream",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "SoundClassification.Gunshot",
+                                "caption": "Gunshot",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "SoundClassification.Eplosion",
+                                "caption": "Eplosion",
+                                "defaultValue": false,
+                                "value": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "SoundClassification.CrashingGlass",
+                                "caption": "Crashing glass",
+                                "defaultValue": false,
+                                "value": false
+                            }
+                        ]
+                    }
                 ]
             }
         ]
     },
-    "eventTypes": 
+    "eventTypes":
     [
         {
             "id": "nx.hanwha.FaceDetection",
@@ -590,7 +710,7 @@
             "groupId": "nx.hanwha.Queue"
         }
     ],
-    "groups": 
+    "groups":
     [
         {
             "id": "nx.hanwha.Queue",
