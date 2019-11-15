@@ -212,7 +212,7 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
             return total;
         }();
 
-    const auto text = QString("%1 W/%2 W")
+    const auto text = QString("%1 W / %2 W")
         .arg(consumptionValue(consumption))
         .arg(consumptionValue(data.upperPowerLimitWatts));
 
