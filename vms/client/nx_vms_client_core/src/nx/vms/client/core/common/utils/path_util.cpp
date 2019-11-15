@@ -1,6 +1,7 @@
 #include "path_util.h"
 
 #include <QtQml/QtQml>
+#include <QtGui/QVector3D>
 
 namespace nx::vms::client::core {
 
@@ -40,6 +41,41 @@ QRectF PathUtil::boundingRect() const
 bool PathUtil::contains(const QPointF& point) const
 {
     return m_path.contains(point);
+}
+
+bool PathUtil::checkSelfIntersections() const
+{
+    if (m_points.size() < 4)
+        return false;
+
+    constexpr auto crossProductZ =
+        [](const QPointF& a, const QPointF& b)
+        {
+            return QVector3D::crossProduct(QVector3D(a), QVector3D(b)).z();
+        };
+
+    constexpr auto intersect =
+        [crossProductZ](const QPointF& s1, const QPointF& e1, const QPointF& s2, const QPointF& e2)
+        {
+            return QRectF(s1, e1).intersects(QRectF(s2, e2))
+                && crossProductZ(e1 - s1, s2 - s1) * crossProductZ(e1 - s1, e2 - s1) <= 0
+                && crossProductZ(e2 - s2, s1 - s2) * crossProductZ(e2 - s2, e1 - s2) <= 0;
+        };
+
+    // Naive algorithm of self-intersection check. Try to find intersection of any pair of
+    // segments.
+    auto points = m_points;
+    points.append(m_points.first());
+
+    for (int i = 3; i < points.size(); ++i)
+    {
+        for (int j = (i == points.size() - 1 ? 2 : 1); j <= i - 2; ++j)
+        {
+            if (intersect(points[i - 1], points[i], points[j - 1], points[j]))
+                return true;
+        }
+    }
+    return false;
 }
 
 void PathUtil::registerQmlType()
