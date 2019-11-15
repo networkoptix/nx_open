@@ -269,7 +269,17 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 audioData->m_data.write((const char*) packet.data, packet.size);
                 break;
             }
-
+            case AVMEDIA_TYPE_SUBTITLE:
+                // TODO: temporary solution. Wi will switch it to some metadata type soon
+                {
+                    auto metadata =
+                        new QnCompressedMetadata(MetadataType::ObjectDetection, packet.size);
+                    metadata->timestamp = packetTimestamp(packet);
+                    metadata->m_data.write((const char*)packet.data, packet.size);
+                    data = QnAbstractMediaDataPtr(metadata);
+                    break;
+                }
+                continue;
             default:
             {
                 continue;

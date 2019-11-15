@@ -27,9 +27,9 @@ namespace nx::vms::server {
         virtual bool needConfigureProvider() const override;
         virtual void startIfNotRunning() override;
         virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
+        virtual void stop() override;
     protected:
         virtual void start(Priority priority = InheritPriority) override;
-        virtual void stop() override;
     protected:
         QnAbstractStreamDataProviderPtr m_provider = nullptr;
     };
@@ -64,9 +64,9 @@ namespace nx::vms::server {
          */
         PutInOrderDataProvider(
             const QnAbstractStreamDataProviderPtr& provider,
-            std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
             std::chrono::microseconds minQueueDuration = kMinQueueDuration,
             std::chrono::microseconds maxQueueDuration = kMaxQueueDuration,
+            std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
             BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
         virtual ~PutInOrderDataProvider();
 

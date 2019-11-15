@@ -1592,12 +1592,11 @@ void QnStorageManager::getTimePeriodInternal(
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive && sortOrder == Qt::SortOrder::AscendingOrder)
             {
+                using namespace std::chrono;
                 lastPeriod.durationMs = 0;
-                Recorders recorders = recordingManager()->findRecorders(camera);
-                if (catalog->getCatalog() == QnServer::HiQualityCatalog && recorders.recorderHiRes)
-                    lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
-                else if (catalog->getCatalog() == QnServer::LowQualityCatalog && recorders.recorderLowRes)
-                    lastPeriod.durationMs = recorders.recorderLowRes->duration()/1000;
+                auto quality = catalog->getCatalog();
+                if (auto duration = recordingManager()->recorderFileDuration(camera, quality))
+                    lastPeriod.durationMs = duration_cast<milliseconds>(*duration).count();
             }
         }
     }

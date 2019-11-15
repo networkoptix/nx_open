@@ -88,9 +88,9 @@ QnSharedResourcePointer<QnAbstractVideoCamera> ProxyDataProvider::getOwner() con
 
 PutInOrderDataProvider::PutInOrderDataProvider(
     const QnAbstractStreamDataProviderPtr& provider,
-    microseconds initialQueueDuration,
     microseconds minQueueDuration,
     microseconds maxQueueDuration,
+    microseconds initialQueueDuration,
     BufferingPolicy policy)
     :
     ProxyDataProvider(provider),
