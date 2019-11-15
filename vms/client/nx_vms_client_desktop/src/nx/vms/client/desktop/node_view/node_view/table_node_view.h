@@ -29,7 +29,7 @@ public:
 
     using IndicesList = QList<QModelIndex>;
 
-    // The only supported user changes are checks. Generoc changes should be added.
+    // The only supported user changes are checks. Generic changes should be added.
     IndicesList userCheckChangedIndices() const;
 
     void applyUserChanges();

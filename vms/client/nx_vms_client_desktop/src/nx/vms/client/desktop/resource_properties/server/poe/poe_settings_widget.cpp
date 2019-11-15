@@ -4,8 +4,8 @@
 
 #include "ui_poe_settings_widget.h"
 
-#include <nx/vms/client/core/poe_settings/poe_controller.h>
-#include <nx/vms/client/desktop/settings/server/pages/poe_settings_reducer.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_controller.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_reducer.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <core/resource_management/resource_pool.h>

@@ -30,7 +30,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
-#include <nx/vms/client/desktop/settings/server/pages/poe_settings_widget.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;

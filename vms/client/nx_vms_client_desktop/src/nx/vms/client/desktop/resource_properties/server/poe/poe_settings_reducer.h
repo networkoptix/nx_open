@@ -3,7 +3,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
-#include <nx/vms/client/desktop/settings/server/pages/poe_settings_state.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_state.h>
 
 namespace nx::vms::api { struct NetworkBlockData; }
 
