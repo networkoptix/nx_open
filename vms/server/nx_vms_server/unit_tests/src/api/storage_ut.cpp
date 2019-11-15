@@ -1,8 +1,10 @@
 ﻿#include "test_api_requests.h"
 
+#include <test_support/user_utils.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/utils.h>
 #include <utils/crypt/symmetrical.h>
 #include <nx/utils/url.h>
 #include <core/resource_management/resource_pool.h>
@@ -11,8 +13,9 @@
 
 #include <gtest/gtest.h>
 
-namespace nx {
-namespace test {
+namespace nx::vms::server::test {
+
+using namespace nx::test;
 
 namespace {
 
@@ -65,6 +68,7 @@ TEST(GetStorages, saveAndMerge)
     storage.parentId = launcher.commonModule()->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
+
     NX_TEST_API_POST(&launcher, lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
 
     NX_INFO(this, "Retrieve the created storage.");
@@ -119,6 +123,9 @@ protected:
     virtual void SetUp() override
     {
         whenServerStarted();
+        m_viewer = test_support::createUser(
+            &m_server, nx::vms::api::GlobalPermission::advancedViewerPermissions, "viewer");
+        m_admin = test_support::getOwner(&m_server);
     }
 
     virtual void TearDown() override
@@ -132,27 +139,26 @@ protected:
         NX_TEST_API_POST(&m_server, "/ec2/saveStorage", data, removeJsonFields({"id"}));
     }
 
-    void thenItShouldBeRetrievableViaApiWithEncryptedCredentials(
+    void thenAdminShoudSeeStorageDataWithUrlUnchanged(const nx::vms::api::StorageData& expected)
+    {
+        const auto actual = getStorageData(expected.name, m_admin);
+        ASSERT_TRUE(actual);
+
+        ASSERT_EQ(expected.isBackup, actual->isBackup);
+#if 0 //< Enable when /ec2/saveStorage starts saving additional params.
+            ASSERT_EQ(expected.addParams, actual.addParams);
+#endif
+        ASSERT_EQ(expected.spaceLimit, actual->spaceLimit);
+        ASSERT_EQ(expected.storageType, actual->storageType);
+        ASSERT_EQ(expected.usedForWriting, actual->usedForWriting);
+        ASSERT_EQ(actual->url, expected.url);
+    }
+
+    void thenUserWithoutModifyPermissonsShouldSeeNoStorages(
         const nx::vms::api::StorageData& expected)
     {
-        nx::vms::api::StorageDataList storages;
-        NX_TEST_API_GET(&m_server, "/ec2/getStorages", &storages);
-        const auto dataIt = std::find_if(
-            storages.cbegin(), storages.cend(),
-            [&expected](const auto& data) { return expected.name == data.name; });
-
-        ASSERT_NE(storages.cend(), dataIt);
-        ASSERT_EQ(expected.isBackup, dataIt->isBackup);
-
-#if 0 //< Enable when /ec2/saveStorage starts saving additional params.
-            ASSERT_EQ(expected.addParams, dataIt->addParams);
-#endif
-
-        ASSERT_EQ(expected.spaceLimit, dataIt->spaceLimit);
-        ASSERT_EQ(expected.storageType, dataIt->storageType);
-        ASSERT_EQ(expected.usedForWriting, dataIt->usedForWriting);
-
-        assertUrls(expected.url, dataIt->url);
+        const auto actual = getStorageData(expected.name, m_viewer);
+        ASSERT_FALSE(actual);
     }
 
     void thenResourceShouldHaveUrlUnencrypted(const nx::vms::api::StorageData& expected)
@@ -200,6 +206,27 @@ protected:
             "UPDATE vms_resource SET url = ? where name = ?", data.url, data.name);
     }
 
+    std::optional<nx::vms::api::StorageData> getStorageData(
+        const QString& name, const nx::vms::api::UserDataEx& user)
+    {
+        nx::vms::api::StorageDataList storages;
+        NX_GTEST_WRAP(NX_TEST_API_GET(
+            &m_server,
+            "/ec2/getStorages",
+            &storages,
+            nx::network::http::StatusCode::ok,
+            user.name, user.password));
+
+        const auto dataIt = std::find_if(
+            storages.cbegin(), storages.cend(),
+            [&name](const auto& data) { return name == data.name; });
+
+        if (dataIt == storages.cend())
+            return std::nullopt;
+
+        return *dataIt;
+    }
+
 private:
     static constexpr const char* const kDbConnectionName = "test";
     static constexpr const char* const kMigrationFileName =
@@ -211,6 +238,8 @@ private:
             MediaServerLauncher::DisabledFeature::noMonitorStatistics,
             MediaServerLauncher::DisabledFeature::noResourceDiscovery});
     QSqlDatabase m_db;
+    nx::vms::api::UserDataEx m_viewer;
+    nx::vms::api::UserDataEx m_admin;
 
     void assertUrls(const QString& expected, const QString& actual)
     {
@@ -258,11 +287,11 @@ private:
     QSqlQuery createAndExecQuery(const QString& queryString, Args&&... args)
     {
         QSqlQuery query(m_db);
-        [&]() { ASSERT_TRUE(query.prepare(queryString)) << queryString.toStdString(); }();
+        NX_GTEST_WRAP(ASSERT_TRUE(query.prepare(queryString)) << queryString.toStdString());
         std::initializer_list<int> dummy = {(query.addBindValue(std::forward<Args>(args)), 42)...};
         (void) dummy;
 
-        [&]() { ASSERT_TRUE(query.exec()); }();
+        NX_GTEST_WRAP(ASSERT_TRUE(query.exec()));
         return query;
     }
 
@@ -283,8 +312,9 @@ TEST_P(Storage, CredentialsEncryption)
 {
     const auto data = storageDataWithUrl(GetParam().url);
     whenStorageDataSaved(data);
-    thenItShouldBeRetrievableViaApiWithEncryptedCredentials(data);
     thenResourceShouldHaveUrlUnencrypted(data);
+    thenAdminShoudSeeStorageDataWithUrlUnchanged(data);
+    thenUserWithoutModifyPermissonsShouldSeeNoStorages(data);
 }
 
 TEST_P(Storage, Migration)
@@ -296,8 +326,9 @@ TEST_P(Storage, Migration)
     whenStorageMigrationRecordRemoved();
     whenStorageUrlInDbAltered(data);
     whenServerStarted();
-    thenItShouldBeRetrievableViaApiWithEncryptedCredentials(data);
     thenResourceShouldHaveUrlUnencrypted(data);
+    thenAdminShoudSeeStorageDataWithUrlUnchanged(data);
+    thenUserWithoutModifyPermissonsShouldSeeNoStorages(data);
 }
 
 #if defined (Q_OS_UNIX)
@@ -330,5 +361,4 @@ TEST_P(Storage, Migration)
         ));
 #endif
 
-} // namespace test
-} // namespace nx
+} // namespace nx::vms::server::test

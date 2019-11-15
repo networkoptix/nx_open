@@ -1,0 +1,51 @@
+{
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "HD Witness.exe (bin\\HD Witness.exe)",
+      "name": ".ACS Mode Client",
+      "args": [
+        "--acs",
+        "--no-fullscreen",
+        "--proto=4001",
+        "nx-vms://cloud-test.hdw.mx/client/10.0.3.14:7001/view?resources={\"a7178593-98ad-eb04-4b85-e3cc353e245a\"},{\"97bad347-f07f-8457-cc86-76d1810bdd1a\"}&timestamp=1561470192000&auth=YWRtaW46cXdlYXNkMjM0"
+      ],
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "HD Witness.exe (bin\\HD Witness.exe)",
+      "name": "HD Witness.exe (bin\\HD Witness.exe)",
+      "args": [],
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
+      "name": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
+      "args": [
+        "--gtest_filter=ClientStateHandlerTest.*:*SharedMemory*.*"
+      ],
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "nxtool.exe (bin\\nxtool.exe)",
+      "name": "nxtool.exe (bin\\nxtool.exe)",
+      "env": "Path=${env.qtdir}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "mobile_client.exe (bin\\mobile_client.exe)",
+      "name": "mobile_client.exe (bin\\mobile_client.exe)",
+      "env": "Path=${env.qtdir}"
+    }
+  ],
+  "defaults": {},
+  "version": "0.2.1"
+}
