@@ -114,7 +114,7 @@ Window
             {
                 anchors.verticalCenter: parent.verticalCenter
                 flat: true
-                text: qsTr("Reset")
+                text: qsTr("Clear")
                 iconUrl: "qrc:/skin/text_buttons/refresh.png"
                 leftPadding: 0
                 rightPadding: 16
