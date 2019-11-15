@@ -11,6 +11,8 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count === 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
+
     MouseArea
     {
         id: mouseArea

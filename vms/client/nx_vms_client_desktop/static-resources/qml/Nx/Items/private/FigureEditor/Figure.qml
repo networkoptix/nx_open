@@ -7,6 +7,7 @@ Item
 
     property string hint: ""
     property int hintStyle: Banner.Style.Info
+    property bool acceptable: true
 
     width: parent.width
     height: parent.height

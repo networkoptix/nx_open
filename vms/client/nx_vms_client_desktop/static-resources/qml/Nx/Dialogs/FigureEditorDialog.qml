@@ -144,6 +144,7 @@ Window
                     accepted()
                 }
                 width: Math.max(implicitWidth, 80)
+                enabled: editor.figureAcceptable
             }
 
             Button

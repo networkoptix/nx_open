@@ -12,6 +12,7 @@ Item
 
     property string figureType: "polygon"
     readonly property bool hasFigure: figure && figure.hasFigure
+    readonly property bool figureAcceptable: !figure || figure.acceptable
     property color color
 
     property int hintStyle

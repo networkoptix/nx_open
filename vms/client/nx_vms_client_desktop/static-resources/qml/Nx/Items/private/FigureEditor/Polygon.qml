@@ -15,6 +15,8 @@ Figure
     property real snapDistance: 8
     readonly property bool hasFigure: pointMakerInstrument.count > 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
+    acceptable: !pathUtil.hasSelfIntersections
+        && (!pointMakerInstrument.enabled || pointMakerInstrument.count === 0)
 
     MouseArea
     {

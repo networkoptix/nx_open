@@ -10,6 +10,7 @@ Figure
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
     property string allowedDirections: "any"
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
 
     MouseArea
     {
