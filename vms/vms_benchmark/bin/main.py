@@ -1015,7 +1015,7 @@ def main(conf_file, ini_file, log_file):
 
     conf, ini = load_configs(conf_file, ini_file)
 
-    if conf['liveStreamsPerCameraRatio'] + conf['archiveStreamsPerCameraRatio'] != 0:
+    if conf['liveStreamsPerCameraRatio'] + conf['archiveStreamsPerCameraRatio'] == 0:
         raise exceptions.ConfigOptionsRestrictionError(
             'Config settings liveStreamsPerCameraRatio and archiveStreamsPerCameraRatio should not be zero ' +
             'simultaneously.'
