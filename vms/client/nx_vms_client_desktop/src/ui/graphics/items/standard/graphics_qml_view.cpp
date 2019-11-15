@@ -501,6 +501,17 @@ void GraphicsQmlView::focusOutEvent(QFocusEvent* event)
     QCoreApplication::sendEvent(d->m_quickWindow.data(), event);
 }
 
+bool GraphicsQmlView::focusNextPrevChild(bool next)
+{
+    QKeyEvent event(QEvent::KeyPress, next ? Qt::Key_Tab : Qt::Key_Backtab, Qt::NoModifier);
+    QCoreApplication::sendEvent(d->m_quickWindow.data(), &event);
+
+    QKeyEvent releaseEvent(QEvent::KeyRelease, next ? Qt::Key_Tab : Qt::Key_Backtab, Qt::NoModifier);
+    QCoreApplication::sendEvent(d->m_quickWindow.data(), &releaseEvent);
+
+    return event.isAccepted();
+}
+
 void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     if (!d->m_rootItem)
