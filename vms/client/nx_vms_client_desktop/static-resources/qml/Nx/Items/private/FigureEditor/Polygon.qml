@@ -302,6 +302,8 @@ Figure
 
     function deserialize(json)
     {
+        pointMakerInstrument.finish()
+
         if (!json)
         {
             pointMakerInstrument.clear()
