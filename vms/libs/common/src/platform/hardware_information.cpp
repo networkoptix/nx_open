@@ -61,11 +61,11 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
 
 #if !defined(__arm__) && !defined(__aarch64__)
     int cpuinfo[4];
-#if defined(_MSC_VER)
-    __cpuid(cpuinfo, 1);
-#else
-    __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
-#endif
+    #if defined(_MSC_VER)
+        __cpuid(cpuinfo, 1);
+    #else
+        __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
+    #endif
     const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
     if (hasHyperThreading)
         physicalCores /= 2;
