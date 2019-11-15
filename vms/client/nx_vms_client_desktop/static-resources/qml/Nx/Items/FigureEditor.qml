@@ -14,6 +14,9 @@ Item
     readonly property bool hasFigure: figure && figure.hasFigure
     property color color
 
+    property int hintStyle
+    property string hint: ""
+
     Rectangle
     {
         anchors.fill: parent
@@ -38,15 +41,13 @@ Item
                 return ""
         }
 
-        onLoaded: figure = item
-    }
-
-    Binding
-    {
-        target: editor
-        property: "color"
-        value: figure.color
-        when: figure
+        onLoaded:
+        {
+            figure = item
+            editor.color = Qt.binding(function() { return figure.color })
+            editor.hint = Qt.binding(function() { return figure.hint })
+            editor.hintStyle = Qt.binding(function() { return figure.hintStyle })
+        }
     }
 
     onColorChanged:

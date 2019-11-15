@@ -134,6 +134,22 @@ Figure
         }
     }
 
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start line.")
+        }
+        else
+        {
+            if (allowedDirections !== "none")
+                return qsTr("Click arrows to toggle the desired directions.")
+        }
+
+        return ""
+    }
+
     function startCreation()
     {
         pointMakerInstrument.start()

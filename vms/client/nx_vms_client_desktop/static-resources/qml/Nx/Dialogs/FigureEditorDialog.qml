@@ -67,31 +67,12 @@ Window
             }
         }
 
-        Rectangle
+        Banner
         {
-            visible: !editor.hasFigure
+            visible: text !== ""
             anchors.bottom: parent.bottom
-            width: parent.width
-            height: 32
-            color: ColorTheme.colors.brand_d6
-
-            Text
-            {
-                anchors.fill: parent
-                verticalAlignment: Text.AlignVCenter
-                leftPadding: 16
-                color: ColorTheme.buttonText
-                text:
-                {
-                    if (figureType === "line")
-                        return qsTr("Click on screen to add line")
-                    else if (figureType === "box")
-                        return qsTr("Click on screen to add box")
-                    else if (figureType === "polygon")
-                        return qsTr("Click on screen to add polygon")
-                    return ""
-                }
-            }
+            text: editor.hint
+            style: editor.hintStyle
         }
     }
 
