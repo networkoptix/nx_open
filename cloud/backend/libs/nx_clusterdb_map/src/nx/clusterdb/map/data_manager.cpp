@@ -94,6 +94,8 @@ DataManager::DataManager(
 
 DataManager::~DataManager()
 {
+    m_asyncRequestCounter.wait();
+
     m_syncEngine->incomingCommandDispatcher()
         .removeHandler<command::SaveKeyValuePair>();
 
@@ -115,8 +117,9 @@ void DataManager::insertOrUpdate(
         {
             return insertToOrUpdateDb(queryContext, key, value);
         },
-        [completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult)
+        [completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(toResult(dbResult));
         });
@@ -135,8 +138,9 @@ void DataManager::remove(
         {
             return removeFromDb(queryContext, key);
         },
-        [completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult)
+        [completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(toResult(dbResult));
         });
@@ -157,8 +161,9 @@ void DataManager::get(
             *sharedValue = getFromDb(queryContext, key);
             return nx::sql::DBResult::ok;
         },
-        [sharedValue, completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult) mutable
+        [sharedValue, completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult) mutable
         {
             completionHandler(
                 toResult(filterDbResult(*sharedValue, dbResult)),
@@ -180,8 +185,9 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
             *sharedKey = getLowerBoundFromDb(queryContext, key);
             return nx::sql::DBResult::ok;
         },
-        [sharedKey, completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult)
+        [sharedKey, completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(
                 toResult(filterDbResult(*sharedKey, dbResult)),
@@ -202,7 +208,8 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
             *sharedKey = getUpperBoundFromDb(queryContext, key);
             return nx::sql::DBResult::ok;
         },
-        [sharedKey, completionHandler = std::move(completionHandler)](
+        [sharedKey, completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(
@@ -239,8 +246,9 @@ void DataManager::getRange(
             *sharedPairs = getRangeFromDb(queryContext, keyLowerBound, keyUpperBound);
             return nx::sql::DBResult::ok;
         },
-        [sharedPairs, completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult)
+        [sharedPairs, completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
+                nx::sql::DBResult dbResult)
         {
             completionHandler(
                 toResult(filterDbResult(*sharedPairs, dbResult)),
@@ -268,7 +276,8 @@ void DataManager::getRange(
             *sharedPairs = getRangeFromDb(queryContext, keyLowerBound);
             return nx::sql::DBResult::ok;
         },
-        [sharedPairs, completionHandler = std::move(completionHandler)](
+        [sharedPairs, completionHandler = std::move(completionHandler),
+            lock = m_asyncRequestCounter.getScopedIncrement()](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(

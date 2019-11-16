@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/sql/types.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/clusterdb/engine/command.h>
 
@@ -190,6 +191,7 @@ private:
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     std::string m_clusterId;
     EventProvider* m_eventProvider;
+    nx::utils::Counter m_asyncRequestCounter;
 
     dao::KeyValueDao m_keyValueDao;
 };
