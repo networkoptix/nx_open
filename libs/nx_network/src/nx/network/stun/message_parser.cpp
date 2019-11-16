@@ -75,7 +75,12 @@ nx::network::server::ParserState MessageParser::parse(
             // Parsing completed or failed. Anyway, current message cannot be continued.
             m_cachedContent = CachedContent::header;
             m_bytesToCache = kHeaderSize;
-            return result;
+
+            // The whole message has been processed (the size defined by the message header),
+            // but did the parser stop? If not - likely, the message is malformed.
+            return result == server::ParserState::readingMessage
+                ? server::ParserState::failed
+                : result;
         }
 
         if (!NX_ASSERT(m_cachedContent == CachedContent::header))

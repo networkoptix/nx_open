@@ -270,6 +270,9 @@ TEST_F(StunMessageParser, detects_malformed_header)
     thenParseFailed();
 }
 
+/**
+ * This message has inconsistent attribute size: it conflicts with the message header.
+ */
 static constexpr char kCorruptedMessage[] =
     "AKYA9CESpEIdpZkCcDPOqQY2DZPgAwAyZGNfMWY1M2Q1OTUtMTQxNC00YWVkLTlhOWMtZTQzODAzMDJhNWFhX"
     "zEwOTY5ODMzOTYAAOAEACZ7MDk1YmIzYjAtZGU3MC00YjFiLTgzOGUtZjg1MWU2MDIzODhjfQAA4AUABAAAAA"
@@ -277,9 +280,10 @@ static constexpr char kCorruptedMessage[] =
     "iLWRlNzUzZjg4MmRmZAAAAOIEACE2NS4xMjQuMjQ2LjE3NSwxNzIuMjMuNC4yMzc6NTM3N1ZOZW0mmVBlALtO"
     "BevgR1K2RtD2";
 
-TEST_F(StunMessageParser, corrupted_message)
+TEST_F(StunMessageParser, corrupted_message_results_in_parser_error)
 {
     whenParseBuffer(QByteArray::fromBase64(kCorruptedMessage));
+    thenParseFailed();
 }
 
 } // namespace test
