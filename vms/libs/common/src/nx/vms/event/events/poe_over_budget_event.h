@@ -30,7 +30,7 @@ public:
     PoeOverBudgetEvent(
         QnMediaServerResourcePtr sourceServer,
         EventState eventState,
-        std::chrono::microseconds,
+        std::chrono::microseconds timestamp,
         double currentConsumptionWatts,
         double upperLimitWatts,
         double lowerLimitWatts);
@@ -46,3 +46,5 @@ private:
 QN_FUSION_DECLARE_FUNCTIONS(PoeOverBudgetEvent::Parameters, (json))
 
 } // namespace nx::vms::event
+
+Q_DECLARE_METATYPE(nx::vms::event::PoeOverBudgetEventPtr);

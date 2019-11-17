@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/vms/event/events/instant_event.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 namespace nx::vms::event {
 
@@ -13,3 +14,5 @@ public:
 };
 
 } // namespace nx::vms::event
+
+Q_DECLARE_METATYPE(nx::vms::event::FanErrorEventPtr);

@@ -81,6 +81,8 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/events/analytics_sdk_event.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
+#include <nx/vms/event/events/poe_over_budget_event.h>
+#include <nx/vms/event/events/fan_error_event.h>
 #include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
@@ -142,6 +144,8 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<nx::vms::event::EventReason>("nx::vms::event::EventReason");
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
     qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>();
+    qRegisterMetaType<nx::vms::event::PoeOverBudgetEventPtr>();
+    qRegisterMetaType<nx::vms::event::FanErrorEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
