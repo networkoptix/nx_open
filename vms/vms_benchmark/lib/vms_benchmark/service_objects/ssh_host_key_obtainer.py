@@ -6,9 +6,9 @@ from io import StringIO
 from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 
 
-# TODO: #alevenkov: Add a comment explaining why this is needed.
-# TODO: Rename to ObtainSshHostKeyIfNeeded.
-class SshHostKeyIsKnown:
+# plink (used on Windows) tool haven't option to disable ssh host key checking. Instead of this it has only option to
+# pass the key. Thus on Windows we should preliminary obtain the ssh host key.
+class SshHostKeyObtainer:
     def __init__(self, dev, conf_file):
         self.dev = dev
         self.conf_file = conf_file
@@ -20,8 +20,11 @@ class SshHostKeyIsKnown:
             error_messages = re.split(r'[\r\n]+', stderr.getvalue().strip())
 
             def fail(reason):
-                logging.error('Obtaining host key failed: %s. Ssh reported:\n%r',
-                    reason, error_messages)
+                logging.error(
+                    'Obtaining host key failed: %s. Ssh reported:\n%r',
+                    reason,
+                    error_messages
+                )
                 raise SshHostKeyObtainingFailed("Unable to obtain ssh host key of the box.")
 
             host_key = None

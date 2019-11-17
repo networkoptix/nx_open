@@ -6,7 +6,8 @@
 #include <QtCore/QFileInfo>
 
 #include <QtWidgets/QApplication>
-#include <QtWebKit/QWebSettings>
+#include <QtWebEngine/QtWebEngine>
+#include <QtWebEngineWidgets/QWebEngineSettings>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QSurfaceFormat>
 
@@ -238,20 +239,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initSkin();
     initLocalResources();
     initSurfaceFormat();
-
-    // WebKit initialization must occur only once per application run. Actual for ActiveX module.
-    static bool isWebKitInitialized = false;
-    if (!isWebKitInitialized)
-    {
-        const auto settings = QWebSettings::globalSettings();
-        settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
-        settings->enablePersistentStorage();
-
-        if (ini().enableWebKitDeveloperExtras)
-            settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-
-        isWebKitInitialized = true;
-    }
+    initWebEngine();
 }
 
 QnClientModule::~QnClientModule()
@@ -355,6 +343,8 @@ void QnClientModule::initSurfaceFormat()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
     format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
+    format.setDepthBufferSize(16);
+    format.setStencilBufferSize(8);
 
     QSurfaceFormat::setDefaultFormat(format);
 }
@@ -685,6 +675,57 @@ void QnClientModule::initSkin()
     commonModule->store(skin.take());
     commonModule->store(customizer.take());
     commonModule->store(new ColorTheme());
+}
+
+void QnClientModule::initWebEngine()
+{
+    // QtWebEngine uses a dedicated process to handle web pages. That process needs to know from
+    // where to load libraries. It's not a problem for release packages since everything is
+    // gathered in one place, but it is a problem for development builds. The simplest solution for
+    // this is to set library search path variable. In Linux this variable is needed only for
+    // QtWebEngine::initialize() call. After the variable could be restored to the original value.
+    // In macOS it's needed for every web page constructor, so we just set it for the whole
+    // lifetime of Client application.
+
+    const QByteArray libraryPathVariable =
+        nx::utils::AppInfo::isLinux()
+            ? "LD_LIBRARY_PATH"
+            : nx::utils::AppInfo::isMacOsX()
+                ? "DYLD_LIBRARY_PATH"
+                : "";
+
+    const QByteArray originalLibraryPath =
+        libraryPathVariable.isEmpty() ? QByteArray() : qgetenv(libraryPathVariable);
+
+    if (!libraryPathVariable.isEmpty())
+    {
+        QString libPath = QDir(QCoreApplication::applicationDirPath()).absoluteFilePath("../lib");
+        if (!originalLibraryPath.isEmpty())
+        {
+            libPath += L':';
+            libPath += originalLibraryPath;
+        }
+
+        qputenv(libraryPathVariable, libPath.toLocal8Bit());
+    }
+
+    qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
+    QtWebEngine::initialize();
+
+    const auto settings = QWebEngineSettings::defaultSettings();
+    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+
+    // TODO: Add ini parameters for WebEngine attributes
+    //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
+    //settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
+
+    if (!nx::utils::AppInfo::isMacOsX())
+    {
+        if (!originalLibraryPath.isEmpty())
+            qputenv(libraryPathVariable, originalLibraryPath);
+        else
+            qunsetenv(libraryPathVariable);
+    }
 }
 
 void QnClientModule::initLocalResources()

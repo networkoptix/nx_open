@@ -67,9 +67,9 @@ public:
     static State setAnalyticsSettingsLoading(State state, bool value);
     static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
     static std::pair<bool, State> setDeviceAgentSettingsValues(
-        State state, const QnUuid& engineId, const QVariantMap& values);
+        State state, const QnUuid& engineId, const QJsonObject& values);
     static std::pair<bool, State> resetDeviceAgentSettingsValues(
-        State state, const QnUuid& engineId, const QVariantMap& values);
+        State state, const QnUuid& engineId, const QJsonObject& values);
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(

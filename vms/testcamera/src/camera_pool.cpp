@@ -101,12 +101,13 @@ protected:
                     continue;
 
                 if (QByteArray((const char*) buffer, bytesRead).startsWith(
-                    testCameraIni().findMessage))
+                    testCameraIni().findMessage + QByteArray("\n")))
                 {
                     // got discovery message
                     qDebug() << "Got discovery message from " << peerEndpoint.toString();
                     QByteArray camResponse = QnCameraPool::instance()->getDiscoveryResponse();
                     QByteArray rez(testCameraIni().idMessage);
+                    rez.append('\n');
                     rez.append(';');
                     rez.append(camResponse);
                     discoverySock->setDestAddr( peerEndpoint );
@@ -198,11 +199,15 @@ void QnCameraPool::addCameras(
         for (int i = 0; i < primaryFileList.length(); i++)
         {
             QString primaryFile = primaryFileList[i];
-            QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
+
+            const QString secondaryFile = //< Secondary file is optional.
+                (!m_noSecondaryStream && i < secondaryFileList.length())
+                    ? secondaryFileList[i]
+                    : QString();
 
             QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
-            if (!m_noSecondaryStream)
+            if (!secondaryFile.isEmpty())
                 camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
 

@@ -357,7 +357,13 @@ void CameraSettingsDialogStore::generateLogicalId()
 void CameraSettingsDialogStore::resetExpertSettings()
 {
     d->executeAction(
-        [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+                [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+}
+
+QnUuid CameraSettingsDialogStore::resourceId() const
+{
+    return d->state.isSingleCamera()
+        ? QnUuid::fromStringSafe(d->state.singleCameraProperties.id) : QnUuid();
 }
 
 QVariantList CameraSettingsDialogStore::analyticsEngines() const
@@ -418,13 +424,13 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& v
     setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
 }
 
-QVariantMap CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
 {
     return d->state.analytics.settingsValuesByEngineId.value(engineId).get();
 }
 
 void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QVariantMap& values)
+    const QnUuid& engineId, const QJsonObject& values)
 {
     d->executeAction(
         [&](State state)
@@ -434,7 +440,7 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
 }
 
 void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QVariantMap& values)
+    const QnUuid& engineId, const QJsonObject& values)
 {
     d->executeAction(
         [&](State state)

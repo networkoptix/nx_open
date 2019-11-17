@@ -191,50 +191,50 @@
         "default": "interface web de {{PRODUCT_NAME}}"
     },
     "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "pausa",
-            "help": "help | show commands",
-            "collapse all servers": "recolher todos os servidores",
-            "collapse server": "collapse server + [server name]",
-            "play": "reproduzir",
-            "clear search": "limpar pesquisa",
-            "live": "go to live | show me live",
-            "expand all servers": "expandir todos os servidores",
-            "stop listening": "parar de ouvir",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Sistema Offline",
         "cameraLinks": {
-            "copyToClipboard": "copiar para o Clipboard",
             "highStream": "High stream",
-            "copyDefaultText": "copiar",
-            "unknown": "Desconhecido",
             "lowStream": "Low stream",
             "transcoding": "Transcoding",
+            "unknown": "Desconhecido",
+            "copyToClipboard": "copiar para o Clipboard",
+            "copyDefaultText": "copiar",
             "copyActiveText": "copiado para o Clipboard"
         },
-        "searchCamPlaceholder": "Pesquisar",
+        "systemOffline": "Sistema Offline",
         "cameraStates": {
-            "noFormat": "Este browser não suporta a reprodução de vídeo desta câmara.",
-            "ieWin10": "Por favor, utilize browsers Microsoft Edge ou Google Chrome.",
-            "iosVideoTooLarge": "O iOS não suporta vídeos maiores que fullHD (2MP: 1920x1080).",
+            "offline": "Offline",
+            "error": "Erro",
             "unauthorized": "Necessária autenticação",
-            "ubuntuNX": "Este navegador não suporta vídeo de servidores baseados em ARM. Por favor, use o navegador Chromium.",
-            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para o Internet Explorer.",
+            "noData": "Sem dados",
+            "iosVideoTooLarge": "O iOS não suporta vídeos maiores que fullHD (2MP: 1920x1080).",
+            "flashRequired": "Por favor, <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> para reproduzir vídeos.",
             "flashOrWebmRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> ou o <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para reproduzir vídeo no Internet Explorer.",
             "noArmSupport": "Este navegador ou dispositivo não suporta a reprodução de vídeo a partir de servidores baseados em ARM.",
-            "error": "Erro",
-            "offline": "Offline",
-            "noData": "Sem dados",
-            "flashRequired": "Por favor, <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> para reproduzir vídeos."
+            "noFormat": "Este browser não suporta a reprodução de vídeo desta câmara.",
+            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para o Internet Explorer.",
+            "ieWin10": "Por favor, utilize browsers Microsoft Edge ou Google Chrome.",
+            "ubuntuNX": "Este navegador não suporta vídeo de servidores baseados em ARM. Por favor, use o navegador Chromium."
+        },
+        "searchCamPlaceholder": "Pesquisar",
+        "resolution": {
+            "auto": "Auto",
+            "high": "Alta",
+            "low": "Baixa"
         },
         "chromeCastWarning": "O Chromecast consome muitos recursos e pode causar problemas no seu servidor.",
-        "resolution": {
-            "high": "Alta",
-            "auto": "Auto",
-            "low": "Baixa"
+        "voiceCommands": {
+            "play": "reproduzir",
+            "pause": "pausa",
+            "live": "go to live | show me live",
+            "view": "view + [camera name]",
+            "search": "find + [text for searchbar]",
+            "clear search": "limpar pesquisa",
+            "expand server": "expand server + [server name]",
+            "collapse server": "collapse server + [server name]",
+            "expand all servers": "expandir todos os servidores",
+            "collapse all servers": "recolher todos os servidores",
+            "stop listening": "parar de ouvir",
+            "help": "help | show commands"
         }
     }
 }

@@ -1,6 +1,6 @@
 import QtQuick 2.6
-import QtMultimedia 5.0
 import Nx 1.0
+import nx.client.core 1.0
 
 Item
 {
@@ -14,8 +14,8 @@ Item
 
     property real videoCenterHeightOffsetFactor: 0
 
-    property real visibleVideoWidth: Utils.isRotated90(videoRotation) ? item.height : item.width
-    property real visibleVideoHeight: Utils.isRotated90(videoRotation) ? item.width : item.height
+    property real visibleVideoWidth: Geometry.isRotated90(videoRotation) ? item.height : item.width
+    property real visibleVideoHeight: Geometry.isRotated90(videoRotation) ? item.width : item.height
 
     readonly property real leftPadding: (width - visibleVideoWidth) / 2
     readonly property real rightPadding: leftPadding
@@ -36,7 +36,7 @@ Item
         var width = sourceSize.width
         var height = width / videoAr
 
-        if (Utils.isRotated90(videoRotation))
+        if (Geometry.isRotated90(videoRotation))
             return Qt.size(width, height)
         else
             return Qt.size(height, width)
@@ -54,7 +54,7 @@ Item
     function updateSize()
     {
         var size = boundedSize(width, height)
-        if (Utils.isRotated90(videoRotation))
+        if (Geometry.isRotated90(videoRotation))
         {
             item.width = size.height
             item.height = size.width
@@ -86,7 +86,7 @@ Item
         if (height === 0.0 || sourceSize.height === 0.0)
             return Qt.size(0, 0)
 
-        var rotated90 = Utils.isRotated90(videoRotation)
+        var rotated90 = Geometry.isRotated90(videoRotation)
         var boundAr = width / height
         var videoAr = (customAspectRatio == 0
             ? sourceSize.width / sourceSize.height

@@ -760,7 +760,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
-        [](const Camera& camera) { return camera->isCameraControlDisabled(); });
+        [](const Camera& camera) { return camera->isCameraControlDisabledInternal(); });
 
     fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
         [](const Camera& camera) { return camera->useBitratePerGop(); });
@@ -1489,7 +1489,7 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
-    State state, const QnUuid& engineId, const QVariantMap& values)
+    State state, const QnUuid& engineId, const QJsonObject& values)
 {
     if (!std::any_of(
         state.analytics.engines.begin(),
@@ -1510,7 +1510,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(
-    State state, const QnUuid& engineId, const QVariantMap& values)
+    State state, const QnUuid& engineId, const QJsonObject& values)
 {
     state.analytics.settingsValuesByEngineId[engineId].setBase(values);
     state.analytics.settingsValuesByEngineId[engineId].resetUser();

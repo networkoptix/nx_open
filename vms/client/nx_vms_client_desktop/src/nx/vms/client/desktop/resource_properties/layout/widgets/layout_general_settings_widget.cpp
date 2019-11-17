@@ -1,14 +1,14 @@
 #include "layout_general_settings_widget.h"
 #include "ui_layout_general_settings_widget.h"
+#include "../redux/layout_settings_dialog_store.h"
+#include "../redux/layout_settings_dialog_state.h"
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include "../redux/layout_settings_dialog_store.h"
-#include "../redux/layout_settings_dialog_state.h"
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 
 namespace nx::vms::client::desktop {
@@ -58,6 +58,10 @@ void LayoutGeneralSettingsWidget::setupUi()
     auto logicalIdHint = nx::vms::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
     logicalIdHint->addHintLine(
         tr("Custom number that can be assigned to a layout for quick identification and access"));
+
+    setWarningStyleOn(ui->logicalIdWarningLabel);
+    ui->logicalIdWarningLabel->setText(tr("This ID is already used in the System. "
+        "Use Generate button to find a free ID."));
 }
 
 void LayoutGeneralSettingsWidget::loadState(const LayoutSettingsDialogState& state)
@@ -67,6 +71,12 @@ void LayoutGeneralSettingsWidget::loadState(const LayoutSettingsDialogState& sta
     ui->fixedSizeGroupBox->setChecked(state.fixedSizeEnabled);
     ui->fixedWidthSpinBox->setValue(state.fixedSize.width());
     ui->fixedHeightSpinBox->setValue(state.fixedSize.height());
+
+    const bool duplicateLogicalId =
+        state.otherLogicalIds.find(state.logicalId) != state.otherLogicalIds.cend();
+
+    ui->logicalIdWarningLabel->setVisible(duplicateLogicalId);
+    setWarningStyleOn(ui->logicalIdSpinBox, duplicateLogicalId);
 }
 
 } // namespace nx::vms::client::desktop

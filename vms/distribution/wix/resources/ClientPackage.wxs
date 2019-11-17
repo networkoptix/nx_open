@@ -6,7 +6,7 @@
         <PackageGroup Id="ClientPackageGroup">
             <MsiPackage
                 Id="ClientPackage"
-                Name="$(var.ClientMsiName)"
+                Name="client"
                 SourceFile="$(var.ClientStrippedMsiFile)"
                 InstallCondition="InstallClientOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"

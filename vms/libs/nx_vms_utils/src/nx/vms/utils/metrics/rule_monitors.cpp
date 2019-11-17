@@ -38,7 +38,7 @@ public:
         if (m_parts.size() > index)
             return m_parts[index];
 
-        throw std::domain_error("Missing parameter in formula: " + m_formula.toStdString());
+        throw RuleSyntaxError("Missing parameter in formula: " + m_formula.toStdString());
     }
 
     ValueMonitor* monitor(int index) const
@@ -47,7 +47,7 @@ public:
         if (id.startsWith(kVariableMark))
             return monitor(id.mid(kVariableMark.size()));
 
-        throw std::domain_error("Expected parameter instead of value in formula: "
+        throw RuleSyntaxError("Expected parameter instead of value in formula: "
             + m_formula.toStdString());
     }
 
@@ -60,7 +60,7 @@ public:
             return m;
         }
 
-        throw std::invalid_argument("Unknown value id: " + id.toStdString());
+        throw UnknownValueId("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }
@@ -82,15 +82,12 @@ public:
         return
             [operation, getter1 = value(firstI), getter2 = value(secondI)]
             {
-                // Currently all of the values are optional. If one of them is missing, the formula
-                // result should be missing too.
-                // TODO: Add optionality marker to all formulas and report error if any of
-                // non-optional values is missing.
                 const Value v1 = getter1();
                 const Value v2 = getter2();
-                return (v1.isNull() || v2.isNull())
-                    ? Value() //< No value if 1 of arguments is missing.
-                    : Value(operation(std::move(v1), std::move(v2)));
+                if (v1.isNull() || v2.isNull())
+                    throw NullValueError("At least one argument is missing");
+
+                return Value(operation(std::move(v1), std::move(v2)));
             };
     }
 
@@ -101,24 +98,37 @@ public:
             firstI, secondI,
             [operation](Value v1, Value v2)
             {
-                // Currenlty we do not have any way of reporting errors to the user. Returning the
-                // error string is the only option for error detection during manual testing. End
-                // users will newer see them, because rules newer change and we test our product
-                // properly :).
-                // TODO: Implement some kind of error handling, visible to the user.
-                return (!v1.isDouble() || !v2.isDouble())
-                    ? Value("ERROR: One of the arguments is not an integer")
-                    : Value(operation(v1.toDouble(), v2.toDouble()));
+                if (!v1.isDouble() || !v2.isDouble())
+                    throw FormulaCalculationError("At least one argument is not a number");
+                return Value(operation(v1.toDouble(), v2.toDouble()));
             });
     }
 
-    static auto square(Value value)
+    template<typename Operation> //< Value(bool, bool)
+    ValueGenerator boolOperation(int firstI, int secondI, Operation operation) const
+    {
+        return binaryOperation(
+            firstI, secondI,
+            [operation](Value v1, Value v2)
+            {
+                if (!v1.isBool() || !v2.isBool())
+                    throw FormulaCalculationError("At least one argument is not a boolean");
+                return Value(operation(v1.toBool(), v2.toBool()));
+            });
+    }
+
+    static int square(Value value) noexcept(false)
     {
         const auto params = value.toString().split(L'x');
-        if (params.size() == 2)
-            return params[0].toInt() * params[1].toInt();
+        if (params.size() != 2)
+            throw FormulaCalculationError("Invalid resolution size syntax");
 
-        return 0;
+        bool isOk1 = false;
+        bool isOk2 = false;
+        int result = params[0].toInt(&isOk1) * params[1].toInt(&isOk2);
+        if (!isOk1 || !isOk2)
+            throw FormulaCalculationError("Invalid resolution size syntax: integers expected");
+        return result;
     }
 
     ValueGenerator getBinaryOperation() const
@@ -151,10 +161,10 @@ public:
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
 
         if (function() == "&&" || function() == "and")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() && v2.toBool(); });
+            return boolOperation(1, 2, [](auto v1, auto v2) { return v1 && v2; });
 
         if (function() == "||" || function() == "or")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1.toBool() || v2.toBool(); });
+            return boolOperation(1, 2, [](auto v1, auto v2) { return v1 || v2; });
 
         return nullptr;
     }
@@ -171,8 +181,7 @@ public:
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
                 {
-                    // TODO: Error handling.
-                    return Value("ERROR: Wrong duration: " + durationStr);
+                    throw FormulaCalculationError("Invalid duration: " + durationStr.toStdString());
                 }
 
                 return Value(operation(
@@ -295,7 +304,7 @@ public:
         if (auto generator = getDurationOperation())
             return generator;
 
-        throw std::domain_error("Unsupported function: " + function().toStdString());
+        throw RuleSyntaxError("Unsupported function: " + function().toStdString());
     }
 
     bool isLocal() const { return m_isLocal; }
@@ -315,7 +324,7 @@ ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& m
     {
         return parseFormulaOrThrow(formula, monitors);
     }
-    catch (const std::domain_error& error)
+    catch (const RuleSyntaxError& error)
     {
         NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formula '%1': %2", formula, error.what());
         return ValueGeneratorResult{nullptr, Scope::local};
@@ -332,11 +341,12 @@ ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMoni
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
 {
     const auto value =
-        [monitors = &monitors](const QString& name) -> QString
+        [template_, monitors = &monitors](const QString& name) -> QString
         {
             if (const auto it = monitors->find(name); it != monitors->end())
                 return it->second->formattedValue().toVariant().toString();
 
+            NX_ASSERT(false, "Value [%1] is not found for template [%2]", name, template_);
             return nx::utils::log::makeMessage("{%1 IS NOT FOUND}", name);
         };
 
@@ -347,8 +357,8 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
         };
 }
 
-ExtraValueMonitor::ExtraValueMonitor(ValueGeneratorResult formula):
-    ValueMonitor(formula.scope),
+ExtraValueMonitor::ExtraValueMonitor(QString name, ValueGeneratorResult formula):
+    ValueMonitor(std::move(name), formula.scope),
     m_generator(std::move(formula.generator))
 {
 }
@@ -358,9 +368,18 @@ void ExtraValueMonitor::setGenerator(ValueGenerator generator)
     m_generator = std::move(generator);
 }
 
-api::metrics::Value ExtraValueMonitor::value() const
+api::metrics::Value ExtraValueMonitor::valueOrThrow() const
 {
-    return m_generator();
+    try
+    {
+        return m_generator();
+    }
+    catch (const NullValueError&)
+    {
+        if (!optional())
+            throw;
+        return {};
+    }
 }
 
 void ExtraValueMonitor::forEach(
@@ -370,23 +389,53 @@ void ExtraValueMonitor::forEach(
 }
 
 AlarmMonitor::AlarmMonitor(
+    QString parentParameterId,
+    bool isOptional,
     api::metrics::AlarmLevel level,
     ValueGeneratorResult condition,
     TextGenerator text)
 :
+    m_parentParameterId(std::move(parentParameterId)),
+    m_optional(isOptional),
     m_scope(condition.scope),
     m_level(std::move(level)),
     m_condition(std::move(condition.generator)),
-    m_text(std::move(text))
+    m_textGenerator(std::move(text))
 {
 }
 
 std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
 {
-    if (!m_condition().toBool())
-        return std::nullopt;
+    try {
+        if (!m_condition().toBool())
+            return std::nullopt;
 
-    return api::metrics::Alarm{m_level, m_text()};
+        return api::metrics::Alarm{m_level, m_textGenerator()};
+    }
+    catch (const ExpectedError& e)
+    {
+        NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
+    }
+    catch (const NullValueError& e)
+    {
+        NX_ASSERT(m_optional, "Value %1 is not optional: %2", this, e.what());
+    }
+    catch (const MetricsError& e)
+    {
+        NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
+    }
+    catch (const std::exception& e)
+    {
+        NX_ASSERT(false, "Unexpected general error when checkin alarm %1: %2", this, e.what());
+    }
+
+    // TODO: Should we return error to the user if it occures?
+    return std::nullopt;
+}
+
+QString AlarmMonitor::idForToStringFromPtr() const
+{
+    return m_parentParameterId;
 }
 
 } // namespace nx::vms::utils::metrics

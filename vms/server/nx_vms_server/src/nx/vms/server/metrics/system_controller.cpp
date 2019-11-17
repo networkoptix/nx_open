@@ -27,7 +27,7 @@ void SystemResourceController::start()
                 remove(*m_lastId);
 
             m_lastId = globalSettings()->localSystemId();
-            add(nullptr, *m_lastId, utils::metrics::Scope::system);
+            add(nullptr, m_lastId->toSimpleString(), utils::metrics::Scope::system);
         });
 }
 
@@ -45,17 +45,7 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "servers",
-                [pool](const auto&)
-                {
-                    return Value(pool->getAllServers(Qn::AnyStatus).size());
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "users",
-                [pool](const auto&)
-                {
-                    return Value(pool->getResources<QnUserResource>().size());
-                }
+                [pool](const auto&) { return Value(pool->getAllServers(Qn::AnyStatus).size()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "cameras",
@@ -67,19 +57,22 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "storages",
+                [pool](const auto&) { return Value(pool->getResources<QnStorageResource>().size()); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "users",
                 [pool](const auto&)
                 {
-                    return Value(pool->getResources<QnStorageResource>().size());
+                    // Subtracting video wall user (see: addFakeVideowallUser),
+                    // avoid filtering for performance.
+                    return Value(pool->getResources<QnUserResource>().size() - 1);
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "version",
                 [pool](const auto&)
                 {
-                    const auto guid = pool->commonModule()->moduleGUID();
-                    if (auto server = pool->getResourceById<QnMediaServerResource>(guid))
-                        return Value(toString(server->getVersion()));
-                    return Value();
+                    return Value(toString(pool->getOwnMediaServerOrThrow()->getVersion()));
                 }
             )
         )

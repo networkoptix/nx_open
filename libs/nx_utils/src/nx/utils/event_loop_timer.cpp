@@ -2,6 +2,8 @@
 
 #include <QtCore/QThread>
 
+#include <limits>
+
 namespace nx::utils {
 
 using namespace std::chrono;
@@ -11,7 +13,7 @@ EventLoopTimer::EventLoopTimer(milliseconds checkPeriod):
     m_timer(this),
     m_checkPeriod(checkPeriod)
 {
-    NX_ASSERT(checkPeriod >= 1ms);
+    NX_ASSERT(checkPeriod >= 1ms && checkPeriod.count() < std::numeric_limits<int>::max());
     m_timer.setSingleShot(true);
     QObject::connect(&m_timer, &QTimer::timeout, this, &EventLoopTimer::onTimer);
 }
@@ -19,7 +21,7 @@ EventLoopTimer::EventLoopTimer(milliseconds checkPeriod):
 void EventLoopTimer::start(milliseconds timeout, MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(timeout >= std::chrono::milliseconds::zero());
-    NX_ASSERT(handler);
+    NX_CRITICAL(handler);
 
     std::lock_guard<std::mutex> lock(m_mutex);
 

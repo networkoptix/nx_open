@@ -711,35 +711,27 @@ QnVirtualCameraResource::DeviceAgentManifestMap
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
 }
 
-QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const
+QHash<QnUuid, QJsonObject> QnVirtualCameraResource::deviceAgentSettingsValues() const
 {
-    const auto values = QJson::deserialized<QHash<QnUuid, QJsonObject>>(
+    return QJson::deserialized<QHash<QnUuid, QJsonObject>>(
         getProperty(kDeviceAgentsSettingsValuesProperty).toUtf8());
-
-    QHash<QnUuid, QVariantMap> result;
-    for (auto it = values.begin(); it != values.end(); ++it)
-        result.insert(it.key(), it.value().toVariantMap());
-    return result;
 }
 
 void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QHash<QnUuid, QVariantMap>& settingsValues)
+    const QHash<QnUuid, QJsonObject>& settingsValues)
 {
-    QHash<QnUuid, QJsonObject> result;
-    for (auto it = settingsValues.begin(); it != settingsValues.end(); ++it)
-        result.insert(it.key(), QJsonObject::fromVariantMap(it.value()));
-
-    setProperty(kDeviceAgentsSettingsValuesProperty, QString::fromUtf8(QJson::serialized(result)));
+    setProperty(kDeviceAgentsSettingsValuesProperty,
+        QString::fromUtf8(QJson::serialized(settingsValues)));
     saveProperties();
 }
 
-QVariantMap QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
+QJsonObject QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
 {
     return deviceAgentSettingsValues()[engineId];
 }
 
 void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QVariantMap& settingsValues)
+    const QnUuid& engineId, const QJsonObject& settingsValues)
 {
     auto settingsValuesByEngineId = deviceAgentSettingsValues();
     settingsValuesByEngineId[engineId] = settingsValues;

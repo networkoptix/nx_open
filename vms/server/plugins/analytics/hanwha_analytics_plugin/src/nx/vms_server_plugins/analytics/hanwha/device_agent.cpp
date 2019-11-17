@@ -1,6 +1,7 @@
 #include "device_agent.h"
 
 #include <chrono>
+#include <sstream>
 
 #include <QtCore/QUrl>
 
@@ -14,6 +15,8 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
+
+#include <nx/sdk/helpers/string_map.h>
 
 #include "common.h"
 
@@ -59,10 +62,116 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
+const char* upperBoolean(const char* value)
 {
-    // There are no DeviceAgent settings for this plugin.
+    if (!value)
+        return nullptr;
+    if (strcmp(value, "false") == 0)
+        return "False";
+    if (strcmp(value, "true") == 0)
+        return "True";
+    return value;
+}
+
+void DeviceAgent::updateCameraEventSetting(
+    const IStringMap* settings,
+    const char* commandPreambule,
+    AnalyticsParamSpan analyticsParamSpan,
+   Ptr<StringMap>& errorMap)
+{
+
+    std::stringstream query;
+    query << commandPreambule;
+
+    bool areParametersRead = true; //< optimistic prediction
+
+    for (auto param: analyticsParamSpan)
+    {
+        if (const auto value = upperBoolean(settings->value(param.plugin)); value)
+        {
+            query << param.sunapi << value;
+        }
+        else //< very unlikely
+        {
+            errorMap->setItem(param.plugin, "Failed to receive a value from server");
+            areParametersRead = false;
+        }
+    }
+    if (!areParametersRead)
+        return;
+
+    nx::utils::Url command(m_url);
+    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
+    command.setPath(kEventPath);
+    command.setQuery(QString::fromStdString(query.str()));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    bool isApproved = false;
+    std::string errorMessage;
+    if (!isSent)
+    {
+        errorMessage = "Failed to send command to camera.";
+    }
+    else
+    {
+        auto* response = m_settingsHttpClient.response();
+        isApproved = (response->statusLine.statusCode == 200);
+        if (!isApproved)
+            errorMessage = response->statusLine.toString().toStdString();
+    }
+    if (!isSent || !isApproved)
+    {
+        for (const auto& param: analyticsParamSpan)
+            errorMap->setItem(param.plugin, errorMessage.c_str());
+    }
+
+}
+
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* outResult, const IStringMap* settings)
+{
+    auto errorMap = makePtr<nx::sdk::StringMap>();
+    std::string errorMessage;
+
+    {
+        // 1. ShockDetection. SUNAPI 2.5.4 (2018-08-07) 2.23
+        constexpr const char* kShockPreambule = "msubmenu=shockdetection&action=set";
+        constexpr AnalyticsParam kShockParams[] = {
+            { "ShockDetection.Enable", "&Enable=" },
+            { "ShockDetection.ThresholdLevel", "&ThresholdLevel=" },
+            { "ShockDetection.Sensitivity", "&Sensitivity=" }
+        };
+        updateCameraEventSetting(settings, kShockPreambule, kShockParams, errorMap);
+    }
+    {
+        // 2. MotionDetection
+    }
+    {
+        // 3. TamperingDetection 2.6
+        constexpr const char* kTamperingPreambule = "msubmenu=tamperingdetection&action=set";
+        constexpr AnalyticsParam kTamperingParams[] = {
+            { "TamperingDetection.Enable", "&Enable=" },
+            { "TamperingDetection.ThresholdLevel", "&ThresholdLevel=" },
+            { "TamperingDetection.SensitivityLevel", "&SensitivityLevel=" },
+            { "TamperingDetection.MinimumDuration", "&Duration=" },
+            { "TamperingDetection.ExceptDarkImages", "&DarknessDetection=" }
+        };
+        updateCameraEventSetting(settings, kTamperingPreambule, kTamperingParams, errorMap);
+    }
+
+    {
+        // 4. DefocusDetection SUNAPI 2.5.4 (2018-08-07) 2.14
+        constexpr const char* kDefocusPreambule = "msubmenu=defocusdetection&action=set";
+        constexpr AnalyticsParam kDefocuseParams[] = {
+            { "DefocusDetection.Enable", "&Enable=" },
+            { "DefocusDetection.ThresholdLevel", "&ThresholdLevel=" },
+            { "DefocusDetection.Sensitivity", "&Sensitivity=" },
+            { "DefocusDetection.MinimumDuration", "&Duration=" }
+        };
+        updateCameraEventSetting(settings, kDefocusPreambule, kDefocuseParams, errorMap);
+    }
+
+    *outResult = errorMap.releasePtr();
 }
 
 void DeviceAgent::getPluginSideSettings(
@@ -159,6 +268,9 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
+
+    m_settingsHttpClient.setUserName(m_auth.user());
+    m_settingsHttpClient.setUserPassword(m_auth.password());
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

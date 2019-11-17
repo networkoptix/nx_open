@@ -921,7 +921,7 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
+    if (m_currentData && streamDataFilter.testFlag(StreamDataFilter::motion))
     {
         const int channel = m_currentData->channelNumber;
 
@@ -950,7 +950,6 @@ void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters
     constexpr int kAnalyticsReaderId = 1;
 
     const bool sendMotion = filter.testFlag(StreamDataFilter::motion);
-    const bool sendAnalytics = filter.testFlag(StreamDataFilter::objectDetection);
 
     if (!m_motionConnection[channel])
         m_motionConnection[channel] = std::make_shared<MetadataMultiplexer>();
@@ -964,16 +963,6 @@ void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters
 
     if (!sendMotion && m_motionConnection[channel]->readerById(kMotionReaderId))
         m_motionConnection[channel]->removeById(kMotionReaderId);
-
-    if (sendAnalytics && !m_motionConnection[channel]->readerById(kAnalyticsReaderId))
-    {
-        auto analyticsReader = m_delegate->getAnalyticsConnection(channel);
-        if (analyticsReader)
-            m_motionConnection[channel]->add(kAnalyticsReaderId, analyticsReader);
-    }
-
-    if (!sendAnalytics && m_motionConnection[channel]->readerById(kAnalyticsReaderId))
-        m_motionConnection[channel]->removeById(kAnalyticsReaderId);
 }
 
 void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
@@ -1032,6 +1021,14 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
                 return createEmptyPacket(isReverseMode());
             }
         }
+
+        if (result && result->dataType == QnAbstractMediaData::GENERIC_METADATA
+            && !m_streamDataFilter.testFlag(StreamDataFilter::objectDetection))
+        {
+            continue;
+        }
+
+
         break;
     }
 

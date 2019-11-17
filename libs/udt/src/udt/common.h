@@ -50,9 +50,9 @@ Yunhong Gu, last updated 08/01/2009
 #include <windows.h>
 #endif
 #include <cstdlib>
+
 #include "udt.h"
 #include "socket_addresss.h"
-
 
 #ifdef _WIN32
 // Windows compability
@@ -71,6 +71,14 @@ int pthread_cond_wait_monotonic_timeout(
 
 int pthread_cond_wait_monotonic_timepoint(
     pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks);
+#endif
+
+#ifdef _WIN32
+using ThreadId = DWORD;
+#else
+using ThreadId = pthread_t;
+
+ThreadId GetCurrentThreadId();
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,35 +208,6 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class CGuard
-{
-public:
-    CGuard(pthread_mutex_t& lock);
-    ~CGuard();
-
-    void unlock();
-
-public:
-    static void createMutex(pthread_mutex_t& lock);
-    static void releaseMutex(pthread_mutex_t& lock);
-
-    static void createCond(pthread_cond_t& cond);
-    static void releaseCond(pthread_cond_t& cond);
-
-private:
-    pthread_mutex_t& m_Mutex;            // Alias name of the mutex to be protected
-    bool m_iLocked;                       // Locking status
-
-    CGuard& operator=(const CGuard&);
-
-    static bool enterCS(pthread_mutex_t& lock);
-    static bool leaveCS(pthread_mutex_t& lock);
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 // UDT Sequence Number 0 - (2^31 - 1)
 
 // seqcmp: compare two seq#, considering the wraping
@@ -241,17 +220,17 @@ private:
 class CSeqNo
 {
 public:
-    inline static int seqcmp(int32_t seq1, int32_t seq2)
+    static int seqcmp(int32_t seq1, int32_t seq2)
     {
         return (abs(seq1 - seq2) < m_iSeqNoTH) ? (seq1 - seq2) : (seq2 - seq1);
     }
 
-    inline static int seqlen(int32_t seq1, int32_t seq2)
+    static int seqlen(int32_t seq1, int32_t seq2)
     {
         return (seq1 <= seq2) ? (seq2 - seq1 + 1) : (seq2 - seq1 + m_iMaxSeqNo + 2);
     }
 
-    inline static int seqoff(int32_t seq1, int32_t seq2)
+    static int seqoff(int32_t seq1, int32_t seq2)
     {
         if (abs(seq1 - seq2) < m_iSeqNoTH)
             return seq2 - seq1;
@@ -262,17 +241,17 @@ public:
         return seq2 - seq1 + m_iMaxSeqNo + 1;
     }
 
-    inline static int32_t incseq(int32_t seq)
+    static int32_t incseq(int32_t seq)
     {
         return (seq == m_iMaxSeqNo) ? 0 : seq + 1;
     }
 
-    inline static int32_t decseq(int32_t seq)
+    static int32_t decseq(int32_t seq)
     {
         return (seq == 0) ? m_iMaxSeqNo : seq - 1;
     }
 
-    inline static int32_t incseq(int32_t seq, int32_t inc)
+    static int32_t incseq(int32_t seq, int32_t inc)
     {
         return (m_iMaxSeqNo - seq >= inc) ? seq + inc : seq - m_iMaxSeqNo + inc - 1;
     }
@@ -289,7 +268,7 @@ public:
 class CAckNo
 {
 public:
-    inline static int32_t incack(int32_t ackno)
+    static int32_t incack(int32_t ackno)
     {
         return (ackno == m_iMaxAckSeqNo) ? 0 : ackno + 1;
     }
@@ -305,17 +284,17 @@ public:
 class CMsgNo
 {
 public:
-    inline static int msgcmp(int32_t msgno1, int32_t msgno2)
+    static int msgcmp(int32_t msgno1, int32_t msgno2)
     {
         return (abs(msgno1 - msgno2) < m_iMsgNoTH) ? (msgno1 - msgno2) : (msgno2 - msgno1);
     }
 
-    inline static int msglen(int32_t msgno1, int32_t msgno2)
+    static int msglen(int32_t msgno1, int32_t msgno2)
     {
         return (msgno1 <= msgno2) ? (msgno2 - msgno1 + 1) : (msgno2 - msgno1 + m_iMaxMsgNo + 2);
     }
 
-    inline static int msgoff(int32_t msgno1, int32_t msgno2)
+    static int msgoff(int32_t msgno1, int32_t msgno2)
     {
         if (abs(msgno1 - msgno2) < m_iMsgNoTH)
             return msgno2 - msgno1;
@@ -326,7 +305,7 @@ public:
         return msgno2 - msgno1 + m_iMaxMsgNo + 1;
     }
 
-    inline static int32_t incmsg(int32_t msgno)
+    static int32_t incmsg(int32_t msgno)
     {
         return (msgno == m_iMaxMsgNo) ? 0 : msgno + 1;
     }
@@ -352,5 +331,61 @@ struct CMD5
     static void compute(const char* input, unsigned char result[16]);
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Should be used to report OS-specific error.
+ * E.g.,
+ * <pre><code>
+ * auto handle = socket(...);
+ * if (handle < 0)
+ *     return OsError();
+ * </code></pre>
+ */
+class OsError:
+    public UDT::Error
+{
+};
+
+namespace OsErrorCode
+{
+    static constexpr UDT::Errno ok = 0;
+
+#if defined(_WIN32)
+    static constexpr UDT::Errno addressFamilyNotSupported = WSAEAFNOSUPPORT;
+    static constexpr UDT::Errno protocolNotSupported = WSAEPROTONOSUPPORT;
+    static constexpr UDT::Errno badDescriptor = WSAEBADF;
+    static constexpr UDT::Errno connectionRefused = WSAECONNREFUSED;
+    static constexpr UDT::Errno invalidData = WSAEINVAL;
+    static constexpr UDT::Errno wouldBlock = WSAEWOULDBLOCK;
+    static constexpr UDT::Errno already = WSAEALREADY;
+    static constexpr UDT::Errno notConnected = WSAENOTCONN;
+    static constexpr UDT::Errno isConnected = WSAEISCONN;
+    static constexpr UDT::Errno noProtocolOption = WSAENOPROTOOPT;
+    static constexpr UDT::Errno addressInUse = WSAEADDRINUSE;
+    static constexpr UDT::Errno notSupported = WSAEOPNOTSUPP;
+    static constexpr UDT::Errno timedOut = WSAETIMEDOUT;
+    static constexpr UDT::Errno messageTooLarge = WSAEMSGSIZE;
+    static constexpr UDT::Errno connectionReset = WSAECONNRESET;
+    static constexpr UDT::Errno io = ERROR_GEN_FAILURE;
+#else
+    static constexpr UDT::Errno addressFamilyNotSupported = EAFNOSUPPORT;
+    static constexpr UDT::Errno protocolNotSupported = EPROTONOSUPPORT;
+    static constexpr UDT::Errno badDescriptor = EBADF;
+    static constexpr UDT::Errno connectionRefused = ECONNREFUSED;
+    static constexpr UDT::Errno invalidData = EINVAL;
+    static constexpr UDT::Errno wouldBlock = EWOULDBLOCK;
+    static constexpr UDT::Errno already = EALREADY;
+    static constexpr UDT::Errno notConnected = ENOTCONN;
+    static constexpr UDT::Errno isConnected = EISCONN;
+    static constexpr UDT::Errno noProtocolOption = ENOPROTOOPT;
+    static constexpr UDT::Errno addressInUse = EADDRINUSE;
+    static constexpr UDT::Errno notSupported = EOPNOTSUPP;
+    static constexpr UDT::Errno timedOut = ETIMEDOUT;
+    static constexpr UDT::Errno messageTooLarge = EMSGSIZE;
+    static constexpr UDT::Errno connectionReset = ECONNRESET;
+    static constexpr UDT::Errno io = EIO;
+#endif
+}
 
 #endif

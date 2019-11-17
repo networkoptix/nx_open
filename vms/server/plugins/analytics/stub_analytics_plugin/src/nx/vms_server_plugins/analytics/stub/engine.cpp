@@ -408,6 +408,30 @@ std::string Engine::manifestString() const
                         "value": true
                     }
                 ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "ROI",
+                "items": [
+                    {
+                      "type": "PolygonFigure",
+                      "name": "testPolygon",
+                      "caption": "Polygon",
+                      "value": { "points": [[0.1, 0.1], [0.5, 0.2], [0.2, 0.5]], "color": "#e040fb" }
+                    },
+                    {
+                      "type": "BoxFigure",
+                      "name": "testBox",
+                      "caption": "Box",
+                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                    },
+                    {
+                      "type": "LineFigure",
+                      "name": "testLine",
+                      "caption": "Line",
+                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                    }
+                ]
             }
         ]
     }

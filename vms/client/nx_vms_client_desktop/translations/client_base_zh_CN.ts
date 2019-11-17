@@ -983,6 +983,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>显示日历</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation>页面...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2933,6 +2937,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或&quot;空白&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>无法侦测到捕捉之分辨率</translation>
     </message>
   </context>
   <context>
@@ -5675,6 +5683,42 @@ If you intended to move analytics data to another storage location, please conta
       <source>Stores analytics data</source>
       <translation>存储数据分析</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>保留</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation>本机</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation type="unfinished">ram</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation type="unfinished">optical</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation type="unfinished">swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation>网络</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation>USB</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation>未知</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6365,6 +6409,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation>下载中&lt;br&gt;已开始</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6499,6 +6550,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>无法将 %1 合并到我们的系统。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>无法确认已刪除摄像机上的事件。</translation>
     </message>
   </context>
   <context>
@@ -9859,6 +9917,45 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>New Layout %1</source>
       <translation>新视窗%1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation>另存文件為...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>无法覆盖文件</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation>保存文件失败</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation>禁止写入%1 文件夹。</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>下载文件中...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>打开包含的文件夹</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation>停止文件下载？</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation>文件已下载</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation>文件下载失败</translation>
     </message>
   </context>
 </TS>

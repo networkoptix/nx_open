@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/metrics.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::api::metrics::test {
@@ -390,6 +391,60 @@ static const QByteArray kAlarmsExample(R"json({
     }
 })json");
 
+struct Counts
+{
+    const size_t types = 0;
+    const size_t resources = 0;
+    const size_t groups = 0;
+    const size_t values = 0;
+};
+
+class ValuesPerformance: public testing::TestWithParam<Counts>
+{
+protected:
+    SystemValues makeValues() const
+    {
+        const auto counts = GetParam();
+        SystemValues values;
+        for (size_t t = 0; t < counts.types; ++t)
+        {
+            auto& type = values[QStringLiteral("resource_type_%1").arg(t)];
+            for (size_t r = 0; r < counts.resources; ++r)
+            {
+                auto& resource = type[QStringLiteral("resource_id_%1").arg(r)];
+                for (size_t g = 0; g < counts.groups; ++g)
+                {
+                    auto& group = resource[QStringLiteral("group_id_%1").arg(g)];
+                    for (size_t v = 0; v < counts.values; ++v)
+                        group[QStringLiteral("parameter_value_id_%1").arg(r)] = Value((double) v);
+                }
+            }
+        }
+        return values;
+    }
+};
+
+TEST_P(ValuesPerformance, Serialization)
+{
+    const auto values = makeValues();
+
+    nx::utils::ElapsedTimer timer(/*started*/ true);
+    const auto serialized = QJson::serialized(values);
+    NX_INFO(this, "Serialized %1 bytes in %2", serialized.size(), timer.elapsed());
+
+    SystemValues deserialized;
+    timer.restart();
+    EXPECT_TRUE(QJson::deserialize(serialized, &deserialized));
+    NX_INFO(this, "Deserialized %1 bytes in %2", serialized.size(), timer.elapsed());
+}
+
+INSTANTIATE_TEST_CASE_P(Metrics, ValuesPerformance, ::testing::Values(
+   Counts{1, 100, 1, 5},
+   Counts{5, 100, 5, 10},
+   Counts{5, 1000, 5, 10},
+   Counts{5, 10000, 5, 10}
+));
+
 TEST(Metrics, Alarms)
 {
     SystemAlarms alarms;
@@ -422,20 +477,20 @@ TEST(Metrics, Formatting)
     #define EXPECT_FORMAT(FORMAT, VALUE, RESULT) \
         EXPECT_EQ(makeFormatter(FORMAT)(Value(VALUE)), Value(RESULT))
 
-    EXPECT_FORMAT("", 100.0, 100);
+    EXPECT_FORMAT("", 100.0, "100");
     EXPECT_FORMAT("pixels", 100.0, "100 pixels");
 
-    EXPECT_FORMAT("KB", 100.0, "0.098 KB");
-    EXPECT_FORMAT("KB", 5000.0, "4.883 KB");
+    EXPECT_FORMAT("KB", 100.0, "0.1 KB");
+    EXPECT_FORMAT("KB", 5000.0, "4.88 KB");
     EXPECT_FORMAT("KB", 5000555.0, "4883 KB");
 
     EXPECT_FORMAT("MB", 100.0, "0 MB");
-    EXPECT_FORMAT("MB", 6000666.0, "5.723 MB");
-    EXPECT_FORMAT("MB", 6000666000.0, "5722 MB");
+    EXPECT_FORMAT("MB", 6000666.0, "5.72 MB");
+    EXPECT_FORMAT("MB", 6000666000.0, "5723 MB");
 
     EXPECT_FORMAT("KBps", 5000555.0, "4883 KBps");
-    EXPECT_FORMAT("MPix/s", 6000666000.0, "6000 MPix/s");
-    EXPECT_FORMAT("Gbps", 7000777000.0, "56.006 Gbps");
+    EXPECT_FORMAT("MPix/s", 6000666000.0, "6001 MPix/s");
+    EXPECT_FORMAT("Gbps", 7000777000.0, "56 Gbps");
 
     EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
     EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");

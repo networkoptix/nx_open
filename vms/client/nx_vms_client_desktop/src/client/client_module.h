@@ -62,6 +62,7 @@ private:
     bool initLogFromFile(const QString& filename, const QString& suffix = QString());
     void initNetwork();
     void initSkin();
+    void initWebEngine();
     void initLocalResources();
     void initLocalInfo();
     void registerResourceDataProviders();

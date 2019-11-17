@@ -26,7 +26,7 @@ JsonRestResponse makeSettingsResponse(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
 {
     nx::vms::api::analytics::SettingsResponse response;
-    response.values = QJsonObject::fromVariantMap(engine->settingsValues());
+    response.values = engine->settingsValues();
 
     const auto parentPlugin = engine->plugin();
     if (!NX_ASSERT(parentPlugin))
@@ -103,7 +103,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    engine->setSettingsValues(settings.toVariantMap());
+    engine->setSettingsValues(settings);
     engine->saveProperties();
 
     return makeSettingsResponse(engine);

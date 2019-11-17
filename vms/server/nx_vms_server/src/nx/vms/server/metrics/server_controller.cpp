@@ -60,11 +60,7 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-            {
-                add(server.get(), server->getId(), (server->getId() == moduleGUID())
-                    ? utils::metrics::Scope::local
-                    : utils::metrics::Scope::system);
-            }
+                add(server.get(), moduleGUID());
         });
 
     QObject::connect(
@@ -262,12 +258,12 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "plugins",
+            "activePlugins",
             [this](const auto&)
             {
                 QStringList result;
                 for (const auto& value: serverModule()->pluginManager()->metrics())
-                    result.push_back(value.name);
+                    result.push_back(lm("%1. %2").args(result.size() + 1, value.name));
                 return result.isEmpty() ? Value() : Value(result.join(L'\n'));
             }
         )

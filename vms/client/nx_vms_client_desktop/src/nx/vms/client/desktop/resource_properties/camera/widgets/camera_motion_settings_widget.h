@@ -6,7 +6,7 @@
 #include <ui/customization/customized.h>
 
 class QButtonGroup;
-class QQuickView;
+class QQuickWidget;
 class QQuickItem;
 class QShowEvent;
 class QHideEvent;
@@ -49,7 +49,7 @@ private:
     const QScopedPointer<Ui::CameraMotionSettingsWidget> ui;
     const QScopedPointer<core::CameraMotionHelper> m_motionHelper;
     QButtonGroup* const m_sensitivityButtons = nullptr;
-    QQuickView* const m_motionView = nullptr;
+    QQuickWidget* const m_motionWidget = nullptr;
     QVector<QColor> m_sensitivityColors;
     QString m_cameraId;
 };

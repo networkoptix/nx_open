@@ -317,6 +317,9 @@ public:
     int maxRtpRetryCount() const;
     void setMaxRtpRetryCount(int newVal);
 
+    int sendRtspCommandOptions() const;
+    void setSendRtspCommandOptions(bool newVal);
+
     bool sequentialFlirOnvifSearcherEnabled() const;
     void setSequentialFlirOnvifSearcherEnabled(bool newVal);
 
@@ -526,6 +529,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxWebMTranscoders = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_sendRtspCommandOptions = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration = nullptr;

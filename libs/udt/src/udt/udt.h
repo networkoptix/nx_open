@@ -38,9 +38,7 @@ written by
 Yunhong Gu, last updated 01/18/2011
 *****************************************************************************/
 
-#ifndef __UDT_H__
-#define __UDT_H__
-
+#pragma once
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -201,109 +199,6 @@ struct CPerfMon
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class UDT_API CUDTException
-{
-public:
-    CUDTException(int major = 0, int minor = 0, int err = -1);
-    CUDTException(const CUDTException& e);
-    virtual ~CUDTException();
-
-    // Functionality:
-    //    Get the description of the exception.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Text message for the exception description.
-
-    virtual const char* getErrorMessage();
-
-    // Functionality:
-    //    Get the UDT error code for the exception.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    major * 1000 + minor.
-
-    virtual int getErrorCode() const;
-
-    // Functionality:
-    //    Get the system errno for the exception.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    errno or -1 if not available.
-
-    virtual int getErrno() const;
-
-    // Functionality:
-    //    Clear the error code.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    None.
-
-    virtual void clear();
-
-private:
-    int m_iMajor;        // major exception categories
-
-                         // 0: correct condition
-                         // 1: network setup exception
-                         // 2: network connection broken
-                         // 3: memory exception
-                         // 4: file exception
-                         // 5: method not supported
-                         // 6+: undefined error
-
-    int m_iMinor;        // for specific error reasons
-    int m_iErrno;        // errno returned by the system if there is any
-    std::string m_strMsg;    // text error message
-
-    std::string m_strAPI;    // the name of UDT function that returns the error
-    std::string m_strDebug;    // debug information, set to the original place that causes the error
-
-public: // Error Code
-    static const int SUCCESS;
-    static const int ECONNSETUP;
-    static const int ENOSERVER;
-    static const int ECONNREJ;
-    static const int ESOCKFAIL;
-    static const int ESECFAIL;
-    static const int ECONNFAIL;
-    static const int ECONNLOST;
-    static const int ENOCONN;
-    static const int ERESOURCE;
-    static const int ETHREAD;
-    static const int ENOBUF;
-    static const int EFILE;
-    static const int EINVRDOFF;
-    static const int ERDPERM;
-    static const int EINVWROFF;
-    static const int EWRPERM;
-    static const int EINVOP;
-    static const int EBOUNDSOCK;
-    static const int ECONNSOCK;
-    static const int EINVPARAM;
-    static const int EINVSOCK;
-    static const int EUNBOUNDSOCK;
-    static const int ENOLISTEN;
-    static const int ERDVNOSERV;
-    static const int ERDVUNBOUND;
-    static const int ESTREAMILL;
-    static const int EDGRAMILL;
-    static const int EDUPLISTEN;
-    static const int ELARGEMSG;
-    static const int EINVPOLLID;
-    static const int EASYNCFAIL;
-    static const int EASYNCSND;
-    static const int EASYNCRCV;
-    static const int ETIMEOUT;
-    static const int EPEERERR;
-    static const int EUNKNOWN;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
 // If you need to export these APIs to be used by a different language,
 // declare extern "C" for them, and add a "udt_" prefix to each API.
 // The following APIs: sendfile(), recvfile(), epoll_wait(), geterrormsg(),
@@ -311,7 +206,49 @@ public: // Error Code
 
 namespace UDT {
 
-typedef CUDTException ERRORINFO;
+enum class ProtocolError {
+    none = 0,
+    cannotListenInRendezvousMode,
+    handshakeFailure,
+    remotePeerInRendezvousMode,
+    retransmitReceived,
+    outOfWindowDataReceived,
+};
+
+UDT_API std::string toString(ProtocolError);
+
+#ifdef _WIN32
+using Errno = DWORD;
+#else
+using Errno = int;
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
+class UDT_API Error
+{
+public:
+    /**
+     * Sets osError() to the last OS error code.
+     */
+    Error(ProtocolError protocolError = ProtocolError::none);
+
+    Error(Errno osError, ProtocolError protocolError = ProtocolError::none);
+
+    Errno osError() const;
+    ProtocolError protocolError() const;
+    const char* errorText() const;
+
+private:
+    Errno m_osError;
+    ProtocolError m_protocolError;
+    std::string m_errorText;
+
+    std::string prepareErrorText();
+};
+
+//-------------------------------------------------------------------------------------------------
+
 typedef UDTOpt SOCKOPT;
 typedef CPerfMon TRACEINFO;
 typedef ud_set UDSET;
@@ -328,6 +265,7 @@ UDT_API int bind2(UDTSOCKET u, UDPSOCKET udpsock);
 UDT_API int listen(UDTSOCKET u, int backlog);
 UDT_API UDTSOCKET accept(UDTSOCKET u, struct sockaddr* addr, int* addrlen);
 UDT_API int connect(UDTSOCKET u, const struct sockaddr* name, int namelen);
+
 /**
  * @param how. Currently ignored. The function always works as if UDT_SHUT_RDWR was passed here.
  */
@@ -356,30 +294,35 @@ UDT_API int epoll_add_usock(int eid, UDTSOCKET u, const int* events = NULL);
 UDT_API int epoll_add_ssock(int eid, SYSSOCKET s, const int* events = NULL);
 UDT_API int epoll_remove_usock(int eid, UDTSOCKET u);
 UDT_API int epoll_remove_ssock(int eid, SYSSOCKET s);
+
 /**
-* @param readfds map<socket handle, event mask (bit mask of EPOLLOpt values)>.
-*   UDT_EPOLL_IN in implied. Event mask should not be tested for UDT_EPOLL_IN.
-* Same rules apply to each fd set.
-*/
+ * @param readfds map<socket handle, event mask (bit mask of EPOLLOpt values)>.
+ * UDT_EPOLL_IN in implied. Event mask should not be tested for UDT_EPOLL_IN.
+ * Same rules apply to each fd set.
+ */
 UDT_API int epoll_wait(
     int eid,
-    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds,
+    int64_t msTimeOut,
     std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* wrfds = NULL);
-UDT_API int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int* wnum, int64_t msTimeOut,
-    SYSSOCKET* lrfds = NULL, int* lrnum = NULL, SYSSOCKET* lwfds = NULL, int* lwnum = NULL);
+
+UDT_API int epoll_wait2(
+    int eid,
+    UDTSOCKET* readfds, int* rnum,
+    UDTSOCKET* writefds, int* wnum,
+    int64_t msTimeOut,
+    SYSSOCKET* lrfds = NULL, int* lrnum = NULL,
+    SYSSOCKET* lwfds = NULL, int* lwnum = NULL);
+
 /**
-* Interrupts one epoll_wait call: the one running simultaneously in another thread (if any)
-*   or the next call to be made.
-* Causes epoll_wait to return 0 as if timeout has passed.
-*/
+ * Interrupts one epoll_wait call: the one running simultaneously in another thread (if any)
+ * or the next call to be made.
+ * Causes epoll_wait to return 0 as if timeout has passed.
+ */
 UDT_API int epoll_interrupt_wait(int eid);
 UDT_API int epoll_release(int eid);
-UDT_API ERRORINFO& getlasterror();
-UDT_API int getlasterror_code();
-UDT_API const char* getlasterror_desc();
+UDT_API const Error& getlasterror();
 UDT_API int perfmon(UDTSOCKET u, TRACEINFO* perf, bool clear = true);
 UDT_API UDTSTATUS getsockstate(UDTSOCKET u);
 
 }  // namespace UDT
-
-#endif

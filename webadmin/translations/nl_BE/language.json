@@ -191,50 +191,50 @@
         "default": "{{PRODUCT_NAME}} web interface"
     },
     "common": {
-        "voiceCommands": {
-            "search": "vind + [text for searchbar]",
-            "pause": "pauze",
-            "help": "help | show commands",
-            "collapse all servers": "vouw alle servers samen",
-            "collapse server": "vouw server + [servernaam] samen",
-            "play": "afspelen",
-            "clear search": "wis zoekopdracht",
-            "live": "ga naar Live | live weergeven",
-            "expand all servers": "vouw alle servers uit",
-            "stop listening": "stop met luisteren",
-            "expand server": "vouw server + [servernaam] uit",
-            "view": "bekijk + [camera naam]"
-        },
-        "systemOffline": "Systeem Offline",
         "cameraLinks": {
-            "copyToClipboard": "kopiëren naar klembord",
             "highStream": "Hoge stroom",
-            "copyDefaultText": "kopiëren",
-            "unknown": "Onbekend",
             "lowStream": "Lage stroom",
             "transcoding": "Transcoding",
+            "unknown": "Onbekend",
+            "copyToClipboard": "kopiëren naar klembord",
+            "copyDefaultText": "kopiëren",
             "copyActiveText": "gekopieerd naar het klembord"
         },
-        "searchCamPlaceholder": "Zoek",
+        "systemOffline": "Systeem Offline",
         "cameraStates": {
-            "noFormat": "Deze browser ondersteunt het afspelen van videobeelden van deze camera niet.",
-            "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
-            "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
+            "offline": "Offline",
+            "error": "Error",
             "unauthorized": "Authentication required",
-            "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
-            "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+            "noData": "Geen data",
+            "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
+            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's.",
             "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
             "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
-            "error": "Error",
-            "offline": "Offline",
-            "noData": "Geen data",
-            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
+            "noFormat": "Deze browser ondersteunt het afspelen van videobeelden van deze camera niet.",
+            "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+            "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
+            "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser."
+        },
+        "searchCamPlaceholder": "Zoek",
+        "resolution": {
+            "auto": "Automatisch",
+            "high": "Hoog",
+            "low": "Lage"
         },
         "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
-        "resolution": {
-            "high": "Hoog",
-            "auto": "Automatisch",
-            "low": "Lage"
+        "voiceCommands": {
+            "play": "afspelen",
+            "pause": "pauze",
+            "live": "ga naar Live | live weergeven",
+            "view": "bekijk + [camera naam]",
+            "search": "vind + [text for searchbar]",
+            "clear search": "wis zoekopdracht",
+            "expand server": "vouw server + [servernaam] uit",
+            "collapse server": "vouw server + [servernaam] samen",
+            "expand all servers": "vouw alle servers uit",
+            "collapse all servers": "vouw alle servers samen",
+            "stop listening": "stop met luisteren",
+            "help": "help | show commands"
         }
     }
 }

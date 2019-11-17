@@ -174,6 +174,9 @@ void savePreferredCloudServer(const QString& systemId, const QnUuid& serverId)
     if (iter != preferredServers.end())
         preferredServers.erase(iter);
 
+    NX_DEBUG(typeid(Settings), "Setting server %1 as preferred for cloud system %2",
+        serverId.toSimpleString(), systemId);
+
     preferredServers.push_back({systemId, serverId});
 
     while (preferredServers.size() > kMaxStoredPreferredCloudServers)

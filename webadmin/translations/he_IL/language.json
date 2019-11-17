@@ -191,50 +191,50 @@
         "default": "ממשק אינטרנט ל {{PRODUCT_NAME}}"
     },
     "common": {
-        "voiceCommands": {
-            "search": "מצא + [טקסט עבור סרגל חיפוש]",
-            "pause": "השהה",
-            "help": "עזרה | הצג פקודות",
-            "collapse all servers": "כווץ את כל השרתים",
-            "collapse server": "כווץ שרת + [שם שרת]",
-            "play": "נגן",
-            "clear search": "נקה את החיפוש",
-            "live": "עבור שידור חי | הצג לי שידור חי",
-            "expand all servers": "הרחב את כל השרתים",
-            "stop listening": "עצור האזנה",
-            "expand server": "הרחב שרת + [שם שרת]",
-            "view": "הצג + [שם המצלמה]"
-        },
-        "systemOffline": "השרת אינו זמין",
         "cameraLinks": {
-            "copyToClipboard": "העתק ללוח העריכה",
             "highStream": "תזרים ראשי",
-            "copyDefaultText": "העתק",
-            "unknown": "לא ידוע",
             "lowStream": "תזרים משני",
             "transcoding": "המרה",
+            "unknown": "לא ידוע",
+            "copyToClipboard": "העתק ללוח העריכה",
+            "copyDefaultText": "העתק",
             "copyActiveText": "הועתק ללוח"
         },
-        "searchCamPlaceholder": "חיפוש",
+        "systemOffline": "השרת אינו זמין",
         "cameraStates": {
-            "noFormat": "דפדפן זה אינו תומך בשחזור וידאו ממצלמה זו.",
-            "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
-            "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+            "offline": "לא מקוון",
+            "error": "שגיאה",
             "unauthorized": "נדרש אימות",
-            "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת.",
-            "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+            "noData": "אין נתונים",
+            "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+            "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי Arm.",
             "flashOrWebmRequired": "יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
             "noArmSupport": "דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
-            "error": "שגיאה",
-            "offline": "לא מקוון",
-            "noData": "אין נתונים",
-            "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי Arm."
+            "noFormat": "דפדפן זה אינו תומך בשחזור וידאו ממצלמה זו.",
+            "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+            "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+            "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת."
+        },
+        "searchCamPlaceholder": "חיפוש",
+        "resolution": {
+            "auto": "אוטומטי",
+            "high": "גבוה",
+            "low": "נמוך"
         },
         "chromeCastWarning": "Chromecast הוא משאב אינטנסיבי ועשוי לגרום לבעיות בשרת שלך.",
-        "resolution": {
-            "high": "גבוה",
-            "auto": "אוטומטי",
-            "low": "נמוך"
+        "voiceCommands": {
+            "play": "נגן",
+            "pause": "השהה",
+            "live": "עבור שידור חי | הצג לי שידור חי",
+            "view": "הצג + [שם המצלמה]",
+            "search": "מצא + [טקסט עבור סרגל חיפוש]",
+            "clear search": "נקה את החיפוש",
+            "expand server": "הרחב שרת + [שם שרת]",
+            "collapse server": "כווץ שרת + [שם שרת]",
+            "expand all servers": "הרחב את כל השרתים",
+            "collapse all servers": "כווץ את כל השרתים",
+            "stop listening": "עצור האזנה",
+            "help": "עזרה | הצג פקודות"
         }
     }
 }

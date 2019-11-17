@@ -27,8 +27,7 @@ endforeach()
 
 nx_copy(${QT_DIR}/qml DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
-nx_copy(${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 # Variables used for configuring files.
 set(common_depends
@@ -46,6 +45,8 @@ set(common_depends
     "libsm6"
     "libice6"
     "libaudio2"
+    "libgl1-mesa-glx | libgl1"
+    "libegl1-mesa | libegl1-x11"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 

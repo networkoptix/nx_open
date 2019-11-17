@@ -2543,6 +2543,20 @@ void QnPlOnvifResource::fillStreamCapabilityLists(
         std::back_inserter(m_secondaryStreamCapabilitiesList), hasSecondaryToken);
 }
 
+template <typename VideoEncoderConfigurationType>
+void QnPlOnvifResource::validateMaxFps(const std::string& token,
+    const std::vector<VideoEncoderConfigurationType>& configurations)
+{
+    for (auto configuration: configurations)
+    {
+        if (configuration && configuration->token == token)
+        {
+            checkMaxFps(configuration);
+            break;
+        }
+    }
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
     bool isMedia2Supported = !m_serviceUrls.media2ServiceUrl.isEmpty();
@@ -2674,26 +2688,18 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     if (optionsList[0].frameRateMax > 0)
         setMaxFps(optionsList[0].frameRateMax);
 
-    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled() && !isMedia2Supported)
-    {
-        onvifXsd__VideoEncoderConfiguration* bestConfiguration = nullptr;
-        auto& configurations = videoEncoder1Configurations.get()->Configurations;
-        for (onvifXsd__VideoEncoderConfiguration* configuration: configurations)
-        {
-            if (configuration && configuration->token == optionsList[0].videoEncoderToken)
-            {
-                bestConfiguration = configuration;
-                break;
-            }
-        }
-        if(bestConfiguration)
-            checkMaxFps(bestConfiguration);
-    }
-
+    fillStreamCapabilityLists(optionsList);
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fillStreamCapabilityLists(optionsList);
+    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
+    {
+        const auto videoEncoder = optionsList[0].videoEncoderToken;
+        if (isMedia2Supported)
+            validateMaxFps(videoEncoder, videoEncoder2Configurations.get()->Configurations);
+        else
+            validateMaxFps(videoEncoder, videoEncoder1Configurations.get()->Configurations);
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -3659,7 +3665,8 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     scheduleRenewSubscriptionTimer(renewSubsciptionTimeoutSec);
 }
 
-void QnPlOnvifResource::checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration)
+template <typename VideoEncoderConfigurationType>
+void QnPlOnvifResource::checkMaxFps(VideoEncoderConfigurationType* configuration)
 {
     if (!configuration || !configuration->RateControl || !configuration->Resolution)
         return;
@@ -3673,7 +3680,6 @@ void QnPlOnvifResource::checkMaxFps(onvifXsd__VideoEncoderConfiguration* configu
     if (primaryStreamCapabilities.resolutions.isEmpty())
         return;
 
-    // This code seems to be never executed. (???)
     int maxFpsOrig = getMaxFps();
     int rangeHi = getMaxFps()-2;
     int rangeLow = getMaxFps()/4;
@@ -3695,7 +3701,12 @@ void QnPlOnvifResource::checkMaxFps(onvifXsd__VideoEncoderConfiguration* configu
                 return;
 
             configuration->RateControl->FrameRateLimit = currentFps;
-            CameraDiagnostics::Result result = sendVideoEncoderToCamera(*configuration);
+            CameraDiagnostics::Result result;
+            using Media2Type = onvifXsd__VideoEncoder2Configuration;
+            if constexpr (std::is_same<VideoEncoderConfigurationType, Media2Type>::value)
+                result = sendVideoEncoder2ToCamera(*configuration);
+            else
+                result = sendVideoEncoderToCamera(*configuration);
             if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
             {
                 if (currentFps >= maxFpsOrig-2)

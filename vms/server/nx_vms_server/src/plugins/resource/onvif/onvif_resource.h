@@ -465,7 +465,8 @@ private:
     void setAudioEncoderOptions(const AudioOptions& options);
 
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    void checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration);
+    template <typename VideoEncoderConfigurationType>
+    void checkMaxFps(VideoEncoderConfigurationType* configuration);
 
     void updateVideoSource(onvifXsd__VideoSourceConfiguration* source, const QRect& maxRect) const;
     CameraDiagnostics::Result sendVideoSourceToCamera(onvifXsd__VideoSourceConfiguration* source);
@@ -738,6 +739,10 @@ protected:
     void updateTimer(
         nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function);
+    template <typename VideoEncoderConfigurationType>
+    void validateMaxFps(
+        const std::string& token,
+        const std::vector<VideoEncoderConfigurationType>& configurations);
 private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

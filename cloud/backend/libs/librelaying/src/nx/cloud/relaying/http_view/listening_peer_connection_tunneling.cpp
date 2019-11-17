@@ -40,7 +40,7 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     const nx::network::http::RequestContext* requestContext,
     CompletionHandler completionHandler)
 {
-    const auto serverId = 
+    const auto serverId =
         requestContext->requestPathParams.getByName(relay::api::kServerIdName);
     if (serverId.empty())
     {
@@ -79,6 +79,9 @@ void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
         completionHandler(nx::network::http::StatusCode::forbidden, peerName);
         return;
     }
+
+    // TODO: #ak Take line from vms when merging to vms branch.
+    httpResponse->headers.emplace(relay::api::kNxProtocolHeader, "NXRELAY/0.0.1");
 
     serializeToHeaders(&httpResponse->headers, response);
     completionHandler(nx::network::http::StatusCode::ok, peerName);

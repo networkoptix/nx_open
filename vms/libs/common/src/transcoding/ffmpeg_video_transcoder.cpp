@@ -223,7 +223,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!decoder)
     {
         decoder = m_videoDecoders[video->channelNumber] = 
-            new QnFfmpegVideoDecoder(m_config, m_metrics, video->compressionType, video);
+            new QnFfmpegVideoDecoder(m_config, m_metrics, video);
     }
 
     if (result)

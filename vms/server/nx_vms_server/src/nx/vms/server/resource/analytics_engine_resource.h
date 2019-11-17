@@ -31,8 +31,8 @@ public:
 
     analytics::wrappers::EnginePtr sdkEngine() const;
 
-    virtual QVariantMap settingsValues() const override;
-    virtual void setSettingsValues(const QVariantMap& values) override;
+    virtual QJsonObject settingsValues() const override;
+    virtual void setSettingsValues(const QJsonObject& values) override;
 
     bool sendSettingsToSdkEngine();
 
@@ -44,7 +44,7 @@ signals:
 private:
     std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;
 
-    std::optional<QVariantMap> loadSettingsFromFile() const;
+    std::optional<QJsonObject> loadSettingsFromFile() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

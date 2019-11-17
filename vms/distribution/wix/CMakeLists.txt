@@ -24,6 +24,8 @@ else()
    set(installerIcon ${productLogo})
 endif()
 
+include(wix_utils)
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 
 add_subdirectory(custom_actions)
@@ -43,10 +45,15 @@ file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
-if (withMediaServer OR withDesktopClient)
+if(withDesktopClient)
+    add_subdirectory(desktop_client)
+endif()
+
+if(withMediaServer OR withDesktopClient)
     add_custom_target(distribution_wix ALL
         DEPENDS
             wix_custom_actions
+            distribution_wix_desktop_client_resources
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
@@ -121,6 +128,7 @@ if(withDesktopClient)
             "--output" ${client_qml_dir}
             "--prefer-compiled"
             "--skip-styles"
+            "--clean"
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 
@@ -149,7 +157,6 @@ if(withDesktopClient)
     set_target_properties(
         collect_qml_dependencies
         generate_client_update_package
-        create_nxtool_installer
         generate_client_debug_package
         PROPERTIES FOLDER distribution)
 endif()

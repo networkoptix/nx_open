@@ -2,7 +2,6 @@
 
 #include <QtCore/QMimeData>
 
-#include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 
@@ -27,6 +26,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -70,6 +70,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
+    rootContext()->setContextProperty("workbench", workbench());
     rootContext()->setContextProperty(lit("context"), this);
     setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
     setResizeMode(QQuickWidget::SizeRootObjectToView);

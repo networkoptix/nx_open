@@ -5,7 +5,10 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/analytics/i_device_agent.h>
+
+#include <nx/network/http/http_client.h>
 
 #include "engine.h"
 #include "metadata_monitor.h"
@@ -14,6 +17,30 @@ namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace hanwha {
+
+struct AnalyticsParam
+{
+    const char* plugin;
+    const char* sunapi;
+};
+
+/** temporary crutch till C++20 std::span */
+class AnalyticsParamSpan
+{
+public:
+    template<int N>
+    AnalyticsParamSpan(const AnalyticsParam(&params)[N]) noexcept:
+        m_begin(params),
+        m_end(params + std::size(params))
+    {
+    }
+    const AnalyticsParam* begin() { return m_begin; }
+    const AnalyticsParam* end() { return m_end; }
+
+private:
+    const AnalyticsParam* m_begin;
+    const AnalyticsParam* m_end;
+};
 
 class DeviceAgent:
     public QObject,
@@ -52,6 +79,13 @@ private:
     void stopFetchingMetadata();
 
 private:
+
+    void updateCameraEventSetting(
+        const nx::sdk::IStringMap* settings,
+        const char* kCommandPreambule,
+        AnalyticsParamSpan analyticsParamSpan, //< TODO: update in C++20
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap);
+
     Engine* const m_engine;
 
     Hanwha::EngineManifest m_engineManifest;
@@ -67,6 +101,8 @@ private:
 
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
+
+    nx::network::http::HttpClient m_settingsHttpClient;
 };
 
 } // namespace hanwha

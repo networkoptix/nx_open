@@ -525,6 +525,7 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, int bufferSize):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
+    m_duration(0),
     m_data(CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }
@@ -533,6 +534,7 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(
     MetadataType type, int bufferSize, QnAbstractAllocator* allocator):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
+    m_duration(0),
     m_data(allocator, CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }

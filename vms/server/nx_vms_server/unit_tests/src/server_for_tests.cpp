@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <api/test_api_requests.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <recorder/storage_manager.h>
 
 namespace nx::vms::server::test {
 
@@ -46,6 +47,9 @@ QnStorageResourcePtr ServerForTests::addStorage(const QString& storageName)
     [&](){ NX_TEST_API_POST(this, lit("/ec2/saveStorage"), storage); }();
 
     auto storageRes = commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
+    while (!serverModule()->normalStorageManager()->hasStorage(storageRes))
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
     storageRes.dynamicCast<QnFileStorageResource>()->setMounted(true);
     storageRes->initOrUpdate();
     return storageRes;

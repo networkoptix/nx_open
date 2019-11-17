@@ -28,9 +28,9 @@ protected:
     void add(std::unique_ptr<ResourceMonitor> monitor);
     bool remove(const QString& id);
 
-    // NOTE: Called before any synchronisation
-    virtual void beforeValues(Scope, bool) {}
-    virtual void beforeAlarms(Scope) {}
+    // NOTE: Those functions are called mutex-free.
+    virtual void beforeValues(Scope /*scope*/, bool /*format*/) {}
+    virtual void beforeAlarms(Scope /*scope*/) {}
 
 private:
     const QString m_name;

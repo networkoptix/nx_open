@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <QtCore/QVariantMap>
+#include <QtCore/QJsonObject>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
@@ -68,7 +68,7 @@ analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModu
 
 nx::sdk::Ptr<nx::sdk::DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device);
 
-std::optional<QVariantMap> toQVariantMap(const QString& mapJson);
+std::optional<QJsonObject> toQJsonObject(const QString& mapJson);
 
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(

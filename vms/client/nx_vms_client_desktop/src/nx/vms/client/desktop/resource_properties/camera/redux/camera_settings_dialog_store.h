@@ -2,6 +2,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 
 #include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
@@ -83,6 +84,7 @@ public:
     void generateLogicalId();
     void resetExpertSettings();
 
+    Q_INVOKABLE QnUuid resourceId() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
@@ -92,11 +94,11 @@ public:
     Q_INVOKABLE bool analyticsSettingsLoading() const;
     void setAnalyticsSettingsLoading(bool value);
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
-    Q_INVOKABLE QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
+    Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QVariantMap& values);
+        const QnUuid& engineId, const QJsonObject& values);
     void resetDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QVariantMap& values);
+        const QnUuid& engineId, const QJsonObject& values);
     Q_INVOKABLE bool recordingEnabled() const;
 
     void setWearableMotionDetectionEnabled(bool value);

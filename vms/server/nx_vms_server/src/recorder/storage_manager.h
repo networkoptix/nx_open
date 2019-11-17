@@ -22,6 +22,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/timer_manager.h>
 #include <set>
 #include <unordered_map>
@@ -155,7 +156,6 @@ public:
         nx::vms::server::StorageResourceList()) const;
 
     nx::vms::server::StorageResourceList getStoragesInLexicalOrder() const;
-    bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     bool clearSpaceForFile(const QString& path, qint64 size);
@@ -205,6 +205,8 @@ public:
     std::chrono::milliseconds archiveAge(const QnVirtualCameraResourcePtr& camera) const;
     qint64 recordingBitrateBps(
         const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const;
+    QnServer::StoragePool getRole() const;
+
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
@@ -321,18 +323,18 @@ private:
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
-    StorageMap                  m_storageRoots;
-    FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];
+    StorageMap m_storageRoots;
+    FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;
-    mutable QnMutex m_rebuildInfoMutex;
     mutable QnMutex m_localPatches;
     mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
     QTimer m_timer;
 
+    mutable nx::utils::Lockable<QnStorageScanData> m_scanData;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
@@ -340,8 +342,6 @@ private:
      * Storage id --> 'corresponding storage has too much data not managed by VMS' flag map.
      */
     QSet<QnUuid> m_fullDisksIds;
-
-    QnStorageScanData m_archiveRebuildInfo;
 
     friend class nx::vms::server::WritableStoragesHelper;
     friend class RebuildAsyncTask;

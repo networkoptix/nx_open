@@ -1,22 +1,34 @@
 #include "web_widget.h"
 
-#include <QtNetwork/QNetworkReply>
-#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QLabel>
+#include <QtWebEngineWidgets/QWebEngineHistory>
 
 #include <ui/style/webview_style.h>
 
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/ini.h>
+
+#include <utils/common/event_processors.h>
+
+namespace {
+
+using namespace std::chrono;
+
+constexpr milliseconds kBlankPageLoadTimeout = 1s;
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
 WebWidget::WebWidget(QWidget* parent):
-    base_type(parent),
-    m_webView(new QWebView(this))
+    base_type(parent)
 {
-    NxUi::setupWebViewStyle(m_webView);
-    anchorWidgetToParent(m_webView);
+    m_webEngineView = new WebEngineView(this);
+
+    NxUi::setupWebViewStyle(m_webEngineView);
+    anchorWidgetToParent(m_webEngineView);
 
     static constexpr int kDotRadius = 8;
     auto busyIndicator = new BusyIndicatorWidget(parent);
@@ -31,32 +43,37 @@ WebWidget::WebWidget(QWidget* parent):
     errorLabel->setForegroundRole(QPalette::WindowText);
     anchorWidgetToParent(errorLabel);
 
-    connect(m_webView, &QWebView::loadStarted, busyIndicator, &QWidget::show);
-    connect(m_webView, &QWebView::loadFinished, busyIndicator, &QWidget::hide);
-    connect(m_webView, &QWebView::loadStarted, errorLabel, &QWidget::hide);
-    connect(m_webView, &QWebView::loadFinished, errorLabel, &QWidget::setHidden);
+    connect(m_webEngineView, &QWebEngineView::loadStarted, busyIndicator, &QWidget::show);
+    connect(m_webEngineView, &QWebEngineView::loadFinished, busyIndicator, &QWidget::hide);
+    connect(m_webEngineView, &QWebEngineView::loadStarted, errorLabel, &QWidget::hide);
+    connect(m_webEngineView, &QWebEngineView::loadFinished, this,
+        [this, errorLabel](bool ok)
+        {
+            static const QUrl kEmptyPage("about:blank");
+            errorLabel->setVisible(m_webEngineView->url() == kEmptyPage);
+            if (ok)
+                return;
+            // Replicate QWebKit behavior.
+            m_webEngineView->load(kEmptyPage);
+        });
 }
 
-QWebView* WebWidget::view() const
+WebEngineView* WebWidget::webEngineView() const
 {
-    return m_webView;
+    return m_webEngineView;
 }
 
 void WebWidget::load(const QUrl& url)
 {
-    m_webView->load(url);
-}
-
-void WebWidget::load(const QNetworkRequest& request)
-{
-    m_webView->load(request);
+    m_webEngineView->load(url);
 }
 
 void WebWidget::reset()
 {
-    m_webView->triggerPageAction(QWebPage::Stop);
-    m_webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
-    m_webView->setContent({});
+    m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
+    m_webEngineView->page()->profile()->clearHttpCache();
+    m_webEngineView->page()->history()->clear();
+    m_webEngineView->load(QUrl());
 }
 
 } // namespace nx::vms::client::desktop

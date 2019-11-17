@@ -11,7 +11,7 @@
 #include "redux/layout_settings_dialog_state.h"
 #include "redux/layout_settings_dialog_state_reducer.h"
 #include "redux/layout_settings_dialog_store.h"
-
+#include "watchers/layout_logical_ids_watcher.h"
 #include "widgets/layout_background_settings_widget.h"
 #include "widgets/layout_general_settings_widget.h"
 
@@ -25,6 +25,7 @@ struct LayoutSettingsDialog::Private
     QPointer<LayoutSettingsDialogStore> store;
     QnLayoutResourcePtr layout;
     QPointer<LayoutBackgroundSettingsWidget> backgroundTab;
+    LayoutLogicalIdsWatcher* logicalIdsWatcher = nullptr;
 
     void resetChanges()
     {
@@ -50,7 +51,7 @@ struct LayoutSettingsDialog::Private
     }
 };
 
-LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent) :
+LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::LayoutSettingsDialog),
     d(new Private())
@@ -61,6 +62,8 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent) :
     d->store = new LayoutSettingsDialogStore(this);
     connect(d->store, &LayoutSettingsDialogStore::stateChanged, this,
         &LayoutSettingsDialog::loadState);
+
+    d->logicalIdsWatcher = new LayoutLogicalIdsWatcher(d->store.data(), commonModule(), this);
 
     auto generalTab = new LayoutGeneralSettingsWidget(d->store, ui->tabWidget);
     d->backgroundTab = new LayoutBackgroundSettingsWidget(d->store, ui->tabWidget);
@@ -90,6 +93,7 @@ LayoutSettingsDialog::~LayoutSettingsDialog()
 bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
     d->layout = layout;
+    d->logicalIdsWatcher->setExcludedLayout(layout);
     d->resetChanges();
     return true;
 }

@@ -142,6 +142,7 @@ public slots:
         vms::api::EventState eventState, const QnUuid& userId = QnUuid(),
         QString* errorMessage = nullptr);
 
+    void stop();
 private slots:
     void onNewResource(const QnResourcePtr& resource);
 private:

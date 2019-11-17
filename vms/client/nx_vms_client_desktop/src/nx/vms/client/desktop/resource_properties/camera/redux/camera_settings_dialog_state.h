@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
 
@@ -269,7 +270,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         // Engines, which are enabled by the user.
         UserEditable<QSet<QnUuid>> enabledEngines;
 
-        QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
+        QHash<QnUuid, UserEditable<QJsonObject>> settingsValuesByEngineId;
         bool loading = false;
         QnUuid currentEngineId;
     };
@@ -350,6 +351,13 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool canForceZoomCapability() const
     {
         return devicesDescription.canForceZoomCapability == CombinedValue::All;
+    }
+
+    bool canShowWebPage() const
+    {
+        return isSingleCamera()
+            && (ini().showWebPageForAllCameras ||
+                !singleCameraProperties.settingsUrlPath.isEmpty());
     }
 };
 

@@ -1225,15 +1225,19 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    const auto commonModule = this->commonModule();
-    if (commonModule)
+    if (const auto commonModule = this->commonModule())
     {
         const auto& settings = commonModule->globalSettings();
         if (settings && !settings->isCameraSettingsOptimizationEnabled())
             return true;
     }
 
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
+    return isCameraControlDisabledInternal();
+}
+
+bool QnSecurityCamResource::isCameraControlDisabledInternal() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
     return (*userAttributesLock)->cameraControlDisabled;
 }
 

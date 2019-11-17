@@ -90,24 +90,16 @@ Ptr<DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device)
     return deviceInfo;
 }
 
-std::optional<QVariantMap> toQVariantMap(const QString& mapJson)
+std::optional<QJsonObject> toQJsonObject(const QString& mapJson)
 {
     bool isValid = false;
-    const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
+    const auto& result = QJson::deserialized<QJsonObject>(
         mapJson.toUtf8(), /*defaultValue*/{}, &isValid);
 
     if (!isValid)
-        std::nullopt;
+        return std::nullopt;
 
-    QVariantMap result;
-    for (const auto& setting: deserialized)
-    {
-        result.insert(
-            QString::fromStdString(setting.name),
-            QString::fromStdString(setting.value));
-    }
-
-    return result;
+    return std::move(result);
 }
 
 std::optional<IUncompressedVideoFrame::PixelFormat>

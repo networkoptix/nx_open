@@ -108,23 +108,23 @@ QJsonObject AbstractEngine::serializeModel() const
     return {};
 }
 
-QVariantMap AbstractEngine::values() const
+QJsonObject AbstractEngine::values() const
 {
     if (!m_settingsItem)
         return {};
 
-    QVariantMap result;
+    QJsonObject result;
     processValueItemsRecursively(m_settingsItem.data(),
         [&result](ValueItem* item)
         {
-            result[item->name()] = item->value();
+            result[item->name()] = item->value().toJsonValue();
             return true;
         });
 
     return result;
 }
 
-void AbstractEngine::applyValues(const QVariantMap& values) const
+void AbstractEngine::applyValues(const QJsonObject& values) const
 {
     if (!m_settingsItem)
         return;
@@ -143,7 +143,7 @@ void AbstractEngine::applyValues(const QVariantMap& values) const
     return;
 }
 
-AbstractEngine::ModelAndValues AbstractEngine::tryValues(const QVariantMap& values) const
+AbstractEngine::ModelAndValues AbstractEngine::tryValues(const QJsonObject& values) const
 {
     const auto originalValues = this->values();
 

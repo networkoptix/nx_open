@@ -12,7 +12,7 @@ Video Management System (VMS).
 
 Most of the source code and other files are licensed under the terms of Mozilla Public License 2.0
 (unless specified otherwise in the files) which can be found in the license_mpl2.md file in the
-root directory of the repository.
+`licenses` directory in the root directory of the repository.
 
 For details about the components, see `readme.md` files in sub-folders.
 

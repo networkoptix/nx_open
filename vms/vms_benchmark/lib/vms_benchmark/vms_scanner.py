@@ -133,7 +133,10 @@ class VmsScanner:
     def scan(device, linux_distribution):
 
         if linux_distribution.with_systemd:
-            systemd_scripts = device.eval('systemctl list-unit-files --type=service "*"-mediaserver.service', stderr=None)
+            systemd_scripts = device.eval(
+                'systemctl list-unit-files --type=service "*"-mediaserver.service',
+                stderr=None
+            )
 
             if not systemd_scripts:
                 return None
@@ -172,10 +175,10 @@ class VmsScanner:
             if server_config:
                 try:
                     [tmp_file_fd, tmp_file_path] = tempfile.mkstemp()
-                except:
+                except Exception:
                     # TODO: #alevenkov: Rewrite properly.
                     import time
-                    time.sleep(100)
+                    time.sleep(0.1)
                     try:
                         [tmp_file_fd, tmp_file_path] = tempfile.mkstemp()
                     except:
@@ -213,7 +216,10 @@ class VmsScanner:
             if pid is None:
                 return None
             proc_status_filename = f'/proc/{pid}/status'
-            uid_str = device.eval(fr"cat {proc_status_filename} | grep -o 'Uid:\s\+[0-9]\+' | grep -o '[0-9]\+'")
+            uid_str = device.eval(
+                fr"cat {proc_status_filename} | grep -o 'Uid:\s\+[0-9]\+' | grep -o '[0-9]\+'",
+                su=True
+            )
             if uid_str is None:
                 raise exceptions.BoxCommandError(f"Cannot obtain uid of running Server.")
             try:

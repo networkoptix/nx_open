@@ -137,12 +137,21 @@ bool EventsStorage::initialize(const Settings& settings)
 
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     const auto archivePath = closeDirPath(settings.path) + "archive/";
+
     if (!makePath(archivePath)
         || !changeOwner({
             {settings.path, ChownMode::nonRecursive},
             {archivePath, ChownMode::nonRecursive}})
-        || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName))
-        || !m_dbController->initialize()
+        || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName)))
+    {
+        m_dbController.reset();
+        NX_WARNING(this, "Failed to initialize analytics DB directories at %1", settings.path);
+        return false;
+    }
+
+    NX_DEBUG(this, "Initializing analytics SQLite DB");
+
+    if (!m_dbController->initialize()
         || !readMaximumEventTimestamp()
         || !loadDictionaries())
     {
@@ -151,9 +160,13 @@ bool EventsStorage::initialize(const Settings& settings)
         return false;
     }
 
+    NX_DEBUG(this, "Initializing archive directory at %1", archivePath);
+
     m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
         m_mediaServerModule,
         archivePath);
+
+    NX_DEBUG(this, "Analytics DB initialized");
 
     return true;
 }
@@ -344,6 +357,8 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
 
 bool EventsStorage::readMaximumEventTimestamp()
 {
+    NX_DEBUG(this, "Loading max event timestamp");
+
     try
     {
         m_maxRecordedTimestamp = m_dbController->queryExecutor().executeSelectQuerySync(
@@ -362,6 +377,8 @@ bool EventsStorage::readMaximumEventTimestamp()
         NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
         return false;
     }
+
+    NX_DEBUG(this, "Loaded max event timestamp %1", m_maxRecordedTimestamp);
 
     return true;
 }
@@ -395,6 +412,8 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
 
 bool EventsStorage::loadDictionaries()
 {
+    NX_DEBUG(this, "Loading dictionaries");
+
     try
     {
         m_dbController->queryExecutor().executeSelectQuerySync(
@@ -411,6 +430,8 @@ bool EventsStorage::loadDictionaries()
         NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
         return false;
     }
+
+    NX_DEBUG(this, "Dictionaries loaded");
 
     return true;
 }

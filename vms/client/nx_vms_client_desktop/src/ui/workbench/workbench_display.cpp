@@ -291,7 +291,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* We should disable all one-key shortcuts while web view is in the focus. */
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
     {
-        bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
+        bool isWebView = scene() && dynamic_cast<GraphicsWebEngineView*>(scene()->focusItem());
 
         for (auto actionId : {
             action::NotificationsTabAction, //< N
@@ -594,6 +594,8 @@ void QnWorkbenchDisplay::initSceneView()
         const auto hackInit =
             [this, connection, viewport]()
             {
+                if (!NX_ASSERT(viewport->context(), "QOpenGLWidget::aboutToCompose with no context"))
+                    return;
                 auto cache = QOpenGLTextureCache::cacheForContext(viewport->context());
                 auto cacheHack = reinterpret_cast<QnOpenGLTextureCacheHack*>(cache);
                 cacheHack->m_cache.setMaxCost(2 * 1024 * 1024);

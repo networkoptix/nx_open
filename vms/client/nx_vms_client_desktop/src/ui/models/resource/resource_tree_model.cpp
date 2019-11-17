@@ -1294,8 +1294,6 @@ void QnResourceTreeModel::updateSystemHasManyServers()
     }
 
     const bool hasManyServers = servers.size() > 1;
-    if (m_systemHasManyServers == hasManyServers)
-        return;
 
     m_systemHasManyServers = hasManyServers;
     for (const auto& server: servers)

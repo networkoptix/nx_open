@@ -348,7 +348,7 @@ action::ActionScope WorkbenchUi::currentScope() const
         return action::TimelineScope;
 
     /* We should not handle any button as an action while the item was focused. */
-    if (dynamic_cast<QnGraphicsWebView*>(focusItem))
+    if (dynamic_cast<GraphicsWebEngineView*>(focusItem))
         return action::InvalidScope;
 
     if (display()->scene()->hasFocus())

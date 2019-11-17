@@ -39,15 +39,9 @@ void CameraController::start()
             {
                 if (camera->hasFlags(Qn::desktop_camera))
                     return; //< Ignore desktop cameras.
-                const auto addOrUpdate =
-                    [this, camera]()
-                    {
-                        add(camera, camera->getId(), (camera->getParentId() == moduleGUID())
-                            ? utils::metrics::Scope::local
-                            : utils::metrics::Scope::system);
-                    };
 
-                connect(camera, &QnResource::parentIdChanged, addOrUpdate);
+                const auto addOrUpdate = [this, camera]() { add(camera, moduleGUID()); };
+                QObject::connect(camera, &QnResource::parentIdChanged, addOrUpdate);
                 addOrUpdate();
             }
         });
@@ -68,7 +62,7 @@ auto makeInfoProviders()
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
             "server",
-            [](const auto& r) { return Value(r->getParentServer()->getName()); }
+            [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "type",
@@ -118,6 +112,12 @@ auto makeAvailabilityProviders()
     );
 }
 
+static void operator *= (QSize& left, const QSize& right)
+{
+    left.setWidth(left.width() * right.width());
+    left.setHeight(left.height() * right.height());
+}
+
 auto makeStreamProviders(StreamIndex streamIndex)
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
@@ -126,7 +126,12 @@ auto makeStreamProviders(StreamIndex streamIndex)
             [streamIndex](const auto& r)
             {
                 if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
-                    return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
+                {
+                    auto resolution = p->resolution;
+                    if (auto layout = r->getVideoLayout())
+                        resolution *= layout->size();
+                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                }
                 return Value();
             }
         ),
@@ -183,8 +188,9 @@ auto makeStorageProviders()
             "archiveLengthS",
             [](const auto& r)
             {
+                using namespace std::chrono;
                 const auto value = r->calendarDuration();
-                return value.count() > 0 ? Value(value) : Value();
+                return value.count() > 0 ? Value(duration_cast<seconds>(value)) : Value();
             }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
@@ -219,7 +225,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+                "name", [](const auto& r) { return Value(r->getUserDefinedName()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

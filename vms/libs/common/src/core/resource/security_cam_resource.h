@@ -230,6 +230,7 @@ public:
     bool isDualStreamingDisabled() const;
 
     void setCameraControlDisabled(bool value);
+    bool isCameraControlDisabledInternal() const;
     virtual bool isCameraControlDisabled() const;
 
     int defaultSecondaryFps(Qn::StreamQuality quality) const;

@@ -87,16 +87,12 @@ struct Ini: nx::kit::IniConfig
         "Forces the compatibility mode dialog to appear when connecting to the system.");
     NX_INI_FLAG(0, allowOsScreenSaver,
         "Allows the OS to enable a screensaver when the user is not active.");
-    NX_INI_FLAG(0, enableWebKitDeveloperExtras,
-        "Enables WebKit developer tools such as Inspector.\n"
-        "\n"
-        "The tools will become available in built-in browser windows. ATTENTION: Activation\n"
-        "of this setting may result in unstable behavior of the built-in browser.");
     NX_INI_FLAG(1, enableWebKitPlugins,
         "Enables WebKit NPAPI plugins (Flash, Java, etc.).");
     NX_INI_FLAG(1, modalServerSetupWizard,
         "Whether to show Server's setup wizard dialog in a modal window. Default behavior: modal\n"
         "window. To be changed for debugging of web-based components only.");
+    NX_INI_FLAG(0, showWebPageForAllCameras, "Always show Web page in Camera Settings.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor,
         "Allows to show the screenshot above the timeline when mouse pointer hovers over the\n"
         "timeline.\n"

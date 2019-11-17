@@ -28,6 +28,8 @@ set(nx_kit_files
     src/nx/kit/output_redirector.cpp
     src/nx/kit/test.h
     src/nx/kit/test.cpp
+    src/nx/kit/json.h
+    src/nx/kit/json.cpp
     src/ini_config_c.h
     src/ini_config_c_impl.h
 )
@@ -70,7 +72,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/W4 /WX)
 endif()
-
 
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)

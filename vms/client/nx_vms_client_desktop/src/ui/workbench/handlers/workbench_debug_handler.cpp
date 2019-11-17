@@ -7,12 +7,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
-#if defined(NX_ENABLE_WEBENGINE)
-    #include <QtWebEngineWidgets/QWebEnginePage>
-    #include <QtWebEngineWidgets/QWebEngineView>
-#endif
-
-#include <QtWebKitWidgets/QWebView>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineView>
 
 #include <common/common_module.h>
 
@@ -30,7 +26,6 @@
 #include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/style/webview_style.h>
-#include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/widgets/main_window.h>
 
@@ -66,41 +61,29 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-class QnWebViewDialog: public QDialog
+class WebEngineViewDialog: public QDialog
 {
     using base_type = QDialog;
 
 public:
-    QnWebViewDialog(QWidget* parent = nullptr):
+    WebEngineViewDialog(QWidget* parent = nullptr) :
         base_type(parent, Qt::Window),
-        m_page(new QnWebPage(this)),
-        m_webView(new QWebView(this)),
+        m_page(new QWebEnginePage(this)),
+        m_webView(new QWebEngineView(this)),
         m_urlLineEdit(new QLineEdit(this))
     {
         m_webView->setPage(m_page);
 
-        NxUi::setupWebViewStyle(m_webView);
-
-        QVBoxLayout *layout = new QVBoxLayout(this);
+        auto layout = new QVBoxLayout(this);
         layout->setContentsMargins(QMargins());
         layout->addWidget(m_urlLineEdit);
-        layout->addWidget(m_webView);
+        layout->addWidget(m_webView, 1);
         connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
             [this]
             {
                 m_webView->load(m_urlLineEdit->text());
             });
-
-        auto paletteWidget = new PaletteWidget(this);
-        paletteWidget->setDisplayPalette(m_webView->palette());
-        layout->addWidget(paletteWidget);
-        connect(paletteWidget, &PaletteWidget::paletteChanged, this,
-            [this, paletteWidget]
-            {
-                m_webView->setPalette(paletteWidget->displayPalette());
-            });
-
-        }
+    }
 
     QString url() const { return m_urlLineEdit->text(); }
 
@@ -111,52 +94,11 @@ public:
     }
 
 private:
-    QnWebPage* const m_page;
-    QWebView* const m_webView;
+    QWebEnginePage* const m_page;
+    QWebEngineView* const m_webView;
     QLineEdit* const m_urlLineEdit;
 };
 
-#if defined(NX_ENABLE_WEBENGINE)
-
-    class WebEngineViewDialog: public QDialog
-    {
-        using base_type = QDialog;
-
-    public:
-        WebEngineViewDialog(QWidget* parent = nullptr) :
-            base_type(parent, Qt::Window),
-            m_page(new QWebEnginePage(this)),
-            m_webView(new QWebEngineView(this)),
-            m_urlLineEdit(new QLineEdit(this))
-        {
-            m_webView->setPage(m_page);
-
-            auto layout = new QVBoxLayout(this);
-            layout->setContentsMargins(QMargins());
-            layout->addWidget(m_urlLineEdit);
-            layout->addWidget(m_webView, 1);
-            connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
-                [this]
-                {
-                    m_webView->load(m_urlLineEdit->text());
-                });
-        }
-
-        QString url() const { return m_urlLineEdit->text(); }
-
-        void setUrl(const QString& value)
-        {
-            m_urlLineEdit->setText(value);
-            m_webView->load(QUrl::fromUserInput(value));
-        }
-
-    private:
-        QWebEnginePage* const m_page;
-        QWebEngineView* const m_webView;
-        QLineEdit* const m_urlLineEdit;
-    };
-
-#endif
 
 //-------------------------------------------------------------------------------------------------
 // QnDebugControlDialog
@@ -208,23 +150,13 @@ public:
                 dialog->show();
             });
 
-        addButton("Web View",
-            [this]()
+        addButton("Web Engine View",
+            [this]
             {
-                auto dialog(new QnWebViewDialog(this));
+                auto dialog = new WebEngineViewDialog(this);
                 //dialog->setUrl("http://localhost:7001");
                 dialog->show();
             });
-
-        #if defined(NX_ENABLE_WEBENGINE)
-            addButton("Web Engine View",
-                [this]
-                {
-                    auto dialog = new WebEngineViewDialog(this);
-                    //dialog->setUrl("http://localhost:7001");
-                    dialog->show();
-                });
-        #endif
 
 
         addButton("Toggle default password",

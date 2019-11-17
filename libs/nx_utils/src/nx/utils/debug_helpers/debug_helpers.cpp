@@ -16,13 +16,25 @@ QString debugFilesDirectoryPath(const QString& path, bool canCreate)
     const QString fullPath = basePath + path;
 
     const QDir directory(fullPath);
-    if (!directory.exists() && canCreate)
-        directory.mkpath(directory.absolutePath());
-
-    if (!directory.exists())
+    if (canCreate)
     {
-        NX_WARNING(kLogTag, "Directory doesn't exist: %1", directory.absolutePath());
-        return QString();
+        if (!directory.exists())
+        {
+            if (!directory.mkpath(directory.absolutePath()))
+            {
+                NX_WARNING(kLogTag,
+                    "Unable to create debug output dir: %1", directory.absolutePath());
+                return QString();
+            }
+        }
+    }
+    else
+    {
+        if (!directory.exists())
+        {
+            NX_WARNING(kLogTag, "Debug output dir does not exist: %1", directory.absolutePath());
+            return QString();
+        }
     }
 
     return directory.absolutePath();

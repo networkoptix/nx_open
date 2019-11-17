@@ -17,6 +17,7 @@ enum class StreamRecorderError
     fileCreate,
     videoStreamAllocation,
     audioStreamAllocation,
+    metadataStreamAllocation,
     invalidAudioCodec,
     incompatibleCodec,
     fileWrite,

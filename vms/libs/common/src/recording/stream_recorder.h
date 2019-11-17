@@ -179,7 +179,7 @@ private:
         qint64 totalWriteTimeNs = 0;
         QnAviArchiveMetadata metadata;
         QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::custom;
-
+        AVStream* metadataStream = nullptr;
         StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage);
     };
 

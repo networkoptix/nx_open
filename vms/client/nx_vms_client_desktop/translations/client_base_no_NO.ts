@@ -983,6 +983,10 @@ to view more bookmarks</source>
       <source>Unpin Calendar</source>
       <translation>Løsne kalenderen</translation>
     </message>
+    <message>
+      <source>Page...</source>
+      <translation>Side...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2966,6 +2970,10 @@ til %1</translation>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44,1 kHz og 48 kHz lydformater støttes ikke av lydfangerenheten. Velg en annen lydenhet eller &quot;ingen&quot; i innstillingene for skjermopptak.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Kunne ikke oppdage opptaks-oppløsningen</translation>
     </message>
   </context>
   <context>
@@ -5741,6 +5749,42 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Stores analytics data</source>
       <translation>Lagrer analysedata</translation>
     </message>
+    <message>
+      <source>Reserved</source>
+      <translation>Reservert</translation>
+    </message>
+    <message>
+      <source>local</source>
+      <translation>lokal</translation>
+    </message>
+    <message>
+      <source>ram</source>
+      <translation>ram</translation>
+    </message>
+    <message>
+      <source>optical</source>
+      <translation>optisk</translation>
+    </message>
+    <message>
+      <source>swap</source>
+      <translation>swap</translation>
+    </message>
+    <message>
+      <source>network</source>
+      <translation>nettverk</translation>
+    </message>
+    <message>
+      <source>usb</source>
+      <translation>usb</translation>
+    </message>
+    <message>
+      <source>unknown</source>
+      <translation>ukjent</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6433,6 +6477,13 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
+    <name>QnWebPage</name>
+    <message>
+      <source>DOWNLOADING&lt;br&gt;STARTED</source>
+      <translation>LAST NED&lt;br&gt;STARTET</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6568,6 +6619,13 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Kunne ikke slå sammen %1 til systemet vårt.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchNotificationsHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
     </message>
   </context>
   <context>
@@ -9995,6 +10053,45 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     <message>
       <source>New Layout %1</source>
       <translation>Ny visning %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::utils::WebDownloader</name>
+    <message>
+      <source>Save File As...</source>
+      <translation>Lagre fil som...</translation>
+    </message>
+    <message>
+      <source>Failed to overwrite file</source>
+      <translation>Kunne ikke overskrive filen</translation>
+    </message>
+    <message>
+      <source>Failed to save file</source>
+      <translation>Kunne ikke lagre filen</translation>
+    </message>
+    <message>
+      <source>%1 folder is blocked for writing.</source>
+      <translation>%1 mappen er blokkert for skriving.</translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Laster ned fil...</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Åpne innholdsmappen</translation>
+    </message>
+    <message>
+      <source>Stop file downloading?</source>
+      <translation>Vil du stoppe nedlasting av fil?</translation>
+    </message>
+    <message>
+      <source>File downloaded</source>
+      <translation>Fil lastet ned</translation>
+    </message>
+    <message>
+      <source>File downloading failed</source>
+      <translation>Nedlasting av fil mislyktes</translation>
     </message>
   </context>
 </TS>

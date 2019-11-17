@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/details/resource_node_view_item_delegate.h>
 #include <client/client_settings.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/desktop/node_view/node_view/sorting_filtering/node_view_base_sort_model.h>
 
 namespace {
 
@@ -287,6 +288,9 @@ void CameraSelectionDialog::Private::reloadViewData()
 {
     const auto view = q->ui->filteredResourceSelectionWidget->view();
 
+    if (const auto filterModel = qobject_cast<node_view::NodeViewBaseSortModel*>(view->model()))
+        filterModel->setFilteringEnabled(false);
+
     if (view->state().rootNode)
         view->applyPatch(NodeViewStatePatch::clearNodeViewPatch());
 
@@ -296,6 +300,9 @@ void CameraSelectionDialog::Private::reloadViewData()
 
     view->expandToDepth(0);
     updateAlertMessage();
+
+    if (const auto filterModel = qobject_cast<node_view::NodeViewBaseSortModel*>(view->model()))
+        filterModel->setFilteringEnabled(true);
 }
 
 bool CameraSelectionDialog::Private::setShowInvalidCameras(bool value)

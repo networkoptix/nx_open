@@ -57,7 +57,7 @@ public:
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analyzeFrame call)
     QSize videoResolution() const;
-
+    void stop();
 private:
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);

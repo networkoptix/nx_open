@@ -46,6 +46,8 @@ bool InstanceController::initialize()
         return false;
     }
 
+    NX_DEBUG(this, lm("DB initialized"));
+
     return true;
 }
 

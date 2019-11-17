@@ -19,8 +19,10 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
         None    = 0,
         Normal  = 1,
         Backup  = 2,
-        Both    = Normal | Backup
+        Both    = Normal | Backup,
     };
+
+    QString toString(StoragePool pool);
 
     inline StoragePool
     operator | (StoragePool lhs, StoragePool rhs) {
@@ -41,4 +43,5 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
     static const std::string serverStartedEventTimeoutMsName = "serverStartedEventTimeoutMs";
 
 } // namespace QnServer
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )

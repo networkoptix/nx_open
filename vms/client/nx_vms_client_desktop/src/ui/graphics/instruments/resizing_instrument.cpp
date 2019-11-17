@@ -32,7 +32,7 @@ bool itemIsResizableWidget(QGraphicsItem* item)
         return false;
     }
 
-    if (auto webView = qobject_cast<QnGraphicsWebView*>(widget))
+    if (auto webView = qobject_cast<nx::vms::client::desktop::GraphicsWebEngineView*>(widget))
         return false;
 
     return true;

@@ -28,7 +28,7 @@ struct LayoutSettingsDialogState: AbstractReduxState
     float cellAspectRatio = 0.0;
 
     int logicalId = 0;
-    int reservedLogicalId = 0;
+    std::set<int> otherLogicalIds;
 
     // Split values to keep old values when user toggles checkbox.
     bool fixedSizeEnabled = false;
@@ -187,7 +187,7 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
     NX_VMS_CLIENT_DESKTOP_API)
 
 #define LayoutSettingsDialogState_Fields (locked)(isLocalFile)(cellAspectRatio)(logicalId)\
-    (reservedLogicalId)(fixedSizeEnabled)(fixedSize)(background)
+    (fixedSizeEnabled)(fixedSize)(background)
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,
     (debug)(eq),

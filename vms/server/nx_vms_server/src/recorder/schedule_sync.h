@@ -114,10 +114,11 @@ private:
 #undef COPY_ERROR_LIST
 
     enum class SyncCode {
-        Interrupted,
-        OutOfTime,
-        WrongBackupType,
-        Ok
+        interrupted,
+        wrongTime,
+        wrongBackupType,
+        reindexInProgress,
+        ok,
     };
 
 private:
@@ -129,17 +130,13 @@ private:
 
     int state() const;
     void initSyncData();
-
-    void addSyncDataKey(
-        QnServer::ChunksCatalog quality,
-        const QString           &cameraId
-    );
-
+    void addSyncDataKey( QnServer::ChunksCatalog quality, const QString &cameraId);
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
-
     ChunkKey getOldestChunk(
         const QString &cameraId, QnServer::ChunksCatalog catalog, qint64 fromTimeMs,
         SyncData* syncData = nullptr) const;
+
+    static QString toString(SyncCode code);
 
 private:
     std::atomic<bool> m_backupSyncOn;

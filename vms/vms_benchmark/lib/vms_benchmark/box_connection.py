@@ -23,9 +23,8 @@ class BoxConnection:
         def message(self):
             return self.message
 
-    def __init__(self, host, port, login, password, conf_file):
+    def __init__(self, host, port, login, password, ssh_key):
         self.host = host
-        self.conf_file = conf_file
         target = f"{login}@{host}" if login else host
         if platform.system() == 'Linux':
             self.ssh_args = [
@@ -43,7 +42,12 @@ class BoxConnection:
                 *(('-pw', password) if password else ()),
                 '-batch',
             ]
+
+        if ssh_key is not None:
+            self.ssh_args += ['-i', ssh_key]
+
         logging.info("SSH command:\n    " + '\n    '.join(self.ssh_args))
+
         self.ip = None
         self.local_ip = None
         self.is_root = False
@@ -59,8 +63,7 @@ class BoxConnection:
         ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
         ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
         if not ssh_connection_var_value or len(ssh_connection_info) < 3:
-            raise exceptions.BoxCommandError(
-                f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
+            raise exceptions.BoxCommandError(f'Unable to read SSH connection information.')
 
         self.ip = ssh_connection_info[2]
         self.local_ip = ssh_connection_info[0]
@@ -69,15 +72,13 @@ class BoxConnection:
         line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
         eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
         if not eth_name:
-            raise exceptions.BoxCommandError(
-                f'Unable to detect box network adapter which serves ip {self.ip}.')
+            raise exceptions.BoxCommandError(f'Unable to detect box network adapter which serves ip {self.ip}.')
 
         eth_dir = f'/sys/class/net/{eth_name}'
         eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
 
         if not eth_name_check_result or eth_name_check_result.return_code != 0:
-            raise exceptions.BoxCommandError(
-                f'Unable to find box network adapter info dir {repr(eth_dir)}.')
+            raise exceptions.BoxCommandError(f'Unable to find box network adapter info dir {repr(eth_dir)}.')
 
         self.eth_name = eth_name
         eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
@@ -91,26 +92,20 @@ class BoxConnection:
             f"Executing remote command:\n"
             f"    {command_wrapped}\n"
             f"    stdin:\n"
-            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'NO'}")
+            f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'N/A'}")
 
-        opts = {}
-
-        if stdin:
-            opts['input'] = stdin.encode('UTF-8')
+        actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
 
         try:
-            actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
             run = subprocess.run(
                 [*self.ssh_args, command_wrapped],
                 timeout=actual_timeout_s,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                **opts
+                input=stdin.encode() if stdin else None,
             )
         except subprocess.TimeoutExpired:
-            message = (f'Unable to execute remote command via ssh: '
-                f'timeout of {actual_timeout_s} seconds expired; ' +
-                f'check boxHostnameOrIp in {repr(self.conf_file)}.')
+            message = f'Unable to execute remote command via ssh: timeout of {actual_timeout_s} seconds expired.'
             if exc:
                 raise exceptions.BoxCommandError(message=message)
             else:
@@ -137,7 +132,7 @@ class BoxConnection:
                     raise exceptions.BoxCommandError(
                         "Cannot connect via SSH, "
                         "check that SSH service is running "
-                        "on port specified in boxSshPort setting (22 by default)")
+                        "on port specified in boxSshPort .conf setting (22 by default)")
         else:
             if run.returncode == 255:
                 if exc:
