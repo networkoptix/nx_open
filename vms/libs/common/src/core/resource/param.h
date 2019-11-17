@@ -111,6 +111,7 @@ namespace ResourcePropertyKey
         static const QString kBookmarkCount("bookmarkCount");
         static const QString kUdtInternetTraffic_bytes("udtInternetTraffic_bytes");
         static const QString kHddList("hddList");
+        static const QString kNvrPoePortPoweringModes("nvrPoePortPoweringModes");
     }
 }
 
