@@ -67,11 +67,6 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
     };
 
     /**%apidoc
-     * Id of the connected device (if any), zero UUID otherwise.
-     */
-    QnUuid deviceId;
-
-    /**%apidoc
      * MAC address of the connected device.
      */
     QString macAddress;
@@ -101,7 +96,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NetworkPortState::PoweringStatus);
 #define nx_vms_api_NetworkPortState_Fields \
     (portNumber) \
     (poweringMode) \
-    (deviceId) \
     (macAddress) \
     (devicePowerConsumptionWatts) \
     (devicePowerConsumptionLimitWatts) \
