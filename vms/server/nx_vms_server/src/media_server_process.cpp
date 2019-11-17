@@ -192,6 +192,7 @@
 #include <nx/vms/server/rest/server_time_handler.h>
 #include <nx/vms/server/rest/plugin_info_handler.h>
 #include <nx/vms/server/rest/nvr_network_block_handler.h>
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -4803,6 +4804,9 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
+
+    nx::vms::server::nvr::IService* nvrService = serverModule->nvrService();
+    nvrService->start();
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());
