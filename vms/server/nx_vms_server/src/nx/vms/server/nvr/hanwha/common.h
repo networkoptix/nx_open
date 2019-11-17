@@ -10,8 +10,8 @@ static constexpr int kOutputCount = 2;
 
 static const QString kDefaultVendor("Hanwha");
 static const QString kHanwhaPoeNvrDriverName("Hanwha WAVE PoE NVR");
-static const QString kRecLedId("recordingLed");
+static const QString kRecordingLedId("recordingLed");
 static const QString kPoeOverBudgetLedId("poeOverBudgetLed");
-static const QString kAlarmOutLedId("alarmOutLed");
+static const QString kAlarmOutputLedId("alarmOutputLed");
 
 } // namespace nx::vms::server::nvr::hanwha
