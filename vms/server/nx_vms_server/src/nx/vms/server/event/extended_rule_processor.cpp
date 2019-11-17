@@ -394,17 +394,17 @@ bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractAction
         return false;
     }
 
-    nvr::IBuzzerController* const buzzerController = nvrService->buzzerController();
-    if (!buzzerController)
+    nvr::IBuzzerManager* const buzzerManager = nvrService->buzzerManager();
+    if (!buzzerManager)
     {
         NX_WARNING(this,
-            "Got an NVR buzzer action but the Server doesn't provid the buzzer controller");
+            "Got an NVR buzzer action but the Server doesn't provide the buzzer manager");
     }
 
     if (const auto durationMs = action->getParams().durationMs; durationMs > 0)
     {
         NX_DEBUG(this, "Enabling the NVR buzzer for %1ms", durationMs);
-        buzzerController->enable(milliseconds(durationMs));
+        buzzerManager->setState(nvr::BuzzerState::enabled, milliseconds(durationMs));
     }
     else
     {
@@ -412,12 +412,12 @@ bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractAction
         if (action->getToggleState() == vms::api::EventState::active)
         {
             NX_DEBUG(this, "Enabling the NVR buzzer");
-            buzzerController->enable(/* infinite duration */ milliseconds::zero());
+            buzzerManager->setState(nvr::BuzzerState::enabled);
         }
         else if (action->getToggleState() == vms::api::EventState::inactive)
         {
             NX_DEBUG(this, "Disabling the NVR buzzer");
-            buzzerController->disable();
+            buzzerManager->setState(nvr::BuzzerState::disabled);
         }
     }
 
