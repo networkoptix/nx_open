@@ -1,60 +1,113 @@
 #include "service.h"
 
-#include <nx/vms/server/nvr/hanwha/io_controller.h>
-#include <nx/vms/server/nvr/hanwha/led_controller.h>
-#include <nx/vms/server/nvr/hanwha/network_block_controller.h>
-#include <nx/vms/server/nvr/hanwha/buzzer_controller.h>
-#include <nx/vms/server/nvr/hanwha/io_module_searcher.h>
-#include <nx/vms/server/nvr/hanwha/led_manager.h>
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
+
+#include <nx/vms/server/root_fs.h>
+
+#include <nx/vms/server/nvr/hanwha/connector.h>
+
+#include <nx/vms/server/nvr/hanwha/io/io_manager.h>
+#include <nx/vms/server/nvr/hanwha/io/io_platform_abstraction.h>
+#include <nx/vms/server/nvr/hanwha/io/io_module_searcher.h>
+
+#include <nx/vms/server/nvr/hanwha/network_block/network_block_controller.h>
+#include <nx/vms/server/nvr/hanwha/network_block/network_block_manager.h>
+#include <nx/vms/server/nvr/hanwha/network_block/network_block_platform_abstraction.h>
+#include <nx/vms/server/nvr/hanwha/network_block/dummy_powering_policy.h>
+
+#include <nx/vms/server/nvr/hanwha/buzzer/buzzer_manager.h>
+#include <nx/vms/server/nvr/hanwha/buzzer/buzzer_platform_abstraction.h>
+
+#include <nx/vms/server/nvr/hanwha/fan/fan_manager.h>
+#include <nx/vms/server/nvr/hanwha/fan/fan_platform_abstraction.h>
+
+#include <nx/vms/server/nvr/hanwha/led/led_manager.h>
+#include <nx/vms/server/nvr/hanwha/led/led_platform_abstraction.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
 Service::Service(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule),
-    m_buzzerController(std::make_unique<BuzzerController>()),
-    m_networkBlockController(std::make_unique<NetworkBlockController>()),
-    m_ioController(std::make_unique<IoController>()),
-    m_ledController(std::make_unique<LedController>()),
-    m_ledManager(std::make_unique<LedManager>(serverModule))
+    nx::vms::server::ServerModuleAware(serverModule)
 {
+    NX_DEBUG(this, "Creating the Hanwha NVR service");
 }
 
 Service::~Service()
 {
-    // TODO: #dmishin implement
+    NX_DEBUG(this, "Destroying the Hanwha NVR service");
 }
 
 void Service::start()
 {
-    m_buzzerController->start();
-    m_networkBlockController->start();
-    m_ioController->start();
-    m_ledController->start();
-    m_ledManager->start();
+    NX_DEBUG(this, "Starting the Hanwha NVR service");
+
+    m_networkBlockManager = std::make_unique<NetworkBlockManager>(
+        serverModule()->commonModule()->currentServer(),
+        std::make_unique<NetworkBlockPlatformAbstraction>(serverModule()->rootFileSystem()),
+        std::make_unique<DummyPoweringPolicy>(3.0, 4.0)); //< TODO: #dmishin remove hardcode!
+
+    int ioDeviceDescriptor =
+        serverModule()->rootFileSystem()->open("/dev/ia_resource", QIODevice::ReadWrite);
+    // TODO: #dmishin handle errors.
+
+    m_ioManager = std::make_unique<IoManager>(
+        std::make_unique<IoPlatformAbstraction>(ioDeviceDescriptor));
+    m_fanManager = std::make_unique<FanManager>(
+        std::make_unique<FanPlatformAbstraction>(ioDeviceDescriptor));
+    m_buzzerManager = std::make_unique<BuzzerManager>(
+        std::make_unique<BuzzerPlatformAbstraction>(ioDeviceDescriptor));
+    m_ledManager = std::make_unique<LedManager>(
+        std::make_unique<LedPlatformAbstraction>(ioDeviceDescriptor));
+
+    m_connector = std::make_unique<Connector>(
+        serverModule()->commonModule()->currentServer(),
+        serverModule()->eventConnector(),
+        m_networkBlockManager.get(),
+        m_ioManager.get(),
+        m_buzzerManager.get(),
+        m_fanManager.get(),
+        m_ledManager.get());
+
+    m_networkBlockManager->start();
+    m_ioManager->start();
+    m_fanManager->start();
+    m_buzzerManager->start();
 }
 
-IBuzzerController* Service::buzzerController()
+INetworkBlockManager* Service::networkBlockManager()
 {
-    return m_buzzerController.get();
+    NX_DEBUG(this, "Network block manager has been requested");
+    return m_networkBlockManager.get();
 }
 
-INetworkBlockController* Service::networkBlockController()
+IIoManager* Service::ioManager()
 {
-    return m_networkBlockController.get();
+    NX_DEBUG(this, "IO manager has been requested");
+    return m_ioManager.get();
 }
 
-IIoController* Service::ioController()
+IBuzzerManager* Service::buzzerManager()
 {
-    return m_ioController.get();
+    NX_DEBUG(this, "Buzzer manager has been requested");
+    return m_buzzerManager.get();
 }
 
-ILedController* Service::ledController()
+IFanManager* Service::fanManager()
 {
-    return m_ledController.get();
+    NX_DEBUG(this, "Fan manager has been requested");
+    return m_fanManager.get();
+}
+
+ILedManager* Service::ledManager()
+{
+    NX_DEBUG(this, "Led manager has been requested");
+    return m_ledManager.get();
 }
 
 QnAbstractResourceSearcher* Service::createSearcher()
 {
+    NX_DEBUG(this, "Creating new IoModule searcher");
     return new IoModuleSearcher(serverModule());
 }
 

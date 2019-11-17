@@ -1,15 +1,16 @@
 #pragma once
 
-#include <nx/vms/server/nvr/i_startable.h>
-#include <nx/vms/server/nvr/i_buzzer_controller.h>
-#include <nx/vms/server/nvr/i_network_block_controller.h>
-#include <nx/vms/server/nvr/i_io_controller.h>
-#include <nx/vms/server/nvr/i_led_controller.h>
+#include <nx/vms/server/nvr/i_network_block_manager.h>
+#include <nx/vms/server/nvr/i_io_manager.h>
+#include <nx/vms/server/nvr/i_buzzer_manager.h>
+#include <nx/vms/server/nvr/i_fan_manager.h>
+#include <nx/vms/server/nvr/i_led_manager.h>
+
 #include <core/resource_management/resource_searcher.h>
 
 namespace nx::vms::server::nvr {
 
-class IService: public IStartable
+class IService
 {
 public:
     enum class Capability
@@ -27,13 +28,15 @@ public:
 
     virtual void start() = 0;
 
-    virtual IBuzzerController* buzzerController() = 0;
+    virtual INetworkBlockManager* networkBlockManager() = 0;
 
-    virtual INetworkBlockController* networkBlockController() = 0;
+    virtual IIoManager* ioManager() = 0;
 
-    virtual IIoController* ioController() = 0;
+    virtual IBuzzerManager* buzzerManager() = 0;
 
-    virtual ILedController* ledController() = 0;
+    virtual IFanManager* fanManager() = 0;
+
+    virtual ILedManager* ledManager() = 0;
 
     virtual QnAbstractResourceSearcher* createSearcher() = 0;
 

@@ -7,7 +7,7 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-class LedManager;
+class Connector;
 
 class Service: public IService, public nx::vms::server::ServerModuleAware
 {
@@ -18,25 +18,28 @@ public:
 
     virtual void start() override;
 
-    virtual IBuzzerController* buzzerController() override;
+    virtual INetworkBlockManager* networkBlockManager() override;
 
-    virtual INetworkBlockController* networkBlockController() override;
+    virtual IIoManager* ioManager() override;
 
-    virtual IIoController* ioController() override;
+    virtual IBuzzerManager* buzzerManager() override;
 
-    virtual ILedController* ledController() override;
+    virtual IFanManager* fanManager() override;
+
+    virtual ILedManager* ledManager() override;
 
     virtual QnAbstractResourceSearcher* createSearcher() override;
 
     virtual IService::Capabilities capabilities() const override;
 
 private:
-    std::unique_ptr<IBuzzerController> m_buzzerController;
-    std::unique_ptr<INetworkBlockController> m_networkBlockController;
-    std::unique_ptr<IIoController> m_ioController;
-    std::unique_ptr<ILedController> m_ledController;
+    std::unique_ptr<Connector> m_connector;
 
-    std::unique_ptr<LedManager> m_ledManager;
+    std::unique_ptr<INetworkBlockManager> m_networkBlockManager;
+    std::unique_ptr<IIoManager> m_ioManager;
+    std::unique_ptr<IBuzzerManager> m_buzzerManager;
+    std::unique_ptr<IFanManager> m_fanManager;
+    std::unique_ptr<ILedManager> m_ledManager;
 };
 
 } // namespace nx::vms::server::hanwha_nvr
