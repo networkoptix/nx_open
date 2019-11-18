@@ -56,7 +56,7 @@ private:
     void stopFetchingMetadata();
 
 private:
-    static void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    static void replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
         AnalyticsParamSpan params, const char* reason);
 
     std::vector<std::string> ReadSettingsFromServer(
