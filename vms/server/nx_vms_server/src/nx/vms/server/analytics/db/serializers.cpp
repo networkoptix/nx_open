@@ -10,43 +10,6 @@ namespace nx::analytics::db {
 
 static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
 
-void TrackSerializer::serialize(
-    const std::vector<ObjectPosition>& track,
-    QByteArray* buf)
-{
-    serializeTrackSequence(track, buf);
-}
-
-void TrackSerializer::serializeTrackSequence(
-    const std::vector<ObjectPosition>& track,
-    QByteArray* buf)
-{
-    if (track.empty())
-        return;
-
-    buf->reserve(buf->size() + 9 + 2 + track.size() * 11);
-
-    // Writing base timestamp. All timestamps will be saved as an offset from this base.
-    nx::utils::compact_int::serialize(track.front().timestampUs, buf);
-
-    nx::utils::compact_int::serialize((long long)track.size(), buf);
-
-    for (const auto& position: track)
-        serialize(track.front().timestampUs, position, buf);
-}
-
-void TrackSerializer::serialize(
-    qint64 baseTimestamp,
-    const ObjectPosition& position,
-    QByteArray* buf)
-{
-    nx::utils::compact_int::serialize(position.timestampUs - baseTimestamp, buf);
-    nx::utils::compact_int::serialize(position.durationUs, buf);
-    serialize(translate(position.boundingBox, kResolution), buf);
-
-    // TODO: attributes?
-}
-
 void TrackSerializer::serialize(const QRect& rect, QByteArray* buf)
 {
     nx::utils::compact_int::serialize(rect.x(), buf);
@@ -55,48 +18,6 @@ void TrackSerializer::serialize(const QRect& rect, QByteArray* buf)
     nx::utils::compact_int::serialize(rect.height(), buf);
 }
 
-void TrackSerializer::deserialize(
-    QnByteArrayConstRef* buf,
-    std::vector<ObjectPosition>* track)
-{
-    while (!buf->isEmpty())
-        deserializeTrackSequence(buf, track);
-}
-
-void TrackSerializer::deserializeTrackSequence(
-    QnByteArrayConstRef* buf,
-    std::vector<ObjectPosition>* track)
-{
-    long long baseTimestamp = 0;
-    nx::utils::compact_int::deserialize(buf, &baseTimestamp);
-
-    long long trackSize = 0;
-    nx::utils::compact_int::deserialize(buf, &trackSize);
-
-    track->reserve(track->size() + trackSize);
-    for (long long i = 0; i < trackSize; ++i)
-    {
-        track->push_back(ObjectPosition());
-        deserialize(baseTimestamp, buf, &track->back());
-    }
-}
-
-void TrackSerializer::deserialize(
-    qint64 baseTimestamp,
-    QnByteArrayConstRef* buf,
-    ObjectPosition* position)
-{
-    nx::utils::compact_int::deserialize(buf, &position->timestampUs);
-    position->timestampUs += baseTimestamp;
-
-    nx::utils::compact_int::deserialize(buf, &position->durationUs);
-
-    QRect translatedRect;
-    deserialize(buf, &translatedRect);
-    position->boundingBox = translate(translatedRect, kResolution);
-
-    // TODO: attributes?
-}
 
 void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
 {

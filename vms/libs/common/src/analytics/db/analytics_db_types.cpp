@@ -13,8 +13,11 @@
 
 #include "config.h"
 #include "analytics_db_utils.h"
+#include <nx/streaming/media_data_packet.h>
 
 using namespace nx::common::metadata;
+
+static const int kGridDataSizeBytes = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
 namespace nx::analytics::db {
 
@@ -46,13 +49,68 @@ bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
 } // namespace
 
 
-bool ObjectPosition::operator==(const ObjectPosition& right) const
+void ObjectRegion::add(const QRectF& rect)
 {
-    return deviceId == right.deviceId
-        && timestampUs == right.timestampUs
-        && durationUs == right.durationUs
-        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
-        && attributes == right.attributes;
+    if (boundingBoxGrid.size() == 0)
+        boundingBoxGrid.resize(kGridDataSizeBytes);
+
+    QnMetaDataV1::addMotion(this->boundingBoxGrid.data(), rect);
+}
+
+bool ObjectRegion::intersect(const QRectF& rect) const
+{
+    if (boundingBoxGrid.size() == 0)
+        return false;
+
+    simd128i mask[kGridDataSizeBytes / sizeof(simd128i)];
+    int maskStart, maskEnd;
+    NX_ASSERT(!useSSE2() || ((std::ptrdiff_t)mask) % 16 == 0);
+    QnMetaDataV1::createMask(rect, (char*)mask, &maskStart, &maskEnd);
+    return QnMetaDataV1::matchImage((quint64*) boundingBoxGrid.data(), mask, maskStart, maskEnd);
+}
+
+bool ObjectRegion::isEmpty() const
+{
+    return boundingBoxGrid.size() == 0;
+}
+
+QRectF ObjectRegion::boundingBox() const
+{
+    QRect rect = QnMetaDataV1::boundingBox(boundingBoxGrid.data());
+    return QRectF(
+        rect.left() / (float)Qn::kMotionGridWidth,
+        rect.top() / (float)Qn::kMotionGridHeight,
+        rect.width() / (float)Qn::kMotionGridWidth,
+        rect.height() / (float)Qn::kMotionGridHeight);
+}
+
+bool ObjectRegion::isSimpleRect() const
+{
+    if (boundingBoxGrid.size() == 0)
+        return false;
+    QRect rect = QnMetaDataV1::boundingBox(boundingBoxGrid.data());
+    for (int y = rect.top(); y <= rect.bottom(); ++y)
+    {
+        for (int x = rect.left(); x <= rect.right(); ++x)
+        {
+            if (!QnMetaDataV1::isMotionAt(x, y, boundingBoxGrid.data()))
+                return false;
+        }
+    }
+    return true;
+}
+
+void ObjectRegion::clear()
+{
+    boundingBoxGrid.clear();
+}
+
+bool ObjectRegion::operator==(const ObjectRegion& right) const
+{
+    if (boundingBoxGrid.size() != right.boundingBoxGrid.size())
+        return false;
+    return memcmp(boundingBoxGrid.data(),
+        right.boundingBoxGrid.data(), boundingBoxGrid.size()) == 0;
 }
 
 bool BestShot::operator==(const BestShot& right) const
@@ -68,12 +126,12 @@ bool ObjectTrack::operator==(const ObjectTrack& right) const
         //&& attributes == right.attributes
         && firstAppearanceTimeUs == right.firstAppearanceTimeUs
         && lastAppearanceTimeUs == right.lastAppearanceTimeUs
-        && objectPositionSequence == right.objectPositionSequence
+        && objectPosition == right.objectPosition
         && bestShot == right.bestShot;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (BestShot)(ObjectTrack)(ObjectPosition),
+    (BestShot)(ObjectTrack)(ObjectRegion)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
 
@@ -155,16 +213,8 @@ bool Filter::acceptsTrack(const ObjectTrack& track) const
         return false;
 
     // Checking the track.
-    if (!std::any_of(
-            track.objectPositionSequence.cbegin(),
-            track.objectPositionSequence.cend(),
-            [this](const ObjectPosition& position)
-            {
-                return acceptsBoundingBox(position.boundingBox);
-            }))
-    {
+    if (boundingBox && !track.objectPosition.intersect(*boundingBox))
         return false;
-    }
 
     return true;
 }

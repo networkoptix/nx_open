@@ -68,7 +68,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
 
             for (auto itr = m_motionData.begin(); itr != m_motionData.end(); ++itr)
             {
-                if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((simd128i*) itr->data, (simd128i*) masks[itr->channel]))
+                if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((quint64*) itr->data, (simd128i*) masks[itr->channel]))
                     periods.rbegin()->push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
             }
         }

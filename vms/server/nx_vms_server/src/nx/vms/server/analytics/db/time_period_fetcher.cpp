@@ -60,12 +60,9 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
     QnTimePeriodList result;
     for (const auto& track: tracks)
     {
-        for (const auto& position: track.objectPositionSequence)
-        {
-            result += QnTimePeriod(
-                duration_cast<milliseconds>(microseconds(position.timestampUs)),
-                duration_cast<milliseconds>(microseconds(position.durationUs)));
-        }
+        auto startTime = duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
+        auto endTime = duration_cast<milliseconds>(microseconds(track.lastAppearanceTimeUs));
+        result += QnTimePeriod(startTime.count(), endTime.count() - startTime.count());
     }
 
     return QnTimePeriodList::aggregateTimePeriodsUnconstrained(

@@ -43,7 +43,7 @@ std::vector<ObjectTrack> ObjectTrackCache::getTracksToInsert(bool flush)
             m_maxObjectLifetime);
 
         result.push_back(ctx.track);
-        ctx.track.objectPositionSequence.clear();
+        ctx.track.objectPosition.clear();
         ctx.newAttributesSinceLastUpdate.clear();
     }
 
@@ -71,7 +71,7 @@ std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid
         m_maxObjectLifetime);
 
     auto result = ctx.track;
-    ctx.track.objectPositionSequence.clear();
+    ctx.track.objectPosition.clear();
     ctx.newAttributesSinceLastUpdate.clear();
 
     return result;
@@ -88,7 +88,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     {
         if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             !ctx.insertionReported ||
-            ctx.track.objectPositionSequence.empty())
+            ctx.track.objectPosition.isEmpty())
         {
             continue;
         }
@@ -101,7 +101,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
 
         ObjectTrackUpdate trackUpdate;
         trackUpdate.trackId = trackId;
-        trackUpdate.appendedTrack = std::exchange(ctx.track.objectPositionSequence, {});
+        trackUpdate.appendedTrack = std::exchange(ctx.track.objectPosition, {});
         trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
         trackUpdate.allAttributes = ctx.track.attributes;
 
@@ -216,14 +216,7 @@ void ObjectTrackCache::updateObject(
 
     addNewAttributes(objectMetadata.attributes, &trackContext);
 
-    ObjectPosition objectPosition;
-    objectPosition.deviceId = packet.deviceId;
-    objectPosition.timestampUs = packet.timestampUs;
-    objectPosition.durationUs = packet.durationUs;
-    objectPosition.boundingBox = objectMetadata.boundingBox;
-    objectPosition.attributes = objectMetadata.attributes;
-
-    trackContext.track.objectPositionSequence.push_back(std::move(objectPosition));
+    trackContext.track.objectPosition.add(objectMetadata.boundingBox);
 }
 
 void ObjectTrackCache::addNewAttributes(

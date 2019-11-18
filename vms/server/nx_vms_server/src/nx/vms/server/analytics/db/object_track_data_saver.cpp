@@ -115,14 +115,15 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, track.attributes);
 
-        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(track.objectPositionSequence);
+        auto trackMinTimestamp = track.firstAppearanceTimeUs;
+        auto trackMaxTimestamp = track.lastAppearanceTimeUs;
 
         query->bindValue(0, deviceDbId);
         query->bindValue(1, (long long) objectTypeDbId);
         query->bindValue(2, QnSql::serialized_field(track.id));
         query->bindValue(3, trackMinTimestamp / kUsecInMs);
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
-        query->bindValue(5, TrackSerializer::serialized(track.objectPositionSequence));
+        query->bindValue(5, track.objectPosition.boundingBoxGrid);
         query->bindValue(6, (long long) attributesId);
         query->bindValue(7, track.bestShot.initialized()
             ? track.bestShot.timestampUs / kUsecInMs
@@ -202,24 +203,6 @@ ObjectTrackDataSaver::ObjectTrackDbAttributes ObjectTrackDataSaver::fetchTrackDb
         query->value(2).toInt()};
 }
 
-std::pair<qint64, qint64> ObjectTrackDataSaver::findMinMaxTimestamp(
-    const std::vector<ObjectPosition>& track)
-{
-    auto timestamps = std::make_pair<qint64, qint64>(
-        std::numeric_limits<qint64>::max(),
-        std::numeric_limits<qint64>::min());
-
-    for (const auto& pos: track)
-    {
-        if (pos.timestampUs < timestamps.first)
-            timestamps.first = pos.timestampUs;
-        if (pos.timestampUs > timestamps.second)
-            timestamps.second = pos.timestampUs;
-    }
-
-    return timestamps;
-}
-
 void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
     auto updateObjectQuery = queryContext->connection()->createQuery();
@@ -237,10 +220,10 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, trackUpdate.allAttributes);
 
-        auto [trackMinTimestamp, trackMaxTimestamp] =
-            findMinMaxTimestamp(trackUpdate.appendedTrack);
+        auto trackMinTimestamp = trackUpdate.firstAppearanceTimeUs;
+        auto trackMaxTimestamp = trackUpdate.lastAppearanceTimeUs;
 
-        updateObjectQuery->bindValue(0, TrackSerializer::serialized(trackUpdate.appendedTrack));
+        updateObjectQuery->bindValue(0, trackUpdate.appendedTrack.boundingBoxGrid);
         updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);

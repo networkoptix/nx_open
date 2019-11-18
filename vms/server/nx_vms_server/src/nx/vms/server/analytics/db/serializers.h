@@ -38,33 +38,8 @@ private:
     /**
      * NOTE: Two serialization results can be appended to each other safely.
      */
-    static void serialize(
-        const std::vector<ObjectPosition>& track,
-        QByteArray* buf);
-
-    static void serializeTrackSequence(
-        const std::vector<ObjectPosition>& track,
-        QByteArray* buf);
-
-    static void serialize(
-        qint64 baseTimestamp,
-        const ObjectPosition& position,
-        QByteArray* buf);
 
     static void serialize(const QRect& rect, QByteArray* buf);
-
-    static void deserialize(
-        QnByteArrayConstRef* buf,
-        std::vector<ObjectPosition>* track);
-
-    static void deserializeTrackSequence(
-        QnByteArrayConstRef* buf,
-        std::vector<ObjectPosition>* track);
-
-    static void deserialize(
-        qint64 baseTimestamp,
-        QnByteArrayConstRef* buf,
-        ObjectPosition* position);
 
     static void deserialize(QnByteArrayConstRef* buf, QRect* rect);
 

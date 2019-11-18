@@ -18,11 +18,14 @@ struct ObjectTrackUpdate
 {
     int64_t dbId = kInvalidDbId;
     QnUuid trackId;
-    std::vector<ObjectPosition> appendedTrack;
+    ObjectRegion appendedTrack;
     /** Attributes that were added since the last insert/update. */
     std::vector<common::metadata::Attribute> appendedAttributes;
     /** All object's attributes. */
     std::vector<common::metadata::Attribute> allAttributes;
+
+    qint64 firstAppearanceTimeUs = 0;
+    qint64 lastAppearanceTimeUs = 0;
 };
 
 /**

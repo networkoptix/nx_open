@@ -110,7 +110,7 @@ protected:
 
     void andOnlyNewTrackIsPresentInUpdate()
     {
-        ASSERT_EQ(1, m_objectUpdates.front().appendedTrack.size());
+        ASSERT_EQ(1, m_objectUpdates.front().appendedTrack.isSimpleRect());
     }
 
     void andNewAttributeListIsPresentInUpdate()

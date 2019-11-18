@@ -47,17 +47,6 @@ public:
     {
     }
 
-    virtual void createLookupCursor(
-        Filter /*filter*/,
-        CreateCursorCompletionHandler completionHandler) override
-    {
-        m_asyncCaller.post(
-            [completionHandler = std::move(completionHandler)]()
-            {
-                completionHandler(ResultCode::error, nullptr);
-            });
-    }
-
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override

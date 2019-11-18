@@ -156,49 +156,17 @@ protected:
         std::vector<ObjectTrack> tracks,
         const Filter& filter)
     {
-        for (auto trackIter = tracks.begin(); trackIter != tracks.end(); )
+        for (auto trackIter = tracks.begin(); trackIter != tracks.end(); ++trackIter)
         {
             if (!filter.acceptsTrack(*trackIter))
             {
                 trackIter = tracks.erase(trackIter);
                 continue;
             }
-
-            for (auto objectPositionIter = trackIter->objectPositionSequence.begin();
-                objectPositionIter != trackIter->objectPositionSequence.end();
-                )
-            {
-                // NOTE: If object position does not satisfy the region filter -
-                // it is still returned with the matched object.
-                // But, if position does not specify time range - it is dropped.
-                // That's a functional requirement.
-                if (satisfiesCommonConditions(filter, *objectPositionIter))
-                    ++objectPositionIter;
-                else
-                    objectPositionIter = trackIter->objectPositionSequence.erase(objectPositionIter);
-            }
-
-            if (trackIter->objectPositionSequence.empty())
-                trackIter = tracks.erase(trackIter);
-            else
-                ++trackIter;
         }
 
         if (filter.maxObjectTracksToSelect > 0 && (int)tracks.size() > filter.maxObjectTracksToSelect)
             tracks.erase(tracks.begin() + filter.maxObjectTracksToSelect, tracks.end());
-
-        if (filter.maxObjectTrackSize > 0)
-        {
-            for (auto& track: tracks)
-            {
-                if ((int) track.objectPositionSequence.size() > filter.maxObjectTrackSize)
-                {
-                    track.objectPositionSequence.erase(
-                        track.objectPositionSequence.begin() + filter.maxObjectTrackSize,
-                        track.objectPositionSequence.end());
-                }
-            }
-        }
 
         return tracks;
     }
@@ -507,10 +475,6 @@ private:
         auto objectMetadataPackets = toObjectMetadataPackets(packets);
         objectMetadataPackets = filterObjectTracksAndApplySortOrder(filter, std::move(objectMetadataPackets));
 
-        // NOTE: Object bbox is stored in the DB with limited precision.
-        // So, lowering precision to that in the DB.
-        objectMetadataPackets = applyTrackBoxPrecision(std::move(objectMetadataPackets));
-
         return objectMetadataPackets;
     }
 
@@ -524,8 +488,7 @@ private:
             objectTracks.begin(), objectTracks.end(),
             [&filter](const ObjectTrack& left, const ObjectTrack& right)
             {
-                return left.objectPositionSequence.front().timestampUs
-                    > right.objectPositionSequence.front().timestampUs;
+                return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
             });
 
         auto filteredObjectTracks = filterObjectTracks(objectTracks, filter);
@@ -535,38 +498,14 @@ private:
             [&filter](const ObjectTrack& left, const ObjectTrack& right)
             {
                 if (filter.sortOrder == Qt::AscendingOrder)
-                {
-                    return left.objectPositionSequence.front().timestampUs
-                        < right.objectPositionSequence.front().timestampUs;
-                }
+                    return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
                 else
-                {
-                    return left.objectPositionSequence.front().timestampUs
-                        > right.objectPositionSequence.front().timestampUs;
-                }
+                    return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
             });
 
         return filteredObjectTracks;
     }
 
-    std::vector<nx::analytics::db::ObjectTrack> applyTrackBoxPrecision(
-        std::vector<nx::analytics::db::ObjectTrack> tracks)
-    {
-        static const QSize kResolution(kCoordinatesPrecision, kCoordinatesPrecision);
-
-        for (auto& track: tracks)
-        {
-            for (auto& position: track.objectPositionSequence)
-            {
-                position.boundingBox =
-                    translate(
-                        translate(position.boundingBox, kResolution),
-                        kResolution);
-            }
-        }
-
-        return tracks;
-    }
 
     bool satisfiesFilter(
         const Filter& filter,
@@ -616,12 +555,9 @@ private:
                 track.objectTypeId = objectMetadata.typeId;
                 track.attributes = objectMetadata.attributes;
                 track.deviceId = packet->deviceId;
-                track.objectPositionSequence.push_back(ObjectPosition());
-                ObjectPosition& objectPosition = track.objectPositionSequence.back();
-                objectPosition.boundingBox = objectMetadata.boundingBox;
-                objectPosition.timestampUs = packet->timestampUs;
-                objectPosition.durationUs = packet->durationUs;
-                objectPosition.deviceId = packet->deviceId;
+                track.firstAppearanceTimeUs = packet->timestampUs;
+                track.lastAppearanceTimeUs = packet->timestampUs;
+                track.objectPosition.add(objectMetadata.boundingBox);
 
                 if (objectMetadata.bestShot)
                 {
@@ -657,9 +593,6 @@ private:
                 it->lastAppearanceTimeUs =
                     std::max(it->lastAppearanceTimeUs, nextIter->lastAppearanceTimeUs);
                 std::move(
-                    nextIter->objectPositionSequence.begin(), nextIter->objectPositionSequence.end(),
-                    std::back_inserter(it->objectPositionSequence));
-                std::move(
                     nextIter->attributes.begin(), nextIter->attributes.end(),
                     std::back_inserter(it->attributes));
 
@@ -671,22 +604,6 @@ private:
             else
             {
                 ++it;
-            }
-        }
-
-        for (auto& track: *tracks)
-        {
-            std::sort(
-                track.objectPositionSequence.begin(), track.objectPositionSequence.end(),
-                [](const ObjectPosition& left, const ObjectPosition& right)
-                { return left.timestampUs < right.timestampUs; });
-
-            if (!track.objectPositionSequence.empty())
-            {
-                track.firstAppearanceTimeUs =
-                    (track.objectPositionSequence.begin()->timestampUs / kUsecInMs) * kUsecInMs;
-                track.lastAppearanceTimeUs =
-                    (track.objectPositionSequence.rbegin()->timestampUs / kUsecInMs) * kUsecInMs;
             }
         }
     }
@@ -1421,30 +1338,6 @@ protected:
         filter().freeText.clear();
     }
 
-    void whenReadDataUsingCursor()
-    {
-        m_packetsRead.clear();
-
-        // NOTE: Currently, the cursor is forward only.
-        setSortOrder(Qt::AscendingOrder);
-
-        // NOTE: Limiting object's track when using cursor does not make any sense.
-        // It will just skip data.
-        filter().maxObjectTrackSize = 0;
-
-        if (!m_cursor)
-            createCursor();
-
-        readAllDataFromCursor();
-    }
-
-    void whenCreateCursor()
-    {
-        eventsStorage().createLookupCursor(
-            filter(),
-            [this](auto&&... args) { saveCursor(std::forward<decltype(args)>(args)...); });
-    }
-
     void thenCursorIsCreated()
     {
         m_cursor = m_createdCursorsQueue.pop();
@@ -1483,12 +1376,6 @@ protected:
     void andObjectMetadataWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
-    }
-
-    void createCursor()
-    {
-        whenCreateCursor();
-        thenCursorIsCreated();
     }
 
     void addMoreData()
@@ -1535,53 +1422,6 @@ private:
         }
     }
 };
-
-TEST_F(AnalyticsDbCursor, reads_all_available_data)
-{
-    whenReadDataUsingCursor();
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbCursor, reads_all_matched_data)
-{
-    givenRandomCursorFilter();
-
-    whenReadDataUsingCursor();
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbCursor, aggregates_object_metadata_with_same_timestamp)
-{
-    givenObjectMetadataPacketsWithSameTimestamp();
-
-    whenReadDataUsingCursor();
-
-    thenResultMatchesExpectations();
-    andObjectMetadataWithSameTimestampAreDeliveredInSinglePacket();
-}
-
-TEST_F(AnalyticsDbCursor, interleaved_object_tracks_are_reported_interleaved)
-{
-    givenObjectMetadataPacketsWithInterleavedTracks();
-    whenReadDataUsingCursor();
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbCursor, recreated_cursor_is_able_to_access_new_data)
-{
-    createCursor();
-
-    addMoreData();
-    whenReadDataUsingCursor();
-
-    addMoreData();
-    createCursor();
-
-    whenReadDataUsingCursor();
-    thenResultMatchesExpectations();
-}
-
-// TEST_F(AnalyticsDbCursor, attribute_change_history_is_preserved)
 
 //-------------------------------------------------------------------------------------------------
 // Time periods lookup.

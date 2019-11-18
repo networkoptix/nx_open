@@ -176,14 +176,14 @@ nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(IPluginDiagnosticEvent::
 
 nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     const nx::analytics::db::ObjectTrack& track,
-    const nx::analytics::db::ObjectPosition& objectPosition)
+    const nx::analytics::db::BestShot& bestShot)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
     objectMetadata->setTrackId(
         nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(track.id));
     objectMetadata->setTypeId(track.objectTypeId.toStdString());
-    objectMetadata->setTimestampUs(objectPosition.timestampUs);
-    const auto& boundingBox = objectPosition.boundingBox;
+    objectMetadata->setTimestampUs(bestShot.timestampUs);
+    const auto& boundingBox = bestShot.rect;
     objectMetadata->setBoundingBox(Rect(
         boundingBox.x(),
         boundingBox.y(),
@@ -202,19 +202,6 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     }
 
     return objectMetadata;
-}
-
-nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::ObjectTrack& track)
-{
-    auto timestampedTrack = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
-    for (const auto& objectPosition: track.objectPositionSequence)
-    {
-        if (auto objectMetadataPtr = createTimestampedObjectMetadata(track, objectPosition))
-            timestampedTrack->addItem(objectMetadataPtr.get());
-    }
-
-    return timestampedTrack;
 }
 
 nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
