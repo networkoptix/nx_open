@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -31,7 +31,9 @@ static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVC
 
 QString getSpeed(const NetworkPortState& port)
 {
-    return port.linkSpeedMbps > 0 ? QString("%1 Mbps").arg(port.linkSpeedMbps) : "-";
+    return port.linkSpeedMbps > 0
+        ? PoESettingsTableView::tr("%1 Mbps").arg(port.linkSpeedMbps)
+        : "-";
 }
 
 QString consumptionValue(double value)
@@ -128,7 +130,9 @@ ViewNodeData dataFromPort(
     const NetworkPortState& port,
     QnResourcePool* resourcePool)
 {
-    const auto resource = resourcePool->getResourceById(port.deviceId);
+    const auto resource = resourcePool->getResourceByMacAddress(port.macAddress)
+        .staticCast<QnResource>();
+
     const auto resourceNodeViewData = resource
         ? getResourceNodeData(resource, PoESettingsColumn::camera, QnResourceDisplayInfo(resource).extraInfo())
         : wrongResourceNodeData(port.macAddress);
