@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -132,10 +132,18 @@ ViewNodeData dataFromPort(
 {
     const auto resource = resourcePool->getResourceByMacAddress(port.macAddress)
         .staticCast<QnResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto resourceNodeViewData =
+        [port, resource, camera]()
+        {
+            if (!resource)
+                return wrongResourceNodeData(port.macAddress);
 
-    const auto resourceNodeViewData = resource
-        ? getResourceNodeData(resource, PoESettingsColumn::camera, QnResourceDisplayInfo(resource).extraInfo())
-        : wrongResourceNodeData(port.macAddress);
+            const auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
+            return camera && !camera->getGroupId().isEmpty()
+                ? getGroupNodeData(camera, PoESettingsColumn::camera, extraInfo)
+                : getResourceNodeData(resource, PoESettingsColumn::camera, extraInfo);
+        }();
 
     return ViewNodeDataBuilder(resourceNodeViewData)
         .withText(PoESettingsColumn::port, QString::number(port.portNumber))

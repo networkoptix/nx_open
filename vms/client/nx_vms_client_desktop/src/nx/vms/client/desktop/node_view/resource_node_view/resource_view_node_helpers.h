@@ -16,6 +16,12 @@ details::ViewNodeData getResourceNodeData(
     int resourceColumn,
     const QString& extraText);
 
+details::ViewNodeData getGroupNodeData(
+    const QnVirtualCameraResourcePtr& cameraResource,
+    int resourceColumn,
+    const QString& extraText,
+    int checkColumn = -1);
+
 details::NodePtr createResourceNode(
     const QnResourcePtr& resource,
     const QString& extraText,
