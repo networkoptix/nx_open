@@ -24,7 +24,7 @@ public:
     /** Creates a storage resource */
     QnStorageResourcePtr addStorage(const QString& name);
 
-    template<typename T> T get(const QString& api);
+    template<typename T> T get(const QString& api) const;
 
     template<typename T>
     auto getFlat(const QString& api) { return nx::utils::flat_map(get<T>(api)); }
@@ -35,7 +35,7 @@ public:
 };
 
 template<typename T>
-inline T ServerForTests::get(const QString& api)
+inline T ServerForTests::get(const QString& api) const
 {
     using namespace nx::test;
     QnJsonRestResult result;
@@ -45,7 +45,7 @@ inline T ServerForTests::get(const QString& api)
 }
 
 template<>
-inline QByteArray ServerForTests::get<QByteArray>(const QString& api)
+inline QByteArray ServerForTests::get<QByteArray>(const QString& api) const
 {
     using namespace nx::test;
     QByteArray result;
