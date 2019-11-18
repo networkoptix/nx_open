@@ -93,19 +93,28 @@ void TunnelValidator::processRelayNotification(network::http::Message message)
 {
     using namespace network::http;
 
-    NX_VERBOSE(this, lm("Received (%1) notification").args(
-        message.type == MessageType::request
-        ? message.request->requestLine.toString()
-        : StringType()));
+    auto resultCode = tunneling::ResultCode::ok;
 
-    NX_ASSERT(
-        message.type == MessageType::request &&
-        message.request->requestLine.method != OpenTunnelNotification::kHttpMethod);
+    if (message.type == MessageType::request &&
+        message.request->requestLine.method != OpenTunnelNotification::kHttpMethod)
+    {
+        NX_VERBOSE(this, "Received (%1) relay notification",
+            message.request->requestLine.toString());
+
+        resultCode = tunneling::ResultCode::ok;
+    }
+    else
+    {
+        NX_VERBOSE(this, "Received unexpected HTTP message: \r\n%1",
+            message.toString());
+
+        resultCode = tunneling::ResultCode::ioError;
+    }
 
     m_connection = m_httpConnection.takeSocket();
 
     if (m_handler)
-        nx::utils::swapAndCall(m_handler, tunneling::ResultCode::ok);
+        nx::utils::swapAndCall(m_handler, resultCode);
 }
 
 void TunnelValidator::handleConnectionClosure(
