@@ -272,12 +272,12 @@
   <customwidget>
    <class>nx::vms::client::desktop::settings::PoESettingsTableView</class>
    <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
-   <header location="global">nx/vms/client/desktop/settings/server/pages/poe_settings_table_view.h</header>
+   <header location="global">nx/vms/client/desktop/resource_properties/server/poe/poe_settings_table_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::settings::TotalsPoESettingsTableView</class>
    <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
-   <header location="global">nx/vms/client/desktop/settings/server/pages/totals_poe_settings_table_view.h</header>
+   <header location="global">nx/vms/client/desktop/resource_properties/server/poe/totals_poe_settings_table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
