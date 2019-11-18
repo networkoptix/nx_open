@@ -844,8 +844,7 @@ bool QnBuzzerPolicy::isServerValid(const QnMediaServerResourcePtr& server)
         return false;
 
     using namespace nx::vms::api;
-    return server->getServerFlags().testFlag(ServerFlag::SF_HasBuzzer)
-        || !server->isOnline();
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasBuzzer);
 }
 
 QString QnBuzzerPolicy::infoText()
@@ -859,8 +858,7 @@ bool QnPoeOverBudgetPolicy::isServerValid(const QnMediaServerResourcePtr& server
         return false;
 
     using namespace nx::vms::api;
-    return server->getServerFlags().testFlag(ServerFlag::SF_HasPoeManagementCapability)
-        || !server->isOnline();
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasPoeManagementCapability);
 }
 
 QString QnPoeOverBudgetPolicy::infoText()
@@ -874,8 +872,7 @@ bool QnFanErrorPolicy::isServerValid(const QnMediaServerResourcePtr& server)
         return false;
 
     using namespace nx::vms::api;
-    return server->getServerFlags().testFlag(ServerFlag::SF_HasFanMonitoringCapability)
-        || !server->isOnline();
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasFanMonitoringCapability);
 }
 
 QString QnFanErrorPolicy::infoText()
