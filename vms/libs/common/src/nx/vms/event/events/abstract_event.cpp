@@ -42,6 +42,8 @@ EventType parentEvent(EventType eventType)
         case EventType::serverStartEvent:
         case EventType::licenseIssueEvent:
         case EventType::backupFinishedEvent:
+        case EventType::poeOverBudgetEvent:
+        case EventType::fanErrorEvent:
             return EventType::anyServerEvent;
 
         case EventType::anyEvent:
@@ -72,7 +74,9 @@ QList<EventType> childEvents(EventType eventType)
                 EventType::serverConflictEvent,
                 EventType::serverStartEvent,
                 EventType::licenseIssueEvent,
-                EventType::backupFinishedEvent
+                EventType::backupFinishedEvent,
+                EventType::poeOverBudgetEvent,
+                EventType::fanErrorEvent
             };
 
         // All events except already mentioned.
@@ -107,6 +111,8 @@ QList<EventType> allEvents()
         EventType::serverStartEvent,
         EventType::licenseIssueEvent,
         EventType::backupFinishedEvent,
+        EventType::poeOverBudgetEvent,
+        EventType::fanErrorEvent,
         EventType::softwareTriggerEvent,
         EventType::analyticsSdkEvent,
         EventType::pluginDiagnosticEvent,
