@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include<string_view>
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
@@ -12,35 +15,9 @@
 
 #include "engine.h"
 #include "metadata_monitor.h"
+#include "settings.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace hanwha {
-
-struct AnalyticsParam
-{
-    const char* plugin;
-    const char* sunapi;
-};
-
-/** temporary crutch till C++20 std::span */
-class AnalyticsParamSpan
-{
-public:
-    template<int N>
-    AnalyticsParamSpan(const AnalyticsParam(&params)[N]) noexcept:
-        m_begin(params),
-        m_end(params + std::size(params))
-    {
-    }
-    const AnalyticsParam* begin() { return m_begin; }
-    const AnalyticsParam* end() { return m_end; }
-
-private:
-    const AnalyticsParam* m_begin;
-    const AnalyticsParam* m_end;
-};
+namespace nx::vms_server_plugins::analytics::hanwha {
 
 class DeviceAgent:
     public QObject,
@@ -79,12 +56,65 @@ private:
     void stopFetchingMetadata();
 
 private:
+    static void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+        AnalyticsParamSpan params, const char* reason);
 
-    void updateCameraEventSetting(
+    std::vector<std::string> ReadSettingsFromServer(
         const nx::sdk::IStringMap* settings,
-        const char* kCommandPreambule,
-        AnalyticsParamSpan analyticsParamSpan, //< TODO: update in C++20
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap);
+        AnalyticsParamSpan analyticsParamSpan,
+        int objectIndex = 0);
+
+    std::string sendCommand(const std::string& query);
+
+    std::string WriteSettingsToCamera(
+        const std::vector<std::string>& values,
+        AnalyticsParamSpan analyticsParamSpan,
+        const char* commandPreambule,
+        int objectIndex = 0);
+
+    std::string WriteSettingsToCamera(
+        const char* query,
+        int objectIndex = 0);
+
+    template<class S>
+    void retransmitSettings(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+        const nx::sdk::IStringMap* settings,
+        S& previousState,
+        int objectIndex = 0)
+    {
+        const std::vector<std::string> values =
+            ReadSettingsFromServer(settings, S::kParams, objectIndex);
+        static constexpr const char* failedToReceive = "Failed to receive a value from server";
+
+        if (values.empty())
+        {
+            replanishErrorMap(errorMap, S::kParams, failedToReceive);
+            return;
+        }
+
+        S newState(values);
+        if (!newState || (newState == previousState))
+            return;
+
+        std::string error;
+        if constexpr (maybeEmpty<S>::value)
+        {
+            if (newState.empty())
+                error = WriteSettingsToCamera(S::kAlternativeCommand, objectIndex);
+            else
+                error = WriteSettingsToCamera(values, S::kParams, S::kPreambule, objectIndex);
+        }
+        else
+        {
+            error = WriteSettingsToCamera(values, S::kParams, S::kPreambule, objectIndex);
+        }
+        if (!error.empty())
+            replanishErrorMap(errorMap, S::kParams, error.c_str());
+        else
+            previousState = newState;
+
+    }
 
     Engine* const m_engine;
 
@@ -102,10 +132,9 @@ private:
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
+    Settings m_settings;
+    FrameSize m_frameSize = { 3840, 2160 };
     nx::network::http::HttpClient m_settingsHttpClient;
 };
 
-} // namespace hanwha
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::hanwha

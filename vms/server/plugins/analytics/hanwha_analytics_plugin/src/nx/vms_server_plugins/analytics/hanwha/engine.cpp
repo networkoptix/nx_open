@@ -6,7 +6,6 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 
-
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
@@ -22,10 +21,7 @@
 #include "string_helper.h"
 #include <nx/utils/log/log_main.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace hanwha {
+namespace nx::vms_server_plugins::analytics::hanwha {
 
 namespace {
 
@@ -332,10 +328,19 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     return vendor.startsWith(kHanwhaTechwinVendor) || vendor.startsWith(kSamsungTechwinVendor);
 }
 
-} // namespace hanwha
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> Engine::sharedContext(
+    QString m_sharedId)
+{
+    auto sharedResourcesItr = m_sharedResources.find(m_sharedId);
+    if (sharedResourcesItr != m_sharedResources.cend())
+    {
+        return sharedResourcesItr.value()->sharedContext;
+    }
+    else
+        return {};
+}
+
+} // namespace nx::vms_server_plugins::analytics::hanwha
 
 namespace {
 

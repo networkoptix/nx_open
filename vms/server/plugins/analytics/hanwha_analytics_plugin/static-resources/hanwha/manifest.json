@@ -45,7 +45,7 @@
                     },
                     {
                         "type": "SpinBox",
-                        "name": "ShockDetection.Sensitivity",
+                        "name": "ShockDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
                         "minValue": 0,
@@ -55,15 +55,23 @@
             },
             {
                 "type": "GroupBox",
-                "caption": "2 Motion detection settings",
+                "caption": "Motion detection type settings",
                 "items":
                 [
                     {
-                        "type": "CheckBox",
-                        "name": "MotionDetection.Enable",
-                        "caption": "Enable",
-                        "defaultValue": false
-                    },
+                        "type": "ComboBox",
+                        "name": "MotionDetection.DetectionType",
+                        "caption": "Motion detection type",
+                        "range": ["Off", "MotionDetection", "IntelligentVideo", "MDAndIV"],
+                        "defaultValue": "MotionDetection"
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "2 Motion detection settings",
+                "items":
+                [
                     {
                         "type": "GroupBox",
                         "caption": "Include area 1",
@@ -71,7 +79,9 @@
                         [
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.IncludeArea1.Area",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea1.Points",
                               "caption": "Include area"
                             },
                             {
@@ -84,7 +94,7 @@
                             },
                             {
                                 "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea1.Sensitivity",
+                                "name": "MotionDetection.IncludeArea1.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
                                 "minValue": 0,
@@ -107,7 +117,9 @@
                         [
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.IncludeArea2.Area",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea2.Points",
                               "caption": "Include area"
                             },
                             {
@@ -120,7 +132,7 @@
                             },
                             {
                                 "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea2.Sensitivity",
+                                "name": "MotionDetection.IncludeArea2.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
                                 "minValue": 0,
@@ -138,9 +150,230 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Include area 3 ... 8",
+                        "caption": "Include area 3",
                         "items":
                         [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea3.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea3.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea3.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea3.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 4",
+                        "items":
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea4.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea4.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea4.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea4.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 5",
+                        "items":
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea5.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea5.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea5.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea5.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 6",
+                        "items":
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea6.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea6.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea6.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea6.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 7",
+                        "items":
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea7.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea7.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea7.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea7.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Include area 8",
+                        "items":
+                        [
+                            {
+                              "type": "PolygonFigure",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.IncludeArea8.Points",
+                              "caption": "Include area"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea8.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea8.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "MotionDetection.IncludeArea8.MinimumDuration",
+                                "caption": "Minimum duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            }
                         ]
                     },
                     {
@@ -150,32 +383,43 @@
                         [
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea1",
+                              "name": "MotionDetection.ExcludeArea9.Points",
                               "caption": "Exclude area 1"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea2",
+                              "name": "MotionDetection.ExcludeArea10.Points",
                               "caption": "Exclude area 2"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Size",
-                        "items":
-                        [
-                            {
-                              "type": "BoxFigure",
-                              "name": "MotionDetection.MinimumSize",
-                              "caption": "Minimum",
-                              "value": { "points": [[0.48, 0.48], [0.52, 0.52]], "color": "#e040fb" }
                             },
                             {
-                              "type": "BoxFigure",
-                              "name": "MotionDetection.MaximumSize",
-                              "caption": "Maximum",
-                              "value": { "points": [[0.30, 0.30], [0.70, 0.70]], "color": "#e040fb" }
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea11.Points",
+                              "caption": "Exclude area 3"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea12.Points",
+                              "caption": "Exclude area 4"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea13.Points",
+                              "caption": "Exclude area 5"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea14.Points",
+                              "caption": "Exclude area 6"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea15.Points",
+                              "caption": "Exclude area 7"
+                            },
+                            {
+                              "type": "PolygonFigure",
+                              "name": "MotionDetection.ExcludeArea16.Points",
+                              "caption": "Exclude area 8"
                             }
                         ]
                     }
@@ -246,7 +490,7 @@
                     },
                     {
                         "type": "SpinBox",
-                        "name": "DefocusDetection.Sensitivity",
+                        "name": "DefocusDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
                         "minValue": 0,
@@ -357,12 +601,12 @@
                         [
                             {
                                 "type": "PolygonFigure",
-                                "name": "ObjectDetection.ExcludeArea1",
+                                "name": "ObjectDetection.ExcludeArea1.Points",
                                 "caption": "Exclude area 1"
                             },
                             {
                                 "type": "PolygonFigure",
-                                "name": "ObjectDetection.ExcludeArea2",
+                                "name": "ObjectDetection.ExcludeArea2.Points",
                                 "caption": "Exclude area 2"
                             }
                         ]
@@ -410,10 +654,54 @@
                 "items":
                 [
                     {
-                        "type": "CheckBox",
-                        "name": "IVA.Enable",
-                        "caption": "Enable",
-                        "defaultValue": false
+                        "type": "GroupBox",
+                        "caption": "Line1",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line1.Points",
+                                "caption": "Virtual line 1"
+                            },
+                            {
+                              "type": "TextField",
+                              "name": "IVA.Line1.Name",
+                              "caption": "Name",
+                              "defaultValue": ""
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "IVA.Line1.ObjectTypeFilter",
+                                "caption": "Object type",
+                                "range": ["", "Person", "Vehicle", "Person,Vehicle"],
+                                "defaultValue": "MotionDetection"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line2",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line2.Points",
+                                "caption": "Virtual line 2"
+                            },
+                            {
+                              "type": "TextField",
+                              "name": "IVA.Line2.Name",
+                              "caption": "Name",
+                              "defaultValue": ""
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "IVA.Line1.ObjectTypeFilter",
+                                "caption": "Object type",
+                                "range": ["", "Person", "Vehicle", "Person,Vehicle"],
+                                "defaultValue": "MotionDetection"
+                            }
+                        ]
                     }
                 ]
             },
@@ -450,6 +738,12 @@
                         "defaultValue": false
                     },
                     {
+                        "type": "CheckBox",
+                        "name": "SoundClassification.NoiseReduction",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
                         "type": "SpinBox",
                         "name": "SoundClassification.ThresholdLevel",
                         "caption": "Level of classification",
@@ -478,7 +772,7 @@
                             },
                             {
                                 "type": "CheckBox",
-                                "name": "SoundClassification.Eplosion",
+                                "name": "SoundClassification.Explosion",
                                 "caption": "Eplosion",
                                 "defaultValue": false,
                                 "value": false
