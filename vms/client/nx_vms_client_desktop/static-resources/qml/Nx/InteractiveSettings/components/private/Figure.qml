@@ -31,6 +31,8 @@ LabeledItem
                 sourceSize: Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
                 videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
 
+                visible: preview.hasFigure
+
                 Image
                 {
                     id: backgroundImage
@@ -68,7 +70,6 @@ LabeledItem
                 {
                     id: preview
                     anchors.fill: backgroundImage.status === Image.Ready ? backgroundImage : parent
-                    visible: hasFigure
                     rotation: backgroundImage.rotation
                 }
             }
@@ -124,6 +125,7 @@ LabeledItem
             padding: 0
             iconUrl: "qrc:/skin/buttons/delete.png"
             onClicked: value = ""
+            visible: preview.hasFigure
         }
     }
 

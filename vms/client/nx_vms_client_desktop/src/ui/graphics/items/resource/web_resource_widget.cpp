@@ -35,6 +35,7 @@ QnWebResourceWidget::QnWebResourceWidget(
     const auto webParams = detail::OverlayParams(Visible, false, true, BaseLayer, contentMargins);
 
     addOverlayWidget(m_webEngineView, webParams);
+    setFocusProxy(m_webEngineView);
     connect(this, &QGraphicsWidget::geometryChanged,
         m_webEngineView, &GraphicsQmlView::updateWindowGeometry);
 

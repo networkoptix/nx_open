@@ -7,7 +7,7 @@
 
 namespace nx::cloud::relay::api::detail {
 
-class TunnelValidator:
+class NX_NETWORK_API TunnelValidator:
     public network::http::tunneling::AbstractTunnelValidator
 {
     using base_type = network::http::tunneling::AbstractTunnelValidator;

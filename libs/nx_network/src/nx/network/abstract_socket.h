@@ -556,9 +556,8 @@ protected:
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 
 /**
- * Interface for connection-less socket.
- * In this case AbstractCommunicatingSocket::connect() just rememberes
- * remote address to use with AbstractCommunicatingSocket::send().
+ * Interface for connectionless socket. In this case AbstractCommunicatingSocket::connect() just
+ * remembers the remote address to use with AbstractCommunicatingSocket::send().
  */
 class NX_NETWORK_API AbstractDatagramSocket:
     public AbstractCommunicatingSocket

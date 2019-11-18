@@ -2,12 +2,14 @@ syntax: glob
 
 # IDE and misc software files.
 .idea
+.vs
 .vscode
 *~*.TMP
 *.kdev4
 .DS_Store
 *.swp
 CMakeLists.txt.user*
+CMakeSettings.json
 .vim*
 .ccls*
 compile_commands.json
