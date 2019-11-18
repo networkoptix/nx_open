@@ -49,6 +49,9 @@ public:
         const Border& border = {}) const;
 
 private:
+    std::chrono::milliseconds fixAge(std::chrono::milliseconds age) const;
+
+private:
     const std::chrono::milliseconds m_maxAge;
     const size_t m_maxSize = 0;
     mutable nx::utils::Mutex m_mutex;
@@ -75,7 +78,7 @@ void ValueHistory<Value>::update(Value value)
     if (m_values.size() > m_maxSize)
         m_values.pop_front();
 
-    const auto deadline = now - m_maxAge;
+    const auto deadline = now - fixAge(m_maxAge);
     while (m_values.size() >= 2 && m_values[1].second < deadline)
         m_values.pop_front();
 }
@@ -106,7 +109,7 @@ void ValueHistory<Value>::forEach(
         return;
 
     auto bound = m_values.begin();
-    const auto deadline = now - maxAge;
+    const auto deadline = now - fixAge(maxAge);
     if (maxAge > m_maxAge / 2)
     {
         decltype(bound) next;
@@ -144,6 +147,14 @@ void ValueHistory<Value>::forEach(
 
     for (auto it = bound; it != m_values.end(); ++it)
         action(it->first, interval(it->second, it));
+}
+
+template<typename Value>
+std::chrono::milliseconds ValueHistory<Value>::fixAge(std::chrono::milliseconds age) const
+{
+    const double delimiter = ini().valueHistoryAgeDelimiter;
+    const std::chrono::milliseconds reduced(std::chrono::milliseconds::rep(age.count() / delimiter));
+    return std::max(reduced, std::chrono::milliseconds(1));
 }
 
 } // namespace nx::utils

@@ -156,6 +156,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
     const Watch<ResourceType>& watch)
 :
     RuntimeValueMonitor<ResourceType>(std::move(name), scope, resource, getter),
+    m_history(std::chrono::hours(24)), //< The longest period supported by current metrics system.
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     // NOTE: Required to override default value, because updateValue() is called here before real
