@@ -61,9 +61,17 @@ public:
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         const auto addresses = m_interface.addressEntries();
-        if (!addresses.empty())
-            return addresses.first().ip().toString();
-        return {};
+        if (addresses.empty())
+            return {};
+
+        // Trying to return IPv4 address if there is one.
+        for (const auto& address: addresses)
+        {
+            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                return address.ip().toString();
+        }
+
+        return addresses.first().ip().toString();
     }
 
     QString state() const
