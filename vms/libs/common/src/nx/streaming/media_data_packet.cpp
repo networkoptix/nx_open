@@ -335,26 +335,33 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
-#if defined(__i386) || defined(__amd64) || defined(_WIN32)
-    __m128i* dst = (__m128i*) m_data.data();
-    __m128i* src = (__m128i*) image;
-    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
-    {
-        *dst = _mm_or_si128(*dst, *src); /* SSE2. */
-        dst++;
-        src++;
+    addMotion((quint64*) m_data.data(), (quint64*) image);
+}
 
-    }
-#else
-    // remove without SIMD
-    int64_t* dst = (int64_t*) m_data.data();
-    int64_t* src = (int64_t*) image;
-    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
+void QnMetaDataV1::addMotion(quint64* dst64, quint64* src64)
+{
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+
+    if ((uintptr_t (dst64) % 16 == 0) && (uintptr_t (src64) % 16 == 0))
     {
-        *dst++ |= *src++;
-        *dst++ |= *src++;
+        __m128i* dst = (__m128i*) dst64;
+        __m128i* src = (__m128i*) src64;
+        for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight / 128; ++i)
+        {
+            *dst = _mm_or_si128(*dst, *src); /* SSE2. */
+            dst++;
+            src++;
+
+        }
+        return;
     }
 #endif
+    // add without SIMD
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight / 128; ++i)
+    {
+        *dst64++ |= *src64++;
+        *dst64++ |= *src64++;
+    }
 }
 
 QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)

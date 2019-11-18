@@ -275,6 +275,7 @@ public:
 
     static QRect rectFromNormalizedRect(const QRectF& rectF);
 
+    static void addMotion(quint64* dst, quint64* src);
     static void addMotion(char* buffer, const QRectF& rectF);
     static void addMotion(char* buffer, const QRect& rect);
 

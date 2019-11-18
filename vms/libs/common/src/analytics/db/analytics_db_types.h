@@ -40,6 +40,7 @@ struct ObjectRegion
     QByteArray boundingBoxGrid;
 
     void add(const QRectF& rect);
+    void add(const ObjectRegion& region);
     bool intersect(const QRectF& rect) const;
     bool isEmpty() const;
     QRectF boundingBox() const;

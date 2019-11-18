@@ -57,6 +57,18 @@ void ObjectRegion::add(const QRectF& rect)
     QnMetaDataV1::addMotion(this->boundingBoxGrid.data(), rect);
 }
 
+void ObjectRegion::add(const ObjectRegion& region)
+{
+    if (region.boundingBoxGrid.isEmpty())
+        return;
+    if (boundingBoxGrid.size() == 0)
+        boundingBoxGrid.append(kGridDataSizeBytes, (char)0);
+    NX_ASSERT(region.boundingBoxGrid.size(), kGridDataSizeBytes);
+    QnMetaDataV1::addMotion(
+        (quint64*) this->boundingBoxGrid.data(),
+        (quint64*) region.boundingBoxGrid.data());
+}
+
 bool ObjectRegion::intersect(const QRectF& rect) const
 {
     if (boundingBoxGrid.size() == 0)

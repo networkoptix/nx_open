@@ -205,10 +205,22 @@ ObjectTrackDataSaver::ObjectTrackDbAttributes ObjectTrackDataSaver::fetchTrackDb
 
 void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
+    auto loadExistingRegion =
+        [queryContext](const int64_t& id)
+        {
+            auto query = queryContext->connection()->createQuery();
+            query->prepare(R"sql(SELECT track_detail FROM track WHERE id = ?)sql");
+            query->addBindValue(id);
+            query->exec();
+            if (query->next())
+                return ObjectRegion{query->value(0).toByteArray()};
+            return ObjectRegion();
+        };
+
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE track
-        SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
+        SET track_detail = ?,
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?)
@@ -223,13 +235,18 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         auto trackMinTimestamp = trackUpdate.firstAppearanceTimeUs;
         auto trackMaxTimestamp = trackUpdate.lastAppearanceTimeUs;
 
-        updateObjectQuery->bindValue(0, trackUpdate.appendedTrack.boundingBoxGrid);
+        auto dbId = trackUpdate.dbId != -1
+            ? (long long)trackUpdate.dbId
+            : (long long)m_trackDbAttributes.at(trackUpdate.trackId).dbId;
+
+        ObjectRegion region = loadExistingRegion(dbId);
+        region.add(trackUpdate.appendedTrack);
+
+        updateObjectQuery->bindValue(0, region.boundingBoxGrid);
         updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, trackUpdate.dbId != -1
-            ? (long long) trackUpdate.dbId
-            : (long long)m_trackDbAttributes.at(trackUpdate.trackId).dbId);
+        updateObjectQuery->bindValue(4, dbId);
         updateObjectQuery->exec();
 
         m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);

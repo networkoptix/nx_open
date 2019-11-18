@@ -599,7 +599,7 @@ private:
                 std::move(
                     nextIter->attributes.begin(), nextIter->attributes.end(),
                     std::back_inserter(it->attributes));
-
+                it->objectPosition.add(nextIter->objectPosition);
                 if (nextIter->bestShot.initialized())
                     it->bestShot = nextIter->bestShot;
 
