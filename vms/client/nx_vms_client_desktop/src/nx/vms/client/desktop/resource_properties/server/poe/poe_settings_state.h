@@ -5,22 +5,21 @@
 #include <nx/utils/std/optional.h>
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-struct PoESettingsState
+struct PoeSettingsState
 {
     bool autoUpdates = true;
     bool showPreloader = true;
-    bool showPoEOverBudgetWarning = false;
+    bool showPoeOverBudgetWarning = false;
     bool blockUi = false;
     bool hasChanges = false;
 };
 
-struct PoESettingsStatePatch
+struct PoeSettingsStatePatch
 {
     using BoolOptional = std::optional<bool>;
     BoolOptional autoUpdates;
-    BoolOptional showPoEOverBudgetWarning;
+    BoolOptional showPoeOverBudgetWarning;
     BoolOptional showPreloader;
     BoolOptional blockUi;
     BoolOptional hasChanges;
@@ -28,5 +27,4 @@ struct PoESettingsStatePatch
     node_view::details::NodeViewStatePatch totalsPatch;
 };
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

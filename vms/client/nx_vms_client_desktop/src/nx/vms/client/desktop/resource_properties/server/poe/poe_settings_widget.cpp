@@ -11,34 +11,32 @@
 #include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
 using namespace node_view;
 using namespace node_view::details;
 
-using Controller = core::PoEController;
 using PortMode = nx::vms::api::NetworkPortWithPoweringMode;
 using Mode = PortMode::PoweringMode;
 
-struct PoESettingsWidget::Private: public QObject
+struct PoeSettingsWidget::Private: public QObject
 {
-    Private(PoESettingsWidget* owner);
+    Private(PoeSettingsWidget* owner);
 
     void updateWarningLabel();
     void updatePreloaderVisibility();
     void updateUiBlock();
 
     void updateBlockData();
-    void handlePatchApplied(const PoESettingsStatePatch& patch);
+    void handlePatchApplied(const PoeSettingsStatePatch& patch);
 
-    PoESettingsWidget* const q;
-    Controller controller;
-    Ui::PoESettingsWidget ui;
+    PoeSettingsWidget* const q;
+    PoeController controller;
+    Ui::PoeSettingsWidget ui;
 
-    PoESettingsStore store;
+    PoeSettingsStore store;
 };
 
-PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
+PoeSettingsWidget::Private::Private(PoeSettingsWidget* owner):
     q(owner),
     store(owner)
 {
@@ -49,32 +47,32 @@ PoESettingsWidget::Private::Private(PoESettingsWidget* owner):
     updateUiBlock();
 
     store.setStores(ui.poeTable->store(), ui.totalsTable->store());
-    connect(&store, &PoESettingsStore::patchApplied, this, &Private::handlePatchApplied);
+    connect(&store, &PoeSettingsStore::patchApplied, this, &Private::handlePatchApplied);
 
-    connect(&controller, &Controller::updated, this, &Private::updateBlockData);
-    connect(ui.poeTable, &PoESettingsTableView::hasUserChangesChanged, &store,
+    connect(&controller, &PoeController::updated, this, &Private::updateBlockData);
+    connect(ui.poeTable, &PoeSettingsTableView::hasUserChangesChanged, &store,
         [this]() { store.setHasChanges(ui.poeTable->hasUserChanges()); });
-    connect(&controller, &Controller::initialUpdateInProgressChanged, &store,
+    connect(&controller, &PoeController::initialUpdateInProgressChanged, &store,
         [this]() { store.setPreloaderVisible(controller.initialUpdateInProgress()); });
-    connect(&controller, &Controller::updatingPoweringModesChanged, &store,
+    connect(&controller, &PoeController::updatingPoweringModesChanged, &store,
         [this]() { store.setBlockUi(controller.updatingPoweringModes()); });
 
     updateBlockData();
 }
 
-void PoESettingsWidget::Private::updateWarningLabel()
+void PoeSettingsWidget::Private::updateWarningLabel()
 {
-    ui.poeOverBudgetWarningLabel->setVisible(store.state().showPoEOverBudgetWarning);
+    ui.poeOverBudgetWarningLabel->setVisible(store.state().showPoeOverBudgetWarning);
 }
 
-void PoESettingsWidget::Private::updatePreloaderVisibility()
+void PoeSettingsWidget::Private::updatePreloaderVisibility()
 {
     ui.stackedWidget->setCurrentWidget(store.state().showPreloader
         ? ui.preloaderPage
         : ui.poeSettingsPage);
 }
 
-void PoESettingsWidget::Private::updateUiBlock()
+void PoeSettingsWidget::Private::updateUiBlock()
 {
     const bool blockUi = store.state().blockUi;
     q->setReadOnly(blockUi);
@@ -82,17 +80,17 @@ void PoESettingsWidget::Private::updateUiBlock()
     ui.totalsTable->setEnabled(!blockUi);
 }
 
-void PoESettingsWidget::Private::updateBlockData()
+void PoeSettingsWidget::Private::updateBlockData()
 {
     store.updateBlocks(controller.blockData());
 }
 
-void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch& patch)
+void PoeSettingsWidget::Private::handlePatchApplied(const PoeSettingsStatePatch& patch)
 {
     if (patch.hasChanges)
         emit q->hasChangesChanged();
 
-    if (patch.showPoEOverBudgetWarning)
+    if (patch.showPoeOverBudgetWarning)
         updateWarningLabel();
 
     if (patch.showPreloader)
@@ -107,35 +105,35 @@ void PoESettingsWidget::Private::handlePatchApplied(const PoESettingsStatePatch&
 
 //--------------------------------------------------------------------------------------------------
 
-PoESettingsWidget::PoESettingsWidget(QWidget* parent):
+PoeSettingsWidget::PoeSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
 }
 
-PoESettingsWidget::~PoESettingsWidget()
+PoeSettingsWidget::~PoeSettingsWidget()
 {
 }
 
-bool PoESettingsWidget::hasChanges() const
+bool PoeSettingsWidget::hasChanges() const
 {
     return d->store.state().hasChanges;
 }
 
-void PoESettingsWidget::loadDataToUi()
+void PoeSettingsWidget::loadDataToUi()
 {
 }
 
-void PoESettingsWidget::applyChanges()
+void PoeSettingsWidget::applyChanges()
 {
-    Controller::PowerModes modes;
+    PoeController::PowerModes modes;
     const auto checkedIndices = d->ui.poeTable->userCheckChangedIndices();
     for (const auto index: checkedIndices)
     {
         PortMode mode;
         mode.poweringMode = userCheckedState(index) == Qt::Checked ? Mode::automatic : Mode::off;
-        mode.portNumber = nodeFromIndex(index)->property(PoESettingsReducer::kPortNumberProperty).toInt();
+        mode.portNumber = nodeFromIndex(index)->property(PoeSettingsReducer::kPortNumberProperty).toInt();
         modes.append(mode);
     }
 
@@ -143,15 +141,14 @@ void PoESettingsWidget::applyChanges()
     d->controller.setPowerModes(modes);
 }
 
-void PoESettingsWidget::setServerId(const QnUuid& value)
+void PoeSettingsWidget::setServerId(const QnUuid& value)
 {
     d->controller.setResourceId(value);
 }
 
-void PoESettingsWidget::setAutoUpdate(bool value)
+void PoeSettingsWidget::setAutoUpdate(bool value)
 {
     d->store.setAutoUpdates(value);
 }
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

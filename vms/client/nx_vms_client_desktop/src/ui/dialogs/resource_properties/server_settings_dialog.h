@@ -19,7 +19,7 @@ public:
         SettingsPage,
         StatisticsPage,
         StorageManagmentPage,
-        PoEPage,
+        PoePage,
         PluginsPage,
 
         PageCount

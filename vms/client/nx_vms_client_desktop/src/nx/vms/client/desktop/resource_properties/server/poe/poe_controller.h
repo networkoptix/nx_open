@@ -9,9 +9,9 @@
 #include <nx/utils/impl_ptr.h>
 
 
-namespace nx::vms::client::core {
+namespace nx::vms::client::desktop {
 
-class PoEController: public QObject, public QnConnectionContextAware
+class PoeController: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -25,8 +25,8 @@ class PoEController: public QObject, public QnConnectionContextAware
     Q_PROPERTY(bool updatingPoweringModes READ updatingPoweringModes
         NOTIFY updatingPoweringModesChanged)
 public:
-    PoEController(QObject* parent = nullptr);
-    virtual ~PoEController();
+    PoeController(QObject* parent = nullptr);
+    virtual ~PoeController();
 
     void setResourceId(const QnUuid& value);
     QnUuid resourceId() const;
@@ -56,4 +56,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::client::desktop

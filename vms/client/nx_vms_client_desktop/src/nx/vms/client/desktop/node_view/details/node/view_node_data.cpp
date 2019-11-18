@@ -61,7 +61,37 @@ struct ViewNodeData::Private
     ColumnDataHash data;
     PropertyHash properties;
 
+    ColumnSet usedColumns() const;
+    RoleVector rolesForColumn(Column column) const;
+    RoleVector rolesForOverride(const ViewNodeData& other, int otherColumn) const;
 };
+
+ColumnSet ViewNodeData::Private::usedColumns() const
+{
+    return data.keys().toSet();
+}
+
+RoleVector ViewNodeData::Private::rolesForColumn(Column column) const
+{
+    const auto it = data.find(column);
+    return it == data.end() ? RoleVector() : it.value().keys().toVector();
+}
+
+RoleVector ViewNodeData::Private::rolesForOverride(const ViewNodeData& other, int otherColumn) const
+{
+    const auto otherRoles = other.rolesForColumn(otherColumn);
+    if (!usedColumns().contains(otherColumn))
+        return otherRoles; //< All fields from newly created column.
+
+    RoleVector result;
+    const auto currentRoles = rolesForColumn(otherColumn);
+    for (const auto otherRole: otherRoles)
+    {
+        if (!currentRoles.contains(otherRole))
+            result.append(otherRole);
+    }
+    return result;
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -194,13 +224,12 @@ bool ViewNodeData::hasProperty(int id) const
 
 ColumnSet ViewNodeData::usedColumns() const
 {
-    return d->data.keys().toSet();
+    return d->usedColumns();
 }
 
 RoleVector ViewNodeData::rolesForColumn(Column column) const
 {
-    const auto it = d->data.find(column);
-    return it == d->data.end() ? RoleVector() : it.value().keys().toVector();
+    return d->rolesForColumn(column);
 }
 
 Qt::ItemFlags ViewNodeData::flags(Column column) const
@@ -269,30 +298,10 @@ ViewNodeData::DifferenceData ViewNodeData::difference(const ViewNodeData& other)
         }
     }
 
-
     // Checks for newly added data fields.
-    const auto currentColumns = usedColumns();
     for (const auto otherColumn: otherColumns)
     {
-        const auto rolesForOverride =
-            [this, currentColumns, other, otherColumn]()
-            {
-                const auto otherRoles = other.rolesForColumn(otherColumn);
-                if (!currentColumns.contains(otherColumn))
-                    return otherRoles; //< All fields from newly created column.
-
-                RoleVector result;
-                const auto currentRoles = rolesForColumn(otherColumn);
-                for (const auto otherRole: otherRoles)
-                {
-                    if (!currentRoles.contains(otherRole))
-                        result.append(otherRole);
-                }
-                return result;
-            }();
-
-
-        for (const auto role: rolesForOverride)
+        for (const auto role: d->rolesForOverride(other, otherColumn))
             forOverride.setData(otherColumn, role, other.data(otherColumn, role));
     }
 

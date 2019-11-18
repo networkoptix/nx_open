@@ -16,41 +16,41 @@ static constexpr auto kNvrAction = "/api/nvrNetworkBlock";
 
 } // namespace
 
-namespace nx::vms::client::core {
+namespace nx::vms::client::desktop {
 
 using namespace std::placeholders;
 
 static constexpr int kUpdateIntervalMs = 3000;
 
-struct PoEController::Private: public QObject
+struct PoeController::Private: public QObject
 {
-    Private(PoEController* q);
+    Private(PoeController* q);
 
     void setInitialUpdateInProgress(bool value);
     void setBlockData(const BlockData& data);
     void updateTargetResource(const QnUuid& value);
     void handleReply(bool success, rest::Handle currentHandle, const QnJsonRestResult& result);
     void update();
-    void setPowered(const PoEController::PowerModes& value);
+    void setPowered(const PoeController::PowerModes& value);
     void setUpdatingModeHandle(rest::Handle value);
     void resetHandles();
 
-    PoEController* const q;
+    PoeController* const q;
 
     rest::QnConnectionPtr connection;
     rest::Handle handle = -1;
     rest::Handle updatingModeHandle = -1;
 
-    ResourceHolder<QnMediaServerResource> serverHolder;
+    core::ResourceHolder<QnMediaServerResource> serverHolder;
     bool autoUpdate = true;
     bool initialUpdateInProgress = false;
-    PoEController::BlockData blockData;
+    PoeController::BlockData blockData;
     QTimer updateTimer;
     using Handler = std::function<void (bool success, rest::Handle handle, const QnJsonRestResult& result)>;
     const Handler handleReplyCallback;
 };
 
-PoEController::Private::Private(PoEController* q):
+PoeController::Private::Private(PoeController* q):
     q(q),
     handleReplyCallback(nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
@@ -62,7 +62,7 @@ PoEController::Private::Private(PoEController* q):
     connect(&updateTimer, &QTimer::timeout, this, &Private::update);
 }
 
-void PoEController::Private::setInitialUpdateInProgress(bool value)
+void PoeController::Private::setInitialUpdateInProgress(bool value)
 {
     if (value == initialUpdateInProgress)
         return;
@@ -71,7 +71,7 @@ void PoEController::Private::setInitialUpdateInProgress(bool value)
     emit q->initialUpdateInProgressChanged();
 }
 
-void PoEController::Private::setBlockData(const BlockData& data)
+void PoeController::Private::setBlockData(const BlockData& data)
 {
     if (data == blockData)
         return;
@@ -80,7 +80,7 @@ void PoEController::Private::setBlockData(const BlockData& data)
     emit q->updated();
 }
 
-void PoEController::Private::updateTargetResource(const QnUuid& value)
+void PoeController::Private::updateTargetResource(const QnUuid& value)
 {
     if (!serverHolder.setResourceId(value))
         return;
@@ -102,7 +102,7 @@ void PoEController::Private::updateTargetResource(const QnUuid& value)
     update();
 }
 
-void PoEController::Private::handleReply(
+void PoeController::Private::handleReply(
     bool success,
     rest::Handle replyHandle,
     const QnJsonRestResult& result)
@@ -123,7 +123,7 @@ void PoEController::Private::handleReply(
     setBlockData(QJson::deserialize(result.reply, &data) ? data : BlockData());
 }
 
-void PoEController::Private::update()
+void PoeController::Private::update()
 {
     if (!connection)
         return;
@@ -137,7 +137,7 @@ void PoEController::Private::update()
         QThread::currentThread());
 }
 
-void PoEController::Private::setPowered(const PoEController::PowerModes& value)
+void PoeController::Private::setPowered(const PoeController::PowerModes& value)
 {
     if (!connection)
         return;
@@ -153,7 +153,7 @@ void PoEController::Private::setPowered(const PoEController::PowerModes& value)
     setUpdatingModeHandle(handle);
 }
 
-void PoEController::Private::setUpdatingModeHandle(rest::Handle value)
+void PoeController::Private::setUpdatingModeHandle(rest::Handle value)
 {
     if (value == updatingModeHandle)
         return;
@@ -163,7 +163,7 @@ void PoEController::Private::setUpdatingModeHandle(rest::Handle value)
     q->updatingPoweringModesChanged();
 }
 
-void PoEController::Private::resetHandles()
+void PoeController::Private::resetHandles()
 {
     setUpdatingModeHandle(-1);
     handle = -1;
@@ -171,32 +171,32 @@ void PoEController::Private::resetHandles()
 
 //--------------------------------------------------------------------------------------------------
 
-PoEController::PoEController(QObject* parent):
+PoeController::PoeController(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
 }
 
-PoEController::~PoEController()
+PoeController::~PoeController()
 {
 }
 
-void PoEController::setResourceId(const QnUuid& value)
+void PoeController::setResourceId(const QnUuid& value)
 {
     d->updateTargetResource(value);
 }
 
-QnUuid PoEController::resourceId() const
+QnUuid PoeController::resourceId() const
 {
     return d->serverHolder.resourceId();
 }
 
-const PoEController::BlockData& PoEController::blockData() const
+const PoeController::BlockData& PoeController::blockData() const
 {
     return d->blockData;
 }
 
-void PoEController::setAutoUpdate(bool value)
+void PoeController::setAutoUpdate(bool value)
 {
     if (d->autoUpdate == value)
         return;
@@ -213,25 +213,25 @@ void PoEController::setAutoUpdate(bool value)
     }
 }
 
-bool PoEController::autoUpdate() const
+bool PoeController::autoUpdate() const
 {
     return d->autoUpdate;
 }
 
-void PoEController::setPowerModes(const PowerModes& value)
+void PoeController::setPowerModes(const PowerModes& value)
 {
     d->setPowered(value);
 }
 
-bool PoEController::initialUpdateInProgress() const
+bool PoeController::initialUpdateInProgress() const
 {
     return d->initialUpdateInProgress;
 }
 
-bool PoEController::updatingPoweringModes() const
+bool PoeController::updatingPoweringModes() const
 {
     return d->updatingModeHandle >= 0;
 }
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::client::desktop
 

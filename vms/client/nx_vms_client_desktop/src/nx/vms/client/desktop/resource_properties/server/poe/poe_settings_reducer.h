@@ -9,9 +9,8 @@
 namespace nx::vms::api { struct NetworkBlockData; }
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-class PoESettingsReducer
+class PoeSettingsReducer
 {
 public:
     static constexpr int kPortNumberProperty = node_view::lastResourceNodeViewProperty;
@@ -25,23 +24,22 @@ public:
         const node_view::details::NodeViewState& state,
         const nx::vms::api::NetworkBlockData& data);
 
-    static PoESettingsStatePatch::BoolOptional poeOverBudgetChanges(
-        const PoESettingsState& state,
+    static PoeSettingsStatePatch::BoolOptional poeOverBudgetChanges(
+        const PoeSettingsState& state,
         const nx::vms::api::NetworkBlockData& data);
 
-    static PoESettingsStatePatch::BoolOptional blockUiChanges(
-        const PoESettingsState& state,
+    static PoeSettingsStatePatch::BoolOptional blockUiChanges(
+        const PoeSettingsState& state,
         const bool blockUi);
 
-    static PoESettingsStatePatch::BoolOptional showPreloaderChanges(
-        const PoESettingsState& state,
+    static PoeSettingsStatePatch::BoolOptional showPreloaderChanges(
+        const PoeSettingsState& state,
         const bool value);
 
-    static PoESettingsStatePatch::BoolOptional autoUpdatesChanges(
-        const PoESettingsState& state,
+    static PoeSettingsStatePatch::BoolOptional autoUpdatesChanges(
+        const PoeSettingsState& state,
         const bool value);
 };
 
-} // namespace settings
 } // namespace nx::vms::client::desktop
 

@@ -5,9 +5,8 @@
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-class PoESettingsWidget:
+class PoeSettingsWidget:
     public QnAbstractPreferencesWidget,
     public QnWorkbenchContextAware
 {
@@ -15,8 +14,8 @@ class PoESettingsWidget:
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    PoESettingsWidget(QWidget* parent = nullptr);
-    virtual ~PoESettingsWidget() override;
+    PoeSettingsWidget(QWidget* parent = nullptr);
+    virtual ~PoeSettingsWidget() override;
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
@@ -32,5 +31,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

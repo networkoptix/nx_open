@@ -7,24 +7,24 @@
 
 namespace {
 
-using namespace nx::vms::client::desktop::settings;
+using namespace nx::vms::client::desktop;
 
 QString headerText(int column)
 {
     switch(column)
     {
-        case PoESettingsColumn::port:
-            return PoESettingsTableView::tr("Port");
-        case PoESettingsColumn::camera:
-            return PoESettingsTableView::tr("Camera");
-        case PoESettingsColumn::consumption:
-            return PoESettingsTableView::tr("Consumption");
-        case PoESettingsColumn::speed:
-            return PoESettingsTableView::tr("Speed");
-        case PoESettingsColumn::status:
-            return PoESettingsTableView::tr("Status");
-        case PoESettingsColumn::power:
-            return PoESettingsTableView::tr("Power");
+        case PoeSettingsColumn::port:
+            return PoeSettingsTableView::tr("Port");
+        case PoeSettingsColumn::camera:
+            return PoeSettingsTableView::tr("Camera");
+        case PoeSettingsColumn::consumption:
+            return PoeSettingsTableView::tr("Consumption");
+        case PoeSettingsColumn::speed:
+            return PoeSettingsTableView::tr("Speed");
+        case PoeSettingsColumn::status:
+            return PoeSettingsTableView::tr("Status");
+        case PoeSettingsColumn::power:
+            return PoeSettingsTableView::tr("Power");
         default:
             return QString();
     }
@@ -33,7 +33,7 @@ QString headerText(int column)
 const auto kHeaderDataProvider =
     [](int column, Qt::Orientation orientation, int role, QVariant& data)
     {
-        if (orientation != Qt::Horizontal || !qBetween<int>(0, column, PoESettingsColumn::count))
+        if (orientation != Qt::Horizontal || !qBetween<int>(0, column, PoeSettingsColumn::count))
             return false;
 
         switch(role)
@@ -49,28 +49,27 @@ const auto kHeaderDataProvider =
 } // namespace
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-struct PoESettingsTableView::Private
+struct PoeSettingsTableView::Private
 {
 };
 
 //--------------------------------------------------------------------------------------------------
 
-PoESettingsTableView::PoESettingsTableView(QWidget* parent):
-    base_type(PoESettingsColumn::count, parent),
+PoeSettingsTableView::PoeSettingsTableView(QWidget* parent):
+    base_type(PoeSettingsColumn::count, parent),
     d(new Private())
 {
     setItemDelegate(new node_view::ResourceNodeViewItemDelegate());
     setHeaderDataProvider(kHeaderDataProvider);
-    setupHeader(this);
+    setupPoeHeader(this);
 }
 
-PoESettingsTableView::~PoESettingsTableView()
+PoeSettingsTableView::~PoeSettingsTableView()
 {
 }
 
-void PoESettingsTableView::setupHeader(QTableView* view)
+void PoeSettingsTableView::setupPoeHeader(QTableView* view)
 {
     static constexpr int kMinimumColumnWidth = 110;
 
@@ -80,10 +79,9 @@ void PoESettingsTableView::setupHeader(QTableView* view)
     header->setSectionsClickable(true);
     header->setMinimumSectionSize(kMinimumColumnWidth);
     header->setSectionResizeMode(QHeaderView::Fixed);
-    header->setSectionResizeMode(PoESettingsColumn::port, QHeaderView::Fixed);
-    header->setSectionResizeMode(PoESettingsColumn::camera, QHeaderView::Stretch);
+    header->setSectionResizeMode(PoeSettingsColumn::port, QHeaderView::Fixed);
+    header->setSectionResizeMode(PoeSettingsColumn::camera, QHeaderView::Stretch);
     header->setDefaultAlignment(Qt::AlignLeft);
 }
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

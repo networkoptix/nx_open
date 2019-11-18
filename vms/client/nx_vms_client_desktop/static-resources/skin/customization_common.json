@@ -320,11 +320,11 @@
     },
 
     "nx::vms::client::desktop::node_view::NodeViewItemDelegate": {
-	"colors": {
-	    "chartColor": "brand_d3"
-	}
+        "colors": {
+            "chartColor": "brand_d3"
+        }
     },
-    
+
     "QnRecordingStatsItemDelegate": {
         "colors": {
             "chartBackground": "brand_d3",

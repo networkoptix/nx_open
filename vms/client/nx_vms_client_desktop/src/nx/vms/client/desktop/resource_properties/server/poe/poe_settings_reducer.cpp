@@ -20,7 +20,6 @@
 namespace {
 
 using namespace nx::vms::client::desktop;
-using namespace settings;
 using namespace node_view;
 using namespace node_view::details;
 
@@ -32,7 +31,7 @@ static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVC
 QString getSpeed(const NetworkPortState& port)
 {
     return port.linkSpeedMbps > 0
-        ? PoESettingsTableView::tr("%1 Mbps").arg(port.linkSpeedMbps)
+        ? PoeSettingsTableView::tr("%1 Mbps").arg(port.linkSpeedMbps)
         : "-";
 }
 
@@ -57,21 +56,21 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
     switch(port.poweringStatus)
     {
         case PoweringStatus::disconnected:
-            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Disconnected"));
+            builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Disconnected"));
             builder.withData(
-                PoESettingsColumn::status, Qt::TextColorRole, colorTheme()->color("dark13"));
+                PoeSettingsColumn::status, Qt::TextColorRole, colorTheme()->color("dark13"));
             break;
         case PoweringStatus::connected:
-            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Connected"));
+            builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Connected"));
             break;
         case PoweringStatus::powered:
-            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Powered"));
-            builder.withData(PoESettingsColumn::status, Qt::TextColorRole,
+            builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Powered"));
+            builder.withData(PoeSettingsColumn::status, Qt::TextColorRole,
                 colorTheme()->color("green_core"));
             break;
         default:
             NX_ASSERT(false, "Unexpected network port powering status!");
-            builder.withText(PoESettingsColumn::status, PoESettingsTableView::tr("Unexpected"));
+            builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Unexpected"));
             break;
     }
     return builder.data();
@@ -87,9 +86,9 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
 ViewNodeData wrongResourceNodeData(const QString macAddress)
 {
     static const QString kEmptyText =
-        PoESettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
+        PoeSettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
     static const QString kUnknownDeviceText =
-        PoESettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
+        PoeSettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
 
     static const auto kTransparentIcon =
         []()
@@ -106,13 +105,13 @@ ViewNodeData wrongResourceNodeData(const QString macAddress)
     ViewNodeDataBuilder builder;
 
     builder
-        .withData(PoESettingsColumn::camera, resourceExtraTextRole, extraText)
-        .withData(PoESettingsColumn::camera, resourceColumnRole, true)
-        .withData(PoESettingsColumn::camera, useItalicFontRole, true)
-        .withIcon(PoESettingsColumn::camera, kTransparentIcon).data();
+        .withData(PoeSettingsColumn::camera, resourceExtraTextRole, extraText)
+        .withData(PoeSettingsColumn::camera, resourceColumnRole, true)
+        .withData(PoeSettingsColumn::camera, useItalicFontRole, true)
+        .withIcon(PoeSettingsColumn::camera, kTransparentIcon).data();
 
     if (isUnknownDevice)
-        builder.withData(PoESettingsColumn::camera, Qt::TextColorRole, colorTheme()->color("light10"));
+        builder.withData(PoeSettingsColumn::camera, Qt::TextColorRole, colorTheme()->color("light10"));
     return builder;
 }
 
@@ -141,24 +140,24 @@ ViewNodeData dataFromPort(
 
             const auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
             return camera && !camera->getGroupId().isEmpty()
-                ? getGroupNodeData(camera, PoESettingsColumn::camera, extraInfo)
-                : getResourceNodeData(resource, PoESettingsColumn::camera, extraInfo);
+                ? getGroupNodeData(camera, PoeSettingsColumn::camera, extraInfo)
+                : getResourceNodeData(resource, PoeSettingsColumn::camera, extraInfo);
         }();
 
     return ViewNodeDataBuilder(resourceNodeViewData)
-        .withText(PoESettingsColumn::port, QString::number(port.portNumber))
+        .withText(PoeSettingsColumn::port, QString::number(port.portNumber))
 
-        .withText(PoESettingsColumn::consumption, getConsumptionText(port))
-        .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
+        .withText(PoeSettingsColumn::consumption, getConsumptionText(port))
+        .withData(PoeSettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
 
-        .withText(PoESettingsColumn::speed, getSpeed(port))
+        .withText(PoeSettingsColumn::speed, getSpeed(port))
         .withNodeData(poweringStatusData(port))
 
-        .withCheckedState(PoESettingsColumn::power, getPowerStatusCheckedState(port))
-        .withData(PoESettingsColumn::power, useSwitchStyleForCheckboxRole, true)
+        .withCheckedState(PoeSettingsColumn::power, getPowerStatusCheckedState(port))
+        .withData(PoeSettingsColumn::power, useSwitchStyleForCheckboxRole, true)
 
-        .withData(PoESettingsColumn::consumption, progressRole, progressValue(port))
-        .withProperty(PoESettingsReducer::kPortNumberProperty, port.portNumber).data();
+        .withData(PoeSettingsColumn::consumption, progressRole, progressValue(port))
+        .withProperty(PoeSettingsReducer::kPortNumberProperty, port.portNumber).data();
 }
 
 NodePtr createPortNodes(
@@ -178,12 +177,11 @@ NodePtr createPortNodes(
 } // namespace
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
 using namespace node_view;
 using namespace node_view::details;
 
-NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
+NodeViewStatePatch PoeSettingsReducer::blockDataChangesPatch(
     const NodeViewState& state,
     const nx::vms::api::NetworkBlockData& data,
     QnResourcePool* resourcePool)
@@ -211,7 +209,7 @@ NodeViewStatePatch PoESettingsReducer::blockDataChangesPatch(
     return result;
 }
 
-node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatch(
+node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatch(
     const node_view::details::NodeViewState& state,
     const nx::vms::api::NetworkBlockData& data)
 {
@@ -233,9 +231,9 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
         : colorTheme()->color("light4");
 
     const auto nodeData = ViewNodeDataBuilder()
-        .withText(PoESettingsColumn::consumption, text)
-        .withData(PoESettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
-        .withData(PoESettingsColumn::consumption, Qt::TextColorRole, color)
+        .withText(PoeSettingsColumn::consumption, text)
+        .withData(PoeSettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
+        .withData(PoeSettingsColumn::consumption, Qt::TextColorRole, color)
         .withProperty(hoverableProperty, false)
         .data();
 
@@ -256,35 +254,34 @@ node_view::details::NodeViewStatePatch PoESettingsReducer::totalsDataChangesPatc
     return result;
 }
 
-PoESettingsStatePatch::BoolOptional PoESettingsReducer::poeOverBudgetChanges(
-    const PoESettingsState& state,
+PoeSettingsStatePatch::BoolOptional PoeSettingsReducer::poeOverBudgetChanges(
+    const PoeSettingsState& state,
     const nx::vms::api::NetworkBlockData& data)
 {
-    return data.isInPoeOverBudgetMode == state.showPoEOverBudgetWarning
-        ? PoESettingsStatePatch::BoolOptional()
+    return data.isInPoeOverBudgetMode == state.showPoeOverBudgetWarning
+        ? PoeSettingsStatePatch::BoolOptional()
         : data.isInPoeOverBudgetMode;
 }
 
-PoESettingsStatePatch::BoolOptional PoESettingsReducer::blockUiChanges(
-    const PoESettingsState& state,
+PoeSettingsStatePatch::BoolOptional PoeSettingsReducer::blockUiChanges(
+    const PoeSettingsState& state,
     const bool blockUi)
 {
-    return blockUi == state.blockUi ? PoESettingsStatePatch::BoolOptional() : blockUi;
+    return blockUi == state.blockUi ? PoeSettingsStatePatch::BoolOptional() : blockUi;
 }
 
-PoESettingsStatePatch::BoolOptional PoESettingsReducer::showPreloaderChanges(
-    const PoESettingsState& state,
+PoeSettingsStatePatch::BoolOptional PoeSettingsReducer::showPreloaderChanges(
+    const PoeSettingsState& state,
         const bool value)
 {
-    return value == state.showPreloader ? PoESettingsStatePatch::BoolOptional() : value;
+    return value == state.showPreloader ? PoeSettingsStatePatch::BoolOptional() : value;
 }
 
-PoESettingsStatePatch::BoolOptional PoESettingsReducer::autoUpdatesChanges(
-    const PoESettingsState& state,
+PoeSettingsStatePatch::BoolOptional PoeSettingsReducer::autoUpdatesChanges(
+    const PoeSettingsState& state,
     const bool value)
 {
-    return value == state.autoUpdates ? PoESettingsStatePatch::BoolOptional() : value;
+    return value == state.autoUpdates ? PoeSettingsStatePatch::BoolOptional() : value;
 }
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

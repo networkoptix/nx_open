@@ -4,9 +4,8 @@
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-enum PoESettingsColumn
+enum PoeSettingsColumn
 {
     first,
 
@@ -20,21 +19,20 @@ enum PoESettingsColumn
     count
 };
 
-class PoESettingsTableView: public node_view::TableNodeView
+class PoeSettingsTableView: public node_view::TableNodeView
 {
     Q_OBJECT
     using base_type = node_view::TableNodeView;
 
 public:
-    PoESettingsTableView(QWidget* parent = nullptr);
-    virtual ~PoESettingsTableView() override;
+    PoeSettingsTableView(QWidget* parent = nullptr);
+    virtual ~PoeSettingsTableView() override;
 
-    static void setupHeader(QTableView* view);
+    static void setupPoeHeader(QTableView* view);
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

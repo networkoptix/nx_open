@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PoESettingsWidget</class>
- <widget class="QWidget" name="PoESettingsWidget">
+ <class>PoeSettingsWidget</class>
+ <widget class="QWidget" name="PoeSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -98,7 +98,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="nx::vms::client::desktop::settings::PoESettingsTableView" name="poeTable">
+          <widget class="nx::vms::client::desktop::PoeSettingsTableView" name="poeTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -147,7 +147,7 @@
           </widget>
          </item>
          <item>
-          <widget class="nx::vms::client::desktop::settings::TotalsPoESettingsTableView" name="totalsTable">
+          <widget class="nx::vms::client::desktop::TotalsPoeSettingsTableView" name="totalsTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -270,12 +270,12 @@
    <header location="global">nx/vms/client/desktop/node_view/node_view/table_node_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::settings::PoESettingsTableView</class>
+   <class>nx::vms::client::desktop::PoeSettingsTableView</class>
    <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
    <header location="global">nx/vms/client/desktop/resource_properties/server/poe/poe_settings_table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::settings::TotalsPoESettingsTableView</class>
+   <class>nx::vms::client::desktop::TotalsPoeSettingsTableView</class>
    <extends>nx::vms::client::desktop::node_view::TableNodeView</extends>
    <header location="global">nx/vms/client/desktop/resource_properties/server/poe/totals_poe_settings_table_view.h</header>
   </customwidget>

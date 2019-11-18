@@ -14,15 +14,13 @@ namespace nx::vms::client::desktop {
 
 namespace node_view::details { class NodeViewStore; }
 
-namespace settings {
-
-class PoESettingsStore: public QObject
+class PoeSettingsStore: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    PoESettingsStore(
+    PoeSettingsStore(
         QnCommonModuleAware* commonModuleAware,
         QObject* parent = nullptr);
 
@@ -30,9 +28,9 @@ public:
         const node_view::details::NodeViewStorePtr& blockTableStore,
         const node_view::details::NodeViewStorePtr& totalsTableStore);
 
-    virtual ~PoESettingsStore() override;
+    virtual ~PoeSettingsStore() override;
 
-    const PoESettingsState& state() const;
+    const PoeSettingsState& state() const;
 
     void updateBlocks(const nx::vms::api::NetworkBlockData& data);
 
@@ -47,12 +45,11 @@ public:
     void applyUserChanges();
 
 signals:
-    void patchApplied(const PoESettingsStatePatch& patch);
+    void patchApplied(const PoeSettingsStatePatch& patch);
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

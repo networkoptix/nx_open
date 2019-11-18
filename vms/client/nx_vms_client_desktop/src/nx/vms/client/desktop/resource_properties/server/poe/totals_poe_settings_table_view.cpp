@@ -5,12 +5,11 @@
 #include "poe_settings_table_view.h"
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-TotalsPoESettingsTableView::TotalsPoESettingsTableView(QWidget* parent):
-    base_type(PoESettingsColumn::count, parent)
+TotalsPoeSettingsTableView::TotalsPoeSettingsTableView(QWidget* parent):
+    base_type(PoeSettingsColumn::count, parent)
 {
-    PoESettingsTableView::setupHeader(this);
+    PoeSettingsTableView::setupPoeHeader(this);
     horizontalHeader()->setFixedHeight(1);
 
     setHeaderDataProvider(
@@ -20,9 +19,8 @@ TotalsPoESettingsTableView::TotalsPoESettingsTableView(QWidget* parent):
         });
 }
 
-TotalsPoESettingsTableView::~TotalsPoESettingsTableView()
+TotalsPoeSettingsTableView::~TotalsPoeSettingsTableView()
 {
 }
 
-} // namespace settings
 } // namespace nx::vms::client::desktop

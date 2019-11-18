@@ -10,27 +10,26 @@
 class QnResourcePool;
 
 namespace nx::vms::client::desktop {
-namespace settings {
 
-struct PoESettingsStore::Private
+struct PoeSettingsStore::Private
 {
-    Private(PoESettingsStore* store, QnCommonModuleAware* commonModuleAware);
-    void applyPatch(const PoESettingsStatePatch& patch);
+    Private(PoeSettingsStore* store, QnCommonModuleAware* commonModuleAware);
+    void applyPatch(const PoeSettingsStatePatch& patch);
 
-    PoESettingsStore* const q;
+    PoeSettingsStore* const q;
     QnResourcePool* const pool;
     node_view::details::NodeViewStorePtr blockStore;
     node_view::details::NodeViewStorePtr totalsStore;
-    PoESettingsState state;
+    PoeSettingsState state;
 };
 
-PoESettingsStore::Private::Private(PoESettingsStore* store, QnCommonModuleAware* commonModuleAware):
+PoeSettingsStore::Private::Private(PoeSettingsStore* store, QnCommonModuleAware* commonModuleAware):
     q(store),
     pool(commonModuleAware->resourcePool())
 {
 }
 
-void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
+void PoeSettingsStore::Private::applyPatch(const PoeSettingsStatePatch& patch)
 {
     if (blockStore)
         blockStore->applyPatch(patch.blockPatch);
@@ -44,8 +43,8 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
     if (patch.showPreloader)
         state.showPreloader = patch.showPreloader.value();
 
-    if (patch.showPoEOverBudgetWarning)
-        state.showPoEOverBudgetWarning = patch.showPoEOverBudgetWarning.value();
+    if (patch.showPoeOverBudgetWarning)
+        state.showPoeOverBudgetWarning = patch.showPoeOverBudgetWarning.value();
 
     if (patch.blockUi)
         state.blockUi = patch.blockUi.value();
@@ -58,17 +57,17 @@ void PoESettingsStore::Private::applyPatch(const PoESettingsStatePatch& patch)
 
 //--------------------------------------------------------------------------------------------------
 
-PoESettingsStore::PoESettingsStore(QnCommonModuleAware* commonModuleAware, QObject* parent):
+PoeSettingsStore::PoeSettingsStore(QnCommonModuleAware* commonModuleAware, QObject* parent):
     base_type(parent),
     d(new Private(this, commonModuleAware))
 {
 }
 
-PoESettingsStore::~PoESettingsStore()
+PoeSettingsStore::~PoeSettingsStore()
 {
 }
 
-void PoESettingsStore::setStores(
+void PoeSettingsStore::setStores(
     const node_view::details::NodeViewStorePtr& blockTableStore,
     const node_view::details::NodeViewStorePtr& totalsTableStore)
 {
@@ -76,69 +75,68 @@ void PoESettingsStore::setStores(
     d->totalsStore = totalsTableStore;
 }
 
-const PoESettingsState& PoESettingsStore::state() const
+const PoeSettingsState& PoeSettingsStore::state() const
 {
     return d->state;
 }
 
-void PoESettingsStore::updateBlocks(const nx::vms::api::NetworkBlockData& data)
+void PoeSettingsStore::updateBlocks(const nx::vms::api::NetworkBlockData& data)
 {
-    PoESettingsStatePatch patch;
-    patch.blockPatch = PoESettingsReducer::blockDataChangesPatch(
+    PoeSettingsStatePatch patch;
+    patch.blockPatch = PoeSettingsReducer::blockDataChangesPatch(
         d->blockStore->state(), data, d->pool);
 
-    patch.totalsPatch = PoESettingsReducer::totalsDataChangesPatch(
+    patch.totalsPatch = PoeSettingsReducer::totalsDataChangesPatch(
         d->totalsStore->state(), data);
 
-    patch.showPoEOverBudgetWarning = PoESettingsReducer::poeOverBudgetChanges(d->state, data);
+    patch.showPoeOverBudgetWarning = PoeSettingsReducer::poeOverBudgetChanges(d->state, data);
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::setHasChanges(bool value)
+void PoeSettingsStore::setHasChanges(bool value)
 {
     if (d->state.hasChanges == value)
         return;
 
-    PoESettingsStatePatch patch;
+    PoeSettingsStatePatch patch;
     patch.hasChanges = value;
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::setBlockUi(bool value)
+void PoeSettingsStore::setBlockUi(bool value)
 {
-    PoESettingsStatePatch patch;
-    patch.blockUi = PoESettingsReducer::blockUiChanges(d->state, value);
+    PoeSettingsStatePatch patch;
+    patch.blockUi = PoeSettingsReducer::blockUiChanges(d->state, value);
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::setPreloaderVisible(bool value)
+void PoeSettingsStore::setPreloaderVisible(bool value)
 {
-    PoESettingsStatePatch patch;
-    patch.showPreloader = PoESettingsReducer::showPreloaderChanges(d->state, value);
+    PoeSettingsStatePatch patch;
+    patch.showPreloader = PoeSettingsReducer::showPreloaderChanges(d->state, value);
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::setAutoUpdates(bool value)
+void PoeSettingsStore::setAutoUpdates(bool value)
 {
-    PoESettingsStatePatch patch;
-    patch.autoUpdates = PoESettingsReducer::autoUpdatesChanges(d->state, value);
+    PoeSettingsStatePatch patch;
+    patch.autoUpdates = PoeSettingsReducer::autoUpdatesChanges(d->state, value);
 
     d->applyPatch(patch);
 }
 
-void PoESettingsStore::applyUserChanges()
+void PoeSettingsStore::applyUserChanges()
 {
-    PoESettingsStatePatch patch;
+    PoeSettingsStatePatch patch;
     patch.blockPatch = node_view::NodeViewStateReducer::applyUserChangesPatch(
         d->blockStore->state());
 
     d->applyPatch(patch);
 }
 
-} // namespace settings
 } // namespace nx::vms::client::desktop
 
