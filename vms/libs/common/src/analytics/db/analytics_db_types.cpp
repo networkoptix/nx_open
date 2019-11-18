@@ -52,7 +52,7 @@ bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
 void ObjectRegion::add(const QRectF& rect)
 {
     if (boundingBoxGrid.size() == 0)
-        boundingBoxGrid.resize(kGridDataSizeBytes);
+        boundingBoxGrid.append(kGridDataSizeBytes, (char) 0);
 
     QnMetaDataV1::addMotion(this->boundingBoxGrid.data(), rect);
 }

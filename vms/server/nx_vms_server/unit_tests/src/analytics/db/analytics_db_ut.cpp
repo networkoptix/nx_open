@@ -156,13 +156,12 @@ protected:
         std::vector<ObjectTrack> tracks,
         const Filter& filter)
     {
-        for (auto trackIter = tracks.begin(); trackIter != tracks.end(); ++trackIter)
+        for (auto trackIter = tracks.begin(); trackIter != tracks.end();)
         {
             if (!filter.acceptsTrack(*trackIter))
-            {
                 trackIter = tracks.erase(trackIter);
-                continue;
-            }
+            else
+                ++trackIter;
         }
 
         if (filter.maxObjectTracksToSelect > 0 && (int)tracks.size() > filter.maxObjectTracksToSelect)
@@ -474,6 +473,11 @@ private:
     {
         auto objectMetadataPackets = toObjectMetadataPackets(packets);
         objectMetadataPackets = filterObjectTracksAndApplySortOrder(filter, std::move(objectMetadataPackets));
+        for (auto& packet : objectMetadataPackets)
+        {
+            packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
+            packet.lastAppearanceTimeUs -= packet.lastAppearanceTimeUs % 1000;
+        }
 
         return objectMetadataPackets;
     }
