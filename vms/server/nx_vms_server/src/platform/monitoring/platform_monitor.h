@@ -179,6 +179,7 @@ public:
      * @return Network load entry for the specified network interface on this PC.
      */
     NetworkLoad networkInterfaceLoadOrThrow(const QString& interfaceName);
+    NetworkLoad networkInterfaceLoadOrThrow(const nx::utils::MacAddress& macAddress);
 
     /**
      * @returns A list of network load entries for all network interfaces of the given types on

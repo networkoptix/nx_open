@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/mac_address.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
 #include <platform/platform_abstraction.h>
@@ -34,10 +35,19 @@ public:
         return m_interface.name();
     }
 
+    // NOTE: NIC in windows may have two different names... for Linux it is the same.
     QString humanReadableName() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         return m_interface.humanReadableName();
+    }
+
+    nx::utils::MacAddress hardwareAddress() const
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        const auto result = nx::utils::MacAddress(m_interface.hardwareAddress());
+        NX_ASSERT(!result.isNull());
+        return result;
     }
 
     void updateInterface(QNetworkInterface iface)
@@ -83,9 +93,10 @@ public:
     enum class Rate { in, out };
     api::metrics::Value load(Rate rate) const
     {
-        const auto name = humanReadableName();
+        // NOTE: Using MAC because windows has some mess with interfaces names (VMS-16182).
+        const auto mac = hardwareAddress();
         const auto load = NX_METRICS_EXPECTED_ERROR(
-            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(name),
+            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(mac),
             std::invalid_argument, "Error getting NIC load");
         return api::metrics::Value(nx::utils::switch_(rate,
             Rate::in, [&]{ return load.bytesPerSecIn; },
