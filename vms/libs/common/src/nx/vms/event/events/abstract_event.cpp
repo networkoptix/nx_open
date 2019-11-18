@@ -134,6 +134,7 @@ bool hasToggleState(
     case EventType::cameraInputEvent:
     case EventType::userDefinedEvent:
     case EventType::softwareTriggerEvent:
+    case EventType::poeOverBudgetEvent:
         return true;
     case EventType::analyticsSdkEvent:
     {
