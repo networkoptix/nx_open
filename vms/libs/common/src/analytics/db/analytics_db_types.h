@@ -119,7 +119,6 @@ struct Filter
      * Zero value is treated as no limit.
      */
     int maxObjectTracksToSelect = 0;
-    int maxObjectTrackSize = 1;
     /**
      * Found tracks are sorted by minimal track time using this order.
      */

@@ -393,7 +393,6 @@ std::optional<nx::analytics::db::ObjectTrack>
     using namespace nx::analytics::db;
     Filter filter;
     filter.objectTrackId = objectTrackId;
-    filter.maxObjectTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
 
     NX_DEBUG(this,
         "Trying to fetch Track with id %1. Full Track is needed: %2",

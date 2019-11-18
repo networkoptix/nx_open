@@ -805,12 +805,6 @@ protected:
         }
     }
 
-    void addMaxTrackLengthLimitToFilter()
-    {
-        // TODO: #ak Currently, only 1 track element can be returned.
-        m_filter.maxObjectTrackSize = 1;
-    }
-
     void addRandomTextFoundInDataToFilter()
     {
         m_filter.freeText = attributeDictionary().getRandomText();
@@ -1021,8 +1015,6 @@ protected:
     void whenLookupWithMaxTrackLengthLimit()
     {
         m_filter.objectTrackId = m_specificObjectTrackId;
-        addMaxTrackLengthLimitToFilter();
-        //m_filter.maxTrackSize = 1;
 
         whenLookupObjectTracks();
     }
@@ -1250,7 +1242,6 @@ TEST_F(
 
     filter().boundingBox = packet->objectMetadataList.front().boundingBox;
     filter().deviceIds = {deviceId};
-    filter().maxObjectTrackSize = 0;
 
     whenLookupObjectTracks();
     thenResultMatchesExpectations();
@@ -1268,7 +1259,6 @@ public:
     AnalyticsDbCursor()
     {
         filter().sortOrder = Qt::AscendingOrder;
-        filter().maxObjectTrackSize = 0;
     }
 
 protected:
