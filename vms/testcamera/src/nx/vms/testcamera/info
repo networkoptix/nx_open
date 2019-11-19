@@ -1,0 +1,35 @@
+camera.cpp:        const auto frameLoggerContext = logger->pushContext(
+camera.cpp:    const auto logger = m_logger->cloneForContext(
+camera.cpp:            const auto fileLoggerContext = logger->pushContext(lm("file #%1%2").args(file.index,
+camera_discovery_listener.cpp:                m_logger->info("Listening to discovery messages from IP range ("
+camera_discovery_listener.cpp:        m_logger->error("Unable to listen to discovery messages on requested IP addresses.");
+camera_discovery_listener.cpp:            m_logger->verbose(lm(msg).args(*outServerAddress, SystemError::getLastOSErrorText()));
+camera_discovery_listener.cpp:            m_logger->error(lm(msg).args(*outServerAddress, SystemError::getLastOSErrorText()));
+camera_discovery_listener.cpp:        m_logger->error(lm("Unable to send discovery response message to Server %1: %2").args(
+camera_discovery_listener.cpp:        m_logger->error(lm("Unable to send discovery response message to Server %1: "
+camera_discovery_listener.cpp:        m_logger->verbose(lm("Sent discovery response message to Server %1")
+camera_discovery_listener.cpp:            m_logger->info(lm("Got discovery message from Server %1").args(serverAddress));
+camera_discovery_listener.cpp:            m_logger->verbose(lm("Got discovery message from%1 Server %2")
+camera_discovery_listener.cpp:            m_logger->verbose(lm("Got unexpected discovery message from%1 Server %2: %3").args(
+camera_request_processor.cpp:        m_logger->info("No data received from Server; expected Camera URL.");
+camera_request_processor.cpp:        m_logger->error(lm("Unable to receive Camera URL: %1").args(
+camera_request_processor.cpp:    m_logger->verbose(lm("Received Camera URL: %1").args(nx::kit::utils::toString(cameraUrl)));
+camera_request_processor.cpp:        m_logger->verbose(lm("No Camera found with MAC %1.").args(macAddress));
+camera_request_processor.cpp:        m_logger->warning("Secondary stream requested in the URL but is not available.");
+file_cache.cpp:        m_logger->error(lm("Cannot open file %1").args(filename));
+file_cache.cpp:    m_logger->info(lm("Loading file #%1 %2").args(fileIndex, filename));
+file_cache.cpp:            m_logger->warning(lm("File too large, using first ~100 MB: #%1 %2")
+file_cache.cpp:        m_logger->error(lm("No video frames in file #%1 %2").args(fileIndex, filename));
+file_cache.cpp:    m_logger->info(lm("File loaded for streaming: #%1 %2").args(fileIndex, filename));
+file_streamer.cpp:            m_logger->warning(lm("B-frame suspected: timestamp %1, pts %2.")
+file_streamer.cpp:        m_logger->error(e.what());
+file_streamer.cpp:        m_logger->error(
+file_streamer.cpp:    m_logger->info(lm("Unlooping: File period is %1.").args(us(context.unloopingPeriod)));
+file_streamer.cpp:        m_logger->error("Unlooping: Pts is negative.");
+file_streamer.cpp:        m_logger->verbose(lm("Unlooping: Starting new loop with unlooping shift %1.")
+file_streamer.cpp:        m_logger->info(lm("Unlooping: Shifting unlooped ptses by %1.")
+frame_logger.cpp:            logger->error("Unable to open frames logging file: " + logFramesFilename);
+frame_logger.cpp:        logger->info("INI: Logging frames to file: " + logFramesFilename);
+frame_logger.cpp:    const QString line = Logger::currentDateTime() + " " + logger->tag() + ": "
+frame_logger.cpp:        + message + logger->context() + "\n";
+frame_logger.cpp:        logger->error("Unable to log frame to file: " + m_logFramesFile->fileName());
