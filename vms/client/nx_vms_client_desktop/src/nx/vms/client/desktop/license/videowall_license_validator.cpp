@@ -17,7 +17,12 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     auto commonInfo = manager->items()->getItem(commonModule()->remoteGUID());
 
     if (commonInfo.data.prematureVideoWallLicenseExpirationDate == 0)
-        return false;
+    {
+        // Runtime info is not found, but information about expiration date is also missing.
+        // Assume that other servers are still waiting for the server with license to come up.
+        info = commonInfo;
+        return true;
+    }
 
     // Video Wall license should remain valid before prematureVideoWallLicenseExpirationDate, so
     // we need to override runtime info from missing server with runtime info from common module.

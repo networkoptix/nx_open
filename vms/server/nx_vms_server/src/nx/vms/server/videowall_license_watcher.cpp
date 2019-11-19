@@ -17,8 +17,8 @@ using namespace std::chrono;
 
 namespace {
 
-constexpr milliseconds kLicenseCheckInterval = 10s;
-constexpr int kLicenseErrorCounterLimit = 1;
+constexpr milliseconds kLicenseCheckInterval = 1min;
+constexpr int kLicenseErrorCounterLimit = 5;
 
 } // namespace
 
