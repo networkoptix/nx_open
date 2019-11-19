@@ -3,7 +3,7 @@
 #include "../resource_view_node_helpers.h"
 #include "../resource_node_view_state_reducer.h"
 #include "../../details/node/view_node.h"
-#include "../../details/node/view_node_helpers.h"
+#include "../../details/node/view_node_helper.h"
 #include "../../details/node_view_state_patch.h"
 
 #include <core/resource/resource.h>
@@ -26,7 +26,7 @@ void BaseResourceNodeView<BaseNodeView>::setInvalidLeafResources(
 {
     details::PathList paths;
     const auto rootNode = BaseNodeView::state().rootNode;
-    details::forEachLeaf(rootNode,
+    details::ViewNodeHelper::forEachLeaf(rootNode,
         [&paths, resourceIds](const details::NodePtr& node)
         {
             const auto resource = getResource(node);

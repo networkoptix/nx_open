@@ -5,7 +5,7 @@
 #include "../details/node_view_store.h"
 #include "../details/node_view_state.h"
 #include "../details/node_view_state_patch.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_data_builder.h"
 #include "../node_view/node_view_state_reducer.h"
 #include "../node_view/node_view_item_delegate.h"
@@ -90,13 +90,13 @@ TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
 void TableNodeView::Private::updateCheckedIndices()
 {
     TableNodeView::IndicesList current;
-    forEachNode(store->state().rootNode,
+    ViewNodeHelper::forEachNode(store->state().rootNode,
         [this, &current](const NodePtr& node)
         {
             const auto& data = node->data();
             for (const int column: data.usedColumns())
             {
-                if (data.hasData(column, makeUserActionRole(Qt::CheckStateRole)))
+                if (data.hasData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole)))
                     current.append(model.index(node, column));
             }
         });
@@ -177,7 +177,7 @@ void TableNodeView::handleUserDataChangeRequested(
     if (role != Qt::CheckStateRole)
         return;
 
-    const auto node = details::nodeFromIndex(index);
+    const auto node = details::ViewNodeHelper::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
     d->store->applyPatch(NodeViewStateReducer::setNodeChecked(
         d->store->state(), node->path(), {index.column()}, checkedState, true));

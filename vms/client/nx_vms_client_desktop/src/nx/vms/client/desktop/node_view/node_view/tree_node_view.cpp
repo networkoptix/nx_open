@@ -8,7 +8,7 @@
 #include "../details/node_view_state.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_constants.h"
 
 #include <QtCore/QSortFilterProxyModel>
@@ -95,7 +95,7 @@ void TreeNodeView::Private::handleCollapsed(const QModelIndex& index)
 
 void TreeNodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool expanded)
 {
-    if (const auto node = nodeFromIndex(index))
+    if (const auto node = ViewNodeHelper::nodeFromIndex(index))
     {
         store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(
             store.state(), node->path(), expanded));
@@ -108,7 +108,7 @@ void TreeNodeView::Private::handleExpandStateChanged(const QModelIndex& index, b
 
 void TreeNodeView::Private::updateExpandedState(const QModelIndex& index)
 {
-    const bool expandedNode = details::expanded(index);
+    const bool expandedNode = details::ViewNodeHelper(index).expanded();
     if (owner->isExpanded(index) != expandedNode)
         owner->setExpanded(index, expandedNode);
 }
@@ -208,7 +208,7 @@ void TreeNodeView::handleDataChangeRequest(
     if (role != Qt::CheckStateRole)
         return;
 
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
     d->store.applyPatch(NodeViewStateReducer::setNodeChecked(
         d->store.state(), node->path(), {index.column()}, checkedState));

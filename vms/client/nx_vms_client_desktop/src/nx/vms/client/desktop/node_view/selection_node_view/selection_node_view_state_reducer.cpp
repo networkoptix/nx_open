@@ -2,7 +2,7 @@
 
 #include "selection_view_node_helpers.h"
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_data_builder.h"
 #include "../node_view/node_view_state_reducer.h"
 
@@ -44,7 +44,7 @@ int addCheckStateChangeToPatch(
     patch.appendPatchSteps(checkStatePatch);
 
     const int anyColumn = *columns.begin();
-    switch(checkedState(node, anyColumn))
+    switch(ViewNodeHelper(node).checkedState(anyColumn))
     {
         case Qt::Checked:
             return nodeCheckedState == Qt::Unchecked ? -1 : 0;
@@ -61,7 +61,7 @@ int addCheckStateChangeToPatch(
 bool checkable(const ColumnSet& selectionColumns, const NodePtr& node)
 {
     return std::any_of(selectionColumns.begin(), selectionColumns.end(),
-        [node](const int column) { return checkable(node, column); });
+        [node](const int column) { return ViewNodeHelper(node).checkable(column); });
 }
 
 NodeList getSiblings(const NodePtr& node)
@@ -120,7 +120,7 @@ Qt::CheckState getSiblingsCheckState(
     const int anyColumn = *selectionColumns.begin();
     for (auto it = siblings.begin(); it != siblings.end(); ++it)
     {
-        const auto state = checkedState(*it, anyColumn);
+        const auto state = ViewNodeHelper(*it).checkedState(anyColumn);
         if (state != currentCheckedState)
             return Qt::PartiallyChecked;
     }

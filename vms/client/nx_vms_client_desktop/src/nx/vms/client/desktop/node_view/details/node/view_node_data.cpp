@@ -1,6 +1,6 @@
 #include "view_node_data.h"
 
-#include "view_node_helpers.h"
+#include "view_node_helper.h"
 #include "view_node_data_builder.h"
 
 #include <nx/utils/log/assert.h>
@@ -238,7 +238,7 @@ Qt::ItemFlags ViewNodeData::flags(Column column) const
 
     const auto flagIt = d->flags.find(column);
     const auto flagsValue = flagIt == d->flags.end() ? Qt::ItemIsEnabled : flagIt.value();
-    return checkable(*this, column) ? flagsValue | kCheckableFlags : flagsValue;
+    return ViewNodeHelper(*this).checkable(column) ? flagsValue | kCheckableFlags : flagsValue;
 }
 
 void ViewNodeData::setFlag(Column column, Qt::ItemFlag flag, bool value)

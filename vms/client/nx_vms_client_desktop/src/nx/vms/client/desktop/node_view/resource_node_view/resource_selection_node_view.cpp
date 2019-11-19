@@ -8,7 +8,7 @@
 #include "../details/node_view_store.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_state_patch.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../node_view/sorting_filtering/node_view_numeric_sort_model.h"
 
 #include <nx/utils/uuid.h>
@@ -61,7 +61,7 @@ void ResourceSelectionNodeView::Private::handlePatchApplied(const NodeViewStateP
         if (hasOtherChange)
             continue;
 
-        const bool hasCheckChange = checkable(data, resourceCheckColumn)
+        const bool hasCheckChange = ViewNodeHelper(data).checkable(resourceCheckColumn)
             && data.hasDataForColumn(resourceCheckColumn);
         if (!hasCheckChange && !data.hasProperty(selectedChildrenCountProperty))
             continue;
@@ -118,7 +118,7 @@ void ResourceSelectionNodeView::setSelectionMode(SelectionMode mode)
 void ResourceSelectionNodeView::setLeafResourcesSelected(const QnUuidSet& resourceIds, bool select)
 {
     PathList paths;
-    details::forEachLeaf(state().rootNode,
+    details::ViewNodeHelper::forEachLeaf(state().rootNode,
         [resourceIds, &paths](const details::NodePtr& node)
         {
             const auto resource = getResource(node);

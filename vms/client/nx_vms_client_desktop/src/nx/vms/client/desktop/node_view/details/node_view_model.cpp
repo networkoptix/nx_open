@@ -3,7 +3,7 @@
 #include "node_view_state.h"
 #include "node_view_state_patch.h"
 #include "node/view_node.h"
-#include "node/view_node_helpers.h"
+#include "node/view_node_helper.h"
 #include "node/view_node_constants.h"
 
 #include <QtCore/QAbstractProxyModel>
@@ -122,7 +122,7 @@ QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent)
         return QModelIndex();
 
     const auto node = parent.isValid()
-        ? nodeFromIndex(parent)->nodeAt(row).data()
+        ? ViewNodeHelper::nodeFromIndex(parent)->nodeAt(row).data()
         : d->state.rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
@@ -133,7 +133,7 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
     if (!child.isValid())
         QModelIndex();
 
-    const auto node = nodeFromIndex(child);
+    const auto node = ViewNodeHelper::nodeFromIndex(child);
     const auto parent = node ? node->parent() : NodePtr();
     const bool rootOrFirstLevelNode = !parent || !parent->parent();
 
@@ -143,7 +143,7 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->state.rootNode;
+    const auto node = parent.isValid() ? ViewNodeHelper::nodeFromIndex(parent) : d->state.rootNode;
     return node ? node->childrenCount() : 0;
 }
 
@@ -165,7 +165,7 @@ bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int
 
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     if (!node)
         return QVariant();
 
@@ -173,12 +173,14 @@ QVariant NodeViewModel::data(const QModelIndex& index, int role) const
     if (role != Qt::CheckStateRole)
         return node->data(column, role);
 
-    return checkable(index) ? checkedState(index, true) : QVariant();
+    return ViewNodeHelper(index).checkable(column)
+        ? ViewNodeHelper(index).checkedState(column, true)
+        : QVariant();
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
 }
 

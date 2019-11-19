@@ -6,80 +6,64 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
-int makeUserActionRole(int initialRole, bool isUserAction = true);
+class ViewNodeHelper
+{
+public:
+    static int makeUserActionRole(int initialRole, bool isUserAction = true);
 
-NX_VMS_CLIENT_DESKTOP_API NodePtr nodeFromIndex(const QModelIndex& index);
+    static NodePtr nodeFromIndex(const QModelIndex& index);
 
-using ForEachNodeCallback = std::function<void (const NodePtr& node)>;
-NX_VMS_CLIENT_DESKTOP_API void forEachLeaf(const NodePtr& root, const ForEachNodeCallback& callback);
-NX_VMS_CLIENT_DESKTOP_API void forEachNode(const NodePtr& root, const ForEachNodeCallback& callback);
+    using ForEachNodeCallback = std::function<void (const NodePtr& node)>;
+    static void forEachLeaf(const NodePtr& root, const ForEachNodeCallback& callback);
+    static void forEachNode(const NodePtr& root, const ForEachNodeCallback& callback);
 
-NX_VMS_CLIENT_DESKTOP_API bool expanded(const NodePtr& node);
-NX_VMS_CLIENT_DESKTOP_API bool expanded(const ViewNodeData& data);
-NX_VMS_CLIENT_DESKTOP_API bool expanded(const QModelIndex& index);
+    static NodePtr createSimpleNode(
+        const QString& caption,
+        const NodeList& children,
+        int checkableColumn = -1,
+        int groupSortOrder = 0);
 
-NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const NodePtr& node);
-NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const ViewNodeData& data);
-NX_VMS_CLIENT_DESKTOP_API bool isSeparator(const QModelIndex& index);
+    static NodePtr createSimpleNode(
+        const QString& caption,
+        int checkableColumn = -1,
+        int groupSortOrder = 0);
 
-NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API qreal progressValue(const QModelIndex& index);
+    static NodePtr createSeparatorNode(int groupSortOrder = 0);
 
-NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API bool useSwitchStyleForCheckbox(const QModelIndex& index);
 
-/**
-* Assuming that the sort order is ascending, nodes with lesser group sort order property will go
-*     before nodes with greater group sort order property regardless any other contents.
-*     Group sort order may be either positive or negative, default value is 0.
-*
-* @param index Model index representing node stored in NodeViewModel.
-*/
-NX_VMS_CLIENT_DESKTOP_API int groupSortOrder(const QModelIndex& index);
+public:
+    ViewNodeHelper(const QModelIndex& index);
+    ViewNodeHelper(const ViewNodeData& data);
+    ViewNodeHelper(const NodePtr& node);
 
-NX_VMS_CLIENT_DESKTOP_API QString text(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API QString text(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API QString text(const QModelIndex& index);
+    bool expanded() const;
 
-NX_VMS_CLIENT_DESKTOP_API bool checkable(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API bool checkable(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API bool checkable(const QModelIndex& index);
+    bool isSeparator() const;
 
-NX_VMS_CLIENT_DESKTOP_API bool hoverable(const NodePtr& node);
-NX_VMS_CLIENT_DESKTOP_API bool hoverable(const ViewNodeData& data);
-NX_VMS_CLIENT_DESKTOP_API bool hoverable(const QModelIndex& index);
+    bool hoverable() const;
 
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const NodePtr& node, int column);
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const ViewNodeData& data, int column);
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState userCheckedState(const QModelIndex& index);
+    bool checkable(int column) const;
 
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
-    const NodePtr& node,
-    int column,
-    bool isUserAction = false);
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
-    const ViewNodeData& data,
-    int column,
-    bool isUserAction = false);
+    Qt::CheckState userCheckedState(int column) const;
 
-NX_VMS_CLIENT_DESKTOP_API Qt::CheckState checkedState(
-    const QModelIndex& index,
-    bool isUserAction = false);
+    Qt::CheckState checkedState(int column, bool isUserAction = false);
 
-NX_VMS_CLIENT_DESKTOP_API NodePtr createSimpleNode(
-    const QString& caption,
-    const NodeList& children,
-    int checkableColumn = -1,
-    int groupSortOrder = 0);
+    qreal progressValue(int column) const;
 
-NX_VMS_CLIENT_DESKTOP_API NodePtr createSimpleNode(
-    const QString& caption,
-    int checkableColumn = -1,
-    int groupSortOrder = 0);
+    QString text(int column) const;
 
-NX_VMS_CLIENT_DESKTOP_API NodePtr createSeparatorNode(int groupSortOrder = 0);
+    bool useSwitchStyleForCheckbox(int column) const;
+
+    /**
+    * Assuming that the sort order is ascending, nodes with lesser group sort order property will go
+    *     before nodes with greater group sort order property regardless any other contents.
+    *     Group sort order may be either positive or negative, default value is 0.
+    */
+    int groupSortOrder() const;
+
+private:
+    const ViewNodeData* const m_data;
+};
 
 } // namespace details
 } // namespace node_view

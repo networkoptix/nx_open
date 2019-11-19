@@ -1,6 +1,6 @@
 #include "node_view_item_delegate.h"
 
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_constants.h"
 
 #include <ui/style/helper.h>
@@ -46,7 +46,7 @@ void tryDrawProgressBackground(
     const QColor& chartColor,
     const QModelIndex& index)
 {
-    const auto progress = progressValue(index);
+    const auto progress = ViewNodeHelper(index).progressValue(index.column());
     if (progress < 0)
         return;
 
@@ -83,7 +83,7 @@ void NodeViewItemDelegate::paint(
         return;
     }
 
-    if (useSwitchStyleForCheckbox(index))
+    if (ViewNodeHelper(index).useSwitchStyleForCheckbox(index.column()))
     {
         drawSwitch(painter, option);
         return;
@@ -105,7 +105,7 @@ void NodeViewItemDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
 
-    if (isSeparator(index))
+    if (ViewNodeHelper(index).isSeparator())
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
@@ -115,7 +115,7 @@ void NodeViewItemDelegate::initStyleOption(
     else
         option->state |= QStyle::State_Off;
 
-    if (!hoverable(index))
+    if (!ViewNodeHelper(index).hoverable())
         option->state &= ~QStyle::State_MouseOver;
 
     const auto useItalicFont = index.data(useItalicFontRole);

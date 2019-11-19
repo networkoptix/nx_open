@@ -6,7 +6,7 @@
 #include <nx/vms/client/desktop/node_view/details/node_view_store.h>
 #include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>

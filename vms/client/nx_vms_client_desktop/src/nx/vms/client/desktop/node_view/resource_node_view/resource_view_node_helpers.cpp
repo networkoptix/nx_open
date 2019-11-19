@@ -4,7 +4,7 @@
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_data.h"
 #include "../details/node/view_node_data_builder.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 
 #include <QtGui/QPainter>
 
@@ -50,7 +50,7 @@ namespace node_view {
 
 bool isResourceColumn(const QModelIndex& index)
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     if (!node)
         return false;
 
@@ -168,7 +168,7 @@ QnResourcePtr getResource(const NodePtr& node)
 
 QnResourcePtr getResource(const QModelIndex& index)
 {
-    return getResource(nodeFromIndex(index));
+    return getResource(ViewNodeHelper::nodeFromIndex(index));
 }
 
 QString extraText(const QModelIndex& index)
@@ -185,7 +185,7 @@ bool isValidResourceNode(const NodePtr& node)
 
 bool isValidResourceNode(const QModelIndex& index)
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     return node && isValidResourceNode(node);
 }
 

@@ -1,7 +1,7 @@
 #include "resource_node_view_item_delegate.h"
 
 #include "../resource_view_node_helpers.h"
-#include "../../details/node/view_node_helpers.h"
+#include "../../details/node/view_node_helper.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
@@ -129,7 +129,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
         painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
 
     // Text drawing.
-    const auto nodeText = text(index);
+    const auto nodeText = ViewNodeHelper(index).text(index.column());
     const auto nodeExtraText = extraText(index);
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */

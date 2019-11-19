@@ -3,7 +3,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
 
 using namespace nx::vms::client::desktop::node_view;
@@ -91,23 +91,23 @@ TEST(ViewNodeTest, base_data_fields_test)
 
     const auto node = ViewNode::create(nodeData);
 
-    ASSERT_TRUE(details::text(node, firstTestColumn) == kTestText);
-    ASSERT_TRUE(details::text(nodeData, firstTestColumn) == kTestText);
+    ASSERT_TRUE(details::ViewNodeHelper(node).text(firstTestColumn) == kTestText);
+    ASSERT_TRUE(details::ViewNodeHelper(nodeData).text(firstTestColumn) == kTestText);
 
-    ASSERT_TRUE(details::checkable(node, firstTestColumn));
-    ASSERT_TRUE(details::checkable(nodeData, firstTestColumn));
-    ASSERT_TRUE(details::checkedState(node, firstTestColumn) == Qt::Checked);
-    ASSERT_TRUE(details::checkedState(nodeData, firstTestColumn) == Qt::Checked);
+    ASSERT_TRUE(details::ViewNodeHelper(node).checkable(firstTestColumn));
+    ASSERT_TRUE(details::ViewNodeHelper(nodeData).checkable(firstTestColumn));
+    ASSERT_TRUE(details::ViewNodeHelper(node).checkedState(firstTestColumn) == Qt::Checked);
+    ASSERT_TRUE(details::ViewNodeHelper(nodeData).checkedState(firstTestColumn) == Qt::Checked);
 
-    ASSERT_TRUE(details::checkable(node, secondTestColumn));
-    ASSERT_TRUE(details::checkable(nodeData, secondTestColumn));
-    ASSERT_TRUE(details::checkedState(node, secondTestColumn) == Qt::Unchecked);
-    ASSERT_TRUE(details::checkedState(nodeData, secondTestColumn) == Qt::Unchecked);
+    ASSERT_TRUE(details::ViewNodeHelper(node).checkable(secondTestColumn));
+    ASSERT_TRUE(details::ViewNodeHelper(nodeData).checkable(secondTestColumn));
+    ASSERT_TRUE(details::ViewNodeHelper(node).checkedState(secondTestColumn) == Qt::Unchecked);
+    ASSERT_TRUE(details::ViewNodeHelper(nodeData).checkedState(secondTestColumn) == Qt::Unchecked);
 
-    ASSERT_FALSE(details::checkable(node, thirdTestColumn));
-    ASSERT_FALSE(details::checkable(nodeData, thirdTestColumn));
-    ASSERT_FALSE(details::checkable(node, fourthTestColumn));
-    ASSERT_FALSE(details::checkable(nodeData, fourthTestColumn));
+    ASSERT_FALSE(details::ViewNodeHelper(node).checkable(thirdTestColumn));
+    ASSERT_FALSE(details::ViewNodeHelper(nodeData).checkable(thirdTestColumn));
+    ASSERT_FALSE(details::ViewNodeHelper(node).checkable(fourthTestColumn));
+    ASSERT_FALSE(details::ViewNodeHelper(nodeData).checkable(fourthTestColumn));
 
     ASSERT_TRUE(nodeData.flags(firstTestColumn).testFlag(kInitialTestFlag));
     ASSERT_FALSE(nodeData.flags(firstTestColumn).testFlag(kAnotherTestFlag));
@@ -122,8 +122,8 @@ TEST(ViewNodeTest, separator)
     const auto separatorNodeData = ViewNodeDataBuilder().separator().data();
 
     // Checks if data represents separator node
-    ASSERT_TRUE(details::isSeparator(separatorNodeData));
-    ASSERT_TRUE(details::isSeparator(ViewNode::create(separatorNodeData)));
+    ASSERT_TRUE(details::ViewNodeHelper(separatorNodeData).isSeparator());
+    ASSERT_TRUE(details::ViewNodeHelper(ViewNode::create(separatorNodeData)).isSeparator());
 }
 
 TEST(ViewNodeTest, apply_data_test)

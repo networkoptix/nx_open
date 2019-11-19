@@ -4,7 +4,7 @@
 #include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <nx/utils/scope_guard.h>
 
@@ -19,12 +19,12 @@ static const auto kAnotherNodeText = QString("Some text");
 
 NodePtr createTestTree()
 {
-    return createSimpleNode("root", {
-        createSimpleNode("1",
-            { createSimpleNode("1_1")}),
-        createSimpleNode("2",
-            { createSimpleNode("2_1"),
-              createSimpleNode("2_2")})
+    return ViewNodeHelper::createSimpleNode("root", {
+        ViewNodeHelper::createSimpleNode("1",
+            { ViewNodeHelper::createSimpleNode("1_1")}),
+        ViewNodeHelper::createSimpleNode("2",
+            { ViewNodeHelper::createSimpleNode("2_1"),
+              ViewNodeHelper::createSimpleNode("2_2")})
         });
 }
 
@@ -75,15 +75,15 @@ TEST(NodeViewStatePatchTest, patch_from_node)
     ASSERT_TRUE(state.rootNode->childrenCount() == 2);
 
     const auto child1 = state.rootNode->nodeAt(0);
-    ASSERT_TRUE(text(child1, kDefaultTextColumn) == "1");
+    ASSERT_TRUE(ViewNodeHelper(child1).text(kDefaultTextColumn) == "1");
     ASSERT_TRUE(child1->childrenCount() == 1);
-    ASSERT_TRUE(text(child1->nodeAt(0), kDefaultTextColumn) == "1_1");
+    ASSERT_TRUE(ViewNodeHelper(child1->nodeAt(0)).text(kDefaultTextColumn) == "1_1");
 
     const auto child2 = state.rootNode->nodeAt(1);
-    ASSERT_TRUE(text(child2, kDefaultTextColumn) == "2");
+    ASSERT_TRUE(ViewNodeHelper(child2).text(kDefaultTextColumn) == "2");
     ASSERT_TRUE(child2->childrenCount() == 2);
-    ASSERT_TRUE(text(child2->nodeAt(0), kDefaultTextColumn) == "2_1");
-    ASSERT_TRUE(text(child2->nodeAt(1), kDefaultTextColumn) == "2_2");
+    ASSERT_TRUE(ViewNodeHelper(child2->nodeAt(0)).text(kDefaultTextColumn) == "2_1");
+    ASSERT_TRUE(ViewNodeHelper(child2->nodeAt(1)).text(kDefaultTextColumn) == "2_2");
 }
 
 TEST(NodeViewStatePatchTest, simple_add_node)
@@ -100,7 +100,7 @@ TEST(NodeViewStatePatchTest, simple_add_node)
     state = patch.applyTo(std::move(state));
 
     ASSERT_FALSE(state.rootNode.isNull());
-    ASSERT_TRUE(isSeparator(state.rootNode->nodeAt(0)));
+    ASSERT_TRUE(ViewNodeHelper(state.rootNode->nodeAt(0)).isSeparator());
 }
 
 TEST(NodeViewStatePatchTest, change_node)
@@ -114,11 +114,11 @@ TEST(NodeViewStatePatchTest, change_node)
     ASSERT_TRUE(patch.steps.front().operationData.operation == updateDataOperation);
 
     NodeViewState state;
-    state.rootNode = createSimpleNode(kNodeText);
+    state.rootNode = ViewNodeHelper::createSimpleNode(kNodeText);
     state = patch.applyTo(std::move(state));
 
     ASSERT_FALSE(state.rootNode.isNull());
-    ASSERT_TRUE(text(state.rootNode, kDefaultTextColumn) == kAnotherNodeText);
+    ASSERT_TRUE(ViewNodeHelper(state.rootNode).text(kDefaultTextColumn) == kAnotherNodeText);
 }
 
 TEST(NodeViewStatePatchTest, simple_remove_node)
@@ -131,7 +131,7 @@ TEST(NodeViewStatePatchTest, simple_remove_node)
     ASSERT_TRUE(patch.steps.front().operationData.operation == removeNodeOperation);
 
     NodeViewState state;
-    state.rootNode = createSimpleNode(kNodeText);
+    state.rootNode = ViewNodeHelper::createSimpleNode(kNodeText);
     state = patch.applyTo(std::move(state));
 
     ASSERT_TRUE(state.rootNode.isNull());
@@ -149,14 +149,14 @@ TEST(NodeViewStatePatchTest, remove_tree_nodes)
 
     ASSERT_TRUE(state.rootNode->childrenCount() == 2);
     ASSERT_TRUE(state.rootNode->nodeAt(1)->childrenCount() == 1);
-    ASSERT_TRUE(text(state.rootNode->nodeAt(1)->nodeAt(0), kDefaultTextColumn) == "2_1");
+    ASSERT_TRUE(ViewNodeHelper(state.rootNode->nodeAt(1)->nodeAt(0)).text(kDefaultTextColumn) == "2_1");
 
     NodeViewStatePatch removeParentPatch;
     removeParentPatch.addRemovalStep(ViewNodePath({0}));
     state = removeParentPatch.applyTo(std::move(state));
 
     ASSERT_TRUE(state.rootNode->childrenCount() == 1);
-    ASSERT_TRUE(text(state.rootNode->nodeAt(0), kDefaultTextColumn) == "2");
+    ASSERT_TRUE(ViewNodeHelper(state.rootNode->nodeAt(0)).text(kDefaultTextColumn) == "2");
 
     NodeViewStatePatch removeRootPatch;
     removeRootPatch.addRemovalStep(ViewNodePath());
@@ -186,7 +186,7 @@ TEST(NodeViewStatePatchTest, change_guard)
 
     NodeViewStatePatch changeTextPatch;
 
-    details::forEachNode(state.rootNode,
+    details::ViewNodeHelper::forEachNode(state.rootNode,
         [&changeTextPatch](const NodePtr& node)
         {
             changeTextPatch.addUpdateDataStep(node->path(),
@@ -202,7 +202,7 @@ TEST(NodeViewStatePatchTest, change_guard)
     const auto checkText =
         [](const NodePtr& node)
         {
-            ASSERT_TRUE(text(node, kDefaultTextColumn) == kNodeText);
+            ASSERT_TRUE(ViewNodeHelper(node).text(kDefaultTextColumn) == kNodeText);
         };
 
     recursiveCall(state.rootNode, checkText);
@@ -217,7 +217,7 @@ TEST(NodeViewStatePatchTest, remove_guard)
     state = createTreePatch.applyTo(std::move(state));
 
     int nodesCount = 0;
-    details::forEachNode(state.rootNode,
+    details::ViewNodeHelper::forEachNode(state.rootNode,
         [&nodesCount](const NodePtr& /*node*/) { ++nodesCount; });
 
     int removeGuardCallCount = 0;
@@ -238,7 +238,7 @@ TEST(NodeViewStatePatchTest, remove_guard)
     state = removeNodesPatch.applyTo(std::move(state), getRemoveNodeGuard);
 
     int resultNodesCount = 0;
-    details::forEachNode(state.rootNode,
+    details::ViewNodeHelper::forEachNode(state.rootNode,
         [&resultNodesCount](const NodePtr& /*node*/) { ++resultNodesCount; });
 
     ASSERT_TRUE(nodesCount == removeGuardCallCount + 1); //< No remove guard call for root node

@@ -7,7 +7,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/poe/poe_controller.h>
 #include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_reducer.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
@@ -132,8 +132,11 @@ void PoeSettingsWidget::applyChanges()
     for (const auto index: checkedIndices)
     {
         PortMode mode;
-        mode.poweringMode = userCheckedState(index) == Qt::Checked ? Mode::automatic : Mode::off;
-        mode.portNumber = nodeFromIndex(index)->property(PoeSettingsReducer::kPortNumberProperty).toInt();
+        mode.poweringMode = ViewNodeHelper(index).userCheckedState(index.column()) == Qt::Checked
+            ? Mode::automatic
+            : Mode::off;
+        mode.portNumber = ViewNodeHelper::nodeFromIndex(index)->property(
+            PoeSettingsReducer::kPortNumberProperty).toInt();
         modes.append(mode);
     }
 

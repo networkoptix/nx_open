@@ -1,7 +1,7 @@
 #include "node_view_state_reducer.h"
 
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_data_builder.h"
 
 namespace nx::vms::client::desktop {
@@ -24,8 +24,12 @@ details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     bool hasChangedData = false;
     for (const int column: columns)
     {
-        if (!checkable(node, column) || checkedState(node, column, isUserAction) == nodeCheckedState)
+
+        if (!ViewNodeHelper(node).checkable(column)
+            || ViewNodeHelper(node).checkedState(column, isUserAction) == nodeCheckedState)
+        {
             continue;
+        }
 
         ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState, isUserAction);
         hasChangedData = true;
@@ -53,7 +57,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
     bool value)
 {
     const auto node = state.nodeByPath(path);
-    if (!node || expanded(node) == value)
+    if (!node || ViewNodeHelper(node).expanded() == value)
         return NodeViewStatePatch();
 
     NodeViewStatePatch patch;
@@ -64,25 +68,25 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
 details::NodeViewStatePatch NodeViewStateReducer::applyUserChangesPatch(
     const details::NodeViewState& state)
 {
-    static const auto kUserCheckStateRole = makeUserActionRole(Qt::CheckStateRole);
+    static const auto kUserCheckStateRole = ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole);
 
     NodeViewStatePatch result;
 
-    forEachNode(state.rootNode,
+    ViewNodeHelper::forEachNode(state.rootNode,
         [&result](const NodePtr& node)
         {
             const auto& data = node->data();
             for (const int column: data.usedColumns())
             {
-                if (!data.hasData(column, makeUserActionRole(Qt::CheckStateRole)))
+                if (!data.hasData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole)))
                     continue;
 
                 const auto& path = node->path();
                 result.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
 
                 const auto& data = node->data();
-                const auto userState = userCheckedState(data, column);
-                const auto currentState = checkedState(data, column);
+                const auto userState = ViewNodeHelper(data).userCheckedState(column);
+                const auto currentState = ViewNodeHelper(data).checkedState(column);
                 if (userState == currentState)
                     continue;
 

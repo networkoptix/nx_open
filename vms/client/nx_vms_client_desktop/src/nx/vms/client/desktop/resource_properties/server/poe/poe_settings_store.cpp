@@ -4,7 +4,7 @@
 
 #include <common/common_module_aware.h>
 #include <nx/vms/client/desktop/node_view/details/node_view_store.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/node_view/node_view_state_reducer.h>
 
 class QnResourcePool;

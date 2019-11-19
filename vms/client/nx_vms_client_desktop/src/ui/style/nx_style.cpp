@@ -65,7 +65,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helpers.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 
 using namespace style;
 using namespace nx::vms::client::desktop;
@@ -1053,8 +1053,9 @@ void QnNxStyle::drawPrimitive(
                         QVariant value = widget->property(Properties::kHoveredRowProperty);
                         if (value.isValid())
                         {
+                            using Helper = nx::vms::client::desktop::node_view::details::ViewNodeHelper;
                             hasHover = value.toInt() == item->index.row()
-                                && nx::vms::client::desktop::node_view::details::hoverable(item->index);
+                                && Helper(item->index).hoverable();
                         }
                     }
                 }

@@ -2,7 +2,7 @@
 
 #include <QtGui/QIcon>
 
-#include "view_node_helpers.h"
+#include "view_node_helper.h"
 #include "view_node_constants.h"
 
 namespace nx::vms::client::desktop {
@@ -53,7 +53,7 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     Qt::CheckState value,
     bool isUserAction)
 {
-    m_data->setData(column, makeUserActionRole(Qt::CheckStateRole, isUserAction), value);
+    m_data->setData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole, isUserAction), value);
     return *this;
 }
 
@@ -76,7 +76,7 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     if (value)
         return withCheckedState(column, *value, isUserAction);
 
-    m_data->removeData(column, makeUserActionRole(Qt::CheckStateRole, isUserAction));
+    m_data->removeData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole, isUserAction));
     return *this;
 }
 
