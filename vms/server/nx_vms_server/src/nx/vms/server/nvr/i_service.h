@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/vms/server/nvr/types.h>
 #include <nx/vms/server/nvr/i_network_block_manager.h>
 #include <nx/vms/server/nvr/i_io_manager.h>
 #include <nx/vms/server/nvr/i_buzzer_manager.h>
@@ -28,17 +29,19 @@ public:
 
     virtual void start() = 0;
 
-    virtual INetworkBlockManager* networkBlockManager() = 0;
+    virtual DeviceInfo deviceInfo() const = 0;
 
-    virtual IIoManager* ioManager() = 0;
+    virtual INetworkBlockManager* networkBlockManager() const = 0;
 
-    virtual IBuzzerManager* buzzerManager() = 0;
+    virtual IIoManager* ioManager() const = 0;
 
-    virtual IFanManager* fanManager() = 0;
+    virtual IBuzzerManager* buzzerManager() const = 0;
 
-    virtual ILedManager* ledManager() = 0;
+    virtual IFanManager* fanManager() const = 0;
 
-    virtual QnAbstractResourceSearcher* createSearcher() = 0;
+    virtual ILedManager* ledManager() const = 0;
+
+    virtual QnAbstractResourceSearcher* createSearcher() const = 0;
 
     virtual Capabilities capabilities() const = 0;
 };

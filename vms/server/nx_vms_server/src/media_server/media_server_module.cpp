@@ -27,7 +27,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
-#include <nx/vms/server/nvr/hanwha/service.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_proxy.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
@@ -56,6 +55,10 @@
 #include <nx/vms/server/update/update_manager.h>
 #include <nx/vms/server/meta_types.h>
 #include <nx/vms/server/network/multicast_address_registry.h>
+
+#include <nx/vms/server/nvr/i_service.h>
+#include <nx/vms/server/nvr/service_factory.h>
+#include <nx/vms/server/nvr/hanwha/service_provider.h>
 
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
@@ -223,7 +226,11 @@ QnMediaServerModule::QnMediaServerModule(
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
-    m_nvrService = std::make_unique<nx::vms::server::nvr::hanwha::Service>(this);
+    nx::vms::server::nvr::ServiceFactory serviceFactory;
+    serviceFactory.registerServiceProvider(
+        std::make_unique<nx::vms::server::nvr::hanwha::ServiceProvider>(this));
+
+    m_nvrService = serviceFactory.createService();
 
     initOutgoingSocketCounter();
 

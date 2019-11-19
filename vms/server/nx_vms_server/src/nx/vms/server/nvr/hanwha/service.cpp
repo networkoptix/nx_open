@@ -2,8 +2,11 @@
 
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <core/resource/media_server_resource.h>
 
-#include <nx/vms/server/root_fs.h>
+#include <nx/vms/server/event/event_connector.h>
+
+#include <nx/vms/server/nvr/i_manager_factory.h>
 
 #include <nx/vms/server/nvr/hanwha/connector.h>
 
@@ -27,8 +30,14 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-Service::Service(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+Service::Service(
+    QnMediaServerModule* serverModule,
+    std::unique_ptr<IManagerFactory> managerFactory,
+    DeviceInfo deviceInfo)
+    :
+    ServerModuleAware(serverModule),
+    m_managerFactory(std::move(managerFactory)),
+    m_deviceInfo(std::move(deviceInfo))
 {
     NX_DEBUG(this, "Creating the Hanwha NVR service");
 }
@@ -42,23 +51,40 @@ void Service::start()
 {
     NX_DEBUG(this, "Starting the Hanwha NVR service");
 
-    m_networkBlockManager = std::make_unique<NetworkBlockManager>(
-        serverModule()->commonModule()->currentServer(),
-        std::make_unique<NetworkBlockPlatformAbstraction>(serverModule()->rootFileSystem()),
-        std::make_unique<DummyPoweringPolicy>(3.0, 4.0)); //< TODO: #dmishin remove hardcode!
+    m_networkBlockManager = m_managerFactory->createNetworkBlockManager();
+    if (!m_networkBlockManager)
+    {
+        NX_ERROR(this, "Unable to obtain the network block manager");
+        return;
+    }
 
-    int ioDeviceDescriptor =
-        serverModule()->rootFileSystem()->open("/dev/ia_resource", QIODevice::ReadWrite);
-    // TODO: #dmishin handle errors.
+    m_ioManager = m_managerFactory->createIoManager();
+    if (!m_ioManager)
+    {
+        NX_ERROR(this, "Unable to obtain the IO manager");
+        return;
+    }
 
-    m_ioManager = std::make_unique<IoManager>(
-        std::make_unique<IoPlatformAbstraction>(ioDeviceDescriptor));
-    m_fanManager = std::make_unique<FanManager>(
-        std::make_unique<FanPlatformAbstraction>(ioDeviceDescriptor));
-    m_buzzerManager = std::make_unique<BuzzerManager>(
-        std::make_unique<BuzzerPlatformAbstraction>(ioDeviceDescriptor));
-    m_ledManager = std::make_unique<LedManager>(
-        std::make_unique<LedPlatformAbstraction>(ioDeviceDescriptor));
+    m_fanManager = m_managerFactory->createFanManager();
+    if (!m_fanManager)
+    {
+        NX_ERROR(this, "Unable to obtain the fan manager");
+        return;
+    }
+
+    m_buzzerManager = m_managerFactory->createBuzzerManager();
+    if (!m_buzzerManager)
+    {
+        NX_ERROR(this, "Unable to obtain the buzzer manager");
+        return;
+    }
+
+    m_ledManager = m_managerFactory->createLedManager();
+    if (!m_ledManager)
+    {
+        NX_ERROR(this, "Unable to obtain the LED manager");
+        return;
+    }
 
     m_connector = std::make_unique<Connector>(
         serverModule()->commonModule()->currentServer(),
@@ -75,37 +101,42 @@ void Service::start()
     m_buzzerManager->start();
 }
 
-INetworkBlockManager* Service::networkBlockManager()
+DeviceInfo Service::deviceInfo() const
+{
+    return m_deviceInfo;
+}
+
+INetworkBlockManager* Service::networkBlockManager() const
 {
     NX_DEBUG(this, "Network block manager has been requested");
     return m_networkBlockManager.get();
 }
 
-IIoManager* Service::ioManager()
+IIoManager* Service::ioManager() const
 {
     NX_DEBUG(this, "IO manager has been requested");
     return m_ioManager.get();
 }
 
-IBuzzerManager* Service::buzzerManager()
+IBuzzerManager* Service::buzzerManager() const
 {
     NX_DEBUG(this, "Buzzer manager has been requested");
     return m_buzzerManager.get();
 }
 
-IFanManager* Service::fanManager()
+IFanManager* Service::fanManager() const
 {
     NX_DEBUG(this, "Fan manager has been requested");
     return m_fanManager.get();
 }
 
-ILedManager* Service::ledManager()
+ILedManager* Service::ledManager() const
 {
     NX_DEBUG(this, "Led manager has been requested");
     return m_ledManager.get();
 }
 
-QnAbstractResourceSearcher* Service::createSearcher()
+QnAbstractResourceSearcher* Service::createSearcher() const
 {
     NX_DEBUG(this, "Creating new IoModule searcher");
     return new IoModuleSearcher(serverModule());
