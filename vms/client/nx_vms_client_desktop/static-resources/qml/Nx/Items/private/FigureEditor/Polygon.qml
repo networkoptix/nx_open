@@ -37,6 +37,11 @@ Figure
         closed: true
 
         enabled: false
+
+        maxPoints: (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= 3)
+            ? figureSettings.maxPoints : -1
+
+        onEnabledChanged: canvas.requestPaint()
     }
 
     PathHoverInstrument
@@ -205,7 +210,7 @@ Figure
     {
         id: temporaryGrip
 
-        visible: hoverInstrument.edgeHovered
+        visible: hoverInstrument.edgeHovered && pointMakerInstrument.count < maxPoints
         color: figure.color
         ghost: !pressed
 
@@ -263,20 +268,15 @@ Figure
     {
         if (pointMakerInstrument.enabled)
         {
-            if (pointMakerInstrument.count > 0)
-            {
-                if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
-                    return qsTr("Maximum points count is reached.")
-            }
-            else
-            {
+            if (pointMakerInstrument.count === 0)
                 return qsTr("Click on video to start polygon.")
-            }
         }
         else
         {
             if (pathUtil.hasSelfIntersections)
                 return qsTr("Polygon is not valid. Remove self-intersections to proceed.")
+            if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
+                return qsTr("Maximum points count is reached.")
         }
 
         return ""

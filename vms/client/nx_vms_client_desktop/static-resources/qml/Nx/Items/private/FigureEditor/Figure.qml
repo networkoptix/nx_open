@@ -4,6 +4,7 @@ import Nx.Controls 1.0
 Item
 {
     property color color: "black"
+    property var figureSettings
 
     property string hint: ""
     property int hintStyle: Banner.Style.Info

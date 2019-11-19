@@ -11,6 +11,7 @@ Item
     property Figure figure: null
 
     property string figureType: "polygon"
+    property var figureSettings
     readonly property bool hasFigure: figure && figure.hasFigure
     readonly property bool figureAcceptable: !figure || figure.acceptable
     property color color
@@ -54,6 +55,7 @@ Item
         onLoaded:
         {
             figure = item
+            figure.figureSettings = figureSettings
             editor.color = Qt.binding(function() { return figure.color })
             editor.hint = Qt.binding(function() { return figure.hint })
             editor.hintStyle = Qt.binding(function() { return figure.hintStyle })

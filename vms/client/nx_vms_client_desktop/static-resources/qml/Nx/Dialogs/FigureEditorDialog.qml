@@ -24,7 +24,7 @@ Window
     signal accepted()
 
     property alias figureType: editor.figureType
-    property int maxPolygonPoints: -1
+    property alias figureSettings: editor.figureSettings
 
     property var resourceId
 
