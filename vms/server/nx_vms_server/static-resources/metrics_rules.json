@@ -361,7 +361,7 @@
                         "alarms": [
                             {
                                 "level": "warning",
-                                "condition": "greaterThan %offlineEvents 1",
+                                "condition": "greaterThan %offlineEvents 0",
                                 "text": "went Offline %offlineEvents times in last 24 hours"
                             }
                         ]
