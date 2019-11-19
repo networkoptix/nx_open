@@ -339,4 +339,10 @@ DROP TABLE _object_group;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+static constexpr char kDropOldTrackDetail[] =
+R"sql(
+    UPDATE track set track_detail = null;
+)sql";
+
 } // namespace nx::analytics::db

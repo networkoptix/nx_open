@@ -5,6 +5,7 @@
 #include <nx/utils/compact_int.h>
 
 #include <analytics/db/config.h>
+#include <motion/motion_detection.h>
 
 namespace nx::analytics::db {
 
@@ -48,6 +49,18 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRectF* rect)
     QRect translated;
     deserialize(buf, &translated);
     *rect = translate(translated, kResolution);
+}
+
+void TrackSerializer::serialize(const ObjectRegion& data, QByteArray* buf)
+{
+    *buf = data.boundingBoxGrid;
+}
+
+void TrackSerializer::deserialize(QnByteArrayConstRef* buf, ObjectRegion* region)
+{
+    region->boundingBoxGrid.clear();
+    if (buf->size() == Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8)
+        region->boundingBoxGrid = *buf;
 }
 
 //-------------------------------------------------------------------------------------------------

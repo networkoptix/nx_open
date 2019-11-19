@@ -118,17 +118,18 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         auto trackMinTimestamp = track.firstAppearanceTimeUs;
         auto trackMaxTimestamp = track.lastAppearanceTimeUs;
 
-        query->bindValue(0, deviceDbId);
-        query->bindValue(1, (long long) objectTypeDbId);
-        query->bindValue(2, QnSql::serialized_field(track.id));
-        query->bindValue(3, trackMinTimestamp / kUsecInMs);
-        query->bindValue(4, trackMaxTimestamp / kUsecInMs);
-        query->bindValue(5, track.objectPosition.boundingBoxGrid);
-        query->bindValue(6, (long long) attributesId);
-        query->bindValue(7, track.bestShot.initialized()
+        query->addBindValue(deviceDbId);
+        query->addBindValue((long long) objectTypeDbId);
+        query->addBindValue(QnSql::serialized_field(track.id));
+        query->addBindValue(trackMinTimestamp / kUsecInMs);
+        query->addBindValue(trackMaxTimestamp / kUsecInMs);
+        query->addBindValue(TrackSerializer::serialized(track.objectPosition));
+
+        query->addBindValue((long long) attributesId);
+        query->addBindValue(track.bestShot.initialized()
             ? track.bestShot.timestampUs / kUsecInMs
             : 0);
-        query->bindValue(8, track.bestShot.initialized()
+        query->addBindValue(track.bestShot.initialized()
             ? TrackSerializer::serialized(track.bestShot.rect)
             : QByteArray());
 

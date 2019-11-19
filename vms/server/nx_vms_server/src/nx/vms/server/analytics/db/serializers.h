@@ -46,6 +46,9 @@ private:
     static void serialize(const QRectF& rect, QByteArray* buf);
 
     static void deserialize(QnByteArrayConstRef* buf, QRectF* rect);
+
+    static void serialize(const ObjectRegion& data, QByteArray* buf);
+    static void deserialize(QnByteArrayConstRef* buf, ObjectRegion* region);
 };
 
 //-------------------------------------------------------------------------------------------------

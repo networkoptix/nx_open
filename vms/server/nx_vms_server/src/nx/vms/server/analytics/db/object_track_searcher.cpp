@@ -332,7 +332,8 @@ std::optional<ObjectTrack> ObjectTrackSearcher::loadTrack(
                 query->value("best_shot_rect").toByteArray());
     }
 
-    track.objectPosition.boundingBoxGrid = query->value("track_detail").toByteArray();
+    track.objectPosition = TrackSerializer::deserialized<ObjectRegion>
+        (query->value("track_detail").toByteArray());
 
     if (!filter(track))
         return std::nullopt;
