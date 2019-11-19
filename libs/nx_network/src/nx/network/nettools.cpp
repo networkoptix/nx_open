@@ -220,8 +220,8 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
             if (!allowedAddresses.isEmpty() && !allowedAddresses.contains(address.ip()))
                 continue;
 
-            if (isIpV4 && !filter.testFlag(AddressFilter::ipV4) ||
-                isIpV6 && !filter.testFlag(AddressFilter::ipV6))
+            if ((isIpV4 && !filter.testFlag(AddressFilter::ipV4))
+                || (isIpV6 && !filter.testFlag(AddressFilter::ipV6)))
             {
                 continue;
             }
