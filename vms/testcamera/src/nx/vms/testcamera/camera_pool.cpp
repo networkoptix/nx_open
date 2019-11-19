@@ -67,7 +67,7 @@ void CameraPool::reportAddingCameras(
     }
 
     const QString cameraCountMessagePart = cameraForEachFile
-        ? lm("%1 (one per each file)").args(primaryFileNames.size())
+        ? lm("%1 (one per each file)").args(primaryFileNames.size()).toQString()
         : QString::number(count);
 
     const QString offlineFreqMessagePart = (testCameraOptions.offlineFreq == 0)
