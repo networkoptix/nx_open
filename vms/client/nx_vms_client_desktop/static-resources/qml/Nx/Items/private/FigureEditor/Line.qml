@@ -9,7 +9,8 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count === 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
-    property string allowedDirections: "any"
+    property string allowedDirections: (figureSettings && figureSettings.allowedDirections)
+        ? figureSettings.allowedDirections : ""
     acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
 
     MouseArea
@@ -105,7 +106,7 @@ Figure
             {
                 arrowB.checked = !checked
             }
-            else if (allowedDirections === "any" && !checked && !arrowB.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowB.checked)
             {
                 arrowB.checked = true
             }
@@ -130,7 +131,7 @@ Figure
             {
                 arrowA.checked = !checked
             }
-            else if (allowedDirections === "any" && !checked && !arrowA.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowA.checked)
             {
                 arrowA.checked = true
             }
@@ -193,7 +194,7 @@ Figure
 
     function serialize()
     {
-        const direction = (arrowA.checked !== arrowB.checked)
+        const direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
             ? arrowA.checked ? "a" : "b"
             : ""
 
