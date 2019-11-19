@@ -9,6 +9,8 @@ Item
     property int hintStyle: Banner.Style.Info
     property bool acceptable: true
 
+    property var hoverInstrument: null
+
     width: parent.width
     height: parent.height
 

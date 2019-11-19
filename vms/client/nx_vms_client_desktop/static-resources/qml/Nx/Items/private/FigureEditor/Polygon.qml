@@ -47,6 +47,8 @@ Figure
         item: mouseArea
     }
 
+    hoverInstrument: hoverInstrument.enabled ? hoverInstrument : pointMakerInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument

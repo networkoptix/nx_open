@@ -18,6 +18,15 @@ Item
     property int hintStyle
     property string hint: ""
 
+    // This property is a dirty workaround for lack of silent hover events monitoring. In Qt 5.11
+    // it is impossible to listen hover events in one item and at the same time receive them in
+    // another item behind it. In Qt 5.12 it is possible with HoverHandler. But currently we use
+    // Qt 5.11, so have to use a workaround. This property just exposes an active instrument
+    // which could be used to check hover events.
+    // TODO: #4.2 #dklychkov Remove this property and make FigureEditorDialog banner use
+    // HoverHandler.
+    property var hoverInstrument: null
+
     Rectangle
     {
         anchors.fill: parent
@@ -48,6 +57,8 @@ Item
             editor.color = Qt.binding(function() { return figure.color })
             editor.hint = Qt.binding(function() { return figure.hint })
             editor.hintStyle = Qt.binding(function() { return figure.hintStyle })
+
+            editor.hoverInstrument = Qt.binding(function() { return figure.hoverInstrument })
         }
     }
 
