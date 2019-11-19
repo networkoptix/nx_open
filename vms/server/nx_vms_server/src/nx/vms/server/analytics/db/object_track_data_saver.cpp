@@ -211,7 +211,7 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         {
             auto query = queryContext->connection()->createQuery();
             query->prepare(R"sql(SELECT track_detail FROM track WHERE id = ?)sql");
-            query->addBindValue(id);
+            query->addBindValue((long long) id);
             query->exec();
             if (query->next())
                 return ObjectRegion{query->value(0).toByteArray()};
