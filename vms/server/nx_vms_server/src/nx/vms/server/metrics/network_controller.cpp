@@ -45,8 +45,9 @@ public:
     nx::utils::MacAddress hardwareAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        const auto result = nx::utils::MacAddress(m_interface.hardwareAddress());
-        NX_ASSERT(!result.isNull());
+        const auto macStr = m_interface.hardwareAddress();
+        const auto result = nx::utils::MacAddress(macStr);
+        NX_ASSERT(!result.isNull(), "Failed to parse the MAC address: [%1]", macStr);
         return result;
     }
 
