@@ -3,10 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/server/nvr/hanwha/common.h>
-
-#if defined (Q_OS_LINUX)
-    #include <nx/vms/server/nvr/hanwha/ioctl_common.h>
-#endif
+#include <nx/vms/server/nvr/hanwha/ioctl_common.h>
 
 namespace nx::vms::server::nvr::hanwha {
 

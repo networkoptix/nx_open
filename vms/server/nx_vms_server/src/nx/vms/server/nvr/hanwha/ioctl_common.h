@@ -1,5 +1,9 @@
 #pragma once
 
+#include <QtCore/qsystemdetection.h>
+
+#if defined (Q_OS_LINUX)
+
 #include <sys/ioctl.h>
 
 namespace nx::vms::server::nvr::hanwha {
@@ -121,3 +125,5 @@ struct I2cCommandData
 };
 
 } // namespace nx::vms::server::nvr::hanwha
+
+#endif
