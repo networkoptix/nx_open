@@ -341,7 +341,7 @@
                         "display": "table|panel",
                         "alarms": [
                             {
-                                "level": "warning",
+                                "level": "error",
                                 "condition": "equal %status Unauthorized",
                                 "text": "is %status"
                             },
