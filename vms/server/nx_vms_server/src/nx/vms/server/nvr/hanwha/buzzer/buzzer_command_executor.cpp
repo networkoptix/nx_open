@@ -34,6 +34,8 @@ void BuzzerCommandExecutor::stop()
     pleaseStop();
     m_waitCondition.wakeOne();
     wait();
+
+    m_platformAbstraction->setState(BuzzerState::disabled);
 }
 
 void BuzzerCommandExecutor::run()
