@@ -363,6 +363,11 @@
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 0",
                                 "text": "went Offline %offlineEvents times in last 24 hours"
+                            },
+                            {
+                                "level": "error",
+                                "condition": "greaterThan %offlineEvents 5",
+                                "text": "went Offline %offlineEvents times in last 24 hours"
                             }
                         ]
                     },
