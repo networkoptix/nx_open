@@ -9,9 +9,8 @@
 
 #include <nx/vms/server/root_fs.h>
 
-#if defined (Q_OS_LINUX)
-    #include <nx/vms/server/nvr/hanwha/ioctl_common.h>
-#endif
+#include <nx/vms/server/nvr/hanwha/common.h>
+#include <nx/vms/server/nvr/hanwha/ioctl_common.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -26,12 +25,10 @@ static const std::map<int, double> kPowerLimitWattsByDeviceClass = {
 };
 
 #if defined (Q_OS_LINUX)
-static const QString kNetworkControllerDeviceFileName("/dev/ip1829_cdev");
-static const QString kPowerSupplyDeviceFileName("/dev/poe");
 static const std::map<int, int> kPortCountByBoardId = {
-    {0x00, 16},
-    {0x01, 8},
-    {0x11, 4},
+    {kWrn1610BoardId, 16},
+    {kWrn810BoardId, 8},
+    {kWrn410BoardId, 4},
 };
 
 class NetworkBlockPlatformAbstractionImpl: public INetworkBlockPlatformAbstraction
@@ -47,7 +44,7 @@ public:
         if (m_networkControllerDeviceFd < 0)
         {
             NX_ERROR(this,
-                "Unable to open the network controller device %1",
+                "Unable to open the network controller device '%1'",
                 kNetworkControllerDeviceFileName);
 
             return;
@@ -59,7 +56,8 @@ public:
 
         if (m_powerSupplyDeviceFd < 0)
         {
-            NX_ERROR(this, "Unable to open the power supply device %1", kPowerSupplyDeviceFileName);
+            NX_ERROR(this,
+                "Unable to open the power supply device '%1'", kPowerSupplyDeviceFileName);
             return;
         }
 

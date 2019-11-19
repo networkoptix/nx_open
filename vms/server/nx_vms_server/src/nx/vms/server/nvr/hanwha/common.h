@@ -14,4 +14,12 @@ static const QString kRecordingLedId("recordingLed");
 static const QString kPoeOverBudgetLedId("poeOverBudgetLed");
 static const QString kAlarmOutputLedId("alarmOutputLed");
 
+static const QString kIoDeviceFileName("/dev/ia_resource");
+static const QString kNetworkControllerDeviceFileName("/dev/ip1829_cdev");
+static const QString kPowerSupplyDeviceFileName("/dev/poe");
+
+static const int kWrn1610BoardId = 0;
+static const int kWrn810BoardId = 0b1;
+static const int kWrn410BoardId = 0b11;
+
 } // namespace nx::vms::server::nvr::hanwha

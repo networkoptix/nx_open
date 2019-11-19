@@ -47,6 +47,12 @@ inline bool operator==(const NetworkPortPoeState& rhs, const NetworkPortPoeState
 
 using IoStateChangeHandler = std::function<void(const QnIOStateDataList& state)>;
 
+struct DeviceInfo
+{
+    QString vendor;
+    QString model;
+};
+
 enum class FanState
 {
     undefined,
