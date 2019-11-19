@@ -41,10 +41,13 @@ IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction
         [this](const QnIOStateDataList& states) { handleOutputPortStates(states); })),
     m_timer(std::make_unique<nx::network::aio::Timer>())
 {
+    NX_DEBUG(this, "Creating the IO manager");
 }
 
 IoManager::~IoManager()
 {
+    NX_DEBUG(this, "Destroying the IO manager");
+
     m_timer->cancelSync();
     m_stateFetcher->stop();
     m_commandExecutor->stop();
@@ -52,6 +55,8 @@ IoManager::~IoManager()
 
 void IoManager::start()
 {
+    NX_DEBUG(this, "Starting the IO manager");
+
     for (int i = 0; i < kOutputCount; ++i)
         m_platformAbstraction->setOutputPortState(makeOutputId(i), IoPortState::inactive);
 

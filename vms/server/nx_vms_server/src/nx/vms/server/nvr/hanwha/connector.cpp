@@ -38,8 +38,9 @@ Connector::Connector(
     m_fanManager(fanManager),
     m_ledManager(ledManager)
 {
-    NX_DEBUG(this, "Crating connector");
+    NX_DEBUG(this, "Creating connector");
 
+    NX_DEBUG(this, "Connecting to the event connector");
     connect(this, &Connector::poeOverBudget,
         eventConnector, &nx::vms::server::event::EventConnector::at_poeOverBudget,
         Qt::QueuedConnection);
@@ -55,6 +56,7 @@ Connector::Connector(
         return;
     }
 
+    NX_DEBUG(this, "Connecting to the resource pool");
     connect(resourcePool, &QnResourcePool::statusChanged,
         this, &Connector::at_resourceStatusChanged,
         Qt::QueuedConnection);
@@ -67,15 +69,18 @@ Connector::Connector(
         this, &Connector::at_resourceAddedOrRemoved,
         Qt::QueuedConnection);
 
+    NX_DEBUG(this, "Registering a PoE over budget handler");
     m_poeOverBudgetHandlerId = m_networkBlockManager->registerPoeOverBudgetHandler(
         [this](const nx::vms::api::NetworkBlockData& networkBlockData)
         {
             handlePoeOverBudgetStateChanged(networkBlockData);
         });
 
+    NX_DEBUG(this, "Registering an alarm output handler");
     m_alarmOutputHandlerId = m_ioManager->registerStateChangeHandler(
         [this](const QnIOStateDataList& portStates) { handleIoPortStatesChanged(portStates); });
 
+    NX_DEBUG(this, "Registering a fan alarm handler");
     m_fanAlarmHandlerId = m_fanManager->registerStateChangeHandler(
         [this](FanState state) { handleFanStateChange(state);} );
 }
