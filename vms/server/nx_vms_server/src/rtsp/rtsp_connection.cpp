@@ -962,6 +962,8 @@ QnAbstractStreamDataProviderPtr initLiveProvider(
     QnVideoCameraPtr camera, QnServer::ChunksCatalog quality)
 {
     QnLiveStreamProviderPtr cameraProvider = camera->getLiveReader(quality);
+    if (!cameraProvider)
+        return nullptr;
 
     auto reorderingDataProvider = PutInOrderDataProviderPtr(
         new PutInOrderDataProvider(cameraProvider));
