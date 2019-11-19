@@ -362,12 +362,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 0",
-                                "text": "went Offline %offlineEvents times in last 24 hours"
+                                "text": "went Offline %offlineEvents times for the last hour"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %offlineEvents 5",
-                                "text": "went Offline %offlineEvents times in last 24 hours"
+                                "text": "went Offline %offlineEvents times for the last hour"
                             }
                         ]
                     },
