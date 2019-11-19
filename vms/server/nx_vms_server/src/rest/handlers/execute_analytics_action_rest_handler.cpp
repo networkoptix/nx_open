@@ -49,11 +49,6 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.objectTrack)
     {
-        const auto track = createObjectTrack(*actionData.objectTrack);
-        if (!track)
-            return nullptr;
-
-        objectTrackInfo->setTrack(track.get());
 
         if (actionData.bestShotObjectPosition)
         {
@@ -316,7 +311,7 @@ std::optional<ExtendedAnalyticsActionData>
         return std::nullopt;
     }
 
-    if (objectTrack->objectPositionSequence.empty())
+    if (objectTrack->objectPosition.isEmpty())
     {
         NX_DEBUG(this, "Object Track %1 position sequence is empty", trackId);
         return std::nullopt;
@@ -331,7 +326,7 @@ std::optional<ExtendedAnalyticsActionData>
     // Either an Object position or the best shot video frame is needed.
     const int64_t bestShotTimestampUs = objectTrack->bestShot.initialized()
         ? objectTrack->bestShot.timestampUs
-        : objectTrack->objectPositionSequence[0].timestampUs;
+        : objectTrack->firstAppearanceTimeUs;
 
     if (!NX_ASSERT(bestShotTimestampUs != AV_NOPTS_VALUE))
     {
@@ -342,37 +337,15 @@ std::optional<ExtendedAnalyticsActionData>
 
     if (needBestShotObjectPosition)
     {
-        std::optional<ObjectPosition> objectPosition;
-        if (bestShotTimestampUs == objectTrack->objectPositionSequence[0].timestampUs)
-            objectPosition = objectTrack->objectPositionSequence[0];
-
-        if (!objectPosition)
-        {
-            if (needFullTrack) //< The Track is already fetched.
-            {
-                objectPosition = fetchObjectPositionByTimestampFromTrack(
-                    *objectTrack,
-                    bestShotTimestampUs);
-            }
-            else
-            {
-                objectPosition = fetchObjectPositionByTimestamp(trackId, bestShotTimestampUs);
-            }
-        }
-
-        if (!objectPosition)
-        {
-            NX_WARNING(this,
-                "Unable to find best shot position for Track %1 by timestamp %2 us",
-                trackId,
-                bestShotTimestampUs);
-            return std::nullopt;
-        }
-
         if (objectTrack->bestShot.initialized())
-            objectPosition->boundingBox = objectTrack->bestShot.rect;
-
-        extendedAnalyticsActionData.bestShotObjectPosition = objectPosition;
+        {
+            extendedAnalyticsActionData.bestShotObjectPosition = objectTrack->bestShot;
+        }
+        else
+        {
+            extendedAnalyticsActionData.bestShotObjectPosition->timestampUs = objectTrack->firstAppearanceTimeUs;
+            extendedAnalyticsActionData.bestShotObjectPosition->rect = objectTrack->objectPosition.boundingBox();
+        }
     }
 
     if (needBestShotVideoFrame)
@@ -412,94 +385,6 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     return executeActionResult.errorMessage;
 }
 
-std::optional<nx::analytics::db::ObjectPosition>
-    QnExecuteAnalyticsActionRestHandler::fetchObjectPositionByTimestamp(
-        const QnUuid& objectTrackId,
-        int64_t timestampUs)
-{
-    using namespace nx::analytics::db;
-    using namespace std::chrono;
-
-    static const seconds kSearchTimeRangeDuration(2);
-
-    NX_DEBUG(this,
-        "Trying to fetch an object position by timestamp. Track id: %1, timestamp: %2",
-        objectTrackId, timestampUs);
-
-    Filter filter;
-    filter.objectTrackId = objectTrackId;
-    filter.timePeriod = QnTimePeriod(
-        duration_cast<milliseconds>(microseconds(timestampUs) - kSearchTimeRangeDuration / 2),
-        duration_cast<milliseconds>(kSearchTimeRangeDuration));
-    filter.maxObjectTrackSize = 0;
-
-    const auto result = makeDatabaseRequest(filter);
-    if (!result || result->empty())
-        return std::nullopt;
-
-    return fetchObjectPositionByTimestampFromTrack(result->at(0), timestampUs);
-}
-
-std::optional<nx::analytics::db::ObjectPosition>
-    QnExecuteAnalyticsActionRestHandler::fetchObjectPositionByTimestampFromTrack(
-        const nx::analytics::db::ObjectTrack& objectTrack,
-        int64_t timestampUs)
-{
-    class Comparator
-    {
-    public:
-        bool operator()(const ObjectPosition& position, int64_t timestamp) const
-        {
-            return position.timestampUs > timestamp;
-        };
-
-        bool operator()(int64_t timestamp, const ObjectPosition& position) const
-        {
-            return position.timestampUs > timestamp;
-        }
-    };
-
-    const auto& objectPositionSequence = objectTrack.objectPositionSequence;
-
-    const auto lowerBound =
-        std::lower_bound(
-            objectPositionSequence.cbegin(),
-            objectPositionSequence.cend(),
-            timestampUs,
-            Comparator());
-
-    const auto upperBound =
-        std::upper_bound(
-            objectPositionSequence.cbegin(),
-            objectPositionSequence.cend(),
-            timestampUs,
-            Comparator());
-
-    if (lowerBound == objectPositionSequence.cend() && upperBound == objectPositionSequence.cend())
-    {
-        NX_DEBUG(this,
-            "Unable to find position with timestamp %1 in the Track %2",
-            timestampUs, objectTrack.id);
-
-        return std::nullopt;
-    }
-
-    if (lowerBound == objectPositionSequence.cend())
-    {
-        NX_DEBUG(this,
-            "Unable to find lower bound for position with timestamp %1 in the Track %2, "
-            "using upper bound %3",
-            timestampUs, objectTrack.id, upperBound->timestampUs);
-
-        return *upperBound;
-    }
-
-    NX_DEBUG(this, "Got poistion for timestamp %1 for the Track %2, position timestmap is %3",
-        timestampUs, objectTrack.id, lowerBound->timestampUs);
-
-    return *lowerBound;
-}
-
 std::optional<nx::analytics::db::ObjectTrack>
     QnExecuteAnalyticsActionRestHandler::fetchObjectTrack(
         const QnUuid& objectTrackId,
@@ -508,7 +393,6 @@ std::optional<nx::analytics::db::ObjectTrack>
     using namespace nx::analytics::db;
     Filter filter;
     filter.objectTrackId = objectTrackId;
-    filter.maxObjectTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
 
     NX_DEBUG(this,
         "Trying to fetch Track with id %1. Full Track is needed: %2",

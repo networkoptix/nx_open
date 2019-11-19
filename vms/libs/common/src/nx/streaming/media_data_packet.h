@@ -274,13 +274,20 @@ public:
     void addMotion(QnConstMetaDataV1Ptr data);
 
     static QRect rectFromNormalizedRect(const QRectF& rectF);
+
+    static void addMotion(quint64* dst, quint64* src);
+    static void addMotion(char* buffer, const QRectF& rectF);
+    static void addMotion(char* buffer, const QRect& rect);
+
     void addMotion(const QRectF& data);
     void addMotion(const QRect& data);
 
     // Removes part of motion info by motion mask.
     void removeMotion(const simd128i* data);
 
-    static bool isMotionAt(int x, int y, char* mask);
+    static bool isMotionAt(int x, int y, const char* mask);
+    static QRect boundingBox(const char* data);
+
     bool isMotionAt(int x, int y) const;
 
     void setMotionAt(int x, int y);
@@ -302,6 +309,16 @@ public:
         char* mask,
         int* maskStart = 0,
         int* maskEnd = 0);
+    static void createMask(
+        const QRect& rect,
+        char* mask,
+        int* maskStart = 0,
+        int* maskEnd = 0);
+    static void createMask(
+        const QRectF& rectF,
+        char* mask,
+        int* maskStart = 0,
+        int* maskEnd = 0);
 
     virtual QnMetaDataV1* clone(
         QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
@@ -313,7 +330,7 @@ public:
     void serialize(QIODevice* ioDevice) const;
 
     static bool matchImage(
-        const simd128i* data,
+        const quint64* data,
         const simd128i* mask,
         int maskStart = 0,
         int maskEnd = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128 - 1);

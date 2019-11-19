@@ -105,12 +105,6 @@ private:
         nx::sql::AbstractSqlQuery* query,
         FilterFunc filter);
 
-    void filterTrack(std::vector<ObjectPosition>* const track);
-
-    void truncateTrack(
-        std::vector<ObjectPosition>* const track,
-        int maxSize);
-
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,
         const ObjectTypeDao& objectTypeDao,
