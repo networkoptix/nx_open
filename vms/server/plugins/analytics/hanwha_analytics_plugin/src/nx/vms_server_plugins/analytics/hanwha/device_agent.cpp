@@ -86,7 +86,8 @@ std::string specify(const char* v, unsigned int n)
     if (n == 0)
         return result;
 
-    const std::string nAsString = (std::stringstream() << n).str();
+    const std::string nAsString =
+        static_cast<const std::stringstream&>((std::stringstream() << n)).str();
     result.replace(result.find("#"), 1, nAsString);
 
     return result;
