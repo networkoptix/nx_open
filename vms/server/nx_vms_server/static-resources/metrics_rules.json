@@ -554,6 +554,9 @@
                         "display": "table|panel",
                         "format": "resource"
                     },
+                    "pool": {
+                        "display": "table|panel"
+                    },
                     "type": {
                         "display": "table|panel"
                     }
