@@ -4,14 +4,15 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
+
+#include <nx/vms/server/nvr/i_service.h>
 #include <nx/vms/server/nvr/hanwha/common.h>
 #include <nx/vms/server/nvr/hanwha/io/io_module_resource.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
 static const QString kDefaultNvrIoModuleName("NVR IO block");
-static const QString kDefaultNvrIoModuleModel("NVR-IO-module #dmishin take model from board id!");
-static const QString kDefaultNvrIoModuleFirmware("#dmishin take firmware from driver version!");
+static const QString kDefaultNvrIoModuleModelPrefix("NVR-IO-module-");
 static const QString kNvrIoModuleResourceTypeName("Hanwha_Wave_Nvr_Io_Module");
 
 
@@ -34,11 +35,16 @@ QnResourceList IoModuleSearcher::findResources()
     if (resourceType.isNull())
         return {};
 
+    const IService* nvrService = serverModule()->nvrService();
+    if (!NX_ASSERT(nvrService, "Unable to access the NVR service"))
+        return {};
+
+    const DeviceInfo deviceInfo = nvrService->deviceInfo();
     IoModuleResourcePtr ioModule(new IoModuleResource(serverModule()));
+
     ioModule->setTypeId(resourceType->getId());
     ioModule->setName(kDefaultNvrIoModuleName);
-    ioModule->setModel(kDefaultNvrIoModuleModel);
-    ioModule->setFirmware(kDefaultNvrIoModuleFirmware);
+    ioModule->setModel(kDefaultNvrIoModuleModelPrefix + deviceInfo.model);
     ioModule->setPhysicalId(
         serverModule()->commonModule()->moduleGUID().toString() + "_io_module");
     ioModule->setVendor(kDefaultVendor);
