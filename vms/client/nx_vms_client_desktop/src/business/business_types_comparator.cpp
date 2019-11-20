@@ -5,9 +5,8 @@
 using namespace nx;
 using namespace vms::event;
 
-QnBusinessTypesComparator::QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject* parent):
-    base_type(parent),
-    m_onlyUserAvailableActions(onlyUserAvailableActions)
+QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
+    base_type(parent)
 {
     initLexOrdering();
 }
@@ -44,7 +43,7 @@ void QnBusinessTypesComparator::initLexOrdering()
     // action types to lex order
     maxType = 0;
     QMap<QString, int> actionTypes;
-    for (auto actionType: getAllActions())
+    for (auto actionType: allActions())
     {
         actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
@@ -67,97 +66,26 @@ int QnBusinessTypesComparator::toLexActionType(ActionType actionType) const
     return m_actionTypeToLexOrder[actionType];
 }
 
-QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype) const
+QList<nx::vms::api::EventType> QnBusinessTypesComparator::lexSortedEvents(
+    const QList<nx::vms::api::EventType>& events) const
 {
-    static const QList<EventType> userEvents{
-        EventType::cameraMotionEvent,
-        EventType::cameraInputEvent,
-        EventType::softwareTriggerEvent,
-        EventType::analyticsSdkEvent,
-        EventType::userDefinedEvent,
-        EventType::pluginDiagnosticEvent,
-    };
-
-    static const QList<EventType> failureEvents{
-        EventType::cameraDisconnectEvent,
-        EventType::storageFailureEvent,
-        EventType::networkIssueEvent,
-        EventType::cameraIpConflictEvent,
-        EventType::serverFailureEvent,
-        EventType::serverConflictEvent,
-        EventType::licenseIssueEvent,
-        EventType::poeOverBudgetEvent,
-        EventType::fanErrorEvent,
-    };
-
-    static const QList<EventType> successEvents{
-        EventType::serverStartEvent,
-        EventType::backupFinishedEvent,
-    };
-
-    QList<EventType> events;
-    switch (subtype)
-    {
-        case EventSubType::user:
-            events = userEvents;
-            break;
-        case EventSubType::failure:
-            events = failureEvents;
-            break;
-        case EventSubType::success:
-            events = successEvents;
-            break;
-        case EventSubType::any:
-            events = allEvents();
-            break;
-        default:
-            NX_ASSERT(false, "All values must be enumerated");
-            break;
-    }
-
-    std::sort(events.begin(), events.end(),
+    auto result = events;
+    std::sort(result.begin(), result.end(),
         [this](EventType l, EventType r)
         {
             return lexicographicalLessThan(l, r);
         });
-    return events;
+    return result;
 }
 
-QList<ActionType> QnBusinessTypesComparator::getAllActions() const
+QList<nx::vms::api::ActionType> QnBusinessTypesComparator::lexSortedActions(
+    const QList<nx::vms::api::ActionType>& actions) const
 {
-    return m_onlyUserAvailableActions
-        ? userAvailableActions()
-        : allActions();
-}
-
-QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subtype) const
-{
-    static QSet<ActionType> clientsideActions{
-        ActionType::openLayoutAction,
-        ActionType::showOnAlarmLayoutAction,
-        ActionType::fullscreenCameraAction,
-        ActionType::exitFullscreenAction
-    };
-
-    auto allowedActions = getAllActions().toSet();
-    switch (subtype)
-    {
-        case ActionSubType::server:
-            allowedActions.subtract(clientsideActions);
-            break;
-        case ActionSubType::client:
-            allowedActions.intersect(clientsideActions);
-            break;
-        default:
-            break;
-    }
-
-    QList<ActionType> actions = allowedActions.toList();
-    std::sort(actions.begin(), actions.end(),
+    auto result = actions;
+    std::sort(result.begin(), result.end(),
         [this](ActionType l, ActionType r)
         {
             return lexicographicalLessThan(l, r);
         });
-    return actions;
+    return result;
 }
-

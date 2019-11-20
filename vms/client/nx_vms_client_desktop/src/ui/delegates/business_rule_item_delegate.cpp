@@ -35,9 +35,12 @@
 
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/event_rules/accessible_nvr_event_action.h>
 
 #include <ui/delegates/select_cameras_delegate_editor_button.h>
 #include <ui/delegates/select_users_delegate_editor_button.h>
+
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -53,7 +56,7 @@ enum { comboBoxMaxVisibleItems = 100 };
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator(true)),
+    m_lexComparator(new QnBusinessTypesComparator(this)),
     m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
 {
 }
@@ -383,8 +386,8 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
 QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
     const QModelIndex& index) const
 {
-    using EventSubType = QnBusinessTypesComparator::EventSubType;
     auto comboBox = new QComboBox(parent);
+    comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
 
     auto addItem =
         [this, comboBox](vms::api::EventType eventType)
@@ -392,14 +395,20 @@ QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
             comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
         };
 
-    comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::user))
+    const auto accessibleEvents = AccessibleNvrEventAction::removeInacessibleNvrEvents(
+        vms::event::allEvents(), resourcePool());
+
+    const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
+    const auto failureEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::failure);
+    const auto successEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::success);
+
+    for (const auto eventType: m_lexComparator->lexSortedEvents(userEvents))
         addItem(eventType);
     comboBox->insertSeparator(comboBox->count());
-    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::failure))
+    for (const auto eventType: m_lexComparator->lexSortedEvents(failureEvents))
         addItem(eventType);
     comboBox->insertSeparator(comboBox->count());
-    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::success))
+    for (const auto eventType: m_lexComparator->lexSortedEvents(successEvents))
         addItem(eventType);
 
     return comboBox;
@@ -414,7 +423,11 @@ QWidget* QnBusinessRuleItemDelegate::createActionEditor(QWidget* parent,
 
     QComboBox* comboBox = new QComboBox(parent);
     comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-    for (vms::api::ActionType actionType: m_lexComparator->lexSortedActions())
+
+    const auto accessibleActions = AccessibleNvrEventAction::removeInacessibleNvrActions(
+        vms::event::userAvailableActions(), resourcePool());
+
+    for (const auto actionType: m_lexComparator->lexSortedActions(accessibleActions))
     {
         if (isInstantOnly && !vms::event::canBeInstant(actionType))
             continue;

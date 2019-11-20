@@ -26,6 +26,8 @@
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/event_rules/accessible_nvr_event_action.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -197,10 +199,16 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
             model->appendRow(item);
         };
 
-    using EventSubType = QnBusinessTypesComparator::EventSubType;
+    const auto accessibleEvents = AccessibleNvrEventAction::removeInacessibleNvrEvents(
+        vms::event::allEvents(), resourcePool());
 
-    QnBusinessTypesComparator lexComparator(true);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
+    QnBusinessTypesComparator lexComparator;
+
+    const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
+    const auto failureEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::failure);
+    const auto successEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::success);
+
+    for (const auto eventType: lexComparator.lexSortedEvents(userEvents))
     {
         if (eventType == EventType::pluginDiagnosticEvent)
         {
@@ -213,17 +221,22 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
         addEventItem(eventType);
     }
     addSeparator(m_eventTypesModel);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::failure))
+    for (const auto eventType: lexComparator.lexSortedEvents(failureEvents))
         addEventItem(eventType);
     addSeparator(m_eventTypesModel);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::success))
+    for (const auto eventType: lexComparator.lexSortedEvents(successEvents))
         addEventItem(eventType);
 
-    using ActionSubType = QnBusinessTypesComparator::ActionSubType;
-    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::server))
+    const auto accessibleActions = AccessibleNvrEventAction::removeInacessibleNvrActions(
+        nx::vms::event::userAvailableActions(), resourcePool());
+
+    const auto serverActions = filterActionsBySubtype(accessibleActions, ActionSubtype::server);
+    const auto clientActions = filterActionsBySubtype(accessibleActions, ActionSubtype::client);
+
+    for (const auto actionType: lexComparator.lexSortedActions(serverActions))
         addActionItem(actionType);
     addSeparator(m_actionTypesModel);
-    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::client))
+    for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
     m_actionParams.additionalResources = userRolesManager()->adminRoleIds().toVector().toStdVector();
