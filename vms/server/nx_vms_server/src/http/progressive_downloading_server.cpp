@@ -240,368 +240,361 @@ void ProgressiveDownloadingServer::run()
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
-    bool ready = true;
     if (d->clientRequest.isEmpty())
-        ready = readRequest();
-
-    if (ready)
     {
-        parseRequest();
-
-        d->response.messageBody.clear();
-
-        NX_DEBUG(this, "Start export data by url: [%1]", getDecodedUrl());
-
-        //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
-        const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
-        const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
-        const QString& resId = requestedResourcePath.mid(0, nameFormatSepPos);
-        QByteArray streamingFormat = nameFormatSepPos == -1 ? QByteArray()
-            : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
-        QByteArray mimeType = getMimeType(streamingFormat);
-        if (mimeType.isEmpty())
+        if (!readRequest())
         {
-            d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
-            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
+            // TODO why not send bad request?
+            NX_WARNING(this, "Failed to read request");
             return;
         }
-
-        // If user request 'mp4' format use smooth streaming format to make mp4 streamable.
-        if (streamingFormat == "mp4")
-            streamingFormat = "ismv";
-
-        const QUrlQuery decodedUrlQuery(getDecodedUrl().toQUrl());
-
-        QSize videoSize(640,480);
-        QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
-        if (resolutionStr.endsWith('p'))
-            resolutionStr = resolutionStr.left(resolutionStr.length()-1);
-        QList<QByteArray> resolution = resolutionStr.split('x');
-        if (resolution.size() == 1)
-            resolution.insert(0,QByteArray("0"));
-        if (resolution.size() == 2)
-        {
-            videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
-            if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
-            {
-                qWarning() << "Invalid resolution specified for web streaming. Defaulting to 480p";
-                videoSize = QSize(0,480);
-            }
-        }
-
-        Qn::StreamQuality quality = Qn::StreamQuality::normal;
-        if (decodedUrlQuery.hasQueryItem(QnCodecParams::quality))
-            quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::StreamQuality::undefined);
-
-        QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
-            commonModule()->resourcePool(), resId);
-        if (!resource)
-        {
-            d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
-            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
-            return;
-        }
-
-        if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
-        {
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
-            return;
-        }
-
-        Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
-        QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
-        if (camRes)
-            mediaStreamEvent = camRes->checkForErrors();
-        if (mediaStreamEvent)
-        {
-            sendMediaEventErrorResponse(mediaStreamEvent);
-            return;
-        }
-
-        bool audioOnly = decodedUrlQuery.hasQueryItem("audio_only");
-
-        QnFfmpegTranscoder::Config config;
-        config.computeSignature = true;
-        d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
-
-        QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes)
-        {
-            QnLegacyTranscodingSettings extraParams;
-            extraParams.resource = mediaRes;
-            int rotation;
-            if (decodedUrlQuery.hasQueryItem("rotation"))
-                rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
-            else
-                rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
-            extraParams.rotation = rotation;
-            extraParams.forcedAspectRatio = mediaRes->customAspectRatio();
-
-            d->transcoder->setTranscodingSettings(extraParams);
-            d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
-        }
-
-        const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!physicalResource)
-        {
-            d->response.messageBody = QByteArray("Transcoding error. Bad resource");
-            NX_ERROR(this, d->response.messageBody);
-            sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
-            return;
-        }
-        const auto requestedResolutionStr = resolutionStr.isEmpty() ?
-            "" :
-            QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
-
-        AVCodecID videoCodec;
-        QnServer::ChunksCatalog qualityToUse;
-        auto streamInfo = findCompatibleStream(
-            physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
-        if (streamInfo)
-        {
-            qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
-                ? QnServer::HiQualityCatalog
-                : QnServer::LowQualityCatalog;
-            d->transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-            videoCodec = (AVCodecID)streamInfo->codec;
-        }
-        else
-        {
-            d->transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
-            auto newValue = ++metrics->progressiveDownloadingTranscoders();
-            if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
-            {
-                NX_DEBUG(this, "Close session, too many opened connections, max connections: %1",
-                    commonModule()->globalSettings()->maxWebMTranscoders());
-                sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
-                return;
-            }
-            qualityToUse = QnServer::HiQualityCatalog;
-            videoCodec = getPrefferedVideoCodec(
-                streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
-            NX_DEBUG(this,
-                "Compatible video stream not found, transcoding will used, codec id[%1]",
-                videoCodec);
-        }
-
-        if (!audioOnly && d->transcoder->setVideoCodec(
-                videoCodec,
-                d->transcodeMethod,
-                quality,
-                videoSize,
-                -1) != 0 )
-        {
-            d->response.messageBody = QByteArray("Transcoding error. Can not setup video codec:") +
-                d->transcoder->getLastErrorMessage().toLatin1();
-            NX_ERROR(this, d->response.messageBody);
-            sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
-            return;
-        }
-
-        //taking max send queue size from url
-        bool dropLateFrames = streamingFormat == "mpjpeg";
-        unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
-        if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
-        {
-            maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
-            dropLateFrames = true;
-        }
-
-        bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
-        const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
-        const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && d->serverModule->settings().ffmpegRealTimeOptimization())
-            d->transcoder->setUseRealTimeOptimization(true);
-
-
-        QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
-        bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
-        auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
-
-        bool isLive = position.isEmpty() || position == "now";
-        auto requiredPermission = isLive
-            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
-        {
-            if (commonModule()->resourceAccessManager()->hasPermission(
-                d->accessRights, resource, Qn::Permission::ViewLivePermission))
-            {
-                sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
-                return;
-            }
-
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
-            return;
-        }
-
-        ProgressiveDownloadingConsumer::Config consumerConfig;
-        consumerConfig.standFrameDuration = standFrameDuration;
-        consumerConfig.dropLateFrames = dropLateFrames;
-        consumerConfig.maxFramesToCacheBeforeDrop = maxFramesToCacheBeforeDrop;
-        consumerConfig.liveMode = isLive;
-        consumerConfig.continuousTimestamps = continuousTimestamps;
-        consumerConfig.audioOnly = audioOnly;
-        QByteArray endPosition =
-            decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME).toLatin1();
-        if (!endPosition.isEmpty())
-            consumerConfig.endTimeUsec = nx::utils::parseDateTime(endPosition);
-        ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);
-        qint64 timeUSec = DATETIME_NOW;
-        if (isLive)
-        {
-            //if camera is offline trying to put it online
-
-            if (isUTCRequest)
-            {
-                d->response.messageBody = "now";
-                sendResponse(nx::network::http::StatusCode::ok, "text/plain");
-                return;
-            }
-
-            if (!camera) {
-                d->response.messageBody = "Media not found\r\n";
-                sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
-                return;
-            }
-            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
-            dataProvider = liveReader;
-            if (liveReader) {
-                if (camera->isSomeActivity())
-                    dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
-                liveReader->startIfNotRunning();
-                camera->inUse(this);
-            }
-        }
-        else
-        {
-            bool utcFormatOK = false;
-            timeUSec = nx::utils::parseDateTime( position );
-
-            if (isUTCRequest)
-            {
-                QnAbstractArchiveDelegate* archive = 0;
-                if (camRes)
-                {
-                    archive = camRes->createArchiveDelegate();
-                    if (!archive)
-                        archive = new QnServerArchiveDelegate(d->serverModule); // default value
-                }
-                if (archive)
-                {
-                    if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
-                        archive->open(resource, d->serverModule->archiveIntegrityWatcher());
-                    archive->seek( timeUSec, true);
-
-                    if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
-                    {
-                        sendMediaEventErrorResponse(mediaStreamEvent);
-                        return;
-                    }
-
-                    qint64 timestamp = AV_NOPTS_VALUE;
-                    int counter = 0;
-                    while (counter < 20)
-                    {
-                        const QnAbstractMediaDataPtr& data = archive->getNextData();
-                        if (data)
-                        {
-                            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
-                            {
-                                timestamp = data->timestamp;
-                                break;
-                            }
-                            else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
-                                continue; // ignore filler packet
-                            counter++;
-                        }
-                        else {
-                            counter++;
-                        }
-                    }
-
-                    QByteArray ts("\"now\"");
-                    QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
-                    if (timestamp != (qint64)AV_NOPTS_VALUE)
-                    {
-                        if (utcFormatOK)
-                            ts = QByteArray::number(timestamp/1000);
-                        else
-                            ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
-                    }
-                    d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
-                    sendResponse(nx::network::http::StatusCode::ok, "application/json");
-                }
-                else
-                {
-                    sendJsonResponse("Media archive is missing");
-                }
-                delete archive;
-                return;
-            }
-
-            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
-                d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
-            d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
-            d->archiveDP->jumpTo(timeUSec, timeUSec);
-
-            if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
-            {
-                sendMediaEventErrorResponse(mediaEvent);
-                return;
-            }
-
-            d->archiveDP->start();
-            dataProvider = d->archiveDP;
-        }
-
-        if (dataProvider == 0)
-        {
-            sendJsonResponse("Video camera is not ready yet");
-            return;
-        }
-
-        if (d->transcoder->setContainer(streamingFormat) != 0)
-        {
-            QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup output format:") +
-                d->transcoder->getLastErrorMessage().toLatin1();
-            sendJsonResponse(msg);
-            return;
-        }
-
-        if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
-            d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
-
-        dataProvider->addDataProcessor(&dataConsumer);
-        d->chunkedMode = true;
-        d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
-        sendResponse(nx::network::http::StatusCode::ok, mimeType);
-
-        dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
-        dataConsumer.start();
-        while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
-            readRequest(); // just reading socket to determine client connection is closed
-
-        NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
-            d->socket->getForeignAddress(),
-            !dataConsumer.isRunning() ? lit("Data consumer stopped") :
-                !d->socket->isConnected() ? lit("Connection has been closed") :
-                    lit("Terminated")
-        );
-
-        dataConsumer.pleaseStop();
-
-        auto signature = d->transcoder->getSignature(licensePool());
-        sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
-
-        QnByteArray emptyChunk((unsigned)0,0);
-        sendChunk(emptyChunk);
-        sendData(QByteArray("\r\n"));
-
-        dataProvider->removeDataProcessor(&dataConsumer);
-        if (camera)
-            camera->notInUse(this);
     }
+    parseRequest();
+
+    d->response.messageBody.clear();
+
+    NX_DEBUG(this, "Start export data by url: [%1]", getDecodedUrl());
+
+    //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
+    const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
+    const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
+    const QString& resId = requestedResourcePath.mid(0, nameFormatSepPos);
+    QByteArray streamingFormat = nameFormatSepPos == -1 ? QByteArray()
+        : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
+    QByteArray mimeType = getMimeType(streamingFormat);
+    if (mimeType.isEmpty())
+    {
+        d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
+        sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
+        return;
+    }
+
+    // If user request 'mp4' format use smooth streaming format to make mp4 streamable.
+    if (streamingFormat == "mp4")
+        streamingFormat = "ismv";
+
+    const QUrlQuery decodedUrlQuery(getDecodedUrl().toQUrl());
+
+    QSize videoSize(640,480);
+    QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
+    if (resolutionStr.endsWith('p'))
+        resolutionStr = resolutionStr.left(resolutionStr.length()-1);
+    QList<QByteArray> resolution = resolutionStr.split('x');
+    if (resolution.size() == 1)
+        resolution.insert(0,QByteArray("0"));
+    if (resolution.size() == 2)
+    {
+        videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
+        if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
+        {
+            qWarning() << "Invalid resolution specified for web streaming. Defaulting to 480p";
+            videoSize = QSize(0,480);
+        }
+    }
+
+    Qn::StreamQuality quality = Qn::StreamQuality::normal;
+    if (decodedUrlQuery.hasQueryItem(QnCodecParams::quality))
+        quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::StreamQuality::undefined);
+
+    QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+        commonModule()->resourcePool(), resId);
+    if (!resource)
+    {
+        d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
+        sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
+        return;
+    }
+
+    if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
+    {
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
+        return;
+    }
+
+    Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
+    QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+    if (camRes)
+        mediaStreamEvent = camRes->checkForErrors();
+    if (mediaStreamEvent)
+    {
+        sendMediaEventErrorResponse(mediaStreamEvent);
+        return;
+    }
+
+    bool audioOnly = decodedUrlQuery.hasQueryItem("audio_only");
+
+    QnFfmpegTranscoder::Config config;
+    config.computeSignature = true;
+    d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
+
+    QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
+    if (mediaRes)
+    {
+        QnLegacyTranscodingSettings extraParams;
+        extraParams.resource = mediaRes;
+        int rotation;
+        if (decodedUrlQuery.hasQueryItem("rotation"))
+            rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+        else
+            rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+        extraParams.rotation = rotation;
+        extraParams.forcedAspectRatio = mediaRes->customAspectRatio();
+
+        d->transcoder->setTranscodingSettings(extraParams);
+        d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
+    }
+
+    const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!physicalResource)
+    {
+        d->response.messageBody = QByteArray("Transcoding error. Bad resource");
+        NX_ERROR(this, d->response.messageBody);
+        sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
+        return;
+    }
+    const auto requestedResolutionStr = resolutionStr.isEmpty() ?
+        "" :
+        QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
+
+    AVCodecID videoCodec;
+    QnServer::ChunksCatalog qualityToUse;
+    auto streamInfo = findCompatibleStream(
+        physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
+    if (streamInfo)
+    {
+        qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
+            ? QnServer::HiQualityCatalog
+            : QnServer::LowQualityCatalog;
+        d->transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+        videoCodec = (AVCodecID)streamInfo->codec;
+    }
+    else
+    {
+        d->transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+        auto newValue = ++metrics->progressiveDownloadingTranscoders();
+        if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
+        {
+            NX_DEBUG(this, "Close session, too many opened connections, max connections: %1",
+                commonModule()->globalSettings()->maxWebMTranscoders());
+            sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
+            return;
+        }
+        qualityToUse = QnServer::HiQualityCatalog;
+        videoCodec = getPrefferedVideoCodec(
+            streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
+        NX_DEBUG(this,
+            "Compatible video stream not found, transcoding will used, codec id[%1]",
+            videoCodec);
+    }
+
+    if (!audioOnly && d->transcoder->setVideoCodec(
+            videoCodec,
+            d->transcodeMethod,
+            quality,
+            videoSize,
+            -1) != 0 )
+    {
+        d->response.messageBody = QByteArray("Transcoding error. Can not setup video codec:") +
+            d->transcoder->getLastErrorMessage().toLatin1();
+        NX_ERROR(this, d->response.messageBody);
+        sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
+        return;
+    }
+
+    //taking max send queue size from url
+    bool dropLateFrames = streamingFormat == "mpjpeg";
+    unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
+    if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
+    {
+        maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
+        dropLateFrames = true;
+    }
+
+    bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
+    const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+    const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
+    if (rtOptimization && d->serverModule->settings().ffmpegRealTimeOptimization())
+        d->transcoder->setUseRealTimeOptimization(true);
+
+
+    QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
+    bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
+    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
+
+    bool isLive = position.isEmpty() || position == "now";
+    auto requiredPermission = isLive
+        ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+    if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
+    {
+        if (commonModule()->resourceAccessManager()->hasPermission(
+            d->accessRights, resource, Qn::Permission::ViewLivePermission))
+        {
+            sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
+            return;
+        }
+
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
+        return;
+    }
+
+    ProgressiveDownloadingConsumer::Config consumerConfig;
+    consumerConfig.standFrameDuration = standFrameDuration;
+    consumerConfig.dropLateFrames = dropLateFrames;
+    consumerConfig.maxFramesToCacheBeforeDrop = maxFramesToCacheBeforeDrop;
+    consumerConfig.liveMode = isLive;
+    consumerConfig.continuousTimestamps = continuousTimestamps;
+    consumerConfig.audioOnly = audioOnly;
+    QByteArray endPosition =
+        decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME).toLatin1();
+    if (!endPosition.isEmpty())
+        consumerConfig.endTimeUsec = nx::utils::parseDateTime(endPosition);
+    ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);
+    qint64 timeUSec = DATETIME_NOW;
+    if (isLive)
+    {
+        //if camera is offline trying to put it online
+
+        if (isUTCRequest)
+        {
+            d->response.messageBody = "now";
+            sendResponse(nx::network::http::StatusCode::ok, "text/plain");
+            return;
+        }
+
+        if (!camera) {
+            d->response.messageBody = "Media not found\r\n";
+            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
+            return;
+        }
+        QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
+        dataProvider = liveReader;
+        if (liveReader) {
+            if (camera->isSomeActivity())
+                dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
+            liveReader->startIfNotRunning();
+            camera->inUse(this);
+        }
+    }
+    else
+    {
+        timeUSec = nx::utils::parseDateTime( position );
+
+        if (isUTCRequest)
+        {
+            std::unique_ptr<QnAbstractArchiveDelegate> archive;
+            if (camRes)
+            {
+                archive.reset(camRes->createArchiveDelegate());
+                if (!archive)
+                    archive = std::make_unique<QnServerArchiveDelegate>(d->serverModule); // default value
+            }
+            if (!archive)
+            {
+                sendJsonResponse("Media archive is missing");
+                return;
+            }
+            if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
+                archive->open(resource, d->serverModule->archiveIntegrityWatcher());
+            archive->seek( timeUSec, true);
+
+            if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
+            {
+                sendMediaEventErrorResponse(mediaStreamEvent);
+                return;
+            }
+
+            qint64 timestamp = AV_NOPTS_VALUE;
+            int counter = 0;
+            while (counter < 20)
+            {
+                const QnAbstractMediaDataPtr& data = archive->getNextData();
+                if (data)
+                {
+                    if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+                        continue; // ignore filler packet
+
+                    if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
+                    {
+                        timestamp = data->timestamp;
+                        break;
+                    }
+                }
+                counter++;
+            }
+
+            QByteArray ts("\"now\"");
+            QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
+            if (timestamp != (qint64)AV_NOPTS_VALUE)
+            {
+                ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
+            }
+            d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
+            sendResponse(nx::network::http::StatusCode::ok, "application/json");
+            return;
+        }
+
+        d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
+            d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
+        d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+        d->archiveDP->jumpTo(timeUSec, timeUSec);
+
+        if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
+        {
+            sendMediaEventErrorResponse(mediaEvent);
+            return;
+        }
+
+        d->archiveDP->start();
+        dataProvider = d->archiveDP;
+    }
+
+    if (dataProvider == 0)
+    {
+        sendJsonResponse("Video camera is not ready yet");
+        return;
+    }
+
+    if (d->transcoder->setContainer(streamingFormat) != 0)
+    {
+        QByteArray msg;
+        msg = QByteArray("Transcoding error. Can not setup output format:") +
+            d->transcoder->getLastErrorMessage().toLatin1();
+        sendJsonResponse(msg);
+        return;
+    }
+
+    if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
+        d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+
+    dataProvider->addDataProcessor(&dataConsumer);
+    d->chunkedMode = true;
+    d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
+    sendResponse(nx::network::http::StatusCode::ok, mimeType);
+
+    dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+    dataConsumer.start();
+    while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
+        readRequest(); // just reading socket to determine client connection is closed
+
+    NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
+        d->socket->getForeignAddress(),
+        !dataConsumer.isRunning() ? lit("Data consumer stopped") :
+            !d->socket->isConnected() ? lit("Connection has been closed") :
+                lit("Terminated")
+    );
+
+    dataConsumer.pleaseStop();
+
+    auto signature = d->transcoder->getSignature(licensePool());
+    sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
+
+    QnByteArray emptyChunk((unsigned)0,0);
+    sendChunk(emptyChunk);
+    sendData(QByteArray("\r\n"));
+
+    dataProvider->removeDataProcessor(&dataConsumer);
+    if (camera)
+        camera->notInUse(this);
 }
 
 void ProgressiveDownloadingServer::onTimer( const quint64& /*timerID*/ )

@@ -25,9 +25,11 @@ public:
     virtual ~ProgressiveDownloadingServer();
 
     QnFfmpegTranscoder* getTranscoder();
+
 protected:
     virtual void run() override;
     virtual void onTimer( const quint64& timerID ) override;
+
 private:
     static QByteArray getMimeType(const QByteArray& streamingFormat);
     void sendMediaEventErrorResponse(Qn::MediaStreamEvent mediaEvent);
