@@ -55,7 +55,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     testCameraIni().reload();
-    const QByteArray testCameraFindMessage = testCameraIni().findMessage + QByteArray("\n");
+    const QByteArray testCameraFindMessage = testCameraIni().discoveryMessage + QByteArray("\n");
     for (const DiscoveryInfo& info: m_sockList)
     {
         info.sock->sendTo(
@@ -74,7 +74,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QMap<QString, QnResourcePtr> resources;
     QSet<QString> processedMac;
 
-    const QByteArray testCameraIdMessage = testCameraIni().idMessage + QByteArray("\n");
+    const QByteArray testCameraIdMessage =
+        testCameraIni().discoveryResponseMessage + QByteArray("\n");
 
     for (const DiscoveryInfo& info: m_sockList)
     {
