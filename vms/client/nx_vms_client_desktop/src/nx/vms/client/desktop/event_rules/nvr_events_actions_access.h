@@ -6,7 +6,7 @@ class QnResourcePool;
 
 namespace nx::vms::client::desktop {
 
-class AccessibleNvrEventAction
+class NvrEventsActionsAccess
 {
 public:
     static QList<nx::vms::api::EventType> removeInacessibleNvrEvents(

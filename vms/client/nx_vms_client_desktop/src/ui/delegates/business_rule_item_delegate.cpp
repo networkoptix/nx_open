@@ -36,7 +36,7 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
-#include <nx/vms/client/desktop/event_rules/accessible_nvr_event_action.h>
+#include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 
 #include <ui/delegates/select_cameras_delegate_editor_button.h>
 #include <ui/delegates/select_users_delegate_editor_button.h>
@@ -395,7 +395,7 @@ QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
             comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
         };
 
-    const auto accessibleEvents = AccessibleNvrEventAction::removeInacessibleNvrEvents(
+    const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
         vms::event::allEvents(), resourcePool());
 
     const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
@@ -424,7 +424,7 @@ QWidget* QnBusinessRuleItemDelegate::createActionEditor(QWidget* parent,
     QComboBox* comboBox = new QComboBox(parent);
     comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
 
-    const auto accessibleActions = AccessibleNvrEventAction::removeInacessibleNvrActions(
+    const auto accessibleActions = NvrEventsActionsAccess::removeInacessibleNvrActions(
         vms::event::userAvailableActions(), resourcePool());
 
     for (const auto actionType: m_lexComparator->lexSortedActions(accessibleActions))

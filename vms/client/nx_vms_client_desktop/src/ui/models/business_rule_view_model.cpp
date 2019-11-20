@@ -27,7 +27,7 @@
 #include <nx/vms/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
-#include <nx/vms/client/desktop/event_rules/accessible_nvr_event_action.h>
+#include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -199,7 +199,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
             model->appendRow(item);
         };
 
-    const auto accessibleEvents = AccessibleNvrEventAction::removeInacessibleNvrEvents(
+    const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
         vms::event::allEvents(), resourcePool());
 
     QnBusinessTypesComparator lexComparator;
@@ -227,7 +227,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto eventType: lexComparator.lexSortedEvents(successEvents))
         addEventItem(eventType);
 
-    const auto accessibleActions = AccessibleNvrEventAction::removeInacessibleNvrActions(
+    const auto accessibleActions = NvrEventsActionsAccess::removeInacessibleNvrActions(
         nx::vms::event::userAvailableActions(), resourcePool());
 
     const auto serverActions = filterActionsBySubtype(accessibleActions, ActionSubtype::server);

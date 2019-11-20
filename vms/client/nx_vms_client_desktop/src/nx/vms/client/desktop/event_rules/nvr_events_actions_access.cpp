@@ -1,4 +1,4 @@
-#include "accessible_nvr_event_action.h"
+#include "nvr_events_actions_access.h"
 
 #include <nx/vms/event/events/abstract_event.h>
 #include <core/resource_management/resource_pool.h>
@@ -21,7 +21,7 @@ bool serversHaveServerFlag(const QnMediaServerResourceList& servers, ServerFlag 
 
 namespace nx::vms::client::desktop {
 
-QList<EventType> AccessibleNvrEventAction::removeInacessibleNvrEvents(
+QList<EventType> NvrEventsActionsAccess::removeInacessibleNvrEvents(
     const QList<EventType>& events,
     QnResourcePool* resourcePool)
 {
@@ -43,7 +43,7 @@ QList<EventType> AccessibleNvrEventAction::removeInacessibleNvrEvents(
     return result;
 }
 
-QList<ActionType> AccessibleNvrEventAction::removeInacessibleNvrActions(
+QList<ActionType> NvrEventsActionsAccess::removeInacessibleNvrActions(
     const QList<ActionType>& actions,
     QnResourcePool* resourcePool)
 {
