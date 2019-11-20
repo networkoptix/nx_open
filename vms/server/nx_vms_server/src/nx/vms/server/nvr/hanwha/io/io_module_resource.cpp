@@ -2,8 +2,6 @@
 
 #include <media_server/media_server_module.h>
 
-#include <nx/fusion/serialization/lexical.h>
-
 #include <nx/vms/server/nvr/i_service.h>
 #include <nx/vms/server/nvr/hanwha/common.h>
 
@@ -30,9 +28,7 @@ CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
 {
     setFlags(flags() | Qn::io_module);
     setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
-    setProperty(
-        ResourcePropertyKey::kForcedLicenseType,
-        QnLexical::serialized(Qn::LicenseType::LC_Free));
+    setForcedLicenseType(Qn::LicenseType::LC_Free);
 
     const nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!ioManager)

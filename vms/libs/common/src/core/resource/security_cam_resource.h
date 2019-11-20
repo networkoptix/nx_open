@@ -130,6 +130,8 @@ public:
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
+    void setForcedLicenseType(Qn::LicenseType licenseType);
+
     /**
      * Returns true if all cameras in a same camera group should share 1 license
      */
