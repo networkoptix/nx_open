@@ -125,7 +125,7 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "resolution",
             [streamIndex](const auto& r)
             {
-                if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
+                if (auto p = r->actualParams(streamIndex); p && p->resolution.isValid())
                 {
                     auto resolution = p->resolution;
                     if (auto layout = r->getVideoLayout())
