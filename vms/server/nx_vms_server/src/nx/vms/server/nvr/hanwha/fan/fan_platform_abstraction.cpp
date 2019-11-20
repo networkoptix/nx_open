@@ -108,7 +108,7 @@ public:
         NX_ASSERT(false);
     }
 
-private;
+private:
     int m_ioDeviceDescriptor = -1;
 };
 

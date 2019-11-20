@@ -62,6 +62,7 @@ public:
     virtual bool setState(BuzzerState /*state*/) override
     {
         NX_ASSERT(false);
+        return false;
     }
 };
 

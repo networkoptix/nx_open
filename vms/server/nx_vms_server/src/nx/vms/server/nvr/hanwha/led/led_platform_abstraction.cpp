@@ -74,15 +74,15 @@ private:
 };
 
 #else
-class LedPlatformAbstractionImpl
+class LedPlatformAbstractionImpl: public ILedPlatformAbstraction
 {
 public:
-    virtual LedPlatformAbstraction(int /*ioDeviceFileDescriptor*/) override
+    LedPlatformAbstractionImpl(int /*ioDeviceFileDescriptor*/)
     {
         NX_ASSERT(false);
     }
 
-    virtual ~LedPlatformAbstraction() override
+    virtual ~LedPlatformAbstractionImpl() override
     {
         NX_ASSERT(false);
     }
