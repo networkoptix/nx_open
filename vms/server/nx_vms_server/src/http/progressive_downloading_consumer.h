@@ -18,6 +18,7 @@ public:
         unsigned int maxFramesToCacheBeforeDrop = 0;
         bool liveMode = false;
         bool continuousTimestamps = false;
+        bool audioOnly = false;
         int64_t endTimeUsec = AV_NOPTS_VALUE;
     };
 

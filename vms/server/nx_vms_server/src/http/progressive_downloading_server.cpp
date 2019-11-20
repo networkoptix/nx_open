@@ -318,6 +318,8 @@ void ProgressiveDownloadingServer::run()
             return;
         }
 
+        bool audioOnly = decodedUrlQuery.hasQueryItem("audio_only");
+
         QnFfmpegTranscoder::Config config;
         config.computeSignature = true;
         d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
@@ -382,7 +384,7 @@ void ProgressiveDownloadingServer::run()
                 videoCodec);
         }
 
-        if (d->transcoder->setVideoCodec(
+        if (!audioOnly && d->transcoder->setVideoCodec(
                 videoCodec,
                 d->transcodeMethod,
                 quality,
@@ -438,6 +440,7 @@ void ProgressiveDownloadingServer::run()
         consumerConfig.maxFramesToCacheBeforeDrop = maxFramesToCacheBeforeDrop;
         consumerConfig.liveMode = isLive;
         consumerConfig.continuousTimestamps = continuousTimestamps;
+        consumerConfig.audioOnly = audioOnly;
         QByteArray endPosition =
             decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME).toLatin1();
         if (!endPosition.isEmpty())
@@ -599,8 +602,6 @@ void ProgressiveDownloadingServer::run()
         if (camera)
             camera->notInUse(this);
     }
-
-    //d->socket->close();
 }
 
 void ProgressiveDownloadingServer::onTimer( const quint64& /*timerID*/ )

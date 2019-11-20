@@ -157,6 +157,11 @@
                             <description>Turn on realtime optimization. It will drop some frames if not enough CPU for realtime transcoding.</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>audio_only</name>
+                            <description>Send only audio stream.</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>Video stream in the requested format</caption>

@@ -65,6 +65,9 @@ void ProgressiveDownloadingConsumer::putData(const QnAbstractDataPacketPtr& data
         }
     }
     const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.get());
+    if (media && m_config.audioOnly && media->dataType != QnAbstractMediaData::AUDIO)
+        return;
+
     if (m_needKeyData && media)
     {
         if (!(media->flags & AV_PKT_FLAG_KEY))
@@ -117,15 +120,15 @@ bool ProgressiveDownloadingConsumer::processData(const QnAbstractDataPacketPtr& 
             !isArchive && // thin out only live frames
             m_dataOutput->packetsInQueue() > m_config.maxFramesToCacheBeforeDrop) ? NULL : &result;
 
-    if( !resultPtr )
+    if (!resultPtr)
     {
         NX_VERBOSE(this, lit("Insufficient bandwidth to %1. Skipping frame...").
             arg(m_owner->getForeignAddress().toString()));
     }
     int errCode = m_owner->getTranscoder()->transcodePacket(
         media,
-        resultPtr );   //if previous frame dispatch not even started, skipping current frame
-    if( errCode == 0 )
+        resultPtr);   //if previous frame dispatch not even started, skipping current frame
+    if (errCode == 0)
     {
         if( resultPtr && result.size() > 0 )
             sendFrame(media->timestamp, result);
