@@ -149,6 +149,7 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<WebPageData>();
+    qRegisterMetaType<RtpTransportType>();
 };
 
 } // namespace nx::vms::api

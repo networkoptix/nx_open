@@ -16,6 +16,7 @@ public:
     QnResourceDataJsonSerializer():
         QnJsonSerializer(qMetaTypeId<QnResourceData>())
     {
+        registerKey<nx::vms::api::RtpTransportType>(lit("RtpTransportType"));
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
@@ -107,7 +108,8 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
         qnWarning("Resource data for key '%1' was requested with a non-standard type '%2'.", key, QMetaType::typeName(type));
 
     QnJsonSerializer *serializer = QnJsonSerializer::serializer(type);
-    NX_ASSERT(serializer);
+    if (!NX_ASSERT(serializer))
+        return false;
 
     QnJsonContext ctx;
     return serializer->deserialize(&ctx, data.json, value);
