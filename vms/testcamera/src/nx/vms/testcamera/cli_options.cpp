@@ -36,6 +36,11 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
 <option> is one of the following:
  -h, --help
      Show this help text and exit.
+ -L, --log-level[=]<level>
+     Log level: one of NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE; not case-sensitive, and can be
+     shortened to the first letter: N, E, W, I, D, V. Default: INFO
+ --max-file-size-megabytes[=]<value>
+     Load no more than this size of each video file. 0 means no limit. Default: 100.
  -I, --local-interface[=]<ipAddressOrHostname>
      Local interface to listen. Can be specified multiple times to form a list. By default, all
      interfaces are listened to.
@@ -62,9 +67,6 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Force FPS for the primary stream to the given positive integer value.
  --fps-secondary[=]<value>
      Force FPS for the secondary stream to the given positive integer value.
--L, --log-level[=]<level>
-     Log level: one of NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE; not case-sensitive, and can be
-     shortened to the first letter: N, E, W, I, D, V. Default: INFO
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
@@ -95,7 +97,6 @@ class InvalidArgs: public std::exception
 {
 public:
     InvalidArgs(const QString& message): m_message(message.toStdString()) {}
-
     virtual const char* what() const noexcept override { return m_message.c_str(); }
 
 private:
@@ -112,7 +113,20 @@ static int positiveIntArg(const QString& argName, const QString& argValue)
             "Invalid value (expected positive 32-bit integer) for arg '" + argName + "': "
                 + enquoteAndEscape(argValue) + ".");
     }
+    return value;
+}
 
+/** @throws InvalidArgs */
+static int64_t nonNegativeIntArg(const QString& argName, const QString& argValue)
+{
+    bool ok = false;
+    const int64_t value = argValue.toInt(&ok);
+    if (!ok || value < 0)
+    {
+        throw InvalidArgs(
+            "Invalid value (expected non-negative 32-bit integer) for arg '" + argName + "': "
+                + enquoteAndEscape(argValue) + ".");
+    }
     return value;
 }
 
@@ -126,7 +140,6 @@ static int64_t positiveInt64Arg(const QString& argName, const QString& argValue)
             "Invalid value (expected positive 64-bit integer) for arg '" + argName + "': "
                 + enquoteAndEscape(argValue) + ".");
     }
-
     return value;
 }
 
@@ -135,7 +148,6 @@ static QString nonEmptyStringArg(const QString& argName, const QString& argValue
 {
     if (argValue.isEmpty())
         throw InvalidArgs("Empty value for arg '" + argName + "' not allowed.");
-
     return argValue;
 }
 
@@ -150,7 +162,6 @@ static nx::utils::log::Level logLevelArg(const QString& argName, const QString& 
         throw InvalidArgs("Invalid log-level value in arg '" + argName + "': "
             + enquoteAndEscape(argValue) + ".");
     }
-
     return logLevel;
 }
 
@@ -217,6 +228,10 @@ static QString optionsToJsonString(const CliOptions& options)
 
     QString result = "{\n";
 
+    result += "    \"showHelp\": " + boolToJson(options.showHelp) + ",\n";
+    result += "    \"logLevel\": " + lm("\"%1\"").args(options.logLevel) + ",\n";
+    result += "    \"maxFileSizeMegabytes\": "
+        + QString::number(options.maxFileSizeMegabytes) + ",\n";
     result += "    \"cameraForFile\": " + boolToJson(options.cameraForFile) + ",\n";
     result += "    \"includePts\": " + boolToJson(options.includePts) + ",\n";
     result += "    \"noSecondary\": " + boolToJson(options.noSecondary) + ",\n";
@@ -246,7 +261,6 @@ static QString optionsToJsonString(const CliOptions& options)
         result += cameraSetToJsonString(cameraSet, /*prefix*/ QString(8, ' '));
         result += (i == options.cameraSets.size() - 1) ? "" : ",";
         result += "\n";
-
     }
     result += "    ]\n";
 
@@ -392,6 +406,8 @@ static void parseOption(CliOptions* options, const char* const argv[], int* argp
         options->shiftPtsPrimaryPeriodUs = *v;
     else if (const auto v = parse(argv, argp, positiveInt64Arg, "--shift-pts-secondary-period-us"))
         options->shiftPtsSecondaryPeriodUs = *v;
+    else if (const auto v = parse(argv, argp, nonNegativeIntArg, "--max-file-size-megabytes"))
+        options->maxFileSizeMegabytes = *v;
     else if (const auto v = parse(argv, argp, logLevelArg, "--log-level", "-L"))
         options->logLevel = *v;
     else if (arg.startsWith("-"))
@@ -475,7 +491,7 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
 
         if (testCameraIni().printOptions)
         {
-            std::cerr << lm("\nOptions parsed from command-line args:\n%1\n\n").args(
+            std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
                 optionsToJsonString(*options)).toStdString();
         }
 

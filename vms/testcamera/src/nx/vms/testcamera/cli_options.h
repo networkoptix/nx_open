@@ -17,6 +17,8 @@ struct CliOptions
     };
 
     bool showHelp = false;
+    nx::utils::log::Level logLevel = utils::log::Level::info;
+    int maxFileSizeMegabytes = 100;
     bool cameraForFile = false;
     bool includePts = false;
     bool noSecondary = false;
@@ -27,9 +29,11 @@ struct CliOptions
     int64_t shiftPtsSecondaryPeriodUs = -1;
     QStringList localInterfaces;
     QList<CameraSet> cameraSets;
-    nx::utils::log::Level logLevel = utils::log::Level::info;
 };
 
+/**
+ * If help is requested, prints it and exits the process with status 0.
+ */
 bool parseCliOptions(int argc, const char* const argv[], CliOptions* options);
 
 } // namespace nx::vms::testcamera
