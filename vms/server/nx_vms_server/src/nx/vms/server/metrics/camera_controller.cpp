@@ -142,7 +142,9 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "targetFps",
             [streamIndex](const auto& r)
             {
-                if (r->isCameraControlDisabled())
+                const bool fixedQuality =
+                    r->getCameraCapabilities().testFlag(Qn::FixedQualityCapability);
+                if (r->isCameraControlDisabled() || !r->hasVideo() || fixedQuality)
                     return Value();
                 if (auto params = r->targetParams(streamIndex))
                     return Value(params->fps);
