@@ -57,7 +57,7 @@ public:
         m_commonModule->storagePluginFactory()->registerStoragePlugin(
             "file", QnQtFileStorageResource::instance, /*isDefaultProtocol*/ true);
 
-        m_fileCache.reset(new FileCache(m_commonModule.get()));
+        m_fileCache.reset(new FileCache(m_commonModule.get(), options.maxFileSizeMegabytes));
 
         m_cameraPool.reset(new CameraPool(
             options.localInterfaces,
