@@ -645,12 +645,12 @@
                     "state": {
                         "display": "table|panel"
                     },
-                    "firstIp": {
+                    "displayAddress": {
                         "name": "IP",
                         "isOptional": true,
                         "display": "table|panel"
                     },
-                    "ipList": {
+                    "otherAddresses": {
                         "name": "Other IP addresses",
                         "isOptional": true,
                         "display": "panel"
