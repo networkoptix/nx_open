@@ -241,6 +241,9 @@ Figure
 
     function serialize()
     {
+        if (pointMakerInstrument.count === 0)
+            return null
+
         return {
             "points": F.serializePoints(pointMakerInstrument.getRelativePoints()),
             "color": color.toString()
