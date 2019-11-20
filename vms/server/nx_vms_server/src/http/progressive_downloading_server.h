@@ -8,9 +8,9 @@
 
 class QnFfmpegTranscoder;
 
-class QnProgressiveDownloadingConsumerPrivate;
+class ProgressiveDownloadingServerPrivate;
 
-class QnProgressiveDownloadingConsumer
+class ProgressiveDownloadingServer
 :
     virtual public QnTCPConnectionProcessor,
     public nx::utils::TimerEventHandler
@@ -18,11 +18,11 @@ class QnProgressiveDownloadingConsumer
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnProgressiveDownloadingConsumer(
+    ProgressiveDownloadingServer(
         QnMediaServerModule* serverModule,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
-    virtual ~QnProgressiveDownloadingConsumer();
+    virtual ~ProgressiveDownloadingServer();
 
     QnFfmpegTranscoder* getTranscoder();
 protected:
@@ -34,5 +34,5 @@ private:
     void sendJsonResponse(const QString& errorString);
     QByteArray buildSignature();
 private:
-    Q_DECLARE_PRIVATE(QnProgressiveDownloadingConsumer);
+    Q_DECLARE_PRIVATE(ProgressiveDownloadingServer);
 };

@@ -3029,7 +3029,7 @@ bool MediaServerProcess::initTcpListener(
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "favicon.ico");
     registerTcpHandler<QnFileConnectionProcessor>("HTTP", "static");
     registerTcpHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    registerTcpHandler<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
+    registerTcpHandler<ProgressiveDownloadingServer>("HTTP", "media", serverModule());
     registerTcpHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
     hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
