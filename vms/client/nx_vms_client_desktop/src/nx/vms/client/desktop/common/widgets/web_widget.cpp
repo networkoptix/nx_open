@@ -1,6 +1,7 @@
 #include "web_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWebEngineWidgets/QWebEngineHistory>
 
 #include <ui/style/webview_style.h>
 
@@ -65,12 +66,6 @@ WebEngineView* WebWidget::webEngineView() const
 void WebWidget::load(const QUrl& url)
 {
     m_webEngineView->load(url);
-}
-
-void WebWidget::reset()
-{
-    m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
-    m_webEngineView->load(QUrl());
 }
 
 } // namespace nx::vms::client::desktop

@@ -68,10 +68,13 @@ Instrument
 
     function _handleMove(x, y)
     {
+        const pressLocalPos = target.mapFromGlobal(_pressPosition.x, _pressPosition.y)
+        const localPos = target.mapFromGlobal(x, y)
+
         var newX = MathUtils.bound(
-            minX, _pressItemPosition.x + x - _pressPosition.x, maxX)
+            minX, _pressItemPosition.x + localPos.x - pressLocalPos.x, maxX)
         var newY = MathUtils.bound(
-            minY, _pressItemPosition.y + y - _pressPosition.y, maxY)
+            minY, _pressItemPosition.y + localPos.y - pressLocalPos.y, maxY)
 
         target.x = newX
         target.y = newY

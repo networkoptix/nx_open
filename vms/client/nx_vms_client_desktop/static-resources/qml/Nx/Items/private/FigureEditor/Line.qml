@@ -9,7 +9,9 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count === 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
-    property string allowedDirections: "any"
+    property string allowedDirections: (figureSettings && figureSettings.allowedDirections)
+        ? figureSettings.allowedDirections : ""
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
 
     MouseArea
     {
@@ -38,6 +40,8 @@ Figure
         item: mouseArea
     }
 
+    hoverInstrument: hoverInstrument.enabled ? hoverInstrument : pointMakerInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument
@@ -45,6 +49,10 @@ Figure
         pathHoverInstrument: hoverInstrument
         item: mouseArea
         target: figure
+        minX: -Math.min(pointMakerInstrument.startX, pointMakerInstrument.endX)
+        minY: -Math.min(pointMakerInstrument.startY, pointMakerInstrument.endY)
+        maxX: width - Math.max(pointMakerInstrument.startX, pointMakerInstrument.endX)
+        maxY: height - Math.max(pointMakerInstrument.startY, pointMakerInstrument.endY)
     }
 
     Rectangle
@@ -55,7 +63,8 @@ Figure
 
         x: pointMakerInstrument.startX
         y: pointMakerInstrument.startY - height / 2
-        width: F.distance(pointMakerInstrument.startX, pointMakerInstrument.startY, pointMakerInstrument.endX, pointMakerInstrument.endY)
+        width: F.distance(pointMakerInstrument.startX, pointMakerInstrument.startY,
+            pointMakerInstrument.endX, pointMakerInstrument.endY)
         height: 2
 
         transformOrigin: Item.Left
@@ -97,10 +106,8 @@ Figure
             {
                 arrowB.checked = !checked
             }
-            else if (allowedDirections === "any"
-                && !checked && !arrowB.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowB.checked)
             {
-                arrowA.checked = true
                 arrowB.checked = true
             }
         }
@@ -124,12 +131,27 @@ Figure
             {
                 arrowA.checked = !checked
             }
-            else if (allowedDirections === "any" && !checked && !arrowA.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowA.checked)
             {
                 arrowA.checked = true
-                arrowB.checked = true
             }
         }
+    }
+
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start line.")
+        }
+        else
+        {
+            if (allowedDirections !== "none")
+                return qsTr("Click arrows to toggle the desired directions.")
+        }
+
+        return ""
     }
 
     function startCreation()
@@ -142,6 +164,8 @@ Figure
 
     function deserialize(json)
     {
+        pointMakerInstrument.finish()
+
         if (!json)
         {
             pointMakerInstrument.clear()
@@ -170,7 +194,7 @@ Figure
 
     function serialize()
     {
-        const direction = (arrowA.checked !== arrowB.checked)
+        const direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
             ? arrowA.checked ? "a" : "b"
             : ""
 

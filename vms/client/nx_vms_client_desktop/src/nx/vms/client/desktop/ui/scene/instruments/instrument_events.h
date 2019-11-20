@@ -12,8 +12,12 @@ class MouseEvent: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QPoint position MEMBER position CONSTANT)
-    Q_PROPERTY(QPoint globalPosition MEMBER globalPosition CONSTANT)
+    Q_PROPERTY(QPointF localPosition MEMBER localPosition CONSTANT)
+    Q_PROPERTY(QPointF windowPosition MEMBER windowPosition CONSTANT)
+    Q_PROPERTY(QPointF screenPosition MEMBER screenPosition CONSTANT)
+    Q_PROPERTY(QPoint position READ position CONSTANT)
+    Q_PROPERTY(QPoint globalPosition READ globalPosition CONSTANT)
+
     Q_PROPERTY(int button MEMBER button CONSTANT)
     Q_PROPERTY(int buttons MEMBER buttons CONSTANT)
     Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
@@ -23,8 +27,13 @@ class MouseEvent: public QObject
 public:
     MouseEvent(const QMouseEvent* event);
 
-    QPoint position;
-    QPoint globalPosition;
+    QPoint position() const { return localPosition.toPoint(); }
+    QPoint globalPosition() const { return screenPosition.toPoint(); }
+
+    QPointF localPosition;
+    QPointF windowPosition;
+    QPointF screenPosition;
+
     Qt::MouseButton button;
     Qt::MouseButtons buttons;
     Qt::KeyboardModifiers modifiers;

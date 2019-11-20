@@ -22,6 +22,8 @@ public:
     QRectF boundingRect() const;
     Q_INVOKABLE bool contains(const QPointF& point) const;
 
+    Q_INVOKABLE bool checkSelfIntersections() const;
+
     static void registerQmlType();
 
 signals:

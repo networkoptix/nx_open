@@ -68,7 +68,7 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
     stopAnalytics();
 }
 
-bool DeviceAnalyticsBinding::startAnalytics(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::startAnalytics(const QJsonObject& settings)
 {
     QnMutexLocker lock(&m_mutex);
     return startAnalyticsUnsafe(settings);
@@ -80,7 +80,7 @@ void DeviceAnalyticsBinding::stopAnalytics()
     stopAnalyticsUnsafe();
 }
 
-bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::restartAnalytics(const QJsonObject& settings)
 {
     QnMutexLocker lock(&m_mutex);
     stopAnalyticsUnsafe();
@@ -133,7 +133,7 @@ bool DeviceAnalyticsBinding::hasAliveDeviceAgent() const
     return m_started.load();
 }
 
-bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
 {
     if (!m_deviceAgent)
     {
@@ -201,7 +201,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
-QVariantMap DeviceAnalyticsBinding::getSettings() const
+QJsonObject DeviceAnalyticsBinding::getSettings() const
 {
     decltype(m_deviceAgent) deviceAgent;
     {
@@ -221,16 +221,16 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     }
 
     const auto settingsResponse = deviceAgent->pluginSideSettings();
-    return settingsResponse ? settingsResponse->settingValues : QVariantMap();
+    return settingsResponse ? settingsResponse->settingValues : QJsonObject();
 }
 
-void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
+void DeviceAnalyticsBinding::setSettings(const QJsonObject& settings)
 {
     QnMutexLocker lock(&m_mutex);
     setSettingsInternal(settings);
 }
 
-void DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settings)
+void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
 {
     if (!m_deviceAgent)
     {

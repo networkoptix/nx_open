@@ -13,7 +13,6 @@
 #include "proxy_ptz_controller.h"
 #include <common/common_module.h>
 
-#include <utils/common/delete_later.h>
 #include <utils/common/delayed.h>
 
 namespace {
@@ -183,10 +182,7 @@ void QnPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
     }
 
     if (oldController)
-    {
         emit controllerChanged(resource);
-        oldController.reset(nullptr, &qnDeleteLater);
-    }
 }
 
 void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
@@ -238,7 +234,4 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr& resource)
         kDefaultDelay, executorThread);
 
     emit q->controllerChanged(resource);
-
-    if (oldController)
-        oldController.reset(nullptr, &qnDeleteLater);
 }

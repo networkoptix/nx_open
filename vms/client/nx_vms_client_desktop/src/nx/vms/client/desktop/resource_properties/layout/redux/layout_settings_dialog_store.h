@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
@@ -24,6 +26,7 @@ public:
 
     void setLocked(bool value);
     void setLogicalId(int value);
+    void setOtherLogicalIds(const std::set<int>& value);
     void resetLogicalId();
     void generateLogicalId();
     void setFixedSizeEnabled(bool value);

@@ -781,27 +781,19 @@ void EventRibbon::Private::insertNewTiles(
         // This is to prevent all inserted tiles appearing on the screen at once.
         static constexpr qreal kStartingFraction = 0.25;
 
-        AnimationPtr animator(new QVariantAnimation());
+        auto animator = new QVariantAnimation();
         static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileInsertion;
         animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
         animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
         animator->setStartValue(kStartingFraction);
         animator->setEndValue(1.0);
+
+        connect(animator, &QObject::destroyed, this,
+            [this, animator]() { m_animations.remove(animator); });
+
+        m_animations.insert(animator, m_model->index(i));
+        tile->insertAnimation.reset(animator);
         animator->start(QAbstractAnimation::DeleteWhenStopped);
-
-        connect(animator.get(), &QObject::destroyed, this,
-            [this]()
-            {
-                const auto index = m_animations.take(static_cast<QVariantAnimation*>(sender()));
-                if (!index.isValid())
-                    return;
-                const auto& tile = m_tiles[index.row()];
-                if (tile->insertAnimation.get() == sender())
-                    tile->insertAnimation.release();
-            });
-
-        m_animations.insert(animator.get(), m_model->index(i));
-        tile->insertAnimation.reset(animator.release());
     }
 
     updateGuard.rollback();
@@ -897,36 +889,28 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     if (animatedDelta > 0)
     {
-        AnimationPtr animator(new QVariantAnimation());
+        auto animator = new QVariantAnimation();
         static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileRemoval;
         animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
         animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
         animator->setStartValue(qreal(animatedDelta));
         animator->setEndValue(0.0);
-        animator->start(QAbstractAnimation::DeleteWhenStopped);
 
-        connect(animator.get(), &QObject::destroyed, this,
-            [this]()
-            {
-                const auto index = m_animations.take(static_cast<QVariantAnimation*>(sender()));
-                auto& animator = index.isValid()
-                    ? m_tiles[index.row()]->removeAnimation
-                    : m_endAnimation;
-
-                if (animator.get() == sender())
-                    animator.release();
-            });
+        connect(animator, &QObject::destroyed, this,
+            [this, animator]() { m_animations.remove(animator); });
 
         if (first < this->count())
         {
-            m_animations.insert(animator.get(), m_model->index(first));
-            m_tiles[first]->removeAnimation.reset(animator.release());
+            m_animations.insert(animator, m_model->index(first));
+            m_tiles[first]->removeAnimation.reset(animator);
         }
         else
         {
-            m_endAnimation.swap(animator);
-            m_animations.insert(m_endAnimation.get(), {});
+            m_animations.insert(animator, {});
+            m_endAnimation.reset(animator);
         }
+
+        animator->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     updateGuard.rollback();
@@ -1408,9 +1392,9 @@ void EventRibbon::Private::fadeIn(EventTile* widget)
     animator->setEndValue(0.0);
     animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
     animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
-    animator->start(QAbstractAnimation::DeleteWhenStopped);
 
     createFadeCurtain(widget, animator);
+    animator->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void EventRibbon::Private::fadeOut(EventTile* widget)
@@ -1436,10 +1420,10 @@ void EventRibbon::Private::fadeOut(EventTile* widget)
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, animator, nx::utils::guarded(widget,
         [widget, base](int value) { widget->move(widget->x(), base - value); }));
 
-    animator->start(QAbstractAnimation::DeleteWhenStopped);
-
     createFadeCurtain(widget, animator);
     setReadOnly(widget, true);
+
+    animator->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnimation* animator)

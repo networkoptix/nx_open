@@ -337,8 +337,8 @@ startServer()
     sleep 1
     if ! getServerProcessInfo
     then
-        echo "ERROR: Server process not found \
-            despite 'systemd ... start' returned zero exit status." >&2
+        echo "ERROR: Server process not found" \
+            "despite 'systemd ... start' returned zero exit status." >&2
         exit 1
     fi
 

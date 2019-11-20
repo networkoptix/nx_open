@@ -25,6 +25,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 class QScrollBar;
@@ -149,7 +150,7 @@ private:
     using Importance = QnNotificationLevel::Value;
     static constexpr int kApproximateTileHeight = 48;
 
-    using AnimationPtr = std::unique_ptr<QVariantAnimation>;
+    using AnimationPtr = VolatileUniquePtr<QVariantAnimation>;
 
     struct Tile
     {

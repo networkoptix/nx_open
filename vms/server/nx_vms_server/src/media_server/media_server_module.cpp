@@ -429,6 +429,7 @@ void QnMediaServerModule::stop()
     #endif
 
     m_streamingChunkTranscoder->stop();
+    m_eventConnector->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -705,7 +706,6 @@ QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 
 QnPlatformAbstraction* QnMediaServerModule::platform() const
 {
-    NX_CRITICAL(m_platform);
     return m_platform;
 }
 

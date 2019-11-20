@@ -31,7 +31,7 @@ void ClientConnectionTunnelingServer::authorize(
 {
     using namespace std::placeholders;
 
-    const auto sessionId = 
+    const auto sessionId =
         requestContext->requestPathParams.getByName(api::kSessionIdName);
     if (sessionId.empty())
     {
@@ -46,12 +46,13 @@ void ClientConnectionTunnelingServer::authorize(
 
     m_connectSessionManager->connectToPeer(
         inputData,
-        [this, completionHandler = std::move(completionHandler)](
+        [this, httpResponse = requestContext->response, completionHandler = std::move(completionHandler)](
             api::ResultCode resultCode,
             controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc) mutable
         {
             onConnectToPeerFinished(
                 resultCode,
+                httpResponse,
                 std::move(startRelayingFunc),
                 std::move(completionHandler));
         });
@@ -59,6 +60,7 @@ void ClientConnectionTunnelingServer::authorize(
 
 void ClientConnectionTunnelingServer::onConnectToPeerFinished(
     api::ResultCode resultCode,
+    network::http::Response* httpResponse,
     controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
     CompletionHandler completionHandler)
 {
@@ -70,6 +72,9 @@ void ClientConnectionTunnelingServer::onConnectToPeerFinished(
             nullptr);
         return;
     }
+
+    // TODO: #ak Take line from vms when merging to vms branch.
+    httpResponse->headers.emplace(api::kNxProtocolHeader, "NXRELAY/0.0.1");
 
     nx::utils::swapAndCall(
         completionHandler,

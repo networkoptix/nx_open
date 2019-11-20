@@ -6,14 +6,14 @@
 
 namespace nx::vms::server {
 
-std::optional<PlatformMonitor::NetworkLoad> PlatformMonitor::networkInterfaceLoad(
+PlatformMonitor::NetworkLoad PlatformMonitor::networkInterfaceLoadOrThrow(
     const QString& interfaceName)
 {
     auto totalLoad = totalNetworkLoad();
     auto interfaceLoad = nx::utils::find_if(totalLoad,
         [interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
     if (interfaceLoad == nullptr)
-        return {};
+        throw std::invalid_argument("Interface [" + interfaceName.toStdString() + "] not found");
 
     return *interfaceLoad;
 }

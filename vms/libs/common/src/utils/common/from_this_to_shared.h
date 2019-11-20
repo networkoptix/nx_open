@@ -1,15 +1,13 @@
-#ifndef FROM_THIS_TO_SHARED_H
-#define FROM_THIS_TO_SHARED_H
+#pragma once
 
 #include <cassert>
 #include <nx/utils/log/assert.h>
 
 #include "core/resource/shared_resource_pointer.h"
 
-//!Enables conversion from \a this to shared pointer to class
-/*!
-    Implementation moved from QnResource class to enable it for non-QnResource classes
-*/
+/**
+ * Enables conversion from \a this to shared pointer to class.
+ */
 template <class T>
 class QnFromThisToShared
 {
@@ -37,7 +35,8 @@ private:
     void initWeakPointer(const QSharedPointer<T2>& pointer)
     {
         NX_ASSERT(!pointer.isNull());
-        NX_ASSERT(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */
+        NX_ASSERT(m_weakPointer.toStrongRef().isNull(),
+            "You have created two distinct shared pointers to a single object instance.");
 
         m_weakPointer = pointer;
     }
@@ -47,5 +46,3 @@ private:
         m_weakPointer.clear();
     }
 };
-
-#endif  //FROM_THIS_TO_SHARED_H

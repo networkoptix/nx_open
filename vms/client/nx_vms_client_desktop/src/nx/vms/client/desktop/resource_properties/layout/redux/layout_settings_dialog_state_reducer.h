@@ -1,9 +1,10 @@
 #pragma once
 
+#include <set>
+
 #include "layout_settings_dialog_state.h"
 
 #include <core/resource/resource_fwd.h>
-
 #include <utils/common/aspect_ratio.h>
 
 namespace nx::vms::client::desktop {
@@ -29,6 +30,7 @@ public:
 
     static State setLocked(State state, bool value);
     static State setLogicalId(State state, int value);
+    static State setOtherLogicalIds(State state, const std::set<int>& value);
     static State resetLogicalId(State state);
     static State generateLogicalId(State state);
     static State setFixedSizeEnabled(State state, bool value);

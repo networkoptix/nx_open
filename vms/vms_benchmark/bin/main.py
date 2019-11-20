@@ -9,6 +9,7 @@ import sys
 import time
 import uuid
 from typing import List, Tuple, Optional
+from io import StringIO
 
 from vms_benchmark.camera import Camera
 
@@ -56,6 +57,7 @@ from vms_benchmark.server_api import ServerApi
 from vms_benchmark import test_camera_runner, vms_scanner, box_connection, box_platform
 from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
+from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
@@ -68,9 +70,10 @@ import threading
 
 conf_definition = {
     "boxHostnameOrIp": {"type": "str"},
-    "boxLogin": {"type": "str", "default": ""},
+    "boxLogin": {"type": "str"},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
+    "boxSshKey": {"type": "str", "default": None},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "virtualCameraCount": {"type": "intList", "range": [1, 999]},
@@ -80,6 +83,10 @@ conf_definition = {
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
 }
+
+# On Windows plink tool is used and this tool doesn't support the fallback to default for the SSH login.
+if platform.system() != "Windows":
+    conf_definition["boxLogin"]["default"] = ""
 
 
 ini_definition = {
@@ -228,7 +235,8 @@ class _BoxCpuTimes:
 
 
 def box_tx_rx_errors(box):
-    errors_content = box.eval(f'cat /sys/class/net/{box.eth_name}/statistics/tx_errors /sys/class/net/{box.eth_name}/statistics/rx_errors')
+    errors_content = box.eval(
+        f'cat /sys/class/net/{box.eth_name}/statistics/tx_errors /sys/class/net/{box.eth_name}/statistics/rx_errors')
 
     if errors_content is None:
         raise exceptions.BoxFileContentError(f'/sys/class/net/{box.eth_name}/statistics/{{tx,rx}}_errors')
@@ -549,8 +557,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
-        ram_free_bytes = _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
-
         total_live_stream_count = math.ceil(
             conf['liveStreamsPerCameraRatio'] * test_camera_count)
         total_archive_stream_count = math.ceil(
@@ -667,7 +673,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             camera_id, pts_stream_id, pts_us, timestamp_s)
 
                         try:
-                             [cpu_times, storage_failure_event_count, tx_rx_errors, swapped_kilobytes] = box_poller.get_results()
+                            [
+                                cpu_times,
+                                storage_failure_event_count,
+                                tx_rx_errors,
+                                swapped_kilobytes
+                            ] = box_poller.get_results()
                         except LookupError:
                             continue
                         if cpu_times is not None:
@@ -734,13 +745,17 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if issues:
                             streaming_ended_expectedly = True
                             report(
-                                f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) aborted because of issues.")
+                                f"    Streaming test #{test_number} with {test_camera_count} " +
+                                "virtual camera(s) aborted because of issues."
+                            )
                             break
 
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
                             report(
-                                f"    Streaming test #{test_number} with {test_camera_count} virtual camera(s) finished.")
+                                f"    Streaming test #{test_number} with {test_camera_count} " +
+                                "virtual camera(s) finished."
+                            )
                             break
                 finally:
                     box_poller.please_stop()
@@ -819,8 +834,9 @@ def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
 
 def _test_vms(api, box, box_platform, conf, ini, vms):
     ram_free_bytes = box_platform.obtain_ram_free_bytes()
-    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB "
-        f"of {to_megabytes(box_platform.ram_bytes)} MB")
+    report(
+        f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB"
+    )
     _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -935,7 +951,7 @@ def _override_ini_config(vms, ini):
 def _connect_to_box(conf, conf_file):
     password = conf.get('boxPassword', None)
     if password and platform.system() == 'Linux':
-        res = host_tests.SshPassInstalled().call()
+        res = host_tests.SshPassInstalled.call()
 
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
@@ -945,14 +961,23 @@ def _connect_to_box(conf, conf_file):
             )
     box = BoxConnection(
         host=conf['boxHostnameOrIp'],
-        login=conf.get('boxLogin', None),
+        login=conf['boxLogin'],
         password=password,
+        ssh_key=conf['boxSshKey'],
         port=conf['boxSshPort'],
-        conf_file=conf_file
     )
-    host_key = box_tests.SshHostKeyIsKnown(box, conf_file).call()
+    host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
     if host_key is not None:
         box.supply_host_key(host_key)
+
+    try:
+        box.sh('true', exc=True)
+    except exceptions.BoxCommandError as e:
+        raise exceptions.SshConnectionError(
+            "Can't connect to the box via SSH: check SSH configuration settings (host, login, password and so on).",
+            original_exception=e
+        )
+
     box.obtain_connection_info()
     if not box.is_root:
         res = box_tests.SudoConfigured(box).call()
@@ -979,11 +1004,22 @@ def _connect_to_box(conf, conf_file):
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
-    logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG,
-        format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(
+        filename=log_file,
+        filemode='w',
+        level=logging.DEBUG,
+        format='%(asctime)s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
     report(f"VMS Benchmark started; logging to {log_file_ref}.")
 
     conf, ini = load_configs(conf_file, ini_file)
+
+    if conf['liveStreamsPerCameraRatio'] + conf['archiveStreamsPerCameraRatio'] == 0:
+        raise exceptions.ConfigOptionsRestrictionError(
+            'Config settings liveStreamsPerCameraRatio and archiveStreamsPerCameraRatio should not be zero ' +
+            'simultaneously.'
+        )
 
     box = _connect_to_box(conf, conf_file)
     linux_distribution = LinuxDistributionDetector.detect(box)
@@ -1099,14 +1135,23 @@ if __name__ == '__main__':
             logging.info(f'VMS Benchmark finished successfully.')
             sys.exit(0)
         except (VmsBenchmarkIssue, urllib.error.HTTPError) as e:
-            report_exception('ISSUE', e,
-                'Can be caused by network issues, or poor performance of the box or the host.')
+            report_exception(
+                'ISSUE',
+                e,
+                'Can be caused by network issues, or poor performance of the box or the host.'
+            )
         except VmsBenchmarkError as e:
-            report_exception('ERROR', e,
-                f'Technical details may be available in {log_file_ref}.' if log_file_ref else None)
+            report_exception(
+                'ERROR',
+                e,
+                f'Technical details may be available in {log_file_ref}.' if log_file_ref else None
+            )
         except Exception as e:
-            report_exception(f'UNEXPECTED ERROR', e,
-                f'Details may be available in {log_file_ref}.' if log_file_ref else None)
+            report_exception(
+                f'UNEXPECTED ERROR',
+                e,
+                f'Details may be available in {log_file_ref}.' if log_file_ref else None
+            )
 
         logging.info(f'VMS Benchmark finished with an exception.')
     except Exception as e:

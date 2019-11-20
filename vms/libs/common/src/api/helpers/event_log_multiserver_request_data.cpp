@@ -12,16 +12,8 @@
 
 namespace {
 
-static const QString kCameraIdParam = lit("cameraId");
-static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
-static const QString kStartPeriodParam = lit("from");
-static const QString kEndPeriodParam = lit("to");
-static const QString kEventTypeParam = lit("event_type");
-static const QString kEventSubtypeParam = lit("event_subtype");
-static const QString kActionTypeParam = lit("action_type");
-static const QString kRuleIdParam = lit("brule_id");
-static const QString kSortOrderParam = lit("sortOrder");
-static const QString kLimitParam = lit("limit");
+static const QString kSortOrderParam = "sortOrder";
+static const QString kLimitParam = "limit";
 
 static constexpr int kInvalidStartTime = -1;
 

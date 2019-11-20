@@ -384,6 +384,7 @@ class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPr
 public:
     QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
+    QnTranscoder::TranscodeMethod transcodeMethod;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     //saving address and port in case socket will not make it to the destructor
     QString foreignAddress;
@@ -436,6 +437,9 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
     NX_DEBUG(this, lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(-1)-1));
+
+    if (d->transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+        --d->serverModule->commonModule()->metrics()->progressiveDownloadingTranscoders();
 
     quint64 killTimerID = 0;
     {
@@ -504,19 +508,12 @@ void QnProgressiveDownloadingConsumer::run()
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
 
-    std::atomic_int& donwloaderCount = metrics->tcpConnections().progressiveDownloading();
-    auto newValue = ++donwloaderCount;
+    metrics->tcpConnections().progressiveDownloading()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
         {
             --metrics->tcpConnections().progressiveDownloading();
         });
-
-    if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
-    {
-        sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
-        return;
-    }
 
     if (commonModule()->isTranscodeDisabled())
     {
@@ -642,7 +639,6 @@ void QnProgressiveDownloadingConsumer::run()
             QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
 
         AVCodecID videoCodec;
-        QnTranscoder::TranscodeMethod transcodeMethod;
         QnServer::ChunksCatalog qualityToUse;
         auto streamInfo = findCompatibleStream(
             physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
@@ -651,13 +647,19 @@ void QnProgressiveDownloadingConsumer::run()
             qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
                 ? QnServer::HiQualityCatalog
                 : QnServer::LowQualityCatalog;
-            transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+            d->transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
             videoCodec = (AVCodecID)streamInfo->codec;
         }
         else
         {
+            d->transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+            auto newValue = ++metrics->progressiveDownloadingTranscoders();
+            if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
+            {
+                sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
+                return;
+            }
             qualityToUse = QnServer::HiQualityCatalog;
-            transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
             videoCodec = getPrefferedVideoCodec(
                 streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
             NX_DEBUG(this,
@@ -667,7 +669,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (d->transcoder->setVideoCodec(
                 videoCodec,
-                transcodeMethod,
+                d->transcodeMethod,
                 quality,
                 videoSize,
                 -1) != 0 )

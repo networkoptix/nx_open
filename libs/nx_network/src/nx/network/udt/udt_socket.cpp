@@ -20,7 +20,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
-#include "udt_common.h"
 #include "udt_socket_impl.h"
 #include "../aio/async_socket_helper.h"
 #include "../address_resolver.h"
@@ -35,8 +34,7 @@ namespace detail {
 
 static SystemError::ErrorCode getLastUdtErrorAsSystemErrorCode()
 {
-    const auto systemErrorCode =
-        detail::convertToSystemError(UDT::getlasterror().getErrorCode());
+    const auto systemErrorCode = UDT::getlasterror().osError();
     NX_ASSERT(systemErrorCode != SystemError::noError);
     return systemErrorCode == SystemError::noError
         ? SystemError::invalidData
@@ -616,10 +614,9 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 int UdtStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     int sendResult = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
-    if (sendResult == UDT::ERROR)
+    if (sendResult == -1)
     {
-        const auto sysErrorCode =
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode());
+        const auto sysErrorCode = detail::getLastUdtErrorAsSystemErrorCode();
 
         if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
@@ -818,10 +815,10 @@ bool UdtStreamSocket::setRecvMode(bool isRecvSync)
 
 int UdtStreamSocket::handleRecvResult(int recvResult)
 {
-    if (recvResult == UDT::ERROR)
+    if (recvResult == -1)
     {
-        const int udtErrorCode = UDT::getlasterror().getErrorCode();
-        const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
+        //const int udtErrorCode = UDT::getlasterror().getErrorCode();
+        const auto sysErrorCode = UDT::getlasterror().osError();
 
         if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
@@ -829,11 +826,13 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         // UDT doesn't translate the EOF into a recv with zero return, but instead
         // it returns error with 2001 error code. We need to detect this and translate
         // back with a zero return here .
-        if (udtErrorCode == CUDTException::ECONNLOST)
+        //if (udtErrorCode == udterror::ECONNLOST)
+        if (sysErrorCode == SystemError::connectionReset)
         {
             return 0;
         }
-        else if (udtErrorCode == CUDTException::EINVSOCK)
+        //else if (udtErrorCode == udterror::EINVSOCK)
+        else if (sysErrorCode == SystemError::badDescriptor)
         {
             // This is another very ugly hack since after our patch for UDT.
             // UDT cannot distinguish a clean close or a crash. And I cannot

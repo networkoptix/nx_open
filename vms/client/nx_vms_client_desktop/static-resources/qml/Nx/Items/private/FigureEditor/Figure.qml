@@ -1,8 +1,16 @@
 import QtQuick 2.0
+import Nx.Controls 1.0
 
 Item
 {
     property color color: "black"
+    property var figureSettings
+
+    property string hint: ""
+    property int hintStyle: Banner.Style.Info
+    property bool acceptable: true
+
+    property var hoverInstrument: null
 
     width: parent.width
     height: parent.height

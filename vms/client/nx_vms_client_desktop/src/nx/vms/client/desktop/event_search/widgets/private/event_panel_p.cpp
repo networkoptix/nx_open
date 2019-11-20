@@ -99,20 +99,20 @@ EventPanel::Private::Private(EventPanel* q):
             emit this->q->currentTabChanged(m_tabIds.value(m_lastTab), {});
         });
 
-    connect(action(ui::action::NotificationsTabAction), &QAction::triggered,
-        this, [this] { setCurrentTab(Tab::notifications); });
+    connect(action(ui::action::NotificationsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::notifications); });
 
-    connect(action(ui::action::MotionTabAction), &QAction::triggered,
-        this, [this] { setTabCurrent(m_motionTab, m_tabs->currentWidget() != m_motionTab); });
+    connect(action(ui::action::MotionTabAction), &QAction::triggered, this,
+        [this] { setTabCurrent(m_motionTab, m_tabs->currentWidget() != m_motionTab); });
 
-    connect(action(ui::action::BookmarksTabAction), &QAction::triggered,
-        this, [this] { setCurrentTab(Tab::bookmarks); });
+    connect(action(ui::action::BookmarksTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::bookmarks); });
 
-    connect(action(ui::action::EventsTabAction), &QAction::triggered,
-        this, [this] { setCurrentTab(Tab::events); });
+    connect(action(ui::action::EventsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::events); });
 
-    connect(action(ui::action::ObjectsTabAction), &QAction::triggered,
-        this, [this] { setCurrentTab(Tab::analytics); });
+    connect(action(ui::action::ObjectsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::analytics); });
 
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
@@ -135,16 +135,19 @@ EventPanel::Private::Private(EventPanel* q):
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
     for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
     {
-        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-        connect(tab, &AbstractSearchWidget::allowanceChanged, this, &Private::rebuildTabs);
+        m_connections << connect(tab, &AbstractSearchWidget::tileHovered,
+            q, &EventPanel::tileHovered);
+
+        connect(tab, &AbstractSearchWidget::allowanceChanged,
+            this, &Private::rebuildTabs);
     }
 
     rebuildTabs();
 
-    connect(m_notificationsTab, &NotificationListWidget::tileHovered,
+    m_connections << connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         q, &EventPanel::tileHovered);
 
-    connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
+    m_connections << connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         q, &EventPanel::unreadCountChanged);
 
     q->setContextMenuPolicy(Qt::CustomContextMenu);

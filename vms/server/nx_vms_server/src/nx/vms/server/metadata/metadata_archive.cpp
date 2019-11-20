@@ -165,7 +165,11 @@ bool MetadataArchive::saveToArchiveInternal(const QnAbstractCompressedMetadataPt
         }
     }
 
-    quint32 relTime = quint32(timestamp - m_firstTime);
+    /**
+     * It is possible that timestamp < m_firstTime in case of time has been changed to the past
+     * and timezone (or DST flag) has been changed at the same time.
+     */
+    quint32 relTime = quint32(qMax(0LL, timestamp - m_firstTime));
     quint32 duration = std::max(kMinimalDurationMs, quint32(data->m_duration / 1000));
     if (m_detailedIndexFile.write((const char*)&relTime, 4) != 4)
     {

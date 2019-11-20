@@ -27,7 +27,7 @@ void SystemResourceController::start()
                 remove(*m_lastId);
 
             m_lastId = globalSettings()->localSystemId();
-            add(nullptr, *m_lastId, utils::metrics::Scope::system);
+            add(nullptr, m_lastId->toSimpleString(), utils::metrics::Scope::system);
         });
 }
 
@@ -72,10 +72,7 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
                 "version",
                 [pool](const auto&)
                 {
-                    const auto guid = pool->commonModule()->moduleGUID();
-                    if (auto server = pool->getResourceById<QnMediaServerResource>(guid))
-                        return Value(toString(server->getVersion()));
-                    return Value();
+                    return Value(toString(pool->getOwnMediaServerOrThrow()->getVersion()));
                 }
             )
         )

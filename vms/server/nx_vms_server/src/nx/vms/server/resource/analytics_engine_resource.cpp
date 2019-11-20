@@ -40,10 +40,10 @@ wrappers::EnginePtr AnalyticsEngineResource::sdkEngine() const
     return m_sdkEngine;
 }
 
-QVariantMap AnalyticsEngineResource::settingsValues() const
+QJsonObject AnalyticsEngineResource::settingsValues() const
 {
-    auto settingsFromProperty = QJsonDocument::fromJson(
-        getProperty(kSettingsValuesProperty).toUtf8()).object().toVariantMap();
+    const QJsonObject& settingsFromProperty = QJsonDocument::fromJson(
+        getProperty(kSettingsValuesProperty).toUtf8()).object();
 
     auto parentPluginManifest = pluginManifest();
     if (!parentPluginManifest)
@@ -63,10 +63,10 @@ QVariantMap AnalyticsEngineResource::settingsValues() const
     return jsonEngine.values();
 }
 
-void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
+void AnalyticsEngineResource::setSettingsValues(const QJsonObject& values)
 {
-    auto settingsFromProperty = QJsonDocument::fromJson(
-        getProperty(kSettingsValuesProperty).toUtf8()).object().toVariantMap();
+    const QJsonObject& settingsFromProperty = QJsonDocument::fromJson(
+        getProperty(kSettingsValuesProperty).toUtf8()).object();
 
     auto parentPluginManifest = pluginManifest();
     if (!NX_ASSERT(parentPluginManifest, lm("Engine: %1 (%2)").args(getName(), getId())))
@@ -77,8 +77,7 @@ void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
     jsonEngine.applyValues(settingsFromProperty);
     jsonEngine.applyValues(values);
 
-    setProperty(kSettingsValuesProperty,
-        QString::fromUtf8(QJsonDocument(QJsonObject::fromVariantMap(values)).toJson()));
+    setProperty(kSettingsValuesProperty, QString::fromUtf8(QJsonDocument(values).toJson()));
 }
 
 bool AnalyticsEngineResource::sendSettingsToSdkEngine()
@@ -89,7 +88,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
 
     NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
-    std::optional<QVariantMap> effectiveSettings;
+    std::optional<QJsonObject> effectiveSettings;
     if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
@@ -166,11 +165,11 @@ QString AnalyticsEngineResource::libName() const
     return m_sdkEngine->libName();
 }
 
-std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
+std::optional<QJsonObject> AnalyticsEngineResource::loadSettingsFromFile() const
 {
     const auto loadSettings =
         [this](sdk_support::FilenameGenerationOptions filenameGenerationOptions)
-            -> std::optional<QVariantMap>
+            -> std::optional<QJsonObject>
         {
             const QString settingsFilename = sdk_support::debugFileAbsolutePath(
                 pluginsIni().analyticsSettingsSubstitutePath,
@@ -187,10 +186,10 @@ std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
             if (!settingsString)
                 return std::nullopt;
 
-            return sdk_support::toQVariantMap(*settingsString);
+            return sdk_support::toQJsonObject(*settingsString);
         };
 
-    const std::optional<QVariantMap> result = loadSettings(
+    const std::optional<QJsonObject> result = loadSettings(
         sdk_support::FilenameGenerationOption::engineSpecific);
     if (result)
         return result;

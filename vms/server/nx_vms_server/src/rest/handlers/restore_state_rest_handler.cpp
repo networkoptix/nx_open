@@ -45,7 +45,7 @@ void QnRestoreStateRestHandler::afterExecute(
     const QString& /*path*/,
     const QnRequestParamList& /*params*/,
     const QByteArray& body,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
     auto result = QJson::deserialized<QnJsonRestResult>(body);
     if (result.error != QnRestResult::NoError)

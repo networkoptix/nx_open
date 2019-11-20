@@ -2,6 +2,8 @@ import QtQuick 2.10
 import QtQml 2.3
 import nx.vms.client.core 1.0
 import Nx 1.0
+import Nx.Controls 1.0
+import Qt.labs.platform 1.0
 
 import "../figure_utils.js" as F
 
@@ -13,8 +15,8 @@ Figure
     property real snapDistance: 8
     readonly property bool hasFigure: pointMakerInstrument.count > 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
-
-    clip: true
+    acceptable: !pathUtil.hasSelfIntersections
+        && (!pointMakerInstrument.enabled || pointMakerInstrument.count === 0)
 
     MouseArea
     {
@@ -35,6 +37,11 @@ Figure
         closed: true
 
         enabled: false
+
+        maxPoints: (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= 3)
+            ? figureSettings.maxPoints : -1
+
+        onEnabledChanged: canvas.requestPaint()
     }
 
     PathHoverInstrument
@@ -45,6 +52,8 @@ Figure
         item: mouseArea
     }
 
+    hoverInstrument: hoverInstrument.enabled ? hoverInstrument : pointMakerInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument
@@ -54,11 +63,16 @@ Figure
             Qt.point(F.relX(mouseArea.mouseX, mouseArea), F.relY(mouseArea.mouseY, mouseArea)))
         item: mouseArea
         target: figure
+        minX: -F.absX(pathUtil.boundingRect.x, mouseArea)
+        minY: -F.absY(pathUtil.boundingRect.y, mouseArea)
+        maxX: width - F.absX(pathUtil.boundingRect.x + pathUtil.boundingRect.width, mouseArea)
+        maxY: height - F.absY(pathUtil.boundingRect.y + pathUtil.boundingRect.height, mouseArea)
     }
 
     PathUtil
     {
         id: pathUtil
+        property bool hasSelfIntersections: false
     }
 
     Connections
@@ -123,8 +137,9 @@ Figure
             color: figure.color
             x: F.absX(model.x, figure)
             y: F.absY(model.y, figure)
+            z: dragging ? 10 : 0
 
-            property bool snappingEnabled: pointMakerInstrument.count > 3
+            property bool snappingEnabled: true
 
             function snapPoints()
             {
@@ -162,7 +177,12 @@ Figure
 
                     var snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
                     if (snapPointIndex !== -1)
-                        pointMakerInstrument.removePoint(index)
+                    {
+                        if (pointMakerInstrument.count > 3)
+                            pointMakerInstrument.removePoint(index)
+                        else
+                            startCreation()
+                    }
                 }
             }
 
@@ -174,6 +194,15 @@ Figure
                     hoverInstrument.clear()
                 }
             }
+
+            onClicked:
+            {
+                if (button === Qt.RightButton)
+                {
+                    pointMenu.pointIndex = index
+                    pointMenu.open()
+                }
+            }
         }
     }
 
@@ -181,7 +210,7 @@ Figure
     {
         id: temporaryGrip
 
-        visible: hoverInstrument.edgeHovered
+        visible: hoverInstrument.edgeHovered && pointMakerInstrument.count < maxPoints
         color: figure.color
         ghost: !pressed
 
@@ -206,11 +235,65 @@ Figure
         onMoved: pointMakerInstrument.setPoint(pointIndex, Qt.point(x, y))
     }
 
+    Menu
+    {
+        id: pointMenu
+
+        property int pointIndex: -1
+
+        MenuItem
+        {
+            text: qsTr("Delete")
+            onTriggered:
+            {
+                if (pointMenu.pointIndex < 0)
+                    return
+
+                if (pointMakerInstrument.count > 3)
+                    pointMakerInstrument.removePoint(pointMenu.pointIndex)
+                else
+                    startCreation()
+
+            }
+        }
+
+        onVisibleChanged:
+        {
+            if (!visible)
+                pointMenu.pointIndex = -1
+        }
+    }
+
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start polygon.")
+        }
+        else
+        {
+            if (pathUtil.hasSelfIntersections)
+                return qsTr("Polygon is not valid. Remove self-intersections to proceed.")
+            if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
+                return qsTr("Maximum points count is reached.")
+        }
+
+        return ""
+    }
+    hintStyle:
+    {
+        if (!pointMakerInstrument.enabled && pathUtil.hasSelfIntersections)
+            return Banner.Style.Error
+        return Banner.Style.Info
+    }
+
     onColorChanged: canvas.requestPaint()
 
     function refresh()
     {
         pathUtil.points = pointMakerInstrument.getRelativePoints()
+        pathUtil.hasSelfIntersections = pathUtil.checkSelfIntersections()
         canvas.requestPaint()
     }
 
@@ -221,6 +304,8 @@ Figure
 
     function deserialize(json)
     {
+        pointMakerInstrument.finish()
+
         if (!json)
         {
             pointMakerInstrument.clear()

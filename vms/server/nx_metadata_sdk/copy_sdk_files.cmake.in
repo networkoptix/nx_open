@@ -36,5 +36,5 @@ nx_copy_always(${copied_sample_origin} "${copied_sample_files}"
 nx_copy_always(${copied_sample_unit_tests_origin} "${copied_sample_unit_tests_files}"
     ${target_dir}/samples/${copied_sample_unit_tests_target})
     
-nx_copy_always(${CMAKE_SOURCE_DIR}/open "${CMAKE_SOURCE_DIR}/open/license_mpl2.md"
+nx_copy_always(${CMAKE_SOURCE_DIR}/open "${CMAKE_SOURCE_DIR}/open/licenses"
     ${target_dir})

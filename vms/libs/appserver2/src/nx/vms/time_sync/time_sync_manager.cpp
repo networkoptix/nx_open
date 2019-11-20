@@ -213,9 +213,8 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
         return false;
 
     NX_INFO(this,
-        lm("Set sync time to the new value %1. Difference between new and old value is %2")
-            .arg(value.count())
-            .arg(value - syncTime));
+        "Set sync time to the new value %1. Difference between new and old value is %2. rtt=%3",
+        value, value - syncTime, rtt);
 
     setSyncTimeInternal(value);
     emit timeChanged(value.count());

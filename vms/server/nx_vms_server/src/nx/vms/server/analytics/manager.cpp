@@ -392,7 +392,7 @@ QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUui
 void Manager::setSettings(
     const QString& deviceId,
     const QString& engineId,
-    const QVariantMap& deviceAgentSettings)
+    const QJsonObject& deviceAgentSettings)
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
@@ -406,7 +406,7 @@ void Manager::setSettings(
     analyticsContext->setSettings(engineId, deviceAgentSettings);
 }
 
-QVariantMap Manager::getSettings(const QString& deviceId, const QString& engineId) const
+QJsonObject Manager::getSettings(const QString& deviceId, const QString& engineId) const
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
@@ -415,12 +415,12 @@ QVariantMap Manager::getSettings(const QString& deviceId, const QString& engineI
     }
 
     if (!analyticsContext)
-        return QVariantMap();
+        return {};
 
     return analyticsContext->getSettings(engineId);
 }
 
-void Manager::setSettings(const QString& engineId, const QVariantMap& engineSettings)
+void Manager::setSettings(const QString& engineId, const QJsonObject& engineSettings)
 {
     auto engine = sdk_support::find<AnalyticsEngineResource>(serverModule(), engineId);
 
@@ -431,12 +431,12 @@ void Manager::setSettings(const QString& engineId, const QVariantMap& engineSett
     engine->setSettingsValues(engineSettings);
 }
 
-QVariantMap Manager::getSettings(const QString& engineId) const
+QJsonObject Manager::getSettings(const QString& engineId) const
 {
     auto engine = sdk_support::find<AnalyticsEngineResource>(serverModule(), engineId);
 
     if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
-        return QVariantMap();
+        return {};
 
     NX_DEBUG(this, "Getting settings for the Engine %1 (%2)", engine->getName(), engine->getId());
     return engine->settingsValues();

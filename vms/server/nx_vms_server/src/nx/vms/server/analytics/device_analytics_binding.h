@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include <QtCore/QVariantMap>
+#include <QtCore/QJsonObject>
 
 #include <core/resource/resource_fwd.h>
 
@@ -43,15 +43,15 @@ public:
 
     virtual ~DeviceAnalyticsBinding() override;
 
-    bool startAnalytics(const QVariantMap& settings);
+    bool startAnalytics(const QJsonObject& settings);
     void stopAnalytics();
-    bool restartAnalytics(const QVariantMap& settings);
+    bool restartAnalytics(const QJsonObject& settings);
     bool updateNeededMetadataTypes();
 
     bool hasAliveDeviceAgent() const;
 
-    QVariantMap getSettings() const;
-    void setSettings(const QVariantMap& settings);
+    QJsonObject getSettings() const;
+    void setSettings(const QJsonObject& settings);
 
     void setMetadataSink(QnAbstractDataReceptorPtr dataReceptor);
     bool isStreamConsumer() const;
@@ -63,7 +63,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    bool startAnalyticsUnsafe(const QVariantMap& settings);
+    bool startAnalyticsUnsafe(const QJsonObject& settings);
     void stopAnalyticsUnsafe();
 
     wrappers::DeviceAgentPtr createDeviceAgent();
@@ -75,7 +75,7 @@ private:
 
     sdk_support::MetadataTypes neededMetadataTypes() const;
 
-    void setSettingsInternal(const QVariantMap& settings);
+    void setSettingsInternal(const QJsonObject& settings);
 
     void logIncomingFrame(sdk::Ptr<sdk::analytics::IDataPacket> frame);
 

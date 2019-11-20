@@ -177,9 +177,9 @@ public:
     //    0) [in] unit: pointer to a data unit containing new packet
     //    1) [in] offset: offset from last ACK point.
     // Returned value:
-    //    0 is success, -1 if data is repeated.
+    //    false if data is repeated.
 
-    int addData(CUnit* unit, int offset);
+    bool addData(CUnit* unit, int offset);
 
     // Functionality:
     //    Read data into a user buffer.

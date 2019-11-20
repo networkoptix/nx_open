@@ -12,6 +12,7 @@ Item
 
     property color color: "white"
     property var points: []
+    property string direction: ""
 
     readonly property bool hasFigure: points.length === 2
 
@@ -31,12 +32,33 @@ Item
         endY: points.length === 2 ? F.absY(points[1][1], figure) : 0
     }
 
+    LineArrow
+    {
+        x1: line.startX
+        y1: line.startY
+        x2: line.endX
+        y2: line.endY
+        color: figure.color
+        visible: !direction || direction === "a"
+    }
+
+    LineArrow
+    {
+        x1: line.endX
+        y1: line.endY
+        x2: line.startX
+        y2: line.startY
+        color: figure.color
+        visible: !direction || direction === "b"
+    }
+
     onFigureJsonChanged:
     {
         if (figureJson)
         {
             color = figureJson.color
             points = figureJson.points
+            direction = figureJson.direction || ""
             if (!points)
                 points = []
         }

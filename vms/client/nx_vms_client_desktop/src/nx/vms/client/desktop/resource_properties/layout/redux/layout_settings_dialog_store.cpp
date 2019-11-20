@@ -46,6 +46,12 @@ void LayoutSettingsDialogStore::setLogicalId(int value)
     d->executeAction([&](State state) { return Reducer::setLogicalId(std::move(state), value); });
 }
 
+void LayoutSettingsDialogStore::setOtherLogicalIds(const std::set<int>& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setOtherLogicalIds(std::move(state), value); });
+}
+
 void LayoutSettingsDialogStore::resetLogicalId()
 {
     d->executeAction([](State state) { return Reducer::resetLogicalId(std::move(state)); });

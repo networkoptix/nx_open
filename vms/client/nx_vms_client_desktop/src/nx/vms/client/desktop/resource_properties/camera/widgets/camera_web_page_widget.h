@@ -25,7 +25,7 @@ public:
     virtual ~CameraWebPageWidget() override;
 
 public slots:
-    void resetApplicationProxy();
+    void cleanup();
 
 private:
     void loadState(const CameraSettingsDialogState& state);

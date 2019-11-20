@@ -6,6 +6,7 @@ Item
 
     property bool ghost: false
     property color color: "black"
+    property color ghostColor: "white"
     property color borderColor: "white"
     property int axis: Drag.XAndYAxis
     property bool hoverEnabled: true
@@ -17,6 +18,7 @@ Item
     readonly property bool dragging: mouseArea.drag.active
     signal dragStarted()
     signal moved()
+    signal clicked(int button)
 
     Rectangle
     {
@@ -27,11 +29,11 @@ Item
         x: -width / 2
         y: -height / 2
 
-        color: grip.color
+        color: ghost ? ghostColor : grip.color
         border.color: ghost ? "transparent" : grip.borderColor
         border.width: 1
 
-        opacity: ghost ? 0.5 : 1.0
+        opacity: ghost ? 0.7 : 1.0
     }
 
     MouseArea
@@ -42,7 +44,7 @@ Item
         width: 12
         height: 12
 
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: grip.enabled && grip.hoverEnabled
 
         drag.minimumX: 0
@@ -63,16 +65,20 @@ Item
             if (!grip.parent)
                 return
 
-            drag.target = grip
+            if (mouse.button === Qt.LeftButton)
+                drag.target = grip
         }
 
         onReleased:
         {
-            drag.target = undefined
+            if (mouse.button === Qt.LeftButton)
+                drag.target = undefined
         }
 
         onMouseXChanged: processMove(mouse)
         onMouseYChanged: processMove(mouse)
+
+        onClicked: grip.clicked(mouse.button)
 
         function processMove(mouse)
         {

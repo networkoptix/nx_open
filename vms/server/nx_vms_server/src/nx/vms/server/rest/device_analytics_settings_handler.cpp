@@ -69,7 +69,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     const QString& deviceId = request.params[kDeviceIdParameter];
     const QString& engineId = request.params[kAnalyticsEngineIdParameter];
 
-    analyticsManager->setSettings(deviceId, engineId, settings.toVariantMap());
+    analyticsManager->setSettings(deviceId, engineId, settings);
     return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
@@ -160,8 +160,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     JsonRestResponse result(http::StatusCode::ok);
     nx::vms::api::analytics::SettingsResponse response;
 
-    const QVariantMap& settings = analyticsManager->getSettings(deviceId, engineId);
-    response.values = QJsonObject::fromVariantMap(settings);
+    response.values = analyticsManager->getSettings(deviceId, engineId);
 
     const auto settingsModel = deviceAgentSettingsModel(engineId);
     if (!settingsModel)

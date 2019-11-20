@@ -11,6 +11,8 @@ Figure
     readonly property bool hasFigure: pointMakerInstrument.count === 2
         || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
 
+    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
+
     MouseArea
     {
         id: mouseArea
@@ -30,6 +32,8 @@ Figure
         maxPoints: 2
     }
 
+    hoverInstrument: pointMakerInstrument.enabled ? pointMakerInstrument : dragInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument
@@ -38,6 +42,10 @@ Figure
             Qt.point(mouseArea.mouseX - rectangle.x, mouseArea.mouseY - rectangle.y))
         item: mouseArea
         target: figure
+        minX: -rectangle.x
+        minY: -rectangle.y
+        maxX: width - (rectangle.x + rectangle.width)
+        maxY: height - (rectangle.y + rectangle.height)
     }
 
     Rectangle
@@ -202,6 +210,16 @@ Figure
         }
     }
 
+    hint:
+    {
+        if (pointMakerInstrument.enabled)
+        {
+            if (pointMakerInstrument.count === 0)
+                return qsTr("Click on video to start box.")
+        }
+        return ""
+    }
+
     function startCreation()
     {
         pointMakerInstrument.start()
@@ -209,6 +227,8 @@ Figure
 
     function deserialize(json)
     {
+        pointMakerInstrument.finish()
+
         if (!json)
         {
             pointMakerInstrument.clear()

@@ -57,15 +57,14 @@ public:
 
     QWeakPointer<AbstractVideoDataReceptor> registerMediaSource(const QnUuid& deviceId);
 
-    void setSettings(
-        const QString& deviceId,
+    void setSettings(const QString& deviceId,
         const QString& engineId,
-        const QVariantMap& deviceAgentSettings);
+        const QJsonObject& deviceAgentSettings);
 
-    QVariantMap getSettings(const QString& deviceId, const QString& engineId) const;
+    QJsonObject getSettings(const QString& deviceId, const QString& engineId) const;
 
-    void setSettings(const QString& engineId, const QVariantMap& engineSettings);
-    QVariantMap getSettings(const QString& engineId) const;
+    void setSettings(const QString& engineId, const QJsonObject& engineSettings);
+    QJsonObject getSettings(const QString& engineId) const;
 
 public slots:
     void initExistingResources();

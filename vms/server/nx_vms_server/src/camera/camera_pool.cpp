@@ -32,7 +32,7 @@ void QnVideoCameraPool::stop()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_isStopped = true; //< Make sure m_cameras will not be modifyed.
+        m_isStopped = true; //< Make sure m_cameras will not be modified.
     }
 
     for( const QnVideoCameraPtr& camera: m_cameras.values())
