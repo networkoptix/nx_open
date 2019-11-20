@@ -100,6 +100,7 @@ DECLARE_STRUCT_AND_LIST(CloudSystemData)
 DECLARE_STRUCT_AND_LIST(LicenseData)
 DECLARE_STRUCT_AND_LIST(DetailedLicenseData)
 DECLARE_STRUCT(LicenseOverflowData)
+DECLARE_STRUCT(VideoWallLicenseOverflowData)
 
 DECLARE_STRUCT(CleanupDatabaseData)
 DECLARE_STRUCT(P2pStatisticsData)
