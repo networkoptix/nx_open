@@ -215,12 +215,80 @@ void ProgressiveDownloadingServer::sendJsonResponse(const QString& errorString)
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
 }
 
+void ProgressiveDownloadingServer::processPositionRequest(
+    const QnResourcePtr& resource, qint64 timeUSec, const QByteArray& callback)
+{
+    Q_D(ProgressiveDownloadingServer);
+
+    // live position
+    if (timeUSec == DATETIME_NOW)
+    {
+        d->response.messageBody = "now";
+        sendResponse(nx::network::http::StatusCode::ok, "text/plain");
+        return;
+    }
+
+    // archive position
+    std::unique_ptr<QnAbstractArchiveDelegate> archive;
+    QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+    if (camRes)
+    {
+        archive.reset(camRes->createArchiveDelegate());
+        if (!archive)
+            archive = std::make_unique<QnServerArchiveDelegate>(d->serverModule); // default value
+    }
+    if (!archive)
+    {
+        sendJsonResponse("Media archive is missing");
+        return;
+    }
+    if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
+        archive->open(resource, d->serverModule->archiveIntegrityWatcher());
+
+    archive->seek(timeUSec, true);
+
+    if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
+    {
+        sendMediaEventErrorResponse(mediaStreamEvent);
+        return;
+    }
+
+    qint64 timestamp = AV_NOPTS_VALUE;
+    int counter = 0;
+    while (counter < 20)
+    {
+        const QnAbstractMediaDataPtr& data = archive->getNextData();
+        if (data)
+        {
+            if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+                continue; // ignore filler packet
+
+            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
+            {
+                timestamp = data->timestamp;
+                break;
+            }
+        }
+        counter++;
+    }
+
+    QByteArray ts("\"now\"");
+    if (timestamp != (qint64)AV_NOPTS_VALUE)
+    {
+        ts = QByteArray("\"") +
+            QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() +
+            QByteArray("\"");
+    }
+    d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
+    sendResponse(nx::network::http::StatusCode::ok, "application/json");
+    return;
+}
+
 void ProgressiveDownloadingServer::run()
 {
     Q_D(ProgressiveDownloadingServer);
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
-
     metrics->tcpConnections().progressiveDownloading()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
@@ -230,7 +298,8 @@ void ProgressiveDownloadingServer::run()
 
     if (commonModule()->isTranscodeDisabled())
     {
-        d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        d->response.messageBody = QByteArray(
+            "Video transcoding is disabled in the server settings. Feature unavailable.");
         sendResponse(nx::network::http::StatusCode::notImplemented, "text/plain");
         return;
     }
@@ -287,7 +356,7 @@ void ProgressiveDownloadingServer::run()
         videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
         if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
         {
-            qWarning() << "Invalid resolution specified for web streaming. Defaulting to 480p";
+            NX_WARNING(this, "Invalid resolution specified for web streaming. Defaulting to 480p");
             videoSize = QSize(0,480);
         }
     }
@@ -418,7 +487,6 @@ void ProgressiveDownloadingServer::run()
 
 
     QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
-    bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
     auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
 
     bool isLive = position.isEmpty() || position == "now";
@@ -450,17 +518,21 @@ void ProgressiveDownloadingServer::run()
         consumerConfig.endTimeUsec = nx::utils::parseDateTime(endPosition);
     ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);
     qint64 timeUSec = DATETIME_NOW;
+    if (!isLive)
+        timeUSec = nx::utils::parseDateTime(position);
+
+    bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
+    if (isUTCRequest)
+    {
+        // TODO do we need create transcoder for this request type?
+        // TODO is this request type still needed?
+        QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
+        processPositionRequest(resource, timeUSec, callback);
+        return;
+    }
     if (isLive)
     {
         //if camera is offline trying to put it online
-
-        if (isUTCRequest)
-        {
-            d->response.messageBody = "now";
-            sendResponse(nx::network::http::StatusCode::ok, "text/plain");
-            return;
-        }
-
         if (!camera) {
             d->response.messageBody = "Media not found\r\n";
             sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
@@ -477,62 +549,6 @@ void ProgressiveDownloadingServer::run()
     }
     else
     {
-        timeUSec = nx::utils::parseDateTime( position );
-
-        if (isUTCRequest)
-        {
-            std::unique_ptr<QnAbstractArchiveDelegate> archive;
-            if (camRes)
-            {
-                archive.reset(camRes->createArchiveDelegate());
-                if (!archive)
-                    archive = std::make_unique<QnServerArchiveDelegate>(d->serverModule); // default value
-            }
-            if (!archive)
-            {
-                sendJsonResponse("Media archive is missing");
-                return;
-            }
-            if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
-                archive->open(resource, d->serverModule->archiveIntegrityWatcher());
-            archive->seek( timeUSec, true);
-
-            if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
-            {
-                sendMediaEventErrorResponse(mediaStreamEvent);
-                return;
-            }
-
-            qint64 timestamp = AV_NOPTS_VALUE;
-            int counter = 0;
-            while (counter < 20)
-            {
-                const QnAbstractMediaDataPtr& data = archive->getNextData();
-                if (data)
-                {
-                    if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
-                        continue; // ignore filler packet
-
-                    if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
-                    {
-                        timestamp = data->timestamp;
-                        break;
-                    }
-                }
-                counter++;
-            }
-
-            QByteArray ts("\"now\"");
-            QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
-            if (timestamp != (qint64)AV_NOPTS_VALUE)
-            {
-                ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
-            }
-            d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
-            sendResponse(nx::network::http::StatusCode::ok, "application/json");
-            return;
-        }
-
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
             d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
         d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
@@ -597,7 +613,7 @@ void ProgressiveDownloadingServer::run()
         camera->notInUse(this);
 }
 
-void ProgressiveDownloadingServer::onTimer( const quint64& /*timerID*/ )
+void ProgressiveDownloadingServer::onTimer(const quint64& /*timerID*/)
 {
     Q_D(ProgressiveDownloadingServer);
 

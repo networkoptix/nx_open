@@ -5,6 +5,7 @@
 #include "network/tcp_listener.h"
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <core/resource/resource_fwd.h>
 
 class QnFfmpegTranscoder;
 
@@ -34,7 +35,10 @@ private:
     static QByteArray getMimeType(const QByteArray& streamingFormat);
     void sendMediaEventErrorResponse(Qn::MediaStreamEvent mediaEvent);
     void sendJsonResponse(const QString& errorString);
+    void processPositionRequest(
+        const QnResourcePtr& resource, qint64 timeUSec, const QByteArray& callback);
     QByteArray buildSignature();
+
 private:
     Q_DECLARE_PRIVATE(ProgressiveDownloadingServer);
 };
