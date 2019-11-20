@@ -20,7 +20,7 @@ enum class QnLicenseErrorCode
     FutureLicense               /**< License type is unknown, may be license from future version. */
 };
 
-class QnPeerRuntimeInfo;
+struct QnPeerRuntimeInfo;
 
 class QnLicenseValidator: public QObject, public /*mixin*/ QnCommonModuleAware
 {
