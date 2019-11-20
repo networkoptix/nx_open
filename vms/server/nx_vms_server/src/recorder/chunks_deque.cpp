@@ -91,7 +91,8 @@ void ChunksDeque::chunkAdded(const Chunk& chunk)
 {
     auto& value = m_archivePresence[chunk.storageIndex];
     value.space += chunk.getFileSize();
-    value.duration += std::chrono::milliseconds(chunk.durationMs);
+    if (chunk.durationMs > 0)
+        value.duration += std::chrono::milliseconds(chunk.durationMs);
 }
 
 void ChunksDeque::chunkRemoved(const Chunk& chunk)
@@ -99,9 +100,10 @@ void ChunksDeque::chunkRemoved(const Chunk& chunk)
     auto &oldValue = m_archivePresence[chunk.storageIndex];
     NX_ASSERT(oldValue.space >= chunk.getFileSize());
     oldValue.space = std::max<int64_t>(0LL, oldValue.space - chunk.getFileSize());
-    NX_ASSERT(oldValue.duration.count() >= chunk.durationMs);
+    const auto durationMs = std::max(0, chunk.durationMs);
+    NX_ASSERT(oldValue.duration.count() >= durationMs);
     oldValue.duration = std::chrono::milliseconds(
-        std::max<int64_t>(0LL, oldValue.duration.count() - chunk.durationMs));
+        std::max<int64_t>(0LL, oldValue.duration.count() - durationMs));
 }
 
 void ChunksDeque::allRemoved()
