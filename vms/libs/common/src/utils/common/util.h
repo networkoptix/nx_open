@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <QtCore/QString>
+#include <QtCore/QDateTime>
 
 QString strPadLeft(const QString &str, int len, char ch);
 
