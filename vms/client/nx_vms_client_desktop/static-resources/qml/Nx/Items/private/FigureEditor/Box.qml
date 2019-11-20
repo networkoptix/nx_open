@@ -32,6 +32,8 @@ Figure
         maxPoints: 2
     }
 
+    hoverInstrument: pointMakerInstrument.enabled ? pointMakerInstrument : dragInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument

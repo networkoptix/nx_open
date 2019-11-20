@@ -98,6 +98,11 @@ void CursorManager::unsetCursor(QObject* requester)
         d->targetQuickItem->unsetCursor();
 }
 
+QPoint CursorManager::pos() const
+{
+    return QCursor::pos();
+}
+
 void CursorManager::registerQmlType()
 {
     qmlRegisterType<CursorManager>("nx.client.desktop", 1, 0, "CursorManager");

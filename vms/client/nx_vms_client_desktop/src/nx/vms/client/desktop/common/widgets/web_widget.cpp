@@ -68,12 +68,4 @@ void WebWidget::load(const QUrl& url)
     m_webEngineView->load(url);
 }
 
-void WebWidget::reset()
-{
-    m_webEngineView->triggerPageAction(QWebEnginePage::Stop);
-    m_webEngineView->page()->profile()->clearHttpCache();
-    m_webEngineView->page()->history()->clear();
-    m_webEngineView->load(QUrl());
-}
-
 } // namespace nx::vms::client::desktop

@@ -255,6 +255,7 @@
 #include <server/server_globals.h>
 #include <nx/vms/server/unused_wallpapers_watcher.h>
 #include <nx/vms/server/license_watcher.h>
+#include <nx/vms/server/videowall_license_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include <common/static_common_module.h>
@@ -4391,6 +4392,7 @@ void MediaServerProcess::startObjects()
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
         serverModule()->licenseWatcher()->start();
+    serverModule()->videoWallLicenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_universalTcpListener->start();

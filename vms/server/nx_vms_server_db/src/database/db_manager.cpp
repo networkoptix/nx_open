@@ -129,6 +129,7 @@ namespace detail
 {
 
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
+static const char VIDEOWALL_LICENSE_EXPIRED_TIME_KEY[] = "{7D9B47E5-4355-44d6-88A5-3F5993C518DF}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 using std::nullptr_t;
@@ -265,6 +266,7 @@ QnUuid QnDbManager::getType(const QString& typeName)
 QnDbManager::QnDbManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_licenseOverflowMarked(false),
+    m_videoWallLicenseOverflowMarked(false),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_dbJustCreated(false),
@@ -588,6 +590,15 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             m_licenseOverflowMarked = licenseOverflowTime > 0;
         }
 
+        // read video wall license overflow time
+        query.addBindValue(VIDEOWALL_LICENSE_EXPIRED_TIME_KEY);
+        qint64 videoWallLicenseOverflowTime = 0;
+        if (query.exec() && query.next())
+        {
+            videoWallLicenseOverflowTime = query.value(0).toByteArray().toLongLong();
+            m_videoWallLicenseOverflowMarked = videoWallLicenseOverflowTime > 0;
+        }
+
         query.addBindValue(DB_INSTANCE_KEY);
         if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
             setDbId(QnUuid::fromRfc4122(query.value(0).toByteArray()));
@@ -893,6 +904,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
             localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
+        if (localInfo.data.prematureVideoWallLicenseExpirationDate != videoWallLicenseOverflowTime)
+            localInfo.data.prematureVideoWallLicenseExpirationDate = videoWallLicenseOverflowTime;
         runtimeInfoManager->updateLocalItem(localInfo);
     } // end of DB update
 
@@ -5415,6 +5428,24 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseOve
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+    query.addBindValue(QByteArray::number(tran.params.time));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<VideoWallLicenseOverflowData>& tran)
+{
+    if (m_videoWallLicenseOverflowMarked == tran.params.value)
+        return ErrorCode::ok;
+    m_videoWallLicenseOverflowMarked = tran.params.value;
+
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
+    query.addBindValue(VIDEOWALL_LICENSE_EXPIRED_TIME_KEY);
     query.addBindValue(QByteArray::number(tran.params.time));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();

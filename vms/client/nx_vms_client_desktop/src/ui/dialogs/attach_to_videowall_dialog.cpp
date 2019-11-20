@@ -15,8 +15,11 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/license_usage_helper.h>
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
 
 #include <utils/screen_utils.h>
+
+using namespace nx::vms::client::desktop;
 
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget* parent) :
     base_type(parent),
@@ -69,7 +72,9 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
             [pcUuid](const QnVideoWallItem& item) { return item.pcUuid == pcUuid; });
     int localScreensChange = ui->manageWidget->proposedItemsCount() - used;
 
+    license::VideoWallLicenseValidator validator(commonModule());
     QnVideoWallLicenseUsageHelper helper(commonModule());
+    helper.setCustomValidator(&validator);
     QnVideoWallLicenseUsageProposer proposer(&helper, localScreensChange, 0);
 
     QPalette palette = this->palette();

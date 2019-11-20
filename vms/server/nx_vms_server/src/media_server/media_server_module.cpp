@@ -47,6 +47,7 @@
 #include <nx/vms/server/event/event_message_bus.h>
 #include <nx/vms/server/unused_wallpapers_watcher.h>
 #include <nx/vms/server/license_watcher.h>
+#include <nx/vms/server/videowall_license_watcher.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/resource/shared_context_pool.h>
@@ -251,6 +252,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     m_unusedWallpapersWatcher = store(new nx::vms::server::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::vms::server::LicenseWatcher(commonModule()));
+    m_videoWallLicenseWatcher = store(new nx::vms::server::VideoWallLicenseWatcher(this));
 
     m_eventMessageBus = store(new nx::vms::server::event::EventMessageBus(commonModule()));
 
@@ -418,6 +420,7 @@ void QnMediaServerModule::stop()
     m_statusWatcher->stop();
     resourceDiscoveryManager()->stop();
 
+    m_videoWallLicenseWatcher->stop();
     m_licenseWatcher->stop();
     m_resourceSearchers->clear();
 
@@ -507,6 +510,11 @@ nx::vms::server::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersW
 nx::vms::server::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
 {
     return m_licenseWatcher;
+}
+
+nx::vms::server::VideoWallLicenseWatcher* QnMediaServerModule::videoWallLicenseWatcher() const
+{
+    return m_videoWallLicenseWatcher;
 }
 
 nx::vms::server::event::EventMessageBus* QnMediaServerModule::eventMessageBus() const

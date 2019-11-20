@@ -6,6 +6,9 @@ import Nx.Controls 1.0
 import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Core.Items 1.0
+import Nx.Instruments 1.0
+import nx.vms.client.desktop 1.0
+import nx.client.desktop 1.0
 
 Window
 {
@@ -21,7 +24,7 @@ Window
     signal accepted()
 
     property alias figureType: editor.figureType
-    property int maxPolygonPoints: -1
+    property alias figureSettings: editor.figureSettings
 
     property var resourceId
 
@@ -44,8 +47,15 @@ Window
         onSourceChanged: updatePlayingState()
     }
 
+    CursorManager
+    {
+        id: cursorManager
+    }
+
     Item
     {
+        id: content
+
         width: parent.width
         height: parent.height - bottomPanel.height
 
@@ -69,10 +79,56 @@ Window
 
         Banner
         {
+            id: banner
+
             visible: text !== ""
             anchors.bottom: parent.bottom
             text: editor.hint
             style: editor.hintStyle
+            opacity: hovered ? 0 : 1
+
+            property bool hovered: false
+
+            Behavior on opacity { NumberAnimation { duration: 100 } }
+
+            Connections
+            {
+                target: editor.hoverInstrument
+                onHoverMove:
+                {
+                    hoverCheckTimer.stop()
+                    banner.hovered = banner.contains(
+                        banner.mapFromItem(content, hover.position.x, hover.position.y))
+                }
+                onHoverLeave: hoverCheckTimer.start()
+            }
+
+            Timer
+            {
+                // This is a workaround. See FigureEditor.qml.
+                // We can't rely on HoverLeave event because it could happen when a pointer is
+                // still inside the area, but another item is hovered (e.g. when point grip is
+                // hovered we get HoverLeave here). Also we can't check mouse position in the leave
+                // event because it is not always on the item boundary. Thus the simplest solution
+                // is to check the global cursor position after a small delay.
+                // TODO: #4.2 #dklychkov Rewrite to HoverHandler.
+
+                id: hoverCheckTimer
+
+                interval: 50
+                running: false
+
+                onTriggered:
+                {
+                    const globalPos = cursorManager.pos()
+                    const pos = banner.mapFromGlobal(globalPos.x, globalPos.y)
+                    if (pos.x <= 0 || pos.x >= banner.width
+                        || pos.y <= 0 || pos.y >= banner.height)
+                    {
+                        banner.hovered = false
+                    }
+                }
+            }
         }
     }
 

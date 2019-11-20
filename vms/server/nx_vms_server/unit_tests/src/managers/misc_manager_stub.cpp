@@ -34,6 +34,15 @@ int MiscManagerStub::markLicenseOverflow(
     return 0;
 }
 
+int MiscManagerStub::markVideoWallLicenseOverflow(
+    bool /*value*/,
+    qint64 /*time*/,
+    impl::SimpleHandlerPtr /*handler*/)
+{
+    // TODO
+    return 0;
+}
+
 int MiscManagerStub::cleanupDatabase(
     bool cleanupDbObjects,
     bool cleanupTransactionLog,

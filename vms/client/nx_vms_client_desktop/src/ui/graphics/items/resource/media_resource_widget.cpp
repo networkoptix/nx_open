@@ -128,6 +128,8 @@
 
 #include <nx/utils/guarded_callback.h>
 
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
+
 using namespace std::chrono;
 
 using namespace nx;
@@ -2166,8 +2168,14 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper(commonModule()).isValid())
-        return Qn::VideowallWithoutLicenseOverlay;
+    if (qnRuntime->isVideoWallMode())
+    {
+        license::VideoWallLicenseValidator validator(commonModule());
+        QnVideoWallLicenseUsageHelper helper(commonModule());
+        helper.setCustomValidator(&validator);
+        if (!helper.isValid())
+            return Qn::VideowallWithoutLicenseOverlay;
+    }
 
     // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF

@@ -11,9 +11,9 @@ LabeledItem
 
     property var value: ""
     property var defaultValue: ""
-    property int maxPoints: -1
 
     property string figureType: ""
+    property var figureSettings
 
     contentItem: Row
     {
@@ -140,7 +140,7 @@ LabeledItem
             FigureEditorDialog
             {
                 figureType: control.figureType
-                maxPolygonPoints: maxPoints
+                figureSettings: control.figureSettings
                 resourceId: settingsView.resourceId
 
                 onAccepted:

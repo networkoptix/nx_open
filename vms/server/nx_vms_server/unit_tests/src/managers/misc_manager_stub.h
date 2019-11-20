@@ -30,6 +30,11 @@ protected:
         qint64 time,
         impl::SimpleHandlerPtr handler) override;
 
+    virtual int markVideoWallLicenseOverflow(
+        bool value,
+        qint64 time,
+        impl::SimpleHandlerPtr handler) override;
+
     virtual int cleanupDatabase(
         bool cleanupDbObjects,
         bool cleanupTransactionLog,

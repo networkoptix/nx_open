@@ -95,6 +95,7 @@
 
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/utils/platform/autorun.h>
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <utils/screen_utils.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
@@ -313,6 +314,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         m_uuidPool(new QnUuidPool(uuidPoolBase, 16384))
     #endif
 {
+    auto validator = new license::VideoWallLicenseValidator(commonModule(), this);
+    m_licensesHelper->setCustomValidator(validator);
+
     m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
     m_videoWallMode.ready = false;
