@@ -7,6 +7,8 @@
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
+#include <nx/vms/event/events/poe_over_budget_event.h>
+#include <nx/vms/event/events/fan_error_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/server/event/event_connector.h>
 
@@ -126,6 +128,10 @@ static const QString tpUser(lit("user"));
 static const QString tpCaption(lit("caption"));
 static const QString tpDescription(lit("description"));
 
+static const QString tpCurrentPowerConsumptionWatts("currentPowerConsumptionWatts");
+static const QString tpUpperPowerConsumptionLimitWatts("upperPowerConsumptionLimitWatts");
+static const QString tpLowerPowerconsumptionLimitWatts("lowerPowerConsumptionLimitWatts");
+
 static const QSize SCREENSHOT_SIZE(640, 480);
 static const unsigned int MS_PER_SEC = 1000;
 static const std::chrono::seconds kDefaultMailAggregationPeriod(30);
@@ -204,6 +210,14 @@ struct EmailAttachmentData
                 break;
             case EventType::softwareTriggerEvent:
                 templatePath = lit(":/email_templates/software_trigger.mustache");
+                break;
+            case EventType::poeOverBudgetEvent:
+                templatePath = ":/email_templates/poe_over_budget.mustache";
+                imageName = "server.png";
+                break;
+            case EventType::fanErrorEvent:
+                templatePath = ":/email_templates/fan_error.mustache";
+                imageName = "server.png";
                 break;
             default:
                 NX_ASSERT(false, "All cases must be implemented.");
@@ -305,8 +319,10 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
                 result = executePlaySoundAction(action);
+                break;
             case ActionType::buzzerAction:
                 result = executeBuzzerAction(action);
+                break;
             default:
                 break;
         }
@@ -1064,7 +1080,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
             break;
         }
-
         default:
             break;
     }
@@ -1241,6 +1256,26 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             detailsMap[lit("msConflicts")] = conflictsList;
             break;
         }
+        case EventType::poeOverBudgetEvent:
+        {
+            nx::vms::event::PoeOverBudgetEvent::Parameters parameters;
+            if (!QJson::deserialize(params.inputPortId, &parameters))
+            {
+                NX_WARNING(this, "Unable to deserialize 'PoE over budget' event parameters");
+                break;
+            }
+
+            detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpCurrentPowerConsumptionWatts] =
+                QString::number(parameters.currentConsumptionWatts, 'f', 1);
+            detailsMap[tpUpperPowerConsumptionLimitWatts] =
+                QString::number(parameters.upperLimitWatts, 'f', 1);
+            detailsMap[tpLowerPowerconsumptionLimitWatts] =
+                QString::number(parameters.lowerLimitWatts, 'f', 1);
+            break;
+        }
+        case EventType::fanErrorEvent:
+            detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
 
         default:
             break;

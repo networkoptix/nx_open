@@ -1,0 +1,23 @@
+{{#systemName}}
+{{&systemName}}
+{{#systemSignature}}
+{{&systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+Fan error at {{#source}}"{{&source}}" {{/source}}
+
+{{#aggregated}}
+Fan error at {{source}}
+Time: {{&timestampDate}} {{&timestampTime}}
+-------------------------------------------------------------------------------
+
+{{/aggregated}}
+
+
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
+

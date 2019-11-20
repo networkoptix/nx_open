@@ -228,6 +228,14 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
             return lm("%1 - %2").args(resourceName, caption);
         }
+        case EventType::poeOverBudgetEvent:
+        {
+            return tr("PoE over budget at %1").arg(resourceName);
+        }
+        case EventType::fanErrorEvent:
+        {
+            return tr("Fan error at %1").arg(resourceName);
+        }
         default:
             return tr("An unknown event has occurred");
     }
