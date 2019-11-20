@@ -118,7 +118,7 @@ void Connector::handlePoeOverBudgetStateChanged(
             networkBlockData.isInPoeOverBudgetMode
                 ? nx::vms::event::EventState::active
                 : nx::vms::event::EventState::inactive,
-            std::chrono::milliseconds(qnSyncTime->currentUSecsSinceEpoch()),
+            std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()),
             calculateCurrentConsumptionWatts(networkBlockData.portStates),
             networkBlockData.upperPowerLimitWatts,
             networkBlockData.lowerPowerLimitWatts));
@@ -154,7 +154,7 @@ void Connector::handleFanStateChange(FanState fanState)
     const nx::vms::event::FanErrorEventPtr fanErrorEvent(
         new nx::vms::event::FanErrorEvent(
             m_currentServer,
-            std::chrono::milliseconds(qnSyncTime->currentUSecsSinceEpoch())));
+            std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch())));
 
     emit fanError(fanErrorEvent);
 }
