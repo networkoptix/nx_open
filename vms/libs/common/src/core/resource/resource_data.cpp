@@ -16,7 +16,6 @@ public:
     QnResourceDataJsonSerializer():
         QnJsonSerializer(qMetaTypeId<QnResourceData>())
     {
-        registerKey<nx::vms::api::RtpTransportType>(lit("RtpTransportType"));
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
