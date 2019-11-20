@@ -32,14 +32,8 @@ MacAddress::MacAddress(const QByteArray& mac):
 {
 }
 
-MacAddress::MacAddress(const QString& macStr)
+MacAddress::MacAddress(const QString& mac)
 {
-    QString mac = macStr;
-
-    // remove brackets '[]' if exists
-    if (mac.length() >= 2 && mac.at(0) == L'[' && mac.at(mac.length() - 1) == L']')
-        mac = mac.mid(1, mac.length() - 2);
-
     // Check string format.
     const bool hasDelimiters = mac.length() == kMacAddressLength * 3 - 1;
     if (hasDelimiters)
