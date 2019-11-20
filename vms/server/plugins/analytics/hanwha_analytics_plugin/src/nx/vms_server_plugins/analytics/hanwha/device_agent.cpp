@@ -1,6 +1,9 @@
 #include "device_agent.h"
 
 #include <chrono>
+#include <sstream>
+#include <iostream>
+#include <charconv>
 
 #include <QtCore/QUrl>
 
@@ -15,12 +18,11 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
+#include <nx/sdk/helpers/string_map.h>
+
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace hanwha {
+namespace nx::vms_server_plugins::analytics::hanwha {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -59,10 +61,171 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
+const char* upperIfBoolean(const char* value)
 {
-    // There are no DeviceAgent settings for this plugin.
+    if (!value)
+        return nullptr;
+    if (strcmp(value, "false") == 0)
+        return "False";
+    if (strcmp(value, "true") == 0)
+        return "True";
+    return value;
+}
+
+bool endsWith(std::string_view string, std::string_view ending) //< remove in C++20
+{
+    return
+        ending.size() <= string.size()
+        && std::equal(cbegin(ending), cend(ending), cend(string) - ending.size());
+}
+
+std::string specify(const char* v, unsigned int n)
+{
+    NX_ASSERT(v);
+    std::string result(v);
+    if (n == 0)
+        return result;
+
+    const std::string nAsString =
+        static_cast<const std::stringstream&>((std::stringstream() << n)).str();
+    result.replace(result.find("#"), 1, nAsString);
+
+    return result;
+}
+
+// read the setting from the server to plugin
+// returns empty vector, if not all values can be read
+std::vector<std::string> DeviceAgent::ReadSettingsFromServer(
+    const IStringMap* settings,
+    AnalyticsParamSpan analyticsParamSpan,
+    int objectIndex)
+{
+    std::vector<std::string> result;
+    result.reserve(std::size(analyticsParamSpan));
+    for (auto param: analyticsParamSpan)
+    {
+        const char* const value =
+            upperIfBoolean(settings->value(specify(param.plugin, objectIndex).c_str()));
+        if (!value)
+        {
+            result.clear();
+            return result;
+        }
+
+        if (endsWith(param.plugin, ".Points"))
+        {
+            std::optional<std::vector<PluginPoint>> points = parsePluginPoints(value);
+            if (!points)
+            {
+                result.clear();
+                return result;
+            }
+
+            std::string sunapiPoints = pluginPointsToSunapiString(*points, m_frameSize);
+            result.push_back(sunapiPoints);
+        }
+        else
+        {
+            result.emplace_back(value);
+        }
+    }
+    return result;
+}
+
+std::string DeviceAgent::sendCommand(const std::string& query)
+{
+    nx::utils::Url command(m_url);
+    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
+    command.setPath(kEventPath);
+    command.setQuery(QString::fromStdString(query) + QString("&Channel=%1").arg(m_channelNumber));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    if (!isSent)
+        return "Failed to send command to camera";
+
+    auto* response = m_settingsHttpClient.response();
+    const bool isApproved = (response->statusLine.statusCode == 200);
+    if (!isApproved)
+        return response->statusLine.toString().toStdString();
+
+    return {};
+}
+
+static std::string dequote(const std::string& s)
+{
+    if (s.size() >= 2 && s.front() == '"' && s.back() == '"')
+    {
+        return s.substr(1, s.size() - 2);
+    }
+    return s;
+}
+
+std::string DeviceAgent::WriteSettingsToCamera(
+    const std::vector<std::string>& values,
+    AnalyticsParamSpan analyticsParamSpan,
+    const char* commandPreambule,
+    int objectIndex)
+{
+    NX_ASSERT(std::size(values) == std::size(analyticsParamSpan));
+
+    std::stringstream query;
+    query << commandPreambule;
+
+    auto paramIt = analyticsParamSpan.begin();
+    auto valueIt = values.cbegin();
+
+    while (valueIt != values.end())
+    {
+        query << specify(paramIt->sunapi, objectIndex) << dequote(*valueIt);
+        ++paramIt;
+        ++valueIt;
+    }
+
+    return sendCommand(query.str());
+}
+
+// Used for deleting commands.
+std::string DeviceAgent::WriteSettingsToCamera(
+    const char* query,
+    int objectIndex)
+{
+    const std::string specifiedQuery = specify(query, objectIndex);
+    return sendCommand(specifiedQuery);
+}
+
+/*static*/ void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    AnalyticsParamSpan params, const char* reason)
+{
+    for (const auto param: params)
+        errorMap->setItem(param.plugin, reason);
+}
+
+constexpr const char* failedToReceiveError = "Failed to receive a value from server";
+
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* outResult, const IStringMap* settings)
+{
+    //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
+
+    auto errorMap = makePtr<nx::sdk::StringMap>();
+
+    retransmitSettings(errorMap, settings, m_settings.shockDetection);
+
+    retransmitSettings(errorMap, settings, m_settings.motion);
+
+    for (int i = 0; i < 8; ++i)
+        retransmitSettings(errorMap, settings, m_settings.includeArea[i], i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retransmitSettings(errorMap, settings, m_settings.excludeArea[i], i + 8 + 1);
+
+    retransmitSettings(errorMap, settings, m_settings.tamperingDetection);
+    retransmitSettings(errorMap, settings, m_settings.defocusDetection);
+
+    retransmitSettings(errorMap, settings, m_settings.audioDetection);
+
+    return;
+    *outResult = errorMap.releasePtr();
 }
 
 void DeviceAgent::getPluginSideSettings(
@@ -159,6 +322,9 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
+
+    m_settingsHttpClient.setUserName(m_auth.user());
+    m_settingsHttpClient.setUserPassword(m_auth.password());
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
@@ -176,7 +342,4 @@ void DeviceAgent::setMonitor(MetadataMonitor* monitor)
     m_monitor = monitor;
 }
 
-} // namespace hanwha
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::hanwha

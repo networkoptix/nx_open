@@ -44,6 +44,9 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_INT(kLogLevelReducerWindowSizeS, logLevelReducerWindowSizeS,
         "Replace error and warning logs with debugs within this time.");
+
+    NX_INI_DOUBLE(1, valueHistoryAgeDelimiter,
+        "Reduces max age of all ValueHistory storage and requests.");
 };
 
 NX_UTILS_API Ini& ini();

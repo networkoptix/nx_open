@@ -166,7 +166,7 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
 }
 #endif //__i386
 
-inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+inline bool mathImage_cpu(const quint64* data, const simd128i* mask, int maskStart, int maskEnd)
 {
     uint64_t* curPtr = (uint64_t*) data;
     curPtr += maskStart*2;
@@ -183,13 +183,16 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
     return false;
 }
 
-bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::matchImage(const quint64* data, const simd128i* mask, int maskStart, int maskEnd)
 {
+    if (uintptr_t (data) % 16)
+        return mathImage_cpu(data, mask, maskStart, maskEnd);
+
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
-        return mathImage_sse41(data, mask, maskStart, maskEnd);
+        return mathImage_sse41((const simd128i*) data, mask, maskStart, maskEnd);
     else
-        return mathImage_sse2(data, mask, maskStart, maskEnd);
+        return mathImage_sse2((const simd128i*) data, mask, maskStart, maskEnd);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
     return mathImage_cpu(data, mask, maskStart, maskEnd);
@@ -332,26 +335,33 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
-#if defined(__i386) || defined(__amd64) || defined(_WIN32)
-    __m128i* dst = (__m128i*) m_data.data();
-    __m128i* src = (__m128i*) image;
-    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
-    {
-        *dst = _mm_or_si128(*dst, *src); /* SSE2. */
-        dst++;
-        src++;
+    addMotion((quint64*) m_data.data(), (quint64*) image);
+}
 
-    }
-#else
-    // remove without SIMD
-    int64_t* dst = (int64_t*) m_data.data();
-    int64_t* src = (int64_t*) image;
-    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
+void QnMetaDataV1::addMotion(quint64* dst64, quint64* src64)
+{
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+
+    if ((uintptr_t (dst64) % 16 == 0) && (uintptr_t (src64) % 16 == 0))
     {
-        *dst++ |= *src++;
-        *dst++ |= *src++;
+        __m128i* dst = (__m128i*) dst64;
+        __m128i* src = (__m128i*) src64;
+        for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight / 128; ++i)
+        {
+            *dst = _mm_or_si128(*dst, *src); /* SSE2. */
+            dst++;
+            src++;
+
+        }
+        return;
     }
 #endif
+    // add without SIMD
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight / 128; ++i)
+    {
+        *dst64++ |= *src64++;
+        *dst64++ |= *src64++;
+    }
 }
 
 QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
@@ -375,28 +385,64 @@ void QnMetaDataV1::addMotion(const QRectF& rectF)
     return addMotion(rectFromNormalizedRect(rectF));
 }
 
+void QnMetaDataV1::addMotion(char* buffer, const QRectF& rectF)
+{
+    addMotion(buffer, rectFromNormalizedRect(rectF));
+}
+
 void QnMetaDataV1::addMotion(const QRect& rect)
 {
-    const quint32 maskL = (quint32) (-1) >> rect.top();
-    const quint32 maskR = (quint32) (-1) << (31 - rect.bottom());
-    const quint32 mask = qToBigEndian(maskL & maskR);
-    const quint64 mask64 = ((quint64) mask << 32) + mask;
+    addMotion(m_data.data(), rect);
+}
 
-    quint32* data = (quint32*) m_data.data() + rect.left();
+void QnMetaDataV1::addMotion(char* buffer, const QRect& rect)
+{
+    const quint32 maskL = (quint32)(-1) >> rect.top();
+    const quint32 maskR = (quint32)(-1) << (31 - rect.bottom());
+    const quint32 mask = qToBigEndian(maskL & maskR);
+    const quint64 mask64 = ((quint64)mask << 32) + mask;
+
+    quint32* data = (quint32*)buffer + rect.left();
     const quint32* const dataEnd = data + rect.width();
-    const quint64* const dataEnd64 = (quint64*) (std::uintptr_t(dataEnd) & ~std::uintptr_t(7));
+    const quint64* const dataEnd64 = (quint64*)(std::uintptr_t(dataEnd) & ~std::uintptr_t(7));
     if (std::uintptr_t(data) % 8 != 0)
         *data++ |= mask;
-    quint64* data64 = (quint64*) data;
+    quint64* data64 = (quint64*)data;
     NX_ASSERT((std::uintptr_t(data64) & 7) == 0);
     while (data64 < dataEnd64)
         *data64++ |= mask64;
-    data = (quint32*) data64;
+    data = (quint32*)data64;
     if (data < dataEnd)
         *data |= mask;
 }
 
-bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
+QRect QnMetaDataV1::boundingBox(const char* data)
+{
+    int left = Qn::kMotionGridWidth;
+    int right = 0;
+    int top = Qn::kMotionGridHeight;
+    int bottom = 0;
+    bool hasData = false;
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y)
+    {
+        for (int x = 0; x < Qn::kMotionGridWidth; ++x)
+        {
+            if (isMotionAt(x, y, data))
+            {
+                left = std::min(left, x);
+                right = std::max(right, x);
+                top = std::min(top, y);
+                bottom = std::max(bottom, y);
+                hasData = true;
+            }
+        }
+    }
+    if (!hasData)
+        return QRect();
+    return QRect(left, top, right - left + 1, bottom - top + 1);
+}
+
+bool QnMetaDataV1::isMotionAt(int x, int y, const char* mask)
 {
     NX_ASSERT(x<Qn::kMotionGridWidth);
     NX_ASSERT(y<Qn::kMotionGridHeight);
@@ -471,6 +517,21 @@ inline void setBit(quint8* data, int x, int y)
     data[offset] |= 0x80 >> (y&7);
 }
 
+void addDataToMask(const QRect& rect, char* mask, int* maskStart, int* maskEnd)
+{
+    if (maskStart)
+        *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
+    if (maskEnd)
+        *maskEnd = qMax((rect.right() * Qn::kMotionGridHeight + rect.bottom()) / 128, *maskEnd);
+    for (int x = rect.left(); x <= rect.right(); ++x)
+    {
+        for (int y = rect.top(); y <= rect.bottom(); ++y)
+        {
+            setBit((quint8*)mask, x, y);
+        }
+    }
+}
+
 void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart, int* maskEnd)
 {
     if (maskStart)
@@ -482,18 +543,25 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
     for (int i = 0; i < region.rectCount(); ++i)
     {
         QRect rect = region.rects().at(i).intersected(kMaxGridRect);
-        if (maskStart)
-            *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
-        if (maskEnd)
-            *maskEnd = qMax((rect.right() * Qn::kMotionGridHeight + rect.bottom()) / 128, *maskEnd);
-        for (int x = rect.left(); x <= rect.right(); ++x)
-        {
-            for (int y = rect.top(); y <= rect.bottom(); ++y)
-            {
-                setBit((quint8*) mask, x,y);
-            }
-        }
+        addDataToMask(rect, mask, maskStart, maskEnd);
     }
+}
+
+void QnMetaDataV1::createMask(const QRectF& rectF, char* mask, int* maskStart, int* maskEnd)
+{
+    return createMask(rectFromNormalizedRect(rectF), mask, maskStart, maskEnd);
+}
+
+void QnMetaDataV1::createMask(const QRect& data, char* mask, int* maskStart, int* maskEnd)
+{
+    if (maskStart)
+        *maskStart = 0;
+    if (maskEnd)
+        *maskEnd = 0;
+    memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
+
+    QRect rect = data.intersected(kMaxGridRect);
+    addDataToMask(rect, mask, maskStart, maskEnd);
 }
 
 void QnMetaDataV1::serialize(QIODevice* ioDevice) const
@@ -525,6 +593,7 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, int bufferSize):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
+    m_duration(0),
     m_data(CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }
@@ -533,6 +602,7 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(
     MetadataType type, int bufferSize, QnAbstractAllocator* allocator):
     QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
     metadataType(type),
+    m_duration(0),
     m_data(allocator, CL_MEDIA_ALIGNMENT, bufferSize)
 {
 }

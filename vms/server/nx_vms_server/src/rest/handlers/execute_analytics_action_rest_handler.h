@@ -20,7 +20,7 @@ struct ExtendedAnalyticsActionData
     nx::vms::api::analytics::ActionTypeDescriptor actionTypeDescriptor;
 
     std::optional<nx::analytics::db::ObjectTrack> objectTrack;
-    std::optional<nx::analytics::db::ObjectPosition> bestShotObjectPosition;
+    std::optional<nx::analytics::db::BestShot> bestShotObjectPosition;
     CLVideoDecoderOutputPtr bestShotVideoFrame;
 };
 
@@ -63,14 +63,6 @@ private:
     std::optional<nx::analytics::db::ObjectTrack> fetchObjectTrack(
         const QnUuid& objectTrackId,
         bool needFullTrack);
-
-    std::optional<nx::analytics::db::ObjectPosition> fetchObjectPositionByTimestamp(
-        const QnUuid& objectTrackId,
-        int64_t timestampUs);
-
-    std::optional<nx::analytics::db::ObjectPosition> fetchObjectPositionByTimestampFromTrack(
-        const nx::analytics::db::ObjectTrack& track,
-        int64_t timestampUs);
 
     CLVideoDecoderOutputPtr imageByTimestamp(const QnUuid& deviceId, const int64_t timestampUs);
 

@@ -203,6 +203,33 @@ TEST_F(MetricsServersApi, twoServers)
     }
 }
 
+TEST_F(MetricsServersApi, threeServers)
+{
+    auto left = addServer();
+    auto right = addServer();
+
+    const auto hasUptimes =
+        [&](const ServerForTests* server)
+        {
+            auto values = server->get<SystemValues>("/ec2/metrics/values")["servers"];
+            return values[this->id]["availability"]["uptimeS"].toDouble() > 0
+                && values[left->id]["availability"]["uptimeS"].toDouble() > 0
+                && values[right->id]["availability"]["uptimeS"].toDouble() > 0;
+        };
+
+    const auto waitForUptimes =
+        [&](const ServerForTests* server, const QString& label)
+        {
+            NX_INFO(this, "Wait for sync on %1 server %2", label, server->id);
+            while (!hasUptimes(this))
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        };
+
+    waitForUptimes(this, "middle");
+    waitForUptimes(left.get(), "left");
+    waitForUptimes(right.get(), "right");
+}
+
 TEST_F(MetricsServersApi, streamCount)
 {
     auto checkCounters =

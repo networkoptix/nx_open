@@ -964,7 +964,7 @@ QnAbstractStreamDataProviderPtr initLiveProvider(
     QnLiveStreamProviderPtr cameraProvider = camera->getLiveReader(quality);
 
     auto reorderingDataProvider = PutInOrderDataProviderPtr(
-        new PutInOrderDataProvider(cameraProvider, std::chrono::milliseconds(64)));
+        new PutInOrderDataProvider(cameraProvider));
     return reorderingDataProvider;
 }
 

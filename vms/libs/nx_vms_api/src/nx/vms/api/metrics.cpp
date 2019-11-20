@@ -70,15 +70,20 @@ std::function<Value(const Value&)> numericFormatter(const QString& units, Conver
             if (!value.isDouble())
                 return value;
 
+            // If the absolute value is above the threshold, fraction should be omitted. Otherwise
+            // fixed precision without trailing zeros should be applied.
+            static const double kFractionThreshold = 10;
+            static const int kFractionDigits = 2;
+
             const auto number = convert(value.toDouble());
             QString string;
-            if (std::abs(number) > 10)
+            if (std::abs(number) >= kFractionThreshold)
             {
                 string = QString::number(number, 'f', 0);
             }
             else
             {
-                string = QString::number(number, 'f', 2);
+                string = QString::number(number, 'f', kFractionDigits);
                 while (string.endsWith('0')) string.chop(1);
                 if (string.endsWith('.')) string.chop(1);
             }

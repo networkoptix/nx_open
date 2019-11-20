@@ -2699,7 +2699,6 @@ void MediaServerProcess::registerRestHandlers(
      *     range [0.0; 1.0].
      * %param[opt] freeText Text to match within Object Track properties.
      * %param[opt] limit Maximum number of Object Tracks to return.
-     * %param[opt] maxObjectTrackSize Maximum number of elements of an Object Track.
      * %param[opt] sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.

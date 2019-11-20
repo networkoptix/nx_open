@@ -17,7 +17,6 @@
 #include "nx/streaming/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
-#include "server_stream_recorder.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include <nx/vms/event/rule.h>
@@ -41,6 +40,19 @@
 #include <motion/motion_helper.h>
 
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
+
+using namespace nx::vms::server;
+
+RecorderData::~RecorderData()
+{
+    if (recorder)
+        recorder->stop();
+    if (reorderingProvider)
+    {
+        reorderingProvider->stop();
+        reorderingProvider->removeDataProcessor(recorder.get());
+    }
+}
 
 QnRecordingManager::QnRecordingManager(
     QnMediaServerModule* serverModule,
@@ -93,55 +105,10 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 {
-    if( recorders.recorderHiRes )
-        recorders.recorderHiRes->pleaseStop();
+    if(recorders.recorderHiRes)
+        recorders.recorderHiRes->recorder->pleaseStop();
     if (recorders.recorderLowRes)
-        recorders.recorderLowRes->pleaseStop();
-}
-
-void QnRecordingManager::stopRecorder(const Recorders& recorders)
-{
-    if( recorders.recorderHiRes )
-        recorders.recorderHiRes->stop();
-    if (recorders.recorderLowRes)
-        recorders.recorderLowRes->stop();
-}
-
-void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
-{
-    QnVideoCameraPtr camera;
-    if (recorders.recorderHiRes)
-    {
-        recorders.recorderHiRes->stop();
-        camera = videoCameraPool()->getVideoCamera(recorders.recorderHiRes->getResource());
-    }
-    if (recorders.recorderLowRes)
-    {
-        recorders.recorderLowRes->stop();
-        if (!camera)
-            camera = videoCameraPool()->getVideoCamera(recorders.recorderLowRes->getResource());
-    }
-    if (camera)
-    {
-        if (recorders.recorderHiRes)
-        {
-            const auto reader = camera->getLiveReader(QnServer::HiQualityCatalog,
-                /*ensureInitialized*/ false, /*createIfNotExist*/ false);
-            if (reader)
-                reader->removeDataProcessor(recorders.recorderHiRes);
-        }
-
-        if (recorders.recorderLowRes)
-        {
-            const auto reader = camera->getLiveReader(QnServer::LowQualityCatalog,
-                /*ensureInitialized*/ false, /*createIfNotExist*/ false);
-            if (reader)
-                reader->removeDataProcessor(recorders.recorderLowRes);
-        }
-    }
-
-    delete recorders.recorderHiRes;
-    delete recorders.recorderLowRes;
+        recorders.recorderLowRes->recorder->pleaseStop();
 }
 
 void QnRecordingManager::stop()
@@ -151,17 +118,9 @@ void QnRecordingManager::stop()
 
     QnMutexLocker lock( &m_mutex );
 
-    for(const Recorders& recorders: m_recordMap.values())
-    {
-        beforeDeleteRecorder(recorders);
-    }
-    for( QMap<QnResourcePtr, Recorders>::const_iterator
-        it = m_recordMap.cbegin();
-        it != m_recordMap.cend();
-        ++it )
-    {
-        deleteRecorder(it.value(), it.key());
-    }
+    for(const auto& recorders: m_recordMap)
+        beforeDeleteRecorder(recorders.second);
+
     m_recordMap.clear();
     m_scheduleWatchingTimer.stop();
 
@@ -169,23 +128,39 @@ void QnRecordingManager::stop()
     m_delayedStop.clear();
 }
 
-Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
+std::optional<std::chrono::microseconds> QnRecordingManager::recorderFileDuration(
+    const QnResourcePtr& res,
+    QnServer::ChunksCatalog catalog) const
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_recordMap.value(res);
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_recordMap.find(res);
+    if (itr == m_recordMap.end())
+        return std::nullopt;
+    const auto& recorderData = (catalog == QnServer::ChunksCatalog::HiQualityCatalog)
+        ? itr->second.recorderHiRes : itr->second.recorderLowRes;
+    if (!recorderData)
+        return std::nullopt;
+    return std::chrono::microseconds(recorderData->recorder->duration());
 }
 
-QnServerStreamRecorder* QnRecordingManager::createRecorder(
+std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
     const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader,
     QnServer::ChunksCatalog catalog, const QnDualStreamingHelperPtr& dualStreamingHelper)
 {
-    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(serverModule(), res, catalog, reader.data());
+    auto recorder = std::make_unique<QnServerStreamRecorder>(
+        serverModule(), res, catalog, reader.data());
     recorder->setDualStreamingHelper(dualStreamingHelper);
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
-    reader->addDataProcessor(recorder);
-    reader->setNeedKeyData();
-    //recorder->start();
-    return recorder;
+
+    auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(
+            reader,
+            std::chrono::milliseconds(0),
+            std::chrono::milliseconds(0),
+            std::chrono::seconds(5),
+            PutInOrderDataProvider::BufferingPolicy::increaseOnly);
+    reorderingDataProvider->addDataProcessor(recorder.get());
+
+    return std::make_unique<RecorderData>(std::move(recorder), std::move(reorderingDataProvider));
 }
 
 bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
@@ -212,21 +187,27 @@ bool QnRecordingManager::startForcedRecording(
 
     QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constFind(camRes);
-    if (itrRec == m_recordMap.constEnd())
+    auto itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.end())
         return false;
 
     m_delayedStop.remove(camRes);
 
     // update current schedule task
-    const Recorders& recorders = itrRec.value();
+    const Recorders& recorders = itrRec->second;
     if (recorders.recorderHiRes)
-        recorders.recorderHiRes->startForcedRecording(quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
+    {
+        recorders.recorderHiRes->recorder->startForcedRecording(
+            quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
+    }
     if (recorders.recorderLowRes)
-        recorders.recorderLowRes->startForcedRecording(quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
+    {
+        recorders.recorderLowRes->recorder->startForcedRecording(
+            quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
+    }
 
     // start recorder threads
-    startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
+    startOrStopRecording(camRes, camera, recorders);
 
     // return true if recording started. if camera is not accessible e.t.c return false
     return true;
@@ -241,16 +222,19 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
     QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constFind(camRes);
-    if (itrRec == m_recordMap.constEnd())
+    auto itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.end())
         return false;
 
-    const Recorders& recorders = itrRec.value();
+    const Recorders& recorders = itrRec->second;
     if (!recorders.recorderHiRes && !recorders.recorderLowRes)
         return false;
 
-    int afterThreshold = recorders.recorderHiRes ? recorders.recorderHiRes->getFRAfterThreshold() : recorders.recorderLowRes->getFRAfterThreshold();
-    if (afterThreshold > 0 && afterThresholdCheck) {
+    int afterThreshold = recorders.recorderHiRes
+        ? recorders.recorderHiRes->recorder->getFRAfterThreshold()
+        : recorders.recorderLowRes->recorder->getFRAfterThreshold();
+    if (afterThreshold > 0 && afterThresholdCheck)
+    {
         m_delayedStop.insert(camRes, qnSyncTime->currentUSecsSinceEpoch() + afterThreshold*1000000ll);
         return true;
     }
@@ -258,19 +242,23 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
     // update current schedule task
     if (recorders.recorderHiRes)
-        recorders.recorderHiRes->stopForcedRecording();
+        recorders.recorderHiRes->recorder->stopForcedRecording();
     if (recorders.recorderLowRes)
-        recorders.recorderLowRes->stopForcedRecording();
+        recorders.recorderLowRes->recorder->stopForcedRecording();
 
     // start recorder threads
-    startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
+    startOrStopRecording(camRes, camera, recorders);
     return true;
 }
 
 bool QnRecordingManager::startOrStopRecording(
-    const QnResourcePtr& res, const QnVideoCameraPtr& camera,
-    QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
+    const QnResourcePtr& res, const QnVideoCameraPtr& camera, const Recorders& recorders)
 {
+    auto recorderHiRes = recorders.recorderHiRes
+        ? recorders.recorderHiRes->recorder.get() : nullptr;
+    auto recorderLowRes = recorders.recorderLowRes
+        ? recorders.recorderLowRes->recorder.get() : nullptr;
+
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera =
         !isResourceDisabled(res) &&
@@ -368,7 +356,7 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 
     if (!cameraRes)
         return;
-    if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
+    if (cameraRes->hasFlags(Qn::foreigner) && m_recordMap.count(cameraRes) == 0)
         return;
 
     if (cameraRes->hasFlags(Qn::desktop_camera))
@@ -395,12 +383,12 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 
     if (cameraRes->isInitialized()) {
         if (recorders.recorderHiRes)
-            recorders.recorderHiRes->updateCamera(cameraRes);
+            recorders.recorderHiRes->recorder->updateCamera(cameraRes);
         if (recorders.recorderLowRes)
-            recorders.recorderLowRes->updateCamera(cameraRes);
+            recorders.recorderLowRes->recorder->updateCamera(cameraRes);
     }
 
-    startOrStopRecording(cameraRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
+    startOrStopRecording(cameraRes, camera, recorders);
 }
 
 void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resource*/)
@@ -423,13 +411,14 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resour
     // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
     //QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
-    if (itr != m_recordMap.constEnd() && ownResource)
+    auto itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
+    if (itr != m_recordMap.end() && ownResource)
     {
-        if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled())
-            itr->recorderHiRes->setNeedReopen();
-        if (itr->recorderLowRes && itr->recorderLowRes->isAudioPresent() != camera->isAudioEnabled())
-            itr->recorderLowRes->setNeedReopen();
+        const auto& value = itr->second;
+        if (value.recorderHiRes && value.recorderHiRes->recorder->isAudioPresent() != camera->isAudioEnabled())
+            value.recorderHiRes->recorder->setNeedReopen();
+        if (value.recorderLowRes && value.recorderLowRes->recorder->isAudioPresent() != camera->isAudioEnabled())
+            value.recorderLowRes->recorder->setNeedReopen();
     }
 }
 
@@ -472,7 +461,7 @@ void QnRecordingManager::at_serverPropertyChanged(const QnResourcePtr &, const Q
     if (key == QnMediaResource::panicRecordingKey())
     {
         NX_DEBUG(this, "Panic mode has changed, update camera");
-        for (const auto& camera: m_recordMap.keys())
+        for (const auto& [camera, recorder]: m_recordMap)
             updateCamera(camera.dynamicCast<QnSecurityCamResource>());
     }
 }
@@ -486,19 +475,20 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
         return;
     }
 
-    Recorders recorders;
     {
-        QnMutexLocker lock( &m_mutex );
-        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(resource);
-        if (itr == m_recordMap.constEnd())
-            return;
-        recorders = itr.value();
-        m_recordMap.remove(resource);
+        Recorders recorders;
+        {
+            QnMutexLocker lock( &m_mutex );
+            auto itr = m_recordMap.find(resource);
+            if (itr == m_recordMap.end())
+                return;
+            recorders.recorderHiRes = std::move(itr->second.recorderHiRes);
+            recorders.recorderLowRes = std::move(itr->second.recorderLowRes);
+            m_recordMap.erase(resource);
+        }
+        beforeDeleteRecorder(recorders);
     }
 
-    beforeDeleteRecorder(recorders);
-    stopRecorder(recorders);
-    deleteRecorder(recorders, resource);
     videoCameraPool()->removeVideoCamera(resource);
     serverModule()->motionHelper()->remove(resource);
 }
@@ -506,11 +496,11 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const
 {
     QnMutexLocker lock( &m_mutex );
-    QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(camera);
-    if (itr == m_recordMap.constEnd())
+    auto itr = m_recordMap.find(camera);
+    if (itr == m_recordMap.end())
         return false;
-    return (itr.value().recorderHiRes && itr.value().recorderHiRes->isRunning()) ||
-           (itr.value().recorderLowRes && itr.value().recorderLowRes->isRunning());
+    return (itr->second.recorderHiRes && itr->second.recorderHiRes->recorder->isRunning()) ||
+           (itr->second.recorderLowRes && itr->second.recorderLowRes->recorder->isRunning());
 }
 
 void QnRecordingManager::onTimer()
@@ -521,22 +511,23 @@ void QnRecordingManager::onTimer()
     //QnMutexLocker lock( &m_mutex );
 
     bool someRecordingIsPresent = false;
-    for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
+    for (auto itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
-        if (!resourcePool()->getResourceById(itrRec.key()->getId()))
+        if (!resourcePool()->getResourceById(itrRec->first->getId()))
             continue; //< resource just deleted. will be removed from m_recordMap soon
-        auto camera = videoCameraPool()->getVideoCamera(itrRec.key());
+        auto camera = videoCameraPool()->getVideoCamera(itrRec->first);
 
-        const Recorders& recorders = itrRec.value();
+        const Recorders& recorders = itrRec->second;
 
         //if (!recorders.recorderHiRes && !recorders.recorderLowRes)
         //    continue; // no recorders are created now
 
         if (recorders.recorderHiRes)
-            recorders.recorderHiRes->updateScheduleInfo(time);
+            recorders.recorderHiRes->recorder->updateScheduleInfo(time);
         if (recorders.recorderLowRes)
-            recorders.recorderLowRes->updateScheduleInfo(time);
-        someRecordingIsPresent |= startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
+            recorders.recorderLowRes->recorder->updateScheduleInfo(time);
+
+        someRecordingIsPresent |= startOrStopRecording(itrRec->first, camera, recorders);
     }
 
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;

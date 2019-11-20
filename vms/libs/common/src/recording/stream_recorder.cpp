@@ -353,13 +353,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
 
-    if (md->dataType == QnAbstractMediaData::GENERIC_METADATA)
-    {
-        //< It is saved by separate dataConsumer now to sql and binary databases.
-        // In 4.2 we are going to save it to the separate metadata track as well.
-        VERBOSE("GENERIC_METADATA");
-    }
-    else if (md->dataType == QnAbstractMediaData::META_V1)
+    if (md->dataType == QnAbstractMediaData::META_V1)
     {
         VERBOSE("META_V1");
         if (needSaveData(md))
@@ -570,6 +564,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     int streamIndex = channel;
+
     if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
         streamIndex = 0;
 
@@ -625,11 +620,19 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
+        auto context = m_recordingContextVector[i];
+        if (md->dataType == QnAbstractMediaData::GENERIC_METADATA)
+        {
+            if (!context.metadataStream)
+                continue;
+            streamIndex = context.metadataStream->index;
+        }
+
 #if 0 // for storage balancing algorithm test
         if (md && m_recordingContextVector[i].storage)
             m_recordingContextVector[i].storage->addWrited(md->dataSize());
 #endif
-        AVStream* stream = m_recordingContextVector[i].formatCtx->streams[streamIndex];
+        AVStream* stream = context.formatCtx->streams[streamIndex];
         NX_ASSERT(stream->time_base.num && stream->time_base.den);
 
         NX_ASSERT(md->timestamp >= 0);
@@ -1002,6 +1005,22 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             }
             audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
             audioStream->first_dts = 0;
+        }
+
+        if (m_role == StreamRecorderRole::serverRecording)
+        {
+            context.metadataStream = avformat_new_stream(context.formatCtx, nullptr);
+            if (!context.metadataStream)
+            {
+                m_lastError = StreamRecorderErrorStruct(
+                    StreamRecorderError::metadataStreamAllocation,
+                    context.storage
+                );
+                NX_ERROR(this, lit("Can't allocate output metadata stream."));
+                return false;
+            }
+            context.metadataStream->codec->codec_type = AVMEDIA_TYPE_SUBTITLE;
+            context.metadataStream->codec->codec_id = AV_CODEC_ID_TEXT;
         }
 
         initIoContext(

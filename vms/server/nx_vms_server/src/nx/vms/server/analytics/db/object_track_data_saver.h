@@ -93,8 +93,6 @@ private:
     ObjectTrackDbAttributes fetchTrackDbAttributes(
         nx::sql::QueryContext* queryContext, const QnUuid& trackId);
 
-    std::pair<qint64, qint64> findMinMaxTimestamp(const std::vector<ObjectPosition>& track);
-
     void updateObjects(nx::sql::QueryContext* queryContext);
 
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);

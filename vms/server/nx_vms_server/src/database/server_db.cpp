@@ -938,9 +938,9 @@ vms::event::ActionDataList QnServerDb::getActions(
             const auto details = stringsHelper.eventDetails(actionData.eventParams);
             bool found = std::any_of(details.cbegin(), details.cend(),
                 [&request](const QString& data)
-            {
-                return data.contains(request.text, Qt::CaseInsensitive);
-            });
+                {
+                    return data.contains(request.text, Qt::CaseInsensitive);
+                });
             if (!found)
                 continue;
         }

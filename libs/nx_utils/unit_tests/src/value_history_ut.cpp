@@ -8,27 +8,42 @@
 
 namespace nx::utils::test {
 
-TEST(ValueHistoryTest, main)
+using namespace std::chrono;
+using Border = ValueHistory<int>::Border;
+
+class ValueHistoryTest: public testing::Test
 {
-    using namespace std::chrono;
-    using Border = ValueHistory<int>::Border;
-    ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+public:
+    ValueHistoryTest():
+        timeShift(nx::utils::test::ClockType::steady),
+        history(hours(10))
+    {
+    }
 
-    ValueHistory<int> history(hours(10));
-    const auto values =
-        [&history](std::optional<milliseconds> maxAge, Border border)
-        {
-            std::vector<std::pair<int, int>> values;
-            const auto addValue =
-                [&values](int value, milliseconds age)
-                {
-                    values.emplace_back(value, round<hours>(age).count());
-                };
+    QString values(std::optional<milliseconds> maxAge, Border border) const
+    {
+        std::vector<std::pair<int, QString>> values;
+        const auto addValue =
+            [&values](int value, milliseconds age)
+            {
+                const auto h = round<hours>(age);
+                auto ts = QString::number(h.count());
+                if (const auto m = round<minutes>(age) - h; m.count())
+                    ts += QString(":%1").arg((int) m.count(), 2, 10, QChar('0'));
+                values.emplace_back(value, ts);
+            };
 
-            maxAge ? history.forEach(*maxAge, addValue, border) : history.forEach(addValue, border);
-            return containerString(values);
-        };
+        maxAge ? history.forEach(*maxAge, addValue, border) : history.forEach(addValue, border);
+        return containerString(values);
+    }
 
+protected:
+    ScopedTimeShift timeShift;
+    ValueHistory<int> history;
+};
+
+TEST_F(ValueHistoryTest, normalAge)
+{
     EXPECT_EQ(history.current(), 0);
     EXPECT_EQ(values(std::nullopt, Border::keep()), "none");
 
@@ -85,6 +100,30 @@ TEST(ValueHistoryTest, main)
     EXPECT_EQ(values(std::nullopt, Border::drop()), "none");
     EXPECT_EQ(values(std::nullopt, Border::move()), "{ ( 40: 10 ) }");
     EXPECT_EQ(values(std::nullopt, Border::hardcode(0)), "{ ( 0: 10 ) }");
+}
+
+TEST_F(ValueHistoryTest, reducedAge)
+{
+    nx::kit::IniConfig::Tweaks iniTweaks;
+    iniTweaks.set(&nx::utils::ini().valueHistoryAgeDelimiter, double(60)); //< A minute for an hour.
+
+    history.update(10);
+    EXPECT_EQ(history.current(), 10);
+    EXPECT_EQ(values(std::nullopt, Border::keep()), "{ ( 10: 0 ) }");
+
+    timeShift.applyRelativeShift(minutes(5));
+    EXPECT_EQ(values(std::nullopt, Border::keep()), "{ ( 10: 0:05 ) }");
+
+    history.update(20);
+    EXPECT_EQ(history.current(), 20);
+    EXPECT_EQ(values(std::nullopt, Border::keep()), "{ ( 10: 0:05 ), ( 20: 0 ) }");
+    EXPECT_EQ(values(hours(3), Border::move()), "{ ( 10: 0:03 ), ( 20: 0 ) }");
+
+    timeShift.applyRelativeShift(minutes(15));
+    EXPECT_EQ(values(std::nullopt, Border::keep()), "{ ( 20: 0:15 ) }");
+    EXPECT_EQ(values(hours(5), Border::keep()), "{ ( 20: 0:15 ) }");
+    EXPECT_EQ(values(hours(5), Border::move()), "{ ( 20: 0:05 ) }");
+    EXPECT_EQ(values(hours(5), Border::drop()), "none");
 }
 
 namespace {

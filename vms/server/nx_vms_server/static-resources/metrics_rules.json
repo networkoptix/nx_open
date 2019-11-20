@@ -341,7 +341,7 @@
                         "display": "table|panel",
                         "alarms": [
                             {
-                                "level": "warning",
+                                "level": "error",
                                 "condition": "equal %status Unauthorized",
                                 "text": "is %status"
                             },
@@ -356,13 +356,18 @@
                         "name": "Events: Camera Offline (1h)",
                         "description": "Events count: Camera Offline (1h)",
                         "display": "table|panel",
-                        "calculate": "countValues %status 24h Offline",
+                        "calculate": "countValues %status 1h Offline",
                         "insert": "streamIssues",
                         "alarms": [
                             {
                                 "level": "warning",
-                                "condition": "greaterThan %offlineEvents 1",
-                                "text": "went Offline %offlineEvents times in last 24 hours"
+                                "condition": "greaterThan %offlineEvents 0",
+                                "text": "went Offline %offlineEvents times for the last hour"
+                            },
+                            {
+                                "level": "error",
+                                "condition": "greaterThan %offlineEvents 5",
+                                "text": "went Offline %offlineEvents times for the last hour"
                             }
                         ]
                     },
@@ -548,6 +553,9 @@
                     "server": {
                         "display": "table|panel",
                         "format": "resource"
+                    },
+                    "pool": {
+                        "display": "table|panel"
                     },
                     "type": {
                         "display": "table|panel"

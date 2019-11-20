@@ -53,12 +53,6 @@ static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 milliseconds startTime(const ObjectTrack& track)
 {
-    if (NX_ASSERT(!track.objectPositionSequence.empty()))
-    {
-        return duration_cast<milliseconds>(microseconds(
-            track.objectPositionSequence.cbegin()->timestampUs));
-    }
-
     return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
 }
 
@@ -302,13 +296,6 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
             if (success)
             {
                 m_prefetch = std::move(data);
-                for (auto& track: m_prefetch)
-                {
-                    if (NX_ASSERT(!track.objectPositionSequence.empty()))
-                    {
-                        track.deviceId = track.objectPositionSequence.cbegin()->deviceId;
-                    }
-                }
 
                 NX_VERBOSE(this, "Processing %1 loaded tracks", m_prefetch.size());
                 if (!m_prefetch.empty())
@@ -603,9 +590,10 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newTrack.deviceId = objectMetadata->deviceId;
                 newTrack.objectTypeId = item.typeId;
                 newTrack.attributes = item.attributes;
-                newTrack.objectPositionSequence.push_back(pos);
-                newTrack.firstAppearanceTimeUs = pos.timestampUs;
-                newTrack.lastAppearanceTimeUs = pos.timestampUs;
+                newTrack.bestShot.rect = item.boundingBox;
+                newTrack.bestShot.timestampUs = objectMetadata->timestampUs;
+                newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
+                newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
 
                 newObjectIndices[item.trackId] = int(newTracks.size());
                 newTracks.push_back(newTrack);
@@ -800,10 +788,7 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
     if (track.bestShot.initialized())
         return {microseconds(track.bestShot.timestampUs), track.bestShot.rect};
 
-    const auto rect = track.objectPositionSequence.empty()
-        ? QRectF()
-        : track.objectPositionSequence.front().boundingBox;
-
+    const auto rect = track.bestShot.rect;
     return {microseconds(track.firstAppearanceTimeUs), rect};
 }
 
@@ -815,12 +800,9 @@ QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
         return q->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
 
     // Fallback mechanism, just in case.
-    NX_ASSERT(!track.objectPositionSequence.empty());
-    if (track.objectPositionSequence.empty())
-        return {};
 
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(
-        track.objectPositionSequence[0].deviceId);
+        track.deviceId);
 }
 
 } // namespace nx::vms::client::desktop

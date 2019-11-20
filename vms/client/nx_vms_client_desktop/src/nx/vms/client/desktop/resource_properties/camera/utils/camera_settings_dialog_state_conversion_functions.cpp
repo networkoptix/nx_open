@@ -471,7 +471,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     }
 
     if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
-		&& state.expert.remoteMotionDetectionEnabled.hasValue())
+        && state.expert.remoteMotionDetectionEnabled.hasValue())
     {
         setRemoteArchiveMotionDetection(state.expert.remoteMotionDetectionEnabled(), cameras);
     }

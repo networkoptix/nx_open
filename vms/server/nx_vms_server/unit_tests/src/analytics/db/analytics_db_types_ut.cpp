@@ -87,7 +87,7 @@ protected:
         sample.deviceId = QnUuid::createUuid();
         sample.firstAppearanceTimeUs = 0;
         sample.lastAppearanceTimeUs = std::numeric_limits<qint64>::max();
-        sample.objectPositionSequence.push_back(samplePosition);
+        sample.objectPosition.add(samplePosition.boundingBox);
         sample.objectTypeId = "nx.Car";
         sample.attributes.emplace_back("Type", "Truck");
         sample.attributes.emplace_back("Brand", "Mazda");

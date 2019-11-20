@@ -15,6 +15,8 @@
 #include "camera/video_camera.h"
 #include <common/common_module_aware.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/put_in_order_data_provider.h>
+#include "server_stream_recorder.h"
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -25,12 +27,28 @@ namespace ec2 {
     class QnDistributedMutex;
 }
 
+class RecorderData
+{
+public:
+    RecorderData() = default;
+    RecorderData(
+        std::unique_ptr<QnServerStreamRecorder> recorder,
+        std::unique_ptr<nx::vms::server::PutInOrderDataProvider> reorderingProvider)
+        :
+        recorder(std::move(recorder)),
+        reorderingProvider(std::move(reorderingProvider))
+    {
+    }
+    ~RecorderData();
+
+    std::unique_ptr<QnServerStreamRecorder> recorder;
+    std::unique_ptr<nx::vms::server::PutInOrderDataProvider> reorderingProvider;
+};
+
 struct Recorders
 {
-    Recorders(): recorderHiRes(0), recorderLowRes(0) {}
-
-    QnServerStreamRecorder* recorderHiRes;
-    QnServerStreamRecorder* recorderLowRes;
+    std::unique_ptr<RecorderData> recorderHiRes;
+    std::unique_ptr<RecorderData> recorderLowRes;
     QSharedPointer<QnDualStreamingHelper> dualStreamingHelper;
 };
 
@@ -92,7 +110,8 @@ public:
     void stop();
     bool isCameraRecoring(const QnResourcePtr& camera) const;
 
-    Recorders findRecorders(const QnResourcePtr& res) const;
+    std::optional<std::chrono::microseconds> recorderFileDuration(
+        const QnResourcePtr& res, QnServer::ChunksCatalog catalog) const;
 
     bool startForcedRecording(
         const QnSecurityCamResourcePtr& camRes,
@@ -119,15 +138,15 @@ private:
     void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate);
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
-    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,
-                                           QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
-    bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    std::unique_ptr<RecorderData> createRecorder(
+        const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,
+        QnServer::ChunksCatalog catalog,
+        const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
+    bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, const Recorders& recorders);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;
 
     void beforeDeleteRecorder(const Recorders& recorders);
-    void stopRecorder(const Recorders& recorders);
-    void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
@@ -138,7 +157,7 @@ private:
     void disableLicensesIfNeed();
 private:
     mutable QnMutex m_mutex;
-    QMap<QnResourcePtr, Recorders> m_recordMap;
+    std::map<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;

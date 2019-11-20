@@ -31,6 +31,7 @@ protected:
         QnResourceList& result) override;
 
 private:
+    bool checkVmaxDevice(const nx::utils::Url& url);
     static bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);
     QByteArray readDescriptionPage(CLSimpleHTTPClient& client);
     int getApiPort(const QByteArray& answer) const;

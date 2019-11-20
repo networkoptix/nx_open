@@ -23,6 +23,9 @@ public:
     void start() override;
 
 private:
+    void beforeValues(utils::metrics::Scope requestScope, bool formatted) override;
+    void beforeAlarms(utils::metrics::Scope requestScope) override;
+
     enum class Metrics
     {
         transactions,
@@ -43,11 +46,15 @@ private:
 
     qint64 getMetric(Metrics parameter);
     qint64 getDelta(Metrics key, qint64 value);
-    nx::vms::server::PlatformMonitor* platform();
+    nx::vms::server::PlatformMonitor* platform() const;
+    QDateTime currentDateTime() const;
+    QString dateTimeToString(const QDateTime& datetime) const;
 
 private:
     std::vector<std::atomic<qint64>> m_counters;
     std::atomic<int> m_timeChangeEvents = 0;
+    mutable nx::utils::Mutex m_mutex;
+    QDateTime m_currentDateTime;
 };
 
 } // namespace nx::vms::server::metrics

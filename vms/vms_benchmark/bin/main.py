@@ -571,6 +571,8 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         if not ini['enableSecondaryStream']:
             report('INI: Secondary stream is disabled.')
         ini_local_ip = ini['testcameraLocalInterface']
+        if ini['testcameraOutputFile']:
+            report(f"INI: Going to log testcamera output to {ini['testcameraOutputFile']!r}")
         test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=ini_local_ip if ini_local_ip else box.local_ip,
             count=test_camera_count,

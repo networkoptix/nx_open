@@ -115,19 +115,21 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, track.attributes);
 
-        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(track.objectPositionSequence);
+        auto trackMinTimestamp = track.firstAppearanceTimeUs;
+        auto trackMaxTimestamp = track.lastAppearanceTimeUs;
 
-        query->bindValue(0, deviceDbId);
-        query->bindValue(1, (long long) objectTypeDbId);
-        query->bindValue(2, QnSql::serialized_field(track.id));
-        query->bindValue(3, trackMinTimestamp / kUsecInMs);
-        query->bindValue(4, trackMaxTimestamp / kUsecInMs);
-        query->bindValue(5, TrackSerializer::serialized(track.objectPositionSequence));
-        query->bindValue(6, (long long) attributesId);
-        query->bindValue(7, track.bestShot.initialized()
+        query->addBindValue(deviceDbId);
+        query->addBindValue((long long) objectTypeDbId);
+        query->addBindValue(QnSql::serialized_field(track.id));
+        query->addBindValue(trackMinTimestamp / kUsecInMs);
+        query->addBindValue(trackMaxTimestamp / kUsecInMs);
+        query->addBindValue(TrackSerializer::serialized(track.objectPosition));
+
+        query->addBindValue((long long) attributesId);
+        query->addBindValue(track.bestShot.initialized()
             ? track.bestShot.timestampUs / kUsecInMs
             : 0);
-        query->bindValue(8, track.bestShot.initialized()
+        query->addBindValue(track.bestShot.initialized()
             ? TrackSerializer::serialized(track.bestShot.rect)
             : QByteArray());
 
@@ -202,30 +204,24 @@ ObjectTrackDataSaver::ObjectTrackDbAttributes ObjectTrackDataSaver::fetchTrackDb
         query->value(2).toInt()};
 }
 
-std::pair<qint64, qint64> ObjectTrackDataSaver::findMinMaxTimestamp(
-    const std::vector<ObjectPosition>& track)
-{
-    auto timestamps = std::make_pair<qint64, qint64>(
-        std::numeric_limits<qint64>::max(),
-        std::numeric_limits<qint64>::min());
-
-    for (const auto& pos: track)
-    {
-        if (pos.timestampUs < timestamps.first)
-            timestamps.first = pos.timestampUs;
-        if (pos.timestampUs > timestamps.second)
-            timestamps.second = pos.timestampUs;
-    }
-
-    return timestamps;
-}
-
 void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
+    auto loadExistingRegion =
+        [queryContext](const int64_t& id)
+        {
+            auto query = queryContext->connection()->createQuery();
+            query->prepare(R"sql(SELECT track_detail FROM track WHERE id = ?)sql");
+            query->addBindValue((long long) id);
+            query->exec();
+            if (query->next())
+                return ObjectRegion{query->value(0).toByteArray()};
+            return ObjectRegion();
+        };
+
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
         UPDATE track
-        SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
+        SET track_detail = ?,
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?)
@@ -237,16 +233,21 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
             queryContext, trackUpdate.allAttributes);
 
-        auto [trackMinTimestamp, trackMaxTimestamp] =
-            findMinMaxTimestamp(trackUpdate.appendedTrack);
+        auto trackMinTimestamp = trackUpdate.firstAppearanceTimeUs;
+        auto trackMaxTimestamp = trackUpdate.lastAppearanceTimeUs;
 
-        updateObjectQuery->bindValue(0, TrackSerializer::serialized(trackUpdate.appendedTrack));
+        auto dbId = trackUpdate.dbId != -1
+            ? (long long)trackUpdate.dbId
+            : (long long)m_trackDbAttributes.at(trackUpdate.trackId).dbId;
+
+        ObjectRegion region = loadExistingRegion(dbId);
+        region.add(trackUpdate.appendedTrack);
+
+        updateObjectQuery->bindValue(0, region.boundingBoxGrid);
         updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, trackUpdate.dbId != -1
-            ? (long long) trackUpdate.dbId
-            : (long long)m_trackDbAttributes.at(trackUpdate.trackId).dbId);
+        updateObjectQuery->bindValue(4, dbId);
         updateObjectQuery->exec();
 
         m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);
