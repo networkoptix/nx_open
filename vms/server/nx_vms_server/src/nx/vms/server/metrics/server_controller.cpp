@@ -23,7 +23,8 @@ static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_counters((int) Metrics::count)
+    m_counters((int) Metrics::count),
+    m_currentDateTime(&QDateTime::currentDateTime)
 {
     Qn::directConnect(
         serverModule->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
@@ -63,8 +64,7 @@ void ServerController::beforeValues(utils::metrics::Scope requestScope, bool /*f
 void ServerController::beforeAlarms(utils::metrics::Scope /*requestScope*/)
 {
     // Make sure timezone is predefined for entire request.
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_currentDateTime = QDateTime::currentDateTime();
+    m_currentDateTime.update();
 }
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
@@ -203,7 +203,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "osTime",
-            [this](const auto&) { return Value(dateTimeToString(currentDateTime())); }
+            [this](const auto&) { return Value(dateTimeToString(m_currentDateTime.get())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTime",
@@ -305,16 +305,10 @@ nx::vms::server::PlatformMonitor* ServerController::platform() const
     return serverModule()->platform()->monitor();
 }
 
-QDateTime ServerController::currentDateTime() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_currentDateTime;
-}
-
 QString ServerController::dateTimeToString(const QDateTime& dateTime) const
 {
     // Make sure timezone is predefined for entire request.
-    int timeZoneInMinutes = timeZone(currentDateTime()) / 60;
+    int timeZoneInMinutes = timeZone(m_currentDateTime.get()) / 60;
     QString timezone = QString::number(timeZoneInMinutes / 60);
     if (timeZoneInMinutes % 60)
     {
