@@ -451,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     }
                 }
             },
@@ -495,7 +495,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     }
                 }
             },
@@ -513,7 +513,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
