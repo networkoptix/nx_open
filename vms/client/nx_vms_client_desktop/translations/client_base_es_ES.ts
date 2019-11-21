@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Página...</translation>
     </message>
   </context>
   <context>
@@ -2971,7 +2971,7 @@ a %1</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>No se pudo detectar la resolución de captura</translation>
     </message>
   </context>
   <context>
@@ -5752,31 +5752,31 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>local</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>óptico</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>intercambiar</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>red</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>desconocido</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6477,7 +6477,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>DESCARGANDO&lt;br&gt;INICIADO</translation>
     </message>
   </context>
   <context>
@@ -6622,7 +6622,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>No se puede reconocer el evento en la cámara eliminada.</translation>
     </message>
   </context>
   <context>
@@ -10056,7 +10056,7 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Guardar archivo como...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10064,15 +10064,15 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Error al guardar el archivo</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>La carpeta %1 está bloqueada para escritura.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Descargando archivo...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10080,15 +10080,15 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>¿Parar la descarga del archivo?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Archivo descargado</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Falló la descarga del archivo</translation>
     </message>
   </context>
 </TS>
