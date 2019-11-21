@@ -55,7 +55,7 @@
             },
             {
                 "type": "GroupBox",
-                "caption": "Motion detection type settings",
+                "caption": "Common settings: Motion and IVA",
                 "items":
                 [
                     {
@@ -64,6 +64,40 @@
                         "caption": "Motion detection type",
                         "range": ["Off", "MotionDetection", "IntelligentVideo", "MDAndIV"],
                         "defaultValue": "MotionDetection"
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Motion detection object size",
+                        "items":
+                        [
+                            {
+                                "type": "BoxFigure",
+                                "name": "MotionDetection.MinObjectSize.Points",
+                                "caption": "Motion - Minimum object size"
+                            },
+                            {
+                                "type": "BoxFigure",
+                                "name": "MotionDetection.MaxObjectSize.Points",
+                                "caption": "Motion - Maximum object size"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA [AI] object size",
+                        "items":
+                        [
+                            {
+                                "type": "BoxFigure",
+                                "name": "IVA.MinObjectSize.Points",
+                                "caption": "IVA [AI] - Minimum object size"
+                            },
+                            {
+                                "type": "BoxFigure",
+                                "name": "IVA.MaxObjectSize.Points",
+                                "caption": "IVA [AI] - Maximum object size"
+                            }
+                        ]
                     }
                 ]
             },
@@ -383,42 +417,58 @@
                         [
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea9.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea1.Points",
                               "caption": "Exclude area 1"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea10.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea2.Points",
                               "caption": "Exclude area 2"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea11.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea3.Points",
                               "caption": "Exclude area 3"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea12.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea4.Points",
                               "caption": "Exclude area 4"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea13.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea5.Points",
                               "caption": "Exclude area 5"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea14.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea6.Points",
                               "caption": "Exclude area 6"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea15.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea7.Points",
                               "caption": "Exclude area 7"
                             },
                             {
                               "type": "PolygonFigure",
-                              "name": "MotionDetection.ExcludeArea16.Points",
+                              "minPoints": 4,
+                              "maxPoints": 8,
+                              "name": "MotionDetection.ExcludeArea8.Points",
                               "caption": "Exclude area 8"
                             }
                         ]
@@ -503,38 +553,6 @@
                         "defaultValue": 0,
                         "minValue": 0,
                         "maxValue": 5
-                    }
-                ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "AI Common Settings",
-                "items":
-                [
-                    {
-                        "type": "SpinBox",
-                        "name": "AICommonSettings.Sensitivity",
-                        "caption": "Sensitivity",
-                        "defaultValue": 80,
-                        "minValue": 0,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Size",
-                        "items":
-                        [
-                            {
-                              "type": "BoxFigure",
-                              "name": "AICommonSettings.MinimumSize",
-                              "caption": "Minimum object size"
-                            },
-                            {
-                              "type": "BoxFigure",
-                              "name": "AICommonSettings.MaximumSize",
-                              "caption": "Maximum object size"
-                            }
-                        ]
                     }
                 ]
             },

@@ -3,6 +3,7 @@
 #include <vector>
 #include <string_view>
 #include <optional>
+#include <algorithm>
 
 #include <nx/kit/json.h>
 
@@ -17,6 +18,17 @@ struct FrameSize
 {
     int width = 1;
     int height = 1;
+
+    int xRelativeToAbsolute(double x) const
+    {
+        int result = int(x * width + 0.5);
+        return std::min(result, width - 1);
+    };
+    int yRelativeToAbsolute(double y) const
+    {
+        int result = int(y * height + 0.5);
+        return std::min(result, height - 1);
+    };
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -32,6 +44,19 @@ struct PluginPoint
     std::ostream& toSunapiStream(std::ostream& os, FrameSize frameSize) const;
 };
 
+// We need separate typed for width and height
+struct Width
+{
+    double value = 0.;
+    operator double() const { return value; }
+};
+
+struct Height
+{
+    double value = 0.;
+    operator double() const { return value; }
+};
+
 enum class Direction { Right, Left, Both };
 
 /**
@@ -40,6 +65,10 @@ enum class Direction { Right, Left, Both };
  * \return vector of points (may be empty). nullopt - if json is broken.
  */
 std::optional<std::vector<PluginPoint>> parsePluginPoints(const char* value);
+
+std::optional<Width> parsePluginWidth(const char* value);
+
+std::optional<Height> parsePluginHeight(const char* value);
 
 std::optional<Direction> parsePluginDirection(const char* value);
 

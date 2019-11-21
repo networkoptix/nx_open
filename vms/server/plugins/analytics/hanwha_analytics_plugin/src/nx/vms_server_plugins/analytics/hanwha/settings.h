@@ -46,158 +46,24 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-// 1. ShockDetection. SUNAPI 2.5.4 (2018-08-07) 2.23
-struct ShockDetection
-{
-    bool enabled = false;
-    int thresholdLevel = 50;
-    int sensitivityLevel = 80;
-    bool initialized = false;
-
-    static constexpr const char* kPreambule = "msubmenu=shockdetection&action=set";
-    static constexpr AnalyticsParam kParams[] = {
-        { "ShockDetection.Enable", "&Enable=" },
-        { "ShockDetection.ThresholdLevel", "&ThresholdLevel=" },
-        { "ShockDetection.SensitivityLevel", "&Sensitivity=" },
-    };
-
-    ShockDetection() = default;
-    ShockDetection(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool operator==(const ShockDetection& rhs) const;
-    bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
-};
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 
-struct Motion
-{
-    std::string detectionType;
-    bool initialized = false;
-
-    static constexpr const char* kPreambule =
-        "msubmenu=videoanalysis2&action=set";//&DetectionType=MotionDetection";
-
-    static constexpr AnalyticsParam kParams[] = {
-        { "MotionDetection.DetectionType", "&DetectionType=" },
-    };
-
-    Motion() = default;
-    Motion(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool operator==(const Motion& rhs) const;
-    bool operator!=(const Motion& rhs) const { return !(*this == rhs); }
-};
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 
-struct IncludeArea
-{
-    std::vector<SunapiPoint> points;
-    int thresholdLevel = 50;
-    int sensitivityLevel = 80;
-    int minimumDuration = 0;
-    bool initialized = false;
-
-    static constexpr const char* kPreambule =
-        "msubmenu=videoanalysis2&action=set";//&DetectionType=MotionDetection";
-    static constexpr AnalyticsParam kParams[] = {
-        //{ "MotionDetection.Enable", "&Enable=" }, // No `Enable` for Motion in SUNAPI.
-        { "MotionDetection.IncludeArea#.Points", "&ROI.#.Coordinate=" },
-        { "MotionDetection.IncludeArea#.ThresholdLevel", "&ROI.#.ThresholdLevel=" },
-        { "MotionDetection.IncludeArea#.SensitivityLevel", "&ROI.#.SensitivityLevel=" },
-        { "MotionDetection.IncludeArea#.MinimumDuration", "&ROI.#.Duration=" },
-    };
-    static constexpr const char* kAlternativeCommand =
-        "msubmenu=videoanalysis2&action=remove&ROIIndex=#";
-
-    IncludeArea() = default;
-    IncludeArea(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool empty() const { return points.empty(); }
-    bool operator==(const IncludeArea& rhs) const;
-    bool operator!=(const IncludeArea& rhs) const { return !(*this == rhs); }
-};
-
 //-------------------------------------------------------------------------------------------------
 
-struct ExcludeArea
-{
-    std::vector<SunapiPoint> points;
-    bool initialized = false;
-    static constexpr const char* kPreambule =
-        "msubmenu=videoanalysis2&action=set";//&DetectionType=MotionDetection";
-    static constexpr AnalyticsParam kParams[] = {
-        //{ "MotionDetection.Enable", "&Enable=" }, // No `Enable` for Motion in SUNAPI.
-        { "MotionDetection.ExcludeArea#.Points", "&ROI.#.Coordinate=" },
-    };
-    static constexpr const char* kAlternativeCommand =
-        "msubmenu=videoanalysis2&action=remove&ROIIndex=#";
-
-    ExcludeArea() = default;
-    ExcludeArea(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool empty() const { return points.empty(); }
-    bool operator==(const ExcludeArea& rhs) const { return points == rhs.points; }
-    bool operator!=(const ExcludeArea& rhs) const { return !(*this == rhs); }
-};
-
 //-------------------------------------------------------------------------------------------------
-
-struct TamperingDetection
-{
-    bool enabled = false;
-    int thresholdLevel = 50;
-    int sensitivityLevel = 80;
-    int minimumDuration = 0;
-    bool exceptDarkImages = false;
-    bool initialized = false;
-
-    static constexpr const char* kPreambule = "msubmenu=tamperingdetection&action=set";
-    static constexpr AnalyticsParam kParams[] = {
-        { "TamperingDetection.Enable", "&Enable=" },
-        { "TamperingDetection.ThresholdLevel", "&ThresholdLevel=" },
-        { "TamperingDetection.SensitivityLevel", "&SensitivityLevel=" },
-        { "TamperingDetection.MinimumDuration", "&Duration=" },
-        { "TamperingDetection.ExceptDarkImages", "&DarknessDetection=" },
-    };
-
-    TamperingDetection() = default;
-    TamperingDetection(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool operator==(const TamperingDetection& rhs) const;
-    bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
-};
-
 //-------------------------------------------------------------------------------------------------
-
-struct DefocusDetection
-{
-    bool enabled = false;
-    int thresholdLevel = 50;
-    int sensitivityLevel = 80;
-    int minimumDuration = 0;
-    bool initialized = false;
-
-    static constexpr const char* kPreambule = "msubmenu=defocusdetection&action=set";
-    static constexpr AnalyticsParam kParams[] = {
-        { "DefocusDetection.Enable", "&Enable=" },
-        { "DefocusDetection.ThresholdLevel", "&ThresholdLevel=" },
-        { "DefocusDetection.SensitivityLevel", "&Sensitivity=" },
-        { "DefocusDetection.MinimumDuration", "&Duration=" },
-    };
-
-    DefocusDetection() = default;
-    DefocusDetection(const std::vector<std::string>& params);
-    operator bool() const { return initialized; }
-    bool operator==(const DefocusDetection& rhs) const;
-    bool operator!=(const DefocusDetection& rhs) const { return !(*this == rhs); }
-};
-
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 // New Settings Engine - for non-symmetric settings.
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
@@ -206,6 +72,268 @@ struct SettingGroup
     bool initialized = false;
     operator bool() const { return initialized; }
 };
+
+//-------------------------------------------------------------------------------------------------
+
+struct ShockDetection: public SettingGroup
+{
+    bool enabled = false;
+    int thresholdLevel = 50;
+    int sensitivityLevel = 80;
+
+    enum class ServerParamIndex {
+        enabled,
+        thresholdLevel,
+        sensitivityLevel,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "ShockDetection.Enable",
+        "ShockDetection.ThresholdLevel",
+        "ShockDetection.SensitivityLevel",
+    };
+
+    ShockDetection() = default;
+    bool operator==(const ShockDetection& rhs) const;
+    bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const ShockDetection& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const ShockDetection& settingGroup, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct Motion: public SettingGroup
+{
+    std::string detectionType;
+
+    enum class ServerParamIndex {
+        detectionType,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "MotionDetection.DetectionType",
+    };
+
+    Motion() = default;
+    Motion(const std::vector<std::string>& params);
+    bool operator==(const Motion& rhs) const;
+    bool operator!=(const Motion& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const Motion& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const Motion& settingGroup, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct MdObjectSize: public SettingGroup
+{
+    Width minWidth;
+    Height minHeight;
+
+    Width maxWidth;
+    Height maxHeight;
+
+    enum class ServerParamIndex {
+        minWidth,
+        minHeight,
+        maxWidth,
+        maxHeight,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "MotionDetection.MinObjectSize.Points",
+        "MotionDetection.MinObjectSize.Points", //< the same as previous
+        "MotionDetection.MaxObjectSize.Points",
+        "MotionDetection.MaxObjectSize.Points", //< the same as previous
+    };
+
+    MdObjectSize() = default;
+    bool operator == (const MdObjectSize& rhs) const;
+    bool operator!=(const MdObjectSize& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const MdObjectSize& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const MdObjectSize& settingGroup, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct IvaObjectSize : public SettingGroup
+{
+    Width minWidth;
+    Height minHeight;
+
+    Width maxWidth;
+    Height maxHeight;
+
+    enum class ServerParamIndex {
+        minWidth,
+        minHeight,
+        maxWidth,
+        maxHeight,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "IVA.MinObjectSize.Points",
+        "IVA.MinObjectSize.Points", //< the same as previous
+        "IVA.MaxObjectSize.Points",
+        "IVA.MaxObjectSize.Points", //< the same as previous
+    };
+
+    IvaObjectSize() = default;
+    bool operator == (const IvaObjectSize& rhs) const;
+    bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const IvaObjectSize& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const IvaObjectSize& settingGroup, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct MdIncludeArea: public SettingGroup
+{
+    std::vector<PluginPoint> points;
+    int thresholdLevel = 50;
+    int sensitivityLevel = 80;
+    int minimumDuration = 0;
+
+    int internalObjectIndex = 0;
+
+    enum class ServerParamIndex {
+        points,
+        thresholdLevel,
+        sensitivityLevel,
+        minimumDuration,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "MotionDetection.IncludeArea#.Points",
+        "MotionDetection.IncludeArea#.ThresholdLevel",
+        "MotionDetection.IncludeArea#.SensitivityLevel",
+        "MotionDetection.IncludeArea#.MinimumDuration",
+    };
+
+    MdIncludeArea() = default;
+    bool operator==(const MdIncludeArea& rhs) const;
+    bool operator!=(const MdIncludeArea& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const MdIncludeArea& rhs) const;
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const MdIncludeArea& area, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct MdExcludeArea: public SettingGroup
+{
+    std::vector<PluginPoint> points;
+
+    // For Exclude areas internal index = external (gui) indix + 8.
+    int internalObjectIndex = 0;
+
+    enum class ServerParamIndex {
+        points,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "MotionDetection.ExcludeArea#.Points",
+    };
+
+    MdExcludeArea() = default;
+    bool operator == (const MdExcludeArea& rhs) const;
+    bool operator!=(const MdExcludeArea& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const MdExcludeArea& rhs) const;
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const MdExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct TamperingDetection: SettingGroup
+{
+    bool enabled = false;
+    int thresholdLevel = 50;
+    int sensitivityLevel = 80;
+    int minimumDuration = 0;
+    bool exceptDarkImages = false;
+
+    enum class ServerParamIndex {
+        enabled,
+        thresholdLevel,
+        sensitivityLevel,
+        minimumDuration,
+        exceptDarkImages,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "TamperingDetection.Enable",
+        "TamperingDetection.ThresholdLevel",
+        "TamperingDetection.SensitivityLevel",
+        "TamperingDetection.MinimumDuration",
+        "TamperingDetection.ExceptDarkImages",
+    };
+
+    TamperingDetection() = default;
+    bool operator==(const TamperingDetection& rhs) const;
+    bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const TamperingDetection& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const TamperingDetection& area, FrameSize frameSize, int channelNumber = 0);
+
+//-------------------------------------------------------------------------------------------------
+
+struct DefocusDetection: SettingGroup
+{
+    bool enabled = false;
+    int thresholdLevel = 50;
+    int sensitivityLevel = 80;
+    int minimumDuration = 0;
+
+    enum class ServerParamIndex {
+        enabled,
+        thresholdLevel,
+        sensitivityLevel,
+        minimumDuration,
+    };
+    static constexpr const char* kServerParamsNames[] = {
+        "DefocusDetection.Enable",
+        "DefocusDetection.ThresholdLevel",
+        "DefocusDetection.SensitivityLevel",
+        "DefocusDetection.MinimumDuration",
+    };
+
+    DefocusDetection() = default;
+    bool operator==(const DefocusDetection& rhs) const;
+    bool operator!=(const DefocusDetection& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const DefocusDetection& rhs) const { return !(*this == rhs); }
+    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+};
+
+std::string buildCameraRequestQuery(
+    const DefocusDetection& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -518,15 +646,14 @@ std::string buildCameraRequestQuery(
 
 struct Settings
 {
-    ShockDetection shockDetection; //< Analytics::Shock detection
-
+    ShockDetection shockDetection;
     Motion motion;
-    IncludeArea includeArea[8];
-    ExcludeArea excludeArea[8];
-
-    TamperingDetection tamperingDetection; //< Analytics:: Tampering detection
-    DefocusDetection defocusDetection; //< Analytics::Defocus detection
-
+    MdObjectSize mdObjectSize;
+    IvaObjectSize ivaObjectSize;
+    MdIncludeArea mdIncludeArea[8];
+    MdExcludeArea mdExcludeArea[8];
+    TamperingDetection tamperingDetection;
+    DefocusDetection defocusDetection;
     ObjectDetectionObjects objectDetectionObjects;
     ObjectDetectionBestShot objectDetectionBestShot;
     ObjectDetectionExcludeArea objectDetectionExcludeArea[8];
