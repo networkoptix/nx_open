@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 
 #include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
@@ -144,26 +145,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     //ui->gridEvents->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     initEventsModel();
-
-    // init actions model
-    {
-        QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
-        anyActionItem->setData(ActionType::undefinedAction, ActionTypeRole);
-        anyActionItem->setData(false, ProlongedActionRole);
-        m_actionTypesModel->appendRow(anyActionItem);
-
-        for (ActionType actionType: allActions())
-        {
-            QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
-            item->setData(actionType, ActionTypeRole);
-            item->setData(hasToggleState(actionType), ProlongedActionRole);
-
-            QList<QStandardItem*> row;
-            row << item;
-            m_actionTypesModel->appendRow(row);
-        }
-        ui->actionComboBox->setModel(m_actionTypesModel);
-    }
+    initActionsModel();
 
     retranslateUi();
 
@@ -220,6 +202,19 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_delayUpdateTimer.setInterval(kUpdateDelayMs);
     connect(&m_delayUpdateTimer, &QTimer::timeout, this, &QnEventLogDialog::updateData);
 
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                updateServerEventsMenu();
+        });
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                updateServerEventsMenu();
+        });
+
     ItemViewAutoHider::create(ui->gridEvents, tr("No events"));
 
     reset();
@@ -228,8 +223,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 QnEventLogDialog::~QnEventLogDialog() {
 }
 
-QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
-    EventType value)
+QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, EventType value)
 {
     auto item = new QStandardItem(m_helper->eventName(value));
     item->setData(value, EventTypeRole);
@@ -237,7 +231,10 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
     if (rootItem)
         rootItem->appendRow(item);
 
-    for (auto childValue: childEvents(value))
+    const auto accessibleEvents =
+        NvrEventsActionsAccess::removeInacessibleNvrEvents(childEvents(value), resourcePool());
+
+    for (auto childValue: accessibleEvents)
         createEventTree(item, childValue);
 
     if (value == EventType::analyticsSdkEvent)
@@ -323,6 +320,53 @@ void QnEventLogDialog::updateAnalyticsEvents()
     }
 }
 
+void QnEventLogDialog::updateServerEventsMenu()
+{
+    std::function<QModelIndex(const QModelIndex&, EventType)> findIndexByEventType;
+    findIndexByEventType =
+        [this, &findIndexByEventType]
+        (const QModelIndex& rootIndex, EventType eventType) -> QModelIndex
+        {
+            for (int row = 0; row < m_eventTypesModel->rowCount(rootIndex); ++row)
+            {
+                const auto rowIndex = m_eventTypesModel->index(row, 0, rootIndex);
+                const auto eventTypeData = rowIndex.data(EventTypeRole);
+                if (eventTypeData.isNull())
+                    continue;
+
+                if (eventTypeData.value<EventType>() == eventType)
+                    return rowIndex;
+
+                const auto childIndex = findIndexByEventType(rowIndex, eventType);
+                if (childIndex != QModelIndex())
+                    return childIndex;
+            }
+            return QModelIndex();
+        };
+
+    const auto anyServerEventIndex =
+        findIndexByEventType(QModelIndex(), EventType::anyServerEvent);
+    if (anyServerEventIndex == QModelIndex())
+        return;
+
+    const auto anyServerEventItem = m_eventTypesModel->itemFromIndex(anyServerEventIndex);
+    const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
+        childEvents(EventType::anyServerEvent), resourcePool());
+
+    auto selectedEventType = eventType(ui->eventComboBox->currentIndex());
+
+    anyServerEventItem->removeRows(0, anyServerEventItem->rowCount());
+    for (auto childValue: accessibleEvents)
+        createEventTree(anyServerEventItem, childValue);
+
+    if (parentEvent(selectedEventType) == EventType::anyServerEvent)
+    {
+        if (!accessibleEvents.contains(selectedEventType))
+            selectedEventType = EventType::anyServerEvent;
+        ui->eventComboBox->setCurrentIndex(findIndexByEventType(QModelIndex(), selectedEventType));
+    }
+}
+
 bool QnEventLogDialog::isFilterExist() const
 {
     if (!cameras(m_filterCameraList).isEmpty())
@@ -355,6 +399,27 @@ void QnEventLogDialog::initEventsModel()
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
+}
+
+void QnEventLogDialog::initActionsModel()
+{
+    QStandardItem* anyActionItem = new QStandardItem(tr("Any Action"));
+    anyActionItem->setData(ActionType::undefinedAction, ActionTypeRole);
+    anyActionItem->setData(false, ProlongedActionRole);
+    m_actionTypesModel->appendRow(anyActionItem);
+
+    const auto accessibleActions =
+        NvrEventsActionsAccess::removeInacessibleNvrActions(allActions(), resourcePool());
+
+    for (ActionType actionType: accessibleActions)
+    {
+        QStandardItem* item = new QStandardItem(m_helper->actionName(actionType));
+        item->setData(actionType, ActionTypeRole);
+        item->setData(hasToggleState(actionType), ProlongedActionRole);
+
+        m_actionTypesModel->appendRow(item);
+    }
+    ui->actionComboBox->setModel(m_actionTypesModel);
 }
 
 void QnEventLogDialog::reset()
@@ -735,13 +800,17 @@ void QnEventLogDialog::enableUpdateData()
     }
 }
 
-void QnEventLogDialog::setVisible(bool value)
+void QnEventLogDialog::showEvent(QShowEvent* event)
 {
-    // TODO: #Elric use showEvent instead.
+    base_type::showEvent(event);
+    m_dirty = true;
+    enableUpdateData();
+}
 
-    if (value && !isVisible())
-        updateData();
-    QDialog::setVisible(value);
+void QnEventLogDialog::hideEvent(QHideEvent* event)
+{
+    base_type::hideEvent(event);
+    disableUpdateData();
 }
 
 void QnEventLogDialog::updateActionList(bool instantOnly)

@@ -45,11 +45,13 @@ public:
     void setText(const QString& text);
 
 protected:
-    void setVisible(bool value) override;
     virtual void retranslateUi() override;
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
 
 private:
     void initEventsModel();
+    void initActionsModel();
 
     void reset();
     void updateData();
@@ -65,6 +67,7 @@ private:
     QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::api::EventType value);
     void createAnalyticsEventTree(QStandardItem* rootItem);
     void updateAnalyticsEvents();
+    void updateServerEventsMenu();
 
     bool isFilterExist() const;
     void requestFinished();
