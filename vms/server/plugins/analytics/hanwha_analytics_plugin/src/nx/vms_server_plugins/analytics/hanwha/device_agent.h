@@ -65,6 +65,7 @@ private:
         int objectIndex = 0);
 
     std::string sendCommand(const std::string& query);
+    std::string sendCommand2(const std::string& query);
 
     std::string WriteSettingsToCamera(
         const std::vector<std::string>& values,

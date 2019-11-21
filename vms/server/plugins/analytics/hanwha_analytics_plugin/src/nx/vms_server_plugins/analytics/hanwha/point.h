@@ -32,12 +32,16 @@ struct PluginPoint
     std::ostream& toSunapiStream(std::ostream& os, FrameSize frameSize) const;
 };
 
+enum class Direction { Right, Left, Both };
+
 /**
  * Parse the json string (received from server) that contains points. The points have two
  * coordinates of type double.
  * \return vector of points (may be empty). nullopt - if json is broken.
  */
 std::optional<std::vector<PluginPoint>> parsePluginPoints(const char* value);
+
+std::optional<Direction> parsePluginDirection(const char* value);
 
 /**
  * Convert the points into a string in sunapi format (comma separated coordinates). The coordinates

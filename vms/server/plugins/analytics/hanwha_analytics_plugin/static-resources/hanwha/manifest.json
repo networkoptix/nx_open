@@ -527,14 +527,12 @@
                             {
                               "type": "BoxFigure",
                               "name": "AICommonSettings.MinimumSize",
-                              "caption": "Minimum",
-                              "value": { "points": [[0.48, 0.48], [0.52, 0.52]], "color": "#e040fb" }
+                              "caption": "Minimum object size"
                             },
                             {
                               "type": "BoxFigure",
                               "name": "AICommonSettings.MaximumSize",
-                              "caption": "Maximum",
-                              "value": { "points": [[0.30, 0.30], [0.70, 0.70]], "color": "#e040fb" }
+                              "caption": "Maximum object size"
                             }
                         ]
                     }
@@ -542,7 +540,7 @@
             },
             {
                 "type": "GroupBox",
-                "caption": "5 Object detection [AI]",
+                "caption": "5.1 Object detection. Objects [AI]",
                 "items":
                 [
                     {
@@ -596,23 +594,6 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Exclude areas",
-                        "items":
-                        [
-                            {
-                                "type": "PolygonFigure",
-                                "name": "ObjectDetection.ExcludeArea1.Points",
-                                "caption": "Exclude area 1"
-                            },
-                            {
-                                "type": "PolygonFigure",
-                                "name": "ObjectDetection.ExcludeArea2.Points",
-                                "caption": "Exclude area 2"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
                         "caption": "BestShot",
                         "items":
                         [
@@ -650,7 +631,70 @@
             },
             {
                 "type": "GroupBox",
-                "caption": "6 IVA(Intelligent Video Analytics) [AI]",
+                "caption": "5.2 Object detection. Exclude areas [AI]",
+                "items":
+                [
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea1.Points",
+                        "caption": "Area 1"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea2.Points",
+                        "caption": "Area 2"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea3.Points",
+                        "caption": "Area 3"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea4.Points",
+                        "caption": "Area 4"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea5.Points",
+                        "caption": "Area 5"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea6.Points",
+                        "caption": "Area 6"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea7.Points",
+                        "caption": "Area 7"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "ObjectDetection.ExcludeArea8.Points",
+                        "caption": "Area 8"
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "6.1 IVA lines [AI]",
                 "items":
                 [
                     {
@@ -661,20 +705,31 @@
                             {
                                 "type": "LineFigure",
                                 "name": "IVA.Line1.Points",
-                                "caption": "Virtual line 1"
+                                "caption": "Line 1"
                             },
                             {
-                              "type": "TextField",
-                              "name": "IVA.Line1.Name",
-                              "caption": "Name",
-                              "defaultValue": ""
+                                "type": "TextField",
+                                "name": "IVA.Line1.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
                             },
                             {
-                                "type": "ComboBox",
-                                "name": "IVA.Line1.ObjectTypeFilter",
-                                "caption": "Object type",
-                                "range": ["", "Person", "Vehicle", "Person,Vehicle"],
-                                "defaultValue": "MotionDetection"
+                                "type": "CheckBox",
+                                "name": "IVA.Line1.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line1.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line1.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
                             }
                         ]
                     },
@@ -686,22 +741,1007 @@
                             {
                                 "type": "LineFigure",
                                 "name": "IVA.Line2.Points",
-                                "caption": "Virtual line 2"
+                                "caption": "Line 2"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line2.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line2.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line2.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line2.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line3",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line3.Points",
+                                "caption": "Line 3"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line3.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line3.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line3.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line3.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line4",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line4.Points",
+                                "caption": "Line 4"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line4.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line4.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line4.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line4.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line5",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line5.Points",
+                                "caption": "Line 5"
                             },
                             {
                               "type": "TextField",
-                              "name": "IVA.Line2.Name",
+                              "name": "IVA.Line5.Name",
                               "caption": "Name",
                               "defaultValue": ""
                             },
                             {
-                                "type": "ComboBox",
-                                "name": "IVA.Line1.ObjectTypeFilter",
-                                "caption": "Object type",
-                                "range": ["", "Person", "Vehicle", "Person,Vehicle"],
-                                "defaultValue": "MotionDetection"
+                                "type": "CheckBox",
+                                "name": "IVA.Line5.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line5.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line5.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
                             }
                         ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line6",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line6.Points",
+                                "caption": "Line 6"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line6.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line6.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line6.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line6.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line7",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line7.Points",
+                                "caption": "Line 7"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line7.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line7.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line7.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line7.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Line8",
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "IVA.Line8.Points",
+                                "caption": "Line 8"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.Line8.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line8.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line8.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.Line8.Crossing",
+                                "caption": "Crossing",
+                                "defaultValue": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "6.2 IVA include areas [AI]",
+                "items":
+                [
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 1",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea1.Points",
+                                "caption": "Area 1"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea1.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea1.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea1.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea1.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea1.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 2",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea2.Points",
+                                "caption": "Area 2"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea2.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea2.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea2.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea2.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea2.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 3",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea3.Points",
+                                "caption": "Area 3"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea3.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea3.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea3.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea3.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea3.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 4",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea4.Points",
+                                "caption": "Area 4"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea4.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea4.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea4.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea4.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea4.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 5",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea5.Points",
+                                "caption": "Area 5"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea5.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea5.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea5.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea5.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea5.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 6",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea6.Points",
+                                "caption": "Area 6"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea2.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea6.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea6.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea6.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea6.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 7",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea7.Points",
+                                "caption": "Area 7"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea7.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea7.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea7.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea7.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea7.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "IVA Include area 8",
+                        "items":
+                        [
+                            {
+                                "type": "PolygonFigure",
+                                "minPoints": 4,
+                                "maxPoints": 8,
+                                "name": "IVA.IncludeArea8.Points",
+                                "caption": "Area 8"
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "IVA.IncludeArea8.Name",
+                                "caption": "Name",
+                                "defaultValue": ""
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Person",
+                                "caption": "Person",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Vehicle",
+                                "caption": "Vehicle",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Intrusion",
+                                "caption": "Intrusion",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Enter",
+                                "caption": "Enter",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Exit",
+                                "caption": "Exit",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Appear",
+                                "caption": "Appear",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "IVA.IncludeArea8.Loitering",
+                                "caption": "Loitering",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea8.IntrusionDuration",
+                                "caption": "Intrusion duration",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea8.AppearDuration",
+                                "caption": "Appear duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "IVA.IncludeArea8.LoiteringDuration",
+                                "caption": "Loitering duration",
+                                "defaultValue": 10,
+                                "minValue": 0,
+                                "maxValue": 60
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "6.3 IVA Exclude areas [AI]",
+                "items":
+                [
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea1.Points",
+                        "caption": "Area 1"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea2.Points",
+                        "caption": "Area 2"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea3.Points",
+                        "caption": "Area 3"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea4.Points",
+                        "caption": "Area 4"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea5.Points",
+                        "caption": "Area 5"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea6.Points",
+                        "caption": "Area 6"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea7.Points",
+                        "caption": "Area 7"
+                    },
+                    {
+                        "type": "PolygonFigure",
+                        "minPoints": 4,
+                        "maxPoints": 8,
+                        "name": "IVA.ExcludeArea8.Points",
+                        "caption": "Area 8"
                     }
                 ]
             },
@@ -740,7 +1780,7 @@
                     {
                         "type": "CheckBox",
                         "name": "SoundClassification.NoiseReduction",
-                        "caption": "Enable",
+                        "caption": "Noise filter",
                         "defaultValue": false
                     },
                     {
@@ -773,7 +1813,7 @@
                             {
                                 "type": "CheckBox",
                                 "name": "SoundClassification.Explosion",
-                                "caption": "Eplosion",
+                                "caption": "Explosion",
                                 "defaultValue": false,
                                 "value": false
                             },

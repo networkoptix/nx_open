@@ -30,20 +30,47 @@ std::optional<std::vector<PluginPoint>> parsePluginPoints(const char* value)
     NX_ASSERT(value);
     std::vector<PluginPoint> result;
 
-    if (strcmp(value, "\"\"") == 0) //< Correct value for empty vector.
-        return result;
+    if (strcmp(value, "\"\"") == 0)
+        return result; // Empty string means no figure.
 
     std::string err;
     nx::kit::Json json = nx::kit::Json::parse(value, err);
-    std::vector<nx::kit::Json> jsonPoints = json["points"].array_items();
-    if (jsonPoints.empty())
+    if (!json.is_object())
         return std::nullopt;
 
-    result.reserve(jsonPoints.size());
+    const nx::kit::Json& jsonPoints = json["points"];
+    if (!jsonPoints.is_array())
+        return std::nullopt;
 
-    for (const auto &jsonPoint: jsonPoints)
+    std::vector<nx::kit::Json> jsonPointsAsArray = jsonPoints.array_items();
+    result.reserve(jsonPointsAsArray.size());
+
+    for (const auto &jsonPoint: jsonPointsAsArray)
         result.emplace_back(jsonPoint);
     return result;
+}
+
+std::optional<Direction> parsePluginDirection(const char* value)
+{
+    NX_ASSERT(value);
+    std::string err;
+    nx::kit::Json json = nx::kit::Json::parse(value, err);
+    if (!json.is_object())
+        return std::nullopt;
+
+    const nx::kit::Json& jsonPoints = json["direction"];
+    if (!jsonPoints.is_string())
+        return std::nullopt;
+
+    std::string direction = jsonPoints.string_value();
+    if (direction == "b")
+        return Direction::Right;
+    if (direction == "a")
+        return Direction::Left;
+    if (direction == "")
+        return Direction::Both;
+
+    return std::nullopt;
 }
 
 std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize)
