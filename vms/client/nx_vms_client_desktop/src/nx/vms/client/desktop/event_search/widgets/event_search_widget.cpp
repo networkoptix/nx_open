@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -50,13 +51,23 @@ public:
     void resetType();
 
 private:
-    QAction* addMenuAction(QMenu* menu, const QString& title, EventType type,
-        const QString& subType = QString(), bool dynamicTitle = false);
-
     void setupTypeSelection();
+
+    QAction* addMenuAction(
+        QMenu* menu,
+        const QString& title,
+        EventType type,
+        const QString& subType = QString(),
+        bool dynamicTitle = false) const;
+
+    QMenu* createDeviceIssuesMenu(QWidget* parent) const;
+    QMenu* createServerEventsMenu(QWidget* parent) const;
+
+    void updateServerEventsMenu();
     void updateAnalyticsMenu();
 
 private:
+    QAction* m_cameraIssuesSubmenuAction = nullptr;
     QAction* m_serverEventsSubmenuAction = nullptr;
 
     QAction* m_analyticsEventsSubmenuAction = nullptr;
@@ -86,6 +97,20 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     NX_ASSERT(m_eventModel);
 
     setupTypeSelection();
+
+    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                updateServerEventsMenu();
+        });
+
+    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                updateServerEventsMenu();
+        });
 
     auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
         [this]
@@ -142,12 +167,8 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
 
     auto eventFilterMenu = q->createDropdownMenu();
-    auto deviceIssuesMenu = q->createDropdownMenu();
-    auto serverEventsMenu = q->createDropdownMenu();
     auto analyticsEventsMenu = q->createDropdownMenu();
 
-    deviceIssuesMenu->setTitle("<device issues>");
-    serverEventsMenu->setTitle(tr("Server events"));
     analyticsEventsMenu->setTitle(tr("Analytics events"));
 
     StringsHelper helper(q->commonModule());
@@ -169,28 +190,12 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_analyticsEventsSingleAction = addMenuAction(eventFilterMenu,
         helper.eventName(EventType::analyticsSdkEvent), EventType::analyticsSdkEvent);
 
-    q->addDeviceDependentAction(
-        addMenuAction(deviceIssuesMenu, "<any device issue>", vms::api::EventType::anyCameraEvent,
-            QString(), true),
-        tr("Any device issue"),
-        tr("Any camera issue"));
-
-    deviceIssuesMenu->addSeparator();
-
-    for (const auto type: childEvents(EventType::anyCameraEvent))
-        addMenuAction(deviceIssuesMenu, helper.eventName(type), type);
-
-    addMenuAction(serverEventsMenu, tr("Any server event"), EventType::anyServerEvent);
-    serverEventsMenu->addSeparator();
-
-    for (const auto type: childEvents(EventType::anyServerEvent))
-        addMenuAction(serverEventsMenu, helper.eventName(type), type);
-
     eventFilterMenu->addSeparator();
-    q->addDeviceDependentAction(eventFilterMenu->addMenu(deviceIssuesMenu),
+    q->addDeviceDependentAction(eventFilterMenu->addMenu(createDeviceIssuesMenu(eventFilterMenu)),
         tr("Device issues"), tr("Camera issues"));
 
-    m_serverEventsSubmenuAction = eventFilterMenu->addMenu(serverEventsMenu);
+    m_serverEventsSubmenuAction =
+        eventFilterMenu->addMenu(createServerEventsMenu(eventFilterMenu));
 
     connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -203,8 +208,12 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_typeSelectionButton->setMenu(eventFilterMenu);
 }
 
-QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& title,
-    EventType type, const QString& subType, bool dynamicTitle)
+QAction* EventSearchWidget::Private::addMenuAction(
+    QMenu* menu,
+    const QString& title,
+    EventType type,
+    const QString& subType,
+    bool dynamicTitle) const
 {
     auto action = menu->addAction(title);
     connect(action, &QAction::triggered, this,
@@ -233,6 +242,56 @@ QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& t
     }
 
     return action;
+}
+
+QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
+{
+    auto menu = new QMenu(parent);
+    menu->setProperty(style::Properties::kMenuAsDropdown, true);
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    q->addDeviceDependentAction(
+        addMenuAction(menu, QString(), vms::api::EventType::anyCameraEvent, QString(), true),
+        tr("Any device issue"),
+        tr("Any camera issue"));
+
+    menu->addSeparator();
+
+    nx::vms::event::StringsHelper stringsHelper(q->commonModule());
+    for (const auto type: nx::vms::event::childEvents(EventType::anyCameraEvent))
+        addMenuAction(menu, stringsHelper.eventName(type), type);
+
+    return menu;
+}
+
+QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
+{
+    auto menu = new QMenu(parent);
+    menu->setProperty(style::Properties::kMenuAsDropdown, true);
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    menu->setTitle(tr("Server events"));
+
+    addMenuAction(menu, tr("Any server event"), EventType::anyServerEvent);
+    menu->addSeparator();
+
+    const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
+        nx::vms::event::childEvents(EventType::anyServerEvent), q->resourcePool());
+
+    nx::vms::event::StringsHelper stringsHelper(q->commonModule());
+    for (const auto type: accessibleServerEvents)
+        addMenuAction(menu, stringsHelper.eventName(type), type);
+
+    return menu;
+}
+
+void EventSearchWidget::Private::updateServerEventsMenu()
+{
+    m_typeSelectionButton->menu()->removeAction(m_serverEventsSubmenuAction);
+    m_serverEventsSubmenuAction->menu()->deleteLater();
+    m_serverEventsSubmenuAction->deleteLater();
+    m_serverEventsSubmenuAction = m_typeSelectionButton->menu()->insertMenu(
+        m_cameraIssuesSubmenuAction, createServerEventsMenu(m_typeSelectionButton->menu()));
 }
 
 void EventSearchWidget::Private::updateAnalyticsMenu()
