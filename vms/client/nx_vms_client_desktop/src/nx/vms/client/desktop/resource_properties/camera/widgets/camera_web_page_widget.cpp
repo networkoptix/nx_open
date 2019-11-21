@@ -2,6 +2,9 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <chrono>
+
+#include <QtCore/QElapsedTimer>
 #include <QtGui/QContextMenuEvent>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkCookie>
@@ -24,7 +27,74 @@
 
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
+#include <ui/dialogs/common/password_dialog.h>
+
+using namespace std::chrono;
+
 namespace {
+
+constexpr milliseconds kHttpAuthSmallInterval = 10s;
+constexpr int kHttpAuthAttemptsLimit = 3;
+
+/**
+ * Allows to monitor if certain number of attemps is exceeded withing a time perdiod.
+ */
+class AttemptCounter
+{
+public:
+    AttemptCounter() { setLimit(1); }
+
+    void reset()
+    {
+        m_next = 0;
+        m_count = 0;
+    }
+
+    void setLimit(size_t limit)
+    {
+        reset();
+
+        if (limit == 0)
+            return;
+
+        m_timeStamps.resize(limit, {});
+    }
+
+    size_t limit() const { return m_timeStamps.size(); }
+
+    size_t count() const { return m_count; }
+
+    void registerAttempt()
+    {
+        if (m_count < m_timeStamps.size())
+            ++m_count;
+
+        m_timeStamps[m_next] = steady_clock::now();
+        m_next = (m_next + 1) % m_count;
+    }
+
+    milliseconds timeFrame() const
+    {
+        if (m_count == 0)
+            return milliseconds::zero();
+
+        size_t first = m_next % m_count;
+        size_t last = m_next == 0 ? m_count - 1 : m_next - 1;
+
+        return duration_cast<milliseconds>(m_timeStamps[last] - m_timeStamps[first]);
+    }
+
+    bool exceeded(milliseconds time) const
+    {
+        return m_count == m_timeStamps.size() && time > timeFrame();
+    }
+
+private:
+    // Ring buffer.
+    std::vector<steady_clock::time_point> m_timeStamps;
+    size_t m_next = 0;
+    size_t m_count = 0;
+};
 
 // This User-Agent is required for vista camera to use html/js page, not java applet.
 const QString kUserAgentForCameraPage(
@@ -72,6 +142,8 @@ struct CameraWebPageWidget::Private
     bool loadNeeded = false;
 
     QnMutex mutex;
+    AttemptCounter authCounter;
+    AttemptCounter authDialodCounter;
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
@@ -106,17 +178,46 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
+    authCounter.setLimit(kHttpAuthAttemptsLimit);
+    authDialodCounter.setLimit(kHttpAuthAttemptsLimit);
+
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
         [this](const QUrl& requestUrl, QAuthenticator* authenticator)
         {
             QnMutexLocker lock(&mutex);
-            if (lastRequestUrl != requestUrl)
+
+            if (lastRequestUrl == requestUrl)
+            {
+                authCounter.registerAttempt();
+                if (!authCounter.exceeded(kHttpAuthSmallInterval))
+                {
+                    NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
+                    authenticator->setUser(credentials.login());
+                    authenticator->setPassword(credentials.password());
+                    return;
+                }
+            }
+
+            authDialodCounter.registerAttempt();
+            if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
                 return;
 
-            NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
-            authenticator->setUser(credentials.login());
-            authenticator->setPassword(credentials.password());
-    });
+            PasswordDialog dialog(parent);
+
+            auto url = requestUrl;
+
+            // Hide credentials.
+            url.setUserName(QString());
+            url.setPassword(QString());
+
+            dialog.setText(url.toString());
+
+            if (dialog.exec() == QDialog::Accepted)
+            {
+                authenticator->setUser(dialog.username());
+                authenticator->setPassword(dialog.password());
+            }
+        });
 
     QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
         [this](const QUrl&, QAuthenticator* authenticator, const QString&)

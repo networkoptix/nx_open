@@ -194,6 +194,9 @@ Figure
 
     function serialize()
     {
+        if (pointMakerInstrument.count === 0)
+            return null
+
         const direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
             ? arrowA.checked ? "a" : "b"
             : ""

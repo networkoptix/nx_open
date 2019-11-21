@@ -315,8 +315,14 @@ public:
 
 class LineFigure: public ValueItem
 {
+    Q_OBJECT
+    Q_PROPERTY(QString allowedDirections MEMBER m_allowedDirections)
+
 public:
     LineFigure(QObject* parent = nullptr);
+
+private:
+    QString m_allowedDirections;
 };
 
 class BoxFigure: public ValueItem
