@@ -435,16 +435,16 @@
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
-                        {
-                            "level": "warning",
-                            "condition": "greaterThan %fpsDelta 5",
-                            "text": "has actual fps less for %fpsDelta frames/s"
-                        },
-                        {
-                            "level": "error",
-                            "condition": "greaterThan %fpsDelta 10",
-                            "text": "has actual fps less for %fpsDelta frames/s"
-                        }
+                            {
+                                "level": "warning",
+                                "condition": "greaterThan %fpsDeltaAverage 5",
+                                "text": "has actual fps less for %fpsDeltaAverage frames/s"
+                            },
+                            {
+                                "level": "error",
+                                "condition": "greaterThan %fpsDeltaAverage 10",
+                                "text": "has actual fps less for %fpsDeltaAverage frames/s"
+                            }
                         ]
                     },
                     "actualBitrateBps": {
