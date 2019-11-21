@@ -45,10 +45,10 @@
          <string/>
         </property>
         <property name="minimum">
-         <number>5</number>
+         <number>1</number>
         </property>
         <property name="maximum">
-         <number>30</number>
+         <number>86400</number>
         </property>
        </widget>
       </item>
