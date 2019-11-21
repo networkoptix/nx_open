@@ -12,6 +12,7 @@ void QnMediaStreamStatistics::reset()
     QnMutexLocker locker(&m_mutex);
     m_data.clear();
     m_totalSizeBytes = 0;
+    m_lastDataTimer.restart();
 }
 
 void QnMediaStreamStatistics::onData(
@@ -40,6 +41,7 @@ void QnMediaStreamStatistics::onData(
     // Remove old and future data in case of media stream time has been changed.
     removeRange(toIterator(timestamp + kWindowSize), m_data.end());
     removeRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
+    m_lastDataTimer.restart();
 }
 
 void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)
@@ -52,7 +54,7 @@ void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)
 qint64 QnMediaStreamStatistics::bitrateBitsPerSecond() const
 {
     QnMutexLocker locker(&m_mutex);
-    if (m_data.empty())
+    if (m_data.empty() || m_lastDataTimer.elapsed() > kWindowSize)
         return 0;
 
     const auto interval = intervalUnsafe().count();
@@ -70,7 +72,7 @@ bool QnMediaStreamStatistics::hasMediaData() const
 float QnMediaStreamStatistics::getFrameRate() const
 {
     QnMutexLocker locker( &m_mutex );
-    if (m_data.empty())
+    if (m_data.empty() || m_lastDataTimer.elapsed() > kWindowSize)
         return 0;
     const auto interval = intervalUnsafe().count();
     if (interval > 0)
