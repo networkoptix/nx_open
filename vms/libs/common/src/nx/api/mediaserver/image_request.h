@@ -114,6 +114,7 @@ struct CameraImageRequest: ImageRequest
 };
 
 QString toString(CameraImageRequest::StreamSelectionMode value);
+QString toString(CameraImageRequest::AspectRatio value);
 
 inline QString toString(ImageRequest::RoundMethod value)
 {
