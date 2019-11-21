@@ -12,8 +12,9 @@
 
 namespace nx::vms::testcamera {
 
-FileCache::FileCache(QnCommonModule* commonModule):
+FileCache::FileCache(QnCommonModule* commonModule, int maxFileSizeMegabytes):
     m_commonModule(commonModule),
+    m_maxFileSizeMegabytes(maxFileSizeMegabytes),
     m_logger(new Logger("FileCache"))
 {
 }
@@ -53,10 +54,10 @@ bool FileCache::loadFile(const QString& filename)
         frames.append(videoFrame);
 
         totalSize += videoFrame->dataSize();
-        if (totalSize > 1024 * 1024 * 100)
+        if (m_maxFileSizeMegabytes > 0 && totalSize > 1024 * 1024 * m_maxFileSizeMegabytes)
         {
-            NX_LOGGER_WARNING(m_logger, "File too large, using first ~100 MB: #%1 %2",
-                fileIndex, filename);
+            NX_LOGGER_WARNING(m_logger, "File too large, using first ~%1 MB: #%2 %3",
+                m_maxFileSizeMegabytes, fileIndex, filename);
             break;
         }
     }

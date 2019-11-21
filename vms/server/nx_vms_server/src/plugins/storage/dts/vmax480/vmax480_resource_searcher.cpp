@@ -228,14 +228,17 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray&
 
 bool QnPlVmax480ResourceSearcher::checkVmaxDevice(const nx::utils::Url& url)
 {
-    NX_VERBOSE(this, "Check if it VMAX device on %1:%2", url);
+    NX_VERBOSE(this, "Check if it VMAX device on %1", url);
 
     nx::network::http::HttpClient client;
     nx::utils::Url requestUrl(url);
     requestUrl.setScheme("http");
     requestUrl.setPath("/cgi-bin/design/html_template/Login.html");
     if (!client.doGet(requestUrl))
+    {
+        NX_VERBOSE(this, "Not a VMAX device on url %1", url);
         return false;
+    }
     auto response = client.fetchEntireMessageBody();
     return response && response->toLower().contains("web login");
 }

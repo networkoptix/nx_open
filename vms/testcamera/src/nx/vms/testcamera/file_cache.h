@@ -14,7 +14,7 @@ namespace nx::vms::testcamera {
 class Logger; //< private
 
 /**
- * Loads video files into memory, limiting them to first 100 MB.
+ * Loads video files into memory, limiting them in size to the specified value.
  *
  * Thread-safe.
  */
@@ -28,7 +28,7 @@ public:
         QList<QnConstCompressedVideoDataPtr> frames;
     };
 
-    FileCache(QnCommonModule* commonModule);
+    FileCache(QnCommonModule* commonModule, int maxFileSizeMegabytes);
     ~FileCache();
 
     /** @return False on error, having logged the error message. */
@@ -41,6 +41,7 @@ public:
 
 private:
     QnCommonModule* const m_commonModule;
+    const int m_maxFileSizeMegabytes;
     const std::unique_ptr<Logger> m_logger;
 
     QMap<QString, File> m_filesByFilename;

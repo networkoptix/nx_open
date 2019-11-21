@@ -61,36 +61,11 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-const char* upperIfBoolean(const char* value)
-{
-    if (!value)
-        return nullptr;
-    if (strcmp(value, "false") == 0)
-        return "False";
-    if (strcmp(value, "true") == 0)
-        return "True";
-    return value;
-}
-
 bool endsWith(std::string_view string, std::string_view ending) //< remove in C++20
 {
     return
         ending.size() <= string.size()
         && std::equal(cbegin(ending), cend(ending), cend(string) - ending.size());
-}
-
-std::string specify(const char* v, unsigned int n)
-{
-    NX_ASSERT(v);
-    std::string result(v);
-    if (n == 0)
-        return result;
-
-    const std::string nAsString =
-        static_cast<const std::stringstream&>((std::stringstream() << n)).str();
-    result.replace(result.find("#"), 1, nAsString);
-
-    return result;
 }
 
 // read the setting from the server to plugin
@@ -138,6 +113,25 @@ std::string DeviceAgent::sendCommand(const std::string& query)
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
     command.setPath(kEventPath);
     command.setQuery(QString::fromStdString(query) + QString("&Channel=%1").arg(m_channelNumber));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    if (!isSent)
+        return "Failed to send command to camera";
+
+    auto* response = m_settingsHttpClient.response();
+    const bool isApproved = (response->statusLine.statusCode == 200);
+    if (!isApproved)
+        return response->statusLine.toString().toStdString();
+
+    return {};
+}
+
+std::string DeviceAgent::sendCommand2(const std::string& query)
+{
+    nx::utils::Url command(m_url);
+    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
+    command.setPath(kEventPath);
+    command.setQuery(QString::fromStdString(query));
 
     const bool isSent = m_settingsHttpClient.doGet(command);
     if (!isSent)
@@ -200,11 +194,39 @@ std::string DeviceAgent::WriteSettingsToCamera(
         errorMap->setItem(param.plugin, reason);
 }
 
+template<class S, class F>
+void retr2(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    const nx::sdk::IStringMap* settings,
+    S& previousState,
+    F f,
+    FrameSize frameSize,
+    int objectIndex = 0)
+{
+    S settingGroup;
+    if (!settingGroup.loadFromServer(settings, objectIndex))
+        settingGroup.replanishErrorMap(errorMap, "read failed");
+    else
+    {
+        if (settingGroup.differesEnoughFrom(previousState))
+        {
+            const std::string query = buildCameraRequestQuery(settingGroup, frameSize);
+                const std::string error = f(query);
+                if (!error.empty())
+                    settingGroup.replanishErrorMap(errorMap, error);
+                else
+                    previousState = settingGroup;
+        }
+    }
+
+}
+
 constexpr const char* failedToReceiveError = "Failed to receive a value from server";
 
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
+
+    int c = settings->count();
     //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
@@ -222,9 +244,26 @@ void DeviceAgent::doSetSettings(
     retransmitSettings(errorMap, settings, m_settings.tamperingDetection);
     retransmitSettings(errorMap, settings, m_settings.defocusDetection);
 
-    retransmitSettings(errorMap, settings, m_settings.audioDetection);
+    const auto sender = [this](const std::string& s) {return this->sendCommand2(s); };
 
-    return;
+    retr2(errorMap, settings, m_settings.objectDetectionObjects, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.objectDetectionBestShot, sender, m_frameSize);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaLine[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaIncludeArea[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaExcludeArea[i], sender, m_frameSize, i + 1);
+
+    retr2(errorMap, settings, m_settings.audioDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.soundClassification, sender, m_frameSize);
+
     *outResult = errorMap.releasePtr();
 }
 

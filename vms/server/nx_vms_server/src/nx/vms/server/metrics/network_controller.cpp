@@ -58,32 +58,27 @@ public:
         m_interface = std::move(iface);
     }
 
-    nx::vms::api::metrics::Value addressesJson() const
+    nx::vms::api::metrics::Value otherAddressesJson() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         QJsonArray result;
-        for (const auto& address: m_interface.addressEntries())
-            result.append(address.ip().toString());
-        if (result.empty())
-            return {};
+
+        const auto addresses = m_interface.addressEntries();
+        const auto displayIp = displayAddressFromAddresses(addresses);
+
+        for (const auto& address: addresses)
+        {
+            if (address.ip() != displayIp)
+                result.append(address.ip().toString());
+        }
+
         return result;
     }
 
-    nx::vms::api::metrics::Value firstAddress() const
+    nx::vms::api::metrics::Value displayAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        const auto addresses = m_interface.addressEntries();
-        if (addresses.empty())
-            return {};
-
-        // Trying to return IPv4 address if there is one.
-        for (const auto& address: addresses)
-        {
-            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                return address.ip().toString();
-        }
-
-        return addresses.first().ip().toString();
+        return displayAddressFromAddresses(m_interface.addressEntries()).toString();
     }
 
     QString state() const
@@ -106,6 +101,22 @@ public:
     }
 
     QnCommonModule* commonModule() const { return serverModule()->commonModule(); }
+
+private:
+    static QHostAddress displayAddressFromAddresses(const QList<QNetworkAddressEntry>& addresses)
+    {
+        if (addresses.empty())
+            return {};
+
+        // Trying to return IPv4 address if there is one.
+        for (const auto& address: addresses)
+        {
+            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                return address.ip();
+        }
+
+        return addresses.first().ip();
+    }
 
 private:
     QNetworkInterface m_interface;
@@ -143,10 +154,10 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "state", [this](const auto& r) { return r->state(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "firstIp", [this](const auto& r) { return r->firstAddress(); }
+                "displayAddress", [this](const auto& r) { return r->displayAddress(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ipList", [this](const auto& r) { return r->addressesJson(); }
+                "otherAddresses", [this](const auto& r) { return r->otherAddressesJson(); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
