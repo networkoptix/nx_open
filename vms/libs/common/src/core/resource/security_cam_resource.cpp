@@ -349,8 +349,8 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 
         Qn::LicenseType forcedLicenseType = Qn::LicenseType::LC_Invalid;
         if (split.size() == 2
-            && QnUuid::fromArbitraryData(split[0]) == getId()
-            && QnLexical::deserialize<>(split[1], &forcedLicenseType))
+            && QnUuid::fromStringSafe(split[0]) == getId()
+            && QnLexical::deserialize(split[1], &forcedLicenseType))
         {
             return forcedLicenseType;
         }
