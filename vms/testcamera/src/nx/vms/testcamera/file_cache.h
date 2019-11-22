@@ -40,6 +40,11 @@ public:
     int fileCount() const { return m_filesByFilename.size(); }
 
 private:
+    bool loadVideoFrames(
+        const QString& filename,
+        QList<QnConstCompressedVideoDataPtr>* frames);
+
+private:
     QnCommonModule* const m_commonModule;
     const int m_maxFileSizeMegabytes;
     const std::unique_ptr<Logger> m_logger;
