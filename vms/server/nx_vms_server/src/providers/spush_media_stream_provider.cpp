@@ -123,12 +123,13 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
         closeStream(); // to release resources
 
         setNeedKeyData();
-        if (isInitialized)
-        {
-            onEvent(
-                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
-                m_openStreamResult);
-        }
+    }
+
+    if (isInitialized)
+    {
+        onEvent(
+            std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+            m_openStreamResult);
     }
 
     return m_openStreamResult;
