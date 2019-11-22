@@ -41,7 +41,7 @@ public:
 
     int cameraCount() const { return (int) m_cameraByMac.size(); }
 
-    void addCameras(
+    bool addCameras(
         const FileCache* fileCache,
         bool cameraForEachFile,
         const CameraOptions& testCameraOptions,
@@ -65,6 +65,12 @@ private:
         int count,
         const QStringList& primaryFileNames,
         const QStringList& secondaryFileNames);
+
+    bool addCamera(
+        const FileCache* fileCache,
+        const CameraOptions& testCameraOptions,
+        QStringList primaryFileNames,
+        QStringList secondaryFileNames);
 
 private:
     const QStringList m_localInterfacesToListen;

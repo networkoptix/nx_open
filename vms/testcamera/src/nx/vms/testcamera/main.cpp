@@ -113,13 +113,16 @@ private:
                 ? cameraSet.primaryFileNames
                 : cameraSet.secondaryFileNames;
 
-            m_cameraPool->addCameras(
+            if (!m_cameraPool->addCameras(
                 m_fileCache.get(),
                 options.cameraForFile,
                 makeCameraOptions(options, cameraSet),
                 cameraSet.count,
                 cameraSet.primaryFileNames,
-                secondaryFileNames);
+                secondaryFileNames))
+            {
+                return false;
+            }
         }
         return true;
     }
