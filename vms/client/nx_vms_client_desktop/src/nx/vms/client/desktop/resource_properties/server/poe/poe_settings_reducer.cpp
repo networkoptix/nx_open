@@ -83,7 +83,7 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
         : Qt::Checked;
 }
 
-ViewNodeData wrongResourceNodeData(const QString macAddress)
+ViewNodeData wrongResourceNodeData(const QString macAddress, bool connected)
 {
     static const QString kEmptyText =
         PoeSettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
@@ -98,7 +98,7 @@ ViewNodeData wrongResourceNodeData(const QString macAddress)
             return QIcon(pixmap);
         }();
 
-    const bool isUnknownDevice = !nx::utils::MacAddress(macAddress).isNull();
+    const bool isUnknownDevice = !nx::utils::MacAddress(macAddress).isNull() || connected;
     const auto extraText = isUnknownDevice
         ? kUnknownDeviceText.arg(macAddress)
         : kEmptyText;
@@ -136,7 +136,10 @@ ViewNodeData dataFromPort(
         [port, resource, camera]()
         {
             if (!resource)
-                return wrongResourceNodeData(port.macAddress);
+            {
+                const bool connected = port.poweringStatus != NetworkPortState::PoweringStatus::disconnected;
+                return wrongResourceNodeData(port.macAddress, connected);
+            }
 
             const auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
             return camera && !camera->getGroupId().isEmpty()
