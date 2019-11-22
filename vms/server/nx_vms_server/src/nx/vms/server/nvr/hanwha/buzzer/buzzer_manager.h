@@ -6,9 +6,10 @@
 
 #include <nx/vms/server/nvr/i_buzzer_manager.h>
 
+namespace nx::utils { class TimerManager; }
+
 namespace nx::vms::server::nvr::hanwha {
 
-class BuzzerCommandExecutor;
 class IBuzzerPlatformAbstraction;
 
 class BuzzerManager: public IBuzzerManager
@@ -30,12 +31,10 @@ private:
 private:
     nx::utils::Mutex m_mutex;
 
-    std::unique_ptr<nx::network::aio::Timer> m_timer;
+    std::unique_ptr<nx::utils::TimerManager> m_timerManager;
     std::unique_ptr<IBuzzerPlatformAbstraction> m_platformAbstraction;
-    std::unique_ptr<BuzzerCommandExecutor> m_commandExecutor;
 
     int m_enabledCounter = 0;
-    int m_forciblyEnabledCounter = 0;
 };
 
 } // namespace nx::vms::server::nvr::hanwha
