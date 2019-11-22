@@ -203,12 +203,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         if (elapsed > m_rtpFrameTimeoutMs) {
             reason = vms::api::EventReason::networkNoFrame;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-            NX_WARNING(this, "RTP read timeout for camera %1. Reopen stream", getResource()->getUniqueId());
+            NX_WARNING(this, "RTP read timeout for camera %1. Reopen stream", getResource());
         }
         else {
             reason = vms::api::EventReason::networkConnectionClosed;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-            NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource()->getUniqueId());
+            NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource());
         }
 
         emit networkIssue(getResource(),
@@ -393,8 +393,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             {
                 clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
-                if (++errorRetryCnt > m_maxRtpRetryCount) {
-                    qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
+                if (++errorRetryCnt > m_maxRtpRetryCount)
+                {
+                    NX_WARNING(this, "Too many RTP errors for camera %1. Reopen stream",
+                            getResource());
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
@@ -480,7 +482,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     clearKeyData(track.logicalChannelNum);
                     m_demuxedData[rtpChannelNum]->clear();
                     if (++errorRetryCount > m_maxRtpRetryCount) {
-                        qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
+                        NX_WARNING(this, "Too many RTP errors for camera %1. Reopen stream",
+                            getResource());
                         closeStream();
                         return QnAbstractMediaDataPtr(0);
                     }
