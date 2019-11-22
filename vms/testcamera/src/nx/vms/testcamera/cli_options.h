@@ -32,7 +32,11 @@ struct CliOptions
 };
 
 /**
+ * Parses command-line arguments into the given data structure, and validates the values.
+ *
  * If help is requested, prints it and exits the process with status 0.
+ *
+ * On error, prints the error message on stderr and returns false.
  */
 bool parseCliOptions(int argc, const char* const argv[], CliOptions* options);
 
