@@ -12,7 +12,7 @@ FanManager::FanManager(std::unique_ptr<IFanPlatformAbstraction> platformAbstract
     m_platformAbstraction(std::move(platformAbstraction)),
     m_stateFetcher(std::make_unique<FanStateFetcher>(
         m_platformAbstraction.get(),
-        [this](FanState state) { handleState(state); }))
+        [this](FanState state) { updateState(state); }))
 {
     NX_DEBUG(this, "Creating the fan state manager");
 }
@@ -50,13 +50,17 @@ void FanManager::unregisterStateChangeHandler(QnUuid handlerId)
 
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
     if (const auto it = m_handlers.find(handlerId); it != m_handlers.cend())
+    {
         m_handlers.erase(handlerId);
+    }
     else
+    {
         NX_DEBUG(this, "Handler with id %1 doesn't exist");
+    }
 
 }
 
-void FanManager::handleState(FanState state)
+void FanManager::updateState(FanState state)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (state == m_lastState)

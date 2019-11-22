@@ -66,8 +66,7 @@ static constexpr int kGetAlarmInput3Command = 0x14;
 static constexpr int kSetBuzzerCommand = 0x30;
 static constexpr int kGetFanAlarmCommand = 0x43;
 
-// TODO: #dmishin figure out why there are two ways of retrieving board id.
-#define RES_GET_BOARDID			0x20
+static constexpr int kNoErrorResult = 0;
 
 // ------------------------------------------------------------------------------------------------
 

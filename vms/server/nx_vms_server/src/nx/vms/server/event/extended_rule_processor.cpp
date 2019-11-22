@@ -415,6 +415,7 @@ bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractAction
     {
         NX_WARNING(this,
             "Got an NVR buzzer action but the Server doesn't provide the buzzer manager");
+        return false;
     }
 
     if (const auto durationMs = action->getParams().durationMs; durationMs > 0)

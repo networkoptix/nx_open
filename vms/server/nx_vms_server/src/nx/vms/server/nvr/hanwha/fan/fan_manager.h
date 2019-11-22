@@ -27,7 +27,7 @@ public:
     virtual void unregisterStateChangeHandler(QnUuid handlerId) override;
 
 private:
-    void handleState(FanState state);
+    void updateState(FanState state);
 
 public:
     mutable nx::utils::Mutex m_mutex;

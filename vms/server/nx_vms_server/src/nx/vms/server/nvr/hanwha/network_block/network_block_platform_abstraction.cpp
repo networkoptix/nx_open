@@ -16,7 +16,7 @@ namespace nx::vms::server::nvr::hanwha {
 
 static constexpr double kPoePlusPowerConsumptionLimitWatts = 30.0;
 static constexpr int kFastEthernetLinkSpeedMbps = 100;
-static const std::map<int, double> kPowerLimitWattsByDeviceClass = {
+static const std::map</*Device PoE class*/ int, double> kPowerLimitWattsByDevicePoEClass = {
     {0, 15.4},
     {1, 4.5},
     {2, 7.0},
@@ -62,7 +62,7 @@ public:
         }
 
         std::set<int> portNumbers;
-        for (int i = 1; i < portCount(); ++i)
+        for (int i = 1; i <= portCount(); ++i)
             portNumbers.insert(i);
 
         m_macAddressCache = getMacAddresses(std::move(portNumbers));
@@ -148,8 +148,8 @@ public:
             command,
             portNumber);
 
-        const int result = ::ioctl(m_powerSupplyDeviceFd, command, &commandData);
-        if (result != 0)
+        if (const int result = ::ioctl(m_powerSupplyDeviceFd, command, &commandData);
+            result != kNoErrorResult)
         {
             NX_WARNING(this, "Unable to set port powering mode to %1, port #%2, error: %3",
                 isPoeEnabled, portNumber, result);
@@ -178,7 +178,7 @@ private:
                     command,
                     &commandData);
 
-                if (result == 0
+                if (result == kNoErrorResult
                     && portNumbers.find(commandData.portNumber + 1) != portNumbers.cend())
                 {
                     portNumbers.erase(commandData.portNumber);
@@ -231,7 +231,7 @@ private:
         PortPowerConsumptionCommandData commandData;
         commandData.portNumber = portNumber - 1;
 
-#if 0
+#if 0 //< Current ioctl implementation has a bug and always returns an error.
         if (const int result = ::ioctl(m_powerSupplyDeviceFd, command, &commandData); result != 0)
         {
             NX_WARNING(this, "Failed to get power consumption for port %1, error %2",
@@ -264,7 +264,7 @@ private:
         commandData.portNumber = portNumber - 1;
 
         if (const int result = ::ioctl(m_networkControllerDeviceFd, command, &commandData);
-            result != 0)
+            result != kNoErrorResult)
         {
             NX_WARNING(this, "Failed to obtain link status for port %1, error %2",
                 portNumber, result);
@@ -284,7 +284,7 @@ private:
         PortPoweringStatusCommandData commandData;
         commandData.portNumber = portNumber - 1;
 
-#if 0
+#if 0 //< Current ioctl implementation has a bug and always returns an error.
         if (const int result = ::ioctl(m_powerSupplyDeviceFd, command, &commandData); result != 0)
         {
             NX_WARNING(this, "Failed to obtain powering status for port %1, error %2",

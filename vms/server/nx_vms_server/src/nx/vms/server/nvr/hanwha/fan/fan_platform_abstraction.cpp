@@ -36,7 +36,7 @@ public:
 
         if (const int result = ::ioctl(m_ioDeviceDescriptor, command, &commandData); result != 0)
         {
-            NX_DEBUG(this,
+            NX_WARNING(this,
                 "Unable to execute the first stage of fan alarm check, error: %1", result);
             return FanState::error;
         }
@@ -46,7 +46,11 @@ public:
             nx::utils::ElapsedTimer timer;
             timer.restart();
             while (!m_interrupted && timer.elapsed() < kWaitTimeout)
-                m_waitCondition.wait(&m_mutex, kWaitTimeout);
+            {
+                m_waitCondition.wait(
+                    &m_mutex,
+                    std::max(std::chrono::milliseconds::zero(), kWaitTimeout - timer.elapsed()));
+            }
 
             if (m_interrupted)
             {
