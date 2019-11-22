@@ -7,12 +7,11 @@
 
 #include <nx/vms/server/nvr/i_io_manager.h>
 
-namespace nx::network::aio { class Timer; }
+namespace nx::utils { class TimerManager; }
 
 namespace nx::vms::server::nvr::hanwha {
 
 class IoStateFetcher;
-class IoCommandExecutor;
 class IIoPlatformAbstraction;
 
 class IoManager: public IIoManager
@@ -38,9 +37,9 @@ public:
     virtual void unregisterStateChangeHandler(QnUuid handlerId) override;
 
 private:
-    void handleInputPortStates(const std::set<QnIOStateData>& inputPortStates);
-    void handleOutputPortStates(const QnIOStateDataList& outputPortStates);
+    void updatePortStates(const std::set<QnIOStateData>& portStates);
 
+    bool setOutputPortStateInternal(const QString& portId);
     IoPortState calculateOutputPortState(const QString& portId) const;
 
 private:
@@ -49,20 +48,12 @@ private:
 
     std::unique_ptr<IIoPlatformAbstraction> m_platformAbstraction;
     std::unique_ptr<IoStateFetcher> m_stateFetcher;
-    std::unique_ptr<IoCommandExecutor> m_commandExecutor;
-    std::unique_ptr<nx::network::aio::Timer> m_timer;
+    std::unique_ptr<nx::utils::TimerManager> m_timerManager;
 
     std::map<QnUuid, IoStateChangeHandler> m_handlers;
 
-    struct IoPortContext
-    {
-        int enabledCounter = 0;
-        int forciblyEnabledCounter = 0;
-        IoPortState portState = IoPortState::undefined;
-    };
-
-    mutable std::map</*portId*/ QString, IoPortContext> m_outputPortStates;
-    std::set<QnIOStateData> m_lastInputPortStates;
+    mutable std::map</*portId*/ QString, /*enabledCounter*/int> m_outputPortCounters;
+    std::set<QnIOStateData> m_lastPortStates;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

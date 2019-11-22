@@ -2,12 +2,11 @@
 
 #include <utils/common/synctime.h>
 
-#include <nx/network/aio/timer.h>
+#include <nx/utils/timer_manager.h>
 
 #include <nx/vms/server/nvr/hanwha/utils.h>
 #include <nx/vms/server/nvr/hanwha/common.h>
 #include <nx/vms/server/nvr/hanwha/io/io_state_fetcher.h>
-#include <nx/vms/server/nvr/hanwha/io/io_command_executor.h>
 #include <nx/vms/server/nvr/hanwha/io/i_io_platform_abstraction.h>
 
 namespace nx::vms::server::nvr::hanwha {
@@ -35,11 +34,8 @@ IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction
     m_platformAbstraction(std::move(platformAbstraction)),
     m_stateFetcher(std::make_unique<IoStateFetcher>(
         m_platformAbstraction.get(),
-        [this](const std::set<QnIOStateData>& states) { handleInputPortStates(states); })),
-    m_commandExecutor(std::make_unique<IoCommandExecutor>(
-        m_platformAbstraction.get(),
-        [this](const QnIOStateDataList& states) { handleOutputPortStates(states); })),
-    m_timer(std::make_unique<nx::network::aio::Timer>())
+        [this](const std::set<QnIOStateData>& states) { updatePortStates(states); })),
+    m_timerManager(std::make_unique<nx::utils::TimerManager>())
 {
     NX_DEBUG(this, "Creating the IO manager");
 }
@@ -48,9 +44,8 @@ IoManager::~IoManager()
 {
     NX_DEBUG(this, "Destroying the IO manager");
 
-    m_timer->cancelSync();
+    m_timerManager->stop();
     m_stateFetcher->stop();
-    m_commandExecutor->stop();
 }
 
 void IoManager::start()
@@ -58,9 +53,12 @@ void IoManager::start()
     NX_DEBUG(this, "Starting the IO manager");
 
     for (int i = 0; i < kOutputCount; ++i)
-        m_platformAbstraction->setOutputPortState(makeOutputId(i), IoPortState::inactive);
+    {
+        const QString outputId = makeOutputId(i);
+        m_platformAbstraction->setOutputPortState(outputId, IoPortState::inactive);
+        m_stateFetcher->updateOutputPortState(outputId, IoPortState::inactive);
+    }
 
-    m_commandExecutor->start();
     m_stateFetcher->start();
 }
 
@@ -80,49 +78,37 @@ bool IoManager::setOutputPortState(
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (state != IoPortState::active)
     {
-        --m_outputPortStates[portId].forciblyEnabledCounter;
+        --m_outputPortCounters[portId];
     }
     else if (autoResetTimeout == milliseconds::zero())
     {
-        ++m_outputPortStates[portId].forciblyEnabledCounter;
+        ++m_outputPortCounters[portId];
     }
     else
     {
-        ++m_outputPortStates[portId].enabledCounter;
-        m_timer->start(
-            autoResetTimeout,
-            [this, portId]()
+        ++m_outputPortCounters[portId];
+        m_timerManager->addTimerEx(
+            [this, portId](nx::utils::TimerId /*timerId*/)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
-                NX_DEBUG(this, "");
-                -- m_outputPortStates[portId].enabledCounter;
-                m_commandExecutor->setOutputPortState(portId, calculateOutputPortState(portId));
-            });
+                NX_DEBUG(this, "Timed output callback is called for port '%1'", portId);
+                --m_outputPortCounters[portId];
+
+                setOutputPortStateInternal(portId);
+            },
+            autoResetTimeout);
     }
 
-    m_commandExecutor->setOutputPortState(portId, calculateOutputPortState(portId));
-    return true; //< TODO: #dmishin wait for response from the command executor?
+    return setOutputPortStateInternal(portId);
 }
 
 QnIOStateDataList IoManager::portStates() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+
     QnIOStateDataList result;
-    const qint64 timestampMs = qnSyncTime->currentMSecsSinceEpoch();
-    for (int i = 0 ; i < kOutputCount; ++i)
-    {
-        const QString outputPortId = makeOutputId(i);
-
-        QnIOStateData outputPortState;
-        outputPortState.id = outputPortId;
-        outputPortState.isActive = (calculateOutputPortState(outputPortId) == IoPortState::active);
-        outputPortState.timestamp = timestampMs;
-
-        result.push_back(std::move(outputPortState));
-    }
-
-    for (const QnIOStateData& inputPortState: m_lastInputPortStates)
-        result.push_back(inputPortState);
+    for (const QnIOStateData& portState: m_lastPortStates)
+        result.push_back(portState);
 
     NX_DEBUG(this, "Port states have been requested: %1", containerString(result));
 
@@ -147,24 +133,26 @@ void IoManager::unregisterStateChangeHandler(QnUuid handlerId)
     m_handlers.erase(handlerId);
 }
 
-void IoManager::handleInputPortStates(const std::set<QnIOStateData>& inputPortStates)
+void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
 {
-    NX_VERBOSE(this, "Handling input port state, %1", containerString(inputPortStates));
+    NX_VERBOSE(this,
+        "Handling port states received from the state fetcher, %1",
+        containerString(portStates));
 
     QnIOStateDataList changedPortStates;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (inputPortStates == m_lastInputPortStates)
+        if (portStates == m_lastPortStates)
             return;
 
-        changedPortStates = calculateChangedPortStates(m_lastInputPortStates, inputPortStates);
-        m_lastInputPortStates = inputPortStates;
+        changedPortStates = calculateChangedPortStates(m_lastPortStates, portStates);
+        m_lastPortStates = portStates;
     }
 
     if (changedPortStates.empty())
         return;    
 
-    NX_DEBUG(this, "%1 input ports changed their state:", containerString(inputPortStates));
+    NX_DEBUG(this, "%1 IO ports changed their state:", containerString(portStates));
 
     {
         NX_MUTEX_LOCKER lock(&m_handlerMutex);
@@ -173,24 +161,31 @@ void IoManager::handleInputPortStates(const std::set<QnIOStateData>& inputPortSt
     }
 }
 
-void IoManager::handleOutputPortStates(const QnIOStateDataList& outputPortStates)
+bool IoManager::setOutputPortStateInternal(const QString& portId)
 {
-    NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    NX_DEBUG(this, "Handling output port states: %1", containerString(outputPortStates));
-    for (const auto& [_, handler]: m_handlers)
-        handler(outputPortStates);
+    const IoPortState outputPortState = calculateOutputPortState(portId);
+    const bool success = m_platformAbstraction->setOutputPortState(portId, outputPortState);
+    if (success)
+    {
+        NX_DEBUG(this, "Succcesfully set output port '%1' state to %2");
+        m_stateFetcher->updateOutputPortState(portId, outputPortState);
+    }
+    else
+    {
+        NX_WARNING(this, "Unable to set output port '%1' state to %2");
+    }
+
+    return success;
 }
 
 IoPortState IoManager::calculateOutputPortState(const QString& portId) const
 {
-    const auto it = m_outputPortStates.find(portId);
-    if (it == m_outputPortStates.cend())
+    const auto it = m_outputPortCounters.find(portId);
+    if (it == m_outputPortCounters.cend())
         return IoPortState::inactive;
 
-    const auto& portContext = it->second;
-    return (portContext.enabledCounter > 0 || portContext.forciblyEnabledCounter > 0)
-        ? IoPortState::active
-        : IoPortState::inactive;
+    const int portCounter = it->second;
+    return (portCounter > 0) ? IoPortState::active : IoPortState::inactive;
 }
 
 } // namespace nx::vms::server::nvr::hanwha
