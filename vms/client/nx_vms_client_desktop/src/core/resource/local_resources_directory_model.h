@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop {
 
-class LocalResourcesDirectoryModel : public QObject
+class LocalResourcesDirectoryModel: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -28,11 +28,16 @@ private:
     void onDirectoryChanged(const QString& path);
     void onFileChanged(const QString& path);
     void processPendingDirectoryChanges();
+    void processPendingFileChanges();
 
 private:
     QFileSystemWatcher m_fileSystemWatcher;
+
     QTimer m_deferredDirectoryChangeHandlerTimer;
-    QStringList m_pendingDirectoryChanges;
+    QTimer m_deferredFileChangeHandlerTimer;
+
+    QSet<QString> m_pendingDirectoryChanges;
+    QSet<QString> m_pendingFileChanges;
 
     QStringList m_localResourcesDirectories;
     QHash<QString, QStringList> m_childFiles;
