@@ -266,7 +266,7 @@ void ViewNodeData::setFlags(Column column, Qt::ItemFlags flags)
 
 ViewNodeData::DifferenceData ViewNodeData::difference(const ViewNodeData& other) const
 {
-    ColumnRoleHash forRemove;
+    RemoveData forRemove;
     ViewNodeData forOverride;
 
     const auto otherColumns = other.usedColumns();

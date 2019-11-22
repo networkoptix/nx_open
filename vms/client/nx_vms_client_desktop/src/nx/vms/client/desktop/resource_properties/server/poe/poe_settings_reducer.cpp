@@ -4,6 +4,7 @@
 
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
@@ -83,12 +84,20 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
         : Qt::Checked;
 }
 
-ViewNodeData wrongResourceNodeData(const QString macAddress, bool connected)
+QString uknownDeviceString(const QString& macAddress)
+{
+    static const QString kUnknownDeviceText = PoeSettingsTableView::tr("< Unknown device >");
+    static const QString kUnknownDeviceWithMacText =
+        PoeSettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
+    return nx::utils::MacAddress(macAddress).isNull()
+        ? kUnknownDeviceText
+        : kUnknownDeviceWithMacText;
+}
+
+ViewNodeData wrongResourceNodeData(const QString& macAddress, bool connected)
 {
     static const QString kEmptyText =
         PoeSettingsTableView::tr("Empty", "In meaning 'There is no camera physically connected now'");
-    static const QString kUnknownDeviceText =
-        PoeSettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
 
     static const auto kTransparentIcon =
         []()
@@ -99,11 +108,9 @@ ViewNodeData wrongResourceNodeData(const QString macAddress, bool connected)
         }();
 
     const bool isUnknownDevice = !nx::utils::MacAddress(macAddress).isNull() || connected;
-    const auto extraText = isUnknownDevice
-        ? kUnknownDeviceText.arg(macAddress)
-        : kEmptyText;
-    ViewNodeDataBuilder builder;
+    const auto extraText = isUnknownDevice ? uknownDeviceString(macAddress) : kEmptyText;
 
+    ViewNodeDataBuilder builder;
     builder
         .withData(PoeSettingsColumn::camera, resourceExtraTextRole, extraText)
         .withData(PoeSettingsColumn::camera, resourceColumnRole, true)
@@ -177,6 +184,18 @@ NodePtr createPortNodes(
     return root;
 }
 
+OperationData removeUserCheckedActions(OperationData removeData)
+{
+    if (removeData.operation != PatchStepOperation::removeDataOperation)
+        return removeData;
+
+    auto data = removeData.data.value<RemoveData>();
+    for (const auto column: data.keys())
+        data[column].removeAll(ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole));
+
+    return {PatchStepOperation::removeDataOperation, QVariant::fromValue(data)};
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -208,6 +227,7 @@ NodeViewStatePatch PoeSettingsReducer::blockDataChangesPatch(
 
         const auto difference = source.difference(target);
         result.appendPatchStep({node->path(), difference.updateOperation});
+        result.appendPatchStep({node->path(), removeUserCheckedActions(difference.removeOperation)});
     }
     return result;
 }

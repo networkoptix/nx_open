@@ -20,7 +20,7 @@ namespace nx::vms::client::desktop {
 
 using namespace std::placeholders;
 
-static constexpr int kUpdateIntervalMs = 3000;
+static constexpr int kUpdateIntervalMs = 1000;
 
 struct PoeController::Private: public QObject
 {

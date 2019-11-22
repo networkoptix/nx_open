@@ -28,6 +28,7 @@ using Role = int;
 using RoleVector = QVector<Role>;
 
 using ColumnRoleHash = QHash<Column, RoleVector>;
+using RemoveData = ColumnRoleHash;
 
 using OptionalCheckedState = std::optional<Qt::CheckState>;
 

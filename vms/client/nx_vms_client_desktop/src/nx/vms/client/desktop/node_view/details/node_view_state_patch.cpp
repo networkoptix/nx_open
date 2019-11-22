@@ -93,7 +93,7 @@ void handleRemoveDataOperation(
     }
 
     const auto removeDataGuard = getOperationGuard(step);
-    node->removeNodeData(step.operationData.data.value<ColumnRoleHash>());
+    node->removeNodeData(step.operationData.data.value<RemoveData>());
 }
 
 } // namespace
