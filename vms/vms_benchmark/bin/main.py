@@ -76,11 +76,6 @@ conf_definition = {
     "boxSshKey": {"type": "str", "default": None},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
-    "virtualCameraCount": {"type": "intList", "range": [1, 999]},
-    "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
-    "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
-    "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
-    "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
 }
 
@@ -90,6 +85,11 @@ if platform.system() != "Windows":
 
 
 ini_definition = {
+    "virtualCameraCount": {"type": "intList", "range": [1, 999], "default": 4},
+    "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
+    "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
+    "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
+    "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
