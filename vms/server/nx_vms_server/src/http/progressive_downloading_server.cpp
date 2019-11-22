@@ -504,19 +504,15 @@ void QnProgressiveDownloadingConsumer::run()
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
 
-    std::atomic_int& donwloaderCount = metrics->tcpConnections().progressiveDownloading();
-    auto newValue = ++donwloaderCount;
+    QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+    metrics->tcpConnections().progressiveDownloading()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
-        [metrics]()
+        [metrics, &transcodeMethod]()
         {
             --metrics->tcpConnections().progressiveDownloading();
+            if (transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+                --metrics->progressiveDownloadingTranscoders();
         });
-
-    if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
-    {
-        sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
-        return;
-    }
 
     if (commonModule()->isTranscodeDisabled())
     {
@@ -642,7 +638,6 @@ void QnProgressiveDownloadingConsumer::run()
             QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
 
         AVCodecID videoCodec;
-        QnTranscoder::TranscodeMethod transcodeMethod;
         QnServer::ChunksCatalog qualityToUse;
         auto streamInfo = findCompatibleStream(
             physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
@@ -656,8 +651,16 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else
         {
-            qualityToUse = QnServer::HiQualityCatalog;
             transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+            auto newValue = ++metrics->progressiveDownloadingTranscoders();
+            if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
+            {
+                NX_DEBUG(this, "Close session, too many opened connections, max connections: %1",
+                    commonModule()->globalSettings()->maxWebMTranscoders());
+                sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
+                return;
+            }
+            qualityToUse = QnServer::HiQualityCatalog;
             videoCodec = getPrefferedVideoCodec(
                 streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
             NX_DEBUG(this,
@@ -869,6 +872,9 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
+        if (!d->socket->isConnected())
+            metricsGuard.fire();
+
         NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
             d->socket->getForeignAddress(),
             !dataConsumer.isRunning() ? lit("Data consumer stopped") :
@@ -889,8 +895,6 @@ void QnProgressiveDownloadingConsumer::run()
         if (camera)
             camera->notInUse(this);
     }
-
-    //d->socket->close();
 }
 
 void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )

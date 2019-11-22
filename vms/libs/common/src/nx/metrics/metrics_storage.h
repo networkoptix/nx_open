@@ -109,7 +109,10 @@ struct Storage: ParameterSet
     };
     NX_METRICS_ADD(TcpConnections, tcpConnections, "Opened TCP connections");
 
-    NX_METRICS_ADD(std::atomic_int, transcoders, "Amount of video transcoding threads");
+    NX_METRICS_ADD(std::atomic_int, transcoders,
+        "Amount of video transcoding threads (same as amount of encoders)");
+    NX_METRICS_ADD(std::atomic_int, progressiveDownloadingTranscoders,
+        "Amount of opened progressive downloading connections with trancoding");
     NX_METRICS_ADD(std::atomic_int, offlineStatus,
         "How many times resources have switched to the offline state");
 
