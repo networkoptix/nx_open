@@ -97,7 +97,6 @@ class ProgressiveDownloadingServerPrivate: public QnTCPConnectionProcessorPrivat
 public:
     QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
-    QnTranscoder::TranscodeMethod transcodeMethod;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     //saving address and port in case socket will not make it to the destructor
     QString foreignAddress;
@@ -150,9 +149,6 @@ ProgressiveDownloadingServer::~ProgressiveDownloadingServer()
     NX_DEBUG(this, lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(ProgressiveDownloadingServer_count.fetchAndAddOrdered(-1)-1));
-
-    if (d->transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
-        --d->serverModule->commonModule()->metrics()->progressiveDownloadingTranscoders();
 
     quint64 killTimerID = 0;
     {
@@ -290,10 +286,13 @@ void ProgressiveDownloadingServer::run()
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
     metrics->tcpConnections().progressiveDownloading()++;
+    QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
     auto metricsGuard = nx::utils::makeScopeGuard(
-        [metrics]()
+        [metrics, &transcodeMethod]()
         {
             --metrics->tcpConnections().progressiveDownloading();
+            if (transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+                --metrics->progressiveDownloadingTranscoders();
         });
 
     if (commonModule()->isTranscodeDisabled())
@@ -432,12 +431,12 @@ void ProgressiveDownloadingServer::run()
         qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
             ? QnServer::HiQualityCatalog
             : QnServer::LowQualityCatalog;
-        d->transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+        transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
         videoCodec = (AVCodecID)streamInfo->codec;
     }
     else
     {
-        d->transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+        transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
         auto newValue = ++metrics->progressiveDownloadingTranscoders();
         if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
         {
@@ -456,7 +455,7 @@ void ProgressiveDownloadingServer::run()
 
     if (!audioOnly && d->transcoder->setVideoCodec(
             videoCodec,
-            d->transcodeMethod,
+            transcodeMethod,
             quality,
             videoSize,
             -1) != 0 )
@@ -595,6 +594,9 @@ void ProgressiveDownloadingServer::run()
     dataConsumer.start();
     while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
         readRequest(); // just reading socket to determine client connection is closed
+
+    if (!d->socket->isConnected())
+        metricsGuard.fire();
 
     NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
         d->socket->getForeignAddress(),
