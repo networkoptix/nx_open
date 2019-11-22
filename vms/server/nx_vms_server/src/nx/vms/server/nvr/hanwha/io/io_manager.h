@@ -4,10 +4,9 @@
 #include <set>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 
 #include <nx/vms/server/nvr/i_io_manager.h>
-
-namespace nx::utils { class TimerManager; }
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -38,9 +37,7 @@ public:
 
 private:
     void updatePortStates(const std::set<QnIOStateData>& portStates);
-
-    bool setOutputPortStateInternal(const QString& portId);
-    IoPortState calculateOutputPortState(const QString& portId) const;
+    bool setOutputPortStateInternal(const QString& portId, IoPortState portState);
 
 private:
     mutable nx::utils::Mutex m_mutex;
@@ -52,7 +49,13 @@ private:
 
     std::map<QnUuid, IoStateChangeHandler> m_handlers;
 
-    mutable std::map</*portId*/ QString, /*enabledCounter*/int> m_outputPortCounters;
+    struct IoPortContext
+    {
+        nx::utils::TimerId timerId = 0;
+        IoPortState currentState = IoPortState::undefined;
+    };
+
+    mutable std::map</*portId*/ QString, IoPortContext> m_outputPortContexts;
     std::set<QnIOStateData> m_lastPortStates;
 };
 

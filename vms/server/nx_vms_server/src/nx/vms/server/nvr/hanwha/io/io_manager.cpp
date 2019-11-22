@@ -30,6 +30,11 @@ static QnIOStateDataList calculateChangedPortStates(
     return result;
 }
 
+static IoPortState invertedState(IoPortState state)
+{
+    return state == IoPortState::inactive ? IoPortState::active : IoPortState::inactive;
+}
+
 IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction):
     m_platformAbstraction(std::move(platformAbstraction)),
     m_stateFetcher(std::make_unique<IoStateFetcher>(
@@ -76,30 +81,35 @@ bool IoManager::setOutputPortState(
         portId, state, autoResetTimeout);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (state != IoPortState::active)
+    auto& context = m_outputPortContexts[portId];
+    if (context.timerId != 0)
     {
-        --m_outputPortCounters[portId];
+        NX_DEBUG(this, "Canceling timer '%1'", context.timerId);
+        m_timerManager->deleteTimer(context.timerId);
     }
-    else if (autoResetTimeout == milliseconds::zero())
+
+    if (autoResetTimeout != std::chrono::milliseconds::zero())
     {
-        ++m_outputPortCounters[portId];
-    }
-    else
-    {
-        ++m_outputPortCounters[portId];
-        m_timerManager->addTimerEx(
-            [this, portId](nx::utils::TimerId /*timerId*/)
+        context.timerId = m_timerManager->addTimer(
+            [this, portId, state](nx::utils::TimerId timerId)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
-                NX_DEBUG(this, "Timed output callback is called for port '%1'", portId);
-                --m_outputPortCounters[portId];
+                NX_DEBUG(this,
+                    "Timer '%1' callback is called for port '%2', state: %3",
+                    timerId, portId, invertedState(state));
 
-                setOutputPortStateInternal(portId);
+                if (m_outputPortContexts[portId].timerId != timerId)
+                {
+                    NX_DEBUG(this, "The timer '%1' has been canceled, exiting", timerId);
+                    return;
+                }
+
+                setOutputPortStateInternal(portId, invertedState(state));
             },
             autoResetTimeout);
     }
 
-    return setOutputPortStateInternal(portId);
+    return setOutputPortStateInternal(portId, state);
 }
 
 QnIOStateDataList IoManager::portStates() const
@@ -161,31 +171,27 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
     }
 }
 
-bool IoManager::setOutputPortStateInternal(const QString& portId)
+bool IoManager::setOutputPortStateInternal(const QString& portId, IoPortState portState)
 {
-    const IoPortState outputPortState = calculateOutputPortState(portId);
-    const bool success = m_platformAbstraction->setOutputPortState(portId, outputPortState);
+    if (portState == m_outputPortContexts[portId].currentState)
+    {
+        NX_DEBUG(this, "Current state of the output port '%1' is equal to requested: %2, ignoring",
+            portId, portState);
+        return true;
+    }
+
+    const bool success = m_platformAbstraction->setOutputPortState(portId, portState);
     if (success)
     {
-        NX_DEBUG(this, "Succcesfully set output port '%1' state to %2");
-        m_stateFetcher->updateOutputPortState(portId, outputPortState);
+        NX_DEBUG(this, "Succcesfully set output port '%1' state to %2", portId, portState);
+        m_stateFetcher->updateOutputPortState(portId, portState);
     }
     else
     {
-        NX_WARNING(this, "Unable to set output port '%1' state to %2");
+        NX_WARNING(this, "Unable to set output port '%1' state to %2", portId, portState);
     }
 
     return success;
-}
-
-IoPortState IoManager::calculateOutputPortState(const QString& portId) const
-{
-    const auto it = m_outputPortCounters.find(portId);
-    if (it == m_outputPortCounters.cend())
-        return IoPortState::inactive;
-
-    const int portCounter = it->second;
-    return (portCounter > 0) ? IoPortState::active : IoPortState::inactive;
 }
 
 } // namespace nx::vms::server::nvr::hanwha
