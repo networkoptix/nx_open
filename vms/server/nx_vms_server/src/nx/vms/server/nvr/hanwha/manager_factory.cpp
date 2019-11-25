@@ -59,6 +59,8 @@ ManagerFactory::ManagerFactory(
 ManagerFactory::~ManagerFactory()
 {
     NX_DEBUG(this, "Destroying the manager factory");
+    for (const auto& [_, descriptor]: m_descriptorByDeviceFileName)
+        ::close(descriptor);
 }
 
 std::unique_ptr<INetworkBlockManager> ManagerFactory::createNetworkBlockManager() const
