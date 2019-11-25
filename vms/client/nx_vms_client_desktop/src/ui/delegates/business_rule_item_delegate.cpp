@@ -56,7 +56,7 @@ enum { comboBoxMaxVisibleItems = 100 };
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator(this)),
+    m_lexComparator(new QnBusinessTypesComparator()),
     m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
 {
 }
