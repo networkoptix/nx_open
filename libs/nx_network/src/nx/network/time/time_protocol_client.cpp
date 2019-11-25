@@ -9,22 +9,31 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
-constexpr size_t kMaxTimeStrLength = sizeof(quint32);
+constexpr size_t kMaxTimeStrLength = sizeof(quint32) * 2;
 constexpr std::chrono::seconds kSocketRecvTimeout = std::chrono::seconds(7);
 constexpr int kMillisPerSec = 1000;
 
 namespace nx {
 namespace network {
 
-qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr)
+std::optional<qint64> rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr)
 {
     quint32 utcTimeSeconds = 0;
     if ((size_t)timeStr.size() < sizeof(utcTimeSeconds))
-        return -1;
+        return std::nullopt;
+
     memcpy(&utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds));
     utcTimeSeconds = ntohl(utcTimeSeconds);
     utcTimeSeconds -= kSecondsFrom1900_01_01To1970_01_01;
-    return ((qint64) utcTimeSeconds) * kMillisPerSec;
+
+    if ((size_t)timeStr.size() < kMaxTimeStrLength) //< Backward compatibility with rfc868.
+        return ((qint64) utcTimeSeconds) * kMillisPerSec;
+
+    quint32 utcTimeMillis = 0;
+    memcpy(&utcTimeMillis, timeStr.constData() + sizeof(utcTimeSeconds), sizeof(utcTimeMillis));
+    utcTimeMillis = ntohl(utcTimeMillis);
+
+    return ((qint64) utcTimeSeconds) * kMillisPerSec + utcTimeMillis;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,7 +142,11 @@ void TimeProtocolClient::onSomeBytesRead(
         NX_VERBOSE(this, lm("rfc868 time_sync. Connection to %1 has been closed. Received just %2 bytes")
             .arg(m_timeServerEndpoint).arg(m_timeStr.size()));
 
-        reportResult(-1, SystemError::notConnected, std::chrono::milliseconds::zero());
+        // Trying to return hat we have.
+        if (auto time = rfc868TimestampToTimeToUtcMillis(m_timeStr); time != std::nullopt)
+            reportResult(*time, SystemError::noError, m_elapsedTimer.elapsed());
+        else
+            reportResult(-1, SystemError::notConnected, std::chrono::milliseconds::zero());
         return;
     }
 
@@ -147,7 +160,7 @@ void TimeProtocolClient::onSomeBytesRead(
 
         // Max data size has been read, ignoring futher data.
         reportResult(
-            rfc868TimestampToTimeToUtcMillis(m_timeStr),
+            *rfc868TimestampToTimeToUtcMillis(m_timeStr),
             SystemError::noError,
             m_elapsedTimer.elapsed());
         return;
