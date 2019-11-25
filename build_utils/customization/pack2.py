@@ -85,7 +85,7 @@ def unpack(package_path, output_path, clean_package):
         copy_if_different(source, output_path / target)
 
     if clean_package:
-        rmtree(unpacked_package_path)
+        rmtree(unpacked_package_path.as_posix())
 
 
 def list_files(output_path):
