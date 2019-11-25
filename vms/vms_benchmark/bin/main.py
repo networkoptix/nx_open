@@ -76,11 +76,6 @@ conf_definition = {
     "boxSshKey": {"type": "str", "default": None},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
-    "virtualCameraCount": {"type": "intList", "range": [1, 999]},
-    "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
-    "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
-    "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
-    "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
 }
 
@@ -90,6 +85,11 @@ if platform.system() != "Windows":
 
 
 ini_definition = {
+    "virtualCameraCount": {"type": "intList", "range": [1, 999], "default": 4},
+    "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
+    "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
+    "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
+    "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
@@ -518,7 +518,7 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
         return False, None
 
     try:
-        discovering_timeout_seconds = conf['cameraDiscoveryTimeoutSeconds']
+        discovering_timeout_seconds = ini['cameraDiscoveryTimeoutSeconds']
 
         report(
             "    Waiting for virtual camera discovery and going live "
@@ -556,11 +556,11 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     if swapped_initially_kilobytes is None:
         report("Cannot obtain swap information.")
 
-    for [test_number, test_camera_count] in zip(itertools.count(1, 1), conf['virtualCameraCount']):
+    for [test_number, test_camera_count] in zip(itertools.count(1, 1), ini['virtualCameraCount']):
         total_live_stream_count = math.ceil(
-            conf['liveStreamsPerCameraRatio'] * test_camera_count)
+            ini['liveStreamsPerCameraRatio'] * test_camera_count)
         total_archive_stream_count = math.ceil(
-            conf['archiveStreamsPerCameraRatio'] * test_camera_count)
+            ini['archiveStreamsPerCameraRatio'] * test_camera_count)
         report(
             f"\nLoad test #{test_number}: "
             f"{test_camera_count} virtual camera(s), "
@@ -642,7 +642,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 report("    All streams opened.")
 
-                streaming_duration_mins = conf['streamingTestDurationMinutes']
+                streaming_duration_mins = ini['streamingTestDurationMinutes']
                 streaming_test_started_at_s = time.time()
 
                 stream_stats = {
@@ -839,7 +839,7 @@ def _test_vms(api, box, box_platform, conf, ini, vms):
     report(
         f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB"
     )
-    _check_storages(api, ini, camera_count=max(conf['virtualCameraCount']))
+    _check_storages(api, ini, camera_count=max(ini['virtualCameraCount']))
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
         if cameras is not None:
@@ -1017,7 +1017,7 @@ def main(conf_file, ini_file, log_file):
 
     conf, ini = load_configs(conf_file, ini_file)
 
-    if conf['liveStreamsPerCameraRatio'] + conf['archiveStreamsPerCameraRatio'] == 0:
+    if ini['liveStreamsPerCameraRatio'] + ini['archiveStreamsPerCameraRatio'] == 0:
         raise exceptions.ConfigOptionsRestrictionError(
             'Config settings liveStreamsPerCameraRatio and archiveStreamsPerCameraRatio should not be zero ' +
             'simultaneously.'

@@ -294,7 +294,6 @@ void ProgressiveDownloadingServer::run()
             if (transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
                 --metrics->progressiveDownloadingTranscoders();
         });
-
     if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray(

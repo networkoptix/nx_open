@@ -23,27 +23,20 @@ FileCache::~FileCache()
 {
 }
 
-bool FileCache::loadFile(const QString& filename)
+bool FileCache::loadVideoFrames(
+    const QString& filename,
+    QList<QnConstCompressedVideoDataPtr>* frames)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_filesByFilename.find(filename) != m_filesByFilename.end()) //< Already loaded.
-        return true;
-
-    QList<QnConstCompressedVideoDataPtr> frames;
-    const int fileIndex = m_filesByFilename.size();
-
-    const QnAviResourcePtr file(new QnAviResource(filename, m_commonModule));
+    const QnAviResourcePtr aviResource(new QnAviResource(filename, m_commonModule));
     QnAviArchiveDelegate aviArchiveDelegate;
-    if (!aviArchiveDelegate.open(file, nullptr))
+    if (!aviArchiveDelegate.open(aviResource))
     {
-        NX_LOGGER_ERROR(m_logger, "Cannot open file %1", filename);
+        NX_LOGGER_ERROR(m_logger, "Cannot open file.");
         return false;
     }
 
     int64_t totalSize = 0;
-
-    NX_LOGGER_INFO(m_logger, "Loading file #%1 %2", fileIndex, filename);
+    int frameIndex = 0;
 
     while (const QnAbstractMediaDataPtr mediaFrame = aviArchiveDelegate.getNextData())
     {
@@ -51,26 +44,50 @@ bool FileCache::loadFile(const QString& filename)
         if (!videoFrame) //< Unneeded frame type.
             continue;
 
-        frames.append(videoFrame);
-
         totalSize += videoFrame->dataSize();
         if (m_maxFileSizeMegabytes > 0 && totalSize > 1024 * 1024 * m_maxFileSizeMegabytes)
         {
-            NX_LOGGER_WARNING(m_logger, "File too large, using first ~%1 MB: #%2 %3",
-                m_maxFileSizeMegabytes, fileIndex, filename);
+            NX_LOGGER_WARNING(m_logger, "File too large, using first ~%1 MB.",
+                m_maxFileSizeMegabytes);
             break;
         }
+
+        frames->append(videoFrame);
+
+        ++frameIndex;
     }
 
-    if (frames.empty())
+    return true;
+}
+
+bool FileCache::loadFile(const QString& filename)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_filesByFilename.find(filename) != m_filesByFilename.end()) //< Already loaded.
+        return true;
+
+    File file;
+    file.filename = filename;
+    file.index = m_filesByFilename.size();
+
+    const auto fileLoggerContext = m_logger->pushContext(
+        lm("File #%1 %2").args(file.index, file.filename));
+
+    NX_LOGGER_VERBOSE(m_logger, "Loading file.");
+
+    if (!loadVideoFrames(filename, &file.frames))
+        return false;
+
+    if (file.frames.empty())
     {
-        NX_LOGGER_ERROR(m_logger, "No video frames in file #%1 %2", fileIndex, filename);
+        NX_LOGGER_ERROR(m_logger, "No video frames found.");
         return false;
     }
 
-    m_filesByFilename.insert(filename, File{filename, m_filesByFilename.size(), frames});
+    m_filesByFilename.insert(filename, file);
 
-    NX_LOGGER_INFO(m_logger, "File loaded for streaming: #%1 %2", fileIndex, filename);
+    NX_LOGGER_INFO(m_logger, "File loaded for streaming.");
     return true;
 }
 

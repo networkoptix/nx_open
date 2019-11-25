@@ -175,27 +175,27 @@ static constexpr int kHexDumpBytesPerLine = 16;
 void printHexDump(
     PrintFunc printFunc, const char* caption, const char* const bytes, int size)
 {
-    const std::string header = format("Hex dump \"%s\", %d bytes @%p:", caption, size, bytes);
+    std::string s = format("Hex dump \"%s\", %d bytes @%p:", caption, size, bytes);
 
     if (size <= 8) //< Print in single line.
     {
-        printFunc((header + " { " + hexDumpLine(bytes, size, /*bytesPerLine*/ 0) + " }").c_str());
+        printFunc((s + " { " + hexDumpLine(bytes, size, /*bytesPerLine*/ 0) + " }").c_str());
+        return;
     }
-    else
+
+    s += "\n{\n";
+    int count = size;
+    const char* p = bytes;
+    while (count > 0)
     {
-        printFunc(header.c_str());
-        printFunc("{");
-        int count = size;
-        const char* p = bytes;
-        while (count > 0)
-        {
-            const int len = count >= kHexDumpBytesPerLine ? kHexDumpBytesPerLine : count;
-            printFunc((std::string("    ") + hexDumpLine(p, len, kHexDumpBytesPerLine)).c_str());
-            p += len;
-            count -= len;
-        }
-        printFunc("}");
+        const int len = count >= kHexDumpBytesPerLine ? kHexDumpBytesPerLine : count;
+        s += "\n    ";
+        s += hexDumpLine(p, len, kHexDumpBytesPerLine);
+        p += len;
+        count -= len;
     }
+    s += "\n}";
+    printFunc(s.c_str());
 }
 
 } // namespace detail

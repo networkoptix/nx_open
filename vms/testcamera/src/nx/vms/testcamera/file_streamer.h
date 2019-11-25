@@ -59,26 +59,12 @@ public:
     bool streamFrame(const QnCompressedVideoData* frame, int frameIndex) const;
 
 private:
-    template<class Value>
-    void sendAsBigEndian(Value value, const QString& dataCaptionForErrorMessage) const
-    {
-        const auto valueAsBigEndian = qToBigEndian(value);
-        send(&valueAsBigEndian, sizeof(valueAsBigEndian), dataCaptionForErrorMessage);
-    }
-
-    // Workaround for Qt deficiency: on Linux, int64_t is long, and there is no qToBigEndian(long).
-    void sendAsBigEndian(int64_t value, const QString& dataCaptionForErrorMessage) const
-    {
-        const auto valueAsBigEndian = qToBigEndian((qint64) value);
-        send(&valueAsBigEndian, sizeof(valueAsBigEndian), dataCaptionForErrorMessage);
-    }
-
     void send(const void* data, int size, const QString& dataCaptionForErrorMessage) const;
 
     void obtainUnloopingPeriod(microseconds pts) const;
     microseconds unloopAndShiftPtsIfNeeded(const microseconds pts) const;
-    void sendMediaContextWithCodecAndFlags(const QnCompressedVideoData* frame) const;
-    void sendFrame(const QnCompressedVideoData* frame) const;
+    void sendMediaContextPacket(const QnCompressedVideoData* frame) const;
+    void sendFramePacket(const QnCompressedVideoData* frame) const;
 
 private:
     const Logger* const m_logger;
