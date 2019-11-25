@@ -133,7 +133,7 @@ public:
         dataProvider->start();
         QnLiveStreamParams liveParams;
         liveParams.fps = 30;
-        liveParams.resolution = QSize(1920, 1080);
+        liveParams.resolution = QSize(1280, 720);
         dataProvider->setPrimaryStreamParams(liveParams);
 
         const auto cameraId = m_camera->getId().toSimpleString();
@@ -141,14 +141,14 @@ public:
         auto cameraData = systemValues["cameras"][cameraId];
         auto streamData = cameraData[streamPrefix];
         ASSERT_EQ(30, streamData["targetFps"].toInt());
-        ASSERT_EQ("1920x1080", streamData["resolution"].toString());
+        ASSERT_EQ("1280x720", streamData["resolution"].toString());
 
         auto alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
             EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::error);
 
-            liveParams.resolution = QSize(1280, 720);
+            liveParams.resolution = QSize(640, 480);
             dataProvider->setPrimaryStreamParams(liveParams);
             alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
             EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::none);
