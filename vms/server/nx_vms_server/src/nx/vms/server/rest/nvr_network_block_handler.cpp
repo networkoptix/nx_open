@@ -24,7 +24,7 @@ NvrNetworkBlockHandler::NvrNetworkBlockHandler(QnMediaServerModule* serverModule
 {
 }
 
-JsonRestResponse NvrNetworkBlockHandler::executeGet(const JsonRestRequest& request)
+JsonRestResponse NvrNetworkBlockHandler::executeGet(const JsonRestRequest& /*request*/)
 {
     if (const INetworkBlockManager* const manager = networkBlockManager(serverModule()))
         return manager->state();
@@ -35,7 +35,7 @@ JsonRestResponse NvrNetworkBlockHandler::executeGet(const JsonRestRequest& reque
 }
 
 JsonRestResponse NvrNetworkBlockHandler::executePost(
-    const JsonRestRequest& request, const QByteArray& body)
+    const JsonRestRequest& /*request*/, const QByteArray& body)
 {
     std::vector<nx::vms::api::NetworkPortWithPoweringMode> portPoweringModes;
     if (!QJson::deserialize(body, &portPoweringModes))
