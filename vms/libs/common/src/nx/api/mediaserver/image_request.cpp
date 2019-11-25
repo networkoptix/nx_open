@@ -17,6 +17,11 @@ QString toString(CameraImageRequest::StreamSelectionMode value)
     return QnLexical::serialized(value);
 }
 
+QString toString(CameraImageRequest::AspectRatio value)
+{
+    return QnLexical::serialized(value);
+}
+
 } // namespace api
 } // namespace nx
 

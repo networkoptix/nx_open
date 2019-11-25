@@ -1,6 +1,7 @@
 #include "point.h"
 
 #include <charconv>
+#include <cmath>
 
 #include <nx/utils/log/log.h>
 
@@ -48,6 +49,22 @@ std::optional<std::vector<PluginPoint>> parsePluginPoints(const char* value)
     for (const auto &jsonPoint: jsonPointsAsArray)
         result.emplace_back(jsonPoint);
     return result;
+}
+
+std::optional<Width> parsePluginWidth(const char* value)
+{
+    const std::optional<std::vector<PluginPoint>> box = parsePluginPoints(value);
+    if (!box || box->size() != 2)
+        return std::nullopt;
+    return Width{ std::abs((*box)[0].x - (*box)[1].x) };
+}
+
+std::optional<Height> parsePluginHeight(const char* value)
+{
+    const std::optional<std::vector<PluginPoint>> box = parsePluginPoints(value);
+    if (!box || box->size() != 2)
+        return std::nullopt;
+    return Height{ std::abs((*box)[0].y - (*box)[1].y) };
 }
 
 std::optional<Direction> parsePluginDirection(const char* value)

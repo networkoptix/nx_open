@@ -7,49 +7,73 @@
 #include <nx/streaming/config.h>
 #include <nx/utils/log/assert.h>
 
-namespace
+namespace {
+
+const std::chrono::microseconds kMaxAudioJitterUs = std::chrono::milliseconds(200);
+const int kDefaultFrameSize = 1024;
+
+int calcBits(quint64 value)
 {
-    const std::chrono::microseconds kMaxAudioJitterUs = std::chrono::milliseconds(200);
-    const int kDefaultFrameSize = 1024;
-
-    int calcBits(quint64 value)
+    int result = 0;
+    while (value)
     {
-        int result = 0;
-        while (value)
-        {
-            if (value & 1)
-                ++result;
-            value >>= 1;
-        }
-        return result;
+        if (value & 1)
+            ++result;
+        value >>= 1;
     }
-
-    int getMaxAudioChannels(AVCodec* avCodec)
-    {
-        if (!avCodec->channel_layouts)
-            return 1; // default value if unknown
-
-        int result = 0;
-        for (const uint64_t* layout = avCodec->channel_layouts; *layout; ++layout)
-            result = qMax(result, calcBits(*layout));
-        return result;
-    }
-
-    int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
-    {
-        int result = srcSampleRate;
-        bool isPcmCodec = avCodec->id == AV_CODEC_ID_ADPCM_G726
-            || avCodec->id == AV_CODEC_ID_PCM_MULAW
-            || avCodec->id == AV_CODEC_ID_PCM_ALAW;
-
-        if (isPcmCodec)
-            result = 8000;
-        else
-            result = std::max(result, 16000);
-
-        return result;
-    }
+    return result;
 }
+
+int getMaxAudioChannels(AVCodec* avCodec)
+{
+    if (!avCodec->channel_layouts)
+        return 1; // default value if unknown
+
+    int result = 0;
+    for (const uint64_t* layout = avCodec->channel_layouts; *layout; ++layout)
+        result = qMax(result, calcBits(*layout));
+    return result;
+}
+
+int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
+{
+    int result = srcSampleRate;
+    bool isPcmCodec = avCodec->id == AV_CODEC_ID_ADPCM_G726
+        || avCodec->id == AV_CODEC_ID_PCM_MULAW
+        || avCodec->id == AV_CODEC_ID_PCM_ALAW;
+
+    if (isPcmCodec)
+        result = 8000;
+    else
+        result = std::max(result, 16000);
+
+    if (avCodec->id == AV_CODEC_ID_VORBIS) // supported_samplerates is empty for this codec type
+        result = std::min(result, 44100);
+
+    if (avCodec->supported_samplerates) // select closest supported sample rate
+    {
+        int diff = std::numeric_limits<int>::max();
+        for (const int* sampleRate = avCodec->supported_samplerates; *sampleRate; ++sampleRate)
+        {
+            int currentDiff = abs(*sampleRate - srcSampleRate);
+            if (diff > currentDiff)
+            {
+                result = *sampleRate;
+                diff = currentDiff;
+            }
+        }
+    }
+    return result;
+}
+
+int getDefaultBitrate(AVCodecContext* context)
+{
+    if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
+        return 16000; // G726 supports bitrate in range [16000..40000] Kbps only.
+    return 64000 * context->channels;
+}
+
+} // namespace
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     QnAudioTranscoder(codecId),
@@ -68,7 +92,6 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
 
 QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 {
-
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     QnFfmpegHelper::deleteAvCodecContext(m_decoderCtx);
 
@@ -82,17 +105,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
         m_lastErrMessage = tr("Audio context was not specified.");
         return false;
     }
-
-    QnAudioTranscoder::open(audio);
-
     return open(audio->context);
-}
-
-int getDefaultBitrate(AVCodecContext* context)
-{
-    if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
-        return 16000; // G726 supports bitrate in range [16000..40000] Kbps only.
-    return 64000 * context->channels;
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)

@@ -40,133 +40,8 @@ std::string specify(const char* v, unsigned int n)
 }
 
 //-------------------------------------------------------------------------------------------------
-
-ShockDetection::ShockDetection(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-    enabled = (params[0] == "True");
-    char* end = nullptr;
-    // Standard locale-independent conversion designed for JSON.
-    std::from_chars(&params[1].front(), &params[1].back() + 1, thresholdLevel);
-    std::from_chars(&params[2].front(), &params[2].back() + 1, sensitivityLevel);
-    initialized = true;
-}
-
-bool ShockDetection::operator==(const ShockDetection& rhs) const
-{
-    return enabled == rhs.enabled
-        && thresholdLevel == rhs.thresholdLevel
-        && sensitivityLevel == rhs.sensitivityLevel
-        && initialized == rhs.initialized;
-}
-
 //-------------------------------------------------------------------------------------------------
-
-Motion::Motion(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-
-    detectionType = params[0];
-    initialized = true;
-}
-
-bool Motion::operator==(const Motion& rhs) const
-{
-    return detectionType == rhs.detectionType
-        && initialized == rhs.initialized;
-}
-
 //-------------------------------------------------------------------------------------------------
-
-IncludeArea::IncludeArea(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-
-    char* end = nullptr;
-    // Standard locale-independent conversion designed for JSON.
-    points = sunapiStringToSunapiPoints(params[0]);
-    std::from_chars(&params[1].front(), &params[1].back() + 1, thresholdLevel);
-    std::from_chars(&params[2].front(), &params[2].back() + 1, sensitivityLevel);
-    std::from_chars(&params[3].front(), &params[3].back() + 1, minimumDuration);
-    initialized = true;
-}
-
-bool IncludeArea::operator==(const IncludeArea& rhs) const
-{
-    return points == rhs.points
-        && thresholdLevel == rhs.thresholdLevel
-        && sensitivityLevel == rhs.sensitivityLevel
-        && minimumDuration == rhs.minimumDuration
-        && initialized == rhs.initialized;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-ExcludeArea::ExcludeArea(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-
-    char* end = nullptr;
-    points = sunapiStringToSunapiPoints(params[0]);
-    initialized = true;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-TamperingDetection::TamperingDetection(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-
-    enabled = (params[0] == "True");
-    char* end = nullptr;
-    std::from_chars(&params[1].front(), &params[1].back() + 1, thresholdLevel);
-    std::from_chars(&params[2].front(), &params[2].back() + 1, sensitivityLevel);
-    std::from_chars(&params[3].front(), &params[3].back() + 1, minimumDuration);
-    exceptDarkImages = (params[4] == "True");
-    initialized = true;
-}
-
-bool TamperingDetection::operator==(const TamperingDetection& rhs) const
-{
-    return enabled == rhs.enabled
-        && thresholdLevel == rhs.thresholdLevel
-        && sensitivityLevel == rhs.sensitivityLevel
-        && minimumDuration == rhs.minimumDuration
-        && exceptDarkImages == rhs.exceptDarkImages
-        && initialized == rhs.initialized;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-DefocusDetection::DefocusDetection(const std::vector<std::string>& params)
-{
-    if (std::size(params) != std::size(kParams))
-        return;
-
-    enabled = (params[0] == "True");
-    char* end = nullptr;
-    std::from_chars(&params[1].front(), &params[1].back() + 1, thresholdLevel);
-    std::from_chars(&params[2].front(), &params[2].back() + 1, sensitivityLevel);
-    std::from_chars(&params[3].front(), &params[3].back() + 1, minimumDuration);
-    initialized = true;
-}
-
-bool DefocusDetection::operator==(const DefocusDetection& rhs) const
-{
-    return enabled == rhs.enabled
-        && thresholdLevel == rhs.thresholdLevel
-        && sensitivityLevel == rhs.sensitivityLevel
-        && minimumDuration == rhs.minimumDuration
-        && initialized == rhs.initialized;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 //-------------------------------------------------------------------------------------------------
 struct PluginValueError {};
 
@@ -247,6 +122,36 @@ void ReadOrThrow(const char* value, Direction* result)
     throw PluginValueError();
 }
 
+void ReadOrThrow(const char* value, Width* result)
+{
+    if (!value)
+        throw PluginValueError();
+
+    std::optional<Width> tmp = parsePluginWidth(value);
+    if (tmp)
+    {
+        *result = *tmp;
+        return;
+    }
+
+    throw PluginValueError();
+}
+
+void ReadOrThrow(const char* value, Height* result)
+{
+    if (!value)
+        throw PluginValueError();
+
+    std::optional<Height> tmp = parsePluginHeight(value);
+    if (tmp)
+    {
+        *result = *tmp;
+        return;
+    }
+
+    throw PluginValueError();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 std::string buildBool(bool value)
@@ -277,6 +182,543 @@ std::string concat(std::vector<const char*> items, char c = ',')
 #define NX_READ_SETTING_OR_THROW(TMP_OBJECT, FIELD_NAME) ReadOrThrow( \
             settings->value(specify(kServerParamsNames[(int)ServerParamIndex::FIELD_NAME], \
             objectIndex).c_str()), &TMP_OBJECT.FIELD_NAME)
+
+//-------------------------------------------------------------------------------------------------
+
+bool ShockDetection::operator==(const ShockDetection& rhs) const
+{
+    return
+        initialized == rhs.initialized
+        && enabled == rhs.enabled
+        && thresholdLevel == rhs.thresholdLevel
+        && sensitivityLevel == rhs.sensitivityLevel
+        ;
+}
+
+bool ShockDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    ShockDetection tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, enabled);
+        NX_READ_SETTING_OR_THROW(tmp, thresholdLevel);
+        NX_READ_SETTING_OR_THROW(tmp, sensitivityLevel);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+
+}
+
+void ShockDetection::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName : kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildCameraRequestQuery(
+    const ShockDetection& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "shockdetection"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << buildBool(settingGroup.enabled)
+            << "&ThresholdLevel=" << settingGroup.thresholdLevel
+            << "&Sensitivity=" << settingGroup.sensitivityLevel
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool Motion::operator==(const Motion& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && detectionType == rhs.detectionType
+        ;
+}
+
+bool Motion::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    Motion tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, detectionType);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+
+}
+
+void Motion::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName: kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildCameraRequestQuery(
+    const Motion& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "videoanalysis2"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&DetectionType=" << settingGroup.detectionType
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool MdObjectSize::operator==(const MdObjectSize& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && minWidth == rhs.minWidth
+        && minHeight == rhs.minHeight
+        && maxWidth == rhs.maxWidth
+        && maxHeight == rhs.maxHeight
+        ;
+}
+
+bool MdObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    MdObjectSize tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, minWidth);
+        NX_READ_SETTING_OR_THROW(tmp, minHeight);
+        NX_READ_SETTING_OR_THROW(tmp, maxWidth);
+        NX_READ_SETTING_OR_THROW(tmp, maxHeight);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+}
+
+void MdObjectSize::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName: kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildMinObjectSize(const MdObjectSize& settingGroup, FrameSize frameSize)
+{
+    std::stringstream stream;
+    stream
+        << frameSize.xRelativeToAbsolute(settingGroup.minWidth)
+        << ','
+        << frameSize.yRelativeToAbsolute(settingGroup.minHeight);
+    return stream.str();
+}
+
+std::string buildMaxObjectSize(const MdObjectSize& settingGroup, FrameSize frameSize)
+{
+    std::stringstream stream;
+    stream
+        << frameSize.xRelativeToAbsolute(settingGroup.maxWidth)
+        << ','
+        << frameSize.yRelativeToAbsolute(settingGroup.maxHeight);
+    return stream.str();
+}
+
+std::string buildCameraRequestQuery(
+    const MdObjectSize& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "videoanalysis2"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&DetectionType.MotionDetection.MinimumObjectSizeInPixels="
+                << buildMinObjectSize(settingGroup, frameSize)
+            << "&DetectionType.MotionDetection.MaximumObjectSizeInPixels="
+                << buildMaxObjectSize(settingGroup, frameSize)
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool IvaObjectSize::operator==(const IvaObjectSize& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && minWidth == rhs.minWidth
+        && minHeight == rhs.minHeight
+        && maxWidth == rhs.maxWidth
+        && maxHeight == rhs.maxHeight
+        ;
+}
+
+bool IvaObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    IvaObjectSize tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, minWidth);
+        NX_READ_SETTING_OR_THROW(tmp, minHeight);
+        NX_READ_SETTING_OR_THROW(tmp, maxWidth);
+        NX_READ_SETTING_OR_THROW(tmp, maxHeight);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+}
+
+void IvaObjectSize::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName : kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildMinObjectSize(const IvaObjectSize& settingGroup, FrameSize frameSize)
+{
+    std::stringstream stream;
+    stream
+        << frameSize.xRelativeToAbsolute(settingGroup.minWidth)
+        << ','
+        << frameSize.yRelativeToAbsolute(settingGroup.minHeight);
+    return stream.str();
+}
+
+std::string buildMaxObjectSize(const IvaObjectSize& settingGroup, FrameSize frameSize)
+{
+    std::stringstream stream;
+    stream
+        << frameSize.xRelativeToAbsolute(settingGroup.maxWidth)
+        << ','
+        << frameSize.yRelativeToAbsolute(settingGroup.maxHeight);
+    return stream.str();
+}
+
+std::string buildCameraRequestQuery(
+    const IvaObjectSize& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "videoanalysis2"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&DetectionType.IntelligentVideo.MinimumObjectSizeInPixels="
+                << buildMinObjectSize(settingGroup, frameSize)
+            << "&DetectionType.IntelligentVideo.MaximumObjectSizeInPixels="
+                << buildMaxObjectSize(settingGroup, frameSize)
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool MdIncludeArea::operator==(const MdIncludeArea& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && points == rhs.points
+        && thresholdLevel == rhs.thresholdLevel
+        && sensitivityLevel == rhs.sensitivityLevel
+        && minimumDuration == rhs.minimumDuration
+        ;
+}
+
+bool MdIncludeArea::differesEnoughFrom(const MdIncludeArea& rhs) const
+{
+    if (this->points.empty() && rhs.points.empty())
+        return false;
+
+    return *this != rhs;
+}
+
+bool MdIncludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    MdIncludeArea tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, points);
+        NX_READ_SETTING_OR_THROW(tmp, thresholdLevel);
+        NX_READ_SETTING_OR_THROW(tmp, sensitivityLevel);
+        NX_READ_SETTING_OR_THROW(tmp, minimumDuration);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->internalObjectIndex = objectIndex;
+    this->initialized = true;
+    return true;
+}
+
+void MdIncludeArea::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName: kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildCameraRequestQuery(
+    const MdIncludeArea& area, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (area)
+    {
+        if (!area.points.empty())
+        {
+            const std::string prefix = "&ROI."s + std::to_string(area.internalObjectIndex);
+            query
+                << "msubmenu=" << "videoanalysis2"
+                << "&action=" << "set"
+                << "&Channel=" << channelNumber
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(area.points, frameSize)
+                << prefix << ".ThresholdLevel=" << area.thresholdLevel
+                << prefix << ".SensitivityLevel=" << area.sensitivityLevel
+                << prefix << ".Duration=" << area.minimumDuration
+                ;
+        }
+        else
+        {
+            query
+                << "msubmenu=" << "videoanalysis2"
+                << "&action=" << "remove"
+                << "&Channel=" << channelNumber
+                << "&ROIIndex=" << area.internalObjectIndex;
+        }
+    }
+    return query.str();
+
+}
+//-------------------------------------------------------------------------------------------------
+bool MdExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    MdExcludeArea tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, points);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->internalObjectIndex = objectIndex + 8;
+    this->initialized = true;
+    return true;
+}
+
+bool MdExcludeArea::operator==(const MdExcludeArea& rhs) const
+{
+    return
+        initialized == rhs.initialized
+        && internalObjectIndex == rhs.internalObjectIndex
+
+        && points == rhs.points
+        ;
+}
+bool MdExcludeArea::differesEnoughFrom(const MdExcludeArea& rhs) const
+{
+    if (this->points.empty() && rhs.points.empty())
+        return false;
+
+    return *this != rhs;
+}
+
+void MdExcludeArea::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName : kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildCameraRequestQuery(
+    const MdExcludeArea& area, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (area)
+    {
+        if (!area.points.empty())
+        {
+            const std::string prefix = "&ROI."s + std::to_string(area.internalObjectIndex);
+            query
+                << "msubmenu=" << "videoanalysis2"
+                << "&action=" << "set"
+                << "&Channel=" << channelNumber
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(area.points, frameSize)
+                ;
+        }
+        else
+        {
+            query
+                << "msubmenu=" << "videoanalysis2"
+                << "&action=" << "remove"
+                << "&Channel=" << channelNumber
+                << "&ROIIndex=" << area.internalObjectIndex
+                ;
+        }
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool TamperingDetection::operator==(const TamperingDetection& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && enabled == rhs.enabled
+        && thresholdLevel == rhs.thresholdLevel
+        && sensitivityLevel == rhs.sensitivityLevel
+        && minimumDuration == rhs.minimumDuration
+        && exceptDarkImages == rhs.exceptDarkImages
+        ;
+}
+
+bool TamperingDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    TamperingDetection tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, enabled);
+        NX_READ_SETTING_OR_THROW(tmp, thresholdLevel);
+        NX_READ_SETTING_OR_THROW(tmp, sensitivityLevel);
+        NX_READ_SETTING_OR_THROW(tmp, minimumDuration);
+        NX_READ_SETTING_OR_THROW(tmp, exceptDarkImages);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+}
+
+void TamperingDetection::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName: kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+
+}
+
+std::string buildCameraRequestQuery(
+    const TamperingDetection& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "tamperingdetection"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << buildBool(settingGroup.enabled)
+            << "&ThresholdLevel=" << settingGroup.thresholdLevel
+            << "&SensitivityLevel=" << settingGroup.sensitivityLevel
+            << "&Duration=" << settingGroup.minimumDuration
+            << "&DarknessDetection=" << buildBool(settingGroup.exceptDarkImages)
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+bool DefocusDetection::operator==(const DefocusDetection& rhs) const
+{
+    return
+        initialized == rhs.initialized
+
+        && enabled == rhs.enabled
+        && thresholdLevel == rhs.thresholdLevel
+        && sensitivityLevel == rhs.sensitivityLevel
+        && minimumDuration == rhs.minimumDuration
+        ;
+}
+
+bool DefocusDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+{
+    DefocusDetection tmp;
+    try
+    {
+        NX_READ_SETTING_OR_THROW(tmp, enabled);
+        NX_READ_SETTING_OR_THROW(tmp, thresholdLevel);
+        NX_READ_SETTING_OR_THROW(tmp, sensitivityLevel);
+        NX_READ_SETTING_OR_THROW(tmp, minimumDuration);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    this->initialized = true;
+    return true;
+}
+
+void DefocusDetection::replanishErrorMap(
+    nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
+{
+    for (const auto paramName: kServerParamsNames)
+        errorMap->setItem(paramName, reason);
+}
+
+std::string buildCameraRequestQuery(
+    const DefocusDetection& settingGroup, FrameSize frameSize, int channelNumber)
+{
+    std::ostringstream query;
+    if (settingGroup)
+    {
+        query
+            << "msubmenu=" << "defocusdetection"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << buildBool(settingGroup.enabled)
+            << "&ThresholdLevel=" << settingGroup.thresholdLevel
+            << "&Sensitivity=" << settingGroup.sensitivityLevel
+            << "&Duration=" << settingGroup.minimumDuration
+            ;
+    }
+    return query.str();
+}
 
 //-------------------------------------------------------------------------------------------------
 

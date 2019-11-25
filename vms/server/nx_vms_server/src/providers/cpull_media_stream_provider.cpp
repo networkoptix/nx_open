@@ -71,6 +71,12 @@ void QnClientPullMediaStreamProvider::run()
             QnSleep::msleep(kErrorDelayTimeoutMs);
             continue;
         }
+        else
+        {
+            onEvent(
+                std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
+                CameraDiagnostics::NoErrorResult());
+        }
 
         if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
         {

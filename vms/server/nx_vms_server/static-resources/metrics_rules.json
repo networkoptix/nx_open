@@ -216,7 +216,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %encodingThreads 2",
-                                "text": "Encoding threads %encodingThreads could cause high server load"
+                                "text": "has %encodingThreads currently running encoding threads. Recommended number of encoding threads: 2. Limit encoding threads number using maxWebMTranscoders setting in Web Admin advanced settings page."
                             }
                         ]
                     },
@@ -362,12 +362,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 0",
-                                "text": "went Offline %offlineEvents times for the last hour"
+                                "text": "went Offline %offlineEvents times in the last hour"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %offlineEvents 5",
-                                "text": "went Offline %offlineEvents times for the last hour"
+                                "text": "went Offline %offlineEvents times in the last hour"
                             }
                         ]
                     },
@@ -381,12 +381,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %streamIssues1h 0",
-                                "text": "has stream issues %streamIssues1h times in last hour"
+                                "text": "had %streamIssues1h stream issues in the last hour"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %streamIssues1h 5",
-                                "text": "has stream issues %streamIssues1h times in last hour"
+                                "text": "had %streamIssues1h stream issues in the last hour"
                             }
                         ]
                     },
@@ -400,7 +400,7 @@
                             {
                                 "level": "error",
                                 "condition": "greaterThan %ipConflicts3min 0",
-                                "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
+                                "text": "has an IP conflict. Conflicting IP: %ipConflicts"
                             }
                         ]
                     }
@@ -435,16 +435,16 @@
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
-                            {
-                                "level": "warning",
-                                "condition": "greaterThan %fpsDeltaAverage 5",
-                                "text": "has actual fps less for %fpsDeltaAverage frames/s"
-                            },
-                            {
-                                "level": "error",
-                                "condition": "greaterThan %fpsDeltaAverage 10",
-                                "text": "has actual fps less for %fpsDeltaAverage frames/s"
-                            }
+                        {
+                            "level": "warning",
+                            "condition": "greaterThan %fpsDeltaAverage 5",
+                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                        },
+                        {
+                            "level": "error",
+                            "condition": "greaterThan %fpsDelta 10",
+                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                        }
                         ]
                     },
                     "actualBitrateBps": {
@@ -466,7 +466,7 @@
                             {
                                 "level": "error",
                                 "condition": "resolutionGreaterThan %resolution 1280x720",
-                                "text": "Resolution '%resolution' is too high"
+                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
                             }
                         ]
                     },
@@ -529,7 +529,7 @@
                             {
                                 "level": "error",
                                 "condition": "and %isArchiveTooSmall %hasArchiveRotated",
-                                "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
+                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS days."
                             }
                         ]
                     }

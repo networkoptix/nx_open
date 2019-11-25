@@ -231,21 +231,20 @@ void DeviceAgent::doSetSettings(
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
-    retransmitSettings(errorMap, settings, m_settings.shockDetection);
-
-    retransmitSettings(errorMap, settings, m_settings.motion);
-
-    for (int i = 0; i < 8; ++i)
-        retransmitSettings(errorMap, settings, m_settings.includeArea[i], i + 1);
-
-    for (int i = 0; i < 8; ++i)
-        retransmitSettings(errorMap, settings, m_settings.excludeArea[i], i + 8 + 1);
-
-    retransmitSettings(errorMap, settings, m_settings.tamperingDetection);
-    retransmitSettings(errorMap, settings, m_settings.defocusDetection);
-
     const auto sender = [this](const std::string& s) {return this->sendCommand2(s); };
 
+    retr2(errorMap, settings, m_settings.shockDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.motion, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.mdObjectSize, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.ivaObjectSize, sender, m_frameSize);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.mdIncludeArea[i], sender, m_frameSize, i + 1);
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.mdExcludeArea[i], sender, m_frameSize, i + 1);
+
+    retr2(errorMap, settings, m_settings.tamperingDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.defocusDetection, sender, m_frameSize);
     retr2(errorMap, settings, m_settings.objectDetectionObjects, sender, m_frameSize);
     retr2(errorMap, settings, m_settings.objectDetectionBestShot, sender, m_frameSize);
 

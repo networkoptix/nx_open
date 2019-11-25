@@ -97,7 +97,6 @@ class ProgressiveDownloadingServerPrivate: public QnTCPConnectionProcessorPrivat
 public:
     QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
-    QnTranscoder::TranscodeMethod transcodeMethod;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     //saving address and port in case socket will not make it to the destructor
     QString foreignAddress;
@@ -150,9 +149,6 @@ ProgressiveDownloadingServer::~ProgressiveDownloadingServer()
     NX_DEBUG(this, lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(ProgressiveDownloadingServer_count.fetchAndAddOrdered(-1)-1));
-
-    if (d->transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
-        --d->serverModule->commonModule()->metrics()->progressiveDownloadingTranscoders();
 
     quint64 killTimerID = 0;
     {
@@ -290,10 +286,13 @@ void ProgressiveDownloadingServer::run()
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
     metrics->tcpConnections().progressiveDownloading()++;
+    QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
     auto metricsGuard = nx::utils::makeScopeGuard(
-        [metrics]()
+        [metrics, &transcodeMethod]()
         {
             --metrics->tcpConnections().progressiveDownloading();
+            if (transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+                --metrics->progressiveDownloadingTranscoders();
         });
 
     if (commonModule()->isTranscodeDisabled())
@@ -309,14 +308,11 @@ void ProgressiveDownloadingServer::run()
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
-    if (d->clientRequest.isEmpty())
+    if (d->clientRequest.isEmpty() && !readRequest())
     {
-        if (!readRequest())
-        {
-            // TODO why not send bad request?
-            NX_WARNING(this, "Failed to read request");
-            return;
-        }
+        //TODO why not send bad request?
+        NX_WARNING(this, "Failed to read request");
+        return;
     }
     parseRequest();
 
@@ -324,7 +320,8 @@ void ProgressiveDownloadingServer::run()
 
     NX_DEBUG(this, "Start export data by url: [%1]", getDecodedUrl());
 
-    //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
+    //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'.
+    // So, unique ID cannot contain '.', but VMAX resource does contain
     const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
     const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
     const QString& resId = requestedResourcePath.mid(0, nameFormatSepPos);
@@ -434,12 +431,12 @@ void ProgressiveDownloadingServer::run()
         qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
             ? QnServer::HiQualityCatalog
             : QnServer::LowQualityCatalog;
-        d->transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+        transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
         videoCodec = (AVCodecID)streamInfo->codec;
     }
     else
     {
-        d->transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+        transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
         auto newValue = ++metrics->progressiveDownloadingTranscoders();
         if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
         {
@@ -458,7 +455,7 @@ void ProgressiveDownloadingServer::run()
 
     if (!audioOnly && d->transcoder->setVideoCodec(
             videoCodec,
-            d->transcodeMethod,
+            transcodeMethod,
             quality,
             videoSize,
             -1) != 0 )
@@ -487,7 +484,6 @@ void ProgressiveDownloadingServer::run()
 
 
     QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
-    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
 
     bool isLive = position.isEmpty() || position == "now";
     auto requiredPermission = isLive
@@ -530,6 +526,7 @@ void ProgressiveDownloadingServer::run()
         processPositionRequest(resource, timeUSec, callback);
         return;
     }
+    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
     if (isLive)
     {
         //if camera is offline trying to put it online
@@ -541,7 +538,7 @@ void ProgressiveDownloadingServer::run()
         QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
         dataProvider = liveReader;
         if (liveReader) {
-            if (camera->isSomeActivity())
+            if (camera->isSomeActivity() && !audioOnly)
                 dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
             liveReader->startIfNotRunning();
             camera->inUse(this);
@@ -579,6 +576,12 @@ void ProgressiveDownloadingServer::run()
         return;
     }
 
+    if (audioOnly && camRes && !camRes->isAudioEnabled())
+    {
+        sendJsonResponse("Audio is disabled on camera, enable audio to get stream");
+        return;
+    }
+
     if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
         d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
@@ -591,6 +594,9 @@ void ProgressiveDownloadingServer::run()
     dataConsumer.start();
     while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
         readRequest(); // just reading socket to determine client connection is closed
+
+    if (!d->socket->isConnected())
+        metricsGuard.fire();
 
     NX_DEBUG(this, "Done with progressive download connection from %1. Reason: %2",
         d->socket->getForeignAddress(),

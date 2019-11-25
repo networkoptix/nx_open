@@ -64,6 +64,8 @@ TEST(GetImageHelper, updateDstSize_autoRatio)
         .WillRepeatedly(Return(QnAspectRatio(1920, 1080)));
 
     EXPECT_EQ(QSize(1376, 768), updateDstSize(&camera, {1024, 768}, outFrame, AspectRatio::auto_));
+    EXPECT_EQ(QSize(1024, 576), updateDstSize(&camera, {1024, 0}, outFrame, AspectRatio::auto_));
+    EXPECT_EQ(QSize(1376, 768), updateDstSize(&camera, {0, 768}, outFrame, AspectRatio::auto_));
 }
 
 TEST(GetImageHelper, updateDstSize_minSize)

@@ -79,7 +79,7 @@ public:
     virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
-protected:
+
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
@@ -129,7 +129,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/) { return true; }
+    virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/)  = 0;
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 

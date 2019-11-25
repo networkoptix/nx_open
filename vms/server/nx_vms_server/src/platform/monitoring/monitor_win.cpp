@@ -663,5 +663,6 @@ quint64 QnWindowsMonitor::thisProcessRamUsageBytes()
     PROCESS_MEMORY_COUNTERS counters;
     if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
         return counters.WorkingSetSize;
+    NX_WARNING(this, "GetProcessMemoryInfo failed with error %1", GetLastError());
     return 0;
 }
