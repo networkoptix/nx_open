@@ -102,12 +102,23 @@ void Service::stop()
 
     NX_DEBUG(this, "Stopping the NVR service");
 
-    m_connector->stop();
-    m_networkBlockManager->stop();
-    m_ioManager->stop();
-    m_fanManager->stop();
-    m_buzzerManager->stop();
-    m_ledManager->stop();
+    if (m_connector)
+        m_connector->stop();
+
+    if (m_networkBlockManager)
+        m_networkBlockManager->stop();
+
+    if (m_ioManager)
+        m_ioManager->stop();
+
+    if (m_fanManager)
+        m_fanManager->stop();
+
+    if (m_buzzerManager)
+        m_buzzerManager->stop();
+
+    if (m_ledManager)
+        m_ledManager->stop();
 
     m_isStopped = true;
 }
