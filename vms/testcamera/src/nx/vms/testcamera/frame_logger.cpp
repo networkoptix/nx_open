@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 
 #include "logger.h"
 
@@ -15,7 +15,7 @@ static QString currentDateTime()
 
 FrameLogger::FrameLogger()
 {
-    const QString logFramesFilename = testCameraIni().logFramesFile;
+    const QString logFramesFilename = ini().logFramesFile;
     if (logFramesFilename.isEmpty())
         return;
 
