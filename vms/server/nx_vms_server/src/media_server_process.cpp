@@ -3858,7 +3858,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
     serverModule()->p2pDownloader()->stopDownloads();
-    if (nx::vms::server::nvr::IService* nvrService = serverModule()->nvrService())
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule()->nvrService())
         nvrService->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -4807,8 +4807,8 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    nx::vms::server::nvr::IService* nvrService = serverModule->nvrService();
-    nvrService->start();
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule->nvrService())
+        nvrService->start();
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());
