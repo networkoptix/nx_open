@@ -143,15 +143,15 @@ NX_KIT_API void intentionallyCrash(const char* message);
  * Logs execution of a line - to use, write LL at the beginning of the line.
  */
 #define LL \
-    NX_PRINT << "####### LL line " << __LINE__ \
-        << NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        << ", file " << ::nx::kit::debug::relativeSrcFilename(__FILE__);
+    NX_PRINT << "####### LL line " + ::nx::kit::utils::toString(__LINE__) \
+        + NX_KIT_DEBUG_DETAIL_THREAD_ID() \
+        + ", file " + ::nx::kit::debug::relativeSrcFilename(__FILE__);
 
 /**
  * Prints the expression text and its value via toString().
  */
 #define NX_PRINT_VALUE(VALUE) \
-    NX_PRINT << "####### " #VALUE ": " << ::nx::kit::utils::toString((VALUE))
+    NX_PRINT << "####### " #VALUE ": " + ::nx::kit::utils::toString(VALUE)
 
 /**
  * Hex-dumps binary data using NX_PRINT.
