@@ -108,9 +108,6 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
-    QnRtspClient::Config config;
-    config.sendOptions = globalSettings->sendRtspCommandOptions();
-    m_RtpSession.setConfig(config);
     m_RtpSession.setTCPTimeout(std::chrono::milliseconds(m_rtpFrameTimeoutMs));
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);

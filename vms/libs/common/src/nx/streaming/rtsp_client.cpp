@@ -301,11 +301,6 @@ QnRtspClient::QnRtspClient(
         m_tcpSock = nx::network::SocketFactory::createStreamSocket();
 }
 
-void QnRtspClient::setConfig(const Config& config)
-{
-    m_config = config;
-}
-
 QnRtspClient::~QnRtspClient()
 {
     stop();
@@ -447,7 +442,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         return CameraDiagnostics::NoErrorResult();
     }
 
-    if (m_config.sendOptions && !sendOptions())
+    if (!sendOptions())
     {
         stop();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(
