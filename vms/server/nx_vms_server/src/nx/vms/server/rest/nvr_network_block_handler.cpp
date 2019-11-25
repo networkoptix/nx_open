@@ -39,16 +39,21 @@ JsonRestResponse NvrNetworkBlockHandler::executePost(
 {
     std::vector<nx::vms::api::NetworkPortWithPoweringMode> portPoweringModes;
     if (!QJson::deserialize(body, &portPoweringModes))
+    {
+        NX_VERBOSE(this, "Unable to deserialize request: %1", body);
         return nx::network::http::StatusCode::badRequest;
+    }
 
     if (INetworkBlockManager* const manager = networkBlockManager(serverModule()))
     {
         if (manager->setPoeModes(portPoweringModes))
             return manager->state();
 
+        NX_WARNING(this, "Unable to set port powering modes");
         return nx::network::http::StatusCode::internalServerError;
     }
 
+    NX_DEBUG(this, "Unable to access network block manager");
     return nx::network::http::StatusCode::notImplemented;
 }
 
