@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QHash>
+#include <QtCore/QSet>
 #include <QtCore/QFileSystemWatcher>
 #include <QtCore/QTimer>
 
