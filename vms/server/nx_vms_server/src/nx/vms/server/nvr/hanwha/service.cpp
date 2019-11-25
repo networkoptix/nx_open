@@ -11,22 +11,12 @@
 #include <nx/vms/server/nvr/hanwha/connector.h>
 
 #include <nx/vms/server/nvr/hanwha/io/io_manager.h>
-#include <nx/vms/server/nvr/hanwha/io/io_platform_abstraction.h>
 #include <nx/vms/server/nvr/hanwha/io/io_module_searcher.h>
 
-#include <nx/vms/server/nvr/hanwha/network_block/network_block_controller.h>
 #include <nx/vms/server/nvr/hanwha/network_block/network_block_manager.h>
-#include <nx/vms/server/nvr/hanwha/network_block/network_block_platform_abstraction.h>
-#include <nx/vms/server/nvr/hanwha/network_block/dummy_powering_policy.h>
-
 #include <nx/vms/server/nvr/hanwha/buzzer/buzzer_manager.h>
-#include <nx/vms/server/nvr/hanwha/buzzer/buzzer_platform_abstraction.h>
-
 #include <nx/vms/server/nvr/hanwha/fan/fan_manager.h>
-#include <nx/vms/server/nvr/hanwha/fan/fan_platform_abstraction.h>
-
 #include <nx/vms/server/nvr/hanwha/led/led_manager.h>
-#include <nx/vms/server/nvr/hanwha/led/led_platform_abstraction.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
