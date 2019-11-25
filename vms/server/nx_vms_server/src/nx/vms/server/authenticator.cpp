@@ -219,7 +219,7 @@ Authenticator::Result Authenticator::tryCookie(const nx::network::http::Request&
     // TODO: Should be replaced with request.requestLine.method == "GET"
     // as soon as GET queries do not modify anything.
     if (m_authMethodRestrictionList.getAllowedAuthMethods(request)
-        && nx::network::http::AuthMethod::allowWithourCsrf)
+        .testFlag(nx::network::http::AuthMethod::allowWithourCsrf))
     {
         if (auto session = m_sessionKeys.get(sessionKey))
             return {Qn::Auth_OK, std::move(*session), nx::network::http::AuthMethod::cookie};
