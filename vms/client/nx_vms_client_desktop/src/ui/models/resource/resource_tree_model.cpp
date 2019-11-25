@@ -1267,9 +1267,10 @@ void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource
 void QnResourceTreeModel::updateSystemHasManyServers()
 {
     auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
-    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool hasAccessAllMediaPermission =
+        accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
 
-    if (!isAdmin)
+    if (!hasAccessAllMediaPermission)
     {
         servers = servers.filtered(
             [this](const QnMediaServerResourcePtr& server)

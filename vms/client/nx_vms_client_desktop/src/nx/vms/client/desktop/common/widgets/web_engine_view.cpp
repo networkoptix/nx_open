@@ -120,7 +120,7 @@ void WebEngineView::createPageWithUserAgent(const QString& userAgent)
     // to avoid mess in persistent storage.
 
     // Make new profile a parent of the web page because it should outlive the page.
-    auto profile = new QWebEngineProfile(QString(), this);
+    auto profile = new QWebEngineProfile(this);
     profile->setHttpUserAgent(userAgent);
     setPage(new WebEnginePage(profile, profile, *this));
 

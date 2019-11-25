@@ -100,7 +100,10 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "durationS")
         return [](Value v) { return Value(durationString((int64_t) v.toDouble())); };
 
-    if (targetFormat == "Kbps")
+    if (targetFormat == "b" || targetFormat == "bps")
+        return numericFormatter(targetFormat, [](double v) { return v * 8; });
+
+    if (targetFormat == "Kb" || targetFormat == "Kbps")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0); });
 
     if (targetFormat == "KPix/s")
@@ -109,7 +112,7 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "KB"|| targetFormat == "KBps")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0); });
 
-    if (targetFormat == "Mbps")
+    if (targetFormat == "Mb" || targetFormat == "Mbps")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000); });
 
     if (targetFormat == "MPix/s")
@@ -118,7 +121,7 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "MB" || targetFormat == "MBps")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0 * 1024); });
 
-    if (targetFormat == "Gbps")
+    if (targetFormat == "Gb" || targetFormat == "Gbps")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000 * 1000); });
 
     if (targetFormat == "GPix/s")
@@ -127,7 +130,7 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "GB" || targetFormat == "GBps")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0 * 1024 * 1024); });
 
-    if (targetFormat == "Tbps")
+    if (targetFormat == "Tb" || targetFormat == "Tbps")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000 * 1000 * 1000); });
 
     if (targetFormat == "TPix/s")

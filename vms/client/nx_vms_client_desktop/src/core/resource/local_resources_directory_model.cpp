@@ -36,6 +36,7 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
     base_type(parent)
 {
     m_deferredDirectoryChangeHandlerTimer.setSingleShot(true);
+    m_deferredFileChangeHandlerTimer.setSingleShot(true);
 
     connect(&m_fileSystemWatcher, &QFileSystemWatcher::directoryChanged,
         this, &LocalResourcesDirectoryModel::onDirectoryChanged);
@@ -45,6 +46,9 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     connect(&m_deferredDirectoryChangeHandlerTimer, &QTimer::timeout,
         this, &LocalResourcesDirectoryModel::processPendingDirectoryChanges);
+
+    connect(&m_deferredFileChangeHandlerTimer, &QTimer::timeout,
+        this, &LocalResourcesDirectoryModel::processPendingFileChanges);
 
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
@@ -142,17 +146,22 @@ void LocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)
 
 void LocalResourcesDirectoryModel::onDirectoryChanged(const QString& directoryPath)
 {
-    const auto delay = 100ms;
-    m_pendingDirectoryChanges.append(directoryPath);
-    if (m_deferredDirectoryChangeHandlerTimer.isActive())
-        m_deferredDirectoryChangeHandlerTimer.stop();
-    m_deferredDirectoryChangeHandlerTimer.start(delay);
+    static constexpr auto kDelay = 100ms;
+
+    m_pendingDirectoryChanges.insert(directoryPath);
+    m_deferredDirectoryChangeHandlerTimer.start(kDelay);
+}
+
+void LocalResourcesDirectoryModel::onFileChanged(const QString& filePath)
+{
+    static constexpr auto kDelay = 250ms;
+
+    m_pendingFileChanges.insert(filePath);
+    m_deferredFileChangeHandlerTimer.start(kDelay);
 }
 
 void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
 {
-    m_pendingDirectoryChanges.removeDuplicates();
-
     for (const auto& directoryPath: m_pendingDirectoryChanges)
     {
         QDir dir(directoryPath);
@@ -192,18 +201,22 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
     m_pendingDirectoryChanges.clear();
 }
 
-void LocalResourcesDirectoryModel::onFileChanged(const QString& filePath)
+void LocalResourcesDirectoryModel::processPendingFileChanges()
 {
-    if (FileTypeSupport::isValidLayoutFile(filePath))
+    for (const QString& filePath: m_pendingFileChanges)
     {
-        // QFileSystemWatcher loses tracking after temporary file renaming operation.
-        m_fileSystemWatcher.addPath(filePath);
-        emit layoutFileChanged(filePath);
+        if (FileTypeSupport::isValidLayoutFile(filePath))
+        {
+            // QFileSystemWatcher loses tracking after temporary file renaming operation.
+            m_fileSystemWatcher.addPath(filePath);
+            emit layoutFileChanged(filePath);
+        }
+        else if (FileTypeSupport::isMovieFileExt(filePath))
+        {
+            emit videoFileChanged(filePath);
+        }
     }
-    else if (FileTypeSupport::isMovieFileExt(filePath))
-    {
-        emit videoFileChanged(filePath);
-    }
+    m_pendingFileChanges.clear();
 }
 
 } // namespace nx::vms::client::desktop

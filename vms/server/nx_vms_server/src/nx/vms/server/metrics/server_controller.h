@@ -1,9 +1,10 @@
 #pragma once
 
+#include <core/resource/media_server_resource.h>
+#include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/value_cache.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/utils/metrics/resource_controller_impl.h>
-#include <nx/utils/safe_direct_connection.h>
-#include <core/resource/media_server_resource.h>
 
 namespace nx::vms::server { class PlatformMonitor; }
 
@@ -47,14 +48,12 @@ private:
     qint64 getMetric(Metrics parameter);
     qint64 getDelta(Metrics key, qint64 value);
     nx::vms::server::PlatformMonitor* platform() const;
-    QDateTime currentDateTime() const;
     QString dateTimeToString(const QDateTime& datetime) const;
 
 private:
     std::vector<std::atomic<qint64>> m_counters;
     std::atomic<int> m_timeChangeEvents = 0;
-    mutable nx::utils::Mutex m_mutex;
-    QDateTime m_currentDateTime;
+    nx::utils::CachedValue<QDateTime> m_currentDateTime;
 };
 
 } // namespace nx::vms::server::metrics

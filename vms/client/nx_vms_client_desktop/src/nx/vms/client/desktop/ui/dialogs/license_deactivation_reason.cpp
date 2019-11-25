@@ -26,7 +26,7 @@ TextValidateFunction reasonComboBoxValidator(
         [reasons, errorText](const QString& text)
         {
             const auto reasonIndex = reasons.indexOf(text);
-            return  reasonIndex > 0 //< First index is "Choose option"
+            return reasonIndex > 0 //< First index is "Choose option"
                 ? ValidationResult::kValid
                 : ValidationResult(errorText);
         };
@@ -67,7 +67,7 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     m_info(info)
 {
     setIcon(QnMessageBoxIcon::Information);
-    setText(tr("Please fill up information about yourself and reason for license deactivation"));
+    setText(tr("Please enter your contact information and the reason for deactivating your license"));
     setStandardButtons(QDialogButtonBox::Cancel);
     setDefaultButton(QDialogButtonBox::NoButton);
 

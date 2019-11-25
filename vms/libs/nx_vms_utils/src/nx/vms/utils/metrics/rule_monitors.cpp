@@ -195,24 +195,29 @@ public:
     template<typename Extraction> // double(double value, double durationS)
     ValueGenerator durationAggregation(
         int valueI, int durationI, Border border, Extraction extract,
-        bool divideByTime = false) const
+        bool divideByTime = false, bool mustExist = false) const
     {
         return durationOperation(
             valueI, durationI, border,
-            [border, divideByTime, extract = std::move(extract)](const auto& forEach)
+            [border, divideByTime, mustExist, extract = std::move(extract)](const auto& forEach)
             {
                 double totalValue = 0;
                 double totalDurationS = 0;
+                Value lastValue;
                 forEach(
-                    [&](const Value& value, std::chrono::milliseconds duration)
+                    [&](Value value, std::chrono::milliseconds duration)
                     {
+                        lastValue = value;
                         if (value == Value())
-                            return;
+                            return; //< Do not process empty value periods.
 
                         const double durationS = seconds(duration);
                         totalDurationS += durationS;
                         totalValue += extract(value.toDouble(), durationS);
                     });
+
+                if (mustExist && lastValue == Value())
+                    return Value();
 
                 if (divideByTime)
                     return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
@@ -257,14 +262,14 @@ public:
         {
             return durationAggregation(
                 1, 2, Border::move(), [](double v, double d) { return v * d; },
-                /*divideByTime*/ true);
+                /*divideByTime*/ true, /*mustExist*/ true);
         }
 
         if (function() == "deltaAvg") //< sum(v) / t
         {
             return durationAggregation(
                 1, 2, Border::hardcode(0), [](double v, double) { return v; },
-                /*divideByTime*/ true);
+                /*divideByTime*/ true, /*mustExist*/ true);
         }
 
         if (function() == "counterToAvg") //< dv / t
@@ -277,10 +282,15 @@ public:
                     double last = 0;
                     double totalTimeS = 0;
                     forEach(
-                        [&](auto value, auto duration)
+                        [&](const Value& value, Duration duration)
                         {
-                            last = value.toDouble();
-                            if (!first) first = last;
+                            if (value != Value())
+                            {
+                                last = value.toDouble();
+                                if (!first)
+                                    first = last;
+                            }
+
                             totalTimeS += seconds(duration);
                         });
 

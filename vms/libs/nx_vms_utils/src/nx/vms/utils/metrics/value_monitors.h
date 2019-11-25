@@ -184,10 +184,8 @@ void ValueHistoryMonitor<ResourceType>::updateValue()
 {
     // NOTE: Should call RuntimeValueMonitor::valueOrThrow() because
     // ValueHistoryMonitor::valueOrThrow() is reimplemented to return value from the history.
-    const auto value = this->handleValueErrors(
-        [this](){ return RuntimeValueMonitor<ResourceType>::valueOrThrow(); });
-    if (!value.isNull())
-        m_history.update(value);
+    m_history.update(this->handleValueErrors(
+        [this](){ return RuntimeValueMonitor<ResourceType>::valueOrThrow(); }));
 }
 
 } // namespace nx::vms::utils::metrics

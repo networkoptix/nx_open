@@ -437,13 +437,13 @@
                         "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThan %fpsDelta 5",
-                            "text": "dropped by an average of %fpsDelta FPS in the last 10 minutes."
+                            "condition": "greaterThan %fpsDeltaAverage 5",
+                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
                         },
                         {
                             "level": "error",
                             "condition": "greaterThan %fpsDelta 10",
-                            "text": "dropped by an average of %fpsDelta FPS in the last 10 minutes."
+                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
                         }
                         ]
                     },
@@ -451,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     }
                 }
             },
@@ -465,7 +465,7 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "resolutionGreaterThan %resolution 1280x720",
+                                "condition": "greaterOrEqual %resolution 1280x720",
                                 "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
                             }
                         ]
@@ -495,7 +495,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     }
                 }
             },
@@ -513,7 +513,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "KBps"
+                        "format": "Kbps"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,

@@ -171,6 +171,7 @@ void CameraWebPageWidget::Private::createNewPage()
 {
     auto webView = webWidget->webEngineView();
     webView->createPageWithUserAgent(kUserAgentForCameraPage);
+    webView->page()->profile()->clearHttpCache();
 
     // Special actions list for context menu for links.
     webView->insertActions(nullptr, {
@@ -336,9 +337,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setScheme(nx::network::http::kUrlSchemeName)
             .setHost(getNonLocalAddress(currentServerUrl.host()))
             .setPort(currentServerUrl.port())
-            .setPath(state.singleCameraProperties.settingsUrlPath)
-            .setUserName(d->credentials.login())
-            .setPassword(d->credentials.password()).toUrl().toQUrl();
+            .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
         const auto cameraId = QnUuid(state.singleCameraProperties.id);
