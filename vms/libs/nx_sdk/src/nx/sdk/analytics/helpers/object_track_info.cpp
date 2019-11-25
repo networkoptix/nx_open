@@ -8,6 +8,12 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
+IList<ITimestampedObjectMetadata>* ObjectTrackInfo::getTrack() const
+{
+    // TODO: Implement using the new ObjectTrack storage mechanism.
+    return nullptr;
+}
+
 IUncompressedVideoFrame* ObjectTrackInfo::getBestShotVideoFrame() const
 {
     if (!m_bestShotVideoFrame)

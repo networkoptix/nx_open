@@ -18,6 +18,10 @@ class IObjectTrackInfo: public Interface<IObjectTrackInfo>
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackInfo"); }
 
+    /** @return List of metadata that share the same trackId. */
+    protected: virtual IList<ITimestampedObjectMetadata>* getTrack() const = 0;
+    public: Ptr<IList<ITimestampedObjectMetadata>> track() const { return toPtr(getTrack()); }
+
     /**
      * @return Frame defined to be the best shot in the object track by the DeviceAgent that
      *     generated this track, or, if such information is not available, the first frame of the
