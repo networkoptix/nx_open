@@ -666,6 +666,7 @@ void HanwhaChunkLoader::prepareHttpClient()
 {
     const auto authenticator = m_resourceContext->authenticator();
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_httpClient->bindToAioThread(m_timer.getAioThread());
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
     m_httpClient->setSendTimeout(kSendTimeout);
