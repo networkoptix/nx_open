@@ -8,8 +8,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-// TODO: #mshevchenko: Rename to test_camera_packet.h
-
 /**
  * Here is the definition of the protocol used by testcamera to send a video stream to the Server.
  *
