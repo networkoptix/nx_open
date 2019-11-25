@@ -81,15 +81,18 @@ public:
         return displayAddressFromAddresses(m_interface.addressEntries()).toString();
     }
 
-    QString state() const
+    bool isUp() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        return m_interface.flags().testFlag(QNetworkInterface::IsUp) ? "Up" : "Down";
+        return m_interface.flags().testFlag(QNetworkInterface::IsUp);
     }
 
     enum class Rate { in, out };
     api::metrics::Value load(Rate rate) const
     {
+        if (!isUp())
+            return {};
+
         // NOTE: Using MAC because windows has some mess with interfaces names (VMS-16182).
         const auto mac = hardwareAddress();
         const auto load = NX_METRICS_EXPECTED_ERROR(
@@ -151,7 +154,7 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "server", [this](const auto&) { return m_serverId; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "state", [this](const auto& r) { return r->state(); }
+                "state", [this](const auto& r) { return r->isUp() ? "Up" : "Down"; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "displayAddress", [this](const auto& r) { return r->displayAddress(); }
