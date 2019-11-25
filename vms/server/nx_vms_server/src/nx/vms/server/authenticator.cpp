@@ -151,7 +151,7 @@ Authenticator::Result Authenticator::tryAllMethods(
         }
     }
 
-    NX_VERBOSE(this, lm("Result %1 for %2").args(result, request.requestLine));
+    NX_VERBOSE(this, "Result %1 for %2", result, request.requestLine);
     return result;
 }
 
@@ -284,16 +284,16 @@ Qn::AuthResult Authenticator::tryAllMethods(
 
     const QUrlQuery urlQuery(request.requestLine.url.query());
 
-    const unsigned int allowedAuthMethods = m_authMethodRestrictionList.getAllowedAuthMethods(request);
+    const auto allowedAuthMethods = m_authMethodRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods == 0)
         return Qn::Auth_Forbidden;   //NOTE assert?
 
-    NX_VERBOSE(this, lm("Authenticating %1. Allowed auth methods 0b%2")
-        .arg(request.requestLine).arg(allowedAuthMethods, 0, 2));
+    NX_VERBOSE(this, "Authenticating %1. Allowed auth methods %2",
+        request.requestLine, allowedAuthMethods);
 
     if (allowedAuthMethods & nx::network::http::AuthMethod::noAuth)
     {
-        NX_VERBOSE(this, lm("Authenticated %1 by noauth").arg(request.requestLine));
+        NX_VERBOSE(this, "Authenticated %1 by noauth", request.requestLine);
         return Qn::Auth_OK;
     }
 
@@ -318,22 +318,22 @@ Qn::AuthResult Authenticator::tryAllMethods(
         const nx::network::http::StringType& videoWall_auth = nx::network::http::getHeaderValue(request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME);
         if (!videoWall_auth.isEmpty())
         {
-            NX_VERBOSE(this, lm("Authenticating %1 by video wall key %2")
-                .arg(request.requestLine.url).arg(videoWall_auth));
+            NX_VERBOSE(this, "Authenticating %1 by video wall key %2",
+                request.requestLine.url, videoWall_auth);
 
             if (usedAuthMethod)
                 *usedAuthMethod = nx::network::http::AuthMethod::videowallHeader;
 
             if (resourcePool()->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
             {
-                NX_VERBOSE(this, lm("Failed to authenticate %1 by video wall key %2")
-                    .arg(request.requestLine.url).arg(videoWall_auth));
+                NX_VERBOSE(this, "Failed to authenticate %1 by video wall key %2",
+                    request.requestLine.url, videoWall_auth);
                 return Qn::Auth_Forbidden;
             }
             else
             {
-                NX_VERBOSE(this, lm("Authenticated %1 by video wall key %2")
-                    .arg(request.requestLine.url).arg(videoWall_auth));
+                NX_VERBOSE(this, "Authenticated %1 by video wall key %2",
+                    request.requestLine.url, videoWall_auth);
 
                 if (accessRights)
                     *accessRights = Qn::kVideowallUserAccess;
@@ -348,8 +348,7 @@ Qn::AuthResult Authenticator::tryAllMethods(
             isProxy ? lit("proxy_auth") : QString::fromLatin1(Qn::URL_QUERY_AUTH_KEY_NAME)).toLatin1();
         if (!authQueryParam.isEmpty())
         {
-            NX_VERBOSE(this, lm("Authenticating %1 by auth query item")
-                .arg(request.requestLine));
+            NX_VERBOSE(this, "Authenticating %1 by auth query item", request.requestLine);
 
             auto authResult = tryAuthRecord(
                 clientIp,
@@ -364,7 +363,7 @@ Qn::AuthResult Authenticator::tryAllMethods(
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = nx::network::http::AuthMethod::urlQueryDigest;
-                NX_DEBUG(this, lm("%1 with urlQueryDigest (%2)").args(Qn::Auth_OK, request.requestLine));
+                NX_DEBUG(this, "%1 with urlQueryDigest (%2)", Qn::Auth_OK, request.requestLine);
                 return Qn::Auth_OK;
             }
         }
@@ -387,23 +386,22 @@ Qn::AuthResult Authenticator::tryAllMethods(
 
     if (allowedAuthMethods & nx::network::http::AuthMethod::http)
     {
-        NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
-            .arg(request.requestLine));
+        NX_VERBOSE(this, "Authenticating %1 with HTTP authentication", request.requestLine);
 
         result = tryHttpMethods(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
         if (result == Qn::Auth_OK)
         {
-            NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
+            NX_VERBOSE(this, "Authenticated %1 with HTTP authentication", request.requestLine.url);
             return result;
         }
         else
         {
-            NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication: %2")
-                .args(request.requestLine.url, result));
+            NX_VERBOSE(this, "Failed to authenticate %1 with HTTP authentication: %2",
+                request.requestLine.url, result);
         }
     }
 
-    NX_VERBOSE(this, lm("Failed to authenticate %1 with any method").arg(request.requestLine.url));
+    NX_VERBOSE(this, "Failed to authenticate %1 with any method", request.requestLine.url);
     return result;
 }
 
@@ -421,8 +419,8 @@ Qn::AuthResult Authenticator::tryHttpMethods(
     const nx::network::http::StringType nxUserName = nx::network::http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
     if (authorization.isEmpty())
     {
-        NX_VERBOSE(this, lm("Authenticating %1. Authorization header not found")
-            .arg(request.requestLine));
+        NX_VERBOSE(this, "Authenticating %1. Authorization header not found",
+            request.requestLine);
 
         Qn::AuthResult authResult = Qn::Auth_WrongDigest;
         if (usedAuthMethod)
@@ -433,8 +431,8 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             userResource = findUserByName(nxUserName);
             if (userResource)
             {
-                NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
-                    .arg(request.requestLine).arg(nxUserName));
+                NX_VERBOSE(this, "Authenticating %1. Found Nx user %2. Checking realm...",
+                    request.requestLine, nxUserName);
 
                 QString desiredRealm = nx::network::AppInfo::realm();
 
@@ -465,15 +463,15 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             response,
             isProxy);
 
-        NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
+        NX_DEBUG(this, "%1 requesting digest auth [%2]", authResult, request.requestLine);
         return authResult;
     }
 
     nx::network::http::header::Authorization authorizationHeader;
     if (!authorizationHeader.parse(authorization))
     {
-        NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication. "
-            "Error parsing Authorization header").arg(request.requestLine.url));
+        NX_VERBOSE(this, "Failed to authenticate %1 with HTTP authentication. "
+            "Error parsing Authorization header", request.requestLine.url);
         return Qn::Auth_Forbidden;
     }
 
@@ -487,8 +485,8 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
     if (userResource && userResource->isLdap() && userResource->passwordExpired())
     {
-        NX_VERBOSE(this, lm("Authenticating %1. Authentication LDAP user %2")
-            .arg(request.requestLine).arg(userResource->getName()));
+        NX_VERBOSE(this, "Authenticating %1. Authentication LDAP user %2",
+            request.requestLine, userResource->getName());
 
         // Check user password on LDAP server
         QString password;
@@ -539,7 +537,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
         authResult = tryHttpDigest(
             request.requestLine, authorizationHeader, response, isProxy, accessRights);
-        NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
+        NX_DEBUG(this, "%1 with digest (%2)", authResult, request.requestLine);
     }
     else if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::basic)
     {
@@ -562,7 +560,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
     if (authResult == Qn::Auth_OK)
     {
-        NX_VERBOSE(this, lm("Authenticating %1. Fetching access rights").arg(request.requestLine));
+        NX_VERBOSE(this, "Authenticating %1. Fetching access rights", request.requestLine);
 
         // update user information if authorization by server authKey and user-name is specified
         if (accessRights &&
@@ -649,15 +647,15 @@ void Authenticator::saveLoginResult(
     {
         if (data.failures.size() + 1 >= m_lockoutOptions->maxLoginFailures)
         {
-            NX_DEBUG(this, lm("Lockout for %1 from %2 for %3")
-                .args(name, address, m_lockoutOptions->lockoutTime));
+            NX_DEBUG(this, "Lockout for %1 from %2 for %3",
+                name, address, m_lockoutOptions->lockoutTime);
 
             data.lockedOut = std::chrono::steady_clock::now();
             data.failures.clear();
         }
         else
         {
-            NX_VERBOSE(this, lm("Record login failure for %1 from %2").args(name, address));
+            NX_VERBOSE(this, "Record login failure for %1 from %2", name, address);
             data.failures.push_back(std::chrono::steady_clock::now());
         }
     }
@@ -784,10 +782,9 @@ void Authenticator::addAuthHeader(
 
     const QString auth =
         isDigest
-        ? lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
-            .arg(realm)
-            .arg(QLatin1String(m_nonceProvider->generateNonce()))
-        : lit("Basic realm=\"%1\"").arg(realm);
+        ? lm("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5").args(
+            realm, m_nonceProvider->generateNonce())
+        : lm("Basic realm=\"%1\"").args(realm);
 
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
