@@ -72,7 +72,7 @@ void Logger::updateContext()
         m_context.append(context);
     }
     if (!m_context.isEmpty())
-        m_context.prepend(" Context: ");
+        m_context.prepend(" ");
 }
 
 } // namespace nx::vms::testcamera

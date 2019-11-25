@@ -423,11 +423,12 @@ static void validateCameraSet(const CliOptions::CameraSet& cameraSet, const CliO
         throw InvalidArgs("With '--camera-for-file', parameter 'count=' must be omitted or 1.");
 
     if (options.cameraForFile
+        && !cameraSet.secondaryFileNames.empty()
         && cameraSet.secondaryFileNames.size() != cameraSet.primaryFileNames.size())
     {
-        throw InvalidArgs(
-            lm("Existing primary files count %1 must equal existing secondary files count %2.")
-            .args(cameraSet.primaryFileNames.size(), cameraSet.secondaryFileNames.size()));
+        throw InvalidArgs(lm(
+            "Secondary files must be omitted or their count %1 must equal primary files count %2."
+            ).args(cameraSet.primaryFileNames.size(), cameraSet.secondaryFileNames.size()));
     }
 
     if (options.unloopPts && !options.cameraForFile

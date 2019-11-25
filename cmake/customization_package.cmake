@@ -10,6 +10,7 @@ function(nx_unpack_customization_package source_directory target_directory log_f
             ${source_directory}/package.zip
             ${target_directory}
             -l ${log_file}
+            --clean
         RESULT_VARIABLE unpack_result
     )
 

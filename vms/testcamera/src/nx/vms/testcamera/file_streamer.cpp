@@ -4,7 +4,9 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/network/abstract_socket.h>
+
 #include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/packet.h>
 
 #include "logger.h"
 #include "frame_logger.h"
@@ -26,7 +28,6 @@ private:
     const std::string m_what;
 };
 
-
 class SocketError: public Error
 {
 public:
@@ -36,6 +37,12 @@ public:
     {
     }
 };
+
+template<typename Value>
+void appendToBuffer(QByteArray* buffer, const Value& value)
+{
+    buffer->append(reinterpret_cast<const char*>(&value), sizeof(Value));
+}
 
 } // namespace
 
@@ -84,9 +91,9 @@ bool FileStreamer::streamFrame(const QnCompressedVideoData* frame, int frameInde
     try
     {
         if (frameIndex == 0)
-            sendMediaContextWithCodecAndFlags(frame);
+            sendMediaContextPacket(frame);
 
-        sendFrame(frame);
+        sendFramePacket(frame);
 
         if (m_ptsUnloopingContext)
         {
@@ -200,51 +207,71 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
 }
 
 /** @throws SocketError */
-void FileStreamer::sendMediaContextWithCodecAndFlags(const QnCompressedVideoData* frame) const
+void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) const
 {
-    const quint16 codecAndFlags =
-        frame->compressionType
-        | ((/*isKeyFrame*/ 1 << 7) << 8)
-        | ((/*isCodecContext*/ 1 << 6) << 8);
-    sendAsBigEndian(codecAndFlags, "media context codec and flags");
+    using namespace nx::vms::testcamera::packet;
+
+    if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
+        throw Error(lm("Codec id %1 not supported by testcamera.").args(frame->compressionType));
 
     const QByteArray mediaContext = frame->context->serialize();
-    sendAsBigEndian((int32_t) mediaContext.size(), "media context size");
-    send(mediaContext.data(), mediaContext.size(), "media context data");
+
+    Header header;
+    header.setFlags(Flag::keyFrame | Flag::mediaContext);
+    header.setCodecId(frame->compressionType);
+    header.setDataSize(mediaContext.size());
+
+    QByteArray buffer;
+    appendToBuffer(&buffer, header);
+    buffer.append(mediaContext);
+
+    send(buffer.constData(), buffer.size(), "media context packet");
 }
 
 /** @throws SocketError */
-void FileStreamer::sendFrame(const QnCompressedVideoData* frame) const
+void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
 {
-    uint16_t codecAndFlags = frame->compressionType;
+    using namespace nx::vms::testcamera::packet;
 
-    if (frame->compressionType == 0
-        || (frame->compressionType >= (1 << 5) && frame->compressionType != AV_CODEC_ID_H265))
+    if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
+        throw Error(lm("Codec id %1 not supported.").args(frame->compressionType));
+
+    if (frame->dataSize() == 0)
+        throw Error("Frame with zero size found - not supported.");
+
+    if (frame->dataSize() > 8 * 1024 * 1024)
     {
-        throw Error(lm("Codec id %1 not supported by testcamera.").args(frame->compressionType));
+        throw Error(lm("Frame larger than 8 MB (actual: %1 bytes) found - not supported.")
+            .args(frame->dataSize()));
     }
 
+    Flags flags;
     if (frame->flags & AV_PKT_FLAG_KEY)
-        codecAndFlags |= (/*isKeyFrame*/ 1 << 7) << 8;
+        flags |= Flag::keyFrame;
+    if (m_testCameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
+        flags |= Flag::ptsIncluded;
 
-    if (m_testCameraOptions.includePts)
-        codecAndFlags |= (/*isPtsIncluded*/ 1 << 5) << 8;
+    Header header;
+    header.setFlags(flags);
+    header.setCodecId(frame->compressionType);
+    header.setDataSize((int) frame->dataSize());
 
-    sendAsBigEndian(codecAndFlags, "frame codec and flags");
-
-    sendAsBigEndian((uint32_t) frame->dataSize(), "frame data size");
+    QByteArray buffer;
+    appendToBuffer(&buffer, header);
 
     QString ptsLogText = "without pts";
-    if (m_testCameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
+    if (flags & Flag::ptsIncluded)
     {
         const microseconds pts = unloopAndShiftPtsIfNeeded(framePts(frame));
+        appendToBuffer(&buffer, PtsUs(pts.count()));
         ptsLogText = lm("with pts %1").args(us(pts));
-        sendAsBigEndian((int64_t) pts.count(), "pts");
     }
 
     m_frameLogger->logFrameIfNeeded(
         lm("Sending frame %1, %2 bytes.").args(ptsLogText, frame->dataSize()),
         m_logger);
+
+    send(buffer.constData(), buffer.size(), "frame header with optional params");
 
     send(frame->data(), (int) frame->dataSize(), "frame data");
 }

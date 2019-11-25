@@ -78,7 +78,27 @@ void CameraPool::reportAddingCameras(
         cameraCountMessagePart, offlineFreqMessagePart, filesMessagePart);
 }
 
-void CameraPool::addCameras(
+bool CameraPool::addCamera(
+    const FileCache* fileCache,
+    const CameraOptions& testCameraOptions,
+    QStringList primaryFileNames,
+    QStringList secondaryFileNames)
+{
+    auto camera = std::make_unique<Camera>(
+        m_frameLogger.get(),
+        fileCache,
+        (int) m_cameraByMac.size() + 1,
+        testCameraOptions,
+        primaryFileNames,
+        m_noSecondaryStream ? QStringList() : secondaryFileNames);
+
+    const auto [_, success] = m_cameraByMac.insert({camera->mac(), std::move(camera)});
+
+    NX_ASSERT(success, "Unable to add camera with duplicate MAC %1.", camera->mac());
+    return success;
+}
+
+bool CameraPool::addCameras(
     const FileCache* fileCache,
     bool cameraForEachFile,
     const CameraOptions& testCameraOptions,
@@ -95,35 +115,25 @@ void CameraPool::addCameras(
     {
         for (int i = 0; i < count; ++i)
         {
-            auto camera = std::make_unique<Camera>(
-                m_frameLogger.get(),
-                fileCache,
-                (int) m_cameraByMac.size() + 1,
-                testCameraOptions,
-                primaryFileNames,
-                m_noSecondaryStream ? QStringList() : secondaryFileNames);
-
-            m_cameraByMac.insert({camera->mac(), std::move(camera)});
+            if (!addCamera(fileCache, testCameraOptions, primaryFileNames, secondaryFileNames))
+                return false;
         }
     }
     else // Run one camera for each primary-secondary pair of video files.
     {
         if (!NX_ASSERT(primaryFileNames.size() == secondaryFileNames.size()))
-            return;
+            return false;
 
         for (int i = 0; i < primaryFileNames.size(); i++)
         {
-            auto camera = std::make_unique<Camera>(
-                m_frameLogger.get(),
-                fileCache,
-                (int) m_cameraByMac.size() + 1,
-                testCameraOptions,
-                QStringList{primaryFileNames[i]},
-                m_noSecondaryStream ? QStringList() : QStringList{secondaryFileNames[i]});
-
-            m_cameraByMac.insert({camera->mac(), std::move(camera)});
+            if (!addCamera(
+                fileCache, testCameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
+            {
+                return false;
+            }
         }
     }
+    return true;
 }
 
 bool CameraPool::startDiscovery()

@@ -6,7 +6,7 @@ from io import StringIO
 from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 
 
-# plink (used on Windows) tool haven't option to disable ssh host key checking. Instead of this it has only option to
+# plink (used on Windows) tool hasn't option to disable ssh host key checking. Instead of this it has only option to
 # pass the key. Thus on Windows we should preliminary obtain the ssh host key.
 class SshHostKeyObtainer:
     def __init__(self, dev, conf_file):

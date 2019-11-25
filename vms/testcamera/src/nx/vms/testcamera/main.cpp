@@ -21,6 +21,12 @@ namespace nx::vms::testcamera {
 
 namespace {
 
+template<typename... Args>
+void print(std::ostream& stream, const QString& message, Args... args)
+{
+    stream << nx::utils::log::makeMessage(message + "\n", args...).toStdString();
+}
+
 static CameraOptions makeCameraOptions(
     const CliOptions& options, const CliOptions::CameraSet& cameraSet)
 {
@@ -39,6 +45,7 @@ static CameraOptions makeCameraOptions(
 class Executor
 {
 public:
+    /** On error, prints the error message on stderr and returns false. */
     bool initialize(int argc, char* argv[])
     {
         CliOptions options;
@@ -67,10 +74,14 @@ public:
             options.fpsSecondary));
 
         if (!loadFilesAndAddCameras(options))
+        {
+            print(std::cerr, "Unable to load files or add cameras; see the logged error.");
             return false;
+        }
 
-        std::cout << lm("\nLoaded %2 video file(s). Starting %1 camera(s)...\n\n")
-            .args(m_cameraPool->cameraCount(), m_fileCache->fileCount()).toStdString();
+        // NOTE: Printing blank lines before and after to emphasize.
+        print(std::cout, "\nLoaded %2 video file(s). Starting %1 camera(s)...\n",
+            m_cameraPool->cameraCount(), m_fileCache->fileCount());
 
         return m_cameraPool->startDiscovery();
     }
@@ -102,13 +113,16 @@ private:
                 ? cameraSet.primaryFileNames
                 : cameraSet.secondaryFileNames;
 
-            m_cameraPool->addCameras(
+            if (!m_cameraPool->addCameras(
                 m_fileCache.get(),
                 options.cameraForFile,
                 makeCameraOptions(options, cameraSet),
                 cameraSet.count,
                 cameraSet.primaryFileNames,
-                secondaryFileNames);
+                secondaryFileNames))
+            {
+                return false;
+            }
         }
         return true;
     }
@@ -129,14 +143,10 @@ int main(int argc, char* argv[])
         QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
         QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");
         QCoreApplication::setApplicationVersion(nx::utils::AppInfo::applicationVersion());
+        QCoreApplication app(argc, argv); //< Each user may have their own testcamera running.
 
-        // Each user may have their own testcamera running.
-        QCoreApplication app(argc, argv);
-
-        std::cout << (
-            "\n" //< Blank line after the ini-config printout.
-            + app.applicationName() + " version " + app.applicationVersion() + "\n\n"
-        ).toStdString();
+        // NOTE: Print blank lines before (after ini-config printout) and after to emphasize.
+        print(std::cout, "\n%1 version %2\n", app.applicationName(), app.applicationVersion());
 
         Executor executor;
         if (!executor.initialize(argc, argv))
@@ -144,17 +154,17 @@ int main(int argc, char* argv[])
 
         const int exitStatus = app.exec();
 
-        std::cerr << "Finished with exit status " << exitStatus << ".\n";
+        print(std::cerr, "Finished with exit status %1.", exitStatus);
         return exitStatus;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "INTERNAL ERROR: Exception raised: " << e.what() << "\n";
+        print(std::cerr, "INTERNAL ERROR: Exception raised: %1", e.what());
         return 70;
     }
     catch (...)
     {
-        std::cerr << "INTERNAL ERROR: Unknown exception raised.\n";
+        print(std::cerr, "INTERNAL ERROR: Unknown exception raised.");
         return 70;
     }
 }
