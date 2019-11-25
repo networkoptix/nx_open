@@ -16,7 +16,7 @@ NetworkBlockController::NetworkBlockController(
     m_platformAbstraction(std::move(platformAbstraction)),
     m_stateFetcher(std::make_unique<NetworkBlockStateFetcher>(
         m_platformAbstraction.get(),
-        [this](const NetworkPortStateList& state) { handleStates(state); })),
+        [this](const NetworkPortStateList& states) { updateStates(states); })),
     m_handler(std::move(stateHandler))
 {
     NX_DEBUG(this, "Creating Hanwha NVR network block controller");
@@ -55,19 +55,22 @@ NetworkPortPoeStateList NetworkBlockController::setPoeStates(
     NetworkPortPoeStateList result;
     for (const NetworkPortPoeState& portPoeState: poeStates)
     {
-        // TODO: #dmishin something wrong is here. Does setPoeEnabled returns success or actual port
-        // PoE state.
-        const bool isPoeEnabled = m_platformAbstraction->setPoeEnabled(
+        const bool success = m_platformAbstraction->setPoeEnabled(
             portPoeState.portNumber,
             portPoeState.isPoeEnabled);
 
-        result.push_back({portPoeState.portNumber, isPoeEnabled});
+        QnMutexLocker lock(&m_mutex);
+        result.push_back({
+            portPoeState.portNumber,
+            success
+                ? portPoeState.isPoeEnabled
+                : m_lastPortStates[portPoeState.portNumber].isPoeEnabled});
     }
 
     return result;
 }
 
-void NetworkBlockController::handleStates(const NetworkPortStateList& states)
+void NetworkBlockController::updateStates(const NetworkPortStateList& states)
 {
     NX_VERBOSE(this, "Handling port states: %1", containerString(states));
 

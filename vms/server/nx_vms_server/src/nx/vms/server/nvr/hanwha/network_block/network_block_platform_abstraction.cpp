@@ -5,6 +5,7 @@
     #include <sys/ioctl.h>
 #endif
 
+#include <atomic>
 #include <optional>
 
 #include <nx/vms/server/root_fs.h>
@@ -104,6 +105,9 @@ public:
         result.portNumber = portNumber;
         result.isPoeEnabled = isPoeEnabled(portNumber);
 
+        if (m_interrupted.load())
+            return {};
+
         if (!hasConnectedDevice(portNumber))
         {
             NX_VERBOSE(this, "No device is connected to port #%1", portNumber);
@@ -111,8 +115,15 @@ public:
             return result;
         }
 
+        if (m_interrupted.load())
+            return {};
+
         result.linkSpeedMbps = kFastEthernetLinkSpeedMbps;
         result.devicePowerConsumptionWatts = getPowerConsumptionWatts(portNumber);
+
+        if (m_interrupted.load())
+            return {};
+
         if (result.isPoeEnabled && !qFuzzyIsNull(result.devicePowerConsumptionWatts))
         {
             NX_VERBOSE(this, "Setting port #%1 power limit to %2",
@@ -129,9 +140,7 @@ public:
 
     virtual bool setPoeEnabled(int portNumber, bool isPoeEnabled) override
     {
-        NX_DEBUG(this, "%1 PoE on port #%2",
-            (isPoeEnabled ? "Enabling": "Disabling"),
-            portNumber);
+        NX_DEBUG(this, "%1 PoE on port #%2", (isPoeEnabled ? "Enabling": "Disabling"), portNumber);
 
         const int command =
             prepareCommand<PortPoweringStatusCommandData>(kSetPortPoweringStatusCommand);
@@ -156,6 +165,11 @@ public:
         return true;
     }
 
+    virtual void interrupt()
+    {
+        m_interrupted.store(true);
+    }
+
 private:
     std::map<int, nx::utils::MacAddress> getMacAddresses(std::set<int> portNumbers) const
     {
@@ -165,6 +179,9 @@ private:
         {
             for (int j = 0; j < 2; ++j)
             {
+                if (m_interrupted.load())
+                    return {};
+
                 PortMacAddressCommandData commandData;
                 commandData.index = i;
                 commandData.block = j;
@@ -305,6 +322,7 @@ private:
 
     mutable std::map</*portNumber*/ int,  nx::utils::MacAddress> m_macAddressCache;
     mutable std::optional<int> m_cachedPortCount;
+    std::atomic<bool> m_interrupted{false};
 };
 
 #endif
@@ -354,6 +372,12 @@ bool NetworkBlockPlatformAbstraction::setPoeEnabled(int portNumber, bool isPoeEn
         return m_impl->setPoeEnabled(portNumber, isPoeEnabled);
 
     return false;
+}
+
+void NetworkBlockPlatformAbstraction::interrupt()
+{
+    if (NX_ASSERT(m_impl))
+        m_impl->interrupt();
 }
 
 } // namespace nx::vms::server::nvr::hanwha

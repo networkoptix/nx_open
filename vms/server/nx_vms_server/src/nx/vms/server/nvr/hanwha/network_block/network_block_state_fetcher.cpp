@@ -1,12 +1,14 @@
 #include "network_block_state_fetcher.h"
 
+#include <nx/utils/elapsed_timer.h>
+
 #include <nx/vms/server/nvr/hanwha/network_block/i_network_block_platform_abstraction.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
 using namespace nx::vms::api;
 
-static const std::chrono::milliseconds kSleepBetweenIterations(1000); //< TODO: #dmishin change!
+static const std::chrono::milliseconds kSleepBetweenIterations(1000);
 
 NetworkBlockStateFetcher::NetworkBlockStateFetcher(
     INetworkBlockPlatformAbstraction* platformAbstraction,
@@ -25,6 +27,19 @@ NetworkBlockStateFetcher::~NetworkBlockStateFetcher()
     stop();
 }
 
+void NetworkBlockStateFetcher::stop()
+{
+    QnLongRunnable::pleaseStop();
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_platformAbstraction->interrupt();
+        m_waitCondition.wakeOne();
+    }
+
+    QnLongRunnable::wait();
+}
+
 void NetworkBlockStateFetcher::run()
 {
     NX_ASSERT(m_stateHandler);
@@ -32,11 +47,30 @@ void NetworkBlockStateFetcher::run()
     const int portCount = m_platformAbstraction->portCount();
     while (!needToStop())
     {
-        std::this_thread::sleep_for(kSleepBetweenIterations);
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            nx::utils::ElapsedTimer timer;
+            timer.restart();
+            while (!needToStop() && timer.elapsed() < kSleepBetweenIterations)
+            {
+                m_waitCondition.wait(
+                    &m_mutex,
+                    std::max(
+                        std::chrono::milliseconds::zero(),
+                        kSleepBetweenIterations - timer.elapsed()));
 
+                if (needToStop())
+                    return;
+            }
+        }
         NetworkPortStateList result;
         for (int portNumber = 1; portNumber <= portCount; ++portNumber)
+        {
+            if (needToStop())
+                return;
+
             result.push_back(m_platformAbstraction->portState(portNumber));
+        }
 
         m_stateHandler(result);
     }

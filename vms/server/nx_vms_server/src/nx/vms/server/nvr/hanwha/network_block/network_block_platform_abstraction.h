@@ -20,6 +20,8 @@ public:
 
     virtual bool setPoeEnabled(int portNumber, bool isPoeEnabled) override;
 
+    virtual void interrupt() override;
+
 private:
     std::unique_ptr<NetworkBlockPlatformAbstractionImpl> m_impl;
 };

@@ -30,7 +30,7 @@ public:
     NetworkPortPoeStateList setPoeStates(const NetworkPortPoeStateList& poeStates);
 
 private:
-    void handleStates(const NetworkPortStateList& states);
+    void updateStates(const NetworkPortStateList& states);
 
 private:
     mutable QnMutex m_mutex;

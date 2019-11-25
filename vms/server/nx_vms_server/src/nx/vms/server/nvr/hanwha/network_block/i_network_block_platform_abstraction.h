@@ -14,6 +14,8 @@ public:
     virtual NetworkPortState portState(int portNumber) const = 0;
 
     virtual bool setPoeEnabled(int portNumber, bool isPoeEnabled) = 0;
+
+    virtual void interrupt() = 0;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

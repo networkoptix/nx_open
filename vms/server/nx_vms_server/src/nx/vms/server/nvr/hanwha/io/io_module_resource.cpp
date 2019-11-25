@@ -154,17 +154,20 @@ void IoModuleResource::handleStateChange(const QnIOStateDataList& state)
                     portState.id,
                     portState.isActive,
                     portState.timestamp);
+
                 break;
             }
             case Qn::IOPortType::PT_Output:
             {
                 NX_DEBUG(this, "Emitting outputPortStateChanged signal for port %1, state %2",
                     portState.id, portState.isActive);
+
                 emit outputPortStateChanged(
                     toSharedPointer(this),
                     portState.id,
                     portState.isActive,
                     portState.timestamp);
+
                 break;
             }
             default:

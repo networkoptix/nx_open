@@ -56,7 +56,12 @@ void IoStateFetcher::run()
         }
 
         for (int i = 0; i < kInputCount; ++i)
+        {
+            if (needToStop())
+                return;
+
             portStateData.insert(m_platformAbstraction->portState(makeInputId(i)));
+        }
 
         m_stateHandler(portStateData);
     }
