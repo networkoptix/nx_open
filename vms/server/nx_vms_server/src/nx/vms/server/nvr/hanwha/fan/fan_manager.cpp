@@ -48,8 +48,8 @@ FanState FanManager::state() const
 HandlerId FanManager::registerStateChangeHandler(StateChangeHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    NX_DEBUG(this, "Registering fan state change handler, id: %1", ++m_maxHandlerId);
-
+    ++m_maxHandlerId;
+    NX_DEBUG(this, "Registering fan state change handler, id: %1", m_maxHandlerId);
     m_handlers.emplace(m_maxHandlerId, std::move(handler));
     return m_maxHandlerId;
 }

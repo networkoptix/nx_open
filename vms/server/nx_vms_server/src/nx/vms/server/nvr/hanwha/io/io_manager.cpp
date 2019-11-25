@@ -141,7 +141,8 @@ QnIOStateDataList IoManager::portStates() const
 HandlerId IoManager::registerStateChangeHandler(IoStateChangeHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    NX_DEBUG(this, "Registering handler with id %1", ++m_maxHandlerId);
+    ++m_maxHandlerId;
+    NX_DEBUG(this, "Registering handler with id %1", m_maxHandlerId);
     m_handlers.emplace(m_maxHandlerId, std::move(handler));
     return m_maxHandlerId;
 }
@@ -171,9 +172,9 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
     }
 
     if (changedPortStates.empty())
-        return;    
+        return;
 
-    NX_DEBUG(this, "%1 IO ports changed their state:", containerString(portStates));
+    NX_DEBUG(this, "IO ports changed their state: %1", containerString(portStates));
 
     {
         NX_MUTEX_LOCKER lock(&m_handlerMutex);

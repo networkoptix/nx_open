@@ -95,7 +95,10 @@ void IoModuleResource::startInputPortStatesMonitoring()
 {
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!ioManager)
+    {
+        NX_WARNING(this, "Unable to access IO manager while trying to register handler");
         return;
+    }
 
     m_handlerId = ioManager->registerStateChangeHandler(
         [this](const QnIOStateDataList& state) { handleStateChange(state); });
@@ -103,12 +106,18 @@ void IoModuleResource::startInputPortStatesMonitoring()
 
 void IoModuleResource::stopInputPortStatesMonitoring()
 {
-    if (m_handlerId > 0)
+    if (m_handlerId == 0)
+    {
+        NX_DEBUG(this, "Stopping input port monitoring, the state handler is not set");
         return;
+    }
 
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!ioManager)
+    {
+        NX_DEBUG(this, "Unable to access IO manager while trying to unregister IO handler");
         return;
+    }
 
     ioManager->unregisterStateChangeHandler(m_handlerId);
 }

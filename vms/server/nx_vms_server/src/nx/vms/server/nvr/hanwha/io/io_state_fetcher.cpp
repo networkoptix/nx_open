@@ -29,6 +29,7 @@ IoStateFetcher::~IoStateFetcher()
 void IoStateFetcher::updateOutputPortState(const QString& portId, IoPortState state)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_DEBUG(this, "Updating output port state, port id %1, state: %2", portId, state);
     m_outputPortStates[portId] = state;
 }
 

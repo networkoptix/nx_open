@@ -79,7 +79,8 @@ bool NetworkBlockManager::setPoeModes(
 HandlerId NetworkBlockManager::registerPoeOverBudgetHandler(PoeOverBudgetHandler handler)
 {
     QnMutexLocker lock(&m_handlerMutex);
-    NX_DEBUG(this, "Registering PoE over budget handler, id: %1", ++m_maxHandlerId);
+    ++m_maxHandlerId;
+    NX_DEBUG(this, "Registering PoE over budget handler, id: %1", m_maxHandlerId);
     m_poeOverBudgetHandlers.emplace(m_maxHandlerId, std::move(handler));
     return m_maxHandlerId;
 }
