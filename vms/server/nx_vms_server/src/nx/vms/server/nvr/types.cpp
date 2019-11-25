@@ -5,7 +5,7 @@
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::nvr, FanState,
     (nx::vms::server::nvr::FanState::undefined, "")
     (nx::vms::server::nvr::FanState::ok, "ok")
-    (nx::vms::server::nvr::FanState::error, ""))
+    (nx::vms::server::nvr::FanState::error, "error"))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::nvr, BuzzerState,
     (nx::vms::server::nvr::BuzzerState::undefined, "")

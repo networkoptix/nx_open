@@ -40,7 +40,7 @@ struct NetworkPortState: public NetworkPortPoeState
 using NetworkPortPoeStateList = std::vector<NetworkPortPoeState>;
 using NetworkPortStateList = std::vector<NetworkPortState>;
 
-inline bool operator==(const NetworkPortPoeState& rhs, const NetworkPortPoeState& lhs)
+inline bool operator==(const NetworkPortPoeState& lhs, const NetworkPortPoeState& rhs)
 {
     return rhs.portNumber == lhs.portNumber && rhs.isPoeEnabled == lhs.isPoeEnabled;
 }
