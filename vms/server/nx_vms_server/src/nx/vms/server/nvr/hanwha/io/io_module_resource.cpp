@@ -103,7 +103,7 @@ void IoModuleResource::startInputPortStatesMonitoring()
 
 void IoModuleResource::stopInputPortStatesMonitoring()
 {
-    if (m_handlerId.isNull())
+    if (m_handlerId > 0)
         return;
 
     nvr::IIoManager* const ioManager = getIoManager(serverModule());

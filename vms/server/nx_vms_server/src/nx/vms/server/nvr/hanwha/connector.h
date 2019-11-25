@@ -72,9 +72,9 @@ private:
     IFanManager* m_fanManager = nullptr;
     ILedManager* m_ledManager = nullptr;
 
-    QnUuid m_poeOverBudgetHandlerId;
-    QnUuid m_alarmOutputHandlerId;
-    QnUuid m_fanAlarmHandlerId;
+    HandlerId m_poeOverBudgetHandlerId = 0;
+    HandlerId m_alarmOutputHandlerId = 0;
+    HandlerId m_fanAlarmHandlerId = 0;
 
     std::map<QString, bool> m_alarmOutputStates;
 

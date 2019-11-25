@@ -3,6 +3,7 @@
 #include <optional>
 
 #include <nx/vms/server/resource/camera.h>
+#include <nx/vms/server/nvr/types.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -38,7 +39,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    QnUuid m_handlerId;
+    HandlerId m_handlerId = 0;
     std::map<QString, QnIOPortData> m_portDescriptorsById;
 };
 

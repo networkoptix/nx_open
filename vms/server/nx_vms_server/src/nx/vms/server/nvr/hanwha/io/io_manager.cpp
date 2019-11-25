@@ -138,17 +138,15 @@ QnIOStateDataList IoManager::portStates() const
     return result;
 }
 
-QnUuid IoManager::registerStateChangeHandler(IoStateChangeHandler handler)
+HandlerId IoManager::registerStateChangeHandler(IoStateChangeHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    const QnUuid id = getId(m_handlers);
-    NX_DEBUG(this, "Registering handler with id %1", id);
-
-    m_handlers.emplace(id, std::move(handler));
-    return id;
+    NX_DEBUG(this, "Registering handler with id %1", ++m_maxHandlerId);
+    m_handlers.emplace(m_maxHandlerId, std::move(handler));
+    return m_maxHandlerId;
 }
 
-void IoManager::unregisterStateChangeHandler(QnUuid handlerId)
+void IoManager::unregisterStateChangeHandler(HandlerId handlerId)
 {
     NX_DEBUG(this, "Unregistering handler with id %1", handlerId);
 

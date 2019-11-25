@@ -33,9 +33,9 @@ public:
 
     virtual QnIOStateDataList portStates() const override;
 
-    virtual QnUuid registerStateChangeHandler(IoStateChangeHandler handler) override;
+    virtual HandlerId registerStateChangeHandler(IoStateChangeHandler handler) override;
 
-    virtual void unregisterStateChangeHandler(QnUuid handlerId) override;
+    virtual void unregisterStateChangeHandler(HandlerId handlerId) override;
 
 private:
     void updatePortStates(const std::set<QnIOStateData>& portStates);
@@ -49,7 +49,7 @@ private:
     std::unique_ptr<IoStateFetcher> m_stateFetcher;
     std::unique_ptr<nx::utils::TimerManager> m_timerManager;
 
-    std::map<QnUuid, IoStateChangeHandler> m_handlers;
+    std::map<HandlerId, IoStateChangeHandler> m_handlers;
 
     struct IoPortContext
     {
@@ -59,6 +59,8 @@ private:
 
     mutable std::map</*portId*/ QString, IoPortContext> m_outputPortContexts;
     std::set<QnIOStateData> m_lastPortStates;
+
+    HandlerId m_maxHandlerId = 0;
 
     bool m_isStopped = false;
 };

@@ -109,13 +109,13 @@ void Connector::stop()
 
     disconnect(this);
 
-    if (!m_poeOverBudgetHandlerId.isNull())
+    if (m_poeOverBudgetHandlerId > 0)
         m_networkBlockManager->unregisterPoeOverBudgetHandler(m_poeOverBudgetHandlerId);
 
-    if (!m_alarmOutputHandlerId.isNull())
+    if (m_alarmOutputHandlerId > 0)
         m_ioManager->unregisterStateChangeHandler(m_alarmOutputHandlerId);
 
-    if (!m_fanAlarmHandlerId.isNull())
+    if (m_fanAlarmHandlerId > 0)
         m_fanManager->unregisterStateChangeHandler(m_fanAlarmHandlerId);
 
     m_ledManager->setLedState(kRecordingLedId, LedState::disabled);
@@ -218,7 +218,7 @@ void Connector::handleResourcePoolChanges()
 
 void Connector::at_resourceStatusChanged(
     const QnResourcePtr& /*resource*/, Qn::StatusChangeReason /*reason*/)
-{
+{    
     handleResourcePoolChanges();
 }
 

@@ -45,6 +45,7 @@ inline bool operator==(const NetworkPortPoeState& rhs, const NetworkPortPoeState
     return rhs.portNumber == lhs.portNumber && rhs.isPoeEnabled == lhs.isPoeEnabled;
 }
 
+using HandlerId = int64_t;
 using IoStateChangeHandler = std::function<void(const QnIOStateDataList& state)>;
 
 struct DeviceInfo

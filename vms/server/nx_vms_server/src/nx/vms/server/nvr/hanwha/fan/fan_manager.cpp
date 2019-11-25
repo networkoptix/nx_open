@@ -45,17 +45,16 @@ FanState FanManager::state() const
     return m_lastState;
 }
 
-QnUuid FanManager::registerStateChangeHandler(StateChangeHandler handler)
+HandlerId FanManager::registerStateChangeHandler(StateChangeHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    const QnUuid handlerId = getId(m_handlers);
-    NX_DEBUG(this, "Registering fan state change handler, id: %1", handlerId);
+    NX_DEBUG(this, "Registering fan state change handler, id: %1", ++m_maxHandlerId);
 
-    m_handlers.emplace(handlerId, std::move(handler));
-    return handlerId;
+    m_handlers.emplace(m_maxHandlerId, std::move(handler));
+    return m_maxHandlerId;
 }
 
-void FanManager::unregisterStateChangeHandler(QnUuid handlerId)
+void FanManager::unregisterStateChangeHandler(HandlerId handlerId)
 {
     NX_DEBUG(this, "Unregistering fan state change handler, id %1", handlerId);
 

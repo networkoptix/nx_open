@@ -76,16 +76,15 @@ bool NetworkBlockManager::setPoeModes(
     return true; //< TODO: #dmishin handle errors.
 }
 
-QnUuid NetworkBlockManager::registerPoeOverBudgetHandler(PoeOverBudgetHandler handler)
+HandlerId NetworkBlockManager::registerPoeOverBudgetHandler(PoeOverBudgetHandler handler)
 {
     QnMutexLocker lock(&m_handlerMutex);
-    const QnUuid handlerId = getId(m_poeOverBudgetHandlers);
-    NX_DEBUG(this, "Registering PoE over budget handler, id: %1", handlerId);
-    m_poeOverBudgetHandlers.emplace(handlerId, std::move(handler));
-    return handlerId;
+    NX_DEBUG(this, "Registering PoE over budget handler, id: %1", ++m_maxHandlerId);
+    m_poeOverBudgetHandlers.emplace(m_maxHandlerId, std::move(handler));
+    return m_maxHandlerId;
 }
 
-void NetworkBlockManager::unregisterPoeOverBudgetHandler(QnUuid handlerId)
+void NetworkBlockManager::unregisterPoeOverBudgetHandler(HandlerId handlerId)
 {
     NX_DEBUG(this, "Unregistering PoE over budget handler, id %1", handlerId);
 

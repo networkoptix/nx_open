@@ -2,8 +2,6 @@
 
 #include <functional>
 
-#include <nx/utils/uuid.h>
-
 #include <nx/vms/server/nvr/types.h>
 
 namespace nx::vms::server::nvr {
@@ -22,9 +20,9 @@ public:
 
     virtual FanState state() const = 0;
 
-    virtual QnUuid registerStateChangeHandler(StateChangeHandler handler) = 0;
+    virtual HandlerId registerStateChangeHandler(StateChangeHandler handler) = 0;
 
-    virtual void unregisterStateChangeHandler(QnUuid handlerId) = 0;
+    virtual void unregisterStateChangeHandler(HandlerId handlerId) = 0;
 };
 
 } // namespace nx::vms::server::nvr

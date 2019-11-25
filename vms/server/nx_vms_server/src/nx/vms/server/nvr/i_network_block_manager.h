@@ -2,6 +2,8 @@
 
 #include <nx/vms/api/data/network_block_data.h>
 
+#include <nx/vms/server/nvr/types.h>
+
 namespace nx::vms::server::nvr {
 
 class INetworkBlockManager
@@ -20,9 +22,9 @@ public:
     virtual bool setPoeModes(
         const std::vector<nx::vms::api::NetworkPortWithPoweringMode>& poweringModes) = 0;
 
-    virtual QnUuid registerPoeOverBudgetHandler(PoeOverBudgetHandler handler) = 0;
+    virtual HandlerId registerPoeOverBudgetHandler(PoeOverBudgetHandler handler) = 0;
 
-    virtual void unregisterPoeOverBudgetHandler(QnUuid handlerId) = 0;
+    virtual void unregisterPoeOverBudgetHandler(HandlerId handlerId) = 0;
 };
 
 } // namespace nx::vms::server::nvr

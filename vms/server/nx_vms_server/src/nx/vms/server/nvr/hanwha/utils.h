@@ -21,17 +21,6 @@ double calculateCurrentConsumptionWatts(const PortStateList& portStates)
     return totalConsumptionWatts;
 }
 
-template<typename HandlerMap>
-QnUuid getId(const HandlerMap& handlerMap)
-{
-    QnUuid handlerId;
-    do {
-        handlerId = QnUuid::createUuid();
-    } while (handlerMap.find(handlerId) != handlerMap.cend());
-
-    return handlerId;
-}
-
 inline QString makeInputId(int index) { return kInputIdPrefix + QString::number(index); }
 inline QString makeOutputId(int index) { return kOutputIdPrefix + QString::number(index); }
 

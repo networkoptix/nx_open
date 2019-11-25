@@ -26,9 +26,9 @@ public:
 
     virtual QnIOStateDataList portStates() const = 0;
 
-    virtual QnUuid registerStateChangeHandler(IoStateChangeHandler handler) = 0;
+    virtual HandlerId registerStateChangeHandler(IoStateChangeHandler handler) = 0;
 
-    virtual void unregisterStateChangeHandler(QnUuid handlerId) = 0;
+    virtual void unregisterStateChangeHandler(HandlerId handlerId) = 0;
 
 };
 

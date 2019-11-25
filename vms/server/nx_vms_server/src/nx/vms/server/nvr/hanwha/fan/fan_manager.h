@@ -24,9 +24,9 @@ public:
 
     virtual FanState state() const override;
 
-    virtual QnUuid registerStateChangeHandler(StateChangeHandler handler) override;
+    virtual HandlerId registerStateChangeHandler(StateChangeHandler handler) override;
 
-    virtual void unregisterStateChangeHandler(QnUuid handlerId) override;
+    virtual void unregisterStateChangeHandler(HandlerId handlerId) override;
 
 private:
     void updateState(FanState state);
@@ -38,8 +38,10 @@ public:
     std::unique_ptr<IFanPlatformAbstraction> m_platformAbstraction;
     std::unique_ptr<FanStateFetcher> m_stateFetcher;
 
-    std::map<QnUuid, StateChangeHandler> m_handlers;
+    std::map<HandlerId, StateChangeHandler> m_handlers;
     FanState m_lastState = FanState::undefined;
+
+    HandlerId m_maxHandlerId = 0;
 
     bool m_isStopped = false;
 };
