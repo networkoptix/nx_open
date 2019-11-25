@@ -16,13 +16,6 @@ namespace nx::vms::server::nvr::hanwha {
 
 static constexpr double kPoePlusPowerConsumptionLimitWatts = 30.0;
 static constexpr int kFastEthernetLinkSpeedMbps = 100;
-static const std::map</*Device PoE class*/ int, double> kPowerLimitWattsByDevicePoEClass = {
-    {0, 15.4},
-    {1, 4.5},
-    {2, 7.0},
-    {3, 15.4},
-    {4, 30.0},
-};
 
 #if defined (Q_OS_LINUX)
 static const std::map<int, int> kPortCountByBoardId = {
@@ -37,6 +30,8 @@ public:
     NetworkBlockPlatformAbstractionImpl(RootFileSystem* rootFileSystem):
         m_rootFileSystem(rootFileSystem)
     {
+        NX_DEBUG(this, "Creating network block platform abstraction implementation");
+
         NX_INFO(this, "Opening the network controller device");
         m_networkControllerDeviceFd =
             m_rootFileSystem->open(kNetworkControllerDeviceFileName, QIODevice::ReadWrite);
@@ -70,6 +65,7 @@ public:
 
     virtual ~NetworkBlockPlatformAbstractionImpl()
     {
+        NX_DEBUG(this, "Destroying network block platform abstraction implementation");
         close(m_networkControllerDeviceFd);
         close(m_powerSupplyDeviceFd);
     }
@@ -311,59 +307,53 @@ private:
     mutable std::optional<int> m_cachedPortCount;
 };
 
-#else
-
-class NetworkBlockPlatformAbstractionImpl: public INetworkBlockPlatformAbstraction
-{
-public:
-    NetworkBlockPlatformAbstractionImpl(RootFileSystem* /*rootFileSystem*/) {}
-
-    virtual int portCount() const override
-    {
-        NX_ASSERT(false, "Platform is not supported");
-        return 0;
-    }
-
-    virtual NetworkPortState portState(int /*portNumber*/) const override
-    {
-        NX_ASSERT(false, "Platform is not supported");
-        return {};
-    }
-
-    virtual bool setPoeEnabled(int portNumber, bool /*isPoeEnabled*/) override
-    {
-        NX_ASSERT(false, "Platform is not supported");
-        return false;
-    }
-};
-
 #endif
+
+static NetworkBlockPlatformAbstractionImpl* createPlatformAbstractionImpl(
+    RootFileSystem* rootFileSystem)
+{
+#if defined(Q_OS_LINUX)
+    return new NetworkBlockPlatformAbstractionImpl(rootFileSystem);
+#else
+    return nullptr;
+#endif;
+}
 
 // ------------------------------------------------------------------------------------------------
 
 NetworkBlockPlatformAbstraction::NetworkBlockPlatformAbstraction(RootFileSystem* rootFileSystem):
-    m_impl(std::make_unique<NetworkBlockPlatformAbstractionImpl>(rootFileSystem))
+    m_impl(createPlatformAbstractionImpl(rootFileSystem))
 {
+    NX_DEBUG(this, "Creating network block platform abstraction");
 }
 
 NetworkBlockPlatformAbstraction::~NetworkBlockPlatformAbstraction()
 {
-    // Required for m_impl unique_ptr.
+    NX_DEBUG(this, "Destroying network block platform abstraction");
 }
 
 int NetworkBlockPlatformAbstraction::portCount() const
 {
-    return m_impl->portCount();
+    if (NX_ASSERT(m_impl))
+        return m_impl->portCount();
+
+    return 0;
 }
 
 NetworkPortState NetworkBlockPlatformAbstraction::portState(int portNumber) const
 {
-    return m_impl->portState(portNumber);
+    if (NX_ASSERT(m_impl))
+        return m_impl->portState(portNumber);
+
+    return {};
 }
 
 bool NetworkBlockPlatformAbstraction::setPoeEnabled(int portNumber, bool isPoeEnabled)
 {
-    return m_impl->setPoeEnabled(portNumber, isPoeEnabled);
+    if (NX_ASSERT(m_impl))
+        return m_impl->setPoeEnabled(portNumber, isPoeEnabled);
+
+    return false;
 }
 
 } // namespace nx::vms::server::nvr::hanwha

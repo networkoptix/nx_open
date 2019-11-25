@@ -21,13 +21,13 @@ public:
     LedPlatformAbstractionImpl(int ioDeviceFileDescriptor):
         m_ioDeviceFileDescriptor(ioDeviceFileDescriptor)
     {
-        NX_DEBUG(this, "Creating LED platform abstraction");
+        NX_DEBUG(this, "Creating LED platform abstraction implementation");
     }
 
     virtual ~LedPlatformAbstractionImpl() override
     {
         // TODO: #dmsihin close descriptor?
-        NX_DEBUG(this, "Destroying LED platform abstraction");
+        NX_DEBUG(this, "Destroying LED platform abstraction implementation");
     }
 
     virtual std::vector<LedDescription> ledDescriptions() const override
@@ -73,55 +73,42 @@ private:
     int m_ioDeviceFileDescriptor = -1;
 };
 
-#else
-class LedPlatformAbstractionImpl: public ILedPlatformAbstraction
-{
-public:
-    LedPlatformAbstractionImpl(int /*ioDeviceFileDescriptor*/)
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual ~LedPlatformAbstractionImpl() override
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual std::vector<LedDescription> ledDescriptions() const override
-    {
-        NX_ASSERT(false);
-        return {};
-    }
-
-    virtual bool setLedState(const QString& /*ledId*/, LedState /*state*/) override
-    {
-        NX_ASSERT(false);
-        return false;
-    }
-};
-
 #endif
 
-
+LedPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+{
+#if defined(Q_OS_LINUX)
+    return new LedPlatformAbstractionImpl(ioDeviceDescriptor);
+#else
+    return nullptr;
+#endif
+}
 
 LedPlatformAbstraction::LedPlatformAbstraction(int ioDeviceFileDescriptor):
     m_impl(std::make_unique<LedPlatformAbstractionImpl>(ioDeviceFileDescriptor))
 {
+    NX_DEBUG(this, "Creating LED platform abstraction");
 }
 
 LedPlatformAbstraction::~LedPlatformAbstraction()
 {
-    // TODO: #dmishin implement
+    NX_DEBUG(this, "Destroying LED platform abstraction");
 }
 
 std::vector<LedDescription> LedPlatformAbstraction::ledDescriptions() const
 {
-    return m_impl->ledDescriptions();
+    if (NX_ASSERT(m_impl))
+        return m_impl->ledDescriptions();
+
+    return {};
 }
 
 bool LedPlatformAbstraction::setLedState(const QString& ledId, LedState state)
 {
-    return m_impl->setLedState(ledId, state);
+    if (NX_ASSERT(m_impl))
+        return m_impl->setLedState(ledId, state);
+
+    return false;
 }
 
 

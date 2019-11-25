@@ -86,41 +86,19 @@ private:
     bool m_interrupted = false;
 };
 
-#else
-
-class FanPlatformAbstractionImpl: public IFanPlatformAbstraction
-{
-public:
-    FanPlatformAbstractionImpl(int /*ioDeviceDescriptor*/)
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual ~FanPlatformAbstractionImpl() override
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual FanState state() const override
-    {
-        NX_ASSERT(false);
-        return FanState::undefined;
-    }
-
-    virtual void interrupt() override
-    {
-        NX_ASSERT(false);
-    }
-
-private:
-    int m_ioDeviceDescriptor = -1;
-};
-
 #endif
 
+FanPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+{
+#if defined(Q_OS_LINUX)
+    return new FanPlatformAbstractionImpl(ioDeviceDescriptor);
+#else
+    return nullptr;
+#endif
+}
 
 FanPlatformAbstraction::FanPlatformAbstraction(int ioDeviceDescriptor):
-    m_impl(std::make_unique<FanPlatformAbstractionImpl>(ioDeviceDescriptor))
+    m_impl(createPlatformAbstractionImpl(ioDeviceDescriptor))
 {
     NX_DEBUG(this, "Creating the fan platform abstraction");
 }
@@ -132,12 +110,16 @@ FanPlatformAbstraction::~FanPlatformAbstraction()
 
 FanState FanPlatformAbstraction::state() const
 {
-    return m_impl->state();
+    if (NX_ASSERT(m_impl))
+        return m_impl->state();
+
+    return FanState::undefined;
 }
 
 void FanPlatformAbstraction::interrupt()
 {
-    m_impl->interrupt();
+    if (NX_ASSERT(m_impl))
+        m_impl->interrupt();
 }
 
 } // namespace nx::vms::server::nvr::hanwha

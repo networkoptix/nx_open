@@ -14,12 +14,12 @@ public:
     BuzzerPlatformAbstractionImpl(int ioDeviceDescriptor):
         m_ioDeviceDescriptor(ioDeviceDescriptor)
     {
-        NX_DEBUG(this, "Creating the buzzer platform abstraction");
+        NX_DEBUG(this, "Creating the buzzer platform abstraction implementation");
     }
 
     virtual ~BuzzerPlatformAbstractionImpl() override
     {
-        NX_DEBUG(this, "Destroying the buzzer platform abstraction");
+        NX_DEBUG(this, "Destroying the buzzer platform abstraction implementation");
     }
 
     virtual bool setState(BuzzerState state) override
@@ -44,32 +44,20 @@ private:
     int m_ioDeviceDescriptor = -1;
 };
 
-#else
-
-class BuzzerPlatformAbstractionImpl: public IBuzzerPlatformAbstraction
-{
-public:
-    BuzzerPlatformAbstractionImpl(int /*ioDeviceDescriptor*/)
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual ~BuzzerPlatformAbstractionImpl() override
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual bool setState(BuzzerState /*state*/) override
-    {
-        NX_ASSERT(false);
-        return false;
-    }
-};
-
 #endif
 
+BuzzerPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+{
+#if defined(Q_OS_LINUX)
+    return new BuzzerPlatformAbstractionImpl(ioDeviceDescriptor);
+#else
+    return nullptr;
+#endif
+}
+
+
 BuzzerPlatformAbstraction::BuzzerPlatformAbstraction(int ioDeviceDescriptor):
-    m_impl(std::make_unique<BuzzerPlatformAbstractionImpl>(ioDeviceDescriptor))
+    m_impl(createPlatformAbstractionImpl(ioDeviceDescriptor))
 {
     NX_DEBUG(this, "Creating the buzzer platform abstraction");
 }
@@ -81,7 +69,10 @@ BuzzerPlatformAbstraction::~BuzzerPlatformAbstraction()
 
 bool BuzzerPlatformAbstraction::setState(BuzzerState state)
 {
-    return m_impl->setState(state);
+    if (NX_ASSERT(m_impl))
+        return m_impl->setState(state);
+
+    return false;
 }
 
 

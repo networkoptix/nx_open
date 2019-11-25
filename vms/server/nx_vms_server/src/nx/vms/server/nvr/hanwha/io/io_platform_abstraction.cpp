@@ -54,10 +54,12 @@ public:
     IoPlatformAbstractionImpl(int ioDeviceDescriptor):
         m_ioDeviceDescriptor(ioDeviceDescriptor)
     {
+        NX_DEBUG(this, "Creating IO platform abstraction implementation");
     }
 
     ~IoPlatformAbstractionImpl()
     {
+        NX_DEBUG(this, "Destroying IO platform abstraction implementation");
     }
 
     virtual QnIOPortDataList portDescriptors() const override
@@ -141,64 +143,50 @@ private:
     int m_ioDeviceDescriptor = -1;
 
 };
-
-#else
-class IoPlatformAbstractionImpl: public IIoPlatformAbstraction
-{
-public:
-    IoPlatformAbstractionImpl(int /*ioDeviceDescriptor*/)
-    {
-        NX_ASSERT(false);
-    }
-
-    ~IoPlatformAbstractionImpl()
-    {
-        NX_ASSERT(false);
-    }
-
-    virtual QnIOPortDataList portDescriptors() const override
-    {
-        NX_ASSERT(false);
-        return {};
-    }
-
-    virtual bool setOutputPortState(const QString& /*portId*/, IoPortState /*state*/) override
-    {
-        NX_ASSERT(false);
-        return false;
-    }
-
-    virtual QnIOStateData portState(const QString& /*portId*/) const override
-    {
-        NX_ASSERT(false);
-        return QnIOStateData();
-    }
-};
-
 #endif
 
-IoPlatformAbstraction::IoPlatformAbstraction(int ioDeviceDescriptor):
-    m_impl(std::make_unique<IoPlatformAbstractionImpl>(ioDeviceDescriptor))
+IoPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
+#if defined(Q_OS_LINUX)
+    return new IoPlatformAbstractionImpl(ioDeviceDescriptor);
+#else
+    return nullptr;
+#endif
+}
+
+IoPlatformAbstraction::IoPlatformAbstraction(int ioDeviceDescriptor):
+    m_impl(createPlatformAbstractionImpl(ioDeviceDescriptor))
+{
+    NX_DEBUG(this, "Creating IO platform abstraction");
 }
 
 IoPlatformAbstraction::~IoPlatformAbstraction()
 {
+    NX_DEBUG(this, "Destroying IO platform abstraction");
 }
 
 QnIOPortDataList IoPlatformAbstraction::portDescriptors() const
 {
-    return m_impl->portDescriptors();
+    if (NX_ASSERT(m_impl))
+        return m_impl->portDescriptors();
+
+    return {};
 }
 
 bool IoPlatformAbstraction::setOutputPortState(const QString& portId, IoPortState state)
 {
-    return m_impl->setOutputPortState(portId, state);
+    if (NX_ASSERT(m_impl))
+        return m_impl->setOutputPortState(portId, state);
+
+    return false;
 }
 
 QnIOStateData IoPlatformAbstraction::portState(const QString& portId) const
 {
-    return m_impl->portState(portId);
+    if (NX_ASSERT(m_impl))
+        return m_impl->portState(portId);
+
+    return {};
 }
 
 } // namespace nx::vms::server::nvr::hanwha
