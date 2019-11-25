@@ -5,7 +5,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/network/abstract_socket.h>
 
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/vms/testcamera/packet.h>
 
 #include "logger.h"
@@ -70,7 +70,7 @@ microseconds FileStreamer::framePts(const QnCompressedVideoData* frame) const
     if (!NX_ASSERT(frame))
         return microseconds(-1);
 
-    if (testCameraIni().warnIfFramePtsDiffersFromTimestamp && frame->timestamp != frame->pts)
+    if (ini().warnIfFramePtsDiffersFromTimestamp && frame->timestamp != frame->pts)
     {
         // Log the warning only once for each such frame.
         if (const auto& [it, absent] = m_framesWithDifferentPtsAndTimestamp.insert(frame); absent)
@@ -80,7 +80,7 @@ microseconds FileStreamer::framePts(const QnCompressedVideoData* frame) const
         }
     }
 
-    if (testCameraIni().obtainFramePtsFromTimestampField)
+    if (ini().obtainFramePtsFromTimestampField)
         return microseconds(frame->timestamp);
     else
         return microseconds(frame->pts);

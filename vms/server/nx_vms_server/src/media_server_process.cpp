@@ -194,6 +194,8 @@
 
 #include <rtsp/rtsp_connection.h>
 
+#include <nx/vms/server/http_audio/request_processor.h>
+
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <network/multicodec_rtp_reader.h>
@@ -3024,6 +3026,7 @@ bool MediaServerProcess::initTcpListener(
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     registerTcpHandler<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
+    registerTcpHandler<http_audio::AudioRequestProcessor>("HTTP", "api/http_audio", serverModule());
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "api");
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "favicon.ico");

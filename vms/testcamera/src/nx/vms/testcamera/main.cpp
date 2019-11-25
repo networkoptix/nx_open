@@ -9,7 +9,7 @@
 #include <nx/kit/output_redirector.h>
 #include <nx/utils/app_info.h>
 #include <utils/media/ffmpeg_initializer.h>
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/network/socket_global.h>
 
 #include "cli_options.h"
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     {
         nx::kit::OutputRedirector::ensureOutputRedirection();
 
-        testCameraIni().reload(); //< Make .ini appear on the console even when help is requested.
+        ini().reload(); //< Make .ini appear on the console even when help is requested.
 
         QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
         QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");

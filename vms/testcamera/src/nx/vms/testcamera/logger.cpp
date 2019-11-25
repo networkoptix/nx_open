@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/kit/utils.h>
 #include <nx/utils/switch.h>

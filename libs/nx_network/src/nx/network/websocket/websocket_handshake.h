@@ -20,7 +20,8 @@ NX_NETWORK_API nx::Buffer makeAcceptKey(const nx::Buffer& requestKey);
 
 NX_NETWORK_API Error validateRequest(
     const nx::network::http::Request& request,
-    nx::network::http::Response* response);
+    nx::network::http::Response* response,
+    bool disableCompression = false);
 
 NX_NETWORK_API void addClientHeaders(
     nx::network::http::HttpHeaders* headers,

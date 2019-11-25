@@ -6,7 +6,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/network/abstract_socket.h>
 
 #include "logger.h"
@@ -24,7 +24,7 @@ static QByteArray buildMac(int cameraNumber)
 {
     const auto numberBigEndian = qToBigEndian((int32_t) cameraNumber);
 
-    QByteArray mac = testCameraIni().macPrefix;
+    QByteArray mac = ini().macPrefix;
     QByteArray last = QByteArray((const char*) &numberBigEndian, sizeof(numberBigEndian)).toHex();
     while (!last.isEmpty())
     {
@@ -86,7 +86,7 @@ bool Camera::performStreamingFile(
 
         if (!fileStreamer->streamFrame(frames[i].get(), i))
         {
-            if (testCameraIni().stopStreamingOnSocketErrors)
+            if (ini().stopStreamingOnSocketErrors)
             {
                 NX_LOGGER_ERROR(logger,
                     "Frame sending failed due to the above error; stop streaming.");
