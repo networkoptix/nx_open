@@ -20,6 +20,8 @@ public:
 
     virtual void start() override;
 
+    virtual void stop() override;
+
     virtual FanState state() const override;
 
     virtual QnUuid registerStateChangeHandler(StateChangeHandler handler) override;
@@ -38,6 +40,8 @@ public:
 
     std::map<QnUuid, StateChangeHandler> m_handlers;
     FanState m_lastState = FanState::undefined;
+
+    bool m_isStopped = false;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

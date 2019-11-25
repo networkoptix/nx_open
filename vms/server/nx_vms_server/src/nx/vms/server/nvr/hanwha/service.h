@@ -24,6 +24,8 @@ public:
 
     virtual void start() override;
 
+    virtual void stop() override;
+
     virtual DeviceInfo deviceInfo() const override;
 
     virtual INetworkBlockManager* networkBlockManager() const override;
@@ -51,6 +53,8 @@ private:
     std::unique_ptr<IBuzzerManager> m_buzzerManager;
     std::unique_ptr<IFanManager> m_fanManager;
     std::unique_ptr<ILedManager> m_ledManager;
+
+    bool m_isStopped = false;
 };
 
 } // namespace nx::vms::server::hanwha_nvr

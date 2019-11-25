@@ -22,6 +22,8 @@ public:
 
     virtual void start() override;
 
+    virtual void stop() override;
+
     virtual QnIOPortDataList portDesriptiors() const override;
 
     virtual bool setOutputPortState(
@@ -57,6 +59,8 @@ private:
 
     mutable std::map</*portId*/ QString, IoPortContext> m_outputPortContexts;
     std::set<QnIOStateData> m_lastPortStates;
+
+    bool m_isStopped = false;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

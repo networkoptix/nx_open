@@ -38,13 +38,26 @@ NetworkBlockManager::NetworkBlockManager(
 NetworkBlockManager::~NetworkBlockManager()
 {
     NX_DEBUG(this, "Destroying the network block manager");
+    stop();
 }
 
 void NetworkBlockManager::start()
 {
+    NX_DEBUG(this, "Starting the network block manager");
+
     m_networkBlockController->start();
     m_networkBlockController->setPoeStates(
         fromApiPoweringModes(getUserDefinedPortPoweringModes()));
+}
+
+void NetworkBlockManager::stop()
+{
+    if (m_isStopped)
+        return;
+
+    NX_DEBUG(this, "Stopping the network block manager");
+    m_networkBlockController->stop();
+    m_isStopped = true;
 }
 
 nx::vms::api::NetworkBlockData NetworkBlockManager::state() const

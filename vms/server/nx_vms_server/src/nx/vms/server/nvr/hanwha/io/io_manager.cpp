@@ -48,9 +48,7 @@ IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction
 IoManager::~IoManager()
 {
     NX_DEBUG(this, "Destroying the IO manager");
-
-    m_timerManager->stop();
-    m_stateFetcher->stop();
+    stop();
 }
 
 void IoManager::start()
@@ -65,6 +63,21 @@ void IoManager::start()
     }
 
     m_stateFetcher->start();
+}
+
+void IoManager::stop()
+{
+    if (m_isStopped)
+        return;
+
+    NX_DEBUG(this, "Stopping the IO manager");
+    m_timerManager->stop();
+    m_stateFetcher->stop();
+
+    for (int i = 0; i < kOutputCount; ++i)
+        m_platformAbstraction->setOutputPortState(makeOutputId(i), IoPortState::inactive);
+
+    m_isStopped = true;
 }
 
 QnIOPortDataList IoManager::portDesriptiors() const

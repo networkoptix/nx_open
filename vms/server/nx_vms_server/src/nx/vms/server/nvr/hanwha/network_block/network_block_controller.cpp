@@ -25,13 +25,19 @@ NetworkBlockController::NetworkBlockController(
 NetworkBlockController::~NetworkBlockController()
 {
     NX_DEBUG(this, "Destoying Hanwha NVR network block controller");
-    m_stateFetcher->stop();
+    stop();
 }
 
 void NetworkBlockController::start()
 {
     NX_DEBUG(this, "Starting Hanwha NVR network block controller");
     m_stateFetcher->start();
+}
+
+void NetworkBlockController::stop()
+{
+    NX_DEBUG(this, "Stopping network block controller");
+    m_stateFetcher->stop();
 }
 
 NetworkPortStateList NetworkBlockController::state() const

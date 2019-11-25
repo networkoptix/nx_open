@@ -22,6 +22,8 @@ public:
 
     virtual void start() override;
 
+    virtual void stop() override;
+
     virtual nx::vms::api::NetworkBlockData state() const override;
 
     virtual bool setPoeModes(
@@ -66,6 +68,8 @@ private:
 
     std::unique_ptr<NetworkBlockController> m_networkBlockController;
     std::unique_ptr<IPoweringPolicy> m_poweringPolicy;
+
+    bool m_isStopped = false;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

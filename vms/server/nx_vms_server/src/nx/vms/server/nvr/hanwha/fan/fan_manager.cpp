@@ -20,12 +20,23 @@ FanManager::FanManager(std::unique_ptr<IFanPlatformAbstraction> platformAbstract
 FanManager::~FanManager()
 {
     NX_DEBUG(this, "Destroying the fan state manager");
+    stop();
 }
 
 void FanManager::start()
 {
     NX_DEBUG(this, "Starting the fan state manager");
     m_stateFetcher->start();
+}
+
+void FanManager::stop()
+{
+    if (m_isStopped)
+        return;
+
+    NX_DEBUG(this, "Stopping the fan manager");
+    m_stateFetcher->stop();
+    m_isStopped = true;
 }
 
 FanState FanManager::state() const

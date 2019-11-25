@@ -17,6 +17,16 @@ LedManager::~LedManager()
     NX_DEBUG(this, "Destroying the LED manager");
 }
 
+void LedManager::start()
+{
+    NX_DEBUG(this, "Starting the LED manager");
+}
+
+void LedManager::stop()
+{
+    NX_DEBUG(this, "Stopping the LED manager");
+}
+
 std::vector<LedDescription> LedManager::ledDescriptions() const
 {
     NX_DEBUG(this, "LED descriptions are requested");

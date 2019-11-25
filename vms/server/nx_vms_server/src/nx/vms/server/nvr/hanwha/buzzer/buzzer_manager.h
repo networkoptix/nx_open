@@ -21,6 +21,8 @@ public:
 
     virtual void start() override;
 
+    virtual void stop() override;
+
     virtual bool setState(
         BuzzerState state,
         std::chrono::milliseconds duration = std::chrono::milliseconds::zero()) override;
@@ -35,6 +37,8 @@ private:
     std::unique_ptr<IBuzzerPlatformAbstraction> m_platformAbstraction;
 
     int m_enabledCounter = 0;
+
+    bool m_isStopped = false;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

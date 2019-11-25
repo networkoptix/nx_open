@@ -33,9 +33,18 @@ BuzzerState BuzzerManager::calculateState() const
 }
 
 void BuzzerManager::start()
-{
-    // TODO: #dmishin remove this method.
+{    
     NX_DEBUG(this, "Starting the buzzer manager");
+}
+
+void BuzzerManager::stop()
+{
+    if (m_isStopped)
+        return;
+
+    NX_DEBUG(this, "Stopping th buzzer manager");
+    m_timerManager->stop();
+    m_isStopped = true;
 }
 
 bool BuzzerManager::setState(BuzzerState state, milliseconds duration)

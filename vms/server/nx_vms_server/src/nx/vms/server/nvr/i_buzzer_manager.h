@@ -13,6 +13,8 @@ public:
 
     virtual void start() = 0;
 
+    virtual void stop() = 0;
+
     /**
      * If duration is equal to zero then the buzzer is activated until it is explicitly
      *     deactivated.

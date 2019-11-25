@@ -45,6 +45,7 @@ Service::Service(
 Service::~Service()
 {
     NX_DEBUG(this, "Destroying the Hanwha NVR service");
+    stop();
 }
 
 void Service::start()
@@ -99,6 +100,26 @@ void Service::start()
     m_ioManager->start();
     m_fanManager->start();
     m_buzzerManager->start();
+    m_ledManager->start();
+
+    m_connector->start();
+}
+
+void Service::stop()
+{
+    if (m_isStopped)
+        return;
+
+    NX_DEBUG(this, "Stopping the NVR service");
+
+    m_connector->stop();
+    m_networkBlockManager->stop();
+    m_ioManager->stop();
+    m_fanManager->stop();
+    m_buzzerManager->stop();
+    m_ledManager->stop();
+
+    m_isStopped = true;
 }
 
 DeviceInfo Service::deviceInfo() const

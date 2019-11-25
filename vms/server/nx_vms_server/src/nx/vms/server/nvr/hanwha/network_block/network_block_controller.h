@@ -23,6 +23,8 @@ public:
 
     void start();
 
+    void stop();
+
     NetworkPortStateList state() const;
 
     NetworkPortPoeStateList setPoeStates(const NetworkPortPoeStateList& poeStates);

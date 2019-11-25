@@ -13,6 +13,10 @@ public:
 
     virtual ~LedManager() override;
 
+    virtual void start() override;
+
+    virtual void stop() override;
+
     virtual std::vector<LedDescription> ledDescriptions() const override;
 
     virtual bool setLedState(const QString& ledId, LedState state) override;

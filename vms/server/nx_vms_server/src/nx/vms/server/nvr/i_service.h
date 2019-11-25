@@ -29,6 +29,8 @@ public:
 
     virtual void start() = 0;
 
+    virtual void stop() = 0;
+
     virtual DeviceInfo deviceInfo() const = 0;
 
     virtual INetworkBlockManager* networkBlockManager() const = 0;

@@ -3858,6 +3858,8 @@ void MediaServerProcess::stopObjects()
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
     serverModule()->p2pDownloader()->stopDownloads();
+    if (nx::vms::server::nvr::IService* nvrService = serverModule()->nvrService())
+        nvrService->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required

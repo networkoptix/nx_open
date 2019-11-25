@@ -32,6 +32,7 @@ Connector::Connector(
     ILedManager* ledManager)
     :
     m_currentServer(server),
+    m_eventConnector(eventConnector),
     m_networkBlockManager(networkBlockManager),
     m_ioManager(ioManager),
     m_buzzerManager(buzzerManager),
@@ -39,14 +40,27 @@ Connector::Connector(
     m_ledManager(ledManager)
 {
     NX_DEBUG(this, "Creating connector");
+}
 
+Connector::~Connector()
+{
+    NX_DEBUG(this, "Destroying connector");
+    if (!m_stopped)
+        stop();
+}
+
+void Connector::start()
+{
     NX_DEBUG(this, "Connecting to the event connector");
+    if (m_stopped)
+        return;
+
     connect(this, &Connector::poeOverBudget,
-        eventConnector, &nx::vms::server::event::EventConnector::at_poeOverBudget,
+        m_eventConnector, &nx::vms::server::event::EventConnector::at_poeOverBudget,
         Qt::QueuedConnection);
 
     connect(this, &Connector::fanError,
-        eventConnector, &nx::vms::server::event::EventConnector::at_fanError,
+        m_eventConnector, &nx::vms::server::event::EventConnector::at_fanError,
         Qt::QueuedConnection);
 
     QnResourcePool* resourcePool = m_currentServer->resourcePool();
@@ -83,18 +97,33 @@ Connector::Connector(
     NX_DEBUG(this, "Registering a fan alarm handler");
     m_fanAlarmHandlerId = m_fanManager->registerStateChangeHandler(
         [this](FanState state) { handleFanStateChange(state);} );
+
+    QThread::start();
 }
 
-Connector::~Connector()
+void Connector::stop()
 {
-    NX_DEBUG(this, "Destroying connector");
-    m_networkBlockManager->unregisterPoeOverBudgetHandler(m_poeOverBudgetHandlerId);
-    m_ioManager->unregisterStateChangeHandler(m_alarmOutputHandlerId);
-    m_fanManager->unregisterStateChangeHandler(m_fanAlarmHandlerId);
+    NX_DEBUG(this, "Stopping connector");
+
+    m_stopped = true;
+
+    disconnect(this);
+
+    if (!m_poeOverBudgetHandlerId.isNull())
+        m_networkBlockManager->unregisterPoeOverBudgetHandler(m_poeOverBudgetHandlerId);
+
+    if (!m_alarmOutputHandlerId.isNull())
+        m_ioManager->unregisterStateChangeHandler(m_alarmOutputHandlerId);
+
+    if (!m_fanAlarmHandlerId.isNull())
+        m_fanManager->unregisterStateChangeHandler(m_fanAlarmHandlerId);
 
     m_ledManager->setLedState(kRecordingLedId, LedState::disabled);
     m_ledManager->setLedState(kAlarmOutputLedId, LedState::disabled);
     m_ledManager->setLedState(kPoeOverBudgetLedId, LedState::disabled);
+
+    quit();
+    wait();
 }
 
 void Connector::handlePoeOverBudgetStateChanged(

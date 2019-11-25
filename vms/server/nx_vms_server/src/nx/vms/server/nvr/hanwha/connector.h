@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/api_ioport_data.h>
@@ -27,7 +29,7 @@ class ILedManager;
 
 namespace nx::vms::server::nvr::hanwha {
 
-class Connector: public Connective<QObject>
+class Connector: public Connective<QThread>
 {
     Q_OBJECT;
 public:
@@ -41,6 +43,9 @@ public:
         ILedManager* ledManager);
 
     virtual ~Connector();
+
+    void start();
+    void stop();
 
 signals:
     void poeOverBudget(const nx::vms::event::PoeOverBudgetEventPtr& event);
@@ -59,6 +64,8 @@ private:
 private:
     QnMediaServerResourcePtr m_currentServer;
 
+    nx::vms::server::event::EventConnector* m_eventConnector = nullptr;
+
     INetworkBlockManager* m_networkBlockManager = nullptr;
     IIoManager* m_ioManager = nullptr;
     IBuzzerManager* m_buzzerManager = nullptr;
@@ -70,6 +77,8 @@ private:
     QnUuid m_fanAlarmHandlerId;
 
     std::map<QString, bool> m_alarmOutputStates;
+
+    bool m_stopped = false;
 };
 
 } // namespace nx::vms::server::nvr::hanwha
