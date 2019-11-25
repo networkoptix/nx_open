@@ -465,7 +465,7 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "resolutionGreaterThan %resolution 1280x720",
+                                "condition": "greaterOrEqual %resolution 1280x720",
                                 "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
                             }
                         ]
