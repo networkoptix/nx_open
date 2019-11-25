@@ -316,7 +316,7 @@ static NetworkBlockPlatformAbstractionImpl* createPlatformAbstractionImpl(
     return new NetworkBlockPlatformAbstractionImpl(rootFileSystem);
 #else
     return nullptr;
-#endif;
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------

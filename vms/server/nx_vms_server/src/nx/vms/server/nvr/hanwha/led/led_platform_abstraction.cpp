@@ -75,7 +75,7 @@ private:
 
 #endif
 
-LedPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+static LedPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
 #if defined(Q_OS_LINUX)
     return new LedPlatformAbstractionImpl(ioDeviceDescriptor);
@@ -85,7 +85,7 @@ LedPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor
 }
 
 LedPlatformAbstraction::LedPlatformAbstraction(int ioDeviceFileDescriptor):
-    m_impl(std::make_unique<LedPlatformAbstractionImpl>(ioDeviceFileDescriptor))
+    m_impl(createPlatformAbstractionImpl(ioDeviceFileDescriptor))
 {
     NX_DEBUG(this, "Creating LED platform abstraction");
 }

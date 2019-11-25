@@ -88,7 +88,7 @@ private:
 
 #endif
 
-FanPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+static FanPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
 #if defined(Q_OS_LINUX)
     return new FanPlatformAbstractionImpl(ioDeviceDescriptor);
