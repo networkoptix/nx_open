@@ -62,7 +62,7 @@ MacAddress::MacAddress(const QString& mac)
     }
     else if (mac.length() != kMacAddressLength * 2)
     {
-        // Invalid length of string without delimters.
+        // Invalid length of string without delimiters.
         return;
     }
 
