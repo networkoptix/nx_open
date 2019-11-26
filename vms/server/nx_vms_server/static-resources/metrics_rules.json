@@ -513,7 +513,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "Kbps"
+                        "format": "Mbps"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
