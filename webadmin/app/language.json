@@ -132,7 +132,6 @@
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
 
-        "sendRtspCommandOptions": "Send RTSP command OPTIONS firstly on open RTSP session",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",

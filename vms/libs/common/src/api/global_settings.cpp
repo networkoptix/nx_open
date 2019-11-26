@@ -71,9 +71,6 @@ const int kTakeCameraOwnershipWithoutLockDefault = true;
 const QString kMaxRtpRetryCount("maxRtpRetryCount");
 const int kMaxRtpRetryCountDefault(6);
 
-const QString kSendRtspCommandOptions("sendRtspCommandOptions");
-const int kSendRtspCommandOptionsDefault(false);
-
 const int kAuditTrailPeriodDaysDefault = 183;
 const int kEventLogPeriodDaysDefault = 30;
 
@@ -613,11 +610,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRtpRetryCountDefault,
         this);
 
-    m_sendRtspCommandOptions = new QnLexicalResourcePropertyAdaptor<bool>(
-        kSendRtspCommandOptions,
-        kSendRtspCommandOptionsDefault,
-        this);
-
     m_rtpFrameTimeoutMs = new QnLexicalResourcePropertyAdaptor<int>(
         kRtpTimeoutMs,
         kRtpTimeoutMsDefault,
@@ -943,7 +935,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
         << m_maxRtpRetryCount
-        << m_sendRtspCommandOptions
         << m_specificFeaturesAdaptor
     ;
 
@@ -1586,16 +1577,6 @@ int QnGlobalSettings::maxRtpRetryCount() const
 void QnGlobalSettings::setMaxRtpRetryCount(int newVal)
 {
     m_maxRtpRetryCount->setValue(newVal);
-}
-
-int QnGlobalSettings::sendRtspCommandOptions() const
-{
-    return m_sendRtspCommandOptions->value();
-}
-
-void QnGlobalSettings::setSendRtspCommandOptions(bool newVal)
-{
-    m_sendRtspCommandOptions->setValue(newVal);
 }
 
 bool QnGlobalSettings::sequentialFlirOnvifSearcherEnabled() const

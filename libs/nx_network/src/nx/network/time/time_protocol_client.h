@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <QtCore/QByteArray>
 
@@ -18,7 +19,7 @@ constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protoco
 /**
  * Converts time from Time protocol format (rfc868) to millis from epoch (1970-01-01) UTC.
  */
-NX_NETWORK_API qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr);
+NX_NETWORK_API std::optional<qint64> rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr);
 
 /**
  * Fetches time using Time (rfc868) protocol.
@@ -47,7 +48,7 @@ private:
     void onConnectionEstablished(SystemError::ErrorCode errorCode);
     void onSomeBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead);
     void reportResult(
-        qint64 timeMillis, 
+        qint64 timeMillis,
         SystemError::ErrorCode sysErrorCode,
         std::chrono::milliseconds rtt);
     nx::utils::ElapsedTimer m_elapsedTimer;
