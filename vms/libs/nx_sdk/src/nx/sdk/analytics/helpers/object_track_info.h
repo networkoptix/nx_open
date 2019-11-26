@@ -22,7 +22,6 @@ protected:
     virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
     virtual IUncompressedVideoFrame* getBestShotVideoFrame() const override;
     virtual ITimestampedObjectMetadata* getBestShotObjectMetadata() const override;
-    virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
 private:
     Ptr<IList<ITimestampedObjectMetadata>> m_track;
     Ptr<IUncompressedVideoFrame> m_bestShotVideoFrame;
