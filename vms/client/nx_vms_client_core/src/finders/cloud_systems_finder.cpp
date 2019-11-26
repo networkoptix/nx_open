@@ -11,6 +11,7 @@
 #include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <network/system_helpers.h>
+#include <nx/utils/log/log.h>
 
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(15);
 static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
@@ -207,6 +208,9 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (!guard)
                         return;
 
+                    NX_DEBUG(this, lm("Cloud system <%1>: ping request reply:\nSucces:%2\n%3\n%4"),
+                        cloudSystemId, !failed, reply->response()->toString(), data);
+
                     const QnMutexLocker lock(&m_mutex);
                     m_runningRequests.removeOne(reply);
 
@@ -231,11 +235,19 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
                     QnJsonRestResult jsonReply;
                     if (!QJson::deserialize(data, &jsonReply))
+                    {
+                        NX_DEBUG(this, lm("Cloud system <%1>: failed to deserialize json reply:\n%2"),
+                            cloudSystemId, data);
                         return;
+                    }
 
                     nx::vms::api::ModuleInformation moduleInformation;
                     if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
+                    {
+                        NX_DEBUG(this, lm("Cloud system <%1>: failed to deserialize module information:\n%2"),
+                            cloudSystemId, data);
                         return;
+                    }
 
                     // To prevent hanging on of fake online cloud servers
                     // It is almost not hack.
@@ -265,6 +277,8 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     url.setHost(moduleInformation.cloudId());
                     url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
+                    NX_DEBUG(this, lm("Cloud system <%1>: set sever <%2> url to %3"),
+                        cloudSystemId, serverId.toString(), url.toString());
                 }); //< executeInThread
             reply->pleaseStopSync();
 
