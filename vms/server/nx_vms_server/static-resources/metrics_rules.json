@@ -422,28 +422,28 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThan %fpsDeltaAverage 5",
-                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                            "condition": "greaterThan %fpsDeltaAverage10m 5",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         },
                         {
                             "level": "error",
-                            "condition": "greaterThan %fpsDelta 10",
-                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                            "condition": "greaterThan %fpsDeltaAverage10m 10",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         }
                         ]
                     },
@@ -478,16 +478,16 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
