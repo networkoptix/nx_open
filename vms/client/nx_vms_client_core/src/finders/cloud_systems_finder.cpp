@@ -209,7 +209,8 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                         return;
 
                     NX_DEBUG(this, lm("Cloud system <%1>: ping request reply:\nSucces:%2\n%3\n%4"),
-                        cloudSystemId, !failed, reply->response()->toString(), data);
+                        cloudSystemId, !failed, reply->response() ? reply->response()->toString() : "none",
+                        data);
 
                     const QnMutexLocker lock(&m_mutex);
                     m_runningRequests.removeOne(reply);
