@@ -24,7 +24,6 @@ extern "C" {
  *         - Media context data: serialized ffmpeg's MediaContext.
  *     - Frame packet (includes a single video frame, has codecContext flag not set):
  *         - If ptsIncluded flag set: frame's pts, as 64-bit Big Endian.
- *         - If channelNumberIncluded flag set: frame's channel number, as 32-bit Big Endian.
  *         - Frame data: raw compressed frame bytes.
  */
 namespace nx::vms::testcamera::packet {
@@ -84,13 +83,9 @@ public:
 };
 static_assert(sizeof(Header) == 6);
 
-/** In the binary protocol, follows the Header; optional. */
+/** In the binary protocol, follows the Header of frame packet; optional. */
 using PtsUs = BigEndian<int64_t>;
 static_assert(sizeof(PtsUs) == 8);
-
-/** In the binary protocol, follows the Header and the PtsUs (if the latter exists); optional. */
-using ChannelNumber = BigEndian<uint32_t>;
-static_assert(sizeof(ChannelNumber) == 4);
 
 #pragma pack(pop)
 } // namespace nx::vms::testcamera::packet
