@@ -35,6 +35,9 @@ StreamTransformingAsyncChannel::~StreamTransformingAsyncChannel()
 
 void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    if (getAioThread() == aioThread)
+        return;
+
     base_type::bindToAioThread(aioThread);
 
     m_readScheduler.bindToAioThread(aioThread);
