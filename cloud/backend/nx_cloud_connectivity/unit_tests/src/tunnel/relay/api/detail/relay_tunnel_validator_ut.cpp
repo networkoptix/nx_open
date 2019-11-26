@@ -89,6 +89,7 @@ private:
     nx::network::http::Response m_openTunnelResponse;
     nx::utils::SyncQueue<nx::network::http::tunneling::ResultCode> m_validationResults;
 
+private:
     void establishConnection()
     {
         m_clientConnection = std::make_unique<nx::network::TCPSocket>(AF_INET);
