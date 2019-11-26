@@ -503,8 +503,8 @@
                 "name": "Storage Analytics",
                 "values": {
                     "archiveLengthS": {
-                        "name": "Forecast",
-                        "description": "Archive Length",
+                        "name": "Archive",
+                        "description": "Current Archive length",
                         "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
