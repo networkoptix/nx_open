@@ -5,6 +5,8 @@
 #include <nx/vms/server/http_audio/ffmpeg_io_context.h>
 #include <nx/streaming/media_data_packet.h>
 
+struct AVFormatContext;
+
 namespace nx::vms::server::http_audio {
 
 struct UtcTimestamp
