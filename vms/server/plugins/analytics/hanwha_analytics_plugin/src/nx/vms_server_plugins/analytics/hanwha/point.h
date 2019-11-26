@@ -29,6 +29,16 @@ struct FrameSize
         int result = int(y * height + 0.5);
         return std::min(result, height - 1);
     };
+
+    double xAbsoluteToRelative(int x) const
+    {
+        return float(x) / width;
+    };
+
+    double yAbsoluteToRelative(int y) const
+    {
+        return float(y) / height;
+    };
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -38,22 +48,29 @@ struct PluginPoint
     double x = 0;
     double y = 0;
     PluginPoint() = default;
+    PluginPoint(double nx, double ny): x(nx), y(ny) {}
     PluginPoint(const nx::kit::Json& json);
     bool operator==(PluginPoint rhs) const { return x == rhs.x && y == rhs.y; }
     bool operator!=(PluginPoint rhs) const { return !(*this == rhs); }
     std::ostream& toSunapiStream(std::ostream& os, FrameSize frameSize) const;
+
+    bool fromSunapiString(const std::string& value, FrameSize frameSize);
+    bool fromSunapiString(const char*& begin, const char* end, FrameSize frameSize);
+    std::istream& fromSunapiStream(std::istream& is, FrameSize frameSize);
 };
 
 // We need separate typed for width and height
 struct Width
 {
     double value = 0.;
+    Width& operator=(double v) { value = v; return *this; }
     operator double() const { return value; }
 };
 
 struct Height
 {
     double value = 0.;
+    Height& operator=(double v) { value = v; return *this; }
     operator double() const { return value; }
 };
 
@@ -64,13 +81,13 @@ enum class Direction { Right, Left, Both };
  * coordinates of type double.
  * \return vector of points (may be empty). nullopt - if json is broken.
  */
-std::optional<std::vector<PluginPoint>> parsePluginPoints(const char* value);
+std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(const char* value);
 
-std::optional<Width> parsePluginWidth(const char* value);
+std::optional<Width> ServerStringToWidth(const char* value);
 
-std::optional<Height> parsePluginHeight(const char* value);
+std::optional<Height> ServerStringToHeight(const char* value);
 
-std::optional<Direction> parsePluginDirection(const char* value);
+std::optional<Direction> ServerStringToDirection(const char* value);
 
 /**
  * Convert the points into a string in sunapi format (comma separated coordinates). The coordinates
@@ -79,19 +96,5 @@ std::optional<Direction> parsePluginDirection(const char* value);
 std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize);
 
 //-------------------------------------------------------------------------------------------------
-
-/** Point in absolute coordinates (SUNAPI format). Every figure is a vector of such points.*/
-struct SunapiPoint
-{
-    int x = 0;
-    int y = 0;
-    static constexpr int memberCount = 2;
-    SunapiPoint() = default;
-    SunapiPoint(int nx, int ny) : x(nx), y(ny) {}
-    bool operator==(SunapiPoint rhs) const { return x == rhs.x && y == rhs.y; }
-    bool operator!=(SunapiPoint rhs) const { return !(*this == rhs); }
-};
-
-std::vector<SunapiPoint> sunapiStringToSunapiPoints(const std::string& points);
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

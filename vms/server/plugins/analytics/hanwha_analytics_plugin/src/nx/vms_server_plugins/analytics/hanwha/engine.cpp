@@ -122,6 +122,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     const auto deviceAgent = new DeviceAgent(this);
     deviceAgent->setDeviceInfo(deviceInfo);
+    deviceAgent->readCameraSettings();
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
 

@@ -38,6 +38,8 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
+    void readCameraSettings();
+
 protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
@@ -59,63 +61,9 @@ private:
     static void replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
         AnalyticsParamSpan params, const char* reason);
 
-    std::vector<std::string> ReadSettingsFromServer(
-        const nx::sdk::IStringMap* settings,
-        AnalyticsParamSpan analyticsParamSpan,
-        int objectIndex = 0);
+    std::string sendCommandToCamera(const std::string& query);
 
-    std::string sendCommand(const std::string& query);
-    std::string sendCommand2(const std::string& query);
-
-    std::string WriteSettingsToCamera(
-        const std::vector<std::string>& values,
-        AnalyticsParamSpan analyticsParamSpan,
-        const char* commandPreambule,
-        int objectIndex = 0);
-
-    std::string WriteSettingsToCamera(
-        const char* query,
-        int objectIndex = 0);
-
-    template<class S>
-    void retransmitSettings(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
-        const nx::sdk::IStringMap* settings,
-        S& previousState,
-        int objectIndex = 0)
-    {
-        const std::vector<std::string> values =
-            ReadSettingsFromServer(settings, S::kParams, objectIndex);
-        static constexpr const char* failedToReceive = "Failed to receive a value from server";
-
-        if (values.empty())
-        {
-            replanishErrorMap(errorMap, S::kParams, failedToReceive);
-            return;
-        }
-
-        S newState(values);
-        if (!newState || (newState == previousState))
-            return;
-
-        std::string error;
-        if constexpr (maybeEmpty<S>::value)
-        {
-            if (newState.empty())
-                error = WriteSettingsToCamera(S::kAlternativeCommand, objectIndex);
-            else
-                error = WriteSettingsToCamera(values, S::kParams, S::kPreambule, objectIndex);
-        }
-        else
-        {
-            error = WriteSettingsToCamera(values, S::kParams, S::kPreambule, objectIndex);
-        }
-        if (!error.empty())
-            replanishErrorMap(errorMap, S::kParams, error.c_str());
-        else
-            previousState = newState;
-
-    }
+    std::string loadSunapiObject(const char* eventName);
 
     Engine* const m_engine;
 

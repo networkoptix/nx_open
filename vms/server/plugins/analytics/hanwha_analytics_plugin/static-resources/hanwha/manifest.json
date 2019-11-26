@@ -40,7 +40,7 @@
                         "name": "ShockDetection.ThresholdLevel",
                         "caption": "Level of detection",
                         "defaultValue": 50,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
@@ -48,7 +48,7 @@
                         "name": "ShockDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     }
                 ]
@@ -123,7 +123,7 @@
                                 "name": "MotionDetection.IncludeArea1.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -131,7 +131,7 @@
                                 "name": "MotionDetection.IncludeArea1.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -161,7 +161,7 @@
                                 "name": "MotionDetection.IncludeArea2.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -169,7 +169,7 @@
                                 "name": "MotionDetection.IncludeArea2.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -199,7 +199,7 @@
                                 "name": "MotionDetection.IncludeArea3.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -207,7 +207,7 @@
                                 "name": "MotionDetection.IncludeArea3.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -237,7 +237,7 @@
                                 "name": "MotionDetection.IncludeArea4.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -245,7 +245,7 @@
                                 "name": "MotionDetection.IncludeArea4.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -275,7 +275,7 @@
                                 "name": "MotionDetection.IncludeArea5.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -283,7 +283,7 @@
                                 "name": "MotionDetection.IncludeArea5.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -313,7 +313,7 @@
                                 "name": "MotionDetection.IncludeArea6.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -321,7 +321,7 @@
                                 "name": "MotionDetection.IncludeArea6.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -351,7 +351,7 @@
                                 "name": "MotionDetection.IncludeArea7.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -359,7 +359,7 @@
                                 "name": "MotionDetection.IncludeArea7.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -389,7 +389,7 @@
                                 "name": "MotionDetection.IncludeArea8.ThresholdLevel",
                                 "caption": "Level of detection",
                                 "defaultValue": 50,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -397,7 +397,7 @@
                                 "name": "MotionDetection.IncludeArea8.SensitivityLevel",
                                 "caption": "Sensitivity",
                                 "defaultValue": 80,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 100
                             },
                             {
@@ -491,7 +491,7 @@
                         "name": "TamperingDetection.ThresholdLevel",
                         "caption": "Level of detection",
                         "defaultValue": 50,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
@@ -499,15 +499,15 @@
                         "name": "TamperingDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
                         "type": "SpinBox",
                         "name": "TamperingDetection.MinimumDuration",
                         "caption": "Minimum duration (s)",
-                        "defaultValue": 0,
-                        "minValue": 0,
+                        "defaultValue": 1,
+                        "minValue": 1,
                         "maxValue": 5
                     },
                     {
@@ -535,7 +535,7 @@
                         "name": "DefocusDetection.ThresholdLevel",
                         "caption": "Level of detection",
                         "defaultValue": 20,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
@@ -543,7 +543,7 @@
                         "name": "DefocusDetection.SensitivityLevel",
                         "caption": "Sensitivity",
                         "defaultValue": 80,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
@@ -551,7 +551,7 @@
                         "name": "DefocusDetection.MinimumDuration",
                         "caption": "Minimum Duration (s)",
                         "defaultValue": 0,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 5
                     }
                 ]
@@ -1083,7 +1083,7 @@
                                 "name": "IVA.IncludeArea1.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1091,7 +1091,7 @@
                                 "name": "IVA.IncludeArea1.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1169,7 +1169,7 @@
                                 "name": "IVA.IncludeArea2.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1177,7 +1177,7 @@
                                 "name": "IVA.IncludeArea2.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1255,7 +1255,7 @@
                                 "name": "IVA.IncludeArea3.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1263,7 +1263,7 @@
                                 "name": "IVA.IncludeArea3.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1341,7 +1341,7 @@
                                 "name": "IVA.IncludeArea4.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1349,7 +1349,7 @@
                                 "name": "IVA.IncludeArea4.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1427,7 +1427,7 @@
                                 "name": "IVA.IncludeArea5.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1435,7 +1435,7 @@
                                 "name": "IVA.IncludeArea5.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1513,7 +1513,7 @@
                                 "name": "IVA.IncludeArea6.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1521,7 +1521,7 @@
                                 "name": "IVA.IncludeArea6.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1599,7 +1599,7 @@
                                 "name": "IVA.IncludeArea7.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1607,7 +1607,7 @@
                                 "name": "IVA.IncludeArea7.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1685,7 +1685,7 @@
                                 "name": "IVA.IncludeArea8.AppearDuration",
                                 "caption": "Appear duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             },
                             {
@@ -1693,7 +1693,7 @@
                                 "name": "IVA.IncludeArea8.LoiteringDuration",
                                 "caption": "Loitering duration",
                                 "defaultValue": 10,
-                                "minValue": 0,
+                                "minValue": 1,
                                 "maxValue": 60
                             }
                         ]
@@ -1779,7 +1779,7 @@
                         "name": "AudioDetection.ThresholdLevel",
                         "caption": "Level of detection",
                         "defaultValue": 50,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     }
                 ]
@@ -1806,7 +1806,7 @@
                         "name": "SoundClassification.ThresholdLevel",
                         "caption": "Level of classification",
                         "defaultValue": 50,
-                        "minValue": 0,
+                        "minValue": 1,
                         "maxValue": 100
                     },
                     {
