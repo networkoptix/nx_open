@@ -81,6 +81,8 @@ void PoeSettingsTableView::setupPoeHeader(QTableView* view)
     header->setSectionResizeMode(QHeaderView::Fixed);
     header->setSectionResizeMode(PoeSettingsColumn::port, QHeaderView::Fixed);
     header->setSectionResizeMode(PoeSettingsColumn::camera, QHeaderView::Stretch);
+    header->setSectionResizeMode(PoeSettingsColumn::consumption, QHeaderView::ResizeToContents);
+
     header->setDefaultAlignment(Qt::AlignLeft);
 }
 

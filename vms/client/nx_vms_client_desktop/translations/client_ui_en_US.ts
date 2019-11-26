@@ -530,6 +530,19 @@
     </message>
 </context>
 <context>
+    <name>BuzzerBusinessActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
+        <source>Fixed duration:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
@@ -1136,6 +1149,11 @@
         <location/>
         <source>Event Rules...</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2066,6 +2084,24 @@
     </message>
 </context>
 <context>
+    <name>PasswordDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
+        <source>Sign in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2129,6 +2165,14 @@
         <location/>
         <source>INFO</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PoeSettingsWidget</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
+        <source>Attention! Power limit exceeded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2780,6 +2824,14 @@
         <location/>
         <source>Global Email Settings...</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ServerSelectionDialog</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
+        <source>Select Servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
