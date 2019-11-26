@@ -84,6 +84,12 @@ struct ObjectTrack
     bool operator==(const ObjectTrack& right) const;
 };
 
+struct ObjectTrackEx: public ObjectTrack
+{
+    ObjectTrackEx(const ObjectTrack& data);
+    std::vector<ObjectPosition> objectPositionSequence;
+};
+
 #define ObjectTrack_analytics_storage_Fields \
     (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs) \
     (lastAppearanceTimeUs)(objectPosition)(bestShot)

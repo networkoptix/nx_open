@@ -53,6 +53,8 @@ public:
      */
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) = 0;
 
+
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) = 0;
     /**
      * Selects all objects with non-empty track that satisfy to the filter.
      * Output is sorted by timestamp with order defined by filter.sortOrder.

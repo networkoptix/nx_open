@@ -16,6 +16,11 @@
 #include "time_period_fetcher.h"
 
 #include <cmath>
+#include <media_server/media_server_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics::db {
 
@@ -222,6 +227,12 @@ std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
     if (m_dbController)
         return m_dbController->statisticsCollector().getQueryStatistics();
     return std::nullopt;
+}
+
+std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTrack& track)
+{
+    NX_ASSERT(0, "not used");
+    return std::vector<ObjectPosition>();
 }
 
 void EventsStorage::lookup(
@@ -565,6 +576,58 @@ void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr pac
     }
 
     return db->save(std::move(packet));
+}
+
+std::vector<ObjectPosition> MovableAnalyticsDb::lookupTrackDetailsSync(const ObjectTrack& track)
+{
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+
+    std::vector<ObjectPosition> result;
+    auto resource = m_mediaServerModule->resourcePool()->getResourceById(track.deviceId);
+    if (!resource)
+    {
+        NX_DEBUG(this, "Failed to to lookup detail track info for deviceId: %1", track.deviceId);
+        return result;
+    }
+    QnServerArchiveDelegate archive(m_mediaServerModule, MediaQuality::MEDIA_Quality_High);
+    if (!archive.open(resource, m_mediaServerModule->archiveIntegrityWatcher()))
+    {
+        NX_DEBUG(this, "Failed to to lookup detail track info for objectTraclId: %1", track.id);
+        return result;
+    }
+    archive.seek(track.firstAppearanceTimeUs, true);
+    const auto lastTime = track.lastAppearanceTimeUs;
+    while (auto data = std::dynamic_pointer_cast<QnAbstractMediaData>(archive.getNextData()))
+    {
+        if (data->timestamp > lastTime || data->dataType == QnAbstractMediaData::EMPTY_DATA)
+            break;
+
+        auto metadata = std::dynamic_pointer_cast<QnCompressedMetadata>(data);
+        if (!metadata)
+            continue;
+
+        auto packet = nx::common::metadata::fromCompressedMetadataPacket(metadata);
+        if (!packet)
+            break;
+
+        for (const auto& detailData : packet->objectMetadataList)
+        {
+            if (detailData.trackId == track.id)
+            {
+                ObjectPosition position;
+                position.deviceId = track.deviceId;
+                position.timestampUs = packet->timestampUs;
+                position.durationUs = packet->durationUs;
+                position.attributes = detailData.attributes;
+                position.boundingBox = detailData.boundingBox;
+                result.emplace_back(position);
+            }
+        }
+    }
+    NX_VERBOSE(this, "track details data has read from media archive. Request duration %1",
+        timer.elapsed());
+    return result;
 }
 
 void MovableAnalyticsDb::lookup(

@@ -45,6 +45,8 @@ public:
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
+
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override;
@@ -130,6 +132,8 @@ public:
     virtual bool initialized() const override;
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
+
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
 
     virtual void lookup(
         Filter filter,
