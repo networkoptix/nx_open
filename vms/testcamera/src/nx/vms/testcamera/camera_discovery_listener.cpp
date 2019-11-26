@@ -15,11 +15,11 @@ namespace nx::vms::testcamera {
 
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
-    QByteArray discoveryResponseData,
+    std::function<QByteArray()> obtainDiscoveryResponseDataFunc,
     QStringList localInterfacesToListen)
     :
     m_logger(logger),
-    m_discoveryResponseData(std::move(discoveryResponseData)),
+    m_obtainDiscoveryResponseDataFunc(std::move(obtainDiscoveryResponseDataFunc)),
     m_localInterfacesToListen(std::move(localInterfacesToListen))
 {
 }
@@ -115,7 +115,7 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     QByteArray response(testCameraIni().discoveryResponseMessage);
     response.append('\n');
     response.append(';');
-    response.append(m_discoveryResponseData);
+    response.append(m_obtainDiscoveryResponseDataFunc());
 
     discoverySocket->setDestAddr(serverAddress);
     const int bytesSent = discoverySocket->send(response.data(), response.size());

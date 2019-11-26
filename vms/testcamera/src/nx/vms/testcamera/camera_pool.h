@@ -59,6 +59,8 @@ protected:
         std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
 
 private:
+    QByteArray obtainDiscoveryResponseData() const;
+
     void reportAddingCameras(
         bool cameraForEachFile,
         const CameraOptions& testCameraOptions,

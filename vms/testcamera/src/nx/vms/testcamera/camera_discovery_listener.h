@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
@@ -26,7 +28,7 @@ class CameraDiscoveryListener: public QnLongRunnable
 public:
     CameraDiscoveryListener(
         const Logger* logger,
-        QByteArray discoveryResponseData,
+        std::function<QByteArray()> obtainDiscoveryResponseDataFunc,
         QStringList localInterfacesToListen);
 
     virtual ~CameraDiscoveryListener();
@@ -57,7 +59,7 @@ protected:
 
 private:
     const Logger* const m_logger;
-    const QByteArray m_discoveryResponseData;
+    const std::function<QByteArray()> m_obtainDiscoveryResponseDataFunc;
     const QStringList m_localInterfacesToListen;
     QVector<IpRangeV4> m_allowedIpRanges;
 };

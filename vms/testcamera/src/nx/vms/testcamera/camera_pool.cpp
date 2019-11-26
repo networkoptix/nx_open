@@ -136,8 +136,10 @@ bool CameraPool::addCameras(
     return true;
 }
 
-bool CameraPool::startDiscovery()
+QByteArray CameraPool::obtainDiscoveryResponseData() const
 {
+    QMutexLocker lock(&m_mutex);
+
     QByteArray discoveryResponseData = QByteArray::number(testCameraIni().mediaPort);
 
     for (const auto& [mac, camera]: m_cameraByMac)
@@ -149,8 +151,15 @@ bool CameraPool::startDiscovery()
         }
     }
 
-    m_discoveryListener.reset(new CameraDiscoveryListener(
-        m_logger.get(), discoveryResponseData, m_localInterfacesToListen));
+    return discoveryResponseData;
+}
+
+bool CameraPool::startDiscovery()
+{
+    m_discoveryListener = std::make_unique<CameraDiscoveryListener>(
+        m_logger.get(),
+        [this]() { return obtainDiscoveryResponseData(); },
+        m_localInterfacesToListen);
 
     if (!m_discoveryListener->initialize())
         return false;
