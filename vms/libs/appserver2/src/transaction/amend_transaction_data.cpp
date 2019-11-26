@@ -105,6 +105,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 {
     auto result = amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
+    result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->storages);
     return result;
 }
 
