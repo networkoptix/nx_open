@@ -451,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Kbps"
+                        "format": "Mbps"
                     }
                 }
             },
@@ -495,7 +495,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Kbps"
+                        "format": "Mbps"
                     }
                 }
             },
