@@ -295,15 +295,7 @@ void HttpServerConnection::prepareAndSendResponse(
             responseMessageContext->msg.response->statusLine.statusCode);
 
     if (responseMessageContext->msgBody)
-    {
         responseMessageContext->msgBody->bindToAioThread(getAioThread());
-        if (responseMessageContext->msgBody->mimeType().isEmpty())
-        {
-            // Malformed message body?
-            // TODO: #ak Add assert here and ensure no one uses this path.
-            responseMessageContext->msgBody.reset();
-        }
-    }
 
     addResponseHeaders(
         requestDescriptor,
