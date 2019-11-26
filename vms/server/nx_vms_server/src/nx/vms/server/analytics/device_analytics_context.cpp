@@ -33,14 +33,21 @@ static bool isAliveStatus(Qn::ResourceStatus status)
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
 }
 
-static QJsonObject mergeWithDbAndDefaultSettings(
+static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settingsFromUser)
 {
     const auto engineManifest = engine->manifest();
     interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
+
+    const std::optional<QJsonObject> deviceAgentSettingsModel =
+        device->deviceAgentSettingsModel(engine->getId());
+
+    if (!NX_ASSERT(deviceAgentSettingsModel))
+        return std::nullopt;
+
+    jsonEngine.loadModelFromJsonObject(*deviceAgentSettingsModel);
 
     const auto settingsFromProperty = device->deviceAgentSettingsValues(engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
@@ -271,7 +278,20 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
     }
 
     interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(engine->manifest().deviceAgentSettingsModel);
+    const std::optional<QJsonObject> deviceAgentSettingsModel = m_device->deviceAgentSettingsModel(
+        QnUuid::fromStringSafe(engineId));
+
+    if (!deviceAgentSettingsModel)
+    {
+        NX_WARNING(this,
+            "Unable to access DeviceAgent settings model for the Device %1 (%2), Engine %1 (%2)",
+            m_device->getUserDefinedName(), m_device->getId(),
+            engine->getName(), engine->getId());
+
+        return {};
+    }
+
+    jsonEngine.loadModelFromJsonObject(*deviceAgentSettingsModel);
     jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
 
     if (!binding)

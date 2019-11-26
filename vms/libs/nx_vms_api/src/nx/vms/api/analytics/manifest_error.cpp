@@ -37,6 +37,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics, ManifestError
     (nx::vms::api::analytics::ManifestErrorType::emptyGroupName, "emptyGroupName")
     (nx::vms::api::analytics::ManifestErrorType::duplicatedGroupId, "duplicatedGroupId")
     (nx::vms::api::analytics::ManifestErrorType::duplicatedGroupName, "duplicatedGroupName")
+    (
+        nx::vms::api::analytics::ManifestErrorType::deviceAgentSettingsModelIsIncorrect,
+        "deviceAgentSettingsModelIsIncorrect"
+    )
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::ManifestErrorType, (numeric)(debug))
 
@@ -75,6 +79,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics, ManifestError
     (nx::vms::api::analytics::ManifestErrorType::emptyGroupName, "emptyGroupName")
     (nx::vms::api::analytics::ManifestErrorType::duplicatedGroupId, "duplicatedGroupId")
     (nx::vms::api::analytics::ManifestErrorType::duplicatedGroupName, "duplicatedGroupName")
+    (
+        nx::vms::api::analytics::ManifestErrorType::deviceAgentSettingsModelIsIncorrect,
+        "deviceAgentSettingsModelIsIncorrect"
+    )
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::ManifestErrorTypes, (numeric)(debug))
 
@@ -129,6 +137,8 @@ QString toHumanReadableString(ManifestErrorType errorType)
             return "Multiple Groups have the same id";
         case ManifestErrorType::duplicatedGroupName:
             return "Multiple Groups have the same name";
+        case ManifestErrorType::deviceAgentSettingsModelIsIncorrect:
+            return "DeviceAgent settings model is defined but is not a correct JSON object";
         default:
             NX_ASSERT(false);
             return QString();

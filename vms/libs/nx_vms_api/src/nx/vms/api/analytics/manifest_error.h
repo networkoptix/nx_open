@@ -32,6 +32,8 @@ enum class ManifestErrorType
     emptyGroupName = 1 << 18,
     duplicatedGroupId = 1 << 19,
     duplicatedGroupName = 1 << 20,
+
+    deviceAgentSettingsModelIsIncorrect = 1 << 21,
 };
 
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)

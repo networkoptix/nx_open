@@ -135,6 +135,39 @@ DeviceAgent::~DeviceAgent()
  */
 std::string DeviceAgent::manifestString() const
 {
+    static const std::string kOverriddenDeviceAgentSettingsModel = R"json(,
+    "deviceAgentSettingsModel": {
+        "type": "Settings",
+        "items": [
+            {
+                "type": "GroupBox",
+                "caption": "Overridden DeviceAgent settings",
+                "items": [
+                    {
+                        "type": "CheckBox",
+                        "name": "overridenCheckBox",
+                        "caption": "Checkbox from overridden settings model",
+                        "defaultValue": true
+                    },
+                    {
+                        "type": "TextField",
+                        "name": "overridenTextField",
+                        "caption": "Text field from overridden settings model",
+                        "defaultValue": "Overridden text field"
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "overridenSpinBox",
+                        "caption": "Spinbox from overridden settings model",
+                        "defaultValue": 50,
+                        "minValue": 0,
+                        "maxValue": 100
+                    }
+                ]
+            }
+        ]
+    })json";
+
     return /*suppress newline*/1 + R"json(
 {
     "supportedEventTypeIds": [
@@ -178,9 +211,10 @@ std::string DeviceAgent::manifestString() const
             "id": ")json" + kBlinkingObjectType + R"json(",
             "name": "Blinking Object"
         }
-    ]
-}
-)json";
+    ])json"
+        + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
+        + R"json(
+})json";
 }
 
 Result<const IStringMap*> DeviceAgent::settingsReceived()
