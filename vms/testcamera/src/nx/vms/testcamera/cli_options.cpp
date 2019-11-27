@@ -26,9 +26,9 @@ Usage:
 At least one <cameraSet> is required; it is a concatenation of semicolon-separated parameters:
  count=<numberOfCameras>
     Optional. Number of cameras to start, if not --camera-for-file. Default: 1.
- files=<filename>[,<filename>...]
+ files=<filename>[,<filename>]...
      Files for the primary stream. The part after `=` may be enclosed in `"` or `'`.
- secondary-files=<filename>[,<filename>...]
+ secondary-files=<filename>[,<filename>]...
      Optional. Files for the secondary stream. The part after `=` may be enclosed in `"` or `'`.
  offline=0..100
      Optional. Frequency of the camera going offline. Default: 0 - never go offline.
