@@ -353,6 +353,12 @@ public:
 protected:
     virtual const IMediaContext* getContext() const override { return nullptr; }
 
+protected:
+    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const
+    {
+        return nullptr;
+    }
+
 private:
     const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
 };

@@ -43,6 +43,13 @@ protected:
         return nullptr;
     }
 
+protected:
+    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const
+    {
+        // TODO: #dmishin implement.
+        return nullptr;
+    }
+
 private:
     const QnConstCompressedVideoDataPtr m_frame;
     const std::string m_codec;
