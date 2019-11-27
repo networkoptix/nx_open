@@ -92,9 +92,9 @@ bool CameraPool::addCamera(
         primaryFileNames,
         m_noSecondaryStream ? QStringList() : secondaryFileNames);
 
-    const auto [_, success] = m_cameraByMac.insert({camera->mac(), std::move(camera)});
-
-    NX_ASSERT(success, "Unable to add camera with duplicate MAC %1.", camera->mac());
+    const QString mac = camera->mac();
+    const auto [_, success] = m_cameraByMac.insert({mac, std::move(camera)});
+    NX_ASSERT(success, "Unable to add camera with duplicate MAC %1.", mac);
     return success;
 }
 
