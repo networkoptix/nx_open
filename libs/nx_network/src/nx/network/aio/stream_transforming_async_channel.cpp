@@ -43,7 +43,7 @@ void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aio
     m_sendScheduler.bindToAioThread(aioThread);
     m_rawDataChannel->bindToAioThread(aioThread);
 
-    NX_ASSERT(aioThreadBak == aioThread || m_userTaskQueue.empty(),
+    NX_CRITICAL(aioThreadBak == aioThread || m_userTaskQueue.empty(),
         toString(m_userTaskQueue));
 }
 
@@ -104,7 +104,7 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
 
 void StreamTransformingAsyncChannel::processTask(UserTask* task)
 {
-    NX_ASSERT(task->status != UserTaskStatus::done, toString(*task));
+    NX_CRITICAL(task->status != UserTaskStatus::done, toString(*task));
 
     switch (task->type)
     {
