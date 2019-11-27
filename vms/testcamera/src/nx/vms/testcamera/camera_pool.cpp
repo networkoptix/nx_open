@@ -94,11 +94,15 @@ bool CameraPool::addCamera(
 
     const QString mac = camera->mac();
     const auto [_, success] = m_cameraByMac.insert({mac, std::move(camera)});
-    NX_ASSERT(success, "Unable to add camera with duplicate MAC %1.", mac);
-    return success;
+    if (!NX_ASSERT(success, "Unable to add camera: duplicate MAC %1.", mac))
+        return false;
+
+    m_discoveryResponseDataByMac.insert({mac, mac}); //< Currently, the response data has only mac.
+
+    return true;
 }
 
-bool CameraPool::addCamerasSet(
+bool CameraPool::addCameraSet(
     const FileCache* fileCache,
     bool cameraForEachFile,
     const CameraOptions& cameraOptions,
@@ -133,6 +137,7 @@ bool CameraPool::addCamerasSet(
             }
         }
     }
+
     return true;
 }
 
@@ -147,7 +152,11 @@ QByteArray CameraPool::obtainDiscoveryResponseData() const
         if (camera->isEnabled())
         {
             discoveryResponseData.append(';');
-            discoveryResponseData.append(mac);
+
+            const auto it = m_discoveryResponseDataByMac.find(mac);
+            if (!NX_ASSERT(it != m_discoveryResponseDataByMac.end()))
+                continue;
+            discoveryResponseData.append(it->second);
         }
     }
 

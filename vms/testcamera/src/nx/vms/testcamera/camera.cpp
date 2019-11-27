@@ -167,7 +167,7 @@ void Camera::makeOfflineFloodIfNeeded()
         }
     }
 
-    if (m_isEnabled && (nx::utils::random::number(0, 99) < m_cameraOptions.offlineFreq))
+    if (m_isEnabled && nx::utils::random::number(0, 99) < m_cameraOptions.offlineFreq)
     {
         m_isEnabled = false;
         m_offlineTimer.restart();

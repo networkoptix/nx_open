@@ -7,7 +7,7 @@
 
 #include <nx/kit/utils.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/switch.h>
+
 #include <core/resource/test_camera_ini.h>
 
 namespace nx::vms::testcamera {

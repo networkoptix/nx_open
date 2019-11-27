@@ -115,7 +115,7 @@ private:
                 ? cameraSet.primaryFileNames
                 : cameraSet.secondaryFileNames;
 
-            if (!m_cameraPool->addCamerasSet(
+            if (!m_cameraPool->addCameraSet(
                 m_fileCache.get(),
                 options.cameraForFile,
                 makeCameraOptions(options, cameraSet),

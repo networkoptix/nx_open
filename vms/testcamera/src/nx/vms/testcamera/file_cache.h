@@ -1,7 +1,7 @@
 #pragma once
 
-#include <map>
 #include <vector>
+#include <map>
 #include <memory>
 
 #include <QFile>

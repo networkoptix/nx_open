@@ -210,7 +210,7 @@ void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) co
 
     QByteArray buffer;
 
-    auto header = nx::utils::makeAppended<packet::Header>(&buffer);
+    auto header = packet::makeAppended<packet::Header>(&buffer);
     header->setFlags(packet::Flag::keyFrame | packet::Flag::mediaContext);
     header->setCodecId(frame->compressionType);
     header->setDataSize(mediaContext.size());
@@ -243,7 +243,7 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
 
     QByteArray buffer;
 
-    auto header = nx::utils::makeAppended<packet::Header>(&buffer);
+    auto header = packet::makeAppended<packet::Header>(&buffer);
     header->setFlags(flags);
     header->setCodecId(frame->compressionType);
     header->setDataSize((int) frame->dataSize());
@@ -252,7 +252,7 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
     if (flags & packet::Flag::ptsIncluded)
     {
         const microseconds pts = unloopAndShiftPtsIfNeeded(framePts(frame));
-        *nx::utils::makeAppended<packet::PtsUs>(&buffer) = pts.count();
+        packet::makeAppended<packet::PtsUs>(&buffer, pts.count());
         ptsLogText = lm("with pts %1").args(us(pts));
     }
 

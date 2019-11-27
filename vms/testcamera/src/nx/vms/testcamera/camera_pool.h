@@ -41,7 +41,7 @@ public:
 
     int cameraCount() const { return (int) m_cameraByMac.size(); }
 
-    bool addCamerasSet(
+    bool addCameraSet(
         const FileCache* fileCache,
         bool cameraForEachFile,
         const CameraOptions& cameraOptions,
@@ -79,6 +79,7 @@ private:
     const std::unique_ptr<Logger> m_logger;
     const std::unique_ptr<FrameLogger> m_frameLogger;
     std::map<QString, std::unique_ptr<Camera>> m_cameraByMac;
+    std::map<QString, QString> m_discoveryResponseDataByMac;
     mutable QMutex m_mutex;
     std::unique_ptr<CameraDiscoveryListener> m_discoveryListener;
     const bool m_noSecondaryStream;

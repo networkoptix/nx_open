@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QtCore/QFlags>
+#include <QtCore/QtEndian>
 
-#include <nx/utils/endian.h>
 #include <nx/utils/log/assert.h>
 
 extern "C" {
@@ -41,12 +41,12 @@ Q_DECLARE_FLAGS(Flags, Flag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Flags)
 
 /** Has the required binary layout, but offers getters/setters with convenient types and checks. */
-class Header
+struct Header
 {
 private:
     uint8_t m_flags{}; /** Flags (QFlags) presented as a single byte. */
     uint8_t m_codecId{}; /**< Ffmpeg's AVCodecID presented as a single byte. */
-    nx::utils::BigEndian<uint32_t> m_dataSize{}; /**< Size of the packet data in bytes. */
+    QBEInteger<quint32> m_dataSize{}; /**< Size of the packet data in bytes. */
 
 public:
     Flags flags() const { return Flags(m_flags); }
@@ -62,8 +62,17 @@ public:
 static_assert(sizeof(Header) == 6);
 
 /** In the binary protocol, follows the Header of frame packet; optional. */
-using PtsUs = nx::utils::BigEndian<int64_t>;
+using PtsUs = QBEInteger<qint64>;
 static_assert(sizeof(PtsUs) == 8);
+
+/** Constructs a new Value using a constructor, being appended to the given buffer. */
+template<typename Value, typename... Args>
+Value* makeAppended(QByteArray* buffer, Args... args)
+{
+    buffer->resize(buffer->size() + sizeof(Value));
+    // "Placement new" initializes the memory at the end of the buffer with the Value constructor.
+    return new (buffer->data() + buffer->size() - sizeof(Value)) Value(args...);
+}
 
 #pragma pack(pop)
 } // namespace nx::vms::testcamera::packet
