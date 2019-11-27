@@ -488,9 +488,9 @@ TEST(Metrics, Formatting)
     EXPECT_FORMAT("MB", 6000666.0, "5.72 MB");
     EXPECT_FORMAT("MB", 6000666000.0, "5723 MB");
 
-    EXPECT_FORMAT("KBps", 5000555.0, "4883 KBps");
+    EXPECT_FORMAT("KB/s", 5000555.0, "4883 KB/s");
     EXPECT_FORMAT("MPix/s", 6000666000.0, "6001 MPix/s");
-    EXPECT_FORMAT("Gbps", 7000777000.0, "56 Gbps");
+    EXPECT_FORMAT("Gbit/s", 7000777000.0, "56 Gbit/s");
 
     EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
     EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");
