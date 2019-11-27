@@ -652,10 +652,11 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
             return false;
 
         const auto resourcePool = server->resourcePool();
-        if (!resourcePool)
+        if (!resourcePool || server->hasFlags(Qn::removed))
             return false;
 
-        const auto childCameras = resourcePool->getAllCameras(server, true);
+        const auto childCameras =
+            resourcePool->getAllCameras(server, /*ignoreDesktopCameras*/ true);
         if (childCameras.size() != 1)
             return false;
 
