@@ -86,7 +86,7 @@ bool Camera::performStreamingFile(
 
         if (!fileStreamer->streamFrame(frames[i].get(), i))
         {
-            if (testCameraIni().stopStreamingOnSocketErrors)
+            if (testCameraIni().stopStreamingOnErrors)
             {
                 NX_LOGGER_ERROR(logger,
                     "Frame sending failed due to the above error; stop streaming.");
