@@ -60,7 +60,7 @@ QnMetaDataV1Ptr MotionDelegateWrapper::analyzeMotion(const QnAbstractMediaDataPt
         return nullptr;
 
     if (m_motionEstimation.existsMetadata())
-        return std::dynamic_pointer_cast<QnMetaDataV1>(m_motionEstimation.getMotion());
+        return std::dynamic_pointer_cast<QnMetaDataV1>(m_motionEstimation.takeMotion());
 
     return nullptr;
 }

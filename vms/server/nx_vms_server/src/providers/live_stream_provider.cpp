@@ -568,7 +568,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     }
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-        return m_motionEstimation[m_softMotionLastChannel]->getMotion();
+        return m_motionEstimation[m_softMotionLastChannel]->takeMotion();
     else
         return getCameraMetadata();
 }

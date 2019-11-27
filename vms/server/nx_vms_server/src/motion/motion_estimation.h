@@ -52,13 +52,22 @@ public:
         const QnCompressedVideoDataPtr& frame,
         CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
 
+    // Gets motion preserving internal state. Subsequent calls to getMotion and takeMotion will
+    //     return the same data.
     QnMetaDataV1Ptr getMotion();
+
+    // Gets motion and resets internal states (i.e subsequent call to getMotion or takeMotion) will
+    //     return nullptr;
+    QnMetaDataV1Ptr takeMotion();
+
     bool existsMetadata() const;
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analyzeFrame call)
     QSize videoResolution() const;
     void stop();
 private:
+    QnMetaDataV1Ptr makeMotion();
+
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);
     void postFiltering();
@@ -101,4 +110,7 @@ private:
     int m_scaleYStep;
     int m_channelNum;
     nx::metrics::Storage* m_metrics = nullptr;
+
+    bool m_motionHasBeenTaken = true;
+    QnMetaDataV1Ptr m_lastMotionData;
 };
