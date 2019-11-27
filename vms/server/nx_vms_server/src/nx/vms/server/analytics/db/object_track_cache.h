@@ -70,7 +70,7 @@ public:
      */
     std::vector<ObjectTrackUpdate> getTracksToUpdate(bool flush = false);
 
-    std::optional<ObjectTrack> getTrackById(const QnUuid& trackId) const;
+    std::optional<ObjectTrackEx> getTrackById(const QnUuid& trackId) const;
 
     /**
      * MUST be invoked after inserting track to the DB.
@@ -106,6 +106,7 @@ private:
         bool modified = false;
 
         std::map<QString, QString> allAttributes;
+        std::vector<ObjectPosition> allPositionSequence;
     };
 
     const std::chrono::milliseconds m_aggregationPeriod;
