@@ -36,11 +36,19 @@ Label::Label(QString id, QString name):
 {
 }
 
-ValueManifest::ValueManifest(Label label, Displays display, QString format):
-    Label(std::move(label)),
-    display(display),
-    format(std::move(format))
+ValueManifest::ValueManifest(QString id, QString name):
+    Label(std::move(id), std::move(name))
 {
+}
+
+void apply(const ValueRule& rule, ValueManifest* manifest)
+{
+    if (!rule.name.isEmpty())
+        manifest->name = rule.name;
+
+    manifest->description = rule.description;
+    manifest->display = rule.display;
+    manifest->format = rule.format;
 }
 
 static QString durationString(int64_t duration)

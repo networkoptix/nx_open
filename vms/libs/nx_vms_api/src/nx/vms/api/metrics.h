@@ -57,7 +57,7 @@ struct NX_VMS_API ValueManifest: Label
     Displays display;
     QString format;
 
-    ValueManifest(Label label = {}, Displays display = Display::none, QString format = {});
+    ValueManifest(QString id = {}, QString name = {});
 };
 #define ValueManifest_Fields (id)(name)(description)(format)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
@@ -170,6 +170,8 @@ void merge(std::vector<Value>* destination, std::vector<Value>* source)
 {
     destination->insert(destination->end(), source->begin(), source->end());
 }
+
+void NX_VMS_API apply(const ValueRule& rule, ValueManifest* manifest);
 
 NX_VMS_API std::function<Value(const Value&)> makeFormatter(const QString& targetFormat);
 
