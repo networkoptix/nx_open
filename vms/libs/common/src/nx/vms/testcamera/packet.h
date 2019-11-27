@@ -25,6 +25,7 @@ extern "C" {
  *         - Media context data: serialized ffmpeg's MediaContext.
  *     - Frame packet (includes a single video frame, has codecContext flag not set):
  *         - If ptsIncluded flag set: frame's pts, as 64-bit Big Endian.
+ *         - If channelNumberIncluded flag set: frame's channel number, as 0-based byte.
  *         - Frame data: raw compressed frame bytes.
  */
 namespace nx::vms::testcamera::packet {
@@ -36,6 +37,7 @@ enum class Flag: uint8_t
     keyFrame = 1 << 7,
     mediaContext = 1 << 6, /**< Defines packet type: media context or frame. */
     ptsIncluded = 1 << 5, /**< Whether packet body includes 64-bit PTS. */
+    channelNumberIncluded = 1 << 4, /**< Whether packet body includes 8-bit channel number. */
 };
 Q_DECLARE_FLAGS(Flags, Flag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Flags)

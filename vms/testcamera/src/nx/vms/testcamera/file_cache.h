@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <vector>
 #include <map>
 #include <memory>
@@ -27,6 +28,7 @@ public:
     {
         QString filename = "UNINITIALIZED";
         int index = -1; //< Used for logging.
+        int channelCount = -1; //< Number of independent video channels in the file.
         std::vector<std::shared_ptr<const QnCompressedVideoData>> frames;
     };
 
@@ -44,7 +46,8 @@ public:
 private:
     bool loadVideoFrames(
         const QString& filename,
-        std::vector<std::shared_ptr<const QnCompressedVideoData>>* frames) const;
+        std::vector<std::shared_ptr<const QnCompressedVideoData>>* frames,
+        std::set<int>* channelNumbers) const;
 
 private:
     QnCommonModule* const m_commonModule;

@@ -140,6 +140,7 @@ void Camera::performStreaming(
                 socket,
                 streamIndex,
                 filename,
+                file.channelCount,
                 ptsUnloopingContext.get());
 
             if (!performStreamingFile(file.frames, fps, fileStreamer.get(), logger.get()))

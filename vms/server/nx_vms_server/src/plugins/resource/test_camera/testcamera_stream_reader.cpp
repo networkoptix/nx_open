@@ -92,7 +92,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::receivePacket()
         //
         // ATTENTION: If a large number of media context packets is sent, stack overflow may occur.
 
-        if (header.flags() & Flag::ptsIncluded)
+        if (header.flags() & Flag::ptsIncluded || header.flags() & Flag::channelNumberIncluded)
             return error("Invalid packet flags received: %1", header.flagsAsHex());
 
         QByteArray mediaContext(header.dataSize(), /*filler*/ 0);
@@ -122,6 +122,12 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFramePacketBody(
     else
     {
         frame->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    }
+
+    if (header.flags() & Flag::channelNumberIncluded)
+    {
+        if (!receiveData<uint8_t>(&frame->channelNumber, "channel number"))
+            return nullptr;
     }
 
     frame->compressionType = header.codecId();

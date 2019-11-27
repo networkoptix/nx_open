@@ -4,6 +4,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/streaming/config.h> //< for CL_MAX_CHANNELS
 
 #include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/vms/testcamera/packet.h>
@@ -47,6 +48,7 @@ FileStreamer::FileStreamer(
     nx::network::AbstractStreamSocket* socket,
     StreamIndex streamIndex,
     QString filename,
+    int channelCount,
     PtsUnloopingContext* ptsUnloopingContext)
     :
     m_logger(logger),
@@ -55,8 +57,11 @@ FileStreamer::FileStreamer(
     m_socket(socket),
     m_streamIndex(streamIndex),
     m_filename(std::move(filename)),
+    m_channelCount(channelCount),
     m_ptsUnloopingContext(ptsUnloopingContext)
 {
+    NX_ASSERT(m_channelCount >= 1);
+    NX_ASSERT(m_channelCount <= CL_MAX_CHANNELS);
 }
 
 microseconds FileStreamer::framePts(const QnCompressedVideoData* frame) const
@@ -240,6 +245,8 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
         flags |= packet::Flag::keyFrame;
     if (m_cameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
         flags |= packet::Flag::ptsIncluded;
+    if (m_channelCount > 1)
+        flags |= packet::Flag::channelNumberIncluded;
 
     QByteArray buffer;
 
@@ -255,6 +262,9 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
         packet::makeAppended<packet::PtsUs>(&buffer, pts.count());
         ptsLogText = lm("with pts %1").args(us(pts));
     }
+
+    if (flags & packet::Flag::channelNumberIncluded)
+        packet::makeAppended<uint8_t>(&buffer, frame->channelNumber);
 
     m_frameLogger->logFrameIfNeeded(
         lm("Sending frame %1, %2 bytes.").args(ptsLogText, frame->dataSize()),

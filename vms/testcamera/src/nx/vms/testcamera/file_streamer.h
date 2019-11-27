@@ -48,6 +48,7 @@ public:
         nx::network::AbstractStreamSocket* socket,
         StreamIndex streamIndex,
         QString filename,
+        int channelCount,
         PtsUnloopingContext* ptsUnloopingContext);
 
     /** Obtain frame PTS from either its `pts` field or `timestamp` field, depending on .ini. */
@@ -73,6 +74,7 @@ private:
     nx::network::AbstractStreamSocket* const m_socket;
     const StreamIndex m_streamIndex;
     const QString m_filename;
+    const int m_channelCount;
     PtsUnloopingContext* const m_ptsUnloopingContext;
     mutable std::set<const QnCompressedVideoData*> m_framesWithDifferentPtsAndTimestamp;
 };
