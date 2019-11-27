@@ -8,7 +8,7 @@
 #include <utils/common/sleep.h>
 #include <nx/network/abstract_socket.h>
 
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 
 #include "logger.h"
 #include "file_cache.h"
@@ -25,7 +25,7 @@ static QByteArray buildMac(int cameraNumber)
 {
     const auto numberBigEndian = qToBigEndian((int32_t) cameraNumber);
 
-    QByteArray mac = testCameraIni().macPrefix;
+    QByteArray mac = ini().macPrefix;
     QByteArray last = QByteArray((const char*) &numberBigEndian, sizeof(numberBigEndian)).toHex();
     while (!last.isEmpty())
     {
@@ -87,7 +87,7 @@ bool Camera::performStreamingFile(
 
         if (!fileStreamer->streamFrame(frames[i].get(), i))
         {
-            if (testCameraIni().stopStreamingOnErrors)
+            if (ini().stopStreamingOnErrors)
             {
                 NX_LOGGER_ERROR(logger,
                     "Frame sending failed due to the above error; stop streaming.");

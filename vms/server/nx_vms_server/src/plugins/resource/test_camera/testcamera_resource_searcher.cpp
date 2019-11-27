@@ -5,11 +5,13 @@
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/url/url_builder.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
+
+using nx::vms::testcamera::ini;
 
 QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnMediaServerModule* serverModule)
     :
@@ -54,13 +56,13 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
-    testCameraIni().reload();
-    const QByteArray testCameraFindMessage = testCameraIni().discoveryMessage + QByteArray("\n");
+    ini().reload();
+    const QByteArray testCameraFindMessage = ini().discoveryMessage + QByteArray("\n");
     for (const DiscoveryInfo& info: m_sockList)
     {
         info.sock->sendTo(
             testCameraFindMessage.constData(), testCameraFindMessage.size(),
-            nx::network::BROADCAST_ADDRESS, testCameraIni().discoveryPort);
+            nx::network::BROADCAST_ADDRESS, ini().discoveryPort);
     }
 }
 
@@ -75,7 +77,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QSet<QString> processedMac;
 
     const QByteArray testCameraIdMessage =
-        testCameraIni().discoveryResponseMessage + QByteArray("\n");
+        ini().discoveryResponseMessage + QByteArray("\n");
 
     for (const DiscoveryInfo& info: m_sockList)
     {

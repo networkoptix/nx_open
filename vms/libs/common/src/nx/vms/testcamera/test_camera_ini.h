@@ -2,9 +2,11 @@
 
 #include <nx/kit/ini_config.h>
 
-struct TestCameraIni: public nx::kit::IniConfig
+namespace nx::vms::testcamera {
+
+struct Ini: public nx::kit::IniConfig
 {
-    TestCameraIni(): IniConfig("test_camera.ini") { reload(); }
+    Ini(): IniConfig("test_camera.ini") { reload(); }
 
     NX_INI_STRING("92-61", macPrefix, "First two bytes of the desired MAC, separeted by '-'.");
 
@@ -49,8 +51,10 @@ struct TestCameraIni: public nx::kit::IniConfig
         "log them using ERROR log level.");
 };
 
-inline TestCameraIni& testCameraIni()
+inline Ini& ini()
 {
-    static TestCameraIni ini;
+    static Ini ini;
     return ini;
 }
+
+} // namespace nx::vms::testcamera

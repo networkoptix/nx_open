@@ -7,7 +7,7 @@
 #include <nx/network/nettools.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_factory.h>
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 
 #include "logger.h"
 
@@ -96,7 +96,7 @@ QByteArray CameraDiscoveryListener::receiveDiscoveryMessage(
     if (bytesRead < 0)
     {
         static constexpr char msg[] = "Unable to receive discovery message from %1: %2";
-        if (testCameraIni().logReceivingDiscoveryMessageErrorAsVerbose)
+        if (ini().logReceivingDiscoveryMessageErrorAsVerbose)
             NX_LOGGER_VERBOSE(m_logger, msg, *outServerAddress, SystemError::getLastOSErrorText());
         else
             NX_LOGGER_ERROR(m_logger, msg, *outServerAddress, SystemError::getLastOSErrorText());
@@ -112,7 +112,7 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     nx::network::AbstractDatagramSocket* discoverySocket,
     const nx::network::SocketAddress& serverAddress) const
 {
-    QByteArray response(testCameraIni().discoveryResponseMessage);
+    QByteArray response(ini().discoveryResponseMessage);
     response.append('\n');
     response.append(';');
     response.append(m_obtainDiscoveryResponseDataFunc());
@@ -140,14 +140,14 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     auto discoverySocket = nx::network::SocketFactory::createDatagramSocket();
 
     discoverySocket->bind(nx::network::SocketAddress(
-        nx::network::HostAddress::anyHost, testCameraIni().discoveryPort));
+        nx::network::HostAddress::anyHost, ini().discoveryPort));
 
-    discoverySocket->setRecvTimeout(testCameraIni().discoveryMessageTimeoutMs);
+    discoverySocket->setRecvTimeout(ini().discoveryMessageTimeoutMs);
     QByteArray buffer(1024 * 8, '\0');
     nx::network::SocketAddress serverAddress;
 
     const QByteArray expectedDiscoveryMessage =
-        testCameraIni().discoveryMessage + QByteArray("\n");
+        ini().discoveryMessage + QByteArray("\n");
 
     while (!m_needStop)
     {

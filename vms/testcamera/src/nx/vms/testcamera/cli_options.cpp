@@ -8,7 +8,7 @@
 #include <nx/kit/utils.h>
 #include <nx/utils/log/assert.h>
 
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 
 namespace nx::vms::testcamera {
 
@@ -490,7 +490,7 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
 
         validateOptions(*options);
 
-        if (testCameraIni().printOptions)
+        if (ini().printOptions)
         {
             std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
                 optionsToJsonString(*options)).toStdString();

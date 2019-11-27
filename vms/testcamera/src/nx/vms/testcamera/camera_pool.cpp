@@ -4,7 +4,7 @@
 
 #include <nx/kit/utils.h>
 #include <nx/network/nettools.h>
-#include <core/resource/test_camera_ini.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
 
 #include "logger.h"
 #include "frame_logger.h"
@@ -27,7 +27,7 @@ CameraPool::CameraPool(
         localInterfacesToListen.isEmpty()
             ? QHostAddress::Any
             : QHostAddress(localInterfacesToListen[0]),
-        testCameraIni().mediaPort
+        ini().mediaPort
     ),
     m_localInterfacesToListen(std::move(localInterfacesToListen)),
     m_logger(new Logger("CameraPool")),
@@ -145,7 +145,7 @@ QByteArray CameraPool::obtainDiscoveryResponseData() const
 {
     QMutexLocker lock(&m_mutex);
 
-    QByteArray discoveryResponseData = QByteArray::number(testCameraIni().mediaPort);
+    QByteArray discoveryResponseData = QByteArray::number(ini().mediaPort);
 
     for (const auto& [mac, camera]: m_cameraByMac)
     {
