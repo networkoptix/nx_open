@@ -1,10 +1,10 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
-#include <QtCore/QVector>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
@@ -61,7 +61,7 @@ private:
     const Logger* const m_logger;
     const std::function<QByteArray()> m_obtainDiscoveryResponseDataFunc;
     const QStringList m_localInterfacesToListen;
-    QVector<IpRangeV4> m_allowedIpRanges;
+    std::vector<IpRangeV4> m_allowedIpRanges;
 };
 
 } // namespace nx::vms::testcamera

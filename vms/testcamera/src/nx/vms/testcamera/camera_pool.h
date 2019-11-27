@@ -41,10 +41,10 @@ public:
 
     int cameraCount() const { return (int) m_cameraByMac.size(); }
 
-    bool addCameras(
+    bool addCamerasSet(
         const FileCache* fileCache,
         bool cameraForEachFile,
-        const CameraOptions& testCameraOptions,
+        const CameraOptions& cameraOptions,
         int count,
         const QStringList& primaryFileNames,
         const QStringList& secondaryFileNames);
@@ -63,14 +63,14 @@ private:
 
     void reportAddingCameras(
         bool cameraForEachFile,
-        const CameraOptions& testCameraOptions,
+        const CameraOptions& cameraOptions,
         int count,
         const QStringList& primaryFileNames,
         const QStringList& secondaryFileNames);
 
     bool addCamera(
         const FileCache* fileCache,
-        const CameraOptions& testCameraOptions,
+        const CameraOptions& cameraOptions,
         QStringList primaryFileNames,
         QStringList secondaryFileNames);
 

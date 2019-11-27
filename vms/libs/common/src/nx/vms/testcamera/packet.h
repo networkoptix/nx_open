@@ -2,6 +2,7 @@
 
 #include <QtCore/QFlags>
 
+#include <nx/utils/endian.h>
 #include <nx/utils/log/assert.h>
 
 extern "C" {
@@ -29,30 +30,6 @@ extern "C" {
 namespace nx::vms::testcamera::packet {
 #pragma pack(push, 1)
 
-/** Wrapper for integer values which internally stores the number as Big Endian. */
-template<typename Value>
-class BigEndian
-{
-    uint8_t m_bytes[sizeof(Value)]{};
-
-public:
-    BigEndian() = default;
-
-    BigEndian(Value value)
-    {
-        for (size_t i = 0; i < sizeof(Value); ++i)
-            m_bytes[i] = reinterpret_cast<const uint8_t*>(&value)[sizeof(Value) - 1 - i];
-    }
-
-    operator Value() const
-    {
-        Value value;
-        for (size_t i = 0; i < sizeof(Value); ++i)
-            reinterpret_cast<uint8_t*>(&value)[i] = m_bytes[sizeof(Value) - 1 - i];
-        return value;
-    }
-};
-
 enum class Flag: uint8_t
 {
     none = 0,
@@ -66,13 +43,14 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Flags)
 /** Has the required binary layout, but offers getters/setters with convenient types and checks. */
 class Header
 {
+private:
     uint8_t m_flags{}; /** Flags (QFlags) presented as a single byte. */
     uint8_t m_codecId{}; /**< Ffmpeg's AVCodecID presented as a single byte. */
-    BigEndian<uint32_t> m_dataSize{}; /**< Size of the packet data in bytes. */
+    nx::utils::BigEndian<uint32_t> m_dataSize{}; /**< Size of the packet data in bytes. */
 
 public:
     Flags flags() const { return Flags(m_flags); }
-    void setFlags(Flags v) { NX_ASSERT(v >= 0 && v < 256); m_flags = v; }
+    void setFlags(Flags v) { NX_ASSERT((int) v >= 0 && (int) v < 256); m_flags = v; }
     QString flagsAsHex() const { return QString("0x%1").arg(m_flags, /*width*/ 2, /*base*/ 16); }
 
     AVCodecID codecId() const { return (AVCodecID) m_codecId; }
@@ -84,7 +62,7 @@ public:
 static_assert(sizeof(Header) == 6);
 
 /** In the binary protocol, follows the Header of frame packet; optional. */
-using PtsUs = BigEndian<int64_t>;
+using PtsUs = nx::utils::BigEndian<int64_t>;
 static_assert(sizeof(PtsUs) == 8);
 
 #pragma pack(pop)

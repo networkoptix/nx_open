@@ -25,7 +25,7 @@ FileCache::~FileCache()
 
 bool FileCache::loadVideoFrames(
     const QString& filename,
-    QList<QnConstCompressedVideoDataPtr>* frames)
+    std::vector<std::shared_ptr<const QnCompressedVideoData>>* frames) const
 {
     const QnAviResourcePtr aviResource(new QnAviResource(filename, m_commonModule));
     QnAviArchiveDelegate aviArchiveDelegate;
@@ -38,9 +38,9 @@ bool FileCache::loadVideoFrames(
     int64_t totalSize = 0;
     int frameIndex = 0;
 
-    while (const QnAbstractMediaDataPtr mediaFrame = aviArchiveDelegate.getNextData())
+    while (const auto mediaFrame = aviArchiveDelegate.getNextData())
     {
-        const auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(mediaFrame);
+        const auto videoFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaFrame);
         if (!videoFrame) //< Unneeded frame type.
             continue;
 
@@ -52,7 +52,7 @@ bool FileCache::loadVideoFrames(
             break;
         }
 
-        frames->append(videoFrame);
+        frames->push_back(videoFrame);
 
         ++frameIndex;
     }
@@ -69,7 +69,7 @@ bool FileCache::loadFile(const QString& filename)
 
     File file;
     file.filename = filename;
-    file.index = m_filesByFilename.size();
+    file.index = (int) m_filesByFilename.size();
 
     const auto fileLoggerContext = m_logger->pushContext(
         lm("File #%1 %2").args(file.index, file.filename));
@@ -85,7 +85,7 @@ bool FileCache::loadFile(const QString& filename)
         return false;
     }
 
-    m_filesByFilename.insert(filename, file);
+    m_filesByFilename.insert({filename, file});
 
     NX_LOGGER_INFO(m_logger, "File loaded for streaming.");
     return true;
@@ -103,7 +103,7 @@ const FileCache::File& FileCache::getFile(const QString& filename) const
         return m_undefinedFile;
     }
 
-    return *it;
+    return it->second;
 }
 
 } // namespace nx::vms::testcamera

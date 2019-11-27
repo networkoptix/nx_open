@@ -62,7 +62,7 @@ bool CameraDiscoveryListener::initialize()
 bool CameraDiscoveryListener::serverAddressIsAllowed(
     const nx::network::SocketAddress& serverAddress)
 {
-    if (m_allowedIpRanges.isEmpty()) //< All Server IPs are allowed.
+    if (m_allowedIpRanges.empty()) //< All Server IPs are allowed.
         return true;
 
     const auto addr = serverAddress.address.ipV4();

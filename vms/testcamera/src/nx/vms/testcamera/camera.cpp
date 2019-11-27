@@ -6,8 +6,9 @@
 #include <nx/streaming/video_data_packet.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>
-#include <core/resource/test_camera_ini.h>
 #include <nx/network/abstract_socket.h>
+
+#include <core/resource/test_camera_ini.h>
 
 #include "logger.h"
 #include "file_cache.h"
@@ -40,7 +41,7 @@ Camera::Camera(
     const FrameLogger* frameLogger,
     const FileCache* fileCache,
     int number,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     const QStringList& primaryFileNames,
     const QStringList& secondaryFileNames)
     :
@@ -48,7 +49,7 @@ Camera::Camera(
     m_fileCache(fileCache),
     m_number(number),
     m_mac(buildMac(number)),
-    m_options(testCameraOptions),
+    m_cameraOptions(cameraOptions),
     m_primaryFileNames(primaryFileNames),
     m_secondaryFileNames(secondaryFileNames),
     m_logger(new Logger(lm("Camera(%1)").args(m_mac)))
@@ -61,7 +62,7 @@ Camera::~Camera()
 }
 
 bool Camera::performStreamingFile(
-    const QList<QnConstCompressedVideoDataPtr>& frames,
+    const std::vector<std::shared_ptr<const QnCompressedVideoData>>& frames,
     int fps,
     FileStreamer* fileStreamer,
     Logger* logger)
@@ -70,7 +71,7 @@ bool Camera::performStreamingFile(
     QTime frameIntervalTimer;
     frameIntervalTimer.restart();
 
-    for (int i = 0; i < frames.size(); ++i)
+    for (int i = 0; i < (int) frames.size(); ++i)
     {
         const auto frameLoggerContext = logger->pushContext(
             lm("frame #%1 with pts %2").args(i, us(fileStreamer->framePts(frames[i].get()))));
@@ -109,7 +110,7 @@ void Camera::performStreaming(
         (streamIndex == StreamIndex::secondary) ? m_secondaryFileNames : m_primaryFileNames;
     if (!NX_ASSERT(!filenames.isEmpty()))
         return;
-    if (m_options.unloopPts && !NX_ASSERT(filenames.size() == 1))
+    if (m_cameraOptions.unloopPts && !NX_ASSERT(filenames.size() == 1))
         return;
 
     // Clone the logger because this function can be called reenterably for various Servers.
@@ -121,21 +122,24 @@ void Camera::performStreaming(
     socket->setSendTimeout(kSendTimeoutMs);
 
     const std::unique_ptr<FileStreamer::PtsUnloopingContext> ptsUnloopingContext{
-        m_options.unloopPts ? new FileStreamer::PtsUnloopingContext : nullptr};
+        m_cameraOptions.unloopPts ? new FileStreamer::PtsUnloopingContext : nullptr};
 
     for (;;) //< Stream all files in the list infinitely, unless an error occurs.
     {
         for (const QString filename: filenames)
         {
             const auto& file = m_fileCache->getFile(filename);
-            if (!NX_ASSERT(!file.frames.empty()))
-                return;
 
             const auto fileLoggerContext = logger->pushContext(lm("file #%1%2").args(file.index,
                 ptsUnloopingContext ? lm(", loop #%1").args(ptsUnloopingContext->loopIndex) : ""));
 
             const auto fileStreamer = std::make_unique<FileStreamer>(
-                logger.get(), m_frameLogger, m_options, socket, streamIndex, filename,
+                logger.get(),
+                m_frameLogger,
+                m_cameraOptions,
+                socket,
+                streamIndex,
+                filename,
                 ptsUnloopingContext.get());
 
             if (!performStreamingFile(file.frames, fps, fileStreamer.get(), logger.get()))
@@ -148,7 +152,7 @@ void Camera::makeOfflineFloodIfNeeded()
 {
     NX_MUTEX_LOCKER lock(&m_offlineMutex);
 
-    if (m_options.offlineFreq == 0 || m_checkTimer.elapsed() < 1000)
+    if (m_cameraOptions.offlineFreq == 0 || m_checkTimer.elapsed() < 1000)
         return;
 
     m_checkTimer.restart();
@@ -163,7 +167,7 @@ void Camera::makeOfflineFloodIfNeeded()
         }
     }
 
-    if (m_isEnabled && (nx::utils::random::number(0, 99) < m_options.offlineFreq))
+    if (m_isEnabled && (nx::utils::random::number(0, 99) < m_cameraOptions.offlineFreq))
     {
         m_isEnabled = false;
         m_offlineTimer.restart();

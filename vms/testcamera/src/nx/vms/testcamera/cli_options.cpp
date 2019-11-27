@@ -198,20 +198,20 @@ static QString cameraSetToJsonString(const CliOptions::CameraSet& cameraSet, con
 
     result += prefix + "    \"primaryFileNames\":\n";
     result += prefix + "    [\n";
-    for (int j = 0; j < cameraSet.primaryFileNames.size(); ++j)
+    for (int i = 0; i < cameraSet.primaryFileNames.size(); ++i)
     {
-        result += prefix + "        " + enquoteAndEscape(cameraSet.primaryFileNames[j]);
-        result += (j == cameraSet.primaryFileNames.size() - 1) ? "" : ",";
+        result += prefix + "        " + enquoteAndEscape(cameraSet.primaryFileNames[i]);
+        result += (i == cameraSet.primaryFileNames.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += prefix + "    ],\n";
 
     result += prefix + "    \"secondaryFileNames\":\n";
     result += prefix + "    [\n";
-    for (int j = 0; j < cameraSet.secondaryFileNames.size(); ++j)
+    for (int i = 0; i < cameraSet.secondaryFileNames.size(); ++i)
     {
-        result += prefix + "        " + enquoteAndEscape(cameraSet.secondaryFileNames[j]);
-        result += (j == cameraSet.secondaryFileNames.size() - 1) ? "" : ",";
+        result += prefix + "        " + enquoteAndEscape(cameraSet.secondaryFileNames[i]);
+        result += (i == cameraSet.secondaryFileNames.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += prefix + "    ]\n";
@@ -245,7 +245,7 @@ static QString optionsToJsonString(const CliOptions& options)
 
     result += "    \"localInterfaces\":\n";
     result += "    [\n";
-    for (int i = 0; i < options.localInterfaces.size(); ++i)
+    for (int i = 0; i < (int) options.localInterfaces.size(); ++i)
     {
         result += "        " + enquoteAndEscape(options.localInterfaces[i]);
         result += (i == options.localInterfaces.size() - 1) ? "" : ",";
@@ -255,11 +255,11 @@ static QString optionsToJsonString(const CliOptions& options)
 
     result += "    \"cameraSets\":\n";
     result += "    [\n";
-    for (int i = 0; i < options.cameraSets.size(); ++i)
+    for (int i = 0; i < (int) options.cameraSets.size(); ++i)
     {
-        const auto& cameraSet = options.cameraSets[i];
+        const auto& cameraSet = options.cameraSets.at(i);
         result += cameraSetToJsonString(cameraSet, /*prefix*/ QString(8, ' '));
-        result += (i == options.cameraSets.size() - 1) ? "" : ",";
+        result += (i == (int) options.cameraSets.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += "    ]\n";

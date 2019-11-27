@@ -38,18 +38,12 @@ public:
     }
 };
 
-template<typename Value>
-void appendToBuffer(QByteArray* buffer, const Value& value)
-{
-    buffer->append(reinterpret_cast<const char*>(&value), sizeof(Value));
-}
-
 } // namespace
 
 FileStreamer::FileStreamer(
     const Logger* logger,
     const FrameLogger* frameLogger,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     nx::network::AbstractStreamSocket* socket,
     StreamIndex streamIndex,
     QString filename,
@@ -57,7 +51,7 @@ FileStreamer::FileStreamer(
     :
     m_logger(logger),
     m_frameLogger(frameLogger),
-    m_testCameraOptions(testCameraOptions),
+    m_cameraOptions(cameraOptions),
     m_socket(socket),
     m_streamIndex(streamIndex),
     m_filename(std::move(filename)),
@@ -163,7 +157,7 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
         return pts;
     PtsUnloopingContext& context = *m_ptsUnloopingContext;
 
-    if (!m_testCameraOptions.unloopPts)
+    if (!m_cameraOptions.unloopPts)
         return pts;
 
     if (pts < 0s)
@@ -187,8 +181,8 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
     const microseconds unloopedPts = pts + context.unloopingShift;
 
     const microseconds shiftPeriod{(m_streamIndex == StreamIndex::secondary)
-        ? m_testCameraOptions.shiftPtsSecondaryPeriodUs
-        : m_testCameraOptions.shiftPtsPrimaryPeriodUs};
+        ? m_cameraOptions.shiftPtsSecondaryPeriodUs
+        : m_cameraOptions.shiftPtsPrimaryPeriodUs};
 
     if (shiftPeriod < 0s) //< Shifting was not requested in the options.
         return unloopedPts;
@@ -209,20 +203,18 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
 /** @throws SocketError */
 void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) const
 {
-    using namespace nx::vms::testcamera::packet;
-
     if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
         throw Error(lm("Codec id %1 not supported by testcamera.").args(frame->compressionType));
 
     const QByteArray mediaContext = frame->context->serialize();
 
-    Header header;
-    header.setFlags(Flag::keyFrame | Flag::mediaContext);
-    header.setCodecId(frame->compressionType);
-    header.setDataSize(mediaContext.size());
-
     QByteArray buffer;
-    appendToBuffer(&buffer, header);
+
+    auto header = nx::utils::makeAppended<packet::Header>(&buffer);
+    header->setFlags(packet::Flag::keyFrame | packet::Flag::mediaContext);
+    header->setCodecId(frame->compressionType);
+    header->setDataSize(mediaContext.size());
+
     buffer.append(mediaContext);
 
     send(buffer.constData(), buffer.size(), "media context packet");
@@ -231,8 +223,6 @@ void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) co
 /** @throws SocketError */
 void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
 {
-    using namespace nx::vms::testcamera::packet;
-
     if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
         throw Error(lm("Codec id %1 not supported.").args(frame->compressionType));
 
@@ -245,25 +235,24 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
             .args(frame->dataSize()));
     }
 
-    Flags flags;
+    packet::Flags flags;
     if (frame->flags & AV_PKT_FLAG_KEY)
-        flags |= Flag::keyFrame;
-    if (m_testCameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
-        flags |= Flag::ptsIncluded;
-
-    Header header;
-    header.setFlags(flags);
-    header.setCodecId(frame->compressionType);
-    header.setDataSize((int) frame->dataSize());
+        flags |= packet::Flag::keyFrame;
+    if (m_cameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
+        flags |= packet::Flag::ptsIncluded;
 
     QByteArray buffer;
-    appendToBuffer(&buffer, header);
+
+    auto header = nx::utils::makeAppended<packet::Header>(&buffer);
+    header->setFlags(flags);
+    header->setCodecId(frame->compressionType);
+    header->setDataSize((int) frame->dataSize());
 
     QString ptsLogText = "without pts";
-    if (flags & Flag::ptsIncluded)
+    if (flags & packet::Flag::ptsIncluded)
     {
         const microseconds pts = unloopAndShiftPtsIfNeeded(framePts(frame));
-        appendToBuffer(&buffer, PtsUs(pts.count()));
+        *nx::utils::makeAppended<packet::PtsUs>(&buffer) = pts.count();
         ptsLogText = lm("with pts %1").args(us(pts));
     }
 

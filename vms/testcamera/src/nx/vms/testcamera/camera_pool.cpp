@@ -44,7 +44,7 @@ CameraPool::~CameraPool()
 
 void CameraPool::reportAddingCameras(
     bool cameraForEachFile,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     int count,
     const QStringList& primaryFileNames,
     const QStringList& secondaryFileNames)
@@ -70,9 +70,9 @@ void CameraPool::reportAddingCameras(
         ? lm("%1 (one per each file)").args(primaryFileNames.size()).toQString()
         : QString::number(count);
 
-    const QString offlineFreqMessagePart = (testCameraOptions.offlineFreq == 0)
+    const QString offlineFreqMessagePart = (cameraOptions.offlineFreq == 0)
         ? ""
-        : lm(", offlineFreq=%1%%").args(testCameraOptions.offlineFreq);
+        : lm(", offlineFreq=%1%%").args(cameraOptions.offlineFreq);
 
     NX_LOGGER_INFO(m_logger, "Adding %1 camera(s)%2:%3",
         cameraCountMessagePart, offlineFreqMessagePart, filesMessagePart);
@@ -80,7 +80,7 @@ void CameraPool::reportAddingCameras(
 
 bool CameraPool::addCamera(
     const FileCache* fileCache,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     QStringList primaryFileNames,
     QStringList secondaryFileNames)
 {
@@ -88,7 +88,7 @@ bool CameraPool::addCamera(
         m_frameLogger.get(),
         fileCache,
         (int) m_cameraByMac.size() + 1,
-        testCameraOptions,
+        cameraOptions,
         primaryFileNames,
         m_noSecondaryStream ? QStringList() : secondaryFileNames);
 
@@ -98,10 +98,10 @@ bool CameraPool::addCamera(
     return success;
 }
 
-bool CameraPool::addCameras(
+bool CameraPool::addCamerasSet(
     const FileCache* fileCache,
     bool cameraForEachFile,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     int count,
     const QStringList& primaryFileNames,
     const QStringList& secondaryFileNames)
@@ -109,13 +109,13 @@ bool CameraPool::addCameras(
     QMutexLocker lock(&m_mutex);
 
     reportAddingCameras(
-        cameraForEachFile, testCameraOptions, count, primaryFileNames, secondaryFileNames);
+        cameraForEachFile, cameraOptions, count, primaryFileNames, secondaryFileNames);
 
     if (!cameraForEachFile)
     {
         for (int i = 0; i < count; ++i)
         {
-            if (!addCamera(fileCache, testCameraOptions, primaryFileNames, secondaryFileNames))
+            if (!addCamera(fileCache, cameraOptions, primaryFileNames, secondaryFileNames))
                 return false;
         }
     }
@@ -127,7 +127,7 @@ bool CameraPool::addCameras(
         for (int i = 0; i < primaryFileNames.size(); i++)
         {
             if (!addCamera(
-                fileCache, testCameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
+                fileCache, cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
             {
                 return false;
             }
