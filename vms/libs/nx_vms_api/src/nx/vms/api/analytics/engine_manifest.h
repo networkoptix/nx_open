@@ -6,6 +6,7 @@
 #include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/analytics/pixel_format.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -70,6 +71,8 @@ struct NX_VMS_API EngineManifest
 
     Capabilities capabilities;
 
+    StreamIndex preferredStreamIndex = StreamIndex::undefined;
+
     /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
     QList<EventType> eventTypes;
 
@@ -84,7 +87,14 @@ struct NX_VMS_API EngineManifest
     QJsonObject deviceAgentSettingsModel;
 };
 #define EngineManifest_Fields \
-    (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)
+    (capabilities) \
+    (preferredStreamIndex) \
+    (eventTypes) \
+    (objectTypes) \
+    (objectActions) \
+    (groups) \
+    (deviceAgentSettingsModel) \
+
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::ObjectAction::Capabilities)
