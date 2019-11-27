@@ -73,8 +73,9 @@ template<typename Value, typename... Args>
 Value* makeAppended(QByteArray* buffer, Args... args)
 {
     buffer->resize(buffer->size() + sizeof(Value));
+
     // "Placement new" initializes the memory at the end of the buffer with the Value constructor.
-    return new (&buffer[buffer->size() - sizeof(Value)]) Value(args...);
+    return new (buffer->data() + buffer->size() - sizeof(Value)) Value(args...);
 }
 
 } // namespace utils
