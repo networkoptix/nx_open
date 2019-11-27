@@ -192,6 +192,13 @@ void UncompressedVideoFrame::getPixelAspectRatio(PixelAspectRatio* outValue) con
         PixelAspectRatio{m_avFrame->sample_aspect_ratio.num, m_avFrame->sample_aspect_ratio.den};
 }
 
+nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>*
+    UncompressedVideoFrame::getMetadataList() const
+{
+    // TODO: #dmishin implement.
+    return nullptr;
+}
+
 UncompressedVideoFrame::PixelFormat UncompressedVideoFrame::pixelFormat() const
 {
     return !assertValid(__func__) ? ((PixelFormat) 0) : m_pixelFormat;

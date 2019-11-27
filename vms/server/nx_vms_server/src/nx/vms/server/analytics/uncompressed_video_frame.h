@@ -60,6 +60,8 @@ public:
 protected:
     virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const override;
 
+    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const override;
+
 private:
     void acceptAvFrame(const AVFrame* avFrame);
     bool assertValid(const char* func) const;
