@@ -66,15 +66,16 @@ void QnTestCameraResourceSearcher::sendBroadcast()
     }
 }
 
-QnResourceList QnTestCameraResourceSearcher::findResources(void)
+QnResourceList QnTestCameraResourceSearcher::findResources()
 {
-    if (updateSocketList()) {
+    if (updateSocketList())
+    {
         sendBroadcast();
         QnSleep::msleep(1000);
     }
 
-    QMap<QString, QnResourcePtr> resources;
-    QSet<QString> processedMac;
+    QnResourceList result;
+    QSet<QString> processedMacs;
 
     const QByteArray testCameraIdMessage =
         ini().discoveryResponseMessage + QByteArray("\n");
@@ -88,47 +89,47 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             responseData.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
             nx::network::SocketAddress remoteEndpoint;
-            int readed = sock->recvFrom(responseData.data(), responseData.size(), &remoteEndpoint);
-            if (readed < 1)
+            const int bytesRead = sock->recvFrom(
+                responseData.data(), responseData.size(), &remoteEndpoint);
+            if (bytesRead < 1)
                 continue;
-            QList<QByteArray> params = responseData.left(readed).split(';');
+            const QList<QByteArray> params = responseData.left(bytesRead).split(';');
             if (params[0] != testCameraIdMessage || params.size() < 3)
                 continue;
 
-            int videoPort = params[1].toInt();
-            for (int j = 2; j < params.size(); ++j)
+            const int videoPort = params[1].toInt();
+            for (int paramIndex = 2; paramIndex < params.size(); ++paramIndex)
             {
-                QString mac(params[j]);
-                if (processedMac.contains(mac))
+                const QString mac = params[paramIndex];
+                if (processedMacs.contains(mac))
                     continue;
 
-                QnTestCameraResourcePtr resource (new QnTestCameraResource(serverModule()));
-                QString model = QLatin1String(QnTestCameraResource::kModel);
-                QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), model);
-                if (rt.isNull())
+                // TODO: #mshevchenko CURRENT
+                const QnTestCameraResourcePtr resource(new QnTestCameraResource(serverModule()));
+                const QString model = QLatin1String(QnTestCameraResource::kModel);
+                const QnUuid resourceTypeId =
+                    qnResTypePool->getResourceTypeId(manufacturer(), model);
+                if (resourceTypeId.isNull())
                     continue;
 
                 const nx::utils::Url url = nx::network::url::Builder()
-                        .setScheme("tcp")
-                        .setHost(remoteEndpoint.address.toString())
-                        .setPort(videoPort)
-                        .setPath(mac);
+                    .setScheme("tcp")
+                    .setHost(remoteEndpoint.address.toString())
+                    .setPort(videoPort)
+                    .setPath(mac);
 
-                resource->setTypeId(rt);
+                resource->setTypeId(resourceTypeId);
                 resource->setName(model);
                 resource->setModel(model);
                 resource->setMAC(nx::utils::MacAddress(mac));
                 resource->setUrl(url.toString());
 
                 NX_VERBOSE(this, "Found test camera %1 (URL: %2)", resource, url);
-                processedMac << mac;
-                resources.insert(mac, resource);
+                processedMacs << mac;
+                result << resource;
             }
         }
     }
-    QnResourceList result;
-    for (const QnResourcePtr& res: resources.values())
-        result << res;
 
     sendBroadcast();
 
@@ -140,7 +141,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
 {
     QnNetworkResourcePtr result;
 
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    const QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
     {
@@ -150,7 +151,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
 
     if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
+        NX_VERBOSE(this, "Manufacturer %1 != %2", resourceType->getManufacturer(), manufacturer());
         return result;
     }
 
