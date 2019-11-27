@@ -4,6 +4,9 @@
 
 namespace nx::vms::testcamera {
 
+/**
+ * Options for a particular camera, filled from CLI arguments and passed via CameraPool to Camera.
+ */
 struct CameraOptions
 {
     bool includePts = false;

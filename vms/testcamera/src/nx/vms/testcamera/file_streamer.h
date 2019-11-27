@@ -44,7 +44,7 @@ public:
     FileStreamer(
         const Logger* logger,
         const FrameLogger* frameLogger,
-        const CameraOptions& testCameraOptions,
+        const CameraOptions& cameraOptions,
         nx::network::AbstractStreamSocket* socket,
         StreamIndex streamIndex,
         QString filename,
@@ -69,7 +69,7 @@ private:
 private:
     const Logger* const m_logger;
     const FrameLogger* m_frameLogger;
-    const CameraOptions m_testCameraOptions;
+    const CameraOptions m_cameraOptions;
     nx::network::AbstractStreamSocket* const m_socket;
     const StreamIndex m_streamIndex;
     const QString m_filename;

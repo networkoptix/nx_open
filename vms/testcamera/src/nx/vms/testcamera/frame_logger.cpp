@@ -24,7 +24,7 @@ FrameLogger::FrameLogger()
     // Open frame log file on first need.
     if (!m_logFramesFile)
     {
-        m_logFramesFile.reset(new QFile(logFramesFilename));
+        m_logFramesFile = std::make_unique<QFile>(logFramesFilename);
 
         if (!m_logFramesFile->open(QIODevice::WriteOnly))
         {

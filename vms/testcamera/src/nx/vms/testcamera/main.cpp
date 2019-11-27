@@ -54,24 +54,26 @@ public:
 
         nx::utils::log::mainLogger()->setDefaultLevel(options.logLevel);
 
-        m_staticCommonModule.reset(new QnStaticCommonModule(nx::vms::api::PeerType::notDefined));
+        m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
+            nx::vms::api::PeerType::notDefined);
 
-        m_ffmpegInitializer.reset(new QnFfmpegInitializer());
+        m_ffmpegInitializer = std::make_unique<QnFfmpegInitializer>();
 
-        m_commonModule.reset(new QnCommonModule(
-            /*clientMode*/ false, nx::core::access::Mode::direct));
+        m_commonModule = std::make_unique<QnCommonModule>(
+            /*clientMode*/ false, nx::core::access::Mode::direct);
 
         m_commonModule->storagePluginFactory()->registerStoragePlugin(
             "file", QnQtFileStorageResource::instance, /*isDefaultProtocol*/ true);
 
-        m_fileCache.reset(new FileCache(m_commonModule.get(), options.maxFileSizeMegabytes));
+        m_fileCache = std::make_unique<FileCache>(
+            m_commonModule.get(), options.maxFileSizeMegabytes);
 
-        m_cameraPool.reset(new CameraPool(
+        m_cameraPool = std::make_unique<CameraPool>(
             options.localInterfaces,
             m_commonModule.get(),
             options.noSecondary,
             options.fpsPrimary,
-            options.fpsSecondary));
+            options.fpsSecondary);
 
         if (!loadFilesAndAddCameras(options))
         {
@@ -113,7 +115,7 @@ private:
                 ? cameraSet.primaryFileNames
                 : cameraSet.secondaryFileNames;
 
-            if (!m_cameraPool->addCameras(
+            if (!m_cameraPool->addCameraSet(
                 m_fileCache.get(),
                 options.cameraForFile,
                 makeCameraOptions(options, cameraSet),

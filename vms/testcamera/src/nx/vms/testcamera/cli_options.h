@@ -1,7 +1,9 @@
 #pragma once
 
-#include <QtCore/QList>
+#include <vector>
+
 #include <QtCore/QStringList>
+
 #include <nx/utils/log/log_level.h>
 
 namespace nx::vms::testcamera {
@@ -28,7 +30,7 @@ struct CliOptions
     int64_t shiftPtsPrimaryPeriodUs = -1;
     int64_t shiftPtsSecondaryPeriodUs = -1;
     QStringList localInterfaces;
-    QList<CameraSet> cameraSets;
+    std::vector<CameraSet> cameraSets;
 };
 
 /**

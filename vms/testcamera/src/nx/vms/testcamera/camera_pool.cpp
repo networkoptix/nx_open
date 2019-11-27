@@ -44,7 +44,7 @@ CameraPool::~CameraPool()
 
 void CameraPool::reportAddingCameras(
     bool cameraForEachFile,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     int count,
     const QStringList& primaryFileNames,
     const QStringList& secondaryFileNames)
@@ -70,9 +70,9 @@ void CameraPool::reportAddingCameras(
         ? lm("%1 (one per each file)").args(primaryFileNames.size()).toQString()
         : QString::number(count);
 
-    const QString offlineFreqMessagePart = (testCameraOptions.offlineFreq == 0)
+    const QString offlineFreqMessagePart = (cameraOptions.offlineFreq == 0)
         ? ""
-        : lm(", offlineFreq=%1%%").args(testCameraOptions.offlineFreq);
+        : lm(", offlineFreq=%1%%").args(cameraOptions.offlineFreq);
 
     NX_LOGGER_INFO(m_logger, "Adding %1 camera(s)%2:%3",
         cameraCountMessagePart, offlineFreqMessagePart, filesMessagePart);
@@ -80,7 +80,7 @@ void CameraPool::reportAddingCameras(
 
 bool CameraPool::addCamera(
     const FileCache* fileCache,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     QStringList primaryFileNames,
     QStringList secondaryFileNames)
 {
@@ -88,20 +88,24 @@ bool CameraPool::addCamera(
         m_frameLogger.get(),
         fileCache,
         (int) m_cameraByMac.size() + 1,
-        testCameraOptions,
+        cameraOptions,
         primaryFileNames,
         m_noSecondaryStream ? QStringList() : secondaryFileNames);
 
-    const auto [_, success] = m_cameraByMac.insert({camera->mac(), std::move(camera)});
+    const QString mac = camera->mac();
+    const auto [_, success] = m_cameraByMac.insert({mac, std::move(camera)});
+    if (!NX_ASSERT(success, "Unable to add camera: duplicate MAC %1.", mac))
+        return false;
 
-    NX_ASSERT(success, "Unable to add camera with duplicate MAC %1.", camera->mac());
-    return success;
+    m_discoveryResponseDataByMac.insert({mac, mac}); //< Currently, the response data has only mac.
+
+    return true;
 }
 
-bool CameraPool::addCameras(
+bool CameraPool::addCameraSet(
     const FileCache* fileCache,
     bool cameraForEachFile,
-    const CameraOptions& testCameraOptions,
+    const CameraOptions& cameraOptions,
     int count,
     const QStringList& primaryFileNames,
     const QStringList& secondaryFileNames)
@@ -109,13 +113,13 @@ bool CameraPool::addCameras(
     QMutexLocker lock(&m_mutex);
 
     reportAddingCameras(
-        cameraForEachFile, testCameraOptions, count, primaryFileNames, secondaryFileNames);
+        cameraForEachFile, cameraOptions, count, primaryFileNames, secondaryFileNames);
 
     if (!cameraForEachFile)
     {
         for (int i = 0; i < count; ++i)
         {
-            if (!addCamera(fileCache, testCameraOptions, primaryFileNames, secondaryFileNames))
+            if (!addCamera(fileCache, cameraOptions, primaryFileNames, secondaryFileNames))
                 return false;
         }
     }
@@ -127,17 +131,20 @@ bool CameraPool::addCameras(
         for (int i = 0; i < primaryFileNames.size(); i++)
         {
             if (!addCamera(
-                fileCache, testCameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
+                fileCache, cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
             {
                 return false;
             }
         }
     }
+
     return true;
 }
 
-bool CameraPool::startDiscovery()
+QByteArray CameraPool::obtainDiscoveryResponseData() const
 {
+    QMutexLocker lock(&m_mutex);
+
     QByteArray discoveryResponseData = QByteArray::number(ini().mediaPort);
 
     for (const auto& [mac, camera]: m_cameraByMac)
@@ -145,12 +152,23 @@ bool CameraPool::startDiscovery()
         if (camera->isEnabled())
         {
             discoveryResponseData.append(';');
-            discoveryResponseData.append(mac);
+
+            const auto it = m_discoveryResponseDataByMac.find(mac);
+            if (!NX_ASSERT(it != m_discoveryResponseDataByMac.end()))
+                continue;
+            discoveryResponseData.append(it->second);
         }
     }
 
-    m_discoveryListener.reset(new CameraDiscoveryListener(
-        m_logger.get(), discoveryResponseData, m_localInterfacesToListen));
+    return discoveryResponseData;
+}
+
+bool CameraPool::startDiscovery()
+{
+    m_discoveryListener = std::make_unique<CameraDiscoveryListener>(
+        m_logger.get(),
+        [this]() { return obtainDiscoveryResponseData(); },
+        m_localInterfacesToListen);
 
     if (!m_discoveryListener->initialize())
         return false;

@@ -30,14 +30,14 @@ public:
         const FrameLogger* frameLogger,
         const FileCache* fileCache,
         int number,
-        const CameraOptions& testCameraOptions,
+        const CameraOptions& cameraOptions,
         const QStringList& primaryFileNames,
         const QStringList& secondaryFileNames);
 
     ~Camera();
 
-    QByteArray mac() const { return m_mac; }
     int number() const { return m_number; }
+    const QByteArray& mac() const { return m_mac; }
 
     /**
      * Streams the files for the specified stream in an infinite loop. Exits only on error.
@@ -49,7 +49,7 @@ public:
 
 private:
     bool performStreamingFile(
-        const QList<std::shared_ptr<const QnCompressedVideoData>>& frames,
+        const std::vector<std::shared_ptr<const QnCompressedVideoData>>& frames,
         int fps,
         FileStreamer* fileStreamer,
         Logger* logger);
@@ -61,7 +61,7 @@ private:
     const FileCache* const m_fileCache;
     const int m_number;
     const QByteArray m_mac;
-    const CameraOptions m_options;
+    const CameraOptions m_cameraOptions;
     const QStringList m_primaryFileNames;
     const QStringList m_secondaryFileNames;
 

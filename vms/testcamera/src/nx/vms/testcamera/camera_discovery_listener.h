@@ -1,8 +1,10 @@
 #pragma once
 
+#include <functional>
+#include <vector>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
-#include <QtCore/QVector>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
@@ -26,7 +28,7 @@ class CameraDiscoveryListener: public QnLongRunnable
 public:
     CameraDiscoveryListener(
         const Logger* logger,
-        QByteArray discoveryResponseData,
+        std::function<QByteArray()> obtainDiscoveryResponseDataFunc,
         QStringList localInterfacesToListen);
 
     virtual ~CameraDiscoveryListener();
@@ -57,9 +59,9 @@ protected:
 
 private:
     const Logger* const m_logger;
-    const QByteArray m_discoveryResponseData;
+    const std::function<QByteArray()> m_obtainDiscoveryResponseDataFunc;
     const QStringList m_localInterfacesToListen;
-    QVector<IpRangeV4> m_allowedIpRanges;
+    std::vector<IpRangeV4> m_allowedIpRanges;
 };
 
 } // namespace nx::vms::testcamera

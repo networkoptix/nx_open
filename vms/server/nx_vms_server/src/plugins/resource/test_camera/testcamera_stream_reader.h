@@ -9,7 +9,7 @@
 
 #include "testcamera_resource.h"
 
-namespace nx::vms::testcamera::packet { class Header; } //< private
+namespace nx::vms::testcamera::packet { struct Header; } //< private
 
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
