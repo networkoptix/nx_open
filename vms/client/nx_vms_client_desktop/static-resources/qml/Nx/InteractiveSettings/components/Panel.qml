@@ -38,26 +38,25 @@ Panel
         }
     }
 
-    Button
+    MouseArea
     {
         id: expandCollapseButton
 
         visible: control.collapsible
         parent: control.label
         anchors.right: parent.right
-        height: parent.height
         width: 20
-
-        backgroundColor: "transparent"
-        hoveredColor: "transparent"
-        pressedColor: "transparent"
-        text: ""
+        height: parent.height
+        acceptedButtons: Qt.LeftButton
+        hoverEnabled: true
 
         ArrowIcon
         {
             anchors.centerIn: parent
             rotation: control.collapsed ? 0 : 180
-            color: expandCollapseButton.hovered ? ColorTheme.colors.light1 : ColorTheme.colors.light4
+            color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
+                ? ColorTheme.colors.light1 
+                : ColorTheme.colors.light4
         }
         
         onClicked: 
