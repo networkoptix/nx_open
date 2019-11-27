@@ -2,9 +2,10 @@
 
 #include <api/model/api_model_fwd.h>
 #include <rest/server/json_rest_handler.h>
-#include "nx/vms/server/server_module_aware.h"
+#include <platform/platform_abstraction.h>
+#include <core/resource/storage_resource.h>
+#include <nx/vms/server/server_module_aware.h>
 
-class QnPlatformMonitor;
 class QnCommonModule;
 class QnMediaServerModule;
 
@@ -29,5 +30,9 @@ private:
     *   Get list of storages that do not exist in the resource pool, but
     *   can be created on the local (or mounted) partitions.
     */
-    QnStorageSpaceDataList getOptionalStorages(QnCommonModule* commonModule) const;
+    QnStorageSpaceDataList getOptionalStorages() const;
+    QList<QnPlatformMonitor::PartitionSpace> getSuitablePartitions() const;
+    QnStorageResourceList storageListFrom(
+        const QList<QnPlatformMonitor::PartitionSpace>& partitions) const;
+    bool wouldBeWritableInPool(const QnStorageResourcePtr& storage) const;
 };

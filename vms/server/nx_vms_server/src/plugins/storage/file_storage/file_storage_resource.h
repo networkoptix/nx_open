@@ -59,8 +59,11 @@ public:
 
     // true if storage is located on local disks
     bool isLocal();
+
     // calculate space limit judging by partition type
-    qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype) const;
+    static qint64 calcSpaceLimit(
+        QnMediaServerModule* serverModule,
+        QnPlatformMonitor::PartitionType ptype);
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);

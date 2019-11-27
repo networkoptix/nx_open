@@ -4,11 +4,9 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/storage_resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <platform/platform_abstraction.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
@@ -38,7 +36,7 @@ int QnStorageSpaceRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
     /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
@@ -73,7 +71,7 @@ int QnStorageSpaceRestHandler::executeGet(
 
     if (!fastRequest)
     {
-        for (const QnStorageSpaceData& optionalStorage: getOptionalStorages(owner->commonModule()))
+        for (const QnStorageSpaceData& optionalStorage: getOptionalStorages())
             reply.storages.push_back(optionalStorage);
     }
 
@@ -90,16 +88,17 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 {
     QList<QString> result;
     auto pluginManager = serverModule()->pluginManager();
-    NX_ASSERT(pluginManager, "There should be common module.");
-    if (!pluginManager)
+    if (!NX_ASSERT(pluginManager))
         return result;
+
     for (nx_spl::StorageFactory* const storagePlugin:
         pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         result.push_back(storagePlugin->storageType());
         storagePlugin->releaseRef();
     }
-    result.push_back(lit("smb"));
+
+    result.push_back("smb");
     return result;
 }
 
@@ -115,112 +114,117 @@ QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
     return storagePaths;
 }
 
-QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonModule* commonModule) const
+static bool storageExists(
+    const QnPlatformMonitor::PartitionSpace partition,
+    const QList<QString>& existingStoragePaths)
 {
-    QnStorageSpaceDataList result;
-
-    auto partitionEnoughSpace = [this](QnPlatformMonitor::PartitionType ptype, qint64 size)
-    {
-        if (size == QnStorageResource::kUnknownSize)
-            return true;
-        return size >= QnFileStorageResource(serverModule()).calcSpaceLimit(ptype);
-    };
-
-    /* Enumerate auto-generated storages on all possible partitions. */
-    QnPlatformMonitor* monitor = serverModule()->platform()->monitor();
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        monitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition
-            | QnPlatformMonitor::NetworkPartition
-            | QnPlatformMonitor::RemovableDiskPartition);
-
-    for(int i = 0; i < partitions.size(); i++)
-        partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
-
-    const QList<QString> storagePaths = getStoragePaths();
-    for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
-    {
-        if (partition.path.indexOf(QnFileStorageResource::tempFolderName()) != -1)
+    return std::any_of(
+        existingStoragePaths.cbegin(), existingStoragePaths.cend(),
+        [&partition](const QString &storagePath)
         {
-            NX_VERBOSE(this, "Ignore temporary optional partition %1", partition);
-            continue;
-        }
+            return closeDirPath(storagePath).startsWith(partition.path);
+        });
+}
 
-        if (!partitionEnoughSpace(partition.type, partition.sizeBytes))
+static bool containsRestrictedPaths(const QnPlatformMonitor::PartitionSpace& partition)
+{
+    return partition.path.indexOf(QnFileStorageResource::tempFolderName()) != -1;
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnStorageSpaceRestHandler::getSuitablePartitions() const
+{
+    const auto allPartitions = ((QnPlatformMonitor*) serverModule()->platform()->monitor())->totalPartitionSpaceInfo(
+        QnPlatformMonitor::LocalDiskPartition
+        | QnPlatformMonitor::NetworkPartition
+        | QnPlatformMonitor::RemovableDiskPartition);
+
+    const auto storagePaths = getStoragePaths();
+    QList<QnPlatformMonitor::PartitionSpace> result;
+    std::copy_if(
+        allPartitions.cbegin(), allPartitions.cend(), std::back_inserter(result),
+        [&storagePaths, this](const auto& p)
         {
-            NX_VERBOSE(this, "Ignore small optional partition %1", partition);
-            continue;
-        }
-
-        bool hasStorage = std::any_of(
-            storagePaths.cbegin(), storagePaths.cend(),
-            [&partition](const QString &storagePath)
-            {
-                return closeDirPath(storagePath).startsWith(partition.path);
-            });
-
-        if (hasStorage)
-        {
-            NX_VERBOSE(this, "Ignore known optional partition %1", partition);
-            continue;
-        }
-
-        QnStorageSpaceData data;
-        data.url = partition.path + QnAppInfo::mediaFolderName();
-        data.totalSpace = partition.sizeBytes;
-        data.freeSpace = partition.freeBytes;
-        data.reservedSpace = QnFileStorageResource(serverModule()).calcSpaceLimit(partition.type);
-        data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
-        data.storageType = QnLexical::serialized(partition.type);
-
-        QnStorageResourcePtr storage = QnStorageResourcePtr(
-            commonModule->storagePluginFactory()->createStorage(commonModule, data.url, false));
-
-        if (storage)
-        {
-            storage->setUrl(data.url);
-            if (storage->getStorageType().isEmpty())
-                storage->setStorageType(data.storageType);
-
-            data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
-            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
-            if (data.isOnline)
-            {
-                if (storage->getId().isNull())
-                    storage->setIdUnsafe(QnUuid::createUuid());
-                storage->setStatus(Qn::Online);
-                if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
-                    storage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
-            }
-
-            QnStorageResourceList additionalStorages;
-            additionalStorages.append(storage);
-            auto writableStoragesIfCurrentWasAdded = serverModule()->normalStorageManager()->getAllWritableStorages(
-                &additionalStorages);
-
-            bool wouldBeWritableIfAmongstServerStorages =
-                writableStoragesIfCurrentWasAdded.contains(storage);
-            data.isWritable = data.isOnline
-                && storage->isWritable()
-                && wouldBeWritableIfAmongstServerStorages;
-
-            NX_VERBOSE(
-                this,
-                lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
-                    .args(storage->getUrl(), data.isOnline, data.isWritable,
-                        wouldBeWritableIfAmongstServerStorages));
-
-            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && data.isOnline)
-                data.reservedSpace = fileStorage->calcInitialSpaceLimit();
-        }
-        else
-        {
-            NX_VERBOSE(this, "Unable to create storage for partition %1", partition);
-        }
-
-        result.push_back(data);
-    }
+            return p.sizeBytes > QnFileStorageResource::calcSpaceLimit(serverModule(), p.type)
+                && !storageExists(p, storagePaths)
+                && !containsRestrictedPaths(p);
+        });
 
     return result;
+}
+
+static QString storageUrl(const QString& partitionPath)
+{
+    return closeDirPath(partitionPath) + QnAppInfo::mediaFolderName();
+}
+
+QnStorageResourceList QnStorageSpaceRestHandler::storageListFrom(
+    const QList<QnPlatformMonitor::PartitionSpace>& partitions) const
+{
+    QnStorageResourceList result;
+    std::transform(
+        partitions.cbegin(), partitions.cend(), std::back_inserter(result),
+        [this](const auto& p)
+        {
+
+            const auto url = storageUrl(p.path);
+            NX_VERBOSE(this, "Creating a file storage for an optional path %1", url);
+            const auto commonModule = serverModule()->commonModule();
+            auto storage = QnStorageResourcePtr(
+                commonModule->storagePluginFactory()->createStorage(commonModule, url, false))
+                .dynamicCast<QnFileStorageResource>();
+
+            if (!storage)
+            {
+                NX_VERBOSE(this, "Failed to create storage with the optional path %1", url);
+                return QnStorageResourcePtr();
+            }
+
+            if (storage->initOrUpdate() != Qn::StorageInit_Ok)
+            {
+                NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
+                return QnStorageResourcePtr();
+            }
+
+            storage->setStatus(Qn::Online);
+            storage->setSpaceLimit(storage->calcInitialSpaceLimit());
+            storage->setUrl(url);
+            if (!wouldBeWritableInPool(storage))
+            {
+                NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
+                return QnStorageResourcePtr();
+            }
+
+            NX_VERBOSE(this, "Optional storage %1 is operational", url);
+            return storage.dynamicCast<QnStorageResource>();
+        });
+
+
+    result.erase(
+        std::remove_if(result.begin(), result.end(), [](const auto& s) { return !s; }),
+        result.end());
+
+    return result;
+}
+
+static QList<QnStorageSpaceData> spaceDataListFrom(const QnStorageResourceList& storages)
+{
+    QList<QnStorageSpaceData> result;
+    std::transform(
+        storages.cbegin(), storages.cend(), std::back_inserter(result),
+        [](const auto& storage) { return QnStorageSpaceData(storage, /*fastCreate*/ false); });
+    return result;
+}
+
+bool QnStorageSpaceRestHandler::wouldBeWritableInPool(const QnStorageResourcePtr& storage) const
+{
+    QnStorageResourceList additionalStorages{storage};
+    return serverModule()->normalStorageManager()->getAllWritableStorages(
+        &additionalStorages).contains(storage);
+}
+
+QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
+{
+    const auto partitions = getSuitablePartitions();
+    const auto storages = storageListFrom(partitions);
+    return spaceDataListFrom(storages);
 }
