@@ -35,8 +35,7 @@ StreamTransformingAsyncChannel::~StreamTransformingAsyncChannel()
 
 void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    if (getAioThread() == aioThread)
-        return;
+    const auto aioThreadBak = getAioThread();
 
     base_type::bindToAioThread(aioThread);
 
@@ -44,7 +43,8 @@ void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aio
     m_sendScheduler.bindToAioThread(aioThread);
     m_rawDataChannel->bindToAioThread(aioThread);
 
-    NX_ASSERT(m_userTaskQueue.empty(), toString(m_userTaskQueue));
+    NX_ASSERT(aioThreadBak == aioThread || m_userTaskQueue.empty(),
+        toString(m_userTaskQueue));
 }
 
 void StreamTransformingAsyncChannel::readSomeAsync(
