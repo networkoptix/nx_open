@@ -40,7 +40,10 @@ private:
         return true;
     }
 
-    QnAbstractMediaDataPtr receiveFrame(
+    QnAbstractMediaDataPtr receivePacket(
+        const nx::vms::testcamera::packet::Header& header);
+
+    QnAbstractMediaDataPtr receiveFramePacketBody(
         const nx::vms::testcamera::packet::Header& header);
 
 private:
