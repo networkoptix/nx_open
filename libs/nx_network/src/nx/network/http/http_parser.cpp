@@ -67,6 +67,16 @@ void MessageParser::reset()
     m_messageTaken = false;
 }
 
+const HttpStreamReader& MessageParser::streamReader() const
+{
+    return m_httpStreamReader;
+}
+
+HttpStreamReader& MessageParser::streamReader()
+{
+    return m_httpStreamReader;
+}
+
 void MessageParser::provideMessageIfNeeded()
 {
     if (m_messageTaken)
