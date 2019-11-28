@@ -129,14 +129,20 @@ QString Camera::defaultCodec() const
 
 void Camera::setUrl(const QString &urlStr)
 {
-    QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
+    QnVirtualCameraResource::setUrl(urlStr); //< This call emits, so we should not invoke it under lock.
 
-    QnMutexLocker lock( &m_mutex );
-    QUrl url( urlStr );
-    m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
-    setHttpPort( url.port( httpPort() ) );
+    QnMutexLocker lock(&m_mutex);
+
+    const QUrl url(urlStr);
+    const QUrlQuery query(url.query());
+
+    const int port = query.queryItemValue(QLatin1String("http_port")).toInt();
+    m_channelNumber = query.queryItemValue(QLatin1String("channel")).toInt();
+
+    setHttpPort(port > 0 ? port : url.port(httpPort()));
+
     if (m_channelNumber > 0)
-        m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
+        m_channelNumber--; //< convert human readable channel in range [1..x] to range [0..x-1]
 }
 
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)

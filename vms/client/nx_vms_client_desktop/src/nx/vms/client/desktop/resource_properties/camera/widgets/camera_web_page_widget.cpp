@@ -187,7 +187,9 @@ void CameraWebPageWidget::Private::createNewPage()
         {
             QnMutexLocker lock(&mutex);
 
-            if (lastRequestUrl == requestUrl)
+            // Camera may redirect to another path and ask for credentials,
+            // so just check that host matches.
+            if (lastRequestUrl.host() == requestUrl.host())
             {
                 authCounter.registerAttempt();
                 if (!authCounter.exceeded(kHttpAuthSmallInterval))
