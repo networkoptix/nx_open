@@ -4444,6 +4444,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
+    const bool useTwoSockets = serverModule()->settings().useTwoSockets();
     NX_INFO(this, lm("Max TCP connections from server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
@@ -4455,7 +4456,8 @@ void MediaServerProcess::createTcpListener()
         QHostAddress::Any,
         serverModule()->settings().port(),
         maxConnections,
-        acceptSslConnections);
+        acceptSslConnections,
+        useTwoSockets);
 }
 
 void MediaServerProcess::loadResourcesFromDatabase()
