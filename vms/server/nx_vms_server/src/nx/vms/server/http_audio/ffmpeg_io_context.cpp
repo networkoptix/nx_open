@@ -6,6 +6,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
+#include <libavformat/avio.h>
 
 } // extern "C"
 
