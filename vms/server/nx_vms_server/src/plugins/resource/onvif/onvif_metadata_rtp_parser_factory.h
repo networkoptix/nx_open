@@ -9,5 +9,5 @@ public:
     virtual std::unique_ptr<nx::streaming::rtp::StreamParser>
         createParser(const QString& codecName) override;
 
-    virtual std::set<QString> supportedCodecs() const override;
+    virtual bool supportsCodec(const QString& codecName) const override;
 };

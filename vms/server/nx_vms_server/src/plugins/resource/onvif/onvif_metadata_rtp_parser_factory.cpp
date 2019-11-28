@@ -8,13 +8,14 @@ std::unique_ptr<StreamParser> OnvifMetadataRtpParserFactory::createParser(
     const QString& codecName)
 {
     const auto& supportedCodecs = OnvifMetadataRtpParser::kSupportedCodecs;
-    if (supportedCodecs.find(codecName) != supportedCodecs.cend())
+    if (supportedCodecs.find(codecName.toLower()) != supportedCodecs.cend())
         return std::make_unique<OnvifMetadataRtpParser>();
 
     return nullptr;
 }
 
-std::set<QString> OnvifMetadataRtpParserFactory::supportedCodecs() const
+bool OnvifMetadataRtpParserFactory::supportsCodec(const QString& codecName) const
 {
-    return OnvifMetadataRtpParser::kSupportedCodecs;
+    return OnvifMetadataRtpParser::kSupportedCodecs.find(codecName.toLower())
+        != OnvifMetadataRtpParser::kSupportedCodecs.cend();
 }
