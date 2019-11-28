@@ -607,19 +607,24 @@
                         "name": "Total",
                         "description": "Total space",
                         "display": "table|panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     },
                     "mediaSpaceP": {
                         "name": "VMS Media(%)",
                         "description": "Space Used by VMS media (%)",
                         "display": "table|panel",
-                        "format": "%"
+                        "format": "%",
+                        "calculate": "divide %mediaSpaceB %totalSpaceB",
+                        "insert": "mediaSpaceB",
+                        "isOptional": true
                     },
                     "mediaSpaceB": {
                         "name": "VMS Media",
                         "description": "Space Used by VMS media",
                         "display": "panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     }
                 }
             }

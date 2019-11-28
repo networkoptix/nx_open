@@ -139,6 +139,15 @@ public:
         if (function() == "-" || function() == "sub")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
+        if (function() == "+" || function() == "multiply")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 * v2; });
+
+        if (function() == "+" || function() == "divide")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v2 ? Value(v1 / v2) : Value(); });
+
+        if (function() == "-" || function() == "sub")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
+
         if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
