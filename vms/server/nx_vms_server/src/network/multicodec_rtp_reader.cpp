@@ -24,6 +24,8 @@
 #include <nx/streaming/rtp/parsers/simpleaudio_rtp_parser.h>
 #include <nx/streaming/rtp/parsers/mjpeg_rtp_parser.h>
 
+#include <nx/streaming/rtp/parsers/i_rtp_parser_factory.h>
+
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -630,6 +632,12 @@ nx::vms::api::RtpTransportType QnMulticodecRtpReader::getRtpTransport() const
 void QnMulticodecRtpReader::setRtpTransport(nx::vms::api::RtpTransportType value)
 {
     m_rtpTransport = value;
+}
+
+void QnMulticodecRtpReader::setCustomTrackParserFactory(
+    std::unique_ptr<nx::streaming::rtp::IRtpParserFactory> parserFactory)
+{
+    m_customTrackParserFactory = std::move(parserFactory);
 }
 
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
