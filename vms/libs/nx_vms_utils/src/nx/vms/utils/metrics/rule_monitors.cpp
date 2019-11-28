@@ -430,7 +430,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     {
         NX_ASSERT(m_optional, "Value %1 is not optional: %2", this, e.what());
     }
-    catch (const MetricsError& e)
+    catch (const BaseError& e)
     {
         NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
     }

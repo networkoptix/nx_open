@@ -46,11 +46,6 @@ api::metrics::Value ValueMonitor::formattedValue() const noexcept
     return m_formatter ? m_formatter(value()) : value();
 }
 
-QString ValueMonitor::toString() const
-{
-    return lm("%1(%2)").args(m_name, m_scope);
-}
-
 QString ValueMonitor::idForToStringFromPtr() const
 {
     return name();
@@ -69,7 +64,7 @@ api::metrics::Value ValueMonitor::handleValueErrors(
     {
         NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
     }
-    catch (const MetricsError& e)
+    catch (const BaseError& e)
     {
         NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
     }

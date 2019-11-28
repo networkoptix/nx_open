@@ -100,7 +100,7 @@ TEST_F(MetricsGenerators, AlarmErrors)
     EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
     EXPECT_EQ(alarm->text, kAlarmText);
 
-    errorToThrow = std::make_exception_ptr(MetricsError(kErrorMessage));
+    errorToThrow = std::make_exception_ptr(BaseError(kErrorMessage));
     EXPECT_DEATH(monitor.alarm(), kErrorMessage);
 
     errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
