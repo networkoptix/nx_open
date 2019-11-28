@@ -231,29 +231,32 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     const auto addSocket =
         [&](nx::network::SocketAddress localAddress, int ipVersion)
         {
-            if (assignedPort)
-                localAddress.port = assignedPort;
-
             auto socket = nx::network::SocketFactory::createStreamServerSocket(
                 false,
                 nx::network::NatTraversalSupport::enabled,
                 ipVersion);
 
-            if (!socket->setReuseAddrFlag(true))
+            if (localAddress.port)
             {
-                NX_DEBUG(
-                    typeid(QnUniversalTcpListener),
-                    "setReuseAddrFlag(true) unexpectedly failed. %1",
-                    SystemError::getLastOSErrorText());
+                if (!socket->setReuseAddrFlag(true))
+                {
+                    NX_DEBUG(
+                        typeid(QnUniversalTcpListener),
+                        "setReuseAddrFlag(true) unexpectedly failed. %1",
+                        SystemError::getLastOSErrorText());
+                }
+
+                if (!socket->setReusePortFlag(true))
+                {
+                    NX_DEBUG(
+                        typeid(QnUniversalTcpListener),
+                        "setReusePortFlag(true) failed, probably because of unsupported. %1",
+                        SystemError::getLastOSErrorText());
+                }
             }
 
-            if (!socket->setReusePortFlag(true))
-            {
-                NX_DEBUG(
-                    typeid(QnUniversalTcpListener),
-                    "setReusePortFlag(true) failed, probably because of unsupported. %1",
-                    SystemError::getLastOSErrorText());
-            }
+            if (assignedPort)
+                localAddress.port = assignedPort;
 
             if (!socket->bind(localAddress) ||
                 !socket->listen())
@@ -274,8 +277,8 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     if (isAnyHost || (bool) localAddress.address.ipV4())
         addSocket(localAddress, AF_INET);
 
-    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
-        addSocket(localAddress, AF_INET6);
+    //if (isAnyHost || (bool) localAddress.address.isPureIpV6())
+     //   addSocket(localAddress, AF_INET6);
 
     return sockets;
 }
