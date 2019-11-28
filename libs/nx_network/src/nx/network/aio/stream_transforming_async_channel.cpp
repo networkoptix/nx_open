@@ -1,5 +1,7 @@
 #include "stream_transforming_async_channel.h"
 
+#include <sstream>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 
@@ -33,11 +35,16 @@ StreamTransformingAsyncChannel::~StreamTransformingAsyncChannel()
 
 void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    const auto aioThreadBak = getAioThread();
+
     base_type::bindToAioThread(aioThread);
 
     m_readScheduler.bindToAioThread(aioThread);
     m_sendScheduler.bindToAioThread(aioThread);
     m_rawDataChannel->bindToAioThread(aioThread);
+
+    NX_CRITICAL(aioThreadBak == aioThread || m_userTaskQueue.empty(),
+        toString(m_userTaskQueue));
 }
 
 void StreamTransformingAsyncChannel::readSomeAsync(
@@ -97,6 +104,8 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
 
 void StreamTransformingAsyncChannel::processTask(UserTask* task)
 {
+    NX_CRITICAL(task->status != UserTaskStatus::done, toString(*task));
+
     switch (task->type)
     {
         case UserTaskType::read:
@@ -494,6 +503,26 @@ void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventTyp
     // Should be removed when AbstractStreamSocket inherits BasicPollable.
     if (eventType == aio::EventType::etNone)
         m_rawDataChannel->cancelIOSync(aio::EventType::etNone);
+}
+
+std::string StreamTransformingAsyncChannel::toString(
+    const std::deque<std::shared_ptr<UserTask>>& taskQueue)
+{
+    std::ostringstream os;
+    for (const auto& task: taskQueue)
+        os << toString(*task) << "; ";
+
+    return os.str();
+}
+
+std::string StreamTransformingAsyncChannel::toString(const UserTask& task)
+{
+    std::ostringstream os;
+    os << "t " << (int)task.type << ", s " << (int)task.status;
+    if (task.type == UserTaskType::write)
+        os << " (" << static_cast<const WriteTask&>(task).buffer.toBase64().toStdString() << ")";
+
+    return os.str();
 }
 
 } // namespace aio

@@ -58,22 +58,22 @@ TEST_F(MetricsGenerators, ValueErrors)
 {
     const auto plusAB = parseFormulaOrThrow("add %a %b", monitors).generator;
     const auto andAB = parseFormulaOrThrow("and %a %b", monitors).generator;
-    const auto resolutionGreaterThanAB =
-        parseFormulaOrThrow("resolutionGreaterThan %a %b", monitors).generator;
+    const auto resolutionGreaterOrEqualThanAB =
+        parseFormulaOrThrow("resolutionGreaterOrEqualThan %a %b", monitors).generator;
 
     resource.update("a", "zorz");
     resource.update("b", 7);
 
     EXPECT_THROW(plusAB(), FormulaCalculationError);
     EXPECT_THROW(andAB(), FormulaCalculationError);
-    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
+    EXPECT_THROW(resolutionGreaterOrEqualThanAB(), FormulaCalculationError);
 
     resource.update("a", "7x7");
     resource.update("b", "7x7");
-    EXPECT_NO_THROW(resolutionGreaterThanAB());
+    EXPECT_NO_THROW(resolutionGreaterOrEqualThanAB());
 
     resource.update("b", "7x7.1");
-    EXPECT_THROW(resolutionGreaterThanAB(), FormulaCalculationError);
+    EXPECT_THROW(resolutionGreaterOrEqualThanAB(), FormulaCalculationError);
 }
 
 TEST_F(MetricsGenerators, AlarmErrors)
@@ -100,7 +100,7 @@ TEST_F(MetricsGenerators, AlarmErrors)
     EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
     EXPECT_EQ(alarm->text, kAlarmText);
 
-    errorToThrow = std::make_exception_ptr(MetricsError(kErrorMessage));
+    errorToThrow = std::make_exception_ptr(BaseError(kErrorMessage));
     EXPECT_DEATH(monitor.alarm(), kErrorMessage);
 
     errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));

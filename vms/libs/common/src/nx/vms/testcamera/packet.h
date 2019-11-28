@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QFlags>
+#include <QtCore/QtEndian>
 
 #include <nx/utils/log/assert.h>
 
@@ -24,35 +25,11 @@ extern "C" {
  *         - Media context data: serialized ffmpeg's MediaContext.
  *     - Frame packet (includes a single video frame, has codecContext flag not set):
  *         - If ptsIncluded flag set: frame's pts, as 64-bit Big Endian.
- *         - If channelNumberIncluded flag set: frame's channel number, as 32-bit Big Endian.
+ *         - If channelNumberIncluded flag set: frame's channel number, as 0-based byte.
  *         - Frame data: raw compressed frame bytes.
  */
 namespace nx::vms::testcamera::packet {
 #pragma pack(push, 1)
-
-/** Wrapper for integer values which internally stores the number as Big Endian. */
-template<typename Value>
-class BigEndian
-{
-    uint8_t m_bytes[sizeof(Value)]{};
-
-public:
-    BigEndian() = default;
-
-    BigEndian(Value value)
-    {
-        for (size_t i = 0; i < sizeof(Value); ++i)
-            m_bytes[i] = reinterpret_cast<const uint8_t*>(&value)[sizeof(Value) - 1 - i];
-    }
-
-    operator Value() const
-    {
-        Value value;
-        for (size_t i = 0; i < sizeof(Value); ++i)
-            reinterpret_cast<uint8_t*>(&value)[i] = m_bytes[sizeof(Value) - 1 - i];
-        return value;
-    }
-};
 
 enum class Flag: uint8_t
 {
@@ -60,20 +37,22 @@ enum class Flag: uint8_t
     keyFrame = 1 << 7,
     mediaContext = 1 << 6, /**< Defines packet type: media context or frame. */
     ptsIncluded = 1 << 5, /**< Whether packet body includes 64-bit PTS. */
+    channelNumberIncluded = 1 << 4, /**< Whether packet body includes 8-bit channel number. */
 };
 Q_DECLARE_FLAGS(Flags, Flag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Flags)
 
 /** Has the required binary layout, but offers getters/setters with convenient types and checks. */
-class Header
+struct Header
 {
+private:
     uint8_t m_flags{}; /** Flags (QFlags) presented as a single byte. */
     uint8_t m_codecId{}; /**< Ffmpeg's AVCodecID presented as a single byte. */
-    BigEndian<uint32_t> m_dataSize{}; /**< Size of the packet data in bytes. */
+    QBEInteger<quint32> m_dataSize{}; /**< Size of the packet data in bytes. */
 
 public:
     Flags flags() const { return Flags(m_flags); }
-    void setFlags(Flags v) { NX_ASSERT(v >= 0 && v < 256); m_flags = v; }
+    void setFlags(Flags v) { NX_ASSERT((int) v >= 0 && (int) v < 256); m_flags = v; }
     QString flagsAsHex() const { return QString("0x%1").arg(m_flags, /*width*/ 2, /*base*/ 16); }
 
     AVCodecID codecId() const { return (AVCodecID) m_codecId; }
@@ -84,13 +63,18 @@ public:
 };
 static_assert(sizeof(Header) == 6);
 
-/** In the binary protocol, follows the Header; optional. */
-using PtsUs = BigEndian<int64_t>;
+/** In the binary protocol, follows the Header of frame packet; optional. */
+using PtsUs = QBEInteger<qint64>;
 static_assert(sizeof(PtsUs) == 8);
 
-/** In the binary protocol, follows the Header and the PtsUs (if the latter exists); optional. */
-using ChannelNumber = BigEndian<uint32_t>;
-static_assert(sizeof(ChannelNumber) == 4);
+/** Constructs a new Value using a constructor, being appended to the given buffer. */
+template<typename Value, typename... Args>
+Value* makeAppended(QByteArray* buffer, Args... args)
+{
+    buffer->resize(buffer->size() + sizeof(Value));
+    // "Placement new" initializes the memory at the end of the buffer with the Value constructor.
+    return new (buffer->data() + buffer->size() - sizeof(Value)) Value(args...);
+}
 
 #pragma pack(pop)
 } // namespace nx::vms::testcamera::packet

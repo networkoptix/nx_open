@@ -129,21 +129,6 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     return std::nullopt;
 }
 
-std::optional<QJsonObject> DeviceAnalyticsSettingsHandler::deviceAgentSettingsModel(
-    const QString& engineId) const
-{
-    const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
-        serverModule(), engineId);
-
-    if (!engine)
-    {
-        NX_WARNING(this, "Unable to find analytics engine by id %1", engineId);
-        return std::nullopt;
-    }
-
-    return engine->manifest().deviceAgentSettingsModel;
-}
-
 JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const nx::vms::server::analytics::Manager* analyticsManager,
     const QString& engineId,
@@ -162,7 +147,17 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
 
     response.values = analyticsManager->getSettings(deviceId, engineId);
 
-    const auto settingsModel = deviceAgentSettingsModel(engineId);
+    const auto device = sdk_support::find<QnVirtualCameraResource>(serverModule(), deviceId);
+    if (!device)
+    {
+        const auto message = lm("Unable to find the Device with id %1").args(deviceId);
+        NX_WARNING(this, message);
+        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+    }
+
+    const std::optional<QJsonObject> settingsModel =
+        device->deviceAgentSettingsModel(QnUuid::fromStringSafe(engineId));
+
     if (!settingsModel)
     {
         const auto message =

@@ -141,6 +141,8 @@ public:
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
+    std::optional<QJsonObject> deviceAgentSettingsModel(QnUuid engineId) const;
+
     QHash<QnUuid, QJsonObject> deviceAgentSettingsValues() const;
     void setDeviceAgentSettingsValues(const QHash<QnUuid, QJsonObject>& settingsValues);
 

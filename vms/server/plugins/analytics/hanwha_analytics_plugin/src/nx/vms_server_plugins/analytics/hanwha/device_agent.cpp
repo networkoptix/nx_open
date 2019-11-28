@@ -68,65 +68,7 @@ bool endsWith(std::string_view string, std::string_view ending) //< remove in C+
         && std::equal(cbegin(ending), cend(ending), cend(string) - ending.size());
 }
 
-// read the setting from the server to plugin
-// returns empty vector, if not all values can be read
-std::vector<std::string> DeviceAgent::ReadSettingsFromServer(
-    const IStringMap* settings,
-    AnalyticsParamSpan analyticsParamSpan,
-    int objectIndex)
-{
-    std::vector<std::string> result;
-    result.reserve(std::size(analyticsParamSpan));
-    for (auto param: analyticsParamSpan)
-    {
-        const char* const value =
-            upperIfBoolean(settings->value(specify(param.plugin, objectIndex).c_str()));
-        if (!value)
-        {
-            result.clear();
-            return result;
-        }
-
-        if (endsWith(param.plugin, ".Points"))
-        {
-            std::optional<std::vector<PluginPoint>> points = parsePluginPoints(value);
-            if (!points)
-            {
-                result.clear();
-                return result;
-            }
-
-            std::string sunapiPoints = pluginPointsToSunapiString(*points, m_frameSize);
-            result.push_back(sunapiPoints);
-        }
-        else
-        {
-            result.emplace_back(value);
-        }
-    }
-    return result;
-}
-
-std::string DeviceAgent::sendCommand(const std::string& query)
-{
-    nx::utils::Url command(m_url);
-    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
-    command.setPath(kEventPath);
-    command.setQuery(QString::fromStdString(query) + QString("&Channel=%1").arg(m_channelNumber));
-
-    const bool isSent = m_settingsHttpClient.doGet(command);
-    if (!isSent)
-        return "Failed to send command to camera";
-
-    auto* response = m_settingsHttpClient.response();
-    const bool isApproved = (response->statusLine.statusCode == 200);
-    if (!isApproved)
-        return response->statusLine.toString().toStdString();
-
-    return {};
-}
-
-std::string DeviceAgent::sendCommand2(const std::string& query)
+std::string DeviceAgent::sendCommandToCamera(const std::string& query)
 {
     nx::utils::Url command(m_url);
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
@@ -152,39 +94,6 @@ static std::string dequote(const std::string& s)
         return s.substr(1, s.size() - 2);
     }
     return s;
-}
-
-std::string DeviceAgent::WriteSettingsToCamera(
-    const std::vector<std::string>& values,
-    AnalyticsParamSpan analyticsParamSpan,
-    const char* commandPreambule,
-    int objectIndex)
-{
-    NX_ASSERT(std::size(values) == std::size(analyticsParamSpan));
-
-    std::stringstream query;
-    query << commandPreambule;
-
-    auto paramIt = analyticsParamSpan.begin();
-    auto valueIt = values.cbegin();
-
-    while (valueIt != values.end())
-    {
-        query << specify(paramIt->sunapi, objectIndex) << dequote(*valueIt);
-        ++paramIt;
-        ++valueIt;
-    }
-
-    return sendCommand(query.str());
-}
-
-// Used for deleting commands.
-std::string DeviceAgent::WriteSettingsToCamera(
-    const char* query,
-    int objectIndex)
-{
-    const std::string specifiedQuery = specify(query, objectIndex);
-    return sendCommand(specifiedQuery);
 }
 
 /*static*/ void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
@@ -231,7 +140,7 @@ void DeviceAgent::doSetSettings(
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
-    const auto sender = [this](const std::string& s) {return this->sendCommand2(s); };
+    const auto sender = [this](const std::string& s) {return this->sendCommandToCamera(s); };
 
     retr2(errorMap, settings, m_settings.shockDetection, sender, m_frameSize);
     retr2(errorMap, settings, m_settings.motion, sender, m_frameSize);
@@ -245,11 +154,11 @@ void DeviceAgent::doSetSettings(
 
     retr2(errorMap, settings, m_settings.tamperingDetection, sender, m_frameSize);
     retr2(errorMap, settings, m_settings.defocusDetection, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.objectDetectionObjects, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.objectDetectionBestShot, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.odObjects, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.odBestShot, sender, m_frameSize);
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, i + 1);
+        retr2(errorMap, settings, m_settings.odExcludeArea[i], sender, m_frameSize, i + 1);
 
     for (int i = 0; i < 8; ++i)
         retr2(errorMap, settings, m_settings.ivaLine[i], sender, m_frameSize, i + 1);
@@ -363,6 +272,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 
     m_settingsHttpClient.setUserName(m_auth.user());
     m_settingsHttpClient.setUserPassword(m_auth.password());
+    m_settingsHttpClient.addAdditionalHeader("Accept", "application/json");
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
@@ -378,6 +288,79 @@ void DeviceAgent::setEngineManifest(const Hanwha::EngineManifest& manifest)
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
 {
     m_monitor = monitor;
+}
+
+std::string DeviceAgent::loadSunapiObject(const char* eventName)
+{
+    std::string result;
+    nx::utils::Url command(m_url);
+    constexpr const char* kPath = "/stw-cgi/eventsources.cgi";
+    constexpr const char* kQueryPattern = "msubmenu=%1&action=view&Channel=%2";
+    command.setPath(kPath);
+    command.setQuery(QString::fromStdString(kQueryPattern).arg(eventName).arg(m_channelNumber));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    if (!isSent)
+        return result;
+
+    auto* response = m_settingsHttpClient.response();
+    const bool isApproved = (response->statusLine.statusCode == 200);
+    const std::string sl = response->statusLine.toString().toStdString();
+
+    auto messageBodyOptional = m_settingsHttpClient.fetchEntireMessageBody();
+    if (messageBodyOptional.has_value())
+        result = messageBodyOptional->toStdString();
+    else
+        ;//NX_DEBUG(logTag, "makeActiRequest: Error getting response body.");
+    return result; // nx::network::http::StatusCode::internalServerError;
+
+//    m_settings.shockDetection.loadFromSunapi(sss.c_str());
+
+}
+
+void DeviceAgent::readCameraSettings()
+{
+    std::string sunapiString = loadSunapiObject("shockdetection");
+    m_settings.shockDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("tamperingdetection");
+    m_settings.tamperingDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("videoanalysis2");
+    m_settings.motion.loadFromSunapi(sunapiString, m_channelNumber);
+    m_settings.mdObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.mdIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.mdExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    m_settings.ivaObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaLine[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    sunapiString = loadSunapiObject("defocusdetection");
+    m_settings.defocusDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("objectdetection");
+    m_settings.odObjects.loadFromSunapi(sunapiString, m_channelNumber);
+    m_settings.odBestShot.loadFromSunapi(sunapiString, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        m_settings.odExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    sunapiString = loadSunapiObject("audiodetection");
+    m_settings.audioDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("audioanalysis");
+    m_settings.soundClassification.loadFromSunapi(sunapiString, m_channelNumber);
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

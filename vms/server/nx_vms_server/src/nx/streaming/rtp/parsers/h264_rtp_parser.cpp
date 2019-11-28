@@ -112,8 +112,7 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
                 CL_MEDIA_ALIGNMENT,
                 totalSize));
     result->compressionType = AV_CODEC_ID_H264;
-    result->width = m_spsInitialized ? m_sps.getWidth() : -1;
-    result->height = m_spsInitialized ? m_sps.getHeight() : -1;
+
     if (m_keyDataExists)
     {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
@@ -158,6 +157,8 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
     }
 
     result->timestamp = rtpTime;
+    result->width = m_spsInitialized ? m_sps.getWidth() : -1;
+    result->height = m_spsInitialized ? m_sps.getHeight() : -1;
     clearInternalBuffer();
     return result;
 }

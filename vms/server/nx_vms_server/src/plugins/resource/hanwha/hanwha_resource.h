@@ -157,7 +157,7 @@ public:
 
     CameraDiagnostics::Result enableAudioInput();
     CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
-
+    virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
@@ -344,7 +344,7 @@ private:
     Ptz::Capabilities ptzCapabilities(nx::core::ptz::Type ptzType) const;
 
     void setPtzCalibarionTimer();
-
+    QnLiveStreamParams liveStreamParams(Qn::ConnectionRole role) const;
 private:
     using AdvancedParameterId = QString;
 

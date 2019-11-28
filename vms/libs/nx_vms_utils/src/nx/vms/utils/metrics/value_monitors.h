@@ -12,8 +12,8 @@
 namespace nx::vms::utils::metrics {
 
 // NOTE: Inherited from std::runtime_error to have a constructor from a string.
-class MetricsError: public std::runtime_error { using std::runtime_error::runtime_error; };
-class ExpectedError: public MetricsError { using MetricsError::MetricsError; };
+class BaseError: public std::runtime_error { using std::runtime_error::runtime_error; };
+class ExpectedError: public BaseError { using BaseError::BaseError; };
 
 #define NX_METRICS_EXPECTED_ERROR(EXPRESSION, EXCEPTION, MESSAGE) \
     NX_WRAP_EXCEPTION(EXPRESSION, EXCEPTION, nx::vms::utils::metrics::ExpectedError, MESSAGE)
@@ -47,7 +47,6 @@ public:
     void setFormatter(ValueFormatter formatter);
     api::metrics::Value formattedValue() const noexcept;
 
-    QString toString() const;
     QString idForToStringFromPtr() const;
 
 protected:

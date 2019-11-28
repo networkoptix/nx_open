@@ -647,6 +647,21 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectType
     return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), enabledAnalyticsEngines());
 }
 
+std::optional<QJsonObject> QnVirtualCameraResource::deviceAgentSettingsModel(QnUuid engineId) const
+{
+    const auto manifest = deviceAgentManifest(engineId);
+    if (manifest && manifest->deviceAgentSettingsModel.isObject())
+        return manifest->deviceAgentSettingsModel.toObject();
+
+    const auto engine =
+        resourcePool()->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
+
+    if (!engine)
+        return std::nullopt;
+
+    return engine->manifest().deviceAgentSettingsModel;
+}
+
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(

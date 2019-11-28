@@ -7,6 +7,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 #include <libavformat/avio.h>
+#include <libavformat/avformat.h>
 
 } // extern "C"
 

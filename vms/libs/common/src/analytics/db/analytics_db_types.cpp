@@ -456,3 +456,15 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::analytics::db, ResultCode,
     (ResultCode::retryLater, "retryLater")
     (ResultCode::error, "error")
 )
+
+ObjectTrackEx::ObjectTrackEx(const ObjectTrack& data)
+{
+    id = data.id;
+    deviceId = data.deviceId;
+    objectTypeId = data.objectTypeId;
+    attributes = data.attributes;
+    firstAppearanceTimeUs = data.firstAppearanceTimeUs;
+    lastAppearanceTimeUs = data.lastAppearanceTimeUs;
+    objectPosition = data.objectPosition;
+    bestShot = data.bestShot;
+}

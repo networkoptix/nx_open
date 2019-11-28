@@ -158,7 +158,7 @@ public:
 
     int64_t occupiedSpace(int storageIndex = -1) const;
     std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
-    std::chrono::milliseconds calendarDuration(int storageIndex = -1) const;
+    std::chrono::milliseconds calendarDuration() const;
 
     bool hasArchiveRotated() const { return m_hasArchiveRotated; }
     void setHasArchiveRotated(bool value) { m_hasArchiveRotated = value; }

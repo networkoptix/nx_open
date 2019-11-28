@@ -8,6 +8,15 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
+IList<ITimestampedObjectMetadata>* ObjectTrackInfo::getTrack() const
+{
+    if (!m_track)
+        return nullptr;
+
+    m_track->addRef();
+    return m_track.get();
+}
+
 IUncompressedVideoFrame* ObjectTrackInfo::getBestShotVideoFrame() const
 {
     if (!m_bestShotVideoFrame)
@@ -24,6 +33,15 @@ ITimestampedObjectMetadata* ObjectTrackInfo::getBestShotObjectMetadata() const
 
     m_bestShotObjectMetadata->addRef();
     return m_bestShotObjectMetadata.get();
+}
+
+void ObjectTrackInfo::setTrack(IList<ITimestampedObjectMetadata>* track)
+{
+    if (!NX_KIT_ASSERT(track))
+        return;
+
+    track->addRef();
+    m_track = nx::sdk::toPtr(track);
 }
 
 void ObjectTrackInfo::setBestShotVideoFrame(IUncompressedVideoFrame* bestShotVideoFrame)

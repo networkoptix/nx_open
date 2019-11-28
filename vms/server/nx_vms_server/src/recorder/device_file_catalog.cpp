@@ -255,14 +255,12 @@ milliseconds DeviceFileCatalog::occupiedDuration(int storageIndex) const
     return m_chunks.occupiedDuration(storageIndex);
 }
 
-milliseconds DeviceFileCatalog::calendarDuration(int storageIndex) const
+milliseconds DeviceFileCatalog::calendarDuration() const
 {
     QnMutexLocker lk(&m_mutex);
     if (m_chunks.empty())
         return milliseconds(0);
-    qint64 endTimeMs = m_chunks.rbegin()->endTimeMs();
-    if (endTimeMs == DATETIME_NOW)
-        endTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    const auto endTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     return milliseconds(endTimeMs - m_chunks.begin()->startTimeMs);
 }
 

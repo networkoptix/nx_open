@@ -49,6 +49,9 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.objectTrack)
     {
+        const auto track = createObjectTrack(*actionData.objectTrack);
+        if (track)
+            objectTrackInfo->setTrack(track.get());
 
         if (actionData.bestShotObjectPosition)
         {
@@ -339,12 +342,17 @@ std::optional<ExtendedAnalyticsActionData>
     {
         if (objectTrack->bestShot.initialized())
         {
-            extendedAnalyticsActionData.bestShotObjectPosition = objectTrack->bestShot;
+            extendedAnalyticsActionData.bestShotObjectPosition->timestampUs = objectTrack->bestShot.timestampUs;
+            extendedAnalyticsActionData.bestShotObjectPosition->boundingBox = objectTrack->bestShot.rect;
+
         }
         else
         {
             extendedAnalyticsActionData.bestShotObjectPosition->timestampUs = objectTrack->firstAppearanceTimeUs;
-            extendedAnalyticsActionData.bestShotObjectPosition->rect = objectTrack->objectPosition.boundingBox();
+            extendedAnalyticsActionData.bestShotObjectPosition->boundingBox =
+                objectTrack->objectPositionSequence.empty()
+                ? objectTrack->objectPosition.boundingBox()//< Whole object track rect.
+                : objectTrack->objectPositionSequence.begin()->boundingBox; //< First frame rect.
         }
     }
 
@@ -385,7 +393,7 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     return executeActionResult.errorMessage;
 }
 
-std::optional<nx::analytics::db::ObjectTrack>
+std::optional<ObjectTrackEx>
     QnExecuteAnalyticsActionRestHandler::fetchObjectTrack(
         const QnUuid& objectTrackId,
         bool needFullTrack)
@@ -410,7 +418,15 @@ std::optional<nx::analytics::db::ObjectTrack>
         lm("Only one object Track has been requested but got %1").args(lookupResult->size()));
 
     if (!lookupResult->empty())
-        return lookupResult->at(0);
+    {
+        ObjectTrackEx result(lookupResult->at(0));
+        if (needFullTrack)
+        {
+            const auto& storage = serverModule()->analyticsEventsStorage();
+            result.objectPositionSequence = storage->lookupTrackDetailsSync(lookupResult->at(0));
+        }
+        return result;
+    }
 
     NX_DEBUG(this, "Database lookup result is empty for object Track %1", objectTrackId);
     return std::nullopt;

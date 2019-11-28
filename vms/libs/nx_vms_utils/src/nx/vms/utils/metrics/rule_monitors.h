@@ -5,11 +5,11 @@
 namespace nx::vms::utils::metrics {
 
 // General rules file parsing error.
-class RuleSyntaxError: public MetricsError { using MetricsError::MetricsError; };
+class RuleSyntaxError: public BaseError { using BaseError::BaseError; };
 class UnknownValueId: public RuleSyntaxError { using RuleSyntaxError::RuleSyntaxError; };
 
 // General formula calculation error in ExtraValueMonitor.
-class FormulaCalculationError: public MetricsError { using MetricsError::MetricsError; };
+class FormulaCalculationError: public BaseError { using BaseError::BaseError; };
 class NullValueError: public FormulaCalculationError
 {
     using FormulaCalculationError::FormulaCalculationError;

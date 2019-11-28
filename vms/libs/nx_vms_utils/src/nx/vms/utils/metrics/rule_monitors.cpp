@@ -139,6 +139,15 @@ public:
         if (function() == "-" || function() == "sub")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
+        if (function() == "+" || function() == "multiply")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 * v2; });
+
+        if (function() == "+" || function() == "divide")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v2 ? Value(v1 / v2) : Value(); });
+
+        if (function() == "-" || function() == "sub")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
+
         if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
@@ -430,7 +439,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     {
         NX_ASSERT(m_optional, "Value %1 is not optional: %2", this, e.what());
     }
-    catch (const MetricsError& e)
+    catch (const BaseError& e)
     {
         NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
     }

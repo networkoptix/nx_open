@@ -97,6 +97,8 @@ struct ShockDetection: public SettingGroup
     bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const ShockDetection& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
+
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -123,6 +125,7 @@ struct Motion: public SettingGroup
     bool operator!=(const Motion& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const Motion& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -158,6 +161,7 @@ struct MdObjectSize: public SettingGroup
     bool operator!=(const MdObjectSize& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const MdObjectSize& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -193,6 +197,8 @@ struct IvaObjectSize : public SettingGroup
     bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const IvaObjectSize& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
+
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -229,6 +235,7 @@ struct MdIncludeArea: public SettingGroup
     bool operator!=(const MdIncludeArea& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const MdIncludeArea& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -257,6 +264,7 @@ struct MdExcludeArea: public SettingGroup
     bool operator!=(const MdExcludeArea& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const MdExcludeArea& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -294,6 +302,7 @@ struct TamperingDetection: SettingGroup
     bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const TamperingDetection& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -328,6 +337,7 @@ struct DefocusDetection: SettingGroup
     bool operator!=(const DefocusDetection& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const DefocusDetection& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -337,7 +347,7 @@ std::string buildCameraRequestQuery(
 
 //-------------------------------------------------------------------------------------------------
 
-struct ObjectDetectionObjects : public SettingGroup
+struct OdObjects : public SettingGroup
 {
     bool enabled = false;
     bool person = false;
@@ -363,21 +373,22 @@ struct ObjectDetectionObjects : public SettingGroup
         "ObjectDetection.MinimumDuration",
     };
 
-    ObjectDetectionObjects() = default;
-    bool operator == (const ObjectDetectionObjects& rhs) const;
-    bool operator!=(const ObjectDetectionObjects& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const ObjectDetectionObjects& rhs) const { return !(*this == rhs); }
+    OdObjects() = default;
+    bool operator == (const OdObjects& rhs) const;
+    bool operator!=(const OdObjects& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const OdObjects& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionObjects& area, FrameSize frameSize, int channelNumber = 0);
+    const OdObjects& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
-struct ObjectDetectionBestShot : public SettingGroup
+struct OdBestShot : public SettingGroup
 {
     bool person = false;
     bool vehicle = false;
@@ -397,21 +408,22 @@ struct ObjectDetectionBestShot : public SettingGroup
         "ObjectDetection.BestShot.LicensePlate",
     };
 
-    ObjectDetectionBestShot() = default;
-    bool operator == (const ObjectDetectionBestShot& rhs) const;
-    bool operator!=(const ObjectDetectionBestShot& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const ObjectDetectionBestShot& rhs) const { return !(*this == rhs); }
+    OdBestShot() = default;
+    bool operator == (const OdBestShot& rhs) const;
+    bool operator!=(const OdBestShot& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const OdBestShot& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionBestShot& area, FrameSize frameSize, int channelNumber = 0);
+    const OdBestShot& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
-struct ObjectDetectionExcludeArea : public SettingGroup
+struct OdExcludeArea : public SettingGroup
 {
     std::vector<PluginPoint> points;
 
@@ -424,17 +436,18 @@ struct ObjectDetectionExcludeArea : public SettingGroup
         "ObjectDetection.ExcludeArea#.Points",
     };
 
-    ObjectDetectionExcludeArea() = default;
-    bool operator == (const ObjectDetectionExcludeArea& rhs) const;
-    bool operator!=(const ObjectDetectionExcludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const ObjectDetectionExcludeArea& rhs) const;
+    OdExcludeArea() = default;
+    bool operator == (const OdExcludeArea& rhs) const;
+    bool operator!=(const OdExcludeArea& rhs) const { return !(*this == rhs); }
+    bool differesEnoughFrom(const OdExcludeArea& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
+    const OdExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -458,6 +471,7 @@ struct IvaLine : public SettingGroup
         vehicle,
         crossing,
     };
+
     static constexpr const char* kServerParamsNames[] = {
         "IVA.Line#.Points",
         "IVA.Line#.Points", //< direction is also read from "Points"
@@ -473,6 +487,7 @@ struct IvaLine : public SettingGroup
     bool operator!=(const IvaLine& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const IvaLine& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 
@@ -538,6 +553,8 @@ struct IvaIncludeArea: public SettingGroup
     bool operator!=(const IvaIncludeArea& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const IvaIncludeArea& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
+
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -565,6 +582,7 @@ struct IvaExcludeArea: public SettingGroup
     bool operator!=(const IvaExcludeArea& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const IvaExcludeArea& rhs) const;
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -593,6 +611,7 @@ struct AudioDetection : public SettingGroup
     bool operator!=(const AudioDetection& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const AudioDetection& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -635,6 +654,7 @@ struct SoundClassification: public SettingGroup
     bool operator!=(const SoundClassification& rhs) const { return !(*this == rhs); }
     bool differesEnoughFrom(const SoundClassification& rhs) const { return !(*this == rhs); }
     bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
+    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
     void replanishErrorMap(
         nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 };
@@ -654,9 +674,9 @@ struct Settings
     MdExcludeArea mdExcludeArea[8];
     TamperingDetection tamperingDetection;
     DefocusDetection defocusDetection;
-    ObjectDetectionObjects objectDetectionObjects;
-    ObjectDetectionBestShot objectDetectionBestShot;
-    ObjectDetectionExcludeArea objectDetectionExcludeArea[8];
+    OdObjects odObjects;
+    OdBestShot odBestShot;
+    OdExcludeArea odExcludeArea[8];
     IvaLine ivaLine[8];
     IvaIncludeArea ivaIncludeArea[8];
     IvaExcludeArea ivaExcludeArea[8];

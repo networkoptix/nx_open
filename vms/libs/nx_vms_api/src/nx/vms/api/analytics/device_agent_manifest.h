@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QJsonObject>
+
 #include <vector>
 
 #include <nx/vms/api/analytics/manifest_error.h>
@@ -36,12 +38,20 @@ struct NX_VMS_API DeviceAgentManifest
 
     /** Groups used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
+
+    /** Settings model that overrides the one declared in the Engine manifest. */
+    QJsonValue deviceAgentSettingsModel;
 };
 
 NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManifest);
 
 #define DeviceAgentManifest_Fields \
-    (supportedEventTypeIds)(supportedObjectTypeIds)(eventTypes)(objectTypes)(groups)
+    (supportedEventTypeIds) \
+    (supportedObjectTypeIds) \
+    (eventTypes) \
+    (objectTypes) \
+    (groups) \
+    (deviceAgentSettingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentManifest, (json), NX_VMS_API)
 

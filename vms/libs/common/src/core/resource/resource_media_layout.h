@@ -137,8 +137,16 @@ public:
 
     QnCustomResourceVideoLayout(const QSize &size);
 
+    /**
+     * Converts from a string representation produced by toString(). Ignores all errors, setting
+     * to 0 all values that are omitted or cannot be parsed.
+     */
     static QnCustomResourceVideoLayoutPtr fromString(const QString &value);
 
+    /**
+     * Converts to a string representation which is considered to be an implementation detail, and
+     * is guaranteed to be parsed by fromString().
+     */
     virtual QString toString() const override;
 
     virtual int channelCount() const override;

@@ -24,6 +24,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
     NX_INI_INT(-1, crashDeviceAgentOnFrameN,
         "If >= 0, intentionally crash DeviceAgent on processing a frame with this index.");
+
+    NX_INI_FLAG(0, overrideSettingsModelInDeviceAgent,
+        "If set, Device Agents will declare its own settings model in their manifests");
 };
 
 inline Ini& ini()

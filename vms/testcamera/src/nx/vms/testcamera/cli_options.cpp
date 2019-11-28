@@ -7,7 +7,7 @@
 
 #include <nx/kit/utils.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/switch.h>
+
 #include <nx/vms/testcamera/test_camera_ini.h>
 
 namespace nx::vms::testcamera {
@@ -26,9 +26,9 @@ Usage:
 At least one <cameraSet> is required; it is a concatenation of semicolon-separated parameters:
  count=<numberOfCameras>
     Optional. Number of cameras to start, if not --camera-for-file. Default: 1.
- files=<filename>[,<filename>...]
+ files=<filename>[,<filename>]...
      Files for the primary stream. The part after `=` may be enclosed in `"` or `'`.
- secondary-files=<filename>[,<filename>...]
+ secondary-files=<filename>[,<filename>]...
      Optional. Files for the secondary stream. The part after `=` may be enclosed in `"` or `'`.
  offline=0..100
      Optional. Frequency of the camera going offline. Default: 0 - never go offline.
@@ -198,20 +198,20 @@ static QString cameraSetToJsonString(const CliOptions::CameraSet& cameraSet, con
 
     result += prefix + "    \"primaryFileNames\":\n";
     result += prefix + "    [\n";
-    for (int j = 0; j < cameraSet.primaryFileNames.size(); ++j)
+    for (int i = 0; i < cameraSet.primaryFileNames.size(); ++i)
     {
-        result += prefix + "        " + enquoteAndEscape(cameraSet.primaryFileNames[j]);
-        result += (j == cameraSet.primaryFileNames.size() - 1) ? "" : ",";
+        result += prefix + "        " + enquoteAndEscape(cameraSet.primaryFileNames[i]);
+        result += (i == cameraSet.primaryFileNames.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += prefix + "    ],\n";
 
     result += prefix + "    \"secondaryFileNames\":\n";
     result += prefix + "    [\n";
-    for (int j = 0; j < cameraSet.secondaryFileNames.size(); ++j)
+    for (int i = 0; i < cameraSet.secondaryFileNames.size(); ++i)
     {
-        result += prefix + "        " + enquoteAndEscape(cameraSet.secondaryFileNames[j]);
-        result += (j == cameraSet.secondaryFileNames.size() - 1) ? "" : ",";
+        result += prefix + "        " + enquoteAndEscape(cameraSet.secondaryFileNames[i]);
+        result += (i == cameraSet.secondaryFileNames.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += prefix + "    ]\n";
@@ -245,7 +245,7 @@ static QString optionsToJsonString(const CliOptions& options)
 
     result += "    \"localInterfaces\":\n";
     result += "    [\n";
-    for (int i = 0; i < options.localInterfaces.size(); ++i)
+    for (int i = 0; i < (int) options.localInterfaces.size(); ++i)
     {
         result += "        " + enquoteAndEscape(options.localInterfaces[i]);
         result += (i == options.localInterfaces.size() - 1) ? "" : ",";
@@ -255,11 +255,11 @@ static QString optionsToJsonString(const CliOptions& options)
 
     result += "    \"cameraSets\":\n";
     result += "    [\n";
-    for (int i = 0; i < options.cameraSets.size(); ++i)
+    for (int i = 0; i < (int) options.cameraSets.size(); ++i)
     {
-        const auto& cameraSet = options.cameraSets[i];
+        const auto& cameraSet = options.cameraSets.at(i);
         result += cameraSetToJsonString(cameraSet, /*prefix*/ QString(8, ' '));
-        result += (i == options.cameraSets.size() - 1) ? "" : ",";
+        result += (i == (int) options.cameraSets.size() - 1) ? "" : ",";
         result += "\n";
     }
     result += "    ]\n";

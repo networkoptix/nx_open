@@ -258,7 +258,7 @@
                         "name": "Transactions/s",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s",
+                        "format": "Tr/s",
                         "calculate": "deltaAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
@@ -422,28 +422,28 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThan %fpsDeltaAverage 5",
-                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                            "condition": "greaterThan %fpsDeltaAverage10m 5",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         },
                         {
                             "level": "error",
-                            "condition": "greaterThan %fpsDelta 10",
-                            "text": "dropped by an average of %fpsDeltaAverage FPS in the last 10 minutes."
+                            "condition": "greaterThan %fpsDeltaAverage10m 10",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         }
                         ]
                     },
@@ -451,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Kbps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -478,16 +478,16 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
@@ -495,7 +495,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Kbps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -503,8 +503,8 @@
                 "name": "Storage Analytics",
                 "values": {
                     "archiveLengthS": {
-                        "name": "Forecast",
-                        "description": "Archive Length",
+                        "name": "Archive",
+                        "description": "Current Archive length",
                         "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
@@ -513,7 +513,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "Kbps"
+                        "format": "Mbit/s"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
@@ -581,14 +581,14 @@
                     "readRateBps1m": {
                         "name": "Read Rate",
                         "display": "table|panel",
-                        "format": "KBps",
+                        "format": "KB/s",
                         "calculate": "deltaAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                 "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
-                        "format": "KBps",
+                        "format": "KB/s",
                         "calculate": "deltaAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
@@ -597,7 +597,7 @@
                         "description": "Analytics DB transactions per second",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s"
+                        "format": "Tr/s"
                     }
                 }
             },
@@ -607,19 +607,24 @@
                         "name": "Total",
                         "description": "Total space",
                         "display": "table|panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     },
                     "mediaSpaceP": {
                         "name": "VMS Media(%)",
                         "description": "Space Used by VMS media (%)",
                         "display": "table|panel",
-                        "format": "%"
+                        "format": "%",
+                        "calculate": "divide %mediaSpaceB %totalSpaceB",
+                        "insert": "mediaSpaceB",
+                        "isOptional": true
                     },
                     "mediaSpaceB": {
                         "name": "VMS Media",
                         "description": "Space Used by VMS media",
                         "display": "panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     }
                 }
             }
@@ -669,7 +674,7 @@
                     "inBps1m": {
                         "name": "IN Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "Kbit/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
                         "insert": "inBps"
@@ -677,7 +682,7 @@
                     "outBps1m": {
                         "name": "OUT Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "Kbit/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",
                         "insert": "outBps"

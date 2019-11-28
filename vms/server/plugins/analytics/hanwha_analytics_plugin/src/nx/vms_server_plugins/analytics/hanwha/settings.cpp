@@ -44,6 +44,7 @@ std::string specify(const char* v, unsigned int n)
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 struct PluginValueError {};
+struct SunapiValueError {};
 
 void ReadOrThrow(const char* value, bool* result)
 {
@@ -97,7 +98,7 @@ void ReadOrThrow(const char* value, std::vector<PluginPoint>* result)
     if (!value)
         throw PluginValueError();
 
-    std::optional<std::vector<PluginPoint>> tmp = parsePluginPoints(value);
+    std::optional<std::vector<PluginPoint>> tmp = ServerStringToPluginPoints(value);
     if (tmp)
     {
         *result = *tmp;
@@ -112,7 +113,7 @@ void ReadOrThrow(const char* value, Direction* result)
     if (!value)
         throw PluginValueError();
 
-    std::optional<Direction> tmp = parsePluginDirection(value);
+    std::optional<Direction> tmp = ServerStringToDirection(value);
     if (tmp)
     {
         *result = *tmp;
@@ -127,7 +128,7 @@ void ReadOrThrow(const char* value, Width* result)
     if (!value)
         throw PluginValueError();
 
-    std::optional<Width> tmp = parsePluginWidth(value);
+    std::optional<Width> tmp = ServerStringToWidth(value);
     if (tmp)
     {
         *result = *tmp;
@@ -142,7 +143,7 @@ void ReadOrThrow(const char* value, Height* result)
     if (!value)
         throw PluginValueError();
 
-    std::optional<Height> tmp = parsePluginHeight(value);
+    std::optional<Height> tmp = ServerStringToHeight(value);
     if (tmp)
     {
         *result = *tmp;
@@ -152,6 +153,128 @@ void ReadOrThrow(const char* value, Height* result)
     throw PluginValueError();
 }
 
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, bool* result)
+{
+    NX_ASSERT(key);
+
+    if (const auto& param = json[key]; param.is_bool())
+        *result = param.bool_value();
+    else
+        throw SunapiValueError{};
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, int* result)
+{
+    NX_ASSERT(key);
+
+    if (const auto& param = json[key]; param.is_number())
+        *result = param.int_value();
+    else
+        throw SunapiValueError{};
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, std::string* result)
+{
+    NX_ASSERT(key);
+
+    if (const auto& param = json[key]; param.is_string())
+        *result = param.string_value();
+    else
+        throw SunapiValueError{};
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, PluginPoint* result)
+{
+    NX_ASSERT(key);
+
+    const auto& param = json[key];
+    if (!param.is_string())
+        throw SunapiValueError{};
+
+    const std::string value = param.string_value();
+
+    FrameSize frameSize{ 3840, 2160 };
+    if (!result->fromSunapiString(value, frameSize))
+        throw SunapiValueError();
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, Width* result)
+{
+    PluginPoint point;
+    ReadOrThrow2(json, key, &point);
+    *result = point.x;
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, Height* result)
+{
+    PluginPoint point;
+    ReadOrThrow2(json, key, &point);
+    *result = point.y;
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, std::vector<PluginPoint>* result)
+{
+    NX_ASSERT(key);
+    FrameSize frameSize{ 3840, 2160 };
+
+    const auto& points = json[key];
+    if (!points.is_array())
+        throw SunapiValueError{};
+
+    result->reserve(points.array_items().size());
+    for (const nx::kit::Json& point: points.array_items())
+    {
+        if (!point["x"].is_number() || !point["y"].is_number())
+            throw SunapiValueError{};
+
+        const int ix = point["x"].int_value();
+        const int iy = point["y"].int_value();
+        result->emplace_back(frameSize.xAbsoluteToRelative(ix), frameSize.yAbsoluteToRelative(iy));
+    }
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, Direction* result)
+{
+    NX_ASSERT(key);
+
+    if (const auto& param = json[key]; param.is_string())
+    {
+        if (param.string_value() == "RightSide")
+            *result = Direction::Right;
+        else if (param.string_value() == "LeftSide")
+            *result = Direction::Left;
+        else if (param.string_value() == "BothDirections")
+            *result = Direction::Both;
+        else if (param.string_value() != "Off")
+            throw SunapiValueError{}; //< unknown direction
+    }
+    else
+        throw SunapiValueError{};
+}
+
+void ReadOrThrow2(const nx::kit::Json& json, const char* key, bool* result, const char* desired)
+{
+    NX_ASSERT(key);
+
+    if (const auto& param = json[key]; param.is_array())
+    {
+        *result = false;
+        for (const nx::kit::Json& item : param.array_items())
+        {
+            if (item.string_value() == desired)
+            {
+                *result = true;
+                break;
+            }
+        }
+    }
+    else
+        throw SunapiValueError{};
+}
+
+//-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
 std::string buildBool(bool value)
@@ -197,7 +320,7 @@ bool ShockDetection::operator==(const ShockDetection& rhs) const
 
 bool ShockDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    ShockDetection tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -212,6 +335,45 @@ bool ShockDetection::loadFromServer(const nx::sdk::IStringMap* settings, int obj
     this->initialized = true;
     return true;
 
+}
+
+nx::kit::Json getChannelOrThrow(
+    const std::string& cameraReply, const char* eventName, int channelNumber)
+{
+    std::string err;
+    nx::kit::Json json = nx::kit::Json::parse(cameraReply, err);
+    if (!json.is_object())
+        throw SunapiValueError{};
+
+    const nx::kit::Json& jsonChannels = json[eventName];
+    if (!jsonChannels.is_array())
+        throw SunapiValueError{};
+
+    for (const auto& channel: jsonChannels.array_items())
+    {
+        if (const auto& j = channel["Channel"]; j.is_number() && j.int_value() == channelNumber)
+            return channel;
+    }
+    throw SunapiValueError{};
+}
+
+bool ShockDetection::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "ShockDetection", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "ThresholdLevel", &tmp.thresholdLevel);
+        ReadOrThrow2(channel, "Sensitivity", &tmp.sensitivityLevel);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
 }
 
 void ShockDetection::replanishErrorMap(
@@ -252,7 +414,7 @@ bool Motion::operator==(const Motion& rhs) const
 
 bool Motion::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    Motion tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, detectionType);
@@ -265,6 +427,23 @@ bool Motion::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex
     this->initialized = true;
     return true;
 
+}
+
+bool Motion::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        ReadOrThrow2(channel, "DetectionType", &tmp.detectionType);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
 }
 
 void Motion::replanishErrorMap(
@@ -306,7 +485,7 @@ bool MdObjectSize::operator==(const MdObjectSize& rhs) const
 
 bool MdObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    MdObjectSize tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, minWidth);
@@ -320,6 +499,48 @@ bool MdObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int objec
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+nx::kit::Json getObjectSizeJsonObject(const nx::kit::Json& eventJsonObject,
+    const std::string& detectionTypeValue)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& objectSizeList = eventJsonObject["ObjectSizeByDetectionTypes"];
+    if (!objectSizeList.is_array())
+        return result;
+
+    for (const nx::kit::Json& objectSize: objectSizeList.array_items())
+    {
+        const nx::kit::Json& detectionTypeParameter = objectSize["DetectionType"];
+        if (detectionTypeParameter.string_value() == detectionTypeValue)
+        {
+            result = objectSize;
+            return result;
+        }
+    }
+    return result;
+}
+
+bool MdObjectSize::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json objectSizeObject = getObjectSizeJsonObject(channel, "MotionDetection");
+
+        ReadOrThrow2(objectSizeObject, "MinimumObjectSizeInPixels", &tmp.minWidth);
+        ReadOrThrow2(objectSizeObject, "MinimumObjectSizeInPixels", &tmp.minHeight);
+        ReadOrThrow2(objectSizeObject, "MaximumObjectSizeInPixels", &tmp.maxWidth);
+        ReadOrThrow2(objectSizeObject, "MaximumObjectSizeInPixels", &tmp.maxHeight);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -385,7 +606,7 @@ bool IvaObjectSize::operator==(const IvaObjectSize& rhs) const
 
 bool IvaObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    IvaObjectSize tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, minWidth);
@@ -399,6 +620,28 @@ bool IvaObjectSize::loadFromServer(const nx::sdk::IStringMap* settings, int obje
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+bool IvaObjectSize::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json objectSizeObject = getObjectSizeJsonObject(channel, "IntelligentVideo");
+
+        ReadOrThrow2(objectSizeObject, "MinimumObjectSizeInPixels", &tmp.minWidth);
+        ReadOrThrow2(objectSizeObject, "MinimumObjectSizeInPixels", &tmp.minHeight);
+        ReadOrThrow2(objectSizeObject, "MaximumObjectSizeInPixels", &tmp.maxWidth);
+        ReadOrThrow2(objectSizeObject, "MaximumObjectSizeInPixels", &tmp.maxHeight);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -472,7 +715,7 @@ bool MdIncludeArea::differesEnoughFrom(const MdIncludeArea& rhs) const
 
 bool MdIncludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    MdIncludeArea tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -487,6 +730,111 @@ bool MdIncludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int obje
     *this = std::move(tmp);
     this->internalObjectIndex = objectIndex;
     this->initialized = true;
+    return true;
+}
+
+/** returns empty json object if no object with `internalIndex` found*/
+nx::kit::Json getMdRoiJsonObject(nx::kit::Json channelData, int internalIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& Lines = channelData["ROIs"];
+    if (!Lines.is_array())
+        return result;
+
+    for (const nx::kit::Json& Line: Lines.array_items())
+    {
+        const nx::kit::Json& roiIndex = Line["ROI"];
+        if (roiIndex.is_number() && roiIndex.int_value() == internalIndex)
+        {
+            result = Line;
+            return result;
+        }
+    }
+    return result;;
+}
+
+nx::kit::Json getLineJsonObject(nx::kit::Json channelData, int internalIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& Lines = channelData["Lines"];
+    if (!Lines.is_array())
+        return result;
+
+    for (const nx::kit::Json& Line: Lines.array_items())
+    {
+        const nx::kit::Json& roiIndex = Line["Line"];
+        if (roiIndex.is_number() && roiIndex.int_value() == internalIndex)
+        {
+            result = Line;
+            return result;
+        }
+    }
+    return result;;
+}
+
+nx::kit::Json getIvaRoiJsonObject(nx::kit::Json channelData, int internalIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& Lines = channelData["DefinedAreas"];
+    if (!Lines.is_array())
+        return result;
+
+    for (const nx::kit::Json& Line : Lines.array_items())
+    {
+        const nx::kit::Json& roiIndex = Line["DefinedArea"];
+        if (roiIndex.is_number() && roiIndex.int_value() == internalIndex)
+        {
+            result = Line;
+            return result;
+        }
+    }
+    return result;;
+}
+
+nx::kit::Json getOdRoiJsonObject(nx::kit::Json channelData, int internalIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& Areas = channelData["ExcludeAreas"];
+    if (!Areas.is_array())
+        return result;
+
+    for (const nx::kit::Json& Area : Areas.array_items())
+    {
+        const nx::kit::Json& roiIndex = Area["ExcludeArea"];
+        if (roiIndex.is_number() && roiIndex.int_value() == internalIndex)
+        {
+            result = Area;
+            return result;
+        }
+    }
+    return result;;
+}
+
+bool MdIncludeArea::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json roiObject = getMdRoiJsonObject(channel, objectIndex);
+        if (roiObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(roiObject, "Coordinates", &tmp.points);
+        ReadOrThrow2(roiObject, "ThresholdLevel", &tmp.thresholdLevel);
+        ReadOrThrow2(roiObject, "SensitivityLevel", &tmp.sensitivityLevel);
+        ReadOrThrow2(roiObject, "Duration", &tmp.minimumDuration);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -531,7 +879,7 @@ std::string buildCameraRequestQuery(
 //-------------------------------------------------------------------------------------------------
 bool MdExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    MdExcludeArea tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -543,6 +891,32 @@ bool MdExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int obje
     *this = std::move(tmp);
     this->internalObjectIndex = objectIndex + 8;
     this->initialized = true;
+    return true;
+}
+
+bool MdExcludeArea::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json roiObject = getMdRoiJsonObject(channel, objectIndex + 8);
+        if (roiObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(roiObject, "Coordinates", &tmp.points);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -616,7 +990,7 @@ bool TamperingDetection::operator==(const TamperingDetection& rhs) const
 
 bool TamperingDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    TamperingDetection tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -631,6 +1005,27 @@ bool TamperingDetection::loadFromServer(const nx::sdk::IStringMap* settings, int
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+bool TamperingDetection::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "TamperingDetection", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "ThresholdLevel", &tmp.thresholdLevel);
+        ReadOrThrow2(channel, "SensitivityLevel", &tmp.sensitivityLevel);
+        ReadOrThrow2(channel, "Duration", &tmp.minimumDuration);
+        ReadOrThrow2(channel, "DarknessDetection", &tmp.exceptDarkImages);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -677,7 +1072,7 @@ bool DefocusDetection::operator==(const DefocusDetection& rhs) const
 
 bool DefocusDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    DefocusDetection tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -691,6 +1086,26 @@ bool DefocusDetection::loadFromServer(const nx::sdk::IStringMap* settings, int o
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+bool DefocusDetection::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "DefocusDetection", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "ThresholdLevel", &tmp.thresholdLevel);
+        ReadOrThrow2(channel, "Sensitivity", &tmp.sensitivityLevel);
+        ReadOrThrow2(channel, "Duration", &tmp.minimumDuration);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -722,7 +1137,7 @@ std::string buildCameraRequestQuery(
 
 //-------------------------------------------------------------------------------------------------
 
-bool ObjectDetectionObjects::operator==(const ObjectDetectionObjects& rhs) const
+bool OdObjects::operator==(const OdObjects& rhs) const
 {
     return
         initialized == rhs.initialized
@@ -736,9 +1151,9 @@ bool ObjectDetectionObjects::operator==(const ObjectDetectionObjects& rhs) const
         ;
 }
 
-bool ObjectDetectionObjects::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+bool OdObjects::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    ObjectDetectionObjects tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -757,14 +1172,36 @@ bool ObjectDetectionObjects::loadFromServer(const nx::sdk::IStringMap* settings,
     return true;
 }
 
-void ObjectDetectionObjects::replanishErrorMap(
+bool OdObjects::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "ObjectDetection", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "ObjectTypes", &tmp.person, "Person");
+        ReadOrThrow2(channel, "ObjectTypes", &tmp.vehicle, "Vehicle");
+        ReadOrThrow2(channel, "ObjectTypes", &tmp.face, "Face");
+        ReadOrThrow2(channel, "ObjectTypes", &tmp.licensePlate, "LicensePlate");
+        ReadOrThrow2(channel, "Duration", &tmp.minimumDuration);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
+}
+
+void OdObjects::replanishErrorMap(
     nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
 {
     for (const auto paramName : kServerParamsNames)
         errorMap->setItem(paramName, reason);
 }
 
-std::string buildObjectTypes(const ObjectDetectionObjects& settingGroup)
+std::string buildObjectTypes(const OdObjects& settingGroup)
 {
     std::vector<const char*> mode;
 
@@ -784,7 +1221,7 @@ std::string buildObjectTypes(const ObjectDetectionObjects& settingGroup)
 }
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionObjects& settingGroup, FrameSize /*frameSize*/, int channelNumber)
+    const OdObjects& settingGroup, FrameSize /*frameSize*/, int channelNumber)
 {
     std::ostringstream query;
     if (settingGroup)
@@ -803,7 +1240,7 @@ std::string buildCameraRequestQuery(
 
 //-------------------------------------------------------------------------------------------------
 
-bool ObjectDetectionBestShot::operator==(const ObjectDetectionBestShot& rhs) const
+bool OdBestShot::operator==(const OdBestShot& rhs) const
 {
     return
         initialized == rhs.initialized
@@ -815,9 +1252,9 @@ bool ObjectDetectionBestShot::operator==(const ObjectDetectionBestShot& rhs) con
         ;
 }
 
-bool ObjectDetectionBestShot::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+bool OdBestShot::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    ObjectDetectionBestShot tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, person);
@@ -834,14 +1271,34 @@ bool ObjectDetectionBestShot::loadFromServer(const nx::sdk::IStringMap* settings
     return true;
 }
 
-void ObjectDetectionBestShot::replanishErrorMap(
+bool OdBestShot::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "ObjectDetection", channelNumber);
+        // This doesn't work in the PNO-A0981R now (bug in the camera).
+        ReadOrThrow2(channel, "BestShot", &tmp.person, "Person");
+        ReadOrThrow2(channel, "BestShot", &tmp.vehicle, "Vehicle");
+        ReadOrThrow2(channel, "BestShot", &tmp.face, "Face");
+        ReadOrThrow2(channel, "BestShot", &tmp.licensePlate, "LicensePlate");
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
+}
+
+void OdBestShot::replanishErrorMap(
     nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
 {
     for (const auto paramName : kServerParamsNames)
         errorMap->setItem(paramName, reason);
 }
 
-std::string buildObjectTypes(const ObjectDetectionBestShot& settingGroup)
+std::string buildObjectTypes(const OdBestShot& settingGroup)
 {
     std::vector<const char*> mode;
 
@@ -861,7 +1318,7 @@ std::string buildObjectTypes(const ObjectDetectionBestShot& settingGroup)
 }
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionBestShot& settingGroup, FrameSize /*frameSize*/, int channelNumber)
+    const OdBestShot& settingGroup, FrameSize /*frameSize*/, int channelNumber)
 {
     std::ostringstream query;
     if (settingGroup)
@@ -878,9 +1335,9 @@ std::string buildCameraRequestQuery(
 
 //-------------------------------------------------------------------------------------------------
 
-bool ObjectDetectionExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
+bool OdExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    ObjectDetectionExcludeArea tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -895,7 +1352,33 @@ bool ObjectDetectionExcludeArea::loadFromServer(const nx::sdk::IStringMap* setti
     return true;
 }
 
-bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rhs) const
+bool OdExcludeArea::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "ObjectDetection", channelNumber);
+
+        nx::kit::Json areObject = getOdRoiJsonObject(channel, objectIndex);
+        if (areObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(areObject, "Coordinates", &tmp.points);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
+}
+
+bool OdExcludeArea::operator==(const OdExcludeArea& rhs) const
 {
     return
         initialized == rhs.initialized
@@ -904,7 +1387,7 @@ bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rh
         && points == rhs.points
         ;
 }
-bool ObjectDetectionExcludeArea::differesEnoughFrom(const ObjectDetectionExcludeArea& rhs) const
+bool OdExcludeArea::differesEnoughFrom(const OdExcludeArea& rhs) const
 {
     if (this->points.empty() && rhs.points.empty())
         return false;
@@ -912,7 +1395,7 @@ bool ObjectDetectionExcludeArea::differesEnoughFrom(const ObjectDetectionExclude
     return *this != rhs;
 }
 
-void ObjectDetectionExcludeArea::replanishErrorMap(
+void OdExcludeArea::replanishErrorMap(
     nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
 {
     for (const auto paramName : kServerParamsNames)
@@ -920,7 +1403,7 @@ void ObjectDetectionExcludeArea::replanishErrorMap(
 }
 
 std::string buildCameraRequestQuery(
-    const ObjectDetectionExcludeArea& area, FrameSize frameSize, int channelNumber)
+    const OdExcludeArea& area, FrameSize frameSize, int channelNumber)
 {
     std::ostringstream query;
     if (area)
@@ -975,7 +1458,7 @@ bool IvaLine::differesEnoughFrom(const IvaLine& rhs) const
 
 bool IvaLine::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    IvaLine tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -987,7 +1470,6 @@ bool IvaLine::loadFromServer(const nx::sdk::IStringMap* settings, int objectInde
         NX_READ_SETTING_OR_THROW(tmp, person);
         NX_READ_SETTING_OR_THROW(tmp, vehicle);
         NX_READ_SETTING_OR_THROW(tmp, crossing);
-        //NX_READ_SETTING_OR_THROW(tmp, direction);
     }
     catch (PluginValueError&)
     {
@@ -999,6 +1481,38 @@ bool IvaLine::loadFromServer(const nx::sdk::IStringMap* settings, int objectInde
     return true;
 }
 
+bool IvaLine::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json lineObject = getLineJsonObject(channel, objectIndex);
+        if (lineObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(lineObject, "Coordinates", &tmp.points);
+        ReadOrThrow2(lineObject, "Mode", &tmp.direction);
+        ReadOrThrow2(lineObject, "RuleName", &tmp.name);
+        ReadOrThrow2(lineObject, "ObjectTypeFilter", &tmp.person, "Person");
+        ReadOrThrow2(lineObject, "ObjectTypeFilter", &tmp.vehicle, "Vehicle");
+
+        std::string Crossing;
+        ReadOrThrow2(lineObject, "Mode", &Crossing);
+        tmp.crossing = Crossing != "Off";
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
+    return true;
+}
 void IvaLine::replanishErrorMap(
     nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
 {
@@ -1069,7 +1583,7 @@ std::string buildCameraRequestQuery(
 
 bool IvaIncludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    IvaIncludeArea tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -1092,6 +1606,44 @@ bool IvaIncludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int obj
     *this = std::move(tmp);
     this->internalObjectIndex = objectIndex;
     this->initialized = true;
+    return true;
+}
+
+bool IvaIncludeArea::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json ivaRoiObject = getIvaRoiJsonObject(channel, objectIndex);
+        if (ivaRoiObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(ivaRoiObject, "Coordinates", &tmp.points);
+        ReadOrThrow2(ivaRoiObject, "RuleName", &tmp.name);
+        ReadOrThrow2(ivaRoiObject, "ObjectTypeFilter", &tmp.person, "Person");
+        ReadOrThrow2(ivaRoiObject, "ObjectTypeFilter", &tmp.vehicle, "Vehicle");
+
+        ReadOrThrow2(ivaRoiObject, "Mode", &tmp.intrusion, "Intrusion");
+        ReadOrThrow2(ivaRoiObject, "Mode", &tmp.enter, "Entering");
+        ReadOrThrow2(ivaRoiObject, "Mode", &tmp.exit, "Exiting");
+        ReadOrThrow2(ivaRoiObject, "Mode", &tmp.appear, "AppearDisappear");
+        ReadOrThrow2(ivaRoiObject, "Mode", &tmp.loitering, "Loitering");
+
+        ReadOrThrow2(ivaRoiObject, "IntrusionDuration", &tmp.intrusionDuration);
+        ReadOrThrow2(ivaRoiObject, "AppearanceDuration", &tmp.appearDuration);
+        ReadOrThrow2(ivaRoiObject, "LoiteringDuration", &tmp.loiteringDuration);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -1206,7 +1758,7 @@ std::string buildCameraRequestQuery(
 
 bool IvaExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    IvaExcludeArea tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, points);
@@ -1218,6 +1770,31 @@ bool IvaExcludeArea::loadFromServer(const nx::sdk::IStringMap* settings, int obj
     *this = std::move(tmp);
     this->internalObjectIndex = objectIndex + 8;
     this->initialized = true;
+    return true;
+}
+
+bool IvaExcludeArea::loadFromSunapi(
+    const std::string& cameraReply, int channelNumber, int objectIndex)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "VideoAnalysis", channelNumber);
+
+        nx::kit::Json ivaRoiObject = getIvaRoiJsonObject(channel, objectIndex + 8);
+        if (ivaRoiObject == nx::kit::Json())
+        {
+            *this = std::move(tmp); // reset value;
+            return true;
+        }
+
+        ReadOrThrow2(ivaRoiObject, "Coordinates", &tmp.points);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -1289,7 +1866,7 @@ bool AudioDetection::operator==(const AudioDetection& rhs) const
 
 bool AudioDetection::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    AudioDetection tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -1301,6 +1878,24 @@ bool AudioDetection::loadFromServer(const nx::sdk::IStringMap* settings, int obj
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+bool AudioDetection::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "AudioDetection", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "InputThresholdLevel", &tmp.thresholdLevel);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 
@@ -1347,7 +1942,7 @@ bool SoundClassification::operator==(const SoundClassification& rhs) const
 
 bool SoundClassification::loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex)
 {
-    SoundClassification tmp;
+    std::decay_t<decltype(*this)> tmp;
     try
     {
         NX_READ_SETTING_OR_THROW(tmp, enabled);
@@ -1364,6 +1959,29 @@ bool SoundClassification::loadFromServer(const nx::sdk::IStringMap* settings, in
     }
     *this = std::move(tmp);
     this->initialized = true;
+    return true;
+}
+
+bool SoundClassification::loadFromSunapi(const std::string& cameraReply, int channelNumber)
+{
+    std::decay_t<decltype(*this)> tmp;
+    try
+    {
+        nx::kit::Json channel = getChannelOrThrow(cameraReply, "AudioAnalysis", channelNumber);
+
+        ReadOrThrow2(channel, "Enable", &tmp.enabled);
+        ReadOrThrow2(channel, "NoiseReduction", &tmp.noisefilter);
+        ReadOrThrow2(channel, "ThresholdLevel", &tmp.thresholdLevel);
+        ReadOrThrow2(channel, "SoundType", &tmp.scream, "Scream");
+        ReadOrThrow2(channel, "SoundType", &tmp.gunshot, "Gunshot");
+        ReadOrThrow2(channel, "SoundType", &tmp.explosion, "Explosion");
+        ReadOrThrow2(channel, "SoundType", &tmp.crashingGlass, "GlassBreak");
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *this = std::move(tmp);
     return true;
 }
 

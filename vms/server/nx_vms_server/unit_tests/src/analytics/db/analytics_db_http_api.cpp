@@ -64,6 +64,11 @@ public:
             });
     }
 
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override
+    {
+        return std::vector<ObjectPosition>();
+    }
+
     virtual void lookupTimePeriods(
         Filter /*filter*/,
         TimePeriodsLookupOptions /*options*/,

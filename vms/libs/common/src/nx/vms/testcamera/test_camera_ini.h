@@ -31,8 +31,8 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, printOptions, "Print parsed command-line options to stderr.");
 
-    NX_INI_FLAG(1, stopStreamingOnSocketErrors,
-        "Stop streaming from the particular camera on any error while sending data.");
+    NX_INI_FLAG(1, stopStreamingOnErrors,
+        "Stop streaming from the particular camera on any error while streaming a file.");
 
     NX_INI_FLAG(1, obtainFramePtsFromTimestampField,
         "If set, frame PTS to be sent to the Server is obtained from `timestamp` field instead\n"
@@ -57,4 +57,4 @@ inline Ini& ini()
     return ini;
 }
 
-}
+} // namespace nx::vms::testcamera

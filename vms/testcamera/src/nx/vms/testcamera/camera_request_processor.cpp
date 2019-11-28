@@ -1,5 +1,7 @@
 #include "camera_request_processor.h"
 
+#include <QtCore/QList>
+
 #include <nx/kit/utils.h>
 #include <network/tcp_connection_priv.h>
 
@@ -89,7 +91,7 @@ void CameraRequestProcessor::run()
     int fps = 10;
     for (int i = 0; i < params.size(); ++ i)
     {
-        QList<QByteArray> paramVal = params[i].split('=');
+        const QList<QByteArray> paramVal = params[i].split('=');
         if (paramVal[0] == "primary" && paramVal.size() == 2)
         {
             if (paramVal[1] != "1")

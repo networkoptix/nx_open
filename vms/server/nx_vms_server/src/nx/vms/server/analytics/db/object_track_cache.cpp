@@ -113,12 +113,16 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     return result;
 }
 
-std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
+std::optional<ObjectTrackEx> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
     if (auto it = m_tracksById.find(trackId); it != m_tracksById.end())
-        return it->second.track;
+    {
+        ObjectTrackEx result(it->second.track);
+        result.objectPositionSequence = it->second.allPositionSequence;
+        return result;
+    }
 
     return std::nullopt;
 }
@@ -219,6 +223,14 @@ void ObjectTrackCache::updateObject(
     addNewAttributes(objectMetadata.attributes, &trackContext);
 
     trackContext.track.objectPosition.add(objectMetadata.boundingBox);
+
+    ObjectPosition objectPosition;
+    objectPosition.deviceId = packet.deviceId;
+    objectPosition.timestampUs = packet.timestampUs;
+    objectPosition.durationUs = packet.durationUs;
+    objectPosition.boundingBox = objectMetadata.boundingBox;
+    objectPosition.attributes = objectMetadata.attributes;
+    trackContext.allPositionSequence.emplace_back(objectPosition);
 }
 
 void ObjectTrackCache::addNewAttributes(
