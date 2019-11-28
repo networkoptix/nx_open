@@ -236,7 +236,12 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
                 nx::network::NatTraversalSupport::enabled,
                 ipVersion);
 
-            if (localAddress.port)
+            #ifdef Q_OS_UNIX
+                bool isUnix = true;
+            #else
+                bool isUnix = false;
+            #endif
+            if (localAddress.port || isUnix)
             {
                 if (!socket->setReuseAddrFlag(true))
                 {
