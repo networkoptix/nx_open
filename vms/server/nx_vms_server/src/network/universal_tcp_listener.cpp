@@ -277,8 +277,8 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     if (isAnyHost || (bool) localAddress.address.ipV4())
         addSocket(localAddress, AF_INET);
 
-    //if (isAnyHost || (bool) localAddress.address.isPureIpV6())
-     //   addSocket(localAddress, AF_INET6);
+    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
+        addSocket(localAddress, AF_INET6);
 
     return sockets;
 }
