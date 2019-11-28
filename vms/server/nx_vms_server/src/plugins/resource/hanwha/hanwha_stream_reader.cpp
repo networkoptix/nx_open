@@ -16,6 +16,8 @@
 #include <utils/common/util.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include <plugins/resource/onvif/onvif_metadata_rtp_parser_factory.h>
+
 namespace nx {
 namespace vms::server {
 namespace plugins {
@@ -73,6 +75,7 @@ HanwhaStreamReader::HanwhaStreamReader(
     QnRtpStreamReader(res),
     m_hanwhaResource(res)
 {
+    m_rtpReader.setCustomTrackParserFactory(std::make_unique<OnvifMetadataRtpParserFactory>());
 }
 
 HanwhaStreamReader::~HanwhaStreamReader()
