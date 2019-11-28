@@ -187,6 +187,8 @@ public:
 
     void setTransport(nx::vms::api::RtpTransportType transport);
 
+    void setAdditionalSupportedCodecs(std::set<QString> additionalSupportedCodecs);
+
     // RTP transport configured by user
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
 
@@ -302,6 +304,7 @@ private:
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
 
     QByteArray nptPosToString(qint64 posUsec) const;
+
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -365,6 +368,7 @@ private:
     using RequestName = QString;
     QMap<RequestName, nx::network::http::HttpHeaders> m_additionalHeaders;
     QElapsedTimer m_lastReceivedDataTimer;
+    std::set<QString> m_additionalSupportedCodecs;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

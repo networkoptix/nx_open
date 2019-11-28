@@ -559,6 +559,14 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
+    else if (m_customTrackParserFactory)
+    {
+        std::unique_ptr<nx::streaming::rtp::StreamParser> customParser =
+            m_customTrackParserFactory->createParser(codecName);
+
+        if (customParser)
+            result = customParser.release();
+    }
 
     if (result)
         Qn::directConnect(result, &nx::streaming::rtp::StreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
@@ -667,6 +675,20 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
+    if (m_customTrackParserFactory)
+    {
+        const auto tracks = m_RtpSession.getTrackInfo();
+        std::set<QString> additionalSupportedCodecs;
+        for (const QnRtspClient::SDPTrackInfo& track: tracks)
+        {
+            const QString& codecName = track.sdpMedia.rtpmap.codecName;
+            if (m_customTrackParserFactory->supportsCodec(codecName))
+                additionalSupportedCodecs.insert(codecName);
+        }
+
+        m_RtpSession.setAdditionalSupportedCodecs(std::move(additionalSupportedCodecs));
+    }
+
     // Keep alive timeout will be overridden after SETUP request.
     m_RtpSession.setKeepAliveTimeout(std::chrono::milliseconds::zero());
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
@@ -765,11 +787,7 @@ void QnMulticodecRtpReader::createTrackParsers()
     }
     for (auto& track: trackInfo)
     {
-        bool supportedFormat =
-            track.sdpMedia.mediaType == Sdp::MediaType::Video ||
-            track.sdpMedia.mediaType == Sdp::MediaType::Audio;
-
-        if (!track.setupSuccess || !track.ioDevice || !supportedFormat)
+        if (!track.setupSuccess || !track.ioDevice || !isFormatSupported(track.sdpMedia))
             continue;
 
         TrackInfo trackParser;
@@ -1079,6 +1097,20 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerAddressIfNeeded(
     }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+bool QnMulticodecRtpReader::isFormatSupported(const nx::streaming::Sdp::Media media) const
+{
+    bool supportedByCustomParser = false;
+    if (m_customTrackParserFactory)
+    {
+        supportedByCustomParser =
+            m_customTrackParserFactory->supportsCodec(media.rtpmap.codecName);
+    }
+
+    return media.mediaType == nx::streaming::Sdp::MediaType::Audio
+        || media.mediaType == nx::streaming::Sdp::MediaType::Video
+        || supportedByCustomParser;
 }
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(

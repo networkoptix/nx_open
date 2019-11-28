@@ -656,17 +656,23 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
 
 bool QnRtspClient::sendSetup()
 {
+    using namespace nx::streaming;
+
     int audioNum = 0;
     for (uint32_t i = 0; i < m_sdpTracks.size(); ++i)
     {
         auto& track = m_sdpTracks[i];
-        if (track.sdpMedia.mediaType == nx::streaming::Sdp::MediaType::Audio)
+        const QString codecName = track.sdpMedia.rtpmap.codecName;
+
+        const bool isAdditionalSupportedCodec = codecName == METADATA_STR
+            || m_additionalSupportedCodecs.find(codecName) != m_additionalSupportedCodecs.cend();
+
+        if (track.sdpMedia.mediaType == Sdp::MediaType::Audio)
         {
             if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
                 continue;
         }
-        else if (track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Video &&
-            track.sdpMedia.rtpmap.codecName != METADATA_STR)
+        else if (track.sdpMedia.mediaType != Sdp::MediaType::Video && !isAdditionalSupportedCodec)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -1296,6 +1302,11 @@ void QnRtspClient::updateTransportHeader(QByteArray& response)
 void QnRtspClient::setTransport(nx::vms::api::RtpTransportType transport)
 {
     m_transport = transport;
+}
+
+void QnRtspClient::setAdditionalSupportedCodecs(std::set<QString> additionalSupportedCodecs)
+{
+    m_additionalSupportedCodecs = std::move(additionalSupportedCodecs);
 }
 
 QString QnRtspClient::getTrackCodec(int rtpChannelNum)
