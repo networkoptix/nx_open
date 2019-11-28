@@ -163,8 +163,11 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_GT(secondServerValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        while (secondServer->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        while (this->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2
+            || secondServer->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
+        }
 
         auto systemValues = secondServer->get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);
@@ -187,8 +190,11 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        while (get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        while (get<SystemValues>("/ec2/metrics/values")["servers"][secondServerId]["availability"]["status"]
+            != "Offline")
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
+        }
 
         auto systemValues = get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);
