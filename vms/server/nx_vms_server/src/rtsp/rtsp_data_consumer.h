@@ -72,6 +72,7 @@ public:
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
 
     virtual bool needConfigureProvider() const override { return true;  }
+
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -82,7 +83,6 @@ protected:
     void doRealtimeDelay(QnConstAbstractMediaDataPtr media);
 
     bool isMediaTimingsSlow() const;
-    void setLiveQualityInternal(MediaQuality quality);
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(
@@ -97,7 +97,7 @@ protected:
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
     bool needData(const QnAbstractDataPacketPtr& data) const;
-    MediaQuality preferredLiveStreamQuality(int channelNumber) const;
+    void switchQualityIfNeeded(bool isSecondaryProvider);
 
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
@@ -145,15 +145,12 @@ private:
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
     nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};
 
-    MediaQuality m_currentQuality[CL_MAX_CHANNELS]{MEDIA_Quality_None};
     /**
-     * Last live frames timestamps per each possible channel.
-     * m_lastLiveFrameTime[CHANNEL_NUMBER][0] - last primary stream frame timestamp and
-     * m_lastLiveFrameTime[CHANNEL_NUMBER][1] - last secondary stream frame timestamp for the
-     * given CHANNEL_NUMBER.
+     * Last live frames timestamps.
+     * m_lastLiveFrameTime[0] - last primary stream frame timestamp and
+     * m_lastLiveFrameTime[1] - last secondary stream frame timestamp
      */
-    int64_t m_lastLiveFrameTime[CL_MAX_CHANNELS][2]{{0}};
-    bool m_isLive = false;
+    int64_t m_lastLiveFrameTime[2] {0};
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_primarypProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryProcessDataLogger;

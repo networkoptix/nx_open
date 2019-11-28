@@ -1088,13 +1088,11 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::checkQuality()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->liveDpHi &&
-       (d->quality == MEDIA_Quality_Low || d->quality == MEDIA_Quality_LowIframesOnly))
+    if (d->liveDpHi && isLowMediaQuality(d->quality))
     {
-        if (d->liveDpLow == 0) {
+        if (d->liveDpLow == nullptr) {
             d->quality = MEDIA_Quality_High;
-            NX_WARNING(this,
-                "Low quality not supported for camera %1",
+            NX_WARNING(this, "Low quality not supported for camera %1",
                 d->mediaRes->toResource()->getUniqueId());
         }
         else if (d->liveDpLow->isPaused()) {

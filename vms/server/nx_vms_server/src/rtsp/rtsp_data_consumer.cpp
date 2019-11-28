@@ -27,11 +27,6 @@ using namespace nx::vms::api;
 
 namespace {
 
-bool needSecondaryStream(MediaQuality q)
-{
-    return isLowMediaQuality(q);
-}
-
 static const int kTcpSendBlockSize = 1024 * 16;
 static const int kRtpTcpHeaderSize = 4;
 static const uint32_t kMetadataSsrc = 40000;
@@ -265,19 +260,46 @@ void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& un
     }
 }
 
+/**
+ * Determines preferred stream quality for the live stream and switch it. Behavior depends on the
+ * stream quality, desired by the user and on the corresponding camera stream state. If, for
+ * example, user-desired quality is Hi, but the primary stream reader is idle quality will switched
+ * to LowQuality.
+ */
+void QnRtspDataConsumer::switchQualityIfNeeded(bool isSecondaryProvider)
+{
+    const auto kMaxTimeFromPreviousFrameUs = 3 * 1000 * 1000;
+    auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
+    if (m_lastLiveFrameTime[0] == 0)
+        m_lastLiveFrameTime[0] = nowUs;
+    if (m_lastLiveFrameTime[1] == 0)
+        m_lastLiveFrameTime[1] = nowUs;
+    m_lastLiveFrameTime[isSecondaryProvider ? 1 : 0] = nowUs;
+
+    const bool isPrimaryOpened = m_lastLiveFrameTime[0] > nowUs - kMaxTimeFromPreviousFrameUs;
+    const bool isSecondaryOpened = m_lastLiveFrameTime[1] > nowUs - kMaxTimeFromPreviousFrameUs;
+    if (!isLowMediaQuality(m_liveQuality) && !isPrimaryOpened && isSecondaryOpened)
+        setLiveQuality(MediaQuality::MEDIA_Quality_Low);
+    else if (isLowMediaQuality(m_liveQuality) && !isSecondaryOpened && isPrimaryOpened)
+        setLiveQuality(MediaQuality::MEDIA_Quality_High);
+}
+
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    if (const auto abstractMediaData =
+    if (const auto mediaData =
         std::dynamic_pointer_cast<QnAbstractMediaData>(nonConstData))
     {
         const bool isSecondaryProvider =
-            abstractMediaData->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+            mediaData->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)
             ? m_secondaryPutDataLogger
             : m_primarypPutDataLogger;
 
         if (logger)
-            logger->pushData(abstractMediaData, lm("Queue size %1").args(m_dataQueue.size()));
+            logger->pushData(mediaData, lm("Queue size %1").args(m_dataQueue.size()));
+
+        if (mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE)
+            switchQualityIfNeeded(isSecondaryProvider);
     }
 
     if (!needData(nonConstData))
@@ -292,7 +314,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
        (m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION))
     {
         auto unsafeQueue = m_dataQueue.lock();
-        bool clearHiQ = !needSecondaryStream(m_liveQuality); // remove LQ packets, keep HQ
+        bool clearHiQ = !isLowMediaQuality(m_liveQuality); // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
         for (quint32 ch = 0; ch < m_videoChannels; ++ch)
@@ -356,9 +378,12 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
-    QnMutexLocker lock( &m_qualityChangeMutex );
-    if (m_liveQuality != liveQuality)
+    QnMutexLocker lock(&m_qualityChangeMutex);
+    if (m_liveQuality != liveQuality && m_newLiveQuality != liveQuality)
+    {
+        NX_DEBUG(this, "Schedule to change quality from %1, to %2", m_liveQuality, liveQuality);
         m_newLiveQuality = liveQuality;
+    }
 }
 
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
@@ -523,18 +548,18 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     {
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         {
-            QnMutexLocker lock( &m_qualityChangeMutex );
+            QnMutexLocker lock(&m_qualityChangeMutex);
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
             {
-                if (needSecondaryStream(m_newLiveQuality) && isSecondaryProvider)
+                if (isLowMediaQuality(m_newLiveQuality) && isSecondaryProvider)
                 {
-                    setLiveQualityInternal(m_newLiveQuality); // slow network. Reduce quality
+                    m_liveQuality = m_newLiveQuality;
                     m_newLiveQuality = MEDIA_Quality_None;
                     setNeedKeyData();
                 }
-                else if (!needSecondaryStream(m_newLiveQuality) && !isSecondaryProvider)
+                else if (!isLowMediaQuality(m_newLiveQuality) && !isSecondaryProvider)
                 {
-                    setLiveQualityInternal(m_newLiveQuality);
+                    m_liveQuality = m_newLiveQuality;
                     m_newLiveQuality = MEDIA_Quality_None;
                     setNeedKeyData();
                 }
@@ -543,36 +568,10 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
         if (isLive)
         {
-            if (media->channelNumber >= 0 && media->channelNumber < CL_MAX_CHANNELS)
-            {
-                m_lastLiveFrameTime[media->channelNumber][isSecondaryProvider ? 1 : 0] =
-                    qnSyncTime->currentUSecsSinceEpoch();
-            }
-
-            MediaQuality currentQuality = m_currentQuality[media->channelNumber];
-            MediaQuality prefferredQuality = preferredLiveStreamQuality(media->channelNumber);
-
-            // Switching quality only if the current frame is a key frame for video stream.
-            if (prefferredQuality != m_currentQuality[media->channelNumber] && (isKeyFrame || !isVideo))
-                m_currentQuality[media->channelNumber] = prefferredQuality;
-
-            const bool isCurrentQualityLow =
-                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_Low;
-            const bool isCurrentQualityHigh =
-                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_High;
-
-            const bool isMediaFrameQualityAppropriate =
-                (isCurrentQualityLow && isSecondaryProvider)
-                || (isCurrentQualityHigh && !isSecondaryProvider);
-
-            if (!isMediaFrameQualityAppropriate)
-                return true; //< Skip this frame.
-
-            // Live stream has just been started. Let's wait for the first key frame before switch.
-            if (!m_isLive && isVideo && !isKeyFrame)
-                return true;
-
-            m_isLive = true;
+            if (!isLowMediaQuality(m_liveQuality) && isSecondaryProvider)
+                return true; // data for other live quality stream
+            else if (isLowMediaQuality(m_liveQuality) && !isSecondaryProvider)
+                return true; // data for other live quality stream
 
             if (isVideo)
             {
@@ -586,10 +585,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                     return true; // wait for I frame for this channel
                 }
             }
-        }
-        else
-        {
-            m_isLive = false;
         }
     }
 
@@ -715,40 +710,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
-/**
- * Determines preferred stream quality for the live stream. Result depends on the stream quality,
- * desired by the user and on the corresponding camera stream state. If, for example, user-desired
- * quality is Hi, but the primary stream reader is idle we return LowQuality as a result.
- */
-MediaQuality QnRtspDataConsumer::preferredLiveStreamQuality(int channelNumber) const
-{
-    const auto kMaxTimeFromPreviousFrameUs = 1 * 1000 * 1000;
-    auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
-    const bool isPrimaryStreamReaderOpened =
-        m_lastLiveFrameTime[channelNumber][0] > nowUs - kMaxTimeFromPreviousFrameUs;
-
-    const bool isSecondaryStreamReaderOpened =
-        m_lastLiveFrameTime[channelNumber][1] > nowUs - kMaxTimeFromPreviousFrameUs;
-
-    MediaQuality prefferredQuality = MEDIA_Quality_None;
-    if (!needSecondaryStream(m_liveQuality))
-    {
-        if (isPrimaryStreamReaderOpened)
-            prefferredQuality = MediaQuality::MEDIA_Quality_High;
-        else
-            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
-    }
-    else
-    {
-        if (isSecondaryStreamReaderOpened)
-            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
-        else
-            prefferredQuality = MediaQuality::MEDIA_Quality_High;
-    }
-
-    return prefferredQuality;
-}
-
 void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
 {
     int bytesRead = 0;
@@ -830,17 +791,13 @@ void QnRtspDataConsumer::clearUnprocessedData()
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
+    m_lastLiveFrameTime[0] = 0;
+    m_lastLiveFrameTime[1] = 0;
 }
 
 void QnRtspDataConsumer::setUseUTCTime(bool value)
 {
     m_useUTCTime = value;
-}
-
-void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
-{
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    m_liveQuality = quality;
 }
 
 nx::vms::api::StreamDataFilters QnRtspDataConsumer::streamDataFilter() const

@@ -9,8 +9,6 @@
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
-#define MAX_LIVE_FPS 10000000.0
-
 class QnAbstractMediaStreamDataProvider: public QnAbstractStreamDataProvider
 {
     Q_OBJECT
