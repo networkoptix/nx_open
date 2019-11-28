@@ -20,6 +20,13 @@ Text
     horizontalAlignment: Text.AlignLeft
     elide: Text.ElideRight
 
+    function click()
+    {
+        if (navigationMenu)
+            navigationMenu.currentItemId = itemId
+        clicked()
+    }
+
     signal clicked()
 
     MouseArea
@@ -29,11 +36,7 @@ Text
         hoverEnabled: true
 
         onClicked:
-        {
-            if (navigationMenu)
-                navigationMenu.currentItemId = itemId
-            menuItem.clicked()
-        }
+            menuItem.click()
     }
 
     Rectangle

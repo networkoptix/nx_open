@@ -1,28 +1,49 @@
 import QtQuick 2.0
+import QtQuick.Layouts 1.10
 
 import Nx.Controls 1.0
 
 import "private"
 
-Scrollable
+StackLayout
 {
     id: control
 
     property string name: ""
-    property Item childrenItem: contentItem
+    property Item childrenItem: column
+    property StackLayout sectionsItem: control
     property bool contentEnabled: column.enabled
+    property Item scrollBarParent: null
 
-    contentItem: AlignedColumn
+    Scrollable
     {
-        id: column
+        id: view
 
-        width:
+        verticalScrollBar: ScrollBar
         {
-            var scrollBar = control.scrollView.ScrollBar.vertical
-            return scrollBar && scrollBar.parent === control.scrollView
-                ? Math.min(control.scrollView.width, scrollBar.x)
-                : control.scrollView.width
+            parent: scrollBarParent ? scrollBarParent : view
+            x: parent ? parent.width - width : 0
+            height: parent ? parent.height : 0
+            visible: view.visible
         }
+
+        contentItem: AlignedColumn
+        {
+            id: column
+
+            width:
+            {
+                return view.verticalScrollBar && view.verticalScrollBar.parent === view
+                    ? Math.min(view.width, view.verticalScrollBar.x)
+                    : view.width
+            }
+        }
+    }
+
+    onCurrentIndexChanged:
+    {
+        if (currentIndex > 0 && children[currentIndex].hasOwnProperty("scrollBarParent"))
+            children[currentIndex].scrollBarParent = scrollBarParent
     }
 }
 

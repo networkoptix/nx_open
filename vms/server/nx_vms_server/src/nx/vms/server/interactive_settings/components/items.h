@@ -230,9 +230,18 @@ protected:
 class Settings: public Group
 {
     Q_OBJECT
+    using base_type = Group;
 
 public:
     Settings(QObject* parent = nullptr);
+
+    QQmlListProperty<Settings> sections();
+    const QList<Settings*> sectionList() const;
+
+    virtual QJsonObject serialize() const override;
+
+private:
+    QList<Settings*> m_sections;
 };
 
 class GroupBox: public Group

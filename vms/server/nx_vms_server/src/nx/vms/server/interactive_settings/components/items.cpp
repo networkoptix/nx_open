@@ -7,7 +7,7 @@
 
 namespace nx::vms::server::interactive_settings::components {
 
-Item::Item(const QString& type, QObject* parent):
+Item::Item(const QString& type, QObject* parent) :
     QObject(parent),
     m_type(type)
 {
@@ -41,7 +41,7 @@ QJsonObject Group::serialize() const
     auto result = base_type::serialize();
 
     QJsonArray items;
-    for (const auto item: m_items)
+    for (const auto item : m_items)
         items.append(item->serialize());
     result[QStringLiteral("items")] = items;
 
@@ -191,9 +191,31 @@ QJsonObject RealNumberItem::serialize() const
 //-------------------------------------------------------------------------------------------------
 // Specific components.
 
-Settings::Settings(QObject* parent):
+Settings::Settings(QObject* parent) :
     Group(QStringLiteral("Settings"), parent)
 {
+}
+
+QQmlListProperty<Settings> Settings::sections()
+{
+    return QQmlListProperty<Settings>(this, m_sections);
+}
+
+const QList<Settings*> Settings::sectionList() const
+{
+    return m_sections;
+}
+
+QJsonObject Settings::serialize() const
+{
+    auto result = base_type::serialize();
+
+    QJsonArray sections;
+    for (const auto section: m_sections)
+        sections.append(section->serialize());
+
+    result[QStringLiteral("sections")] = sections;
+    return result;
 }
 
 GroupBox::GroupBox(QObject* parent):
