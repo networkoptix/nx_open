@@ -76,13 +76,21 @@ void CameraRequestProcessor::run()
     const QByteArray cameraUrl = receiveCameraUrl();
 
     const int pos = cameraUrl.indexOf('?');
-    const QByteArray macAddress = cameraUrl.left(pos);
     const QList<QByteArray> params = cameraUrl.mid(pos+1).split('&');
+    const QByteArray macAddressString = cameraUrl.left(pos);
+
+    const nx::utils::MacAddress macAddress(macAddressString);
+    if (macAddress.isNull())
+    {
+        NX_LOGGER_VERBOSE(m_logger, "Invalid MAC address %1 in received URL %2.",
+            nx::kit::utils::toString(macAddressString), nx::kit::utils::toString(cameraUrl));
+        return;
+    }
 
     auto* const camera = m_cameraPool->findCamera(macAddress);
     if (camera == nullptr)
     {
-        NX_LOGGER_VERBOSE(m_logger, "No Camera found with MAC %1.", macAddress);
+        NX_LOGGER_VERBOSE(m_logger, "No Camera found with MAC %1.", macAddressString);
         return;
     }
 

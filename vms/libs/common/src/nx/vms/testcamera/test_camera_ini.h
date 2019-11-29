@@ -8,12 +8,13 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("test_camera.ini") { reload(); }
 
-    NX_INI_STRING("92-61", macPrefix, "First two bytes of the desired MAC, separeted by '-'.");
+    NX_INI_STRING("92-61", macAddressPrefix,
+        "The first two bytes of the desired MAC address, separeted by '-'.");
 
     NX_INI_INT(4984, discoveryPort, "Port on which test camera expects discovery packets used\n"
         "for Server's auto camera discovery feature.");
 
-    NX_INI_INT(4985, mediaPort, "Port on which test camera serves the media stream.");
+    NX_INI_INT(4985, mediaPort, "Port on which testcamera serves the media stream.");
 
     NX_INI_STRING(
         "Network Optix Camera Emulator 3.0 discovery",
@@ -23,9 +24,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_STRING(
         "Network Optix Camera Emulator 3.0 discovery response",
-        discoveryResponseMessage,
-        "Message that is sent by testcamera to the Server when the Camera gets discovered. Must\n"
-        "be specified without a trailing newline.");
+        discoveryResponseMessagePrefix,
+        "Prefix for the message that is sent by testcamera to the Server when the Camera gets\n"
+        "discovered. Must be specified without a trailing newline.");
 
     NX_INI_STRING("", logFramesFile, "If not empty, log video frames to this file.");
 

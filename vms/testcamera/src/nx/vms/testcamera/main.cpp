@@ -69,6 +69,7 @@ public:
             m_commonModule.get(), options.maxFileSizeMegabytes);
 
         m_cameraPool = std::make_unique<CameraPool>(
+            m_fileCache.get(),
             options.localInterfaces,
             m_commonModule.get(),
             options.noSecondary,
