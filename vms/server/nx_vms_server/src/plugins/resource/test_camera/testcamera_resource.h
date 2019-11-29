@@ -1,6 +1,5 @@
 #pragma once
-
-#ifdef ENABLE_TEST_CAMERA
+#if defined(ENABLE_TEST_CAMERA)
 
 #include <nx/vms/server/resource/camera.h>
 
@@ -24,8 +23,6 @@ public:
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-
-private:
 };
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)

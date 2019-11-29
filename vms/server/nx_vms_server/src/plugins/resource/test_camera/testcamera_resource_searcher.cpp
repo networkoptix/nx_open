@@ -1,13 +1,14 @@
-#ifdef ENABLE_TEST_CAMERA
-
 #include "testcamera_resource_searcher.h"
-#include "testcamera_resource.h"
+#if defined(ENABLE_TEST_CAMERA)
+
 #include <nx/network/nettools.h>
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include <nx/vms/testcamera/test_camera_ini.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/testcamera/test_camera_ini.h>
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
+
+#include "testcamera_resource.h"
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
@@ -35,23 +36,22 @@ void QnTestCameraResourceSearcher::clearSocketList()
 
 bool QnTestCameraResourceSearcher::updateSocketList()
 {
-    qint64 curretTime = getUsecTimer();
-    if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
+    const qint64 currentTime = getUsecTimer();
+    if (currentTime - m_sockUpdateTime <= SOCK_UPDATE_INTERVAL)
+        return false;
+
+    clearSocketList();
+    for (const auto& address: nx::network::allLocalAddresses(nx::network::ipV4))
     {
-        clearSocketList();
-        for (const auto& address: nx::network::allLocalAddresses(nx::network::ipV4))
-        {
-            DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(),
-                QHostAddress(address.toString()));
-            if (info.sock->bind(address.toString(), 0))
-                m_sockList << info;
-            else
-                delete info.sock;
-        }
-        m_sockUpdateTime = curretTime;
-        return true;
+        DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(),
+            QHostAddress(address.toString()));
+        if (info.sock->bind(address.toString(), 0))
+            m_sockList << info;
+        else
+            delete info.sock;
     }
-    return false;
+    m_sockUpdateTime = currentTime;
+    return true;
 }
 
 void QnTestCameraResourceSearcher::sendBroadcast()
@@ -74,22 +74,22 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
         QnSleep::msleep(1000);
     }
 
-    QnResourceList result;
-    QSet<QString> processedMacs;
+    QnResourceList resources;
+    QSet<QString> processedMacAddresses;
 
     const QByteArray testCameraIdMessage =
-        ini().discoveryResponseMessage + QByteArray("\n");
+        ini().discoveryResponseMessagePrefix + QByteArray("\n");
 
     for (const DiscoveryInfo& info: m_sockList)
     {
-        nx::network::AbstractDatagramSocket* sock = info.sock;
-        while (sock->hasData())
+        nx::network::AbstractDatagramSocket* socket = info.sock;
+        while (socket->hasData())
         {
             QByteArray responseData;
             responseData.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
             nx::network::SocketAddress remoteEndpoint;
-            const int bytesRead = sock->recvFrom(
+            const int bytesRead = socket->recvFrom(
                 responseData.data(), responseData.size(), &remoteEndpoint);
             if (bytesRead < 1)
                 continue;
@@ -97,14 +97,13 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
             if (params[0] != testCameraIdMessage || params.size() < 3)
                 continue;
 
-            const int videoPort = params[1].toInt();
+            const int mediaPort = params[1].toInt();
             for (int paramIndex = 2; paramIndex < params.size(); ++paramIndex)
             {
-                const QString mac = params[paramIndex];
-                if (processedMacs.contains(mac))
+                const QString macAddress = params[paramIndex];
+                if (processedMacAddresses.contains(macAddress))
                     continue;
 
-                // TODO: #mshevchenko CURRENT
                 const QnTestCameraResourcePtr resource(new QnTestCameraResource(serverModule()));
                 const QString model = QLatin1String(QnTestCameraResource::kModel);
                 const QnUuid resourceTypeId =
@@ -115,25 +114,25 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
                 const nx::utils::Url url = nx::network::url::Builder()
                     .setScheme("tcp")
                     .setHost(remoteEndpoint.address.toString())
-                    .setPort(videoPort)
-                    .setPath(mac);
+                    .setPort(mediaPort)
+                    .setPath(macAddress);
 
                 resource->setTypeId(resourceTypeId);
                 resource->setName(model);
                 resource->setModel(model);
-                resource->setMAC(nx::utils::MacAddress(mac));
+                resource->setMAC(nx::utils::MacAddress(macAddress));
                 resource->setUrl(url.toString());
 
-                NX_VERBOSE(this, "Found test camera %1 (URL: %2)", resource, url);
-                processedMacs << mac;
-                result << resource;
+                NX_VERBOSE(this, "Found testcamera %1 with URL %2", resource, url);
+                processedMacAddresses.insert(macAddress);
+                resources.push_back(resource);
             }
         }
     }
 
     sendBroadcast();
 
-    return result;
+    return resources;
 }
 
 QnResourcePtr QnTestCameraResourceSearcher::createResource(
@@ -161,7 +160,6 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
     NX_DEBUG(this, "Create test camera resource [%1], type id: [%2]",
         result, resourceTypeId);
     return result;
-
 }
 
 QString QnTestCameraResourceSearcher::manufacturer() const
@@ -173,9 +171,9 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils
     const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
-        return QList<QnResourcePtr>(); //< searching if only host is present, not specific protocol
+        return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
 
     return QList<QnResourcePtr>();
 }
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)
