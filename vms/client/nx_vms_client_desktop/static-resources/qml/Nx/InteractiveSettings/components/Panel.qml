@@ -18,7 +18,7 @@ Panel
     property alias childrenItem: control.contentItem
 
     width: parent.width
-    contentHeight: (control.collapsed || !contentItem) ? 0 : contentItem.implicitHeight
+    contentHeight: contentItem ? contentItem.implicitHeight : 0
 
     contentItem: AlignedColumn 
     {
@@ -26,15 +26,20 @@ Panel
         height: control.contentHeight
     }
 
-    Behavior on contentHeight
+    states: State
     {
-        id: animatedBehavior
-        enabled: false
+        name: "collapsed"
+        when: control.collapsed
+        PropertyChanges { target: control; contentHeight: 0 }
+    }
 
+    transitions: Transition
+    {
         NumberAnimation 
         { 
-            duration: 200
+            properties: "contentHeight"
             easing.type: Easing.InOutQuad
+            duration: 200
         }
     }
 
@@ -60,9 +65,6 @@ Panel
         }
         
         onClicked: 
-        {
-            animatedBehavior.enabled = Qt.binding(function() { return control.collapsible && control.visible })
             control.collapsed = !control.collapsed
-        }
     }
 }
