@@ -100,14 +100,10 @@ private:
     void switchQualityIfNeeded(bool isSecondaryProvider);
 
 private:
-    //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
-    //QMap<int, QList<int> > m_ctxSended;
     QElapsedTimer m_timer;
     nx::utils::ElapsedTimer m_keepAliveTimer;
-    //quint16 m_sequence[MAX_RTP_CHANNELS];
-    //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
     qint64 m_rtStartTime; // used for realtime streaming mode
@@ -136,8 +132,6 @@ private:
 
     QnByteArray m_sendBuffer;
     bool m_someDataIsDropped;
-    qint64 m_previousRtpTimestamp;
-    qint64 m_previousScaledRtpTimestamp;
 
     int m_framesSinceRangeCheck;
     QByteArray m_prevRangeHeader;

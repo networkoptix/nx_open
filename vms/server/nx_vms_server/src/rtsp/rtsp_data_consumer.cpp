@@ -70,8 +70,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_fastChannelZappingSize(0),
     m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
     m_someDataIsDropped(false),
-    m_previousRtpTimestamp(-1),
-    m_previousScaledRtpTimestamp(-1),
     m_framesSinceRangeCheck(0),
     m_videoChannels(1)
 {
@@ -748,14 +746,13 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
     bool iFramesOnly)
 {
     // Fast channel zapping
-    int prevSize = m_dataQueue.size();
     int copySize = 0;
     if (camera /* && !res->hasFlags(Qn::no_last_gop) */) //< TODO: Add comment.
         copySize = camera->copyLastGop(streamIndex, skipTime, m_dataQueue, iFramesOnly);
-    NX_DEBUG(this, "%1 frames copied from saved gop", copySize);
-    m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
-    m_fastChannelZappingSize = copySize;
 
+    NX_DEBUG(this, "%1 frames copied from saved gop", copySize);
+    m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
+    m_fastChannelZappingSize = copySize;
     return copySize;
 }
 
