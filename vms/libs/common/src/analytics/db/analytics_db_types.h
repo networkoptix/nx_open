@@ -86,15 +86,21 @@ struct ObjectTrack
 
 struct ObjectTrackEx: public ObjectTrack
 {
-    ObjectTrackEx(const ObjectTrack& data);
     std::vector<ObjectPosition> objectPositionSequence;
+
+    ObjectTrackEx() = default;
+    ObjectTrackEx(const ObjectTrack& data);
 };
 
 #define ObjectTrack_analytics_storage_Fields \
     (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs) \
     (lastAppearanceTimeUs)(objectPosition)(bestShot)
 
+#define ObjectTrackEx_analytics_storage_Fields \
+    ObjectTrack_analytics_storage_Fields (objectPositionSequence)
+
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectTrackEx, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 
@@ -126,6 +132,11 @@ struct Filter
      * Zero value is treated as no limit.
      */
     int maxObjectTracksToSelect = 0;
+
+    /**
+     * Select track details(geometry data) if it true.
+     */
+    bool needFullTrack = false;
     /**
      * Found tracks are sorted by minimal track time using this order.
      */
@@ -165,12 +176,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)
+    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)\
+    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
 
-using LookupResult = std::vector<ObjectTrack>;
+using LookupResult = std::vector<ObjectTrackEx>;
 
 //-------------------------------------------------------------------------------------------------
 

@@ -2686,22 +2686,25 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt] deviceId Id of Device.
-     * %param[opt] objectTypeId Analytics Object Type id.
-     * %param[opt] objectTrackId Analytics Object Track id.
-     * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] y1 Top left "y" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] x2 Bottom right "x" coordinate of picture bounding box to search within. In
+     * %param[opt]:uuid deviceId Id of Device.
+     * %param[opt]:string objectTypeId Analytics Object Type id.
+     * %param[opt]:string objectTrackId Analytics Object Track id.
+     * %param[opt]:integer startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:integer endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:float x1 Top left "x" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
+     * %param[opt]:float y1 Top left "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within Object Track properties.
-     * %param[opt] limit Maximum number of Object Tracks to return.
-     * %param[opt] sortOrder Sort order of Object Tracks by a Track start timestamp.
+     * %param[opt]:float x2 Bottom right "x" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:float y2 Bottom right "y" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:string freeText Text to match within Object Track properties.
+     * %param[opt]:integer limit Maximum number of Object Tracks to return.
+     * %param[opt]:boolean needFullTrack Whether to select track details data. This is a heavy
+     *     operation and makes the request much slower. For performance reason this parameter
+     *     is ignored in case the parameter 'objectTrackId' is not present in the request.
+     * %param[opt]::enum sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      * %param[opt] isLocal If "false" then request is forwarded to every other online Server and

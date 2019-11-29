@@ -293,7 +293,7 @@ void EventsStorage::lookup(
 {
     NX_DEBUG(this, "Selecting tracks. Filter %1", filter);
 
-    auto result = std::make_shared<std::vector<ObjectTrack>>();
+    auto result = std::make_shared<std::vector<ObjectTrackEx>>();
     m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
         {
@@ -304,6 +304,11 @@ void EventsStorage::lookup(
                 m_analyticsArchiveDirectory.get(),
                 std::move(filter));
             *result = objectSearcher.lookup(queryContext);
+            if (filter.needFullTrack && !filter.objectTrackId.isNull())
+            {
+                for (auto& track: *result)
+                    track.objectPositionSequence = lookupTrackDetailsSync(track);
+            }
             return nx::sql::DBResult::ok;
         },
         [this, result, completionHandler = std::move(completionHandler)](
