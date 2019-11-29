@@ -15,11 +15,11 @@ namespace nx::vms::testcamera {
 
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
-    std::function<QByteArray()> obtainDiscoveryResponseDataFunc,
+    std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
     QStringList localInterfacesToListen)
     :
     m_logger(logger),
-    m_obtainDiscoveryResponseDataFunc(std::move(obtainDiscoveryResponseDataFunc)),
+    m_obtainDiscoveryResponseMessageFunc(std::move(obtainDiscoveryResponseMessageFunc)),
     m_localInterfacesToListen(std::move(localInterfacesToListen))
 {
 }
@@ -81,7 +81,7 @@ bool CameraDiscoveryListener::serverAddressIsAllowed(
         });
 }
 
-/** @return Empty string if  or on error, having logged the error message. */
+/** @return Empty string on error, having logged the error message. */
 QByteArray CameraDiscoveryListener::receiveDiscoveryMessage(
     QByteArray* buffer,
     nx::network::SocketAddress* outServerAddress,
@@ -112,10 +112,7 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     nx::network::AbstractDatagramSocket* discoverySocket,
     const nx::network::SocketAddress& serverAddress) const
 {
-    QByteArray response(ini().discoveryResponseMessage);
-    response.append('\n');
-    response.append(';');
-    response.append(m_obtainDiscoveryResponseDataFunc());
+    const QByteArray response = m_obtainDiscoveryResponseMessageFunc();
 
     discoverySocket->setDestAddr(serverAddress);
     const int bytesSent = discoverySocket->send(response.data(), response.size());

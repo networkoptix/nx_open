@@ -1,6 +1,6 @@
 #include "camera.h"
 
-#include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 #include <nx/network/socket.h>
 #include <nx/utils/random.h>
 #include <nx/streaming/video_data_packet.h>
@@ -21,20 +21,18 @@ namespace nx::vms::testcamera {
 
 static constexpr unsigned int kSendTimeoutMs = 1000;
 
-static QByteArray buildMac(int cameraNumber)
+static nx::utils::MacAddress makeMacAddress(int cameraNumber)
 {
-    const auto numberBigEndian = qToBigEndian((int32_t) cameraNumber);
+    QString macAddressString = ini().macAddressPrefix;
+    for (int i = 3; i >= 0; --i)
+        macAddressString += QString().sprintf("-%02x", (cameraNumber >> (i * 8)) & 0xFF);
 
-    QByteArray mac = ini().macPrefix;
-    QByteArray last = QByteArray((const char*) &numberBigEndian, sizeof(numberBigEndian)).toHex();
-    while (!last.isEmpty())
-    {
-        mac += '-';
-        mac += last.left(2);
-        last = last.mid(2);
-    }
+    nx::utils::MacAddress macAddress(macAddressString);
 
-    return mac;
+    NX_ASSERT(!macAddress.isNull(),
+        "Invalid camera MAC address string: %1" + nx::kit::utils::toString(macAddressString));
+
+    return macAddress;
 }
 
 Camera::Camera(
@@ -48,11 +46,11 @@ Camera::Camera(
     m_frameLogger(frameLogger),
     m_fileCache(fileCache),
     m_number(number),
-    m_mac(buildMac(number)),
+    m_macAddress(makeMacAddress(number)),
     m_cameraOptions(cameraOptions),
     m_primaryFileNames(primaryFileNames),
     m_secondaryFileNames(secondaryFileNames),
-    m_logger(new Logger(lm("Camera(%1)").args(m_mac)))
+    m_logger(new Logger(lm("Camera(%1)").args(m_macAddress)))
 {
     m_checkTimer.restart();
 }

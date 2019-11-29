@@ -28,7 +28,7 @@ class CameraDiscoveryListener: public QnLongRunnable
 public:
     CameraDiscoveryListener(
         const Logger* logger,
-        std::function<QByteArray()> obtainDiscoveryResponseDataFunc,
+        std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
         QStringList localInterfacesToListen);
 
     virtual ~CameraDiscoveryListener();
@@ -59,7 +59,7 @@ protected:
 
 private:
     const Logger* const m_logger;
-    const std::function<QByteArray()> m_obtainDiscoveryResponseDataFunc;
+    const std::function<QByteArray()> m_obtainDiscoveryResponseMessageFunc;
     const QStringList m_localInterfacesToListen;
     std::vector<IpRangeV4> m_allowedIpRanges;
 };

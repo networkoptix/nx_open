@@ -77,7 +77,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QSet<QString> processedMac;
 
     const QByteArray testCameraIdMessage =
-        ini().discoveryResponseMessage + QByteArray("\n");
+        ini().discoveryResponseMessagePrefix + QByteArray("\n");
 
     for (const DiscoveryInfo& info: m_sockList)
     {
