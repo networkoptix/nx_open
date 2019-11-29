@@ -71,7 +71,7 @@
                     },
                     "vmsTime": {
                         "name": "VMS Time",
-                        "display": "table|panel"
+                        "display": "panel"
                     },
                     "vmsTimeChanged24h": {
                         "name": "Events: Time Changed (24h)",
@@ -206,7 +206,6 @@
                     },
                     "threads": {
                         "name": "Server threads",
-                        "description": "The number of threads inside Server processes.",
                         "display": "panel"
                     },
                     "encodingThreads": {
@@ -256,6 +255,7 @@
                 "values": {
                     "transactionsPerSecond1m": {
                         "name": "Transactions/s",
+                        "description": "Transactions per second",
                         "isOptional": true,
                         "display": "panel",
                         "format": "Tr/s",
@@ -465,10 +465,13 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "resolutionGreaterOrEqualThan %resolution 1280x720",
-                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
+                                "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
+                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
                             }
                         ]
+                    },
+                    "recommendedMaxSecondaryResolution": {
+                        "calculate": "const 1280x720"
                     },
                     "targetFps": {
                         "name": "Target FPS",
@@ -569,7 +572,7 @@
                     },
                     "issues24h": {
                         "name": "Issues (24h)",
-                        "description": "Events Count: Storage Issues (24h)",
+                        "description": "Events count: Storage Issues (24h)",
                         "display": "table|panel",
                         "calculate": "counterDelta %issues 24h",
                         "insert": "issues"
