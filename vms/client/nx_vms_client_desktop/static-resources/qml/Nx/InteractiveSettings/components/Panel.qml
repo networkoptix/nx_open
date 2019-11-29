@@ -20,7 +20,7 @@ Panel
     width: parent.width
     contentHeight: contentItem ? contentItem.implicitHeight : 0
 
-    contentItem: AlignedColumn 
+    contentItem: AlignedColumn
     {
         clip: true
         height: control.contentHeight
@@ -35,8 +35,8 @@ Panel
 
     transitions: Transition
     {
-        NumberAnimation 
-        { 
+        NumberAnimation
+        {
             properties: "contentHeight"
             easing.type: Easing.InOutQuad
             duration: 200
@@ -60,11 +60,11 @@ Panel
             anchors.centerIn: parent
             rotation: control.collapsed ? 0 : 180
             color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
-                ? ColorTheme.colors.light1 
+                ? ColorTheme.colors.light1
                 : ColorTheme.colors.light4
         }
-        
-        onClicked: 
+
+        onClicked:
             control.collapsed = !control.collapsed
     }
 }
