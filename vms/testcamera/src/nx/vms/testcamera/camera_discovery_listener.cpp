@@ -128,7 +128,8 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     }
     else
     {
-        NX_LOGGER_VERBOSE(m_logger, "Sent discovery response message to Server %1", serverAddress);
+        NX_LOGGER_VERBOSE(m_logger, "Sent discovery response message to Server %1: %2",
+            serverAddress, nx::kit::utils::toString(response));
     }
 }
 
