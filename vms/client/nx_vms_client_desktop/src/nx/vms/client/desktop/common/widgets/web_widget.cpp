@@ -1,24 +1,16 @@
 #include "web_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QProgressBar>
 #include <QtWebEngineWidgets/QWebEngineHistory>
 
 #include <ui/style/webview_style.h>
 
-#include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/web_engine_view.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include <utils/common/event_processors.h>
-
-namespace {
-
-using namespace std::chrono;
-
-constexpr milliseconds kBlankPageLoadTimeout = 1s;
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -30,32 +22,21 @@ WebWidget::WebWidget(QWidget* parent):
     NxUi::setupWebViewStyle(m_webEngineView);
     anchorWidgetToParent(m_webEngineView);
 
-    static constexpr int kDotRadius = 8;
-    auto busyIndicator = new BusyIndicatorWidget(parent);
-    busyIndicator->setHidden(true);
-    busyIndicator->dots()->setDotRadius(kDotRadius);
-    busyIndicator->dots()->setDotSpacing(kDotRadius * 2);
-    anchorWidgetToParent(busyIndicator);
+    auto progressBar = new QProgressBar(this);
+    anchorWidgetToParent(progressBar, Qt::TopEdge | Qt::LeftEdge | Qt::RightEdge);
+    progressBar->setStyleSheet(QString::fromUtf8(R"(
+        QProgressBar {
+            border-top: 0px;
+            border-bottom: 1px;
+            border-style: ourset;
+        }
+        )"));
+    progressBar->setFixedHeight(3);
+    progressBar->setTextVisible(false);
+    progressBar->setRange(0, 0);
 
-    auto errorLabel = new QLabel(parent);
-    errorLabel->setText(lit("<h1>%1</h1>").arg(tr("Failed to load page")));
-    errorLabel->setAlignment(Qt::AlignCenter);
-    errorLabel->setForegroundRole(QPalette::WindowText);
-    anchorWidgetToParent(errorLabel);
-
-    connect(m_webEngineView, &QWebEngineView::loadStarted, busyIndicator, &QWidget::show);
-    connect(m_webEngineView, &QWebEngineView::loadFinished, busyIndicator, &QWidget::hide);
-    connect(m_webEngineView, &QWebEngineView::loadStarted, errorLabel, &QWidget::hide);
-    connect(m_webEngineView, &QWebEngineView::loadFinished, this,
-        [this, errorLabel](bool ok)
-        {
-            static const QUrl kEmptyPage("about:blank");
-            errorLabel->setVisible(m_webEngineView->url() == kEmptyPage);
-            if (ok)
-                return;
-            // Replicate QWebKit behavior.
-            m_webEngineView->load(kEmptyPage);
-        });
+    connect(m_webEngineView, &QWebEngineView::loadStarted, progressBar, &QWidget::show);
+    connect(m_webEngineView, &QWebEngineView::loadFinished, progressBar, &QWidget::hide);
 }
 
 WebEngineView* WebWidget::webEngineView() const
