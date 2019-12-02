@@ -48,12 +48,6 @@ void StorageController::start()
         });
 }
 
-static Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
-{
-    const auto bytes = resource->getMetric(metric);
-    return api::metrics::Value(double(bytes) / double(kIoRateUpdateInterval.count()));
-}
-
 static auto transactionsPerSecond(const Resource& storage)
 {
     const auto ownMediaServer = storage->commonModule()->resourcePool()->getOwnMediaServerOrThrow();

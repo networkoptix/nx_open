@@ -23,7 +23,6 @@ static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_counters((int) Metrics::count),
     m_currentDateTime(&QDateTime::currentDateTime)
 {
     Qn::directConnect(
