@@ -466,7 +466,7 @@
                             {
                                 "level": "error",
                                 "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
-                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
+                                "text": " Secondary stream Resolution is too high: %resolution. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
                             }
                         ]
                     },
@@ -608,7 +608,7 @@
                 "values": {
                     "totalSpaceB": {
                         "name": "Total",
-                        "description": "Total space",
+                        "description": "Total Space",
                         "display": "table|panel",
                         "format": "GB",
                         "isOptional": true
@@ -677,7 +677,7 @@
                     "inBps1m": {
                         "name": "IN Rate",
                         "isOptional": true,
-                        "format": "Kbit/s",
+                        "format": "KB/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
                         "insert": "inBps"
@@ -685,7 +685,7 @@
                     "outBps1m": {
                         "name": "OUT Rate",
                         "isOptional": true,
-                        "format": "Kbit/s",
+                        "format": "KB/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",
                         "insert": "outBps"
