@@ -139,7 +139,7 @@ struct CameraWebPageWidget::Private
     CameraWebPageWidget* parent;
     CameraSettingsDialogState::Credentials credentials;
     QUrl lastRequestUrl;
-    QnUuid lastCameraId;
+    CameraSettingsDialogState::SingleCameraProperties lastCamera;
     bool loadNeeded = false;
 
     QnMutex mutex;
@@ -220,6 +220,14 @@ void CameraWebPageWidget::Private::createNewPage()
             url.setUserName(QString());
             url.setPassword(QString());
 
+            // Replace server address with camera address.
+            const auto serverHost = parent->commonModule()->currentUrl().host();
+            if (serverHost == url.host())
+            {
+                url.setHost(lastCamera.ipAddress);
+                url.setPort(-1); //< Hide server port.
+            }
+
             dialog.setText(url.toString());
 
             if (dialog.exec() == QDialog::Accepted)
@@ -268,7 +276,7 @@ void CameraWebPageWidget::Private::resetPage()
     createNewPage();
 
     lastRequestUrl = QUrl();
-    lastCameraId = {};
+    lastCamera = {};
     loadNeeded = false;
 }
 
@@ -309,7 +317,7 @@ void CameraWebPageWidget::Private::setupProxy()
 
 void CameraWebPageWidget::Private::setupCameraCookie()
 {
-    QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCameraId.toByteArray());
+    QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCamera.id.toUtf8());
     QUrl origin(lastRequestUrl);
     origin.setUserName(QString());
     origin.setPassword(QString());
@@ -349,13 +357,13 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
-        const auto cameraId = QnUuid(state.singleCameraProperties.id);
+        const auto cameraId = state.singleCameraProperties.id;
 
-        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCameraId)
+        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
             return;
 
         d->lastRequestUrl = targetUrl;
-        d->lastCameraId = cameraId;
+        d->lastCamera = state.singleCameraProperties;
     }
 
     const bool visible = isVisible();
