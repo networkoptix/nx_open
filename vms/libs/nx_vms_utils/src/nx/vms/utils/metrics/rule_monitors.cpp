@@ -232,6 +232,7 @@ public:
             });
     }
 
+    // TODO: Refactor!
     ValueGenerator getDurationOperation() const
     {
         if (function() == "history")
@@ -261,9 +262,6 @@ public:
                 });
         }
 
-        if (function() == "sum")
-            return durationAggregation(1, 2, Border::drop(), [](double v, double) { return v; });
-
         if (function() == "sampleAvg") //< sum(v * dt) / t
         {
             return durationAggregation(
@@ -271,11 +269,27 @@ public:
                 /*divideByTime*/ true, /*mustExist*/ true);
         }
 
-        if (function() == "deltaAvg") //< sum(v) / t
+        if (function() == "counterDelta") //< dv
         {
-            return durationAggregation(
-                1, 2, Border::hardcode(0), [](double v, double) { return v; },
-                /*divideByTime*/ true, /*mustExist*/ true);
+            return durationOperation(
+                1, 2, Border::move(),
+                [](const auto& forEach)
+                {
+                    std::optional<double> first;
+                    double last = 0;
+                    forEach(
+                        [&](const Value& value, Duration)
+                        {
+                            if (value != Value())
+                            {
+                                last = value.toDouble();
+                                if (!first)
+                                    first = last;
+                            }
+                        });
+
+                    return first ? Value(last - *first) : Value();
+                });
         }
 
         if (function() == "counterToAvg") //< dv / t

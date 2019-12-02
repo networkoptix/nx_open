@@ -77,7 +77,7 @@
                         "name": "Events: Time Changed (24h)",
                         "description": "Events count: Time Changed (24h)",
                         "display": "table|panel",
-                        "calculate": "sum %vmsTimeChanged 24h",
+                        "calculate": "counterDelta %vmsTimeChanged 24h",
                         "insert": "timeChanged",
                         "alarms": [
                             {
@@ -232,14 +232,14 @@
                         "name": "Decoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "deltaAvg %decodedPixels 3s",
+                        "calculate": "counterToAvg %decodedPixels 3s",
                         "insert": "decodedPixels"
                     },
                     "encodingSpeed3s": {
                         "name": "Encoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "deltaAvg %encodedPixels 3s",
+                        "calculate": "counterToAvg %encodedPixels 3s",
                         "insert": "encodedPixels"
                     },
                     "primaryStreams": {
@@ -259,28 +259,28 @@
                         "isOptional": true,
                         "display": "panel",
                         "format": "Tr/s",
-                        "calculate": "deltaAvg %transactionsPerSecond 1m",
+                        "calculate": "counterToAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
                     "actionsTriggered1m": {
                         "name": "Rules Activations/s",
                         "description": "Event Rules activations per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %actionsTriggered 1m",
+                        "calculate": "counterToAvg %actionsTriggered 1m",
                         "insert": "actionsTriggered"
                     },
                     "apiCalls1m": {
                         "name": "API Calls/s",
                         "description": "REST API calls per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %apiCalls 1m",
+                        "calculate": "counterToAvg %apiCalls 1m",
                         "insert": "apiCalls"
                     },
                     "thumbnails1m": {
                         "name": "Thumbnails/s",
                         "description": "Thumbnails per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %thumbnails 1m",
+                        "calculate": "counterToAvg %thumbnails 1m",
                         "insert": "thumbnails"
                     },
                     "activePlugins": {
@@ -375,7 +375,7 @@
                         "name": "Events: Stream Issues (1h)",
                         "description": "Events count: Stream Issues (1h)",
                         "display": "table|panel",
-                        "calculate": "sum %streamIssues 1h",
+                        "calculate": "counterDelta %streamIssues 1h",
                         "insert": "streamIssues",
                         "alarms": [
                             {
@@ -394,7 +394,7 @@
                         "name": "Events: IP Conflicts (3 min)",
                         "description": "Events count: IP Conflicts (3 min)",
                         "display": "panel",
-                        "calculate": "sum %ipConflicts 3m",
+                        "calculate": "counterDelta %ipConflicts 3m",
                         "insert": "ipConflicts",
                         "alarms": [
                             {
@@ -571,7 +571,7 @@
                         "name": "Issues (24h)",
                         "description": "Events Count: Storage Issues (24h)",
                         "display": "table|panel",
-                        "calculate": "sum %issues 24h",
+                        "calculate": "counterDelta %issues 24h",
                         "insert": "issues"
                     }
                 }
@@ -582,14 +582,14 @@
                         "name": "Read Rate",
                         "display": "table|panel",
                         "format": "KB/s",
-                        "calculate": "deltaAvg %readRateBps 1m",
+                        "calculate": "counterToAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                 "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
                         "format": "KB/s",
-                        "calculate": "deltaAvg %writeRateBps 1m",
+                        "calculate": "counterToAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
                 "transactionsPerSecond": {

@@ -884,9 +884,9 @@ QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
     return reader;
 }
 
-qint64 Camera::getAndResetMetric(std::atomic<qint64> Metrics::* parameter)
+qint64 Camera::getMetric(std::atomic<qint64> Metrics::* parameter)
 {
-    return (*m_metrics.*parameter).exchange(0);
+    return (*m_metrics.*parameter).load();
 }
 
 std::chrono::milliseconds Camera::nxOccupiedDuration() const
