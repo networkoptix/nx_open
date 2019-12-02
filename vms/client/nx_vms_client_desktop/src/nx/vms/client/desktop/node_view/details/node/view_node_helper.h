@@ -6,7 +6,7 @@ namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {
 
-class ViewNodeHelper
+class NX_VMS_CLIENT_DESKTOP_API ViewNodeHelper
 {
 public:
     static int makeUserActionRole(int initialRole, bool isUserAction = true);
