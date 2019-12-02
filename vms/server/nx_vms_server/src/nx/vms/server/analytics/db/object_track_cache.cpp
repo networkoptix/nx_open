@@ -106,6 +106,8 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
         trackUpdate.lastAppearanceTimeUs = ctx.track.lastAppearanceTimeUs;
         trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
         trackUpdate.allAttributes = ctx.track.attributes;
+        if (ctx.track.bestShot.initialized())
+            trackUpdate.bestShot = ctx.track.bestShot;
 
         result.push_back(std::move(trackUpdate));
     }
@@ -210,12 +212,14 @@ void ObjectTrackCache::updateObject(
     if (trackContext.track.objectTypeId.isEmpty())
         trackContext.track.objectTypeId = objectMetadata.typeId;
 
-    if (objectMetadata.bestShot)
+    if (objectMetadata.bestShot || !trackContext.track.bestShot.initialized())
     {
         // "Best shot" packet contains only information about the best shot, not a real object movement.
         trackContext.track.bestShot.timestampUs = packet.timestampUs;
         trackContext.track.bestShot.rect = objectMetadata.boundingBox;
-        return;
+
+        if (objectMetadata.bestShot)
+            return;
     }
 
     trackContext.track.lastAppearanceTimeUs = packet.timestampUs;
