@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
     StatusChangeReason
-    Permission UserRole ConnectionResult
+    Permission UserRole ConnectionResult LicenseType
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
@@ -56,6 +56,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
         FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
         MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
+        ServerBoundCapability               = 0x100000, //< Camera is bound to a particular server.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -448,6 +449,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         LC_Count
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(LicenseType);
 
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
@@ -783,7 +785,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::MediaStreamEvent)
+    (Qn::MediaStreamEvent)(Qn::LicenseType)
     ,
     (metatype)(lexical)
 )

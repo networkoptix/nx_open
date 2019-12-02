@@ -4,7 +4,9 @@
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_data.h"
 #include "../details/node/view_node_data_builder.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
+
+#include <QtGui/QPainter>
 
 #include <common/common_module.h>
 #include <core/resource/resource.h>
@@ -20,51 +22,15 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::node_view;
 using namespace nx::vms::client::desktop::node_view::details;
 
-ViewNodeData getResourceNodeData(
+ViewNodeData getResourceNodeDataInternal(
     const QnResourcePtr& resource,
     const QString& extraText,
-    bool checkable)
+    bool checkable,
+    int primaryColumn)
 {
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    auto data = ViewNodeDataBuilder()
-        .withText(resourceNameColumn, resource->getName())
-        .withIcon(resourceNameColumn, qnResIconCache->icon(resource))
-        .withData(resourceNameColumn, cameraExtraStatusRole,
-            QVariant::fromValue(getCameraExtraStatus(camera)))
-        .data();
-
+    auto data = getResourceNodeData(resource, primaryColumn, extraText);
     if (checkable)
         ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
-
-    if (!extraText.isEmpty())
-        data.setData(resourceNameColumn, resourceExtraTextRole, extraText);
-
-    const auto resourceData = QVariant::fromValue(resource);
-    data.setData(resourceNameColumn, resourceRole, resourceData);
-    return data;
-}
-
-ViewNodeData getGroupNodeData(
-    const QnVirtualCameraResourcePtr& cameraResource,
-    const QString& extraText,
-    bool checkable)
-{
-    static const int kGroupedDeviceSortOrder = -1; //< Multisensor cameras and recorders on top of the list
-    const QIcon icon = cameraResource->isMultiSensorCamera()
-        ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
-        : qnResIconCache->icon(QnResourceIconCache::Recorder);
-
-    auto data = ViewNodeDataBuilder()
-        .withText(resourceNameColumn, cameraResource->getUserDefinedGroupName())
-        .withIcon(resourceNameColumn, icon)
-        .withGroupSortOrder(kGroupedDeviceSortOrder)
-        .data();
-
-    if (checkable)
-        ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
-
-    if (!extraText.isEmpty())
-        data.setData(resourceNameColumn, resourceExtraTextRole, extraText);
 
     return data;
 }
@@ -80,13 +46,85 @@ bool isCheckedResourceNode(const NodePtr& node)
 namespace nx::vms::client::desktop {
 namespace node_view {
 
+bool isResourceColumn(const QModelIndex& index)
+{
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
+    if (!node)
+        return false;
+
+    const int column = index.column();
+    const auto& data = node->data();
+    return data.hasData(column, resourceColumnRole)
+        && data.data(column, resourceColumnRole).toBool();
+}
+
+ViewNodeData getGroupNodeData(
+    const QnVirtualCameraResourcePtr& cameraResource,
+    int resourceColumn,
+    const QString& extraText,
+    int checkColumn)
+{
+    if (!cameraResource)
+        return ViewNodeData();
+
+    static const int kGroupedDeviceSortOrder = -1; //< Multisensor cameras and recorders on top of the list
+    const QIcon icon = cameraResource->isMultiSensorCamera()
+        ? qnResIconCache->icon(QnResourceIconCache::MultisensorCamera)
+        : qnResIconCache->icon(QnResourceIconCache::Recorder);
+
+    auto data = ViewNodeDataBuilder()
+        .withData(resourceColumn, resourceColumnRole, true)
+        .withText(resourceColumn, cameraResource->getUserDefinedGroupName())
+        .withIcon(resourceColumn, icon)
+        .withGroupSortOrder(kGroupedDeviceSortOrder)
+        .data();
+
+    if (checkColumn >= 0)
+        ViewNodeDataBuilder(data).withCheckedState(checkColumn, Qt::Unchecked);
+
+    if (!extraText.isEmpty())
+        data.setData(resourceColumn, resourceExtraTextRole, extraText);
+
+    return data;
+}
+
+ViewNodeData getResourceNodeData(
+    const QnResourcePtr& resource,
+    int resourceColumn,
+    const QString& extraText)
+{
+    if (!resource)
+    {
+        NX_ASSERT(false, "Can't create node data for empty resource!");
+        return ViewNodeData();
+    }
+
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto icon = qnResIconCache->icon(resource);
+    auto data = ViewNodeDataBuilder()
+        .withData(resourceColumn, resourceColumnRole, true)
+        .withText(resourceColumn, resource->getName())
+        .withIcon(resourceColumn, icon)
+        .withData(resourceColumn, cameraExtraStatusRole,
+            QVariant::fromValue(getCameraExtraStatus(camera)))
+        .data();
+
+    if (!extraText.isEmpty())
+        data.setData(resourceColumn, resourceExtraTextRole, extraText);
+
+    const auto resourceData = QVariant::fromValue(resource);
+    data.setData(resourceColumn, resourceRole, resourceData);
+
+    return data;
+}
+
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
     const QString& extraText,
     bool checkable)
 {
     return resource
-        ? ViewNode::create(getResourceNodeData(resource, extraText, checkable))
+        ? ViewNode::create(getResourceNodeDataInternal(resource, extraText, checkable, resourceNameColumn))
         : NodePtr();
 }
 
@@ -95,9 +133,11 @@ NodePtr createGroupNode(
     const QString& extraText,
     bool checkable)
 {
-    return resource
-        ? ViewNode::create(getGroupNodeData(resource, extraText, checkable))
-        : NodePtr();
+    if (!resource)
+        return NodePtr();
+
+    return ViewNode::create(getGroupNodeData(
+        resource, resourceNameColumn, extraText, checkable ? resourceCheckColumn : -1));
 }
 
 QnResourceList getSelectedResources(const NodePtr& node)
@@ -129,7 +169,7 @@ QnResourcePtr getResource(const NodePtr& node)
 
 QnResourcePtr getResource(const QModelIndex& index)
 {
-    return getResource(nodeFromIndex(index));
+    return getResource(ViewNodeHelper::nodeFromIndex(index));
 }
 
 QString extraText(const QModelIndex& index)
@@ -137,17 +177,17 @@ QString extraText(const QModelIndex& index)
     return index.data(resourceExtraTextRole).toString();
 }
 
-bool isValidNode(const NodePtr& node)
+bool isValidResourceNode(const NodePtr& node)
 {
-    const auto& data = node->nodeData();
+    const auto& data = node->data();
     return !data.hasProperty(validResourceProperty)
         || data.property(validResourceProperty).toBool();
 }
 
-bool isValidNode(const QModelIndex& index)
+bool isValidResourceNode(const QModelIndex& index)
 {
-    const auto node = nodeFromIndex(index);
-    return node && isValidNode(node);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
+    return node && isValidResourceNode(node);
 }
 
 ViewNodeData getDataForInvalidNode(bool invalid)

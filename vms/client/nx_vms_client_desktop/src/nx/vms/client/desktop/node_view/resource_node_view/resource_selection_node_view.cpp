@@ -8,7 +8,7 @@
 #include "../details/node_view_store.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_state_patch.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../node_view/sorting_filtering/node_view_numeric_sort_model.h"
 
 #include <nx/utils/uuid.h>
@@ -44,7 +44,7 @@ ResourceSelectionNodeView::Private::Private(
     const ColumnSet& selectionColumns)
     :
     q(owner),
-    itemDelegate(owner, selectionColumns)
+    itemDelegate(selectionColumns)
 {
 }
 
@@ -53,16 +53,17 @@ void ResourceSelectionNodeView::Private::handlePatchApplied(const NodeViewStateP
     auto& model = q->sourceModel();
     for (const auto step: patch.steps)
     {
-        if (step.operation != ChangeNodeOperation)
+        if (step.operationData.operation == removeDataOperation)
             continue;
 
-        const auto hasOtherChange = step.data.hasDataForColumn(resourceNameColumn);
+        const auto& data = step.operationData.data.value<ViewNodeData>();
+        const auto hasOtherChange = data.hasDataForColumn(resourceNameColumn);
         if (hasOtherChange)
             continue;
 
-        const bool hasCheckChange = checkable(step.data, resourceCheckColumn)
-            && step.data.hasDataForColumn(resourceCheckColumn);
-        if (!hasCheckChange && !step.data.hasProperty(selectedChildrenCountProperty))
+        const bool hasCheckChange = ViewNodeHelper(data).checkable(resourceCheckColumn)
+            && data.hasDataForColumn(resourceCheckColumn);
+        if (!hasCheckChange && !data.hasProperty(selectedChildrenCountProperty))
             continue;
 
         const auto index = model.index(step.path, resourceNameColumn);
@@ -117,7 +118,7 @@ void ResourceSelectionNodeView::setSelectionMode(SelectionMode mode)
 void ResourceSelectionNodeView::setLeafResourcesSelected(const QnUuidSet& resourceIds, bool select)
 {
     PathList paths;
-    details::forEachLeaf(state().rootNode,
+    details::ViewNodeHelper::forEachLeaf(state().rootNode,
         [resourceIds, &paths](const details::NodePtr& node)
         {
             const auto resource = getResource(node);

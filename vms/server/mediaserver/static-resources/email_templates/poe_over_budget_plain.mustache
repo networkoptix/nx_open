@@ -1,0 +1,25 @@
+{{#systemName}}
+{{&systemName}}
+{{#systemSignature}}
+{{&systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+PoE over budget on {{#source}}"{{&source}}" {{/source}}
+
+{{#aggregated}}
+Server: {{source}}
+Current power consumption: {{currentPowerConsumptionWatts}} watts
+Upper consumption limit: {{upperPowerConsumptionLimitWatts}} watts
+Lower consumption limit: {{lowerPowerConsumptionLimitWatts}} watts
+Time: {{&timestampDate}} {{&timestampTime}}
+-------------------------------------------------------------------------------
+
+{{/aggregated}}
+
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
+

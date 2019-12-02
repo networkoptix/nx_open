@@ -21,8 +21,16 @@ using WeakNodePtr = QWeakPointer<ViewNode>;
 using ConstWeakNodePtr = QWeakPointer<const ViewNode>;
 using NodeList = QList<NodePtr>;
 
-using OptionalCheckedState = std::optional<Qt::CheckState>;
+using Column = int;
 using ColumnSet = QSet<int>;
+
+using Role = int;
+using RoleVector = QVector<Role>;
+
+using ColumnRoleHash = QHash<Column, RoleVector>;
+using RemoveData = ColumnRoleHash;
+
+using OptionalCheckedState = std::optional<Qt::CheckState>;
 
 } // namespace node_view::details
 } // namespace nx::vms::client::desktop

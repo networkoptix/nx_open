@@ -321,6 +321,7 @@
 
     "nx::vms::client::desktop::node_view::ResourceNodeViewItemDelegate": {
         "colors": {
+            "chartColor": "brand_d3",
             "mainText":          "light10",
             "mainTextSelected":  "light4",
             "mainTextAccented":  "brand_core",

@@ -119,6 +119,12 @@ enum EventType
     /** Plugin events. */
     pluginDiagnosticEvent = 14,
 
+    /** Hanwha PoE NVR PoE over budget event. */
+    poeOverBudgetEvent = 15,
+
+    /** Hanwha PoE NVR FAN error event. */
+    fanErrorEvent = 16,
+
     /** System health message. */
     systemHealthEvent = 500,
 
@@ -246,6 +252,14 @@ enum ActionType
     * - layoutResourceId - Uuid of layout to be opened
     */
     openLayoutAction = 19,
+
+    /**
+     * Enable a buzzer on an NVR.
+     * Parameters:
+     * - serverIds (may be taken from event parameters),
+     * - durationMs (optional)
+     */
+    buzzerAction = 20,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

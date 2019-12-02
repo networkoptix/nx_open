@@ -52,7 +52,7 @@
            <x>0</x>
            <y>0</y>
            <width>457</width>
-           <height>303</height>
+           <height>293</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -166,6 +166,9 @@
        </widget>
       </item>
       <item>
+       <widget class="nx::vms::client::desktop::PromoBar" name="infoBar" native="true"/>
+      </item>
+      <item>
        <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
       </item>
      </layout>
@@ -221,15 +224,21 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::node_view::ResourceSelectionNodeView</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h</header>
-  </customwidget>
-  <customwidget>
    <class>nx::vms::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::PromoBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::node_view::ResourceSelectionNodeView</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

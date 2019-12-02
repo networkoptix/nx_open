@@ -1,7 +1,7 @@
 #include "resource_node_view_item_delegate.h"
 
 #include "../resource_view_node_helpers.h"
-#include "../../details/node/view_node_helpers.h"
+#include "../../details/node/view_node_helper.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
@@ -31,11 +31,8 @@ struct ResourceNodeViewItemDelegate::Private
 
 //-------------------------------------------------------------------------------------------------
 
-ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(
-    QTreeView* owner,
-    QObject* parent)
-    :
-    base_type(owner, parent),
+ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(QObject* parent):
+    base_type(parent),
     d(new Private())
 {
 }
@@ -49,14 +46,24 @@ void ResourceNodeViewItemDelegate::paint(
     const QStyleOptionViewItem& styleOption,
     const QModelIndex& index) const
 {
-    base_type::paint(painter, styleOption, index);
+    if (isResourceColumn(index))
+    {
+        QStyleOptionViewItem option(styleOption);
+        initStyleOption(&option, index);
 
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
+        const auto color = index.data(Qt::TextColorRole);
+        const bool useCustomColor = color.isValid();
+        const auto textColor = useCustomColor ? color.value<QColor>() : d->colors.mainText;
+        const auto extraColor = useCustomColor ? textColor : d->colors.extraText;
+        const auto errorColor = useCustomColor ? textColor : qnGlobals->errorTextColor();
 
-    paintItemText(painter, option, index, d->colors.mainText,
-        d->colors.extraText, qnGlobals->errorTextColor());
-    paintItemIcon(painter, option, index, QIcon::Normal);
+        paintItemText(painter, option, index, textColor, extraColor, errorColor);
+        paintItemIcon(painter, option, index, QIcon::Normal);
+    }
+    else
+    {
+        base_type::paint(painter, styleOption, index);
+    }
 }
 
 const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
@@ -95,15 +102,14 @@ void ResourceNodeViewItemDelegate::initStyleOption(
 
 void ResourceNodeViewItemDelegate::paintItemText(
     QPainter* painter,
-    const QStyleOptionViewItem& styleOption,
+    QStyleOptionViewItem& option,
     const QModelIndex& index,
     const QColor& mainColor,
     const QColor& extraColor,
     const QColor& invalidColor) const
 {
-    auto option = styleOption;
     const auto style = option.widget ? option.widget->style() : QApplication::style();
-    auto baseColor = isValidNode(index) ? mainColor : invalidColor;
+    auto baseColor = isValidResourceNode(index) ? mainColor : invalidColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
         baseColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
@@ -123,7 +129,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
         painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
 
     // Text drawing.
-    const auto nodeText = text(index);
+    const auto nodeText = ViewNodeHelper(index).text(index.column());
     const auto nodeExtraText = extraText(index);
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */

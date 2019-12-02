@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.172",
+    "version": "1.0.1.200",
     "data": [
         {
             "keys": [
@@ -1146,6 +1146,12 @@
                 "AXIS|AXISC3003E",
                 "AXIS|AXISA9161",
                 "AXIS|AXISC1004E"
+            ],
+            "noVideoSupport": true
+        },
+        {
+            "keys" :[
+                "Hanwha|NVR-IO-module*"
             ],
             "noVideoSupport": true
         },

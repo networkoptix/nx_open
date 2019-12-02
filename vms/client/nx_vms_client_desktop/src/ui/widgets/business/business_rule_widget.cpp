@@ -38,6 +38,7 @@
 
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -49,7 +50,7 @@ using nx::vms::api::ActionType;
 namespace {
 
 template<typename Policy>
-void updateEventResources(
+void updateEventCameras(
     const QnBusinessRuleViewModelPtr model,
     QWidget* parent)
 {
@@ -206,7 +207,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         const bool isResourceRequired =
             actionType != vms::event::ActionType::fullscreenCameraAction
                 && (vms::event::requiresCameraResource(actionType)
-                    || vms::event::requiresUserResource(actionType));
+                    || vms::event::requiresUserResource(actionType)
+                    || vms::event::requiresServerResource(actionType));
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
         QString actionAtLabelText;
@@ -469,14 +471,41 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
         return;
 
     vms::api::EventType eventType = m_model->eventType();
-    if (eventType == EventType::cameraMotionEvent)
-        updateEventResources<QnCameraMotionPolicy>(m_model, this);
-    else if (eventType == EventType::cameraInputEvent)
-        updateEventResources<QnCameraInputPolicy>(m_model, this);
-    else if (eventType == EventType::analyticsSdkEvent)
-        updateEventResources<QnCameraAnalyticsPolicy>(m_model, this);
-    else
-        updateEventResources<CameraSelectionDialog::DummyPolicy>(m_model, this);
+
+    if (vms::event::requiresCameraResource(eventType))
+    {
+        if (eventType == EventType::cameraMotionEvent)
+            updateEventCameras<QnCameraMotionPolicy>(m_model, this);
+        else if (eventType == EventType::cameraInputEvent)
+            updateEventCameras<QnCameraInputPolicy>(m_model, this);
+        else if (eventType == EventType::analyticsSdkEvent)
+            updateEventCameras<QnCameraAnalyticsPolicy>(m_model, this);
+        else
+            updateEventCameras<CameraSelectionDialog::DummyPolicy>(m_model, this);
+    }
+    else if (vms::event::requiresServerResource(eventType))
+    {
+        bool dialogAccepted = false;
+        QnUuidSet selectedServers = m_model->eventResources();
+
+        switch (eventType)
+        {
+        case EventType::poeOverBudgetEvent:
+            dialogAccepted = ServerSelectionDialog::selectServers(selectedServers,
+                QnPoeOverBudgetPolicy::isServerValid, QnPoeOverBudgetPolicy::infoText(), this);
+            break;
+        case EventType::fanErrorEvent:
+            dialogAccepted = ServerSelectionDialog::selectServers(selectedServers,
+                QnFanErrorPolicy::isServerValid, QnFanErrorPolicy::infoText(), this);
+            break;
+        default:
+            dialogAccepted = ServerSelectionDialog::selectServers(selectedServers,
+                ServerSelectionDialog::ServerFilter(), QString(), this);
+            break;
+        }
+
+        m_model->setEventResources(selectedServers);
+    }
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
@@ -563,6 +592,26 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
 
         if (dialogAccepted)
             m_model->setActionResources(selectedCameras);
+    }
+    else if (vms::event::requiresServerResource(m_model->actionType()))
+    {
+        bool dialogAccepted = false;
+        QnUuidSet selectedServers = m_model->actionResources();
+
+        switch (m_model->actionType())
+        {
+            case ActionType::buzzerAction:
+                dialogAccepted = ServerSelectionDialog::selectServers(selectedServers,
+                    QnBuzzerPolicy::isServerValid, QnBuzzerPolicy::infoText(), this);
+                break;
+            default:
+                dialogAccepted = ServerSelectionDialog::selectServers(selectedServers,
+                    ServerSelectionDialog::ServerFilter(), QString(), this);
+                break;
+        }
+
+        if (dialogAccepted)
+            m_model->setActionResources(selectedServers);
     }
 }
 

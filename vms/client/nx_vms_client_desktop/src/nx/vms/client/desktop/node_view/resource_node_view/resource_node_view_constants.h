@@ -14,7 +14,8 @@ enum ResourceNodeViewColumn
 
 enum ResourceNodeDataRole
 {
-    resourceRole = Qt::UserRole,
+    resourceColumnRole = details::lastViewNodeRole,
+    resourceRole,
     resourceExtraTextRole,
     cameraExtraStatusRole
 };

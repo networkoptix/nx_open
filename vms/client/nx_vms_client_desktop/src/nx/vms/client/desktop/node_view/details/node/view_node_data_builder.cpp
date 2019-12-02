@@ -2,6 +2,7 @@
 
 #include <QtGui/QIcon>
 
+#include "view_node_helper.h"
 #include "view_node_constants.h"
 
 namespace nx::vms::client::desktop {
@@ -17,6 +18,12 @@ ViewNodeDataBuilder::ViewNodeDataBuilder():
 ViewNodeDataBuilder::ViewNodeDataBuilder(ViewNodeData& data):
     m_outerData(true),
     m_data(&data)
+{
+}
+
+ViewNodeDataBuilder::ViewNodeDataBuilder(const ViewNodeData& data):
+    m_outerData(false),
+    m_data(new ViewNodeData(data))
 {
 }
 
@@ -43,29 +50,33 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withText(int column, const QString& va
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     int column,
-    Qt::CheckState value)
+    Qt::CheckState value,
+    bool isUserAction)
 {
-    m_data->setData(column, Qt::CheckStateRole, value);
+    m_data->setData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole, isUserAction), value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     const ColumnSet& columns,
-    Qt::CheckState value)
+    Qt::CheckState value,
+    bool isUserAction)
 {
     for (const auto column: columns)
-        m_data->setData(column, Qt::CheckStateRole, value);
+        withCheckedState(column, value, isUserAction);
+
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     int column,
-    const OptionalCheckedState& value)
+    const OptionalCheckedState& value,
+    bool isUserAction)
 {
     if (value)
-        return withCheckedState(column, *value);
+        return withCheckedState(column, *value, isUserAction);
 
-    m_data->removeData(column, Qt::CheckStateRole);
+    m_data->removeData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole, isUserAction));
     return *this;
 }
 
@@ -111,6 +122,18 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withFlag(int column, Qt::ItemFlag flag
 ViewNodeDataBuilder& ViewNodeDataBuilder::withFlags(int column, Qt::ItemFlags flags)
 {
     m_data->setFlags(column, flags);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withNodeData(const ViewNodeData& data)
+{
+    m_data->applyData(data);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withProperty(int id, const QVariant& value)
+{
+    m_data->setProperty(id, value);
     return *this;
 }
 

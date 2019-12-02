@@ -19,9 +19,7 @@ class ResourceNodeViewItemDelegate: public Customized<NodeViewItemDelegate>
     Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
 
 public:
-    ResourceNodeViewItemDelegate(
-        QTreeView* owner,
-        QObject* parent = nullptr);
+    ResourceNodeViewItemDelegate(QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 
     virtual void paint(
@@ -42,7 +40,7 @@ protected:
 
     void paintItemText(
         QPainter* painter,
-        const QStyleOptionViewItem& option,
+        QStyleOptionViewItem& option,
         const QModelIndex& index,
         const QColor& mainColor,
         const QColor& extraColor,

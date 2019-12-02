@@ -10,4 +10,8 @@
         <param name="hasAdvancedSecondaryStreamControls" default_value="true"/>
     </resource>
     </oem>
+    
+    <oem name="Hanwha WAVE PoE NVR">
+        <resource name="Hanwha_Wave_Nvr_Io_Module" id="C1A34051-9100-4E62-AE70-C87138CD4944" type="Camera"/>
+    </oem>
 </resources>

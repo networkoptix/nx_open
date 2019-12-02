@@ -2,6 +2,7 @@
 
 #include "node_view_base_sort_model.h"
 
+// TODO: Move this model to the appropriate place, related to the resources.
 namespace nx::vms::client::desktop {
 namespace node_view {
 
@@ -16,7 +17,7 @@ public:
 
 public:
     void setShowInvalidDevices(bool showInvalidDevices);
-    bool getShowInvalidDevices() const;
+    bool showInvalidDevices() const;
 
 protected:
     virtual bool filterAcceptsRow(

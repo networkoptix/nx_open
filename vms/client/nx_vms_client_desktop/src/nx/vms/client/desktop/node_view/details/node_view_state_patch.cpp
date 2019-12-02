@@ -14,7 +14,7 @@ void addNode(NodeViewStatePatch& patch, const NodePtr& node)
     if (node->parent())
     {
         const auto parentPath = node->path().parentPath();
-        patch.addAppendStep(parentPath, node->nodeData());
+        patch.addAppendStep(parentPath, node->data());
     }
 
     for (const auto child: node->children())
@@ -29,7 +29,7 @@ void handleAddOperation(
     if (state.rootNode.isNull())
         state.rootNode = ViewNode::create();
 
-    const auto node = ViewNode::create(step.data);
+    const auto node = ViewNode::create(step.operationData.data.value<ViewNodeData>());
     const auto parentNode = state.nodeByPath(step.path);
     const auto addNodeGuard = getOperationGuard(step);
     parentNode->addChild(node);
@@ -43,7 +43,7 @@ void handleChangeOperation(
     if (const auto node = state.rootNode->nodeAt(step.path))
     {
         const auto dataChangedGuard = getOperationGuard(step);
-        node->applyNodeData(step.data);
+        node->applyNodeData(step.operationData.data.value<ViewNodeData>());
     }
     else
     {
@@ -65,7 +65,7 @@ void handleRemoveOperation(
 
     for (const auto child: node->children())
     {
-        const auto childRemoveStep = PatchStep{RemoveNodeOperation, child->path(), {}};
+        const auto childRemoveStep = PatchStep{child->path(), {removeNodeOperation}};
         handleRemoveOperation(childRemoveStep, state, getOperationGuard);
     }
 
@@ -80,6 +80,22 @@ void handleRemoveOperation(
     }
 }
 
+void handleRemoveDataOperation(
+    const PatchStep& step,
+    NodeViewState& state,
+    const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
+{
+    const auto node = state.rootNode ? state.rootNode->nodeAt(step.path) : NodePtr();
+    if (!node)
+    {
+        NX_ASSERT(false, "Can't delete node data by this path!");
+        return;
+    }
+
+    const auto removeDataGuard = getOperationGuard(step);
+    node->removeNodeData(step.operationData.data.value<RemoveData>());
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -91,11 +107,16 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
     return patch;
 }
 
-NodeViewStatePatch NodeViewStatePatch::clearNodeView()
+NodeViewStatePatch NodeViewStatePatch::clearNodeViewPatch()
 {
     NodeViewStatePatch patch;
     patch.addRemovalStep(ViewNodePath());
     return patch;
+}
+
+bool NodeViewStatePatch::isEmpty() const
+{
+    return steps.empty();
 }
 
 NodeViewState&& NodeViewStatePatch::applyTo(
@@ -109,16 +130,19 @@ NodeViewState&& NodeViewStatePatch::applyTo(
 
     for (const auto step: steps)
     {
-        switch(step.operation)
+        switch(step.operationData.operation)
         {
-            case AppendNodeOperation:
+            case appendNodeOperation:
                 handleAddOperation(step, state, safeOperationGuard);
                 break;
-            case ChangeNodeOperation:
+            case updateDataOperation:
                 handleChangeOperation(step, state, safeOperationGuard);
                 break;
-            case RemoveNodeOperation:
+            case removeNodeOperation:
                 handleRemoveOperation(step, state, safeOperationGuard);
+                break;
+            case removeDataOperation:
+                handleRemoveDataOperation(step, state, safeOperationGuard);
                 break;
             default:
                 NX_ASSERT(false, "Operation is not supported.");
@@ -128,23 +152,35 @@ NodeViewState&& NodeViewStatePatch::applyTo(
     return std::move(state);
 }
 
-void NodeViewStatePatch::addChangeStep(
+void NodeViewStatePatch::addRemoveDataStep(
     const ViewNodePath& path,
-    const ViewNodeData& changedData)
+    const ColumnRoleHash& roleHash)
 {
-    steps.push_back({ChangeNodeOperation, path, changedData});
+    steps.push_back({path, {removeDataOperation, QVariant::fromValue(roleHash)}});
+}
+
+void NodeViewStatePatch::addUpdateDataStep(
+    const ViewNodePath& path,
+    const ViewNodeData& updateData)
+{
+    steps.push_back({path, {updateDataOperation, QVariant::fromValue(updateData)}});
 }
 
 void NodeViewStatePatch::addAppendStep(
     const ViewNodePath& parentPath,
     const ViewNodeData& data)
 {
-    steps.push_back({AppendNodeOperation, parentPath, data});
+    steps.push_back({parentPath, {appendNodeOperation, QVariant::fromValue(data)}});
 }
 
 void NodeViewStatePatch::addRemovalStep(const ViewNodePath& path)
 {
-    steps.push_back({RemoveNodeOperation, path, {}});
+    steps.push_back({path, {removeNodeOperation}});
+}
+
+void NodeViewStatePatch::appendPatchStep(const PatchStep& step)
+{
+    steps.push_back(step);
 }
 
 void NodeViewStatePatch::appendPatchSteps(const NodeViewStatePatch& patch)

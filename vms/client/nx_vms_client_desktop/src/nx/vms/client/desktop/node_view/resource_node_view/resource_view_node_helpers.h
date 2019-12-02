@@ -9,6 +9,19 @@ namespace node_view {
 
 namespace details { class ViewNodeData; }
 
+bool isResourceColumn(const QModelIndex& index);
+
+details::ViewNodeData getResourceNodeData(
+    const QnResourcePtr& resource,
+    int resourceColumn,
+    const QString& extraText);
+
+details::ViewNodeData getGroupNodeData(
+    const QnVirtualCameraResourcePtr& cameraResource,
+    int resourceColumn,
+    const QString& extraText,
+    int checkColumn = -1);
+
 details::NodePtr createResourceNode(
     const QnResourcePtr& resource,
     const QString& extraText,
@@ -26,8 +39,8 @@ QnResourcePtr getResource(const QModelIndex& index);
 QString extraText(const QModelIndex& index);
 void setExtraText(const QString& value, const details::NodePtr& node, int column);
 
-bool isValidNode(const details::NodePtr& node);
-bool isValidNode(const QModelIndex& index);
+bool isValidResourceNode(const details::NodePtr& node);
+bool isValidResourceNode(const QModelIndex& index);
 details::ViewNodeData getDataForInvalidNode(bool invalid);
 void setNodeValidState(const details::NodePtr& node, bool valid);
 

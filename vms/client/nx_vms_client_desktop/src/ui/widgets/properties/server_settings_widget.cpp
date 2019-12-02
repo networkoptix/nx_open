@@ -92,7 +92,6 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
         emit hasChangesChanged();
     });
 
-
     connect(ui->maxCamerasSpinBox, QnSpinboxIntValueChanged, this, [this]
     {
         m_maxCamerasAdjusted = true;

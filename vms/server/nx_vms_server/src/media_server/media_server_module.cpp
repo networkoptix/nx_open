@@ -57,6 +57,10 @@
 #include <nx/vms/server/meta_types.h>
 #include <nx/vms/server/network/multicast_address_registry.h>
 
+#include <nx/vms/server/nvr/i_service.h>
+#include <nx/vms/server/nvr/service_factory.h>
+#include <nx/vms/server/nvr/hanwha/service_provider.h>
+
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
 #include <media_server/serverutil.h>
@@ -217,10 +221,17 @@ QnMediaServerModule::QnMediaServerModule(
 
     nx::vms::server::registerSerializers();
 
+    // TODO: #dmishin NVR service factory.
+
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server());
 #endif
+    nx::vms::server::nvr::ServiceFactory serviceFactory;
+    serviceFactory.registerServiceProvider(
+        std::make_unique<nx::vms::server::nvr::hanwha::ServiceProvider>(this));
+
+    m_nvrService = serviceFactory.createService();
 
     initOutgoingSocketCounter();
 
@@ -743,6 +754,11 @@ nx::vms::server::network::MulticastAddressRegistry*
     QnMediaServerModule::multicastAddressRegistry() const
 {
     return m_multicastAddressRegistry;
+}
+
+nx::vms::server::nvr::IService* QnMediaServerModule::nvrService() const
+{
+    return m_nvrService.get();
 }
 
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const

@@ -134,6 +134,10 @@ public slots:
 
     void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
 
+    void at_poeOverBudget(const nx::vms::event::PoeOverBudgetEventPtr& event);
+
+    void at_fanError(const nx::vms::event::FanErrorEventPtr& event);
+
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::api::EventState eventState, const QnUuid& userId = QnUuid(),
         QString* errorMessage = nullptr);

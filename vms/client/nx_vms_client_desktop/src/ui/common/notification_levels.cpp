@@ -51,6 +51,8 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case EventType::storageFailureEvent:
         case EventType::serverFailureEvent:
         case EventType::licenseIssueEvent:
+        case EventType::fanErrorEvent:
+        case EventType::poeOverBudgetEvent:
             return Value::CriticalNotification;
 
         case EventType::backupFinishedEvent:

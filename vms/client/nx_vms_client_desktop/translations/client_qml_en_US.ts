@@ -17,6 +17,13 @@
     </message>
 </context>
 <context>
+    <name>Box</name>
+    <message>
+        <source>Click on video to start box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EmptyTilesPlaceholder</name>
     <message>
         <source>Searching servers in your local network...</source>
@@ -36,6 +43,43 @@
     <message>
         <source>Click to setup</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Figure</name>
+    <message>
+        <source>No shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>click to add</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FigureEditorDialog</name>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Line</name>
+    <message>
+        <source>Click on video to start line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click arrows to toggle the desired directions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -77,6 +121,25 @@
     <message>
         <source>Server is offline</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Polygon</name>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum points count is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click on video to start polygon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

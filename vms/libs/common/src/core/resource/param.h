@@ -86,6 +86,8 @@ namespace ResourcePropertyKey
     static const QString kVideoLayout("VideoLayout");
 
     static const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
+    static const QString kForcedLicenseType("forcedLicenseType");
+
     namespace Onvif
     {
         static const QString kMediaUrl("MediaUrl");
@@ -109,6 +111,7 @@ namespace ResourcePropertyKey
         static const QString kBookmarkCount("bookmarkCount");
         static const QString kUdtInternetTraffic_bytes("udtInternetTraffic_bytes");
         static const QString kHddList("hddList");
+        static const QString kNvrPoePortPoweringModes("nvrPoePortPoweringModes");
     }
 }
 

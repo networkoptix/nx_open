@@ -191,6 +191,8 @@
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
 #include <nx/vms/server/rest/plugin_info_handler.h>
+#include <nx/vms/server/rest/nvr_network_block_handler.h>
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -298,6 +300,8 @@
 
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
+
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <nx/vms/server/metrics/camera_controller.h>
 #include <nx/vms/server/metrics/network_controller.h>
@@ -1978,6 +1982,7 @@ void MediaServerProcess::registerRestHandlers(
      *             %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *             %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *             %value ExecHttpRequestAction Send HTTP request as an action.
+     *             %value BuzzerAction Enable an NVR buzzer
      *         %param:object reply[].actionParams JSON object with action parameters. Only fields
      *             that are applicable to the particular action are used.
      *             %param:uuid reply[].actionParams.actionResourceId Additional parameter for event
@@ -2770,6 +2775,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *     %value ExecHttpRequestAction Send HTTP request as an action.
+     *     %value BuzzerAction Enable an NVR buzzer
      * %param[opt]:enum EventState
      *     %value inactive Event has been finished (for prolonged events).
      *     %value active Event has been started (for prolonged events).
@@ -2795,6 +2801,30 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
+
+    // TODO: #dmishin register this handler conditionally?
+    /**%apidoc GET /api/nvrNetworkBlock
+     * %return:object JSON object with an error code, error string, and an object with information
+     *     about NVR network block, including each port state and the total power consumption
+     *     limit.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply JSON object with the following structure:
+     *         %struct NetworkBlockData
+     *
+     * %apidoc POST /api/nvrNetworkBlock
+     * %param:array portPoweringModes List of port powering modes with the following structure:
+     *     %struct NetworkPortWithPoweringMode
+     * %return:object JSON object with an error code, error string, and an object with information
+     *     about NVR network block after powering mode update, including each port state and the
+     *     total power consumption limit.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:array reply List of port powering modes after update with the following
+     *         structure:
+     *         %struct NetworkPortWithPoweringMode
+     */
+    reg("api/nvrNetworkBlock", new nx::vms::server::rest::NvrNetworkBlockHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -3210,6 +3240,17 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     initPublicIpDiscovery();
     if (!m_ipDiscovery->publicIP().isNull())
         serverFlags |= nx::vms::api::SF_HasPublicIP;
+
+    if (const nvr::IService* const nvrService = serverModule()->nvrService())
+    {
+        const nvr::IService::Capabilities capabilities = nvrService->capabilities();
+        if (capabilities.testFlag(nvr::IService::Capability::buzzer))
+            serverFlags |= nx::vms::api::SF_HasBuzzer;
+        if (capabilities.testFlag(nvr::IService::Capability::poeManagement))
+            serverFlags |= nx::vms::api::SF_HasPoeManagementCapability;
+        if (capabilities.testFlag(nvr::IService::Capability::fanMonitoring))
+            serverFlags |= nx::vms::api::SF_HasFanMonitoringCapability;
+    }
 
     return serverFlags;
 }
@@ -3824,6 +3865,8 @@ void MediaServerProcess::stopObjects()
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
     serverModule()->p2pDownloader()->stopDownloads();
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule()->nvrService())
+        nvrService->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -4773,6 +4816,9 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
+
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule->nvrService())
+        nvrService->start();
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());
