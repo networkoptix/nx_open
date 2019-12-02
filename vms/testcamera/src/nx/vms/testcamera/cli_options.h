@@ -1,10 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include <QtCore/QStringList>
 
 #include <nx/utils/log/log_level.h>
+
+#include "video_layout.h"
 
 namespace nx::vms::testcamera {
 
@@ -16,6 +19,7 @@ struct CliOptions
         int count = 1;
         QStringList primaryFileNames; /**< Must not be empty. */
         QStringList secondaryFileNames; /**< Can be empty: primaryFileNames are re-used. */
+        std::optional<VideoLayout> videoLayout;
     };
 
     bool showHelp = false;

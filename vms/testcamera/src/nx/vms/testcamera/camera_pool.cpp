@@ -80,7 +80,54 @@ void CameraPool::reportAddingCameras(
         cameraCountMessagePart, offlineFreqMessagePart, filesMessagePart);
 }
 
+/**
+ * @return Empty string if no video layout is needed, or a string representation of the appropriate
+ *     video layout in the format required for the discovery response message. On error, returns no
+ *     value, having logged the error message.
+ */
+std::optional<QByteArray> CameraPool::obtainVideoLayoutString(
+    const std::optional<VideoLayout>& specifiedVideoLayout,
+    QStringList fileNames) const
+{
+    int minChannelCount = INT_MAX;
+    for (const QString& filename: fileNames)
+        minChannelCount = std::min(minChannelCount, m_fileCache->getFile(filename).channelCount);
+
+    if (minChannelCount <= 1) //< No multi-channel files: yield no video layout.
+        return "";
+
+    // Otherwise, if there is a specified video layout, yield it, and if not, yield a default video
+    // layout for the minimum channel count for all files of both streams.
+    const VideoLayout& videoLayout =
+        specifiedVideoLayout ? *specifiedVideoLayout : VideoLayout(minChannelCount);
+
+    for (const auto& filename: fileNames)
+    {
+        const auto& file = m_fileCache->getFile(filename);
+
+        // Produce a warning if some file has more channels than this video layout mentions.
+        if (file.channelCount > videoLayout.maxChannelNumber() + 1)
+        {
+            NX_LOGGER_WARNING(m_logger,
+                "File #%1 has %2 channels but video layout contains channels up to %3.",
+                file.index, file.channelCount, videoLayout.maxChannelNumber());
+        }
+
+        // Produce a fatal error if some file does not have enough channels for this video layout.
+        if (file.channelCount < videoLayout.maxChannelNumber() + 1)
+        {
+            NX_LOGGER_ERROR(m_logger,
+                "File #%1 has %2 channels but video layout contains channels up to %3.",
+                file.index, file.channelCount, videoLayout.maxChannelNumber());
+            return std::nullopt;
+        }
+    }
+
+    return videoLayout.toUrlParamString();
+}
+
 bool CameraPool::addCamera(
+    const std::optional<VideoLayout>& videoLayout,
     const CameraOptions& cameraOptions,
     QStringList primaryFileNames,
     QStringList secondaryFileNames)
@@ -103,14 +150,20 @@ bool CameraPool::addCamera(
     if (!NX_ASSERT(success, "Unable to add camera: duplicate MAC %1.", macAddress))
         return false;
 
+    const std::optional<QByteArray> videoLayoutString = obtainVideoLayoutString(
+        videoLayout, primaryFileNames + actualSecondaryFileNames);
+    if (!videoLayoutString)
+        return false;
+
     m_cameraDiscoveryResponseByMacAddress.insert(
-        {macAddress, std::make_shared<CameraDiscoveryResponse>(macAddress)});
+        {macAddress, std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)});
 
     return true;
 }
 
 bool CameraPool::addCameraSet(
     const FileCache* fileCache,
+    const std::optional<VideoLayout>& videoLayout,
     bool cameraForEachFile,
     const CameraOptions& cameraOptions,
     int count,
@@ -127,7 +180,7 @@ bool CameraPool::addCameraSet(
         for (int i = 0; i < count; ++i)
         {
             if (!addCamera(
-                cameraOptions, primaryFileNames, secondaryFileNames))
+                videoLayout, cameraOptions, primaryFileNames, secondaryFileNames))
             {
                 return false;
             }
@@ -141,7 +194,7 @@ bool CameraPool::addCameraSet(
         for (int i = 0; i < primaryFileNames.size(); i++)
         {
             if (!addCamera(
-                cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
+                videoLayout, cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
             {
                 return false;
             }

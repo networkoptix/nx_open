@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <optional>
 
 #include <QtCore/QMutex>
 #include <QtCore/QStringList>
@@ -11,6 +12,7 @@
 #include <nx/vms/testcamera/discovery_response.h>
 
 #include "camera.h"
+#include "video_layout.h"
 
 class QnCommonModule;
 
@@ -44,8 +46,12 @@ public:
 
     int cameraCount() const { return (int) m_cameraByMacAddress.size(); }
 
+    /**
+     * @param videoLayout Can be empty if not specified.
+     */
     bool addCameraSet(
         const FileCache* fileCache,
+        const std::optional<VideoLayout>& videoLayout,
         bool cameraForEachFile,
         const CameraOptions& cameraOptions,
         int count,
@@ -64,6 +70,9 @@ protected:
 private:
     QByteArray obtainDiscoveryResponseMessage() const;
 
+    std::optional<QByteArray> obtainVideoLayoutString(
+        const std::optional<VideoLayout>& specifiedVideoLayout,
+        QStringList fileNames) const;
 
     void reportAddingCameras(
         bool cameraForEachFile,
@@ -73,6 +82,7 @@ private:
         const QStringList& secondaryFileNames);
 
     bool addCamera(
+        const std::optional<VideoLayout>& videoLayout,
         const CameraOptions& cameraOptions,
         QStringList primaryFileNames,
         QStringList secondaryFileNames);

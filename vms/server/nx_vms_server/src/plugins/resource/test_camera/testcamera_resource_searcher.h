@@ -1,12 +1,16 @@
 #pragma once
 #if defined(ENABLE_TEST_CAMERA)
 
+#include <QtCore/QSet>
+#include <QtCore/QString>
 #include <QtCore/QCoreApplication>
 #include <QHostAddress>
 
 #include <core/resource_management/resource_searcher.h>
 #include <nx/network/socket.h>
+#include <nx/utils/mac_address.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnMediaServerModule;
 
@@ -34,6 +38,18 @@ private:
     void sendBroadcast();
     bool updateSocketList();
     void clearSocketList();
+
+    void processDiscoveryResponseMessage(
+        const QByteArray& discoveryResponseMessage,
+        const QString& serverAddress,
+        QnResourceList* resources,
+        QSet<nx::utils::MacAddress>* processedMacAddresses) const;
+
+    QnTestCameraResourcePtr createTestCameraResource(
+        const nx::utils::MacAddress& macAddress,
+        const QString& videoLayoutString,
+        int mediaPort,
+        const QString& serverAddress) const;
 
 private:
     struct DiscoveryInfo

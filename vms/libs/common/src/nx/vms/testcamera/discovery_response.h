@@ -7,8 +7,6 @@
 
 #include <nx/utils/mac_address.h>
 
-#include "test_camera_ini.h"
-
 namespace nx::vms::testcamera {
 
 /**
@@ -18,10 +16,13 @@ namespace nx::vms::testcamera {
 class CameraDiscoveryResponse
 {
 public:
-    CameraDiscoveryResponse(nx::utils::MacAddress macAddress):
-        m_macAddress(std::move(macAddress))
+    /** @param videoLayoutString Must be empty if video layout is not used for this camera. */
+    CameraDiscoveryResponse(nx::utils::MacAddress macAddress, QByteArray videoLayoutString):
+        m_macAddress(std::move(macAddress)), m_videoLayoutString(std::move(videoLayoutString))
     {
         NX_ASSERT(!m_macAddress.isNull());
+        NX_ASSERT(!m_videoLayoutString.contains(';'));
+        NX_ASSERT(!m_videoLayoutString.contains('/'));
     }
 
     /**
@@ -33,6 +34,15 @@ public:
 
     nx::utils::MacAddress macAddress() const { return m_macAddress; }
 
+    /**
+     * @return Video layout string in the Server property format: can be deserialized by
+     *     QnCustomResourceVideoLayout.
+     */
+    QString videoLayoutSerialized() const
+    {
+        return /* temp QByteArray */ QByteArray(m_videoLayoutString).replace('&', ';');
+    }
+
     QByteArray makeCameraDiscoveryResponseMessagePart() const;
 
 private:
@@ -41,14 +51,13 @@ private:
 
 private:
     nx::utils::MacAddress m_macAddress;
+    QByteArray m_videoLayoutString;
 };
-
-// TODO: #mshevchenko: Replace VERBOSE with DEBUG where appropriate.
 
 /**
  * Represents the testcamera discovery response message and (de)serializes it using the format:
  * ```
- *     <port>{;<macAddress>}
+ *     <port>{;<macAddress>[/<videoLayout>]}
  * ```
  */
 class DiscoveryResponse
@@ -65,7 +74,7 @@ public:
      */
     DiscoveryResponse(const QByteArray& discoveryResponseMessage, QString* outErrorMessage);
 
-    int port() const { return m_mediaPort; }
+    int mediaPort() const { return m_mediaPort; }
 
     const std::vector<std::shared_ptr<CameraDiscoveryResponse>>& cameraDiscoveryResponses() const
     {

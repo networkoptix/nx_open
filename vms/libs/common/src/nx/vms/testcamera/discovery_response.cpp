@@ -3,6 +3,8 @@
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/vms/testcamera/test_camera_ini.h>
+
 namespace nx::vms::testcamera {
 
 //-------------------------------------------------------------------------------------------------
@@ -20,20 +22,27 @@ CameraDiscoveryResponse::CameraDiscoveryResponse(
 void CameraDiscoveryResponse::parseCameraDiscoveryResponseMessagePart(
     const QByteArray& cameraDiscoveryResponseMessagePart, QString* outErrorMessage)
 {
-    // Currently, discovery response message part for a camera contains only the MAC address.
-    const QByteArray macAddressString = cameraDiscoveryResponseMessagePart;
+    const auto error = //< Intended to be called like `return error("...");`.
+        [outErrorMessage](const QString& message) { *outErrorMessage = message; };
 
-    m_macAddress = nx::utils::MacAddress(macAddressString);
+    const QList<QByteArray> parts = cameraDiscoveryResponseMessagePart.split('/');
+
+    if (parts.empty())
+        return error("MAC address is missing.");
+    if (parts.size() > 2)
+        return error("Too many slash-separated components.");
+
+    m_macAddress = nx::utils::MacAddress(parts.at(0));
     if (m_macAddress.isNull())
-    {
-        *outErrorMessage =
-            lm("Invalid MAC address: %1.").args(nx::kit::utils::toString(macAddressString));
-    }
+        return error(lm("Invalid MAC address: %1.").args(nx::kit::utils::toString(parts.at(0))));
+
+    m_videoLayoutString = (parts.size() >= 2) ? parts.at(1) : "";
 }
 
 QByteArray CameraDiscoveryResponse::makeCameraDiscoveryResponseMessagePart() const
 {
-    return m_macAddress.toString().toLatin1();
+    return m_macAddress.toString().toLatin1()
+        + (m_videoLayoutString.isEmpty() ? "" : ('/' + m_videoLayoutString));
 }
 
 //-------------------------------------------------------------------------------------------------
