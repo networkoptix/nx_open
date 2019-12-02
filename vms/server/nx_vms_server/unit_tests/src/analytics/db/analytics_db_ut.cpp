@@ -98,8 +98,11 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<ObjectTrack> tracksFound)
+                std::vector<ObjectTrackEx> result)
             {
+                std::vector<ObjectTrack> tracksFound;
+                for (const auto& value: result)
+                    tracksFound.push_back(value);
                 m_lookupResultQueue.push(LookupResult{resultCode, std::move(tracksFound)});
             });
     }
