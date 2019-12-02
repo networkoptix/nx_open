@@ -145,7 +145,7 @@ private:
 };
 #endif
 
-static IoPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+static IIoPlatformAbstraction* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
 #if defined(Q_OS_LINUX)
     return new IoPlatformAbstractionImpl(ioDeviceDescriptor);

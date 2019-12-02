@@ -46,7 +46,7 @@ private:
 
 #endif
 
-BuzzerPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+IBuzzerPlatformAbstraction* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
 #if defined(Q_OS_LINUX)
     return new BuzzerPlatformAbstractionImpl(ioDeviceDescriptor);
@@ -64,7 +64,7 @@ BuzzerPlatformAbstraction::BuzzerPlatformAbstraction(int ioDeviceDescriptor):
 
 BuzzerPlatformAbstraction::~BuzzerPlatformAbstraction()
 {
-    NX_DEBUG(this, "Destroying th buzzer platform abstraction");
+    NX_DEBUG(this, "Destroying the buzzer platform abstraction");
 }
 
 bool BuzzerPlatformAbstraction::setState(BuzzerState state)

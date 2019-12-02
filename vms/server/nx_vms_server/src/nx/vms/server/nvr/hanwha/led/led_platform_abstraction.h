@@ -6,8 +6,6 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-class LedPlatformAbstractionImpl;
-
 class LedPlatformAbstraction: public ILedPlatformAbstraction
 {
 public:
@@ -20,7 +18,7 @@ public:
     virtual bool setLedState(const QString& ledId, LedState state) override;
 
 private:
-    std::unique_ptr<LedPlatformAbstractionImpl> m_impl;
+    std::unique_ptr<ILedPlatformAbstraction> m_impl;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

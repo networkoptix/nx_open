@@ -6,8 +6,6 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-class FanPlatformAbstractionImpl;
-
 class FanPlatformAbstraction: public IFanPlatformAbstraction
 {
 public:
@@ -20,7 +18,7 @@ public:
     virtual void interrupt() override;
 
 private:
-    std::unique_ptr<FanPlatformAbstractionImpl> m_impl;
+    std::unique_ptr<IFanPlatformAbstraction> m_impl;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

@@ -327,7 +327,7 @@ private:
 
 #endif
 
-static NetworkBlockPlatformAbstractionImpl* createPlatformAbstractionImpl(
+static INetworkBlockPlatformAbstraction* createPlatformAbstractionImpl(
     RootFileSystem* rootFileSystem)
 {
 #if defined(Q_OS_LINUX)

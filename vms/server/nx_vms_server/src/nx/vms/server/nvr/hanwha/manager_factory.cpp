@@ -59,8 +59,11 @@ ManagerFactory::ManagerFactory(
 ManagerFactory::~ManagerFactory()
 {
     NX_DEBUG(this, "Destroying the manager factory");
+
+#if defined(Q_OS_LINUX)
     for (const auto& [_, descriptor]: m_descriptorByDeviceFileName)
         ::close(descriptor);
+#endif
 }
 
 std::unique_ptr<INetworkBlockManager> ManagerFactory::createNetworkBlockManager() const

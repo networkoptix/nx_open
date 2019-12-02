@@ -6,8 +6,6 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-class BuzzerPlatformAbstractionImpl;
-
 class BuzzerPlatformAbstraction: public IBuzzerPlatformAbstraction
 {
 public:
@@ -18,7 +16,7 @@ public:
     virtual bool setState(BuzzerState state) override;
 
 private:
-    std::unique_ptr<BuzzerPlatformAbstractionImpl> m_impl;
+    std::unique_ptr<IBuzzerPlatformAbstraction> m_impl;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

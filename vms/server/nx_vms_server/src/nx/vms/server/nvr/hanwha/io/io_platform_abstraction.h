@@ -7,8 +7,6 @@
 
 namespace nx::vms::server::nvr::hanwha {
 
-class IoPlatformAbstractionImpl;
-
 class IoPlatformAbstraction: public IIoPlatformAbstraction
 {
 public:
@@ -23,7 +21,7 @@ public:
     virtual QnIOStateData portState(const QString& portId) const override;
 
 private:
-    std::unique_ptr<IoPlatformAbstractionImpl> m_impl;
+    std::unique_ptr<IIoPlatformAbstraction> m_impl;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

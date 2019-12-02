@@ -6,8 +6,6 @@ namespace nx::vms::server { class RootFileSystem; }
 
 namespace nx::vms::server::nvr::hanwha {
 
-class NetworkBlockPlatformAbstractionImpl;
-
 class NetworkBlockPlatformAbstraction: public INetworkBlockPlatformAbstraction
 {
 public:
@@ -23,7 +21,7 @@ public:
     virtual void interrupt() override;
 
 private:
-    std::unique_ptr<NetworkBlockPlatformAbstractionImpl> m_impl;
+    std::unique_ptr<INetworkBlockPlatformAbstraction> m_impl;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

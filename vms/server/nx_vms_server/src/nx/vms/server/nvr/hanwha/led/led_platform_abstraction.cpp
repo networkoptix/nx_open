@@ -75,7 +75,7 @@ private:
 
 #endif
 
-static LedPlatformAbstractionImpl* createPlatformAbstractionImpl(int ioDeviceDescriptor)
+static ILedPlatformAbstraction* createPlatformAbstractionImpl(int ioDeviceDescriptor)
 {
 #if defined(Q_OS_LINUX)
     return new LedPlatformAbstractionImpl(ioDeviceDescriptor);
