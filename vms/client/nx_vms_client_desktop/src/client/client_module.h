@@ -11,7 +11,6 @@
 
 class QOpenGLWidget;
 class QnClientCoreModule;
-class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnCameraDataManager;
@@ -38,7 +37,6 @@ public:
     void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();
 
-    QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnCameraDataManager* cameraDataManager() const;
     QnClientCoreModule* clientCoreModule() const;
@@ -74,7 +72,6 @@ private:
     QScopedPointer<nx::vms::client::desktop::AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
     QScopedPointer<nx::vms::client::desktop::ResourceDirectoryBrowser> m_resourceDirectoryBrowser;
-    QnNetworkProxyFactory* m_networkProxyFactory = nullptr;
     QnCloudStatusWatcher* m_cloudStatusWatcher = nullptr;
     QnCameraDataManager* m_cameraDataManager = nullptr;
     nx::vms::client::desktop::RadassController* m_radassController = nullptr;
