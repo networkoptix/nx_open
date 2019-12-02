@@ -117,12 +117,10 @@ JsonRestResponse SystemRestHandler::getAndMerge(
 
         const auto url = nx::network::url::Builder()
             .setHost("no-host") //< Prevent assert in http::AsyncClient.
-            .setUserName(serverId.toString())
-            .setPassword(server->getAuthKey())
             .setPath("/api/metrics" + api)
             .setQuery(query);
 
-        serverFutures.push_back(getAsync(serverId, url).then(
+        serverFutures.push_back(getAsync(server, url).then(
             [this, serverId, url](auto result)
             {
                 Values values;
@@ -141,22 +139,25 @@ JsonRestResponse SystemRestHandler::getAndMerge(
     return JsonRestResponse(values);
 }
 
-cf::future<QJsonValue> SystemRestHandler::getAsync(const QnUuid& server, const nx::utils::Url& url)
+cf::future<QJsonValue> SystemRestHandler::getAsync(
+    const QnMediaServerResourcePtr& server, const nx::utils::Url& url)
 {
-    return m_serverConnector->connect(server, kDefaultConnectTimeout).then(
+    return m_serverConnector->connect(server->getId(), kDefaultConnectTimeout).then(
         [this, server, url](auto result) mutable
         {
             auto connection = result.get();
             if (!connection)
             {
-                NX_DEBUG(this, "Connect to %1 has failed", server);
+                NX_DEBUG(this, "Connect to %1 has failed", server->getId());
                 return cf::make_ready_future(QJsonValue());
             }
 
             cf::promise<QJsonValue> promise;
             auto future = promise.get_future();
             auto client = std::make_unique<nx::network::http::AsyncClient>(std::move(connection));
-            client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server.toByteArray());
+            client->setUserName(server->getId().toByteArray());
+            client->setUserPassword(server->getAuthKey().toUtf8());
+            client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
             client.get()->doGet(
                 url,
                 [this, url = std::move(url), server = std::move(server),
@@ -165,7 +166,7 @@ cf::future<QJsonValue> SystemRestHandler::getAsync(const QnUuid& server, const n
                     if (!client->response())
                     {
                         NX_DEBUG(this, "Request to %1 (%2) has failed: %3",
-                            server, url, SystemError::toString(client->lastSysErrorCode()));
+                            server->getId(), url, SystemError::toString(client->lastSysErrorCode()));
                         return promise.set_value(QJsonValue());
                     }
 
@@ -176,7 +177,7 @@ cf::future<QJsonValue> SystemRestHandler::getAsync(const QnUuid& server, const n
                         || result.error != QnJsonRestResult::NoError)
                     {
                         NX_DEBUG(this, "Request to %1 (%2) has failed with code %3: %4",
-                            server, url, httpCode, result.errorString);
+                            server->getId(), url, httpCode, result.errorString);
                         return promise.set_value(QJsonValue());
                     }
 

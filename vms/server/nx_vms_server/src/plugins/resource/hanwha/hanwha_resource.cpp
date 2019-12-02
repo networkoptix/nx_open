@@ -2642,7 +2642,8 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
 
     if (!limits)
         return kHanwhaInvalidFps;
-
+    if (desiredFrameRate == QnLiveStreamParams::kFpsNotInitialized)
+        return QnLiveStreamParams::kFpsNotInitialized;
     return qBound(1, desiredFrameRate, limits->maxFps);
 }
 
@@ -4063,6 +4064,24 @@ std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     HanwhaResource::advancedParametersProviders()
 {
     return { &m_advancedParametersProvider };
+}
+
+QnLiveStreamParams HanwhaResource::liveStreamParams(Qn::ConnectionRole role) const
+{
+    QnLiveStreamParams result;
+    result.codec = toHanwhaString(streamCodec(role));
+    result.resolution = streamResolution(role);
+    result.fps = streamFrameRate(role, QnLiveStreamParams::kFpsNotInitialized);
+    result.bitrateKbps = streamBitrate(role, QnLiveStreamParams());
+    return result;
+}
+
+QnAdvancedStreamParams HanwhaResource::advancedLiveStreamParams() const
+{
+    QnAdvancedStreamParams result;
+    result.primaryStream = liveStreamParams(Qn::ConnectionRole::CR_LiveVideo);
+    result.secondaryStream = liveStreamParams(Qn::ConnectionRole::CR_SecondaryLiveVideo);
+    return result;
 }
 
 } // namespace plugins

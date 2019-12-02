@@ -16,6 +16,7 @@
 #include <core/resource/resource_display_info.h>
 
 #include <api/media_server_statistics_manager.h>
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
@@ -39,6 +40,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/text/human_readable.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -783,9 +785,16 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
     return result;
 }
 
-Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper(commonModule()).isValid())
-        return Qn::VideowallWithoutLicenseOverlay;
+Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
+{
+    if (qnRuntime->isVideoWallMode())
+    {
+        license::VideoWallLicenseValidator validator(commonModule());
+        QnVideoWallLicenseUsageHelper helper(commonModule());
+        helper.setCustomValidator(&validator);
+        if (!helper.isValid())
+            return Qn::VideowallWithoutLicenseOverlay;
+    }
 
     auto status = m_resource->getStatus();
 

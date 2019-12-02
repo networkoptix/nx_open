@@ -13,6 +13,8 @@
 #include <analytics/common/object_metadata.h>
 #include <recording/time_period.h>
 #include <utils/common/request_param.h>
+#include <motion/motion_detection.h>
+#include <utils/common/byte_array.h>
 
 namespace nx::analytics::db {
 
@@ -33,6 +35,24 @@ struct ObjectPosition
     (deviceId)(timestampUs)(durationUs)(boundingBox)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
+struct ObjectRegion
+{
+    QByteArray boundingBoxGrid;
+
+    void add(const QRectF& rect);
+    void add(const ObjectRegion& region);
+    bool intersect(const QRectF& rect) const;
+    bool isEmpty() const;
+    QRectF boundingBox() const;
+    bool isSimpleRect() const;
+    void clear();
+
+    bool operator==(const ObjectRegion& right) const;
+};
+
+#define ObjectRegion_analytics_storage_Fields (boundingBoxGrid)
+QN_FUSION_DECLARE_FUNCTIONS(ObjectRegion, (json)(ubjson));
+
 struct BestShot
 {
     qint64 timestampUs = 0;
@@ -51,24 +71,36 @@ QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
 struct ObjectTrack
 {
     /** Device object has been detected on. */
-    QnUuid deviceId;
     QnUuid id;
+    QnUuid deviceId;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
     nx::common::metadata::Attributes attributes;
     qint64 firstAppearanceTimeUs = 0;
     qint64 lastAppearanceTimeUs = 0;
-    std::vector<ObjectPosition> objectPositionSequence;
+    ObjectRegion objectPosition;
     BestShot bestShot;
 
     bool operator==(const ObjectTrack& right) const;
 };
 
+struct ObjectTrackEx: public ObjectTrack
+{
+    std::vector<ObjectPosition> objectPositionSequence;
+
+    ObjectTrackEx() = default;
+    ObjectTrackEx(const ObjectTrack& data);
+};
+
 #define ObjectTrack_analytics_storage_Fields \
-    (id)(objectTypeId)(attributes)(firstAppearanceTimeUs) \
-    (lastAppearanceTimeUs)(objectPositionSequence)(bestShot)
+    (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs) \
+    (lastAppearanceTimeUs)(objectPosition)(bestShot)
+
+#define ObjectTrackEx_analytics_storage_Fields \
+    ObjectTrack_analytics_storage_Fields (objectPositionSequence)
 
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectTrackEx, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 
@@ -100,7 +132,11 @@ struct Filter
      * Zero value is treated as no limit.
      */
     int maxObjectTracksToSelect = 0;
-    int maxObjectTrackSize = 1;
+
+    /**
+     * Select track details(geometry data) if it true.
+     */
+    bool needFullTrack = false;
     /**
      * Found tracks are sorted by minimal track time using this order.
      */
@@ -140,12 +176,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)
+    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)\
+    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
 
-using LookupResult = std::vector<ObjectTrack>;
+using LookupResult = std::vector<ObjectTrackEx>;
 
 //-------------------------------------------------------------------------------------------------
 

@@ -297,7 +297,18 @@ public:
             return qMin(value, forceStopRecordingTime.defaultValue());
         }
     };
+    Option<qint64> forceStopVideoWallTime{this, "forceStopVideoWallTime",
+        60 * 60 * 24 * 7,
+        "Stop video wall timeout if not enough licenses. Value in seconds. "
+        "Default: 7 days.",
+        [this](const qint64& value)
+        {
+            return qMin(value, forceStopVideoWallTime.defaultValue());
+        }
+    };
     Option<int> maxConnections{this, "maxConnections", 2000, ""};
+    Option<bool> useTwoSockets{this, "useTwoSockets", true,
+        "Listen server port using ipv4 and ipv6 sockets. Use ipv6 only if the value is false"};
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<int> serverStartedEventTimeoutMs{this,
         QString::fromStdString(QnServer::serverStartedEventTimeoutMsName),

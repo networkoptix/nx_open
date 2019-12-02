@@ -369,6 +369,7 @@ std::string Engine::manifestString() const
             {
                 "type": "GroupBox",
                 "caption": "Example Stub DeviceAgent settings",
+                "collapsible": false,
                 "items": [
                     {
                         "type": "TextField",
@@ -412,6 +413,7 @@ std::string Engine::manifestString() const
             {
                 "type": "GroupBox",
                 "caption": "ROI",
+                "collapsed": true,
                 "items": [
                     {
                       "type": "PolygonFigure",
@@ -494,56 +496,6 @@ static std::string timestampedObjectMetadataToString(
         + attributeString;
 }
 
-static std::string objectTrackToString(
-    Ptr<const IList<ITimestampedObjectMetadata>> track,
-    Uuid expectedTrackId)
-{
-    using nx::kit::utils::format;
-
-    if (!track)
-        return "null";
-
-    if (track->count() == 0)
-        return "empty";
-
-    const auto firstMetadataOfTrack = track->at(0);
-    if (!firstMetadataOfTrack)
-        return "INTERNAL ERROR: Invalid Track metadata list";
-
-    std::string result = format(
-        "%d metadata items, Track start time, us: %lld",
-        track->count(),
-        firstMetadataOfTrack->timestampUs());
-
-    Uuid trackld;
-    for (int i = 0; i < track->count(); ++i)
-    {
-        const auto timestampedObjectMetadata = track->at(i);
-        trackld = timestampedObjectMetadata->trackId();
-        if (trackld != track->at(0)->trackId())
-        {
-            if (!result.empty())
-                result += "; ";
-            result += format("INTERNAL ERROR: Track id #%d %s does not equal Track id #0 %s",
-                i,
-                UuidHelper::toStdString(trackld).c_str(),
-                UuidHelper::toStdString(track->at(0)->trackId()).c_str());
-            break;
-        }
-    }
-
-    if (trackld != expectedTrackId)
-    {
-        if (!result.empty())
-            result += "; ";
-        result += format("INTERNAL ERROR: Track id in the Track is %s, but in the Action is %s",
-            UuidHelper::toStdString(trackld).c_str(),
-            UuidHelper::toStdString(expectedTrackId).c_str());
-    }
-
-    return result;
-}
-
 static std::string uncompressedVideoFrameToString(Ptr<const IUncompressedVideoFrame> frame)
 {
     if (!frame)
@@ -575,7 +527,6 @@ Result<IAction::Result> Engine::executeAction(
         else
         {
             messageToUser += std::string("Object track info:\n")
-                + "    Track: " + objectTrackToString(objectTrackInfo->track(), trackId) + "\n"
                 + "    Best shot frame: "
                     + uncompressedVideoFrameToString(objectTrackInfo->bestShotVideoFrame()) + "\n"
                 + "    Best shot metadata: "

@@ -47,17 +47,22 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* /*accessManager*/,
+    QnResourceAccessManager* accessManager,
     nx::vms::api::StorageData* storageData)
 {
     nx::utils::Url url(storageData->url);
     if (url.password().isEmpty())
         return false;
 
-	if (accessData == Qn::kSystemAccess)
+    if (accessData == Qn::kSystemAccess
+        || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+    {
         url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC((url.password())));
+    }
     else
+    {
         url.setPassword(kHiddenPasswordFiller);
+    }
 
     storageData->url = url.toString();
     return true;
@@ -100,6 +105,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 {
     auto result = amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
+    result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->storages);
     return result;
 }
 

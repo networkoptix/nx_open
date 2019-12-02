@@ -1,5 +1,7 @@
 #include "nov_launcher_win.h"
 
+#include <vector>
+
 #include <client/client_app_info.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -9,6 +11,17 @@ static const int IO_BUFFER_SIZE = 1024 * 1024;
 
 // TODO: #GDM #low move out to common place with launcher.exe
 static const qint64 MAGIC = 0x73a0b934820d4055ll;
+
+struct FileDescriptor
+{
+    FileDescriptor(const QString& filename, qint64 position):
+        filename(filename), position(position)
+    {
+    }
+
+    QString filename;
+    qint64 position = 0;
+};
 
 bool appendFile(QFile& dstFile, const QString& srcFileName)
 {
@@ -42,16 +55,16 @@ bool appendFile(QFile& dstFile, const QString& srcFileName)
     }
 }
 
-bool writeIndex(QFile& dstFile, const QVector<qint64>& filePosList, QVector<QString>& fileNameList)
+bool writeIndex(QFile& dstFile, const std::vector<FileDescriptor>& files)
 {
     qint64 indexStartPos = dstFile.pos();
-    for (int i = 1; i < filePosList.size(); ++i)
+    for (int i = 1; i < files.size(); ++i)
     {
-        // no marshaling is required because of platform depending executable file
-        dstFile.write((const char*)&filePosList[i - 1], sizeof(qint64));
-        int strLen = fileNameList[i].length();
+        // No marshaling is required because of platform depending executable file.
+        dstFile.write((const char*)&files[i - 1].position, sizeof(qint64));
+        int strLen = files[i].filename.length();
         dstFile.write((const char*)&strLen, sizeof(int));
-        dstFile.write((const char*)fileNameList[i].data(), strLen * sizeof(wchar_t));
+        dstFile.write((const char*)files[i].filename.data(), strLen * sizeof(wchar_t));
     }
 
     dstFile.write((const char*)&indexStartPos, sizeof(qint64));
@@ -103,10 +116,11 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
     return sourceFiles;
 }
 
-}
+} // namespace
 
-// Does not add layout index structures if novFileName is empty.
-QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& novFileName)
+QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
+    const QString& dstName,
+    const QString& novFileName)
 {
     static const QString kLauncherFile(lit(":/launcher.exe"));
 
@@ -115,8 +129,8 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
     /* List of client binaries. */
     auto sourceFiles = calculateFileList(sourceRoot);
 
-    QVector<qint64> filePosList;
-    QVector<QString> fileNameList;
+    std::vector<FileDescriptor> files;
+    files.reserve(1000);
 
     QFile dstFile(dstName);
     if (!dstFile.open(QIODevice::WriteOnly))
@@ -125,10 +139,9 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
     if (!appendFile(dstFile, kLauncherFile))
         return ErrorCode::WriteFileError;
 
-    filePosList.push_back(dstFile.pos());
-    fileNameList.push_back(kLauncherFile);
+    files.emplace_back(kLauncherFile, dstFile.pos());
 
-    for (const auto& absolutePath : sourceFiles)
+    for (const auto& absolutePath: sourceFiles)
     {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents); // A bit risky but probably OK.
 
@@ -136,26 +149,26 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
         if (!appendFile(dstFile, absolutePath))
             return ErrorCode::WriteFileError;
 
-        filePosList.push_back(dstFile.pos());
-        fileNameList.push_back(relativePath);
+        files.emplace_back(relativePath, dstFile.pos());
     }
 
-    filePosList.push_back(dstFile.pos());
-    fileNameList.push_back(novFileName);
+    if (!novFileName.isEmpty())
+        files.emplace_back(novFileName, dstFile.pos());
 
-    if (!writeIndex(dstFile, filePosList, fileNameList))
+    if (!writeIndex(dstFile, files))
         return ErrorCode::WriteIndexError;
 
+    // Position where video data will start.
     qint64 novPos = dstFile.pos();
     if (!novFileName.isEmpty())
     {
         // Append existing nov file to exe.
         if (!appendFile(dstFile, novFileName))
             return ErrorCode::WriteMediaError;
-
-        dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
-        dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
     }
+
+    dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
+    dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
 
     return ErrorCode::Ok;
 }

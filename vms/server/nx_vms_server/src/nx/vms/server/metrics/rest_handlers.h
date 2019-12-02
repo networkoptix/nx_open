@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/utils/metrics/system_controller.h>
 #include <rest/server/json_rest_handler.h>
@@ -38,7 +39,9 @@ protected:
 private:
     template<typename Values>
     JsonRestResponse getAndMerge(Values values, const QString& api, const QString& query = {});
-    cf::future<QJsonValue> getAsync(const QnUuid& server, const nx::utils::Url& url);
+
+    cf::future<QJsonValue> getAsync(
+        const QnMediaServerResourcePtr& server, const nx::utils::Url& url);
 
 private:
     nx::vms::network::AbstractServerConnector* m_serverConnector = nullptr;

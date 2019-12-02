@@ -32,6 +32,8 @@ Figure
         maxPoints: 2
     }
 
+    hoverInstrument: pointMakerInstrument.enabled ? pointMakerInstrument : dragInstrument
+
     FigureDragInstrument
     {
         id: dragInstrument
@@ -225,6 +227,8 @@ Figure
 
     function deserialize(json)
     {
+        pointMakerInstrument.finish()
+
         if (!json)
         {
             pointMakerInstrument.clear()
@@ -237,6 +241,9 @@ Figure
 
     function serialize()
     {
+        if (pointMakerInstrument.count === 0)
+            return null
+
         return {
             "points": F.serializePoints(pointMakerInstrument.getRelativePoints()),
             "color": color.toString()

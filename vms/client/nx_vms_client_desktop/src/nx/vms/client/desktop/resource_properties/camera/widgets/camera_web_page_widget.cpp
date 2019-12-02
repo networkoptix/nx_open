@@ -2,6 +2,9 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <chrono>
+
+#include <QtCore/QElapsedTimer>
 #include <QtGui/QContextMenuEvent>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkCookie>
@@ -24,7 +27,74 @@
 
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
+#include <ui/dialogs/common/password_dialog.h>
+
+using namespace std::chrono;
+
 namespace {
+
+constexpr milliseconds kHttpAuthSmallInterval = 10s;
+constexpr int kHttpAuthAttemptsLimit = 3;
+
+/**
+ * Allows to monitor if certain number of attemps is exceeded withing a time perdiod.
+ */
+class AttemptCounter
+{
+public:
+    AttemptCounter() { setLimit(1); }
+
+    void reset()
+    {
+        m_next = 0;
+        m_count = 0;
+    }
+
+    void setLimit(size_t limit)
+    {
+        reset();
+
+        if (limit == 0)
+            return;
+
+        m_timeStamps.resize(limit, {});
+    }
+
+    size_t limit() const { return m_timeStamps.size(); }
+
+    size_t count() const { return m_count; }
+
+    void registerAttempt()
+    {
+        if (m_count < m_timeStamps.size())
+            ++m_count;
+
+        m_timeStamps[m_next] = steady_clock::now();
+        m_next = (m_next + 1) % m_count;
+    }
+
+    milliseconds timeFrame() const
+    {
+        if (m_count == 0)
+            return milliseconds::zero();
+
+        size_t first = m_next % m_count;
+        size_t last = m_next == 0 ? m_count - 1 : m_next - 1;
+
+        return duration_cast<milliseconds>(m_timeStamps[last] - m_timeStamps[first]);
+    }
+
+    bool exceeded(milliseconds time) const
+    {
+        return m_count == m_timeStamps.size() && time > timeFrame();
+    }
+
+private:
+    // Ring buffer.
+    std::vector<steady_clock::time_point> m_timeStamps;
+    size_t m_next = 0;
+    size_t m_count = 0;
+};
 
 // This User-Agent is required for vista camera to use html/js page, not java applet.
 const QString kUserAgentForCameraPage(
@@ -56,52 +126,35 @@ struct CameraWebPageWidget::Private
 {
     Private(CameraWebPageWidget* parent);
 
+    void loadPage();
+
+    void resetPage();
+    void createNewPage();
+    void setupProxy();
+    void setupCameraCookie();
+
     WebWidget* const webWidget;
 
+    CameraWebPageWidget* parent;
     CameraSettingsDialogState::Credentials credentials;
     QUrl lastRequestUrl;
     QnUuid lastCameraId;
     bool loadNeeded = false;
 
     QnMutex mutex;
+    AttemptCounter authCounter;
+    AttemptCounter authDialodCounter;
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
-    webWidget(new WebWidget(parent))
+    webWidget(new WebWidget(parent)),
+    parent(parent)
 {
     auto webView = webWidget->webEngineView();
     webView->setIgnoreSslErrors(true);
     webView->setUseActionsForLinks(true);
-    webView->setUserAgent(kUserAgentForCameraPage);
 
     anchorWidgetToParent(webWidget);
-
-    // Special actions list for context menu for links.
-    webView->insertActions(nullptr, {
-        webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
-        webView->pageAction(QWebEnginePage::Copy),
-        webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
-
-    QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
-        [this](const QUrl& requestUrl, QAuthenticator* authenticator)
-        {
-            QnMutexLocker lock(&mutex);
-            if (lastRequestUrl != requestUrl)
-                return;
-
-            NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
-            authenticator->setUser(credentials.login());
-            authenticator->setPassword(credentials.password());
-    });
-
-    QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
-        [parent](const QUrl&, QAuthenticator* authenticator, const QString&)
-        {
-            const auto user = parent->commonModule()->currentUrl().userName();
-            const auto password = parent->commonModule()->currentUrl().password();
-            authenticator->setUser(user);
-            authenticator->setPassword(password);
-        });
 
     installEventHandler(parent, QEvent::Show, parent,
         [this]()
@@ -109,8 +162,73 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
             if (!loadNeeded)
                 return;
 
-            webWidget->load(lastRequestUrl);
+            loadPage();
             loadNeeded = false;
+        });
+}
+
+void CameraWebPageWidget::Private::createNewPage()
+{
+    auto webView = webWidget->webEngineView();
+    webView->createPageWithUserAgent(kUserAgentForCameraPage);
+    webView->page()->profile()->clearHttpCache();
+
+    // Special actions list for context menu for links.
+    webView->insertActions(nullptr, {
+        webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
+        webView->pageAction(QWebEnginePage::Copy),
+        webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+
+    authCounter.setLimit(kHttpAuthAttemptsLimit);
+    authDialodCounter.setLimit(kHttpAuthAttemptsLimit);
+
+    QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
+        [this](const QUrl& requestUrl, QAuthenticator* authenticator)
+        {
+            QnMutexLocker lock(&mutex);
+
+            // Camera may redirect to another path and ask for credentials,
+            // so just check that host matches.
+            if (lastRequestUrl.host() == requestUrl.host())
+            {
+                authCounter.registerAttempt();
+                if (!authCounter.exceeded(kHttpAuthSmallInterval))
+                {
+                    NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
+                    authenticator->setUser(credentials.login());
+                    authenticator->setPassword(credentials.password());
+                    return;
+                }
+            }
+
+            authDialodCounter.registerAttempt();
+            if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
+                return;
+
+            PasswordDialog dialog(parent);
+
+            auto url = requestUrl;
+
+            // Hide credentials.
+            url.setUserName(QString());
+            url.setPassword(QString());
+
+            dialog.setText(url.toString());
+
+            if (dialog.exec() == QDialog::Accepted)
+            {
+                authenticator->setUser(dialog.username());
+                authenticator->setPassword(dialog.password());
+            }
+        });
+
+    QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
+        [this](const QUrl&, QAuthenticator* authenticator, const QString&)
+        {
+            const auto user = parent->commonModule()->currentUrl().userName();
+            const auto password = parent->commonModule()->currentUrl().password();
+            authenticator->setUser(user);
+            authenticator->setPassword(password);
         });
 }
 
@@ -128,9 +246,78 @@ CameraWebPageWidget::~CameraWebPageWidget()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void CameraWebPageWidget::resetApplicationProxy()
+void CameraWebPageWidget::cleanup()
 {
     QNetworkProxy::setApplicationProxy(QNetworkProxy());
+
+    d->resetPage();
+}
+
+void CameraWebPageWidget::Private::resetPage()
+{
+    if (!lastRequestUrl.isValid())
+        return;
+
+    createNewPage();
+
+    lastRequestUrl = QUrl();
+    lastCameraId = {};
+    loadNeeded = false;
+}
+
+void CameraWebPageWidget::Private::setupProxy()
+{
+    const auto currentServerUrl = parent->commonModule()->currentUrl();
+
+    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+
+    // NOTE: Work-around to create ssl tunnel between gateway and server (not between the client
+    // and server over proxy like in the normal case), because there is a bug in browser
+    // implementation (or with something related) which ignores proxy settings for some
+    // requests when loading camera web page. Perhaps this is not a bug, but a
+    // consequence of our non-standard proxying made by the server.
+    if (gateway->isSslEnabled())
+    {
+        int port = currentServerUrl.port();
+        if (nx::network::SocketGlobals::addressResolver()
+            .isCloudHostName(currentServerUrl.host()))
+        {
+            // NOTE: Cloud address should not have port.
+            port = 0;
+        }
+        NX_ASSERT(port >= 0);
+
+        gateway->enforceSslFor(
+            nx::network::SocketAddress(currentServerUrl.host(), port),
+            currentServerUrl.scheme() == nx::network::http::kSecureUrlSchemeName);
+    }
+
+    const auto gatewayAddress = gateway->endpoint();
+    QNetworkProxy gatewayProxy(
+        QNetworkProxy::HttpProxy,
+        gatewayAddress.address.toString(), gatewayAddress.port);
+
+    QNetworkProxy::setApplicationProxy(gatewayProxy);
+}
+
+void CameraWebPageWidget::Private::setupCameraCookie()
+{
+    QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCameraId.toByteArray());
+    QUrl origin(lastRequestUrl);
+    origin.setUserName(QString());
+    origin.setPassword(QString());
+    origin.setPath(QString());
+    webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
+        cameraCookie, origin);
+}
+
+void CameraWebPageWidget::Private::loadPage()
+{
+    setupProxy();
+    createNewPage();
+    setupCameraCookie();
+
+    webWidget->load(lastRequestUrl);
 }
 
 void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
@@ -141,10 +328,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
         if (!state.canShowWebPage())
         {
-            d->lastRequestUrl = QUrl();
-            d->lastCameraId = {};
-            d->webWidget->reset();
-            d->loadNeeded = false;
+            d->resetPage();
             return;
         }
 
@@ -155,66 +339,22 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setScheme(nx::network::http::kUrlSchemeName)
             .setHost(getNonLocalAddress(currentServerUrl.host()))
             .setPort(currentServerUrl.port())
-            .setPath(state.singleCameraProperties.settingsUrlPath)
-            .setUserName(d->credentials.login())
-            .setPassword(d->credentials.password()).toUrl().toQUrl();
+            .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
         const auto cameraId = QnUuid(state.singleCameraProperties.id);
 
-        QNetworkCookie cameraCookie(
-            Qn::CAMERA_GUID_HEADER_NAME, cameraId.toByteArray());
-        QUrl origin(targetUrl);
-        origin.setUserName(QString());
-        origin.setPassword(QString());
-        origin.setPath(QString());
-        d->webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
-            cameraCookie, origin);
-
-        auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-
-        // NOTE: Work-around to create ssl tunnel between gateway and server (not between the client
-        // and server over proxy like in the normal case), because there is a bug in browser
-        // implementation (or with something related) which ignores proxy settings for some
-        // requests when loading camera web page. Perhaps this is not a bug, but a
-        // consequence of our non-standard proxying made by the server.
-        if (gateway->isSslEnabled())
-        {
-            int port = currentServerUrl.port();
-            if (nx::network::SocketGlobals::addressResolver()
-                .isCloudHostName(currentServerUrl.host()))
-            {
-                // NOTE: Cloud address should not have port.
-                port = 0;
-            }
-            NX_ASSERT(port >= 0);
-
-            gateway->enforceSslFor(
-                nx::network::SocketAddress(currentServerUrl.host(), port),
-                currentServerUrl.scheme() == nx::network::http::kSecureUrlSchemeName);
-        }
-
-        const auto gatewayAddress = gateway->endpoint();
-        QNetworkProxy gatewayProxy(
-            QNetworkProxy::HttpProxy,
-            gatewayAddress.address.toString(), gatewayAddress.port);
-
-        QNetworkProxy::setApplicationProxy(gatewayProxy);
-
         if (d->lastRequestUrl == targetUrl && cameraId == d->lastCameraId)
             return;
 
-        NX_VERBOSE(this, "Loading state with request [%1] via proxy [%2:%3]",
-            targetUrl, gatewayAddress.address.toString(), gatewayAddress.port);
         d->lastRequestUrl = targetUrl;
         d->lastCameraId = cameraId;
-        d->webWidget->reset();
     }
 
     const bool visible = isVisible();
     d->loadNeeded = !visible;
     if (visible)
-        d->webWidget->load(d->lastRequestUrl);
+        d->loadPage();
 }
 
 } // namespace nx::vms::client::desktop

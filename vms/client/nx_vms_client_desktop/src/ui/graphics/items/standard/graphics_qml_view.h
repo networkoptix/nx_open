@@ -51,6 +51,7 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
+    virtual bool focusNextPrevChild(bool next) override;
 
 private:
     struct Private;

@@ -11,9 +11,9 @@ LabeledItem
 
     property var value: ""
     property var defaultValue: ""
-    property int maxPoints: -1
 
     property string figureType: ""
+    property var figureSettings
 
     contentItem: Row
     {
@@ -30,6 +30,8 @@ LabeledItem
                 item: backgroundImage
                 sourceSize: Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
                 videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
+
+                visible: preview.hasFigure
 
                 Image
                 {
@@ -68,7 +70,6 @@ LabeledItem
                 {
                     id: preview
                     anchors.fill: backgroundImage.status === Image.Ready ? backgroundImage : parent
-                    visible: hasFigure
                     rotation: backgroundImage.rotation
                 }
             }
@@ -124,6 +125,7 @@ LabeledItem
             padding: 0
             iconUrl: "qrc:/skin/buttons/delete.png"
             onClicked: value = ""
+            visible: preview.hasFigure
         }
     }
 
@@ -138,7 +140,7 @@ LabeledItem
             FigureEditorDialog
             {
                 figureType: control.figureType
-                maxPolygonPoints: maxPoints
+                figureSettings: control.figureSettings
                 resourceId: settingsView.resourceId
 
                 onAccepted:

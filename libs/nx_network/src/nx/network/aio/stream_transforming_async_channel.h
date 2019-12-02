@@ -149,6 +149,9 @@ private:
         std::optional<UserTaskType> userTypeFilter);
 
     void removeUserTask(UserTask* task);
+
+    static std::string toString(const std::deque<std::shared_ptr<UserTask>>& taskQueue);
+    static std::string toString(const UserTask& task);
 };
 
 } // namespace aio

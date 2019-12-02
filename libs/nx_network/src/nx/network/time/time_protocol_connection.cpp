@@ -26,15 +26,22 @@ void TimeProtocolConnection::startReadingConnection(
     NX_ASSERT(!inactivityTimeout);
     using namespace std::placeholders;
 
-    std::uint32_t utcTimeSeconds = nx::utils::timeSinceEpoch().count();
+    const auto utcTime = nx::utils::millisSinceEpoch();
 
-    NX_VERBOSE(this, lm("Sending %1 UTC time to %2")
-        .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()));
+    NX_VERBOSE(this, "Sending %1 UTC time to %2",
+        utcTime, m_socket->getForeignAddress());
 
+    // To preserve compatibility with rfc868 first sending seconds, then - milliseconds.
+    std::uint32_t utcTimeSeconds =
+        std::chrono::duration_cast<std::chrono::seconds>(utcTime).count();
     utcTimeSeconds += network::kSecondsFrom1900_01_01To1970_01_01;
     utcTimeSeconds = htonl(utcTimeSeconds);
-    m_outputBuffer.resize(sizeof(utcTimeSeconds));
-    memcpy(m_outputBuffer.data(), &utcTimeSeconds, sizeof(utcTimeSeconds));
+
+    std::uint32_t utcTimeMillis = htonl(utcTime.count() % 1000);
+
+    m_outputBuffer.reserve(sizeof(utcTimeSeconds) + sizeof(utcTimeMillis));
+    m_outputBuffer.append((const char*) &utcTimeSeconds, sizeof(utcTimeSeconds));
+    m_outputBuffer.append((const char*) &utcTimeMillis, sizeof(utcTimeMillis));
 
     if (!m_socket->setNonBlockingMode(true))
         return m_socketServer->closeConnection(SystemError::getLastOSErrorCode(), this);

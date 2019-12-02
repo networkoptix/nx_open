@@ -47,17 +47,6 @@ public:
     {
     }
 
-    virtual void createLookupCursor(
-        Filter /*filter*/,
-        CreateCursorCompletionHandler completionHandler) override
-    {
-        m_asyncCaller.post(
-            [completionHandler = std::move(completionHandler)]()
-            {
-                completionHandler(ResultCode::error, nullptr);
-            });
-    }
-
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override
@@ -73,6 +62,11 @@ public:
                 m_lookupRequestQueue->push(lookupRequestData);
                 completionHandler(lookupRequestData.resultCode, lookupRequestData.responseData);
             });
+    }
+
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override
+    {
+        return std::vector<ObjectPosition>();
     }
 
     virtual void lookupTimePeriods(

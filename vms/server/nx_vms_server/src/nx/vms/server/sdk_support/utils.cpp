@@ -205,7 +205,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 }
 
 nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::ObjectTrack& track)
+    const nx::analytics::db::ObjectTrackEx& track)
 {
     auto timestampedTrack = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
     for (const auto& objectPosition: track.objectPositionSequence)

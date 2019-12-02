@@ -10,6 +10,7 @@ namespace nx::vms::utils::metrics {
 class NX_VMS_UTILS_API SystemController
 {
 public:
+    ~SystemController();
     void add(std::unique_ptr<ResourceController> resourceController);
     void start();
 

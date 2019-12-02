@@ -571,8 +571,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        /* Only admins can see edge nodes. */
-        return !isAdmin;
+        return !model()->allowHiddenEdgeServers();
 
     case NodeType::analyticsEngines:
     case NodeType::filteredAnalyticsEngines:
@@ -621,11 +620,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         }
 
         /* Hide edge servers, camera will be displayed instead. */
-        if (QnMediaServerResource::isHiddenServer(m_resource) &&
-            !resourcePool()->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
-        {
-            return true;
-        }
+        if (m_flags.testFlag(Qn::server) && model()->allowHiddenEdgeServers())
+            return QnMediaServerResource::isHiddenServer(m_resource);
 
         return false;
 

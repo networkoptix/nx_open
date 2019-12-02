@@ -33,27 +33,7 @@ void ValueMonitor::setScope(Scope scope)
 
 api::metrics::Value ValueMonitor::value() const noexcept
 {
-    try
-    {
-        auto value = valueOrThrow();
-        NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
-        return std::move(value);
-    }
-    catch (const ExpectedError& e)
-    {
-        NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
-    }
-    catch (const MetricsError& e)
-    {
-        NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
-    }
-    catch (const std::exception& e)
-    {
-        NX_ASSERT(false, "Unexpected general error when calculating metric %1: %2", this, e.what());
-    }
-
-    // TODO: Should we return error to the user if it occures?
-    return {};
+    return handleValueErrors([this](){ return this->valueOrThrow(); });
 }
 
 void ValueMonitor::setFormatter(ValueFormatter formatter)
@@ -66,14 +46,34 @@ api::metrics::Value ValueMonitor::formattedValue() const noexcept
     return m_formatter ? m_formatter(value()) : value();
 }
 
-QString ValueMonitor::toString() const
-{
-    return lm("%1(%2)").args(m_name, m_scope);
-}
-
 QString ValueMonitor::idForToStringFromPtr() const
 {
     return name();
+}
+
+api::metrics::Value ValueMonitor::handleValueErrors(
+    std::function<api::metrics::Value()> calculateValue) const
+{
+    try
+    {
+        auto value = calculateValue();
+        NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
+        return std::move(value);
+    }
+    catch (const ExpectedError& e)
+    {
+        NX_DEBUG(this, "Got error: %1", nx::utils::unwrapNestedErrors(e));
+    }
+    catch (const BaseError& e)
+    {
+        NX_ASSERT(false, "Got unexpected metric %1 error: %2", this, e.what());
+    }
+    catch (const std::exception& e)
+    {
+        NX_ASSERT(false, "Unexpected general error when calculating metric %1: %2", this, e.what());
+    }
+    // TODO: Should we return error to the user if it occures?
+    return {};
 }
 
 } // namespace nx::vms::utils::metrics

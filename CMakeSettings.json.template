@@ -1,0 +1,34 @@
+﻿{
+  "configurations": [
+   {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-debug/bin"
+        } ],
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "cmakeCommandArgs": "-DdeveloperBuild=OFF",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3/bin"
+        } ],
+    }
+  ]
+}

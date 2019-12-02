@@ -20,27 +20,11 @@ static const std::chrono::seconds kUpdateInterval(5);
 static const std::chrono::minutes kTimeChangedInterval(1);
 static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 
-static QString dateTimeToString(const QDateTime& datetime)
-{
-    int timeZoneInMinutes = currentTimeZone() / 60;
-    QString timezone =  QString::number(timeZoneInMinutes / 60);
-    if (timeZoneInMinutes % 60)
-    {
-        while (timezone.length() < 2)
-            timezone.insert(0, L'0');
-        timezone += QString::number(timeZoneInMinutes % 60);
-    }
-    if (timeZoneInMinutes >= 0)
-        timezone.insert(0, L'+');
-    return lm("%1 (UTC %2)").args(
-        datetime.toString("yyyy-MM-dd hh:mm:ss"),
-        timezone);
-}
-
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_counters((int) Metrics::count)
+    m_counters((int) Metrics::count),
+    m_currentDateTime(&QDateTime::currentDateTime)
 {
     Qn::directConnect(
         serverModule->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
@@ -70,6 +54,17 @@ void ServerController::start()
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
                 remove(server->getId());
         });
+}
+
+void ServerController::beforeValues(utils::metrics::Scope requestScope, bool /*formatted*/)
+{
+    beforeAlarms(requestScope);
+}
+
+void ServerController::beforeAlarms(utils::metrics::Scope /*requestScope*/)
+{
+    // Make sure timezone is predefined for entire request.
+    m_currentDateTime.update();
 }
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
@@ -208,11 +203,11 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "osTime",
-            [](const auto&) { return Value(dateTimeToString(QDateTime::currentDateTime())); }
+            [this](const auto&) { return Value(dateTimeToString(m_currentDateTime.get())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTime",
-            [](const auto&) { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
+            [this](const auto&) { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTimeChanged",
@@ -305,9 +300,27 @@ qint64 ServerController::getDelta(Metrics key, qint64 value)
     return result;
 }
 
-nx::vms::server::PlatformMonitor* ServerController::platform()
+nx::vms::server::PlatformMonitor* ServerController::platform() const
 {
     return serverModule()->platform()->monitor();
+}
+
+QString ServerController::dateTimeToString(const QDateTime& dateTime) const
+{
+    // Make sure timezone is predefined for entire request.
+    int timeZoneInMinutes = timeZone(m_currentDateTime.get()) / 60;
+    QString timezone = QString::number(timeZoneInMinutes / 60);
+    if (timeZoneInMinutes % 60)
+    {
+        while (timezone.length() < 2)
+            timezone.insert(0, L'0');
+        timezone += QString::number(timeZoneInMinutes % 60);
+    }
+
+    if (timeZoneInMinutes >= 0)
+        timezone.insert(0, L'+');
+
+    return lm("%1 (UTC %2)").args(dateTime.toString("yyyy-MM-dd hh:mm:ss"), timezone);
 }
 
 } // namespace nx::vms::server::metrics

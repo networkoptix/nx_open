@@ -251,7 +251,7 @@ nx::analytics::db::LookupResult
 
     std::sort(
         aggregatedResult.begin(), aggregatedResult.end(),
-        [resultSortOrder](const ObjectTrack& left, const ObjectTrack& right)
+        [resultSortOrder](const ObjectTrackEx& left, const ObjectTrackEx& right)
         {
             if (resultSortOrder == Qt::SortOrder::AscendingOrder)
                 return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;

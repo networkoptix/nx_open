@@ -30,6 +30,12 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
+    const QnTransaction<vms::api::VideoWallLicenseOverflowData>& /*tran*/,
+    NotificationSource /*source*/)
+{
+}
+
+void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::CleanupDatabaseData>& /*tran*/,
     NotificationSource /*source*/)
 {

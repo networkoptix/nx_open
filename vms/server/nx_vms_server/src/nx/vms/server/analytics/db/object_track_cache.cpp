@@ -43,7 +43,7 @@ std::vector<ObjectTrack> ObjectTrackCache::getTracksToInsert(bool flush)
             m_maxObjectLifetime);
 
         result.push_back(ctx.track);
-        ctx.track.objectPositionSequence.clear();
+        ctx.track.objectPosition.clear();
         ctx.newAttributesSinceLastUpdate.clear();
     }
 
@@ -71,7 +71,7 @@ std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid
         m_maxObjectLifetime);
 
     auto result = ctx.track;
-    ctx.track.objectPositionSequence.clear();
+    ctx.track.objectPosition.clear();
     ctx.newAttributesSinceLastUpdate.clear();
 
     return result;
@@ -88,7 +88,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     {
         if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             !ctx.insertionReported ||
-            ctx.track.objectPositionSequence.empty())
+            ctx.track.objectPosition.isEmpty())
         {
             continue;
         }
@@ -101,7 +101,9 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
 
         ObjectTrackUpdate trackUpdate;
         trackUpdate.trackId = trackId;
-        trackUpdate.appendedTrack = std::exchange(ctx.track.objectPositionSequence, {});
+        trackUpdate.appendedTrack = std::exchange(ctx.track.objectPosition, {});
+        trackUpdate.firstAppearanceTimeUs = ctx.track.firstAppearanceTimeUs;
+        trackUpdate.lastAppearanceTimeUs = ctx.track.lastAppearanceTimeUs;
         trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
         trackUpdate.allAttributes = ctx.track.attributes;
 
@@ -111,12 +113,16 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     return result;
 }
 
-std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
+std::optional<ObjectTrackEx> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
     if (auto it = m_tracksById.find(trackId); it != m_tracksById.end())
-        return it->second.track;
+    {
+        ObjectTrackEx result(it->second.track);
+        result.objectPositionSequence = it->second.allPositionSequence;
+        return result;
+    }
 
     return std::nullopt;
 }
@@ -216,14 +222,15 @@ void ObjectTrackCache::updateObject(
 
     addNewAttributes(objectMetadata.attributes, &trackContext);
 
+    trackContext.track.objectPosition.add(objectMetadata.boundingBox);
+
     ObjectPosition objectPosition;
     objectPosition.deviceId = packet.deviceId;
     objectPosition.timestampUs = packet.timestampUs;
     objectPosition.durationUs = packet.durationUs;
     objectPosition.boundingBox = objectMetadata.boundingBox;
     objectPosition.attributes = objectMetadata.attributes;
-
-    trackContext.track.objectPositionSequence.push_back(std::move(objectPosition));
+    trackContext.allPositionSequence.emplace_back(objectPosition);
 }
 
 void ObjectTrackCache::addNewAttributes(

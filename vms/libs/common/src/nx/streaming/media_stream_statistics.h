@@ -5,6 +5,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/camera/camera_diagnostics.h>
+#include <nx/utils/elapsed_timer.h>
 
 struct QnAbstractMediaData;
 using QnAbstractMediaDataPtr = std::shared_ptr<QnAbstractMediaData>;
@@ -37,4 +38,5 @@ private:
     mutable QnMutex m_mutex;
     std::deque<Data> m_data;
     qint64 m_totalSizeBytes = 0;
+    nx::utils::ElapsedTimer m_lastDataTimer;
 };

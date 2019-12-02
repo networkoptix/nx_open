@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         "'--server' will be ignored. Repeat to set multiple URLs.", "url", "");
     parser.addOption(urlOption);
     QCommandLineOption logLevelOption(QStringList() << "log-level",
-        "Log level(NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE)", "level", "");
+        "Log level: one of NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE.", "level", "");
     parser.addOption(logLevelOption);
     QCommandLineOption disableRestart(QStringList() << "disable-restart",
         "Start every RTSP session only once.");

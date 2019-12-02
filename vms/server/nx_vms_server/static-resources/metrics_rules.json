@@ -216,7 +216,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %encodingThreads 2",
-                                "text": "Encoding threads %encodingThreads could cause high server load"
+                                "text": "has %encodingThreads currently running encoding threads. Recommended number of encoding threads: 2. Limit encoding threads number using maxWebMTranscoders setting in Web Admin advanced settings page."
                             }
                         ]
                     },
@@ -258,7 +258,7 @@
                         "name": "Transactions/s",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s",
+                        "format": "Tr/s",
                         "calculate": "deltaAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
@@ -341,7 +341,7 @@
                         "display": "table|panel",
                         "alarms": [
                             {
-                                "level": "warning",
+                                "level": "error",
                                 "condition": "equal %status Unauthorized",
                                 "text": "is %status"
                             },
@@ -356,13 +356,18 @@
                         "name": "Events: Camera Offline (1h)",
                         "description": "Events count: Camera Offline (1h)",
                         "display": "table|panel",
-                        "calculate": "countValues %status 24h Offline",
+                        "calculate": "countValues %status 1h Offline",
                         "insert": "streamIssues",
                         "alarms": [
                             {
                                 "level": "warning",
-                                "condition": "greaterThan %offlineEvents 1",
-                                "text": "went Offline %offlineEvents times in last 24 hours"
+                                "condition": "greaterThan %offlineEvents 0",
+                                "text": "went Offline %offlineEvents times in the last hour"
+                            },
+                            {
+                                "level": "error",
+                                "condition": "greaterThan %offlineEvents 5",
+                                "text": "went Offline %offlineEvents times in the last hour"
                             }
                         ]
                     },
@@ -376,12 +381,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %streamIssues1h 0",
-                                "text": "has stream issues %streamIssues1h times in last hour"
+                                "text": "had %streamIssues1h stream issues in the last hour"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %streamIssues1h 5",
-                                "text": "has stream issues %streamIssues1h times in last hour"
+                                "text": "had %streamIssues1h stream issues in the last hour"
                             }
                         ]
                     },
@@ -395,7 +400,7 @@
                             {
                                 "level": "error",
                                 "condition": "greaterThan %ipConflicts3min 0",
-                                "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
+                                "text": "has an IP conflict. Conflicting IP: %ipConflicts"
                             }
                         ]
                     }
@@ -417,28 +422,28 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS Drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThan %fpsDelta 5",
-                            "text": "has actual fps less for %fpsDelta frames/s"
+                            "condition": "greaterThan %fpsDeltaAverage10m 5",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         },
                         {
                             "level": "error",
-                            "condition": "greaterThan %fpsDelta 10",
-                            "text": "has actual fps less for %fpsDelta frames/s"
+                            "condition": "greaterThan %fpsDeltaAverage10m 10",
+                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
                         }
                         ]
                     },
@@ -446,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -460,8 +465,8 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "resolutionGreaterThan %resolution 1280x720",
-                                "text": "Resolution '%resolution' is too high"
+                                "condition": "resolutionGreaterOrEqualThan %resolution 1280x720",
+                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
                             }
                         ]
                     },
@@ -473,16 +478,16 @@
                     "actualFps": {
                         "name": "Actual FPS",
                         "isOptional": true,
-                        "display": "panel"
+                        "display": "table|panel"
                     },
                     "fpsDelta": {
                         "isOptional": true
                     },
-                    "fpsDeltaAverage": {
+                    "fpsDeltaAverage10m": {
                         "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
-                        "display": "panel",
+                        "display": "table|panel",
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta"
                     },
@@ -490,7 +495,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "KBps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -498,8 +503,8 @@
                 "name": "Storage Analytics",
                 "values": {
                     "archiveLengthS": {
-                        "name": "Forecast",
-                        "description": "Archive Length",
+                        "name": "Archive",
+                        "description": "Current Archive length",
                         "isOptional": true,
                         "display": "table|panel",
                         "format": "durationS"
@@ -508,7 +513,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "KBps"
+                        "format": "Mbit/s"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
@@ -524,7 +529,7 @@
                             {
                                 "level": "error",
                                 "condition": "and %isArchiveTooSmall %hasArchiveRotated",
-                                "text": "Actual archive length %archiveLengthS is less than user defined minimal archive length %minArchiveLengthS"
+                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS days."
                             }
                         ]
                     }
@@ -548,6 +553,9 @@
                     "server": {
                         "display": "table|panel",
                         "format": "resource"
+                    },
+                    "pool": {
+                        "display": "table|panel"
                     },
                     "type": {
                         "display": "table|panel"
@@ -573,14 +581,14 @@
                     "readRateBps1m": {
                         "name": "Read Rate",
                         "display": "table|panel",
-                        "format": "KBps",
+                        "format": "KB/s",
                         "calculate": "deltaAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                 "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
-                        "format": "KBps",
+                        "format": "KB/s",
                         "calculate": "deltaAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
@@ -589,7 +597,7 @@
                         "description": "Analytics DB transactions per second",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s"
+                        "format": "Tr/s"
                     }
                 }
             },
@@ -599,19 +607,24 @@
                         "name": "Total",
                         "description": "Total space",
                         "display": "table|panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     },
                     "mediaSpaceP": {
                         "name": "VMS Media(%)",
                         "description": "Space Used by VMS media (%)",
                         "display": "table|panel",
-                        "format": "%"
+                        "format": "%",
+                        "calculate": "divide %mediaSpaceB %totalSpaceB",
+                        "insert": "mediaSpaceB",
+                        "isOptional": true
                     },
                     "mediaSpaceB": {
                         "name": "VMS Media",
                         "description": "Space Used by VMS media",
                         "display": "panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     }
                 }
             }
@@ -637,12 +650,12 @@
                     "state": {
                         "display": "table|panel"
                     },
-                    "firstIp": {
+                    "displayAddress": {
                         "name": "IP",
                         "isOptional": true,
                         "display": "table|panel"
                     },
-                    "ipList": {
+                    "otherAddresses": {
                         "name": "Other IP addresses",
                         "isOptional": true,
                         "display": "panel"
@@ -661,7 +674,7 @@
                     "inBps1m": {
                         "name": "IN Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "Kbit/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
                         "insert": "inBps"
@@ -669,7 +682,7 @@
                     "outBps1m": {
                         "name": "OUT Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "Kbit/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",
                         "insert": "outBps"

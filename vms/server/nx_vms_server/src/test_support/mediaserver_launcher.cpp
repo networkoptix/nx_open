@@ -42,6 +42,9 @@ MediaServerLauncher::MediaServerLauncher(
     if (disabledFeatures.testFlag(DisabledFeature::noOutgoingConnectionsMetric))
         addSetting("noOutgoingConnectionsMetric", "1");
 
+    if (disabledFeatures.testFlag(DisabledFeature::noUseTwoSockets))
+        addSetting("useTwoSockets", "0");
+
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
 }

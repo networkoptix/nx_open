@@ -177,7 +177,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     }
 
     const char* const dataEnd = m_media->data() + m_media->dataSize();
-    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), int(dataEnd - m_curDataBuffer));
+    int sendLen = qMin<int>(kMaxPacketLen - sendBuffer.size(), dataEnd - m_curDataBuffer);
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
 

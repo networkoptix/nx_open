@@ -11,9 +11,24 @@ PlatformMonitor::NetworkLoad PlatformMonitor::networkInterfaceLoadOrThrow(
 {
     auto totalLoad = totalNetworkLoad();
     auto interfaceLoad = nx::utils::find_if(totalLoad,
-        [interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
+        [&interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
     if (interfaceLoad == nullptr)
         throw std::invalid_argument("Interface [" + interfaceName.toStdString() + "] not found");
+
+    return *interfaceLoad;
+}
+
+PlatformMonitor::NetworkLoad PlatformMonitor::networkInterfaceLoadOrThrow(
+    const nx::utils::MacAddress& macAddress)
+{
+    auto totalLoad = totalNetworkLoad();
+    auto interfaceLoad = nx::utils::find_if(totalLoad,
+        [&macAddress](const auto& load){ return load.macAddress == macAddress; });
+    if (interfaceLoad == nullptr)
+    {
+        throw std::invalid_argument(
+            "Interface with MAC [" + macAddress.toString().toStdString() + "] not found");
+    }
 
     return *interfaceLoad;
 }

@@ -163,8 +163,11 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_GT(secondServerValues["servers"][secondServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(secondServerValues["servers"][secondServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        while (secondServer->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        while (this->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2
+            || secondServer->get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
+        }
 
         auto systemValues = secondServer->get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);
@@ -187,8 +190,11 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_GT(serverValues["servers"][mainServerId]["availability"]["uptimeS"].toDouble(), 0);
         EXPECT_GT(serverValues["servers"][mainServerId]["activity"]["transactionsPerSecond1m"].toDouble(), 0);
 
-        while (get<SystemValues>("/ec2/metrics/values")["servers"].size() != 2)
+        while (get<SystemValues>("/ec2/metrics/values")["servers"][secondServerId]["availability"]["status"]
+            != "Offline")
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); //< Wait for sync.
+        }
 
         auto systemValues = get<SystemValues>("/ec2/metrics/values");
         EXPECT_EQ(systemValues["systems"].size(), 1);
@@ -201,6 +207,33 @@ TEST_F(MetricsServersApi, twoServers)
         EXPECT_FALSE(systemValues["servers"][secondServerId]["availability"].count("uptimeS"));
         EXPECT_FALSE(systemValues["servers"][secondServerId]["activity"].count("transactionsPerSecond1m"));
     }
+}
+
+TEST_F(MetricsServersApi, threeServers)
+{
+    auto left = addServer();
+    auto right = addServer();
+
+    const auto hasUptimes =
+        [&](const ServerForTests* server)
+        {
+            auto values = server->get<SystemValues>("/ec2/metrics/values")["servers"];
+            return values[this->id]["availability"]["uptimeS"].toDouble() > 0
+                && values[left->id]["availability"]["uptimeS"].toDouble() > 0
+                && values[right->id]["availability"]["uptimeS"].toDouble() > 0;
+        };
+
+    const auto waitForUptimes =
+        [&](const ServerForTests* server, const QString& label)
+        {
+            NX_INFO(this, "Wait for sync on %1 server %2", label, server->id);
+            while (!hasUptimes(this))
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        };
+
+    waitForUptimes(this, "middle");
+    waitForUptimes(left.get(), "left");
+    waitForUptimes(right.get(), "right");
 }
 
 TEST_F(MetricsServersApi, streamCount)

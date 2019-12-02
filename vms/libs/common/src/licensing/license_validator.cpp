@@ -26,6 +26,11 @@ bool QnLicenseValidator::isValid(const QnLicensePtr& license, ValidationMode mod
     return validate(license, mode) == QnLicenseErrorCode::NoError;
 }
 
+bool QnLicenseValidator::overrideMissingRuntimeInfo(const QnLicensePtr&, QnPeerRuntimeInfo&) const
+{
+    return false;
+}
+
 QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
     ValidationMode mode) const
 {
@@ -44,7 +49,7 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
 
     // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     // peer where license was activated not found
-    if (info.uuid.isNull())
+    if (info.uuid.isNull() && !overrideMissingRuntimeInfo(license, info))
         return QnLicenseErrorCode::InvalidHardwareID;
 
     if (!license->brand().isEmpty() && license->brand() != info.data.brand)

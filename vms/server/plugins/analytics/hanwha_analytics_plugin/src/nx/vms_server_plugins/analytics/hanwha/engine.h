@@ -18,13 +18,27 @@
 #include "common.h"
 #include "metadata_monitor.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace hanwha {
+namespace nx::vms_server_plugins::analytics::hanwha {
 
 class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
+private:
+    struct SharedResources
+    {
+        std::unique_ptr<MetadataMonitor> monitor;
+        std::shared_ptr<nx::vms::server::plugins::HanwhaSharedResourceContext> sharedContext;
+        std::atomic<int> monitorUsageCount{ 0 };
+        std::atomic<int> deviceAgentCount{ 0 };
+
+        SharedResources(
+            const QString& sharedId,
+            const Hanwha::EngineManifest& driverManifest,
+            const nx::utils::Url &url,
+            const QAuthenticator& auth);
+
+        void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& auth);
+    };
+
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
@@ -45,6 +59,9 @@ public:
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
+    std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> sharedContext(
+        QString m_sharedId);
+
 protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
@@ -58,23 +75,6 @@ protected:
     virtual void doExecuteAction(
         nx::sdk::Result<nx::sdk::analytics::IAction::Result>* outResult,
         const nx::sdk::analytics::IAction* action) override;
-
-private:
-    struct SharedResources
-    {
-        std::unique_ptr<MetadataMonitor> monitor;
-        std::shared_ptr<nx::vms::server::plugins::HanwhaSharedResourceContext> sharedContext;
-        std::atomic<int> monitorUsageCount{0};
-        std::atomic<int> deviceAgentCount{0};
-
-        SharedResources(
-            const QString& sharedId,
-            const Hanwha::EngineManifest& driverManifest,
-            const nx::utils::Url &url,
-            const QAuthenticator& auth);
-
-        void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& auth);
-    };
 
 private:
     boost::optional<QList<QString>> fetchSupportedEventTypeIds(
@@ -98,8 +98,4 @@ private:
     QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 
-} // namespace hanwha
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
-
+} // namespace nx::vms_server_plugins::analytics::hanwha

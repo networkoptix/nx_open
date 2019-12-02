@@ -297,7 +297,8 @@ public:
                         : QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr),
                                                   ifInfo.dwDescrLen - 1 );
 
-                p.first->second.load.macAddress = nx::utils::MacAddress( physicalAddress );
+                p.first->second.load.macAddress = nx::utils::MacAddress::fromRawData(
+                    reinterpret_cast<const unsigned char*>(physicalAddress.constData()));
                 p.first->second.load.type = nx::vms::server::PlatformMonitor::PhysicalInterface;
                 p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;
                 p.first->second.prevMeasureClock = currentClock;
@@ -662,5 +663,6 @@ quint64 QnWindowsMonitor::thisProcessRamUsageBytes()
     PROCESS_MEMORY_COUNTERS counters;
     if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
         return counters.WorkingSetSize;
+    NX_WARNING(this, "GetProcessMemoryInfo failed with error %1", GetLastError());
     return 0;
 }

@@ -9,7 +9,7 @@ import zipfile
 
 from filecmp import cmp
 from pathlib import Path
-from shutil import copy2
+from shutil import copy2, rmtree
 
 FILEMAP_NAME = 'filemap.yaml'
 
@@ -69,7 +69,7 @@ def pack(customization_path, output_path):
             zip.write(existing_file.as_posix(), source.as_posix())
 
 
-def unpack(package_path, output_path):
+def unpack(package_path, output_path, clean_package):
     filemap = find_filemap()
 
     unpacked_package_path = output_path / '_package_'
@@ -83,6 +83,9 @@ def unpack(package_path, output_path):
             logging.warning('File {} not found'.format(source))
             continue
         copy_if_different(source, output_path / target)
+
+    if clean_package:
+        rmtree(unpacked_package_path.as_posix())
 
 
 def list_files(output_path):
@@ -109,13 +112,14 @@ def _add_pack_command(subparsers):
 def _add_unpack_command(subparsers):
 
     def unpack_command(args):
-        return unpack(args.input, args.output)
+        return unpack(args.input, args.output, args.clean)
 
     parser = subparsers.add_parser('unpack', help='Unpack customization package')
     parser.add_argument('input', type=Path, help='Package path')
     parser.add_argument('output', type=Path, help='Unpacked customization path')
     parser.add_argument('-v', '--verbose', help='Verbose output', action='store_true')
     parser.add_argument('-l', '--log', help='Log file path')
+    parser.add_argument('-c', '--clean', help='Remove unpacked package', action='store_true')
     parser.set_defaults(func=unpack_command)
 
 

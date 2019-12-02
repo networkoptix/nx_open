@@ -139,6 +139,12 @@ public:
         if (function() == "-" || function() == "sub")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
+        if (function() == "*" || function() == "multiply")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 * v2; });
+
+        if (function() == "/" || function() == "divide")
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v2 ? Value(v1 / v2) : Value(); });
+
         if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
@@ -148,8 +154,8 @@ public:
         if (function() == ">" || function() == "greaterThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
-        if (function() == "resolutionGreaterThan")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return square(v1) > square(v2); });
+        if (function() == "resolutionGreaterOrEqualThan")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return square(v1) >= square(v2); });
 
         if (function() == "<" || function() == "lessThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
@@ -195,24 +201,29 @@ public:
     template<typename Extraction> // double(double value, double durationS)
     ValueGenerator durationAggregation(
         int valueI, int durationI, Border border, Extraction extract,
-        bool divideByTime = false) const
+        bool divideByTime = false, bool mustExist = false) const
     {
         return durationOperation(
             valueI, durationI, border,
-            [border, divideByTime, extract = std::move(extract)](const auto& forEach)
+            [border, divideByTime, mustExist, extract = std::move(extract)](const auto& forEach)
             {
                 double totalValue = 0;
                 double totalDurationS = 0;
+                Value lastValue;
                 forEach(
-                    [&](const Value& value, std::chrono::milliseconds duration)
+                    [&](Value value, std::chrono::milliseconds duration)
                     {
+                        lastValue = value;
                         if (value == Value())
-                            return;
+                            return; //< Do not process empty value periods.
 
                         const double durationS = seconds(duration);
                         totalDurationS += durationS;
                         totalValue += extract(value.toDouble(), durationS);
                     });
+
+                if (mustExist && lastValue == Value())
+                    return Value();
 
                 if (divideByTime)
                     return (totalDurationS == 0) ? Value() : (totalValue / totalDurationS);
@@ -257,14 +268,14 @@ public:
         {
             return durationAggregation(
                 1, 2, Border::move(), [](double v, double d) { return v * d; },
-                /*divideByTime*/ true);
+                /*divideByTime*/ true, /*mustExist*/ true);
         }
 
         if (function() == "deltaAvg") //< sum(v) / t
         {
             return durationAggregation(
                 1, 2, Border::hardcode(0), [](double v, double) { return v; },
-                /*divideByTime*/ true);
+                /*divideByTime*/ true, /*mustExist*/ true);
         }
 
         if (function() == "counterToAvg") //< dv / t
@@ -277,10 +288,15 @@ public:
                     double last = 0;
                     double totalTimeS = 0;
                     forEach(
-                        [&](auto value, auto duration)
+                        [&](const Value& value, Duration duration)
                         {
-                            last = value.toDouble();
-                            if (!first) first = last;
+                            if (value != Value())
+                            {
+                                last = value.toDouble();
+                                if (!first)
+                                    first = last;
+                            }
+
                             totalTimeS += seconds(duration);
                         });
 
@@ -420,7 +436,7 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     {
         NX_ASSERT(m_optional, "Value %1 is not optional: %2", this, e.what());
     }
-    catch (const MetricsError& e)
+    catch (const BaseError& e)
     {
         NX_ASSERT(false, "Got unexpected alarm %1 error: %2", this, e.what());
     }

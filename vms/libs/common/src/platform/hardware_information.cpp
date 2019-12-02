@@ -59,17 +59,17 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
     logicalCores = std::thread::hardware_concurrency();
     physicalCores = logicalCores;
 
-#if !defined(__arm__) && !defined(__aarch64__)
-    int cpuinfo[4];
-    #if defined(_MSC_VER)
-        __cpuid(cpuinfo, 1);
-    #else
-        __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
+    #if !defined(__arm__) && !defined(__aarch64__)
+        int cpuinfo[4];
+        #if defined(_MSC_VER)
+            __cpuid(cpuinfo, 1);
+        #else
+            __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
+        #endif
+        const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
+        if (hasHyperThreading)
+            physicalCores /= 2;
     #endif
-    const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
-    if (hasHyperThreading)
-        physicalCores /= 2;
-#endif
 }
 
 #if defined(Q_OS_WIN)

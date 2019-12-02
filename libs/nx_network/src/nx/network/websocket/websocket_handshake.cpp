@@ -44,7 +44,7 @@ static Error validateHeaders(const nx::network::http::HttpHeaders& headers)
     if (((headersIt = headers.find(kUpgrade)) == headers.cend()
             || headersIt->second.toLower() != kWebsocketProtocolName.toLower())
         || ((headersIt = headers.find(kConnection)) == headers.cend()
-            || headersIt->second.toLower() != kUpgrade.toLower()))
+            || !headersIt->second.toLower().contains(kUpgrade.toLower())))
     {
         return Error::handshakeError;
     }
@@ -130,7 +130,8 @@ CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
 
 Error validateRequest(
     const nx::network::http::Request& request,
-    nx::network::http::Response* response)
+    nx::network::http::Response* response,
+    bool disableCompression)
 {
     Error result = validateRequestLine(request.requestLine);
     if (result != Error::noError)
@@ -152,7 +153,7 @@ Error validateRequest(
     if (websocketProtocolIt != request.headers.cend())
         response->headers.emplace(kProtocol, websocketProtocolIt->second);
 
-    if (compressionType(request.headers) != CompressionType::none)
+    if (compressionType(request.headers) != CompressionType::none && !disableCompression)
         response->headers.emplace(kExtension, kCompressionAllowed);
 
     return Error::noError;

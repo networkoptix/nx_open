@@ -112,12 +112,6 @@ auto makeAvailabilityProviders()
     );
 }
 
-static void operator *= (QSize& left, const QSize& right)
-{
-    left.setWidth(left.width() * right.width());
-    left.setHeight(left.height() * right.height());
-}
-
 auto makeStreamProviders(StreamIndex streamIndex)
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
@@ -125,11 +119,17 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "resolution",
             [streamIndex](const auto& r)
             {
-                if (auto p = r->targetParams(streamIndex); p && p->resolution.isValid())
+                auto p = r->actualParams(streamIndex);
+                if (!p || !p->resolution.isValid())
+                    p = r->targetParams(streamIndex);
+                if (p && p->resolution.isValid())
                 {
                     auto resolution = p->resolution;
                     if (auto layout = r->getVideoLayout())
-                        resolution *= layout->size();
+                    {
+                        resolution.setWidth(resolution.width() * layout->size().width());
+                        resolution.setHeight(resolution.height() * layout->size().height());
+                    }
                     return Value(CameraMediaStreamInfo::resolutionToString(resolution));
                 }
                 return Value();
@@ -139,7 +139,9 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "targetFps",
             [streamIndex](const auto& r)
             {
-                if (r->isCameraControlDisabled())
+                const bool fixedQuality =
+                    r->getCameraCapabilities().testFlag(Qn::FixedQualityCapability);
+                if (r->isCameraControlDisabled() || !r->hasVideo() || fixedQuality)
                     return Value();
                 if (auto params = r->targetParams(streamIndex))
                     return Value(params->fps);

@@ -196,6 +196,8 @@
 
 #include <rtsp/rtsp_connection.h>
 
+#include <nx/vms/server/http_audio/request_processor.h>
+
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <network/multicodec_rtp_reader.h>
@@ -257,6 +259,7 @@
 #include <server/server_globals.h>
 #include <nx/vms/server/unused_wallpapers_watcher.h>
 #include <nx/vms/server/license_watcher.h>
+#include <nx/vms/server/videowall_license_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include <common/static_common_module.h>
@@ -2688,23 +2691,25 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt] deviceId Id of Device.
-     * %param[opt] objectTypeId Analytics Object Type id.
-     * %param[opt] objectTrackId Analytics Object Track id.
-     * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] y1 Top left "y" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] x2 Bottom right "x" coordinate of picture bounding box to search within. In
+     * %param[opt]:uuid deviceId Id of Device.
+     * %param[opt]:string objectTypeId Analytics Object Type id.
+     * %param[opt]:string objectTrackId Analytics Object Track id.
+     * %param[opt]:integer startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:integer endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:float x1 Top left "x" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
+     * %param[opt]:float y1 Top left "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within Object Track properties.
-     * %param[opt] limit Maximum number of Object Tracks to return.
-     * %param[opt] maxObjectTrackSize Maximum number of elements of an Object Track.
-     * %param[opt] sortOrder Sort order of Object Tracks by a Track start timestamp.
+     * %param[opt]:float x2 Bottom right "x" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:float y2 Bottom right "y" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:string freeText Text to match within Object Track properties.
+     * %param[opt]:integer limit Maximum number of Object Tracks to return.
+     * %param[opt]:boolean needFullTrack Whether to select track details data. This is a heavy
+     *     operation and makes the request much slower. For performance reason this parameter
+     *     is ignored in case the parameter 'objectTrackId' is not present in the request.
+     * %param[opt]::enum sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      * %param[opt] isLocal If "false" then request is forwarded to every other online Server and
@@ -2724,8 +2729,9 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:array reply List of objects corresponding to Analytics Actions.
      *         %param reply[].actions List of JSON objects, each describing a set of actions from a
      *             particular analytics plugin.
-     *         %param reply[].actions[].actionIds List of action ids (strings).
-     *         %param reply[].actions[].pluginId Id of a analytics plugin which offers the actions.
+     *         %param:stringArray reply[].actions[].actionIds List of action ids.
+     *         %param:string reply[].actions[].pluginId Id of a analytics plugin which offers the
+     *             actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
@@ -3054,12 +3060,13 @@ bool MediaServerProcess::initTcpListener(
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     registerTcpHandler<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
+    registerTcpHandler<http_audio::AudioRequestProcessor>("HTTP", "api/http_audio", serverModule());
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "api");
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     registerTcpHandler<QnRestConnectionProcessor>("HTTP", "favicon.ico");
     registerTcpHandler<QnFileConnectionProcessor>("HTTP", "static");
     registerTcpHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    registerTcpHandler<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
+    registerTcpHandler<ProgressiveDownloadingServer>("HTTP", "media", serverModule());
     registerTcpHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
     hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
@@ -4435,6 +4442,7 @@ void MediaServerProcess::startObjects()
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
         serverModule()->licenseWatcher()->start();
+    serverModule()->videoWallLicenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_universalTcpListener->start();
@@ -4482,6 +4490,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
+    const bool useTwoSockets = serverModule()->settings().useTwoSockets();
     NX_INFO(this, lm("Max TCP connections from server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
@@ -4493,7 +4502,8 @@ void MediaServerProcess::createTcpListener()
         QHostAddress::Any,
         serverModule()->settings().port(),
         maxConnections,
-        acceptSslConnections);
+        acceptSslConnections,
+        useTwoSockets);
 }
 
 void MediaServerProcess::loadResourcesFromDatabase()

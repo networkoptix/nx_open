@@ -319,15 +319,21 @@
         }
     },
 
-    "nx::vms::client::desktop::node_view::NodeViewItemDelegate": {
+    "nx::vms::client::desktop::node_view::ResourceNodeViewItemDelegate": {
         "colors": {
             "chartColor": "brand_d3"
+            "mainText":          "light10",
+            "mainTextSelected":  "light4",
+            "mainTextAccented":  "brand_core",
+            "extraText":         "dark17",
+            "extraTextSelected": "light10",
+            "extraTextAccented": "brand_d3"
         }
     },
 
     "QnRecordingStatsItemDelegate": {
         "colors": {
-            "chartBackground": "brand_d3",
+            "chartBackground": "brand_core.setAlpha(40)",
             "chartForeground": "light10",
             "foreignForeground": "dark17",
             "totalForeground": "light4"

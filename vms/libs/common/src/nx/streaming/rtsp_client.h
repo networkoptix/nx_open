@@ -113,7 +113,6 @@ public:
     {
         bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
-        bool sendOptions = false;
     };
 
     static const QByteArray kPlayCommand;
@@ -187,7 +186,6 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
-    void setConfig(const Config& config);
 
     // RTP transport configured by user
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }

@@ -107,14 +107,27 @@ QSize updateDstSize(
     nx::api::ImageRequest::AspectRatio aspectRatio)
 {
     QSize dstSize(srcSize);
-
     const double sar = outFrame.sample_aspect_ratio;
-    const double ar = sar * outFrame.width / outFrame.height;
+    double ar = sar * outFrame.width / outFrame.height;
+
+    // If auto was requested, then should use aspect ratio like it is used in GUI.
+    if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
+    {
+        const auto customAr = camera->aspectRatio();
+        if (customAr.isValid())
+            ar = customAr.toFloat();
+    }
+    NX_VERBOSE(typeid(QnGetImageHelper), "%1(): AR: %2, SAR: %3, mode: %4",
+        __func__, ar, sar, aspectRatio);
+
     NX_ASSERT(ar > 0);
     if (!dstSize.isEmpty())
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
-        dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), kRoundFactor));
+        if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
+            dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height() * ar), kRoundFactor));
+        else
+            dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), kRoundFactor));
     }
     else if (dstSize.height() > 0)
     {
@@ -129,14 +142,6 @@ QSize updateDstSize(
     else
     {
         dstSize = QSize(outFrame.width * sar, outFrame.height);
-    }
-
-    // If auto was requested, then should use aspect ratio like it is used in GUI.
-    if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
-    {
-        const auto customAr = camera->aspectRatio();
-        if (customAr.isValid())
-            dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
     // Scale the image to fit inside max size square.

@@ -98,7 +98,7 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::toInfos(
         }
         catch(const std::exception& e)
         {
-            NX_WARNING(typeid(WritableStoragesHelper), e.what());
+            NX_DEBUG(typeid(WritableStoragesHelper), e.what());
             continue;
         }
     }

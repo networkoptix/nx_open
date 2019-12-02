@@ -10,7 +10,7 @@
 #define NX_REMOVE_PARENTHESES(...) __VA_ARGS__
 
 /**
- * Useful for macros argument overload.
+ * Useful for macro argument overload.
  * ```
  * #define M1(x) ...
  * #define M2(x, y) ...
@@ -32,12 +32,14 @@
 #define NX_GET_14TH_ARG(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, ...) a14
 #define NX_GET_15TH_ARG(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, ...) a15
 
-/** Concatanate MSVC workadound. */
-#define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
+/** Workaround for MSVC preprocessor issue with concatenation. */
 #define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
+#define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
 
-// We can't pass function templates as template parameters, so we're unable to use them with
-// std::apply, std::invoke etc. But generic lambdas are ok in such contexts (because they are
-// essentially class templates).
+/**
+ * We can't pass function templates as template parameters, so we're unable to use them with
+ * std::apply, std::invoke etc. But generic lambdas are ok in such contexts (because they are
+ * essentially class templates).
+ */
 #define NX_WRAP_FUNC_TO_LAMBDA(FUNC) \
     [](auto&&... args) { return FUNC(std::forward<decltype(args)>(args)...); }

@@ -83,7 +83,7 @@ nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedOb
     const nx::analytics::db::ObjectPosition& objectPosition);
 
 nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::ObjectTrack& track);
+    const nx::analytics::db::ObjectTrackEx& track);
 
 nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,

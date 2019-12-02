@@ -1,15 +1,15 @@
-#ifdef ENABLE_TEST_CAMERA
-
 #include "testcamera_stream_reader.h"
+#if defined(ENABLE_TEST_CAMERA)
 
 #include <nx/utils/log/log.h>
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
+#include <nx/vms/testcamera/packet.h>
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
-static const int TESTCAM_TIMEOUT = 5 * 1000;
+static constexpr int kTimeoutMs = 5 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(
     const QnTestCameraResourcePtr& res)
@@ -17,7 +17,7 @@ QnTestCameraStreamReader::QnTestCameraStreamReader(
     CLServerPushStreamReader(res)
 {
     m_socket = nx::network::SocketFactory::createStreamSocket();
-    m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
+    m_socket->setRecvTimeout(kTimeoutMs);
 }
 
 QnTestCameraStreamReader::~QnTestCameraStreamReader()
@@ -25,118 +25,121 @@ QnTestCameraStreamReader::~QnTestCameraStreamReader()
     stop();
 }
 
-int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
+bool QnTestCameraStreamReader::receiveData(
+    void* buffer, int size, const QString& dataCaptionForErrorMessage)
 {
-    int done = 0;
-    while (done < size)
+    int totalBytesRead = 0;
+    while (totalBytesRead < size)
     {
-        const int bytesRead = m_socket->recv(buffer + done, size - done);
+        const int bytesRead = m_socket->recv(
+            (uint8_t*) buffer + totalBytesRead, size - totalBytesRead);
         if (bytesRead < 1)
-            return bytesRead;
-        done += bytesRead;
+        {
+            NX_VERBOSE(this, "STREAM ERROR: Unable to receive %1 (have read %2 of %3 bytes): %4",
+                dataCaptionForErrorMessage, totalBytesRead, size,
+                (bytesRead == 0) ? "Connection closed." : SystemError::getLastOSErrorText());
+            return false;
+        }
+        totalBytesRead += bytesRead;
     }
-    return done;
+
+    return NX_ASSERT(totalBytesRead == size);
 }
 
 QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 {
     if (!isStreamOpened())
-        return QnAbstractMediaDataPtr(0);
+        return nullptr;
 
     if (needMetadata())
         return getMetadata();
 
-    quint8 header[6];
-
-    quint32 bytesRead = receiveData(header, sizeof(header));
-    if (bytesRead != sizeof(header)) {
+    const auto result = receivePacket();
+    if (!result)
+    {
         closeStream();
-        return QnAbstractMediaDataPtr();
+        return nullptr;
     }
 
-    const bool isKeyFrame = header[0] & (1 << 7);
-    const bool isCodecContext = header[0] & (1 << 6);
-    const bool isPtsIncluded = header[0] & (1 << 5);
-    quint16 codec = ((header[0] & 0b00011111) << 8) | header[1];
-    if (codec == 0)
-        NX_VERBOSE(this) << "Stream error: Codec is 0";
+    return result;
+}
 
-    quint32 size = (header[2] << 24) + (header[3] << 16) + (header[4] << 8) + header[5];
-
-    qint64 pts = 0;
-    if (isPtsIncluded)
-    {
-        quint8 ptsBigEndian[8];
-        quint32 bytesRead = receiveData(ptsBigEndian, sizeof(ptsBigEndian));
-        if (bytesRead != sizeof(ptsBigEndian)) {
-            closeStream();
-            NX_VERBOSE(this) << "Stream error: Unable to read PTS";
-            return QnAbstractMediaDataPtr();
-        }
-        pts = (qint64) (
-            (((quint64) ptsBigEndian[0]) << (7 * 8)) |
-            (((quint64) ptsBigEndian[1]) << (6 * 8)) |
-            (((quint64) ptsBigEndian[2]) << (5 * 8)) |
-            (((quint64) ptsBigEndian[3]) << (4 * 8)) |
-            (((quint64) ptsBigEndian[4]) << (3 * 8)) |
-            (((quint64) ptsBigEndian[5]) << (2 * 8)) |
-            (((quint64) ptsBigEndian[6]) << (1 * 8)) |
-            (((quint64) ptsBigEndian[7]) << (0 * 8)));
-        NX_VERBOSE(this) << "Included PTS:" << pts;
-    }
-
-    if (size <= 0 || size > 1024*1024*8)
-    {
-        qWarning() << "Invalid media packet size received. got " << size << "expected < 8Mb";
-        closeStream();
-        return QnAbstractMediaDataPtr();
-    }
-
-    if (isCodecContext)
-    {
-        quint8* ctxData = new quint8[size];
-        quint32 bytesRead = receiveData(ctxData, size);
-
-        if (bytesRead == size)
+QnAbstractMediaDataPtr QnTestCameraStreamReader::receivePacket()
+{
+    const auto error = //< Intended to be called as `return error("message template", ...);`.
+        [this](auto... args)
         {
-            QByteArray payloadArray((const char *) ctxData, size);
-            m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(payloadArray));
-        }
-        delete [] ctxData;
-        return getNextData();
-    }
+            NX_ERROR(this, args...);
+            return nullptr;
+        };
 
-    QnWritableCompressedVideoDataPtr rez(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
-    rez->compressionType = (AVCodecID) codec;
+    using namespace nx::vms::testcamera::packet;
 
-    rez->m_data.finishWriting(size);
+    Header header;
+    if (!receiveData(&header, sizeof(header), "packet header"))
+        return nullptr;
 
-    if (isPtsIncluded)
-        rez->timestamp = pts;
-    else
-        rez->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    if (header.codecId() == 0)
+        return error("STREAM ERROR: Codec id is 0.");
 
-    if (isKeyFrame)
-        rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+    if (header.dataSize() <= 0 || header.dataSize() > 8 * 1024 * 1024)
+        return error("Invalid data size received: %1; expected up to 8 MB.", header.dataSize());
 
-    bytesRead = receiveData((quint8*) rez->m_data.data(), size);
-    if (bytesRead != size) {
-        closeStream();
-        return QnAbstractMediaDataPtr();
-    }
-
-    /*
-    static QFile* gggFile = 0;
-    if (gggFile == 0)
+    if (header.flags() & Flag::mediaContext)
     {
-        gggFile = new QFile("c:/dest.264");
-        gggFile->open(QFile::WriteOnly);
-    }
-    gggFile->write(rez->data.data(), rez->data.size());
-    gggFile->flush();
-    */
+        // Receive and process the media context packet, and then call this function recursively to
+        // receive the next packet (hopefully a frame packet).
+        //
+        // ATTENTION: If a large number of media context packets is sent, stack overflow may occur.
 
-    return rez;
+        if (header.flags() & Flag::ptsIncluded || header.flags() & Flag::channelNumberIncluded)
+            return error("Invalid packet flags received: %1", header.flagsAsHex());
+
+        QByteArray mediaContext(header.dataSize(), /*filler*/ 0);
+        if (!receiveData(mediaContext.data(), mediaContext.size(), "media context"))
+            return nullptr;
+
+        m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(mediaContext));
+        return getNextData(); //< recursion
+    }
+
+    return receiveFramePacketBody(header);
+}
+
+QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFramePacketBody(
+    const nx::vms::testcamera::packet::Header& header)
+{
+    using namespace nx::vms::testcamera::packet;
+
+    const auto frame = std::make_shared<QnWritableCompressedVideoData>(
+        CL_MEDIA_ALIGNMENT, header.dataSize(), m_context);
+
+    if (header.flags() & Flag::ptsIncluded)
+    {
+        if (!receiveData<PtsUs>(&frame->timestamp, "pts"))
+            return nullptr;
+    }
+    else
+    {
+        frame->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    }
+
+    if (header.flags() & Flag::channelNumberIncluded)
+    {
+        if (!receiveData<uint8_t>(&frame->channelNumber, "channel number"))
+            return nullptr;
+    }
+
+    frame->compressionType = header.codecId();
+    frame->m_data.finishWriting(header.dataSize());
+
+    if (header.flags() & Flag::keyFrame)
+        frame->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+
+    if (!receiveData(frame->m_data.data(), header.dataSize(), "frame data"))
+        return nullptr;
+
+    return frame;
 }
 
 CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
@@ -151,7 +154,8 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         closeStream();
         return CameraDiagnostics::CameraInvalidParams(lm("Not empty query: [%1]").args(url));
     }
-    url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo ? "1" : "0", params.fps));
+    url.setQuery(lm("primary=%1&fps=%2").args(
+        getRole() == Qn::CR_LiveVideo ? "1" : "0", params.fps));
 
     if (m_socket->isClosed())
     {
@@ -160,14 +164,15 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
             return CameraDiagnostics::NoErrorResult();
 
         m_socket = nx::network::SocketFactory::createStreamSocket();
-        m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
+        m_socket->setRecvTimeout(kTimeoutMs);
     }
 
-    m_socket->setRecvTimeout(TESTCAM_TIMEOUT);
-    m_socket->setSendTimeout(TESTCAM_TIMEOUT);
+    m_socket->setRecvTimeout(kTimeoutMs);
+    m_socket->setSendTimeout(kTimeoutMs);
 
     NX_VERBOSE(this, "Sending data to URL [%1]", url);
-    if (!m_socket->connect(url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
+    if (!m_socket->connect(
+        url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
@@ -202,4 +207,4 @@ void QnTestCameraStreamReader::pleaseStop()
     m_socket->shutdown();
 }
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)

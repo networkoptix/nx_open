@@ -10,13 +10,17 @@
 
 #include <nx/vms/server/root_fs.h>
 
-#include "cursor.h"
 #include "cleaner.h"
 #include "object_track_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
 
 #include <cmath>
+#include <media_server/media_server_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics::db {
 
@@ -225,35 +229,62 @@ std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
     return std::nullopt;
 }
 
-void EventsStorage::createLookupCursor(
-    Filter filter,
-    CreateCursorCompletionHandler completionHandler)
+std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTrack& track)
 {
-    using namespace nx::utils;
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
 
-    NX_VERBOSE(this, "Requested cursor with filter %1", filter);
+    if (auto details = m_objectTrackCache->getTrackById(track.id))
+    {
+        NX_VERBOSE(this, "Return trackId %1 from the cache", track.id);
+        return details->objectPositionSequence;
+    }
 
-    auto objectSearcher = std::make_shared<ObjectTrackSearcher>(
-        m_deviceDao,
-        m_objectTypeDao,
-        &m_attributesDao,
-        m_analyticsArchiveDirectory.get(),
-        std::move(filter));
+    std::vector<ObjectPosition> result;
+    auto resource = m_mediaServerModule->resourcePool()->getResourceById(track.deviceId);
+    if (!resource)
+    {
+        NX_DEBUG(this, "Failed to to lookup detail track info for deviceId: %1", track.deviceId);
+        return result;
+    }
+    QnServerArchiveDelegate archive(m_mediaServerModule, MediaQuality::MEDIA_Quality_High);
+    if (!archive.open(resource, m_mediaServerModule->archiveIntegrityWatcher()))
+    {
+        NX_DEBUG(this, "Failed to to lookup detail track info for objectTraclId: %1", track.id);
+        return result;
+    }
+    archive.seek(track.firstAppearanceTimeUs, true);
+    const auto lastTime = track.lastAppearanceTimeUs;
+    while (auto data = std::dynamic_pointer_cast<QnAbstractMediaData>(archive.getNextData()))
+    {
+        if (data->timestamp > lastTime || data->dataType == QnAbstractMediaData::EMPTY_DATA)
+            break;
 
-    m_dbController->queryExecutor().createCursor<ObjectTrack>(
-        [objectSearcher](auto&&... args)
-            { objectSearcher->prepareCursorQuery(std::forward<decltype(args)>(args)...); },
-        [objectSearcher](auto&&... args)
-            { objectSearcher->loadCurrentRecord(std::forward<decltype(args)>(args)...); },
-        [this, completionHandler = std::move(completionHandler)](
-            sql::DBResult resultCode,
-            QnUuid dbCursorId) mutable
+        auto metadata = std::dynamic_pointer_cast<QnCompressedMetadata>(data);
+        if (!metadata)
+            continue;
+
+        auto packet = nx::common::metadata::fromCompressedMetadataPacket(metadata);
+        if (!packet)
+            break;
+
+        for (const auto& detailData : packet->objectMetadataList)
         {
-            reportCreateCursorCompletion(
-                resultCode,
-                dbCursorId,
-                std::move(completionHandler));
-        });
+            if (detailData.trackId == track.id)
+            {
+                ObjectPosition position;
+                position.deviceId = track.deviceId;
+                position.timestampUs = packet->timestampUs;
+                position.durationUs = packet->durationUs;
+                position.attributes = detailData.attributes;
+                position.boundingBox = detailData.boundingBox;
+                result.emplace_back(position);
+            }
+        }
+    }
+    NX_VERBOSE(this, "track details data has read from media archive. Request duration %1",
+        timer.elapsed());
+    return result;
 }
 
 void EventsStorage::lookup(
@@ -262,7 +293,7 @@ void EventsStorage::lookup(
 {
     NX_DEBUG(this, "Selecting tracks. Filter %1", filter);
 
-    auto result = std::make_shared<std::vector<ObjectTrack>>();
+    auto result = std::make_shared<std::vector<ObjectTrackEx>>();
     m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
         {
@@ -273,6 +304,11 @@ void EventsStorage::lookup(
                 m_analyticsArchiveDirectory.get(),
                 std::move(filter));
             *result = objectSearcher.lookup(queryContext);
+            if (filter.needFullTrack && !filter.objectTrackId.isNull())
+            {
+                for (auto& track: *result)
+                    track.objectPositionSequence = lookupTrackDetailsSync(track);
+            }
             return nx::sql::DBResult::ok;
         },
         [this, result, completionHandler = std::move(completionHandler)](
@@ -479,40 +515,6 @@ ObjectTrackDataSaver EventsStorage::takeDataToSave(
     return detectionDataSaver;
 }
 
-void EventsStorage::reportCreateCursorCompletion(
-    sql::DBResult resultCode,
-    QnUuid dbCursorId,
-    CreateCursorCompletionHandler completionHandler)
-{
-    if (resultCode != sql::DBResult::ok)
-        return completionHandler(ResultCode::error, nullptr);
-
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_stopped)
-        return completionHandler(ResultCode::ok, nullptr);
-
-    auto dbCursor = std::make_unique<sql::Cursor<ObjectTrack>>(
-        &m_dbController->queryExecutor(),
-        dbCursorId);
-
-    auto cursor = std::make_unique<Cursor>(std::move(dbCursor));
-    cursor->setOnBeforeCursorDestroyed(
-        [this, guard = m_asyncOperationGuard.sharedGuard()](Cursor* cursor)
-        {
-            if (!guard->lock())
-                return;
-
-            QnMutexLocker lock(&m_mutex);
-            m_openedCursors.remove(cursor);
-        });
-
-    m_openedCursors.push_back(cursor.get());
-    lock.unlock();
-
-    completionHandler(ResultCode::ok, std::move(cursor));
-}
-
 void EventsStorage::scheduleDataCleanup(
     const QnMutexLockerBase&,
     QnUuid deviceId,
@@ -577,16 +579,6 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
     }
 }
 
-QRect EventsStorage::packRect(const QRectF& rectf)
-{
-    return translate(rectf, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
-}
-
-QRectF EventsStorage::unpackRect(const QRect& rect)
-{
-    return translate(rect, QSize(kCoordinatesPrecision, kCoordinatesPrecision));
-}
-
 //-------------------------------------------------------------------------------------------------
 
 MovableAnalyticsDb::MovableAnalyticsDb(QnMediaServerModule* mediaServerModule):
@@ -643,20 +635,16 @@ void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr pac
     return db->save(std::move(packet));
 }
 
-void MovableAnalyticsDb::createLookupCursor(
-    Filter filter,
-    CreateCursorCompletionHandler completionHandler)
+std::vector<ObjectPosition> MovableAnalyticsDb::lookupTrackDetailsSync(const ObjectTrack& track)
 {
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to stream from non-initialized analytics DB");
-        return completionHandler(ResultCode::error, nullptr);
+        NX_DEBUG(this, "Attempt to lookup to non-initialized analytics DB");
+        return std::vector<ObjectPosition>();
     }
 
-    return db->createLookupCursor(
-        std::move(filter),
-        std::move(completionHandler));
+    return db->lookupTrackDetailsSync(track);
 }
 
 void MovableAnalyticsDb::lookup(

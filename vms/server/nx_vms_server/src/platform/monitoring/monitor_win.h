@@ -17,7 +17,7 @@ public:
     virtual int thisProcessThreads() override;
 
      /**
-      * Sigar implementation has a bug: it never updates first result for Windows.
+      * NOTE: Sigar implementation has a bug: it never updates first result for Windows.
       */
     virtual quint64 thisProcessRamUsageBytes() override;
 

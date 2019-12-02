@@ -39,7 +39,7 @@ std::vector<api::metrics::ValueGroupManifest> ResourceProvider<ResourceType>::ma
     {
         api::metrics::ValueGroupManifest group(provider->id());
         for (const auto& id: provider->children())
-            group.values.push_back(api::metrics::Label{id});
+            group.values.push_back(api::metrics::ValueManifest{id});
         groups.push_back(std::move(group));
     }
     return groups;

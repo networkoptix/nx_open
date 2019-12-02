@@ -1,12 +1,15 @@
 #pragma once
 
-#ifdef ENABLE_TEST_CAMERA
+#if defined(ENABLE_TEST_CAMERA)
 
 #include <providers/spush_media_stream_provider.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/socket.h>
+#include <nx/utils/log/log.h>
 
 #include "testcamera_resource.h"
+
+namespace nx::vms::testcamera::packet { struct Header; } //< private
 
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
@@ -17,16 +20,35 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual CameraDiagnostics::Result openStreamInternal(
+        bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void pleaseStop() override;
 
-    int receiveData(quint8* buffer, int size);
+private:
+    bool receiveData(void* buffer, int size, const QString& dataCaptionForErrorMessage);
+
+    template<typename Data, typename Target>
+    bool receiveData(Target* target, const QString& dataCaptionForErrorMessage)
+    {
+        Data data;
+        if (!receiveData(&data, sizeof(data), dataCaptionForErrorMessage))
+            return false;
+        NX_VERBOSE(this, "Received %1: %2", dataCaptionForErrorMessage, data);
+        *target = data;
+        return true;
+    }
+
+    QnAbstractMediaDataPtr receivePacket();
+
+    QnAbstractMediaDataPtr receiveFramePacketBody(
+        const nx::vms::testcamera::packet::Header& header);
+
 private:
     mutable QnMutex m_socketMutex;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     QnConstMediaContextPtr m_context;
 };
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)

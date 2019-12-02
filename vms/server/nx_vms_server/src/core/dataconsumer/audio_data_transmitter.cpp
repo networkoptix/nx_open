@@ -5,7 +5,10 @@
 #include <set>
 
 #include <utils/common/sleep.h>
+#include <utils/media/ffmpeg_helper.h>
 #include <core/resource/resource.h>
+
+
 
 AVCodecID QnAbstractAudioTransmitter::toFfmpegCodec(const QString& codec, int* outDefaultBitrate)
 {
@@ -50,7 +53,10 @@ void QnAbstractAudioTransmitter::endOfRun()
 
 void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData)
 {
-    m_transmittedPacketDuration += audioData->getDurationMs();
+    auto duration = audioData->getDurationMs();
+    if (duration == 0)
+        duration = audioData->duration / 1000;
+    m_transmittedPacketDuration += duration;
     qint64 diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
     if(diff > 0)
         QnSleep::msleep(diff);

@@ -289,7 +289,7 @@ void MetadataArchive::loadDataFromIndex(
         while (i < endItr && curData < dataEnd)
         {
             qint64 fullStartTime = i->start + indexHeader.startTime;
-            if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
+            if (QnMetaDataV1::matchImage((quint64*)curData, mask, maskStart, maskEnd)
                 && (!matchExtraData
                     || matchExtraData(fullStartTime, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {
@@ -356,7 +356,7 @@ void MetadataArchive::loadDataFromIndexDesc(
         while (i >= startItr && curData >= buffer)
         {
             qint64 fullStartTimeMs = i->start + indexHeader.startTime;
-            if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd)
+            if (QnMetaDataV1::matchImage((quint64*)curData, mask, maskStart, maskEnd)
                 && (!matchExtraData ||
                     matchExtraData(fullStartTimeMs, filter, curData + kGridDataSizeBytes, recordSize() - kGridDataSizeBytes)))
             {

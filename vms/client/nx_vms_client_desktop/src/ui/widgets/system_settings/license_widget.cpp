@@ -75,25 +75,16 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
 
     const QString licensingAddress(nx::utils::AppInfo::licensingAddress());
     const QnEmailAddress licensingEmail(licensingAddress);
-    QString activationText;
-    if (licensingEmail.isValid())
-    {
-        const QString emailLink = makeMailHref(licensingAddress, licensingAddress);
-        activationText =
-            tr("Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
-            .arg(emailLink);
-    }
-    else
-    {
-        // Http links must be displayed on a separate string to avoid line break on "http://".
-        static const QString kLineBreak = lit("<br>");
-        const QString siteLink = kLineBreak
-            + makeHref(licensingAddress, licensingAddress)
-            + kLineBreak;
-        activationText =
-            tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
-            .arg(siteLink);
-    }
+    static const QString kLineBreak = "<br>";
+
+    // Http links must be displayed on a separate string to avoid line break on "http://".
+    const QString activationLink = licensingEmail.isValid()
+        ? makeMailHref(licensingAddress, licensingAddress)
+        : kLineBreak + makeHref(licensingAddress, licensingAddress);
+
+    const QString activationText =
+        tr("To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.")
+        .arg(activationLink);
 
     ui->manualActivationTextWidget->setText(activationText);
     ui->manualActivationTextWidget->setOpenExternalLinks(true);

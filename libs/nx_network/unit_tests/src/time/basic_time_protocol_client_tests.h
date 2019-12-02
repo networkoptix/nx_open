@@ -68,7 +68,7 @@ protected:
         ASSERT_EQ(SystemError::noError, std::get<1>(m_timeRequestResult));
         ASSERT_LE(
             std::get<0>(m_timeRequestResult),
-            duration_cast<milliseconds>(nx::utils::timeSinceEpoch()).count());
+            duration_cast<milliseconds>(nx::utils::millisSinceEpoch()).count());
     }
 
     void thenErrorHasBeenReported()

@@ -12,8 +12,8 @@
 namespace nx::vms::utils::metrics {
 
 // NOTE: Inherited from std::runtime_error to have a constructor from a string.
-class MetricsError: public std::runtime_error { using std::runtime_error::runtime_error; };
-class ExpectedError: public MetricsError { using MetricsError::MetricsError; };
+class BaseError: public std::runtime_error { using std::runtime_error::runtime_error; };
+class ExpectedError: public BaseError { using BaseError::BaseError; };
 
 #define NX_METRICS_EXPECTED_ERROR(EXPRESSION, EXCEPTION, MESSAGE) \
     NX_WRAP_EXCEPTION(EXPRESSION, EXCEPTION, nx::vms::utils::metrics::ExpectedError, MESSAGE)
@@ -40,18 +40,18 @@ public:
     Scope scope() const;
     void setScope(Scope scope);
 
-    virtual api::metrics::Value value() const noexcept;
+    api::metrics::Value value() const noexcept;
 
     virtual void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const = 0;
 
     void setFormatter(ValueFormatter formatter);
     api::metrics::Value formattedValue() const noexcept;
 
-    QString toString() const;
     QString idForToStringFromPtr() const;
 
 protected:
     virtual api::metrics::Value valueOrThrow() const noexcept(false) = 0;
+    api::metrics::Value handleValueErrors(std::function<api::metrics::Value()> calculateValue) const;
 
 private:
     QString m_name; // TODO: better to have full name?
@@ -109,7 +109,7 @@ public:
 
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
-    virtual api::metrics::Value value() const noexcept override;
+    virtual api::metrics::Value valueOrThrow() const override;
 
 private:
     void updateValue();
@@ -156,6 +156,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
     const Watch<ResourceType>& watch)
 :
     RuntimeValueMonitor<ResourceType>(std::move(name), scope, resource, getter),
+    m_history(std::chrono::hours(24)), //< The longest period supported by current metrics system.
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     // NOTE: Required to override default value, because updateValue() is called here before real
@@ -172,7 +173,7 @@ void ValueHistoryMonitor<ResourceType>::forEach(
 }
 
 template<typename ResourceType>
-api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const noexcept
+api::metrics::Value ValueHistoryMonitor<ResourceType>::valueOrThrow() const
 {
     return m_history.current();
 }
@@ -180,9 +181,10 @@ api::metrics::Value ValueHistoryMonitor<ResourceType>::value() const noexcept
 template<typename ResourceType>
 void ValueHistoryMonitor<ResourceType>::updateValue()
 {
-    const auto value = ValueMonitor::value();
-    if (!value.isNull())
-        m_history.update(value);
+    // NOTE: Should call RuntimeValueMonitor::valueOrThrow() because
+    // ValueHistoryMonitor::valueOrThrow() is reimplemented to return value from the history.
+    m_history.update(this->handleValueErrors(
+        [this](){ return RuntimeValueMonitor<ResourceType>::valueOrThrow(); }));
 }
 
 } // namespace nx::vms::utils::metrics

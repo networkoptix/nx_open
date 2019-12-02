@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <sstream>
+#include <iostream>
+#include <charconv>
 
 #include <QtCore/QUrl>
 
@@ -20,10 +22,7 @@
 
 #include "common.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace hanwha {
+namespace nx::vms_server_plugins::analytics::hanwha {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -62,114 +61,116 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-const char* upperBoolean(const char* value)
+bool endsWith(std::string_view string, std::string_view ending) //< remove in C++20
 {
-    if (!value)
-        return nullptr;
-    if (strcmp(value, "false") == 0)
-        return "False";
-    if (strcmp(value, "true") == 0)
-        return "True";
-    return value;
+    return
+        ending.size() <= string.size()
+        && std::equal(cbegin(ending), cend(ending), cend(string) - ending.size());
 }
 
-void DeviceAgent::updateCameraEventSetting(
-    const IStringMap* settings,
-    const char* commandPreambule,
-    AnalyticsParamSpan analyticsParamSpan,
-   Ptr<StringMap>& errorMap)
+std::string DeviceAgent::sendCommandToCamera(const std::string& query)
 {
-
-    std::stringstream query;
-    query << commandPreambule;
-
-    bool areParametersRead = true; //< optimistic prediction
-
-    for (auto param: analyticsParamSpan)
-    {
-        if (const auto value = upperBoolean(settings->value(param.plugin)); value)
-        {
-            query << param.sunapi << value;
-        }
-        else //< very unlikely
-        {
-            errorMap->setItem(param.plugin, "Failed to receive a value from server");
-            areParametersRead = false;
-        }
-    }
-    if (!areParametersRead)
-        return;
-
     nx::utils::Url command(m_url);
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
     command.setPath(kEventPath);
-    command.setQuery(QString::fromStdString(query.str()));
+    command.setQuery(QString::fromStdString(query));
 
     const bool isSent = m_settingsHttpClient.doGet(command);
-    bool isApproved = false;
-    std::string errorMessage;
     if (!isSent)
+        return "Failed to send command to camera";
+
+    auto* response = m_settingsHttpClient.response();
+    const bool isApproved = (response->statusLine.statusCode == 200);
+    if (!isApproved)
+        return response->statusLine.toString().toStdString();
+
+    return {};
+}
+
+static std::string dequote(const std::string& s)
+{
+    if (s.size() >= 2 && s.front() == '"' && s.back() == '"')
     {
-        errorMessage = "Failed to send command to camera.";
+        return s.substr(1, s.size() - 2);
     }
+    return s;
+}
+
+/*static*/ void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    AnalyticsParamSpan params, const char* reason)
+{
+    for (const auto param: params)
+        errorMap->setItem(param.plugin, reason);
+}
+
+template<class S, class F>
+void retr2(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    const nx::sdk::IStringMap* settings,
+    S& previousState,
+    F f,
+    FrameSize frameSize,
+    int objectIndex = 0)
+{
+    S settingGroup;
+    if (!settingGroup.loadFromServer(settings, objectIndex))
+        settingGroup.replanishErrorMap(errorMap, "read failed");
     else
     {
-        auto* response = m_settingsHttpClient.response();
-        isApproved = (response->statusLine.statusCode == 200);
-        if (!isApproved)
-            errorMessage = response->statusLine.toString().toStdString();
-    }
-    if (!isSent || !isApproved)
-    {
-        for (const auto& param: analyticsParamSpan)
-            errorMap->setItem(param.plugin, errorMessage.c_str());
+        if (settingGroup.differesEnoughFrom(previousState))
+        {
+            const std::string query = buildCameraRequestQuery(settingGroup, frameSize);
+                const std::string error = f(query);
+                if (!error.empty())
+                    settingGroup.replanishErrorMap(errorMap, error);
+                else
+                    previousState = settingGroup;
+        }
     }
 
 }
+
+constexpr const char* failedToReceiveError = "Failed to receive a value from server";
 
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
+
+    int c = settings->count();
+    //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
+
     auto errorMap = makePtr<nx::sdk::StringMap>();
-    std::string errorMessage;
 
-    {
-        // 1. ShockDetection. SUNAPI 2.5.4 (2018-08-07) 2.23
-        constexpr const char* kShockPreambule = "msubmenu=shockdetection&action=set";
-        constexpr AnalyticsParam kShockParams[] = {
-            { "ShockDetection.Enable", "&Enable=" },
-            { "ShockDetection.ThresholdLevel", "&ThresholdLevel=" },
-            { "ShockDetection.Sensitivity", "&Sensitivity=" }
-        };
-        updateCameraEventSetting(settings, kShockPreambule, kShockParams, errorMap);
-    }
-    {
-        // 2. MotionDetection
-    }
-    {
-        // 3. TamperingDetection 2.6
-        constexpr const char* kTamperingPreambule = "msubmenu=tamperingdetection&action=set";
-        constexpr AnalyticsParam kTamperingParams[] = {
-            { "TamperingDetection.Enable", "&Enable=" },
-            { "TamperingDetection.ThresholdLevel", "&ThresholdLevel=" },
-            { "TamperingDetection.SensitivityLevel", "&SensitivityLevel=" },
-            { "TamperingDetection.MinimumDuration", "&Duration=" },
-            { "TamperingDetection.ExceptDarkImages", "&DarknessDetection=" }
-        };
-        updateCameraEventSetting(settings, kTamperingPreambule, kTamperingParams, errorMap);
-    }
+    const auto sender = [this](const std::string& s) {return this->sendCommandToCamera(s); };
 
-    {
-        // 4. DefocusDetection SUNAPI 2.5.4 (2018-08-07) 2.14
-        constexpr const char* kDefocusPreambule = "msubmenu=defocusdetection&action=set";
-        constexpr AnalyticsParam kDefocuseParams[] = {
-            { "DefocusDetection.Enable", "&Enable=" },
-            { "DefocusDetection.ThresholdLevel", "&ThresholdLevel=" },
-            { "DefocusDetection.Sensitivity", "&Sensitivity=" },
-            { "DefocusDetection.MinimumDuration", "&Duration=" }
-        };
-        updateCameraEventSetting(settings, kDefocusPreambule, kDefocuseParams, errorMap);
-    }
+    retr2(errorMap, settings, m_settings.shockDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.motion, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.mdObjectSize, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.ivaObjectSize, sender, m_frameSize);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.mdIncludeArea[i], sender, m_frameSize, i + 1);
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.mdExcludeArea[i], sender, m_frameSize, i + 1);
+
+    retr2(errorMap, settings, m_settings.tamperingDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.defocusDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.odObjects, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.odBestShot, sender, m_frameSize);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.odExcludeArea[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaLine[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaIncludeArea[i], sender, m_frameSize, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        retr2(errorMap, settings, m_settings.ivaExcludeArea[i], sender, m_frameSize, i + 1);
+
+    retr2(errorMap, settings, m_settings.audioDetection, sender, m_frameSize);
+    retr2(errorMap, settings, m_settings.soundClassification, sender, m_frameSize);
 
     *outResult = errorMap.releasePtr();
 }
@@ -271,6 +272,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 
     m_settingsHttpClient.setUserName(m_auth.user());
     m_settingsHttpClient.setUserPassword(m_auth.password());
+    m_settingsHttpClient.addAdditionalHeader("Accept", "application/json");
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
@@ -288,7 +290,77 @@ void DeviceAgent::setMonitor(MetadataMonitor* monitor)
     m_monitor = monitor;
 }
 
-} // namespace hanwha
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+std::string DeviceAgent::loadSunapiObject(const char* eventName)
+{
+    std::string result;
+    nx::utils::Url command(m_url);
+    constexpr const char* kPath = "/stw-cgi/eventsources.cgi";
+    constexpr const char* kQueryPattern = "msubmenu=%1&action=view&Channel=%2";
+    command.setPath(kPath);
+    command.setQuery(QString::fromStdString(kQueryPattern).arg(eventName).arg(m_channelNumber));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    if (!isSent)
+        return result;
+
+    auto* response = m_settingsHttpClient.response();
+    const bool isApproved = (response->statusLine.statusCode == 200);
+    const std::string sl = response->statusLine.toString().toStdString();
+
+    auto messageBodyOptional = m_settingsHttpClient.fetchEntireMessageBody();
+    if (messageBodyOptional.has_value())
+        result = messageBodyOptional->toStdString();
+    else
+        ;//NX_DEBUG(logTag, "makeActiRequest: Error getting response body.");
+    return result; // nx::network::http::StatusCode::internalServerError;
+
+//    m_settings.shockDetection.loadFromSunapi(sss.c_str());
+
+}
+
+void DeviceAgent::readCameraSettings()
+{
+    std::string sunapiString = loadSunapiObject("shockdetection");
+    m_settings.shockDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("tamperingdetection");
+    m_settings.tamperingDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("videoanalysis2");
+    m_settings.motion.loadFromSunapi(sunapiString, m_channelNumber);
+    m_settings.mdObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.mdIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.mdExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    m_settings.ivaObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaLine[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    for (int i = 0; i < 8; ++i)
+        m_settings.ivaExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    sunapiString = loadSunapiObject("defocusdetection");
+    m_settings.defocusDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("objectdetection");
+    m_settings.odObjects.loadFromSunapi(sunapiString, m_channelNumber);
+    m_settings.odBestShot.loadFromSunapi(sunapiString, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        m_settings.odExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+
+    sunapiString = loadSunapiObject("audiodetection");
+    m_settings.audioDetection.loadFromSunapi(sunapiString, m_channelNumber);
+
+    sunapiString = loadSunapiObject("audioanalysis");
+    m_settings.soundClassification.loadFromSunapi(sunapiString, m_channelNumber);
+}
+
+} // namespace nx::vms_server_plugins::analytics::hanwha

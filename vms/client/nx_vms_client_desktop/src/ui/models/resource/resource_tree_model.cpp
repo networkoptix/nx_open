@@ -117,6 +117,18 @@ QList<ResourceTreeNodeType> rootNodeTypes()
     return result;
 }
 
+QnMediaServerResourceList getAllEdgeServers(const QnResourcePool* resourcePool)
+{
+    if (!NX_ASSERT(resourcePool))
+        return QnMediaServerResourceList();
+
+    return resourcePool->getAllServers(Qn::AnyStatus).filtered(
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getServerFlags().testFlag(nx::vms::api::ServerFlag::SF_Edge);
+        });
+}
+
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -457,8 +469,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
 
     case NodeType::edge:
     {
-        /* Only admins can see edge nodes. */
-        if (!isAdmin)
+        if (!allowHiddenEdgeServers())
             return bastardNode;
 
         if (m_scope == CamerasScope)
@@ -1064,7 +1075,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
     if (server)
     {
         connect(server, &QnMediaServerResource::redundancyChanged, this,
-            &QnResourceTreeModel::at_server_redundancyChanged);
+            &QnResourceTreeModel::updateEdgeServerHiddenState);
         connect(server, &QnMediaServerResource::primaryAddressChanged, this,
             [this](const QnResourcePtr& server)
             {
@@ -1123,6 +1134,12 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
         for (const QnVideoWallMatrix &matrix : videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
+
+    if (camera)
+    {
+        if (auto parentServer = camera->getParentResource().dynamicCast<QnMediaServerResource>())
+            updateEdgeServerHiddenState(parentServer);
+    }
 }
 
 void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resource)
@@ -1150,6 +1167,9 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resour
     m_nodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
 
+    if (auto parentServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+        updateEdgeServerHiddenState(parentServer);
+
     if (resource->hasFlags(Qn::server))
         updateSystemHasManyServers();
 }
@@ -1163,11 +1183,8 @@ void QnResourceTreeModel::rebuildTree()
     m_rootNodes[ResourceTreeNodeType::currentUser]->setResource(context()->user());
 
     // Force re-create camera nodes for edge servers.
-    for (const auto& resource: commonModule()->resourcePool()->getAllServers(Qn::AnyStatus))
-    {
-        if (QnMediaServerResource::isHiddenServer(resource))
-            at_server_redundancyChanged(resource);
-    }
+    for (const auto& edgeServer: getAllEdgeServers(resourcePool()))
+        updateEdgeServerHiddenState(edgeServer);
 
     for (auto nodeType: rootNodeTypes())
     {
@@ -1272,9 +1289,10 @@ void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource
 void QnResourceTreeModel::updateSystemHasManyServers()
 {
     auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
-    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool hasAccessAllMediaPermission =
+        accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
 
-    if (!isAdmin)
+    if (!hasAccessAllMediaPermission)
     {
         servers = servers.filtered(
             [this](const QnMediaServerResourcePtr& server)
@@ -1298,7 +1316,7 @@ void QnResourceTreeModel::updateSystemHasManyServers()
     m_systemHasManyServers = hasManyServers;
     for (const auto& server: servers)
     {
-        if (QnMediaServerResource::isHiddenServer(server))
+        if (allowHiddenEdgeServers() && QnMediaServerResource::isHiddenServer(server))
         {
             for (const auto& camera: resourcePool()->getAllCameras(server, true))
             {
@@ -1330,26 +1348,23 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 {
     auto node = ensureResourceNode(resource);
 
-    /* Update edge resource if we are the admin. */
-    if (accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (allowHiddenEdgeServers())
     {
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
-            auto server = camera->getParentServer();
-            bool wasEdge = (node->type() == ResourceTreeNodeType::edge);
-            bool mustBeEdge = QnMediaServerResource::isHiddenServer(server);
-            if (wasEdge != mustBeEdge)
-            {
-                auto serverNode = node->parent();
+            const bool cameraNodeWasEdge = (node->type() == ResourceTreeNodeType::edge);
+            const bool cameraNodeMustBeEdge =
+                QnMediaServerResource::isHiddenServer(camera->getParentServer());
 
+            if (cameraNodeWasEdge != cameraNodeMustBeEdge)
+            {
                 m_resourceNodeByResource.remove(camera);
                 removeNode(node);
-
-                /* Re-create node with changed type. */
                 node = ensureResourceNode(camera);
-                if (serverNode)
-                    serverNode->update();
             }
+
+            for (const auto& edgeServer: getAllEdgeServers(resourcePool()))
+                updateEdgeServerHiddenState(edgeServer);
         }
     }
 
@@ -1394,23 +1409,25 @@ void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
         removeNode(node);
 }
 
-void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr& resource)
+void QnResourceTreeModel::updateEdgeServerHiddenState(const QnResourcePtr& serverResource)
 {
-    auto node = ensureResourceNode(resource);
+    if (!NX_ASSERT(serverResource && serverResource->hasFlags(Qn::server)))
+        return;
+
+    if (!QnMediaServerResource::isEdgeServer(serverResource) || !allowHiddenEdgeServers())
+        return;
+
+    auto node = ensureResourceNode(serverResource);
     node->update();
 
-    /* Update edge nodes if we are the admin. */
-    if (accessController()->hasGlobalPermission(GlobalPermission::admin))
+    for (const auto& cameraResource: resourcePool()->getAllCameras(serverResource, true))
     {
-        for (const QnVirtualCameraResourcePtr &cameraResource: resourcePool()->getAllCameras(resource, true))
-        {
-            auto existingNode = m_resourceNodeByResource.take(cameraResource);
-            removeNode(existingNode);
+        auto existingNode = m_resourceNodeByResource.take(cameraResource);
+        removeNode(existingNode);
 
-            /* Re-create node as it should change its NodeType from ResourceNode to EdgeNode or vice versa. */
-            auto updatedNode = ensureResourceNode(cameraResource);
-            updateNodeParent(updatedNode);
-        }
+        // Re-create node as it may change its NodeType from ResourceNode to EdgeNode or vice versa.
+        auto updatedNode = ensureResourceNode(cameraResource);
+        updateNodeParent(updatedNode);
     }
 }
 
@@ -1447,4 +1464,11 @@ QnResourceTreeModelLayoutNodeManager* QnResourceTreeModel::layoutNodeManager() c
 bool QnResourceTreeModel::resetInProgress() const
 {
     return m_resetInProgress;
+}
+
+bool QnResourceTreeModel::allowHiddenEdgeServers() const
+{
+    // Current implementation of Resource Tree does not imply that this method may return
+    // different values within user session.
+    return accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
 }

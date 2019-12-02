@@ -8,7 +8,6 @@
 
 #include "analytics_archive_directory.h"
 #include "attributes_dao.h"
-#include "cursor.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {
@@ -36,7 +35,7 @@ ObjectTrackSearcher::ObjectTrackSearcher(
         m_filter.maxObjectTracksToSelect = kMaxObjectLookupResultSet;
 }
 
-std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
     if (!m_filter.objectTrackId.isNull())
     {
@@ -136,7 +135,7 @@ std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     return std::move(tracks.front());
 }
 
-std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupTracksUsingArchive(
     nx::sql::QueryContext* queryContext)
 {
     auto archiveFilter =
@@ -148,7 +147,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     if (!archiveFilter)
     {
         NX_DEBUG(this, "Object lookup canceled. The filter is %1", m_filter);
-        return std::vector<ObjectTrack>(); //< No records with such text.
+        return std::vector<ObjectTrackEx>(); //< No records with such text.
     }
 
     archiveFilter->sortOrder = Qt::DescendingOrder;
@@ -333,55 +332,13 @@ std::optional<ObjectTrack> ObjectTrackSearcher::loadTrack(
                 query->value("best_shot_rect").toByteArray());
     }
 
-    track.objectPositionSequence = TrackSerializer::deserialized<decltype(track.objectPositionSequence)>(
-        query->value("track_detail").toByteArray());
+    track.objectPosition = TrackSerializer::deserialized<ObjectRegion>
+        (query->value("track_detail").toByteArray());
 
-    filterTrack(&track.objectPositionSequence);
     if (!filter(track))
         return std::nullopt;
 
-    truncateTrack(&track.objectPositionSequence, m_filter.maxObjectTrackSize);
-    if (!track.objectPositionSequence.empty())
-    {
-        for (auto& position: track.objectPositionSequence)
-            position.deviceId = track.deviceId;
-    }
-
     return track;
-}
-
-void ObjectTrackSearcher::filterTrack(std::vector<ObjectPosition>* const track)
-{
-    using namespace std::chrono;
-
-    auto doesNotSatisfiesFilter =
-        [this](const ObjectPosition& position)
-        {
-            if (!m_filter.timePeriod.isNull())
-            {
-                const auto timestamp = microseconds(position.timestampUs);
-                if (!m_filter.timePeriod.contains(duration_cast<milliseconds>(timestamp)))
-                    return true;
-            }
-
-            return false;
-        };
-
-    track->erase(
-        std::remove_if(track->begin(), track->end(), doesNotSatisfiesFilter),
-        track->end());
-
-    std::sort(
-        track->begin(), track->end(),
-        [](const auto& left, const auto& right) { return left.timestampUs < right.timestampUs; });
-}
-
-void ObjectTrackSearcher::truncateTrack(
-    std::vector<ObjectPosition>* const track,
-    int maxSize)
-{
-    if (maxSize > 0 && (int)track->size() > maxSize)
-        track->erase(track->begin() + maxSize, track->end());
 }
 
 void ObjectTrackSearcher::addObjectTypeIdToFilter(

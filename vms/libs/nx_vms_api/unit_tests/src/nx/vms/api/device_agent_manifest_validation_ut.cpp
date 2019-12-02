@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QtCore/QJsonArray>
+
 #include <nx/vms/api/base_manifest_validation_test.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -18,6 +20,7 @@ protected:
         m_manifest.eventTypes = makeEntries<EventType>("Event");
         m_manifest.objectTypes = makeEntries<ObjectType>("Object");
         m_manifest.groups = makeEntries<Group>("Group");
+        m_manifest.deviceAgentSettingsModel = QJsonObject();
     }
 
     template<typename List, typename TransformationFunc>
@@ -127,6 +130,15 @@ protected:
     void givenManifestWithDuplicatedGroupNames()
     {
         makeIncorrectManifest(&m_manifest.groups, [](auto entry) { entry->name = "name"; });
+    }
+
+    // --------------------------------------------------------------------------------------------
+
+    template<typename Type>
+    void givenManifestWithIncorrectTypeInSettingsModel()
+    {
+        givenCorrectManifest();
+        m_manifest.deviceAgentSettingsModel = Type{};
     }
 };
 
@@ -255,6 +267,21 @@ TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedGroupNamesProduc
     givenManifestWithDuplicatedGroupNames();
     whenValidatingManifest();
     makeSureErrorsAreCaught({ ManifestErrorType::duplicatedGroupName });
+}
+
+TEST_F(DeviceAgentManifestValidationTest, manifestWithIncorrectTypeInSettingsModelProducesAnError)
+{
+    givenManifestWithIncorrectTypeInSettingsModel<QString>();
+    whenValidatingManifest();
+    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
+
+    givenManifestWithIncorrectTypeInSettingsModel<int>();
+    whenValidatingManifest();
+    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
+
+    givenManifestWithIncorrectTypeInSettingsModel<QJsonArray>();
+    whenValidatingManifest();
+    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
 }
 
 } // namespace nx::vms::api::analytics

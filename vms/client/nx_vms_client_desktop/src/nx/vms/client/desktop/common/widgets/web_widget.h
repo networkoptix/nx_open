@@ -22,7 +22,6 @@ public:
     WebEngineView* webEngineView() const;
 
     void load(const QUrl& url);
-    void reset();
 
 private:
     WebEngineView* m_webEngineView = nullptr;

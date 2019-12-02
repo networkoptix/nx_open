@@ -66,6 +66,7 @@ namespace nx::vms::server::time_sync { class TimeSyncManager; }
 namespace nx::vms::server {
     class UnusedWallpapersWatcher;
     class LicenseWatcher;
+    class VideoWallLicenseWatcher;
     class RootFileSystem;
     class Settings;
     class ServerTimeSyncManager;
@@ -110,6 +111,7 @@ public:
     void syncRoSettings() const;
     nx::vms::server::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::vms::server::LicenseWatcher* licenseWatcher() const;
+    nx::vms::server::VideoWallLicenseWatcher* videoWallLicenseWatcher() const;
     nx::vms::server::event::EventMessageBus* eventMessageBus() const;
     PluginManager* pluginManager() const;
     nx::vms::server::analytics::Manager* analyticsManager() const;
@@ -191,6 +193,7 @@ private:
     PluginManager* m_pluginManager = nullptr;
     nx::vms::server::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::vms::server::LicenseWatcher* m_licenseWatcher = nullptr;
+    nx::vms::server::VideoWallLicenseWatcher* m_videoWallLicenseWatcher = nullptr;
     nx::vms::server::event::EventMessageBus* m_eventMessageBus = nullptr;
     nx::vms::server::analytics::Manager* m_analyticsManager = nullptr;
 

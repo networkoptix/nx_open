@@ -309,6 +309,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
     qRegisterMetaType<nx::media::CameraTraits>();
 
+    QnJsonSerializer::registerSerializer<nx::vms::api::RtpTransportType>();
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Ptz::Traits>();
     QnJsonSerializer::registerSerializer<Ptz::Capabilities>();

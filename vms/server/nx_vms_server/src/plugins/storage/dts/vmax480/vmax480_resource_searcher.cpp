@@ -13,6 +13,8 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "vmax480_helper.h"
+#include <nx/network/http/http_client.h>
+
 namespace {
 
 static const int VMAX_API_PORT = 9010;
@@ -224,6 +226,36 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray&
     return camNames;
 }
 
+bool QnPlVmax480ResourceSearcher::checkVmaxDevice(const nx::utils::Url& url)
+{
+    NX_VERBOSE(this, "Check if it VMAX device on %1", url);
+
+    nx::network::http::HttpClient client;
+    nx::utils::Url requestUrl(url);
+    requestUrl.setScheme("http");
+    requestUrl.setPath("/cgi-bin/design/html_template/Login.html");
+    if (!client.doGet(requestUrl))
+    {
+        if (client.response())
+        {
+            NX_VERBOSE(this, "Request failed. HTTP status code %1 from url %2",
+                client.response()->statusLine.statusCode, url);
+        }
+        else
+        {
+            NX_VERBOSE(this, "No HTTP response from url %1", url);
+        }
+        return false;
+    }
+    auto response = client.fetchEntireMessageBody();
+    bool result = response && response->toLower().contains("web login");
+    if (result)
+        NX_VERBOSE(this, "Found a VMAX device on url %1", url);
+    else
+        NX_VERBOSE(this, "Not a VMAX device on url %1", url);
+    return result;
+}
+
 bool QnPlVmax480ResourceSearcher::vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth)
 {
     nx::utils::log::Tag kLogTag(lit("QnPlVmax480ResourceSearcher::vmaxAuthenticate"));
@@ -318,6 +350,9 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils:
 
     if (channels == -1)
     {
+        if (!checkVmaxDevice(url))
+            return result; //< Check if it is VMAX device to not send plain text password.
+
         CLSimpleHTTPClient client(url.host(), httpPort, TCP_TIMEOUT, QAuthenticator());
 
         if (!vmaxAuthenticate(client, auth))

@@ -64,8 +64,8 @@ public:
         const auto windowStartS = m_windowStartS.load();
         if (m_passCount == 0 || windowStartS + windowSizeS <= nowS || windowStartS > nowS)
         {
-            // It is possible to have a rase on these 2 atomics and actual log writing, but it would
-            // only affect the number of records on each level and their order.
+            // It is possible to have a race on these 2 atomics and the actual log writing, but it
+            //  would only affect the number of records on each level and their order.
             m_windowStartS = nowS;
             m_passCount = 0;
         }
@@ -193,16 +193,11 @@ private:
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
     NX_UTILS_LOG_STREAM(LEVEL, TAG).setDelimiter(QString()) /* <<... */
 
-#define NX_UTILS_LOG(...) \
-    NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \
-        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
-        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
-        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
-        NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
-
-/*
+/**
  * Usage:
  *     NX_<LEVEL>(TAG, MESSAGE [, VALUES...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
+ * or, when the log level is known only at runtime:
+ *     NX_UTILS_LOG(nx::utils::log::Level::<level>, TAG, MESSAGE [, VALUES...];
  *
  * Examples:
  *     NX_INFO(this, "Expected value %1", value);
@@ -211,6 +206,18 @@ private:
  * Deprecated usage:
  *     NX_ERROR(this) << "Unexpected value" << value;
  */
+#define NX_UTILS_LOG(...) \
+    /* Choose one of the two macros depending on the number of args supplied to this macro. */ \
+    NX_MSVC_EXPAND(NX_GET_15TH_ARG( \
+        __VA_ARGS__, \
+        /* Repeat 12 times: allow for up to 11 args which are %N-substituted into the message. */ \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_STREAM, /*< Chosen when called with TAG arg only (without a message). */ \
+        args_required /*< Chosed when called without arguments; leads to an error. */ \
+    )(__VA_ARGS__))
+
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
 #define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)
 #define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)

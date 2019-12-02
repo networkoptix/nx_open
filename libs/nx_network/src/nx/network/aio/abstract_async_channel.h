@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <nx/utils/system_error.h>
 
@@ -44,6 +45,8 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) = 0;
 };
+
+using AsyncChannelPtr = std::unique_ptr<nx::network::aio::AbstractAsyncChannel>;
 
 } // namespace aio
 } // namespace network

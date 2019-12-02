@@ -4,6 +4,7 @@
 #include <transaction/transaction.h>
 
 #include <nx/vms/api/data/license_overflow_data.h>
+#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx/vms/api/data/system_id_data.h>
 
 namespace ec2 {
@@ -17,6 +18,8 @@ public:
     virtual ~QnMiscManager();
 
     virtual int markLicenseOverflow(
+        bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
+    virtual int markVideoWallLicenseOverflow(
         bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
     virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog,
         impl::SimpleHandlerPtr handler) override;
@@ -93,6 +96,29 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::markLicenseOverflow, params,
+        [handler, reqId, params](ErrorCode errorCode)
+        {
+            handler->done(reqId, errorCode);
+        }
+    );
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::markVideoWallLicenseOverflow(
+        bool value,
+        qint64 time,
+        impl::SimpleHandlerPtr handler)
+{
+    const int reqId = generateRequestID();
+    nx::vms::api::VideoWallLicenseOverflowData params;
+    params.value = value;
+    params.time = time;
+
+    using namespace std::placeholders;
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::markVideoWallLicenseOverflow, params,
         [handler, reqId, params](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);

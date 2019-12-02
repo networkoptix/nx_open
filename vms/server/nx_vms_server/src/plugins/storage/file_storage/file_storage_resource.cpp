@@ -564,20 +564,34 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
     return Qn::StorageInit_WrongPath;
 }
 
+struct NetResHolder
+{
+    NetResHolder(const nx::utils::Url& url): m_path(constructPath(url))
+    {
+        memset(&m_netRes, 0, sizeof(m_netRes));
+        m_netRes.dwType = RESOURCETYPE_DISK;
+        m_netRes.lpRemoteName = (LPWSTR) m_path.constData();
+    }
+
+    NETRESOURCE* operator*() { return &m_netRes; }
+
+private:
+    QString m_path;
+    NETRESOURCE m_netRes;
+
+    static QString constructPath(const nx::utils::Url& url)
+    {
+        return "\\\\" + url.host() + "\\" + url.path().mid((1));
+    }
+};
+
 Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& url) const
 {
     if (!url.startsWith("smb://"))
         return Qn::StorageInit_Ok;
 
-    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(nx::utils::url::hidePassword(getUrl())));
-
-    QUrl storageUrl(url);
-    NETRESOURCE netRes;
-    memset(&netRes, 0, sizeof(netRes));
-    netRes.dwType = RESOURCETYPE_DISK;
-    QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
-    netRes.lpRemoteName = (LPWSTR) path.constData();
-
+    NX_VERBOSE(this, "Mounting remote drive %2", nx::utils::url::hidePassword(url));
+    nx::utils::Url storageUrl(url);
     QString initialUserName = storageUrl.userName().isEmpty() ? "guest" : storageUrl.userName();
     std::array<QString, 2> userNamesToTest = {
         initialUserName,
@@ -586,11 +600,12 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
 
     const auto password = storageUrl.password();
     bool wrongAuth = false;
+    NetResHolder netRes(storageUrl);
 
     for (const auto& userName : userNamesToTest)
     {
         auto result = updatePermissionsHelper(
-            (LPWSTR) userName.constData(), (LPWSTR) password.constData(), &netRes);
+            (LPWSTR) userName.constData(), (LPWSTR) password.constData(), *netRes);
         switch (result)
         {
             case Qn::StorageInit_Ok:
@@ -640,22 +655,24 @@ QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
 
 QnFileStorageResource::~QnFileStorageResource()
 {
-    QnMutexLocker lk(&m_mutex);
-#ifndef _WIN32
-    if (!m_localPath.isEmpty())
-    {
-#if __linux__
-        auto result = rootTool()->unmount(m_localPath);
-        NX_VERBOSE(
-            this,
-            lm("[mount] unmounting folder %1 while destructing object result: %2")
-                .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
-#elif __APPLE__
-        unmount(m_localPath.toLatin1().constData(), 0);
-#endif
-        rmdir(m_localPath.toLatin1().constData());
-    }
-#endif
+    const auto localPath = getLocalPathSafe();
+    if (localPath.isEmpty())
+        return;
+
+    #if defined(Q_OS_WIN)
+        DWORD result = WNetCancelConnection((LPWSTR) localPath.constData(), TRUE);
+        NX_VERBOSE(this, "Cancelling NET connection %1, result: %2", localPath, result);
+    #else
+        #if __linux__
+            auto result = rootTool()->unmount(localPath);
+            NX_VERBOSE(
+                this, "Unmounting folder %1 while destructing object result: %2",
+                localPath, nx::SystemCommands::unmountCodeToString(result));
+        #elif __APPLE__
+            unmount(localPath.toLatin1().constData(), 0);
+        #endif
+            rmdir(localPath.toLatin1().constData());
+    #endif
 }
 
 QString QnFileStorageResource::tempFolderName()

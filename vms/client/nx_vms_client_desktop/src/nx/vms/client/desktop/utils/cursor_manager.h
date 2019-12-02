@@ -26,6 +26,8 @@ public:
         int section, int rotation = 0);
     Q_INVOKABLE void unsetCursor(QObject* requester = nullptr);
 
+    Q_INVOKABLE QPoint pos() const;
+
     static void registerQmlType();
 
 signals:

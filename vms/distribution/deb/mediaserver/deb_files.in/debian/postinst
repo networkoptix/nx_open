@@ -335,14 +335,16 @@ startServer()
     systemctl start $COMPANY_NAME-mediaserver
 
     sleep 1
-    if ! getServerProcessInfo
+    if getServerProcessInfo
     then
-        echo "ERROR: Server process not found \
-            despite 'systemd ... start' returned zero exit status." >&2
-        exit 1
+        echo "Started service with PID=$SERVER_PID, UID=$SERVER_UID."
+    else
+        echo "WARNING: Server process not found" \
+            "despite 'systemctl start ...' finished with zero exit status." \
+            "This could be caused by the server crash or slow starting. " \
+            "See Server logs (journalctl -u $COMPANY_NAME-mediaserver)." \
+            >&2
     fi
-
-    echo "Started service with PID=$SERVER_PID, UID=$SERVER_UID."
 }
 
 if [[ $RUNTIME != "docker" ]]

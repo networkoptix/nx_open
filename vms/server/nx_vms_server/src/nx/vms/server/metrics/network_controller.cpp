@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/mac_address.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
 #include <platform/platform_abstraction.h>
@@ -34,10 +35,21 @@ public:
         return m_interface.name();
     }
 
+    // NOTE: NIC in windows may have two different names... for Linux it is the same.
     QString humanReadableName() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         return m_interface.humanReadableName();
+    }
+
+    nx::utils::MacAddress hardwareAddress() const
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        const auto macStr = m_interface.hardwareAddress();
+        const auto result = nx::utils::MacAddress(macStr);
+        if (result.isNull())
+            NX_DEBUG(this, "Failed to parse the MAC address: [%1]", macStr);
+        return result;
     }
 
     void updateInterface(QNetworkInterface iface)
@@ -46,38 +58,45 @@ public:
         m_interface = std::move(iface);
     }
 
-    nx::vms::api::metrics::Value addressesJson() const
+    nx::vms::api::metrics::Value otherAddressesJson() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         QJsonArray result;
-        for (const auto& address: m_interface.addressEntries())
-            result.append(address.ip().toString());
-        if (result.empty())
-            return {};
+
+        const auto addresses = m_interface.addressEntries();
+        const auto displayIp = displayAddressFromAddresses(addresses);
+
+        for (const auto& address: addresses)
+        {
+            if (address.ip() != displayIp)
+                result.append(address.ip().toString());
+        }
+
         return result;
     }
 
-    nx::vms::api::metrics::Value firstAddress() const
+    nx::vms::api::metrics::Value displayAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        const auto addresses = m_interface.addressEntries();
-        if (!addresses.empty())
-            return addresses.first().ip().toString();
-        return {};
+        return displayAddressFromAddresses(m_interface.addressEntries()).toString();
     }
 
-    QString state() const
+    bool isUp() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        return m_interface.flags().testFlag(QNetworkInterface::IsUp) ? "Up" : "Down";
+        return m_interface.flags().testFlag(QNetworkInterface::IsUp);
     }
 
     enum class Rate { in, out };
     api::metrics::Value load(Rate rate) const
     {
-        const auto name = humanReadableName();
+        if (!isUp())
+            return {};
+
+        // NOTE: Using MAC because windows has some mess with interfaces names (VMS-16182).
+        const auto mac = hardwareAddress();
         const auto load = NX_METRICS_EXPECTED_ERROR(
-            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(name),
+            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(mac),
             std::invalid_argument, "Error getting NIC load");
         return api::metrics::Value(nx::utils::switch_(rate,
             Rate::in, [&]{ return load.bytesPerSecIn; },
@@ -85,6 +104,22 @@ public:
     }
 
     QnCommonModule* commonModule() const { return serverModule()->commonModule(); }
+
+private:
+    static QHostAddress displayAddressFromAddresses(const QList<QNetworkAddressEntry>& addresses)
+    {
+        if (addresses.empty())
+            return {};
+
+        // Trying to return IPv4 address if there is one.
+        for (const auto& address: addresses)
+        {
+            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                return address.ip();
+        }
+
+        return addresses.first().ip();
+    }
 
 private:
     QNetworkInterface m_interface;
@@ -119,13 +154,13 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "server", [this](const auto&) { return m_serverId; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "state", [this](const auto& r) { return r->state(); }
+                "state", [this](const auto& r) { return r->isUp() ? "Up" : "Down"; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "firstIp", [this](const auto& r) { return r->firstAddress(); }
+                "displayAddress", [this](const auto& r) { return r->displayAddress(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ipList", [this](const auto& r) { return r->addressesJson(); }
+                "otherAddresses", [this](const auto& r) { return r->otherAddressesJson(); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

@@ -76,6 +76,15 @@ static auto infoGroupProvider()
                 [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
+                "pool",
+                [](const auto& r)
+                {
+                    if (!r->isWritable())
+                        return "Reserved";
+                    return r->isBackup() ? "Backup" : "Main";
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "type",
                 [](const auto& r) { return Value(r->getStorageType()); }
             )
@@ -141,15 +150,21 @@ static auto spaceGroupProvider()
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "totalSpaceB",
-                [](const auto& r) { return r->getTotalSpace(); }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceP",
-                [](const auto& r) { return r->nxOccupedSpace() / (double) r->getTotalSpace(); }
+                [](const auto& r)
+                {
+                    if (const auto space = r->getTotalSpace(); space > 0)
+                        return Value(space);
+                    return Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "mediaSpaceB",
-                [](const auto& r) { return r->nxOccupedSpace(); }
+                [](const auto& r)
+                {
+                    if (const auto space = r->nxOccupedSpace(); space > 0)
+                        return Value(space);
+                    return Value();
+                }
             )
         );
 }
@@ -160,7 +175,16 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "_",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getPath()); }
+                "name",
+                [](const auto& r) -> Value
+                {
+                    const auto urlString = r->getUrl();
+                    if (!urlString.contains("://"))
+                        return urlString;
+
+                    const nx::utils::Url url(urlString);
+                    return url.host() + url.path();
+                }
             )
         ),
         infoGroupProvider(),

@@ -22,6 +22,7 @@
 #include "data/layout_tour_data.h"
 #include "data/license_data.h"
 #include "data/license_overflow_data.h"
+#include "data/videowall_license_overflow_data.h"
 #include "data/lock_data.h"
 #include "data/media_server_data.h"
 #include "data/misc_data.h"
@@ -96,6 +97,7 @@ void Metatypes::initialize()
     qRegisterMetaType<LayoutTourData>();
     qRegisterMetaType<LicenseData>();
     qRegisterMetaType<LicenseOverflowData>();
+    qRegisterMetaType<VideoWallLicenseOverflowData>();
     qRegisterMetaType<LockData>();
     qRegisterMetaType<MediaServerData>();
     qRegisterMetaType<MediaServerDataList>();
@@ -149,6 +151,7 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<WebPageData>();
+    qRegisterMetaType<RtpTransportType>();
 };
 
 } // namespace nx::vms::api

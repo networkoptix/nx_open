@@ -45,9 +45,7 @@ public:
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
-    virtual void createLookupCursor(
-        Filter filter,
-        CreateCursorCompletionHandler completionHandler) override;
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
 
     virtual void lookup(
         Filter filter,
@@ -103,11 +101,6 @@ private:
 
     ObjectTrackDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
-    void reportCreateCursorCompletion(
-        sql::DBResult resultCode,
-        QnUuid dbCursorId,
-        CreateCursorCompletionHandler completionHandler);
-
     void scheduleDataCleanup(
         const QnMutexLockerBase&,
         QnUuid deviceId,
@@ -123,8 +116,6 @@ private:
     bool changeOwner(const std::vector<PathAndMode>& pathAndModeList);
 
     static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
-    static QRect packRect(const QRectF& rectf);
-    static QRectF unpackRect(const QRect& rect);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -142,9 +133,7 @@ public:
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
-    virtual void createLookupCursor(
-        Filter filter,
-        CreateCursorCompletionHandler completionHandler) override;
+    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
 
     virtual void lookup(
         Filter filter,

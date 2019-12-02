@@ -20,8 +20,6 @@ private:
     std::optional<JsonRestResponse> checkCommonInputParameters(
         const QnRequestParams& parameters) const;
 
-    std::optional<QJsonObject> deviceAgentSettingsModel(const QString& engineId) const;
-
     JsonRestResponse makeSettingsResponse(
         const nx::vms::server::analytics::Manager* analyticsManager,
         const QString& engineId,
