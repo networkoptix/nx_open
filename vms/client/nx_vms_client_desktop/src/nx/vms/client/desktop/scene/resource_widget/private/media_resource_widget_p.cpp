@@ -330,6 +330,12 @@ void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
     if (this->isAnalyticsSupported == isAnalyticsSupported)
         return;
 
+    // If user opened camera before any analytics objects are found, flag is not set. If enable and
+    // then disable an analytics engine, objects won't be displayed until camera reopening as we do
+    // not have this information anymore. Re-request it when disabling working analytics.
+    if (!isAnalyticsSupported)
+        requestAnalyticsObjectsExistence();
+
     this->isAnalyticsSupported = isAnalyticsSupported;
     emit analyticsSupportChanged();
 }

@@ -257,9 +257,6 @@ QnClientModule::~QnClientModule()
     if (m_resourceDirectoryBrowser)
         m_resourceDirectoryBrowser->stop();
 
-    m_networkProxyFactory = nullptr; // Object will be deleted by QNetworkProxyFactory
-    QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
-
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
@@ -320,11 +317,6 @@ void QnClientModule::startLocalSearchers()
 {
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->resourceDiscoveryManager()->start();
-}
-
-QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
-{
-    return m_networkProxyFactory;
 }
 
 void QnClientModule::initMetaInfo()
@@ -460,10 +452,6 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnCloudConnectionProvider());
     m_cloudStatusWatcher = commonModule->store(
         new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
-
-    //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
-    QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
     m_uploadManager = new UploadManager(commonModule);
     m_wearableManager = new WearableManager(commonModule);

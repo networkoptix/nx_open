@@ -109,6 +109,9 @@ public:
     /** If true, then parseBytes always returns after reading http headers and trailing CRLF have been read. */
     void setBreakAfterReadingHeaders(bool val);
 
+    /** If true, then parseBytes skips invalid HTTP headers instead of failing. */
+    void setParseHeadersStrict(bool enabled);
+
 private:
     enum ChunkStreamParseState
     {
@@ -142,6 +145,7 @@ private:
     bool m_decodeChunked;
     int m_currentMessageNumber;
     bool m_breakAfterReadingHeaders;
+    bool m_parseHeadersStrict;
 
     LineSplitter m_lineSplitter;
     mutable QnMutex m_mutex;

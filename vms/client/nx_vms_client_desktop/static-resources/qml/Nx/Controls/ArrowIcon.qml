@@ -9,6 +9,8 @@ Canvas
     width: 10
     height: 10
 
+    onColorChanged: requestPaint()
+
     onPaint:
     {
         var ctx = getContext("2d")

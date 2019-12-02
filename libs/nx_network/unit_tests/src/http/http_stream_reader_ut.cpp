@@ -67,6 +67,37 @@ TEST(HttpStreamReader, parsingRequest)
     //ASSERT_EQ( streamReader.state(), nx::network::http::HttpStreamReader::messageDone );
 }
 
+TEST(HttpStreamReader, parsingInvalidHeaderResponse)
+{
+    const char invalidHeaderResponse[] =
+        "HTTP/1.1 200 OK\r\n"
+        "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
+        "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
+        "invalid header\r\n"
+        "Content-Type: application/text\r\n"
+        "Content-Length: 4\r\n"
+        "\r\n"
+        "test";
+
+    const auto invalidHeaderData =
+        QByteArray::fromRawData(invalidHeaderResponse, sizeof(invalidHeaderResponse) - 1);
+
+    nx::network::http::HttpStreamReader streamReader;
+    size_t bytesProcessed = 0;
+
+    ASSERT_FALSE(streamReader.parseBytes(invalidHeaderData, &bytesProcessed));
+    ASSERT_EQ(streamReader.state(), nx::network::http::HttpStreamReader::parseError);
+
+    nx::network::http::HttpStreamReader tolerateStreamReader;
+    bytesProcessed = 0;
+
+    tolerateStreamReader.setParseHeadersStrict(false);
+
+    ASSERT_TRUE(tolerateStreamReader.parseBytes(invalidHeaderData, &bytesProcessed));
+    ASSERT_EQ(bytesProcessed, invalidHeaderData.size());
+    ASSERT_EQ(tolerateStreamReader.state(), nx::network::http::HttpStreamReader::messageDone);
+}
+
 TEST(HttpStreamReader, MultipleMessages)
 {
     //vector<pair<message, message body>>

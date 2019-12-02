@@ -24,7 +24,8 @@ HttpStreamReader::HttpStreamReader():
     m_lineEndingOffset(0),
     m_decodeChunked(true),
     m_currentMessageNumber(0),
-    m_breakAfterReadingHeaders(false)
+    m_breakAfterReadingHeaders(false),
+    m_parseHeadersStrict(true)
 {
 }
 
@@ -246,6 +247,11 @@ void HttpStreamReader::setBreakAfterReadingHeaders(bool val)
     m_breakAfterReadingHeaders = val;
 }
 
+void HttpStreamReader::setParseHeadersStrict(bool enabled)
+{
+    m_parseHeadersStrict = enabled;
+}
+
 bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
 {
     for (;;)
@@ -321,7 +327,7 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                 nx::network::http::StringType headerName;
                 nx::network::http::StringType headerValue;
                 if (!parseHeader(&headerName, &headerValue, data))
-                    return false;
+                    return m_parseHeadersStrict ? false : true;
                 m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
                 return true;
             }

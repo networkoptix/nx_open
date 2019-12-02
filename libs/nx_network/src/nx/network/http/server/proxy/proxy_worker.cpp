@@ -34,6 +34,8 @@ ProxyWorker::ProxyWorker(
 
     m_targetHostPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
         std::move(connectionToTheTargetPeer));
+    m_targetHostPipeline->parser().streamReader().setParseHeadersStrict(false);
+
     m_targetHostPipeline->setOnConnectionClosed(
         [this](auto closeReason) { onConnectionClosed(closeReason); });
 
