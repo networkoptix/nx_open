@@ -66,12 +66,12 @@ void ResourceNodeViewItemDelegate::paint(
     }
 }
 
-const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
+const QnResourceItemColors& ResourceNodeViewItemDelegate::resourceColors() const
 {
     return d->colors;
 }
 
-void ResourceNodeViewItemDelegate::setColors(const QnResourceItemColors& colors)
+void ResourceNodeViewItemDelegate::setResourceColors(const QnResourceItemColors& colors)
 {
     d->colors = colors;
 }

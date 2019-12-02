@@ -45,7 +45,7 @@ void ResourceNodeViewItemSelectionDelegate::paint(
             return ViewNodeHelper(node).checkedState(column) != Qt::Unchecked;
         });
 
-    const auto& targetColors = colors();
+    const auto& targetColors = resourceColors();
     const bool highlighted = checked || selectedChildrenCount(node) > 0;
     const auto extraColor = highlighted ? targetColors.extraTextSelected : targetColors.extraText;
     const auto mainColor = highlighted ? targetColors.mainTextSelected : targetColors.mainText;

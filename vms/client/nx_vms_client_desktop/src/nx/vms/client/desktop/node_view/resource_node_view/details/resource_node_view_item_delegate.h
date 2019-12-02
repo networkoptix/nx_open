@@ -16,7 +16,7 @@ class ResourceNodeViewItemDelegate: public Customized<NodeViewItemDelegate>
     Q_OBJECT
     using base_type = Customized<NodeViewItemDelegate>;
 
-    Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
+    Q_PROPERTY(QnResourceItemColors resourceColors READ resourceColors WRITE setResourceColors)
 
 public:
     ResourceNodeViewItemDelegate(QObject* parent = nullptr);
@@ -27,8 +27,8 @@ public:
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const override;
 
-    const QnResourceItemColors& colors() const;
-    void setColors(const QnResourceItemColors& colors);
+    const QnResourceItemColors& resourceColors() const;
+    void setResourceColors(const QnResourceItemColors& colors);
 
     bool getShowRecordingIndicator() const;
     void setShowRecordingIndicator(bool show);
