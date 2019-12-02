@@ -18,7 +18,15 @@ public:
     int saveParamsAsync(const QList<QnUuid>& resourceId);
 
     QString value(const QnUuid& resourceId, const QString& key) const;
-    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true, bool replaceIfExists = true);
+
+    /** @return Whether the stored value has been modified by this call. */
+    bool setValue(
+        const QnUuid& resourceId,
+        const QString& key,
+        const QString& value,
+        bool markDirty = true,
+        bool replaceIfExists = true);
+
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     nx::vms::api::ResourceParamDataList allProperties(const QnUuid& resourceId) const;
 

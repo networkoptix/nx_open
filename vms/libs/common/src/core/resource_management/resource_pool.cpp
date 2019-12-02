@@ -158,9 +158,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
     for (const auto& resource: addedResources)
     {
-        NX_VERBOSE(this) << "RESOURCE ADDED"
-            << resource->metaObject()->className()
-            << resource->getName();
+        NX_VERBOSE(this, "Added resource %1: %2", resource, resource->getName());
         emit resourceAdded(resource);
     }
 }

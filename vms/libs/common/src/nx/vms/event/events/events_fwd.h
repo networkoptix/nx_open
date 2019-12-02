@@ -51,6 +51,12 @@ using AnalyticsSdkEventPtr = QSharedPointer<class AnalyticsSdkEvent>;
 class PluginDiagnosticEvent;
 using PluginDiagnosticEventPtr = QSharedPointer<PluginDiagnosticEvent>;
 
+class PoeOverBudgetEvent;
+using PoeOverBudgetEventPtr = QSharedPointer<PoeOverBudgetEvent>;
+
+class FanErrorEvent;
+using FanErrorEventPtr = QSharedPointer<FanErrorEvent>;
+
 } // namespace event
 } // namespace vms
 } // namespace nx

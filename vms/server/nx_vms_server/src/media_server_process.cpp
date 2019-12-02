@@ -191,6 +191,8 @@
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
 #include <nx/vms/server/rest/plugin_info_handler.h>
+#include <nx/vms/server/rest/nvr_network_block_handler.h>
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -298,6 +300,8 @@
 
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
+
+#include <nx/vms/server/nvr/i_service.h>
 
 #include <nx/vms/server/metrics/camera_controller.h>
 #include <nx/vms/server/metrics/network_controller.h>
@@ -1978,6 +1982,7 @@ void MediaServerProcess::registerRestHandlers(
      *             %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *             %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *             %value ExecHttpRequestAction Send HTTP request as an action.
+     *             %value BuzzerAction Enable an NVR buzzer
      *         %param:object reply[].actionParams JSON object with action parameters. Only fields
      *             that are applicable to the particular action are used.
      *             %param:uuid reply[].actionParams.actionResourceId Additional parameter for event
@@ -2686,22 +2691,25 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt] deviceId Id of Device.
-     * %param[opt] objectTypeId Analytics Object Type id.
-     * %param[opt] objectTrackId Analytics Object Track id.
-     * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
-     * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] y1 Top left "y" coordinate of picture bounding box to search within. In range
-     *     [0.0; 1.0].
-     * %param[opt] x2 Bottom right "x" coordinate of picture bounding box to search within. In
+     * %param[opt]:uuid deviceId Id of Device.
+     * %param[opt]:string objectTypeId Analytics Object Type id.
+     * %param[opt]:string objectTrackId Analytics Object Track id.
+     * %param[opt]:integer startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:integer endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
+     * %param[opt]:float x1 Top left "x" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
+     * %param[opt]:float y1 Top left "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within Object Track properties.
-     * %param[opt] limit Maximum number of Object Tracks to return.
-     * %param[opt] sortOrder Sort order of Object Tracks by a Track start timestamp.
+     * %param[opt]:float x2 Bottom right "x" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:float y2 Bottom right "y" coordinate of picture bounding box to search within.
+     *     In range [0.0; 1.0].
+     * %param[opt]:string freeText Text to match within Object Track properties.
+     * %param[opt]:integer limit Maximum number of Object Tracks to return.
+     * %param[opt]:boolean needFullTrack Whether to select track details data. This is a heavy
+     *     operation and makes the request much slower. For performance reason this parameter
+     *     is ignored in case the parameter 'objectTrackId' is not present in the request.
+     * %param[opt]::enum sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      * %param[opt] isLocal If "false" then request is forwarded to every other online Server and
@@ -2767,6 +2775,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
      *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
      *     %value ExecHttpRequestAction Send HTTP request as an action.
+     *     %value BuzzerAction Enable an NVR buzzer
      * %param[opt]:enum EventState
      *     %value inactive Event has been finished (for prolonged events).
      *     %value active Event has been started (for prolonged events).
@@ -2792,6 +2801,30 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
+
+    // TODO: #dmishin register this handler conditionally?
+    /**%apidoc GET /api/nvrNetworkBlock
+     * %return:object JSON object with an error code, error string, and an object with information
+     *     about NVR network block, including each port state and the total power consumption
+     *     limit.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply JSON object with the following structure:
+     *         %struct NetworkBlockData
+     *
+     * %apidoc POST /api/nvrNetworkBlock
+     * %param:array portPoweringModes List of port powering modes with the following structure:
+     *     %struct NetworkPortWithPoweringMode
+     * %return:object JSON object with an error code, error string, and an object with information
+     *     about NVR network block after powering mode update, including each port state and the
+     *     total power consumption limit.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:array reply List of port powering modes after update with the following
+     *         structure:
+     *         %struct NetworkPortWithPoweringMode
+     */
+    reg("api/nvrNetworkBlock", new nx::vms::server::rest::NvrNetworkBlockHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -3207,6 +3240,17 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     initPublicIpDiscovery();
     if (!m_ipDiscovery->publicIP().isNull())
         serverFlags |= nx::vms::api::SF_HasPublicIP;
+
+    if (const nvr::IService* const nvrService = serverModule()->nvrService())
+    {
+        const nvr::IService::Capabilities capabilities = nvrService->capabilities();
+        if (capabilities.testFlag(nvr::IService::Capability::buzzer))
+            serverFlags |= nx::vms::api::SF_HasBuzzer;
+        if (capabilities.testFlag(nvr::IService::Capability::poeManagement))
+            serverFlags |= nx::vms::api::SF_HasPoeManagementCapability;
+        if (capabilities.testFlag(nvr::IService::Capability::fanMonitoring))
+            serverFlags |= nx::vms::api::SF_HasFanMonitoringCapability;
+    }
 
     return serverFlags;
 }
@@ -3821,6 +3865,8 @@ void MediaServerProcess::stopObjects()
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
     serverModule()->p2pDownloader()->stopDownloads();
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule()->nvrService())
+        nvrService->stop();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -4444,6 +4490,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
+    const bool useTwoSockets = serverModule()->settings().useTwoSockets();
     NX_INFO(this, lm("Max TCP connections from server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
@@ -4455,7 +4502,8 @@ void MediaServerProcess::createTcpListener()
         QHostAddress::Any,
         serverModule()->settings().port(),
         maxConnections,
-        acceptSslConnections);
+        acceptSslConnections,
+        useTwoSockets);
 }
 
 void MediaServerProcess::loadResourcesFromDatabase()
@@ -4768,6 +4816,9 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
+
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule->nvrService())
+        nvrService->start();
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());

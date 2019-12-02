@@ -233,7 +233,7 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
-    NX_WARNING(this, "Too long frame queue, cleanup");
+    NX_DEBUG(this, "Too long frame queue, cleanup");
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
     {

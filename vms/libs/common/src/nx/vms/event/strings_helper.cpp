@@ -61,6 +61,7 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::openLayoutAction:        return tr("Open layout");
         case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
         case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
+        case ActionType::buzzerAction:            return tr("Buzzer");
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -73,7 +74,6 @@ QString StringsHelper::actionName(ActionType value) const
                 resourcePool(),
                 tr("Device recording"),
                 tr("Camera recording"));
-
         default:
             break;
     }
@@ -94,21 +94,23 @@ QString StringsHelper::eventName(EventType value, int count) const
 
     switch (value)
     {
-        case EventType::cameraMotionEvent:     return tr("Motion on Cameras", "", count);
-        case EventType::storageFailureEvent:   return tr("Storage Issue");
-        case EventType::networkIssueEvent:     return tr("Network Issue");
-        case EventType::serverFailureEvent:    return tr("Server Failure");
-        case EventType::serverConflictEvent:   return tr("Server Conflict");
-        case EventType::serverStartEvent:      return tr("Server Started");
-        case EventType::licenseIssueEvent:     return tr("License Issue");
-        case EventType::backupFinishedEvent:   return tr("Archive backup finished");
-        case EventType::analyticsSdkEvent:     return tr("Analytics Event");
-        case EventType::pluginDiagnosticEvent: return tr("Plugin Diagnostic Event");
+        case EventType::cameraMotionEvent:      return tr("Motion on Cameras", "", count);
+        case EventType::storageFailureEvent:    return tr("Storage Issue");
+        case EventType::networkIssueEvent:      return tr("Network Issue");
+        case EventType::serverFailureEvent:     return tr("Server Failure");
+        case EventType::serverConflictEvent:    return tr("Server Conflict");
+        case EventType::serverStartEvent:       return tr("Server Started");
+        case EventType::licenseIssueEvent:      return tr("License Issue");
+        case EventType::backupFinishedEvent:    return tr("Archive Backup Finished");
+        case EventType::analyticsSdkEvent:      return tr("Analytics Event");
+        case EventType::pluginDiagnosticEvent:  return tr("Plugin Diagnostic Event");
+        case EventType::poeOverBudgetEvent:     return tr("PoE over Budget");
+        case EventType::fanErrorEvent:          return tr("Fan Error");
 
-        case EventType::anyServerEvent:        return tr("Any Server Issue");
-        case EventType::anyEvent:              return tr("Any Event");
+        case EventType::anyServerEvent:         return tr("Any Server Issue");
+        case EventType::anyEvent:               return tr("Any Event");
 
-        case EventType::softwareTriggerEvent:  return tr("Soft Trigger");
+        case EventType::softwareTriggerEvent:   return tr("Soft Trigger");
 
         case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -225,6 +227,14 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 : params.caption;
 
             return lm("%1 - %2").args(resourceName, caption);
+        }
+        case EventType::poeOverBudgetEvent:
+        {
+            return tr("PoE over budget at %1").arg(resourceName);
+        }
+        case EventType::fanErrorEvent:
+        {
+            return tr("Fan error at %1").arg(resourceName);
         }
         default:
             return tr("An unknown event has occurred");

@@ -39,6 +39,17 @@ params can be <strong>renamed</strong>, though often <strong>deprecated names</s
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
+<hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
+<!--............................................................................................-->
+<h3>Breaking compatibility</h3>
+<p>
+In method <strong><code>analyticsLookupObjectTracks</code></strong>, parameter
+<strong><code><i>maxObjectTrackSize</i></code></strong> changed to
+<strong><code><b>needFullTrack</b></code></strong>. Previously this parameter was used to limit the
+number of object track metadata items (each item is related to a video frame). The new parameter is
+just a flag showing whether to select all of them or not.
+</p>
+<!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>

@@ -62,7 +62,7 @@ public:
         m_parent(parent),
         m_sortCol(DateTimeColumn),
         m_sortOrder(Qt::DescendingOrder),
-        m_lexComparator(new QnBusinessTypesComparator(false))
+        m_lexComparator(new QnBusinessTypesComparator())
     {
     }
 

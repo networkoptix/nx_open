@@ -92,7 +92,6 @@ private:
 
     QnCameraStatsData m_data;
 
-    QnRecordingStatsColors m_colors;
     bool m_isForecastRole;
     bool m_isHeaderTextBlocked = false;
 };

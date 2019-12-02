@@ -50,7 +50,7 @@ bool isSourceServerRequired(EventType eventType);
 /**
  * @brief The AbstractEvent class
  *                              Base class for business events. Contains parameters of the
- *                              occured event and methods for checking it against the rules.
+ *                              occurred event and methods for checking it against the rules.
  *                              No classes should directly inherit AbstractEvent
  *                              except the QnInstantBusinessEvent and QnProlongedBusinessEvent.
  */

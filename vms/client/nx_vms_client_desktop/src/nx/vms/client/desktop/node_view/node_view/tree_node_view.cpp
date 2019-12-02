@@ -1,14 +1,14 @@
-#include "node_view.h"
+#include "tree_node_view.h"
 
-#include "node_view_state_reducer.h"
 #include "node_view_item_delegate.h"
-#include "sorting_filtering/node_view_group_sorting_model.h"
+#include "../node_view/node_view_state_reducer.h"
+#include "../node_view/sorting_filtering/node_view_group_sorting_model.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_store.h"
 #include "../details/node_view_state.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_constants.h"
 
 #include <QtCore/QSortFilterProxyModel>
@@ -54,9 +54,9 @@ namespace node_view {
 
 using namespace details;
 
-struct NodeView::Private: public QObject
+struct TreeNodeView::Private: public QObject
 {
-    Private(NodeView* owner, int columnCount);
+    Private(TreeNodeView* owner, int columnCount);
 
     void handleExpanded(const QModelIndex& index);
     void handleCollapsed(const QModelIndex& index);
@@ -65,15 +65,15 @@ struct NodeView::Private: public QObject
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
     void handlePatchApplied(const NodeViewStatePatch& patch);
 
-    NodeView* const owner;
+    TreeNodeView* const owner;
     NodeViewStore store;
     NodeViewModel model;
     NodeViewGroupSortingModel groupSortingProxyModel;
     NodeViewItemDelegate itemDelegate;
 };
 
-NodeView::Private::Private(
-    NodeView* owner,
+TreeNodeView::Private::Private(
+    TreeNodeView* owner,
     int columnCount)
     :
     owner(owner),
@@ -83,19 +83,19 @@ NodeView::Private::Private(
     groupSortingProxyModel.setSourceModel(&model);
 }
 
-void NodeView::Private::handleExpanded(const QModelIndex& index)
+void TreeNodeView::Private::handleExpanded(const QModelIndex& index)
 {
     handleExpandStateChanged(index, true);
 }
 
-void NodeView::Private::handleCollapsed(const QModelIndex& index)
+void TreeNodeView::Private::handleCollapsed(const QModelIndex& index)
 {
     handleExpandStateChanged(index, false);
 }
 
-void NodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool expanded)
+void TreeNodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool expanded)
 {
-    if (const auto node = nodeFromIndex(index))
+    if (const auto node = ViewNodeHelper::nodeFromIndex(index))
     {
         store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(
             store.state(), node->path(), expanded));
@@ -106,27 +106,31 @@ void NodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool 
     }
 }
 
-void NodeView::Private::updateExpandedState(const QModelIndex& index)
+void TreeNodeView::Private::updateExpandedState(const QModelIndex& index)
 {
-    const bool expandedNode = details::expanded(index);
+    const bool expandedNode = details::ViewNodeHelper(index).expanded();
     if (owner->isExpanded(index) != expandedNode)
         owner->setExpanded(index, expandedNode);
 }
 
-void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, int to)
+void TreeNodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, int to)
 {
     // We use model of owner instead of QModelIndex::child because parent index can be invalid.
     for (int row = from; row <= to; ++row)
         updateExpandedState(owner->model()->index(row, kAnyColumn, parent));
 }
 
-void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
+void TreeNodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 {
     model.applyPatch(patch);
 
     for (const auto step: patch.steps)
     {
-        if (!step.data.hasProperty(isExpandedProperty))
+        if (step.operationData.operation == PatchStepOperation::removeDataOperation)
+            continue;
+
+        const auto& data = step.operationData.data.value<ViewNodeData>();
+        if (!data.hasProperty(isExpandedProperty))
             continue;
 
         const auto index = getRootModelIndex(model.index(step.path, kAnyColumn), owner->model());
@@ -136,7 +140,7 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 
 //-------------------------------------------------------------------------------------------------
 
-NodeView::NodeView(
+TreeNodeView::TreeNodeView(
     int columnCount,
     QWidget* parent)
     :
@@ -151,7 +155,7 @@ NodeView::NodeView(
     setItemDelegate(&d->itemDelegate);
 
     connect(&d->model, &details::NodeViewModel::dataChangeRequestOccured,
-        this, &NodeView::handleDataChangeRequest);
+        this, &TreeNodeView::handleDataChangeRequest);
 
     connect(&d->store, &details::NodeViewStore::patchApplied,
         d, &Private::handlePatchApplied);
@@ -162,41 +166,41 @@ NodeView::NodeView(
         d, &Private::handleRowsInserted);
 }
 
-NodeView::~NodeView()
+TreeNodeView::~TreeNodeView()
 {
 }
 
-void NodeView::setProxyModel(QSortFilterProxyModel* proxy)
+void TreeNodeView::setProxyModel(QSortFilterProxyModel* proxy)
 {
     d->groupSortingProxyModel.setSourceModel(proxy);
     proxy->setSourceModel(&d->model);
 }
 
-void NodeView::applyPatch(const NodeViewStatePatch& patch)
+void TreeNodeView::applyPatch(const NodeViewStatePatch& patch)
 {
     d->store.applyPatch(patch);
 }
 
-const details::NodeViewState& NodeView::state() const
+const details::NodeViewState& TreeNodeView::state() const
 {
     return d->store.state();
 }
 
-void NodeView::setupHeader()
+void TreeNodeView::setupHeader()
 {
 }
 
-const details::NodeViewStore& NodeView::store() const
+const details::NodeViewStore& TreeNodeView::store() const
 {
     return d->store;
 }
 
-details::NodeViewModel& NodeView::sourceModel() const
+details::NodeViewModel& TreeNodeView::sourceModel()
 {
     return d->model;
 }
 
-void NodeView::handleDataChangeRequest(
+void TreeNodeView::handleDataChangeRequest(
     const QModelIndex& index,
     const QVariant& value,
     int role)
@@ -204,13 +208,13 @@ void NodeView::handleDataChangeRequest(
     if (role != Qt::CheckStateRole)
         return;
 
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
     d->store.applyPatch(NodeViewStateReducer::setNodeChecked(
         d->store.state(), node->path(), {index.column()}, checkedState));
 }
 
-void NodeView::setModel(QAbstractItemModel* model)
+void TreeNodeView::setModel(QAbstractItemModel* model)
 {
     NX_ASSERT(false, "NodeView does not allow to explicitly set model!");
 }

@@ -14,6 +14,7 @@
 #include "config.h"
 #include "analytics_db_utils.h"
 #include <nx/streaming/media_data_packet.h>
+#include <nx/utils/log/log_main.h>
 
 using namespace nx::common::metadata;
 
@@ -143,7 +144,7 @@ bool ObjectTrack::operator==(const ObjectTrack& right) const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (BestShot)(ObjectTrack)(ObjectRegion)(ObjectPosition),
+    (BestShot)(ObjectTrack)(ObjectTrackEx)(ObjectRegion)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
 
@@ -303,11 +304,16 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     if (filter.maxObjectTracksToSelect > 0)
         params->insert(lit("limit"), QString::number(filter.maxObjectTracksToSelect));
 
+    if (filter.needFullTrack)
+        params->insert(lit("needFullTrack"), "true");
+
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
+    const auto kLogTag = nx::utils::log::Tag(std::string("nx::analytics::db::Filter"));
+
     for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
         filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
@@ -355,6 +361,19 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("maxObjectsToSelect")))
         filter->maxObjectTracksToSelect = params.value(lit("maxObjectsToSelect")).toInt();
 
+    static const QString kNeedFullTrack = "needFullTrack";
+    if (params.contains(kNeedFullTrack))
+    {
+        bool success = false;
+        filter->needFullTrack = QnLexical::deserialized<bool>(params.value(kNeedFullTrack), true, &success);
+        if (!success)
+        {
+            NX_WARNING(kLogTag,
+                "Invalid value %1 for parameter %2", params.value(kNeedFullTrack), kNeedFullTrack);
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -380,6 +399,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
 
     os << "maxObjectsToSelect " << filter.maxObjectTracksToSelect << "; ";
+    os << "needFullTrack " << filter.needFullTrack << "; ";
     os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 

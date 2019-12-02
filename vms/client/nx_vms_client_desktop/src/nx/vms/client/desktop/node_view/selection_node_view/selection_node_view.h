@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../node_view/node_view.h"
+#include "../node_view/tree_node_view.h"
 #include "../details/node/view_node_fwd.h"
 #include "../details/node/view_node_path.h"
 
@@ -15,10 +15,10 @@ namespace node_view {
  * View does not support automatic selection state calculation for nodes added/removed after
  * initialization.
  */
-class SelectionNodeView: public NodeView
+class SelectionNodeView: public TreeNodeView
 {
     Q_OBJECT
-    using base_type = NodeView;
+    using base_type = TreeNodeView;
 
 public:
     /**

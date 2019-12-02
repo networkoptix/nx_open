@@ -236,6 +236,14 @@ struct QnAuditLogColors {
 };
 #define QnAuditLogColors_Fields (httpLink)(loginAction)(unsucessLoginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)(chartColor)
 
+struct NodeViewStatsColors
+{
+    NodeViewStatsColors();
+
+    QColor chartColor;
+};
+#define NodeViewStatsColors_Fields (chartColor)
+
 struct QnRecordingStatsColors
 {
     QnRecordingStatsColors();
@@ -311,7 +319,11 @@ struct QnPasswordStrengthColors
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors) \
     (QnTwoWayAudioWidgetColors) \
-    (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
+    (QnRoutingManagementColors) \
+    (QnAuditLogColors) \
+    (QnRecordingStatsColors) \
+    (NodeViewStatsColors) \
+    (QnVideowallManageWidgetColors) \
     (QnServerUpdatesColors) \
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \

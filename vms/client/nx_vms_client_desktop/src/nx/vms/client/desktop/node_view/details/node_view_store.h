@@ -21,8 +21,6 @@ public:
 
     void applyPatch(const NodeViewStatePatch& state);
 
-    bool applyingPatch() const;
-
 signals:
     void patchApplied(const NodeViewStatePatch& patch);
 

@@ -180,7 +180,7 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
 
         context.unloopingShift += context.unloopingPeriod;
 
-        NX_LOGGER_VERBOSE(m_logger, "Unlooping: Starting new loop with unlooping shift %1.",
+        NX_LOGGER_DEBUG(m_logger, "Unlooping: Starting new loop with unlooping shift %1.",
             us(context.unloopingShift));
     }
     const microseconds unloopedPts = pts + context.unloopingShift;

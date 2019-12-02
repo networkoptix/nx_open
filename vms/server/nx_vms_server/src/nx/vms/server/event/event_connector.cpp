@@ -252,6 +252,18 @@ void EventConnector::at_pluginDiagnosticEvent(const nx::vms::event::PluginDiagno
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
+void EventConnector::at_poeOverBudget(const nx::vms::event::PoeOverBudgetEventPtr& event)
+{
+    NX_DEBUG(this, "Got PoE over budget event");
+    serverModule()->eventRuleProcessor()->processEvent(event);
+}
+
+void EventConnector::at_fanError(const nx::vms::event::FanErrorEventPtr& event)
+{
+    NX_DEBUG(this, "Got fan error event");
+    serverModule()->eventRuleProcessor()->processEvent(event);
+}
+
 void EventConnector::at_customEvent(const QString& resourceName, const QString& caption,
     const QString& description, const vms::event::EventMetaData& metadata,
     vms::api::EventState eventState, qint64 timeStampUsec)

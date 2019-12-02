@@ -35,7 +35,7 @@ ObjectTrackSearcher::ObjectTrackSearcher(
         m_filter.maxObjectTracksToSelect = kMaxObjectLookupResultSet;
 }
 
-std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
     if (!m_filter.objectTrackId.isNull())
     {
@@ -135,7 +135,7 @@ std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     return std::move(tracks.front());
 }
 
-std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupTracksUsingArchive(
     nx::sql::QueryContext* queryContext)
 {
     auto archiveFilter =
@@ -147,7 +147,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     if (!archiveFilter)
     {
         NX_DEBUG(this, "Object lookup canceled. The filter is %1", m_filter);
-        return std::vector<ObjectTrack>(); //< No records with such text.
+        return std::vector<ObjectTrackEx>(); //< No records with such text.
     }
 
     archiveFilter->sortOrder = Qt::DescendingOrder;

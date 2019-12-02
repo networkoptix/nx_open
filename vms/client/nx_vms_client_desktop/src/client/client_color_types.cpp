@@ -164,6 +164,11 @@ QnAuditLogColors::QnAuditLogColors() {
     chartColor = QColor(0x25, 0x92, 0xc3);
 }
 
+NodeViewStatsColors::NodeViewStatsColors():
+    chartColor(Qt::cyan)
+{
+}
+
 QnRecordingStatsColors::QnRecordingStatsColors():
     chartBackground(Qt::cyan),
     chartForeground(Qt::white),

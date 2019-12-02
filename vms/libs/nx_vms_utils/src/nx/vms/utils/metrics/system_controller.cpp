@@ -5,6 +5,11 @@
 
 namespace nx::vms::utils::metrics {
 
+SystemController::~SystemController()
+{
+    NX_DEBUG(this, "Removed");
+}
+
 void SystemController::add(std::unique_ptr<ResourceController> resourceController)
 {
     const auto duplicate = std::find_if(
@@ -12,12 +17,13 @@ void SystemController::add(std::unique_ptr<ResourceController> resourceControlle
         [&resourceController](const auto& c) { return c->name() == resourceController->name(); });
 
     NX_ASSERT(duplicate == m_resourceControllers.end(), "Label duplicate with %1", *duplicate);
+    NX_DEBUG(this, "Add %1 as %2", resourceController, resourceController->name());
     m_resourceControllers.push_back(std::move(resourceController));
 }
 
 void SystemController::start()
 {
-    NX_VERBOSE(this, "Starting with %1 resource controllers", m_resourceControllers.size());
+    NX_DEBUG(this, "Starting with %1 resource controllers", m_resourceControllers.size());
     for (const auto& controller: m_resourceControllers)
         controller->start();
 }

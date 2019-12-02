@@ -26,6 +26,8 @@
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -122,6 +124,9 @@ QSet<QnUuid> filterActionResources(
     if (vms::event::requiresUserResource(actionType))
         return filterSubjectIds(ids);
 
+    if (vms::event::requiresServerResource(actionType))
+        return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
+
     return QSet<QnUuid>();
 }
 
@@ -194,10 +199,16 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
             model->appendRow(item);
         };
 
-    using EventSubType = QnBusinessTypesComparator::EventSubType;
+    const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
+        vms::event::allEvents(), resourcePool());
 
-    QnBusinessTypesComparator lexComparator(true);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
+    QnBusinessTypesComparator lexComparator;
+
+    const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
+    const auto failureEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::failure);
+    const auto successEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::success);
+
+    for (const auto eventType: lexComparator.lexSortedEvents(userEvents))
     {
         if (eventType == EventType::pluginDiagnosticEvent)
         {
@@ -210,17 +221,22 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
         addEventItem(eventType);
     }
     addSeparator(m_eventTypesModel);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::failure))
+    for (const auto eventType: lexComparator.lexSortedEvents(failureEvents))
         addEventItem(eventType);
     addSeparator(m_eventTypesModel);
-    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::success))
+    for (const auto eventType: lexComparator.lexSortedEvents(successEvents))
         addEventItem(eventType);
 
-    using ActionSubType = QnBusinessTypesComparator::ActionSubType;
-    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::server))
+    const auto accessibleActions = NvrEventsActionsAccess::removeInacessibleNvrActions(
+        nx::vms::event::userAvailableActions(), resourcePool());
+
+    const auto serverActions = filterActionsBySubtype(accessibleActions, ActionSubtype::server);
+    const auto clientActions = filterActionsBySubtype(accessibleActions, ActionSubtype::client);
+
+    for (const auto actionType: lexComparator.lexSortedActions(serverActions))
         addActionItem(actionType);
     addSeparator(m_actionTypesModel);
-    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::client))
+    for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
     m_actionParams.additionalResources = userRolesManager()->adminRoleIds().toVector().toStdVector();
@@ -626,10 +642,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             break;
     }
 
-    // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
     QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
-    if (!vms::event::requiresCameraResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Servers);
 
     if (resources.size() == 1)
         return qnResIconCache->icon(resources.first());
@@ -637,7 +650,15 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (resources.isEmpty())
         return qnSkin->icon(lit("tree/buggy.png"));
 
-    return qnResIconCache->icon(QnResourceIconCache::Camera);
+    if (vms::event::requiresCameraResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::Camera);
+    if (vms::event::requiresServerResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::Server);
+    if (vms::event::requiresUserResource(m_actionType))
+        return qnResIconCache->icon(QnResourceIconCache::User);
+
+    NX_ASSERT(false);
+    return qnResIconCache->icon(QnResourceIconCache::Unknown);
 }
 
 QSet<QnUuid> QnBusinessRuleViewModel::eventResources() const
@@ -1246,7 +1267,6 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
     }
 
     return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
-
 }
 
 QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
@@ -1318,26 +1338,46 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         case ActionType::execHttpRequestAction:
             return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
+
         default:
             break;
     }
 
-    // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-    if (!vms::event::requiresCameraResource(m_actionType))
-        return braced(tr("System"));
+    if (vms::event::requiresCameraResource(m_actionType))
+    {
+        QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+        if (cameras.size() == 1)
+            return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->extraInfoInTree());
 
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.size() == 1)
-        return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->extraInfoInTree());
+        if (cameras.isEmpty())
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
+                tr("Select at least one device"),
+                tr("Select at least one camera")
+            );
 
-    if (cameras.isEmpty())
-        return QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("Select at least one device"),
-            tr("Select at least one camera")
-        );
+        return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+    }
+    if (vms::event::requiresServerResource(m_actionType))
+    {
+        QnMediaServerResourceList targetServers =
+            resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
-    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+        if (targetServers.isEmpty())
+            return tr("Select server");
+
+        const auto server = targetServers.first();
+        const auto camerasCount = resourcePool()->getAllCameras(server, true).size();
+
+        return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
+    }
+    if (vms::event::requiresUserResource(m_actionType))
+    {
+        return braced(tr("User"));
+    }
+
+    NX_ASSERT(false);
+    return QString();
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const

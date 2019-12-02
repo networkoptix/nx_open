@@ -33,11 +33,11 @@ QnCustomResourceVideoLayoutPtr QnCustomResourceVideoLayout::fromString(const QSt
     return result;
 }
 
-QString QnCustomResourceVideoLayout::toString() const 
+QString QnCustomResourceVideoLayout::toString() const
 {
     QString result(lit("width=%1;height=%2;sensors=%3"));
     QString sensors;
-    for (int i = 0; i < m_channels.size(); ++i) 
+    for (int i = 0; i < m_channels.size(); ++i)
     {
         if (i > 0)
             sensors += L',';
@@ -46,11 +46,11 @@ QString QnCustomResourceVideoLayout::toString() const
     return result.arg(m_size.width()).arg(m_size.height()).arg(sensors);
 }
 
-int QnCustomResourceVideoLayout::channelCount() const 
+int QnCustomResourceVideoLayout::channelCount() const
 {
     if (m_cachedChannelCount)
         return m_cachedChannelCount.get();
-    
+
     int count = 0;
     for (const auto& channel: m_channels)
     {
@@ -62,7 +62,7 @@ int QnCustomResourceVideoLayout::channelCount() const
     return count;
 }
 
-QSize QnCustomResourceVideoLayout::size() const 
+QSize QnCustomResourceVideoLayout::size() const
 {
     return m_size;
 }
@@ -86,9 +86,9 @@ void QnCustomResourceVideoLayout::setChannel(int index, int channel)
     m_channels[index] = channel;
 }
 
-QPoint QnCustomResourceVideoLayout::position(int channel) const 
+QPoint QnCustomResourceVideoLayout::position(int channel) const
 {
-    for (int i = 0; i < m_size.width() * m_size.height(); ++i) 
+    for (int i = 0; i < m_size.width() * m_size.height(); ++i)
         if (m_channels[i] == channel)
             return QPoint(i % m_size.width(), i / m_size.width());
 

@@ -18,6 +18,7 @@ namespace nx::vms::event {
 // TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
 bool requiresCameraResource(ActionType actionType);
 bool requiresUserResource(ActionType actionType);
+bool requiresServerResource(ActionType actionType);
 bool requiresAdditionalUserResource(ActionType actionType);
 
 bool hasToggleState(ActionType actionType);

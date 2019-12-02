@@ -507,8 +507,9 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     NX_ASSERT(!getId().isNull());
     NX_ASSERT(commonModule());
 
-    bool isModified = commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
-        getId(), key, value, markDirty, replaceIfExists);
+    const bool isModified =
+        commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
+            getId(), key, value, markDirty, replaceIfExists);
 
     if (isModified)
         emitPropertyChanged(key);
