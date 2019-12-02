@@ -65,7 +65,7 @@ public:
      */
     DiscoveryResponse(const QByteArray& discoveryResponseMessage, QString* outErrorMessage);
 
-    int port() const { return m_mediaPort; }
+    int mediaPort() const { return m_mediaPort; }
 
     const std::vector<std::shared_ptr<CameraDiscoveryResponse>>& cameraDiscoveryResponses() const
     {
