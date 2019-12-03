@@ -178,6 +178,7 @@ Item
                             itemId: thisEngineId.toString() + modelData.name
                             text: "   " + modelData.name
                             navigationMenu: menu
+                            font.pixelSize: 12
                             active: isActive
 
                             onClicked:
