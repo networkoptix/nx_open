@@ -157,6 +157,26 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     const auto secondaryStreamUrl = state.singleCameraSettings.secondaryStream();
     ui->secondaryStreamLabel->setText(secondaryStreamUrl);
     ui->secondaryStreamCopyButton->setHidden(secondaryStreamUrl.isEmpty());
+
+    // Hide certain fields for RTSP/HTTP links.
+    const bool isNetworkLink = state.isSingleCamera()
+        && state.singleCameraProperties.networkLink;
+
+    ui->vendorTitleLabel->setHidden(isNetworkLink);
+    ui->vendorLabel->setHidden(isNetworkLink);
+    ui->modelTitleLabel->setHidden(isNetworkLink);
+    ui->modelLabel->setHidden(isNetworkLink);
+    ui->vendorDetailTitleLabel->setHidden(isNetworkLink);
+    ui->vendorDetailLabel->setHidden(isNetworkLink);
+    ui->modelDetailTitleLabel->setHidden(isNetworkLink);
+    ui->modelDetailLabel->setHidden(isNetworkLink);
+    ui->firmwareTitleLabel->setHidden(isNetworkLink);
+    ui->firmwareLabel->setHidden(isNetworkLink);
+    ui->macAddressTitleLabel->setHidden(isNetworkLink);
+    ui->macAddressLabel->setHidden(isNetworkLink);
+
+    const int spacerHeight = isNetworkLink ? 0 : 8;
+    ui->verticalSpacer->changeSize(1, spacerHeight, QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void CameraInfoWidget::alignLabels()

@@ -639,8 +639,10 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
         singleProperties.hasVideo = firstCamera->hasVideo();
-        singleProperties.editableStreamUrls =
-            firstCamera->hasCameraCapabilities(Qn::CustomMediaUrlCapability);
+        singleProperties.editableStreamUrls = firstCamera->hasCameraCapabilities(
+            Qn::CustomMediaUrlCapability);
+        singleProperties.networkLink = firstCamera->hasCameraCapabilities(
+            {Qn::CustomMediaUrlCapability | Qn::FixedQualityCapability});
 
         const auto macAddress = firstCamera->getMAC();
         singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();
