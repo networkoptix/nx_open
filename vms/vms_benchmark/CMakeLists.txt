@@ -1,8 +1,15 @@
 message(STATUS "Generating files for VMS Benchmark")
 
 set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/build)
+set(vms_version ${releaseVersion.full})
 
-file(GLOB_RECURSE benchmark_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.py)
+nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/release DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+nx_configure_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/release/lib/vms_benchmark_release/version.py.in
+    ${CMAKE_CURRENT_BINARY_DIR}/release/lib/vms_benchmark_release/version.py
+)
+
+file(GLOB_RECURSE benchmark_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.py ${CMAKE_CURRENT_BINARY_DIR}/release/lib/*.py)
 
 if(targetDevice STREQUAL "windows-x64")
     set(executable_extension .exe)
@@ -43,6 +50,7 @@ add_custom_command(OUTPUT
         --workpath \"${build_dir}/build\" \
         --specpath \"${build_dir}\" \
         -p \"${CMAKE_CURRENT_SOURCE_DIR}/lib\" \
+        -p \"${CMAKE_CURRENT_BINARY_DIR}/release/lib\" \
         --name vms_benchmark \
         \"${CMAKE_CURRENT_SOURCE_DIR}/bin/main.py\" \
     "

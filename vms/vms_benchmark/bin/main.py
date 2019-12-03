@@ -6,6 +6,7 @@ import platform
 import re
 import signal
 import sys
+import os
 import time
 import uuid
 from typing import List, Tuple, Optional
@@ -61,6 +62,18 @@ from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
+
+vms_version = None
+
+try:
+    from vms_benchmark_release.version import vms_version
+except ImportError:
+    def assign_vms_version():
+        def _vms_version():
+            return 'development'
+        global vms_version
+        vms_version = _vms_version
+    assign_vms_version()
 
 import urllib
 import urllib.error
@@ -1013,7 +1026,11 @@ def main(conf_file, ini_file, log_file):
         format='%(asctime)s %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    report(f"VMS Benchmark started; logging to {log_file_ref}.")
+    report(f"VMS Benchmark (version: {vms_version()}) started; logging to {log_file_ref}.")
+
+    if os.path.exists('./build_info.txt'):
+        with open('./build_info.txt', 'r') as f:
+            logging.info('build_info.txt\n' + ''.join(f.readlines()))
 
     conf, ini = load_configs(conf_file, ini_file)
 
