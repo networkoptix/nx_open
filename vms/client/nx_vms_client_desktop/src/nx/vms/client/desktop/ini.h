@@ -92,7 +92,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, modalServerSetupWizard,
         "Whether to show Server's setup wizard dialog in a modal window. Default behavior: modal\n"
         "window. To be changed for debugging of web-based components only.");
-    NX_INI_FLAG(0, showWebPageForAllCameras, "Always show Web page in Camera Settings.");
+    NX_INI_FLAG(1, showWebPageForAllCameras, "Always show Web page in Camera Settings.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor,
         "Allows to show the screenshot above the timeline when mouse pointer hovers over the\n"
         "timeline.\n"
