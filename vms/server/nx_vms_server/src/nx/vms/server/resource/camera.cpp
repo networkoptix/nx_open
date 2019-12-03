@@ -133,7 +133,7 @@ void Camera::setUrl(const QString &urlStr)
 
     QnMutexLocker lock(&m_mutex);
 
-    const QUrl url(urlStr);
+    const utils::Url url(urlStr);
     const QUrlQuery query(url.query());
 
     const int port = query.queryItemValue(QLatin1String("http_port")).toInt();

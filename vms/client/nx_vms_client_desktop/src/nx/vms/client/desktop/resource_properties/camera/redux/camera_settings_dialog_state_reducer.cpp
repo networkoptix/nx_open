@@ -87,10 +87,10 @@ QString calculateWebPage(const Camera& camera)
 
     QString webPageAddress = lit("http://") + camera->getHostAddress();
 
-    QUrl url = QUrl::fromUserInput(camera->getUrl());
+    const auto url = nx::utils::Url::fromUserInput(camera->getUrl());
     if (url.isValid())
     {
-        const QUrlQuery query(url);
+        const QUrlQuery query(url.query());
         int port = query.queryItemValue(lit("http_port")).toInt();
         if (port == 0)
             port = url.port(80);
