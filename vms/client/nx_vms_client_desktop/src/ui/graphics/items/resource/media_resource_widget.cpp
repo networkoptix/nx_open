@@ -69,6 +69,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/roi_figures_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -342,7 +343,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     /* Set up overlays */
     initIoModuleOverlay();
     updateTwoWayAudioWidget();
-    initAreaHighlightOverlay();
+    initAnalyticsOverlays();
     initAreaSelectOverlay();
 
     /* Set up buttons. */
@@ -568,16 +569,19 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
         [this]() { selectThisWidget(true); });
 }
 
-void QnMediaResourceWidget::initAreaHighlightOverlay()
+void QnMediaResourceWidget::initAnalyticsOverlays()
 {
     if (!hasVideo())
         return;
+
+    m_roiFiguresOverlayWidget = new RoiFiguresOverlayWidget(m_compositeOverlay, this);
+    addOverlayWidget(m_roiFiguresOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     m_areaHighlightOverlayWidget = new AreaHighlightOverlayWidget(m_compositeOverlay);
     addOverlayWidget(m_areaHighlightOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged,
-        this, &QnMediaResourceWidget::updateAreaHighlightVisibility);
+        this, &QnMediaResourceWidget::updateAnalyticsVisibility);
 }
 
 void QnMediaResourceWidget::initStatusOverlayController()
@@ -2579,13 +2583,16 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     updateOverlayButton();
 }
 
-void QnMediaResourceWidget::updateAreaHighlightVisibility()
+void QnMediaResourceWidget::updateAnalyticsVisibility()
 {
-    if (!m_areaHighlightOverlayWidget)
-        return;
+    const auto visibility = (m_statusOverlay->opacity() > 0 || !d->analyticsEnabled)
+        ? Invisible : Visible;
 
-    const auto visibility = (m_statusOverlay->opacity() > 0) ? Invisible : Visible;
-    setOverlayWidgetVisibility(m_areaHighlightOverlayWidget, visibility, false);
+    if (m_roiFiguresOverlayWidget)
+        setOverlayWidgetVisibility(m_roiFiguresOverlayWidget, visibility, false);
+
+    if (m_areaHighlightOverlayWidget)
+        setOverlayWidgetVisibility(m_areaHighlightOverlayWidget, visibility, false);
 }
 
 void QnMediaResourceWidget::processDiagnosticsRequest()
@@ -2788,7 +2795,10 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
 {
-    // Cleanup existing object frames in any case.
+    if (d->analyticsEnabled == enabled)
+        return;
+
+        // Cleanup existing object frames in any case.
     if (!enabled)
         d->analyticsController->clearAreas();
 
@@ -2796,9 +2806,13 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
     if (isZoomWindow())
         return;
 
+    d->analyticsEnabled = enabled;
+
     // We should be able to disable analytics if it is not supported anymore.
     if (isAnalyticsSupported() || !enabled)
         d->setAnalyticsEnabledInStream(enabled);
+
+    updateAnalyticsVisibility();
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
