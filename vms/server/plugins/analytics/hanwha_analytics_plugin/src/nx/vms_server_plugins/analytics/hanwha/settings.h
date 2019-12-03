@@ -3,74 +3,73 @@
 #include "point.h"
 
 #include <vector>
+#include <memory>
 
 #include <nx/kit/json.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
 //-------------------------------------------------------------------------------------------------
 
-const char* upperIfBoolean(const char* value);
-
-std::string specify(const char* v, unsigned int n);
-
-//-------------------------------------------------------------------------------------------------
-
-struct AnalyticsParam
-{
-    const char* plugin;
-    const char* sunapi;
-};
-
-/** temporary crutch till C++20 std::span */
-class AnalyticsParamSpan
-{
-public:
-    template<int N>
-    AnalyticsParamSpan(const AnalyticsParam(&params)[N]) noexcept:
-        m_begin(params),
-        m_end(params + std::size(params))
-    {
-    }
-    const AnalyticsParam* begin() const { return m_begin; }
-    const AnalyticsParam* end() const { return m_end; }
-    size_t size() const {return m_end - m_begin; }
-
-private:
-    const AnalyticsParam* m_begin;
-    const AnalyticsParam* m_end;
-};
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-// New Settings Engine - for non-symmetric settings.
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
 struct SettingGroup
 {
-    bool initialized = false;
+    // Server contains a map, where the values of all settings are stored. The keys to values, that
+    // correspond to the current group of settings, are stored in the string array `serverKeys`.
+    // Both `serverKeys` and `serverKeyCount` are initialized by descendants of this class.
+    const char* const* const serverKeys;
+    const int serverKeyCount;
+
+    template<int N>
+    SettingGroup(
+        const char* const(&paramsArray)[N],
+        int nativeIndex = -1,
+        int serverIndexOffset = 0,
+        int deviceIndexOffset = 0)
+    :
+        serverKeys(paramsArray),
+        serverKeyCount(N),
+        m_nativeIndex(nativeIndex),
+        m_serverIndex(nativeIndex >= 0 ? nativeIndex + serverIndexOffset : -1),
+        m_deviceIndex(nativeIndex >= 0 ? nativeIndex + deviceIndexOffset : -1)
+    {
+    }
+
+    SettingGroup& operator=(const SettingGroup& rhs)
+    {
+        initialized = rhs.initialized;
+        m_nativeIndex = rhs.m_nativeIndex;
+        m_serverIndex = rhs.m_serverIndex;
+        m_deviceIndex = rhs.m_deviceIndex;
+        return *this;
+    }
     operator bool() const { return initialized; }
+
+    std::string serverKey(int keyIndex) const;
+
+    void replanishErrorMap(
+        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+
+    int nativeIndex() const { return m_nativeIndex; }
+    int serverIndex() const { return m_serverIndex; }
+    int deviceIndex() const { return m_deviceIndex; }
+
+protected:
+    bool initialized = false;
+
+private:
+
+    // Index of the current SettingGroup, if several same type groups are used in the device.
+    // E.g. if this group of settings describes a line, and many lines are supported, then
+    // it is a number of the line (beginning from 0).
+    // - 1 means that only one such settings group exist.
+    int m_nativeIndex = -1;
+
+    int m_serverIndex = -1;
+    int m_deviceIndex = -1;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -86,25 +85,24 @@ struct ShockDetection: public SettingGroup
         thresholdLevel,
         sensitivityLevel,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "ShockDetection.Enable",
         "ShockDetection.ThresholdLevel",
         "ShockDetection.SensitivityLevel",
     };
+    static constexpr const char* kJsonEventName = "ShockDetection";
+    static constexpr const char* kSunapiEventName = "shockdetection";
 
-    ShockDetection() = default;
+    ShockDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const ShockDetection& rhs) const;
     bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const ShockDetection& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
 
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
-
-std::string buildCameraRequestQuery(
-    const ShockDetection& settingGroup, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -115,23 +113,22 @@ struct Motion: public SettingGroup
     enum class ServerParamIndex {
         detectionType,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "MotionDetection.DetectionType",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    Motion() = default;
-    Motion(const std::vector<std::string>& params);
+    Motion(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const Motion& rhs) const;
     bool operator!=(const Motion& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const Motion& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const Motion& settingGroup, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -149,25 +146,29 @@ struct MdObjectSize: public SettingGroup
         maxWidth,
         maxHeight,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "MotionDetection.MinObjectSize.Points",
         "MotionDetection.MinObjectSize.Points", //< the same as previous
         "MotionDetection.MaxObjectSize.Points",
         "MotionDetection.MaxObjectSize.Points", //< the same as previous
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdObjectSize() = default;
+    MdObjectSize(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator == (const MdObjectSize& rhs) const;
     bool operator!=(const MdObjectSize& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const MdObjectSize& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const MdObjectSize& settingGroup, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildMinObjectSize(FrameSize frameSize) const;
+    std::string buildMaxObjectSize(FrameSize frameSize) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -185,26 +186,29 @@ struct IvaObjectSize : public SettingGroup
         maxWidth,
         maxHeight,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "IVA.MinObjectSize.Points",
-        "IVA.MinObjectSize.Points", //< the same as previous
+        "IVA.MinObjectSize.Points", //< the same as previous, we read corresponding value twice
         "IVA.MaxObjectSize.Points",
-        "IVA.MaxObjectSize.Points", //< the same as previous
+        "IVA.MaxObjectSize.Points", //< the same as previous, we read corresponding value twice
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaObjectSize() = default;
+    IvaObjectSize(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator == (const IvaObjectSize& rhs) const;
     bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const IvaObjectSize& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
 
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildMinObjectSize(FrameSize frameSize) const;
+    std::string buildMaxObjectSize(FrameSize frameSize) const;
 };
-
-std::string buildCameraRequestQuery(
-    const IvaObjectSize& settingGroup, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -215,7 +219,8 @@ struct MdIncludeArea: public SettingGroup
     int sensitivityLevel = 80;
     int minimumDuration = 0;
 
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -223,25 +228,28 @@ struct MdIncludeArea: public SettingGroup
         sensitivityLevel,
         minimumDuration,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "MotionDetection.IncludeArea#.Points",
         "MotionDetection.IncludeArea#.ThresholdLevel",
         "MotionDetection.IncludeArea#.SensitivityLevel",
         "MotionDetection.IncludeArea#.MinimumDuration",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdIncludeArea() = default;
+    MdIncludeArea(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
     bool operator==(const MdIncludeArea& rhs) const;
     bool operator!=(const MdIncludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const MdIncludeArea& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const MdIncludeArea& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -249,28 +257,32 @@ struct MdExcludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
 
-    // For Exclude areas internal index = external (gui) indix + 8.
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 9;
 
     enum class ServerParamIndex {
         points,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "MotionDetection.ExcludeArea#.Points",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdExcludeArea() = default;
+    MdExcludeArea(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
+
     bool operator == (const MdExcludeArea& rhs) const;
     bool operator!=(const MdExcludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const MdExcludeArea& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const MdExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -289,26 +301,26 @@ struct TamperingDetection: SettingGroup
         minimumDuration,
         exceptDarkImages,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "TamperingDetection.Enable",
         "TamperingDetection.ThresholdLevel",
         "TamperingDetection.SensitivityLevel",
         "TamperingDetection.MinimumDuration",
         "TamperingDetection.ExceptDarkImages",
     };
+    static constexpr const char* kJsonEventName = "TamperingDetection";
+    static constexpr const char* kSunapiEventName = "tamperingdetection";
 
-    TamperingDetection() = default;
+    TamperingDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const TamperingDetection& rhs) const;
     bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const TamperingDetection& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const TamperingDetection& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -325,25 +337,25 @@ struct DefocusDetection: SettingGroup
         sensitivityLevel,
         minimumDuration,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "DefocusDetection.Enable",
         "DefocusDetection.ThresholdLevel",
         "DefocusDetection.SensitivityLevel",
         "DefocusDetection.MinimumDuration",
     };
+    static constexpr const char* kJsonEventName = "DefocusDetection";
+    static constexpr const char* kSunapiEventName = "defocusdetection";
 
-    DefocusDetection() = default;
+    DefocusDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const DefocusDetection& rhs) const;
     bool operator!=(const DefocusDetection& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const DefocusDetection& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const DefocusDetection& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -364,7 +376,7 @@ struct OdObjects : public SettingGroup
         licensePlate,
         minimumDuration,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "ObjectDetection.Enable",
         "ObjectDetection.Person",
         "ObjectDetection.Vehicle",
@@ -372,19 +384,22 @@ struct OdObjects : public SettingGroup
         "ObjectDetection.LicensePlate",
         "ObjectDetection.MinimumDuration",
     };
+    static constexpr const char* kJsonEventName = "ObjectDetection";
+    static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdObjects() = default;
+    OdObjects(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator == (const OdObjects& rhs) const;
     bool operator!=(const OdObjects& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const OdObjects& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const OdObjects& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildObjectTypes() const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -401,25 +416,28 @@ struct OdBestShot : public SettingGroup
         face,
         licensePlate,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "ObjectDetection.BestShot.Person",
         "ObjectDetection.BestShot.Vehicle",
         "ObjectDetection.BestShot.Face",
         "ObjectDetection.BestShot.LicensePlate",
     };
+    static constexpr const char* kJsonEventName = "ObjectDetection";
+    static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdBestShot() = default;
+    OdBestShot(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator == (const OdBestShot& rhs) const;
     bool operator!=(const OdBestShot& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const OdBestShot& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const OdBestShot& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildObjectTypes() const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -427,27 +445,31 @@ struct OdExcludeArea : public SettingGroup
 {
     std::vector<PluginPoint> points;
 
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "ObjectDetection.ExcludeArea#.Points",
     };
+    static constexpr const char* kJsonEventName = "ObjectDetection";
+    static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdExcludeArea() = default;
+    OdExcludeArea(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
     bool operator == (const OdExcludeArea& rhs) const;
     bool operator!=(const OdExcludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const OdExcludeArea& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const OdExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -461,7 +483,8 @@ struct IvaLine : public SettingGroup
     bool vehicle = false;
     bool crossing = false;
 
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -472,7 +495,7 @@ struct IvaLine : public SettingGroup
         crossing,
     };
 
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "IVA.Line#.Points",
         "IVA.Line#.Points", //< direction is also read from "Points"
         "IVA.Line#.Name",
@@ -480,21 +503,26 @@ struct IvaLine : public SettingGroup
         "IVA.Line#.Vehicle",
         "IVA.Line#.Crossing",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaLine() = default;
-
+    IvaLine(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
     bool operator==(const IvaLine& rhs) const;
     bool operator!=(const IvaLine& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const IvaLine& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
 
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildFilter() const;
+    std::string buildMode() const;
 };
-
-std::string buildCameraRequestQuery(
-    const IvaLine& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -515,8 +543,8 @@ struct IvaIncludeArea: public SettingGroup
     int appearDuration = 10;
     int loiteringDuration = 10;
 
-    // For Include areas internal and external (gui) indices are the same.
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -532,7 +560,7 @@ struct IvaIncludeArea: public SettingGroup
         appearDuration,
         loiteringDuration,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "IVA.IncludeArea#.Points",
         "IVA.IncludeArea#.Name",
         "IVA.IncludeArea#.Person",
@@ -546,20 +574,27 @@ struct IvaIncludeArea: public SettingGroup
         "IVA.IncludeArea#.AppearDuration",
         "IVA.IncludeArea#.LoiteringDuration",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaIncludeArea() = default;
+    IvaIncludeArea(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
 
     bool operator==(const IvaIncludeArea& rhs) const;
     bool operator!=(const IvaIncludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const IvaIncludeArea& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
 
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string buildMode() const;
+    std::string buildFilter() const;
 };
-std::string buildCameraRequestQuery(
-    const IvaIncludeArea& area, FrameSize frameSize, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -567,28 +602,32 @@ struct IvaExcludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
 
-    // For Exclude areas internal index = external (gui) indix + 8.
-    int internalObjectIndex = 0;
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartSunapiRoiIndexFrom = 9;
 
     enum class ServerParamIndex {
         points,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "IVA.ExcludeArea#.Points",
     };
+    static constexpr const char* kJsonEventName = "VideoAnalysis";
+    static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaExcludeArea() = default;
+    IvaExcludeArea(int roiIndex = -1):
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    {
+    }
+
     bool operator == (const IvaExcludeArea& rhs) const;
     bool operator!=(const IvaExcludeArea& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const IvaExcludeArea& rhs) const;
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber, int objectIndex);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
-};
 
-std::string buildCameraRequestQuery(
-    const IvaExcludeArea& area, FrameSize frameSize, int channelNumber = 0);
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -601,22 +640,23 @@ struct AudioDetection : public SettingGroup
         enabled,
         thresholdLevel,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "AudioDetection.Enable",
         "AudioDetection.ThresholdLevel",
     };
+    static constexpr const char* kJsonEventName = "AudioDetection";
+    static constexpr const char* kSunapiEventName = "audiodetection";
 
-    AudioDetection() = default;
+    AudioDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const AudioDetection& rhs) const;
     bool operator!=(const AudioDetection& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const AudioDetection& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
-std::string buildCameraRequestQuery(
-    const AudioDetection& area, FrameSize /*frameSize*/, int channelNumber = 0);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -639,7 +679,7 @@ struct SoundClassification: public SettingGroup
         explosion,
         crashingGlass,
     };
-    static constexpr const char* kServerParamsNames[] = {
+    static constexpr const char* kServerKeys[] = {
         "SoundClassification.Enable",
         "SoundClassification.NoiseReduction",
         "SoundClassification.ThresholdLevel",
@@ -648,22 +688,77 @@ struct SoundClassification: public SettingGroup
         "SoundClassification.Explosion",
         "SoundClassification.CrashingGlass",
     };
+    static constexpr const char* kJsonEventName = "AudioAnalysis";
+    static constexpr const char* kSunapiEventName = "audioanalysis";
 
-    SoundClassification() = default;
+    SoundClassification(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator==(const SoundClassification& rhs) const;
     bool operator!=(const SoundClassification& rhs) const { return !(*this == rhs); }
-    bool differesEnoughFrom(const SoundClassification& rhs) const { return !(*this == rhs); }
-    bool loadFromServer(const nx::sdk::IStringMap* settings, int objectIndex = 0);
-    bool loadFromSunapi(const std::string& cameraReply, int channelNumber);
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    std::string SoundClassification::buildSoundType() const;
 };
 
-std::string buildCameraRequestQuery(
-    const SoundClassification& area, FrameSize /*frameSize*/, int channelNumber = 0);
+//-------------------------------------------------------------------------------------------------
+struct PluginValueError {};
+struct SunapiValueError {};
+//-------------------------------------------------------------------------------------------------
+template<class SettingsGroupT>
+bool readSettingsFromServer(const nx::sdk::IStringMap* from, SettingsGroupT* to,
+    int roiIndex = -1)
+{
+    SettingsGroupT tmp(roiIndex);
+    try
+    {
+        tmp.readFromServerOrThrow(from, roiIndex);
+    }
+    catch (PluginValueError&)
+    {
+        return false;
+    }
+    *to = std::move(tmp);
+    return true;
+}
+//-------------------------------------------------------------------------------------------------
+nx::kit::Json getChannelInfoOrThrow(
+    const std::string& cameraReply, const char* eventName, int channelNumber);
+//-------------------------------------------------------------------------------------------------
+template<class SettingGroupT>
+bool readFromSunapiReply(const std::string& from, SettingGroupT* to,
+    FrameSize frameSize, int channelNumber, int roiIndex = -1)
+{
+    SettingGroupT tmp(roiIndex);
+    try
+    {
+        nx::kit::Json channelInfo = getChannelInfoOrThrow(
+            from, SettingGroupT::kJsonEventName, channelNumber);
+
+        tmp.readFromCameraOrThrow(channelInfo, frameSize);
+    }
+    catch (SunapiValueError&)
+    {
+        return false;
+    }
+    *to = std::move(tmp);
+    return true;
+}
+//-------------------------------------------------------------------------------------------------
+//template<class SettingGroupT, class LoadingFunction>
+//bool readFromCamera(const std::string& from, SettingGroupT* to,
+//    LoadingFunction loadingFunction,
+//    FrameSize frameSize, int channelNumber, int roiIndex = -1)
+//{
+//    std::string reply = (SettingGroupT::kSunapiEventName);
+//    return readFromSunapiReply(reply, to, frameSize, channelNumber, roiIndex);
+//}
 
 //-------------------------------------------------------------------------------------------------
-
 struct Settings
 {
     ShockDetection shockDetection;
@@ -691,7 +786,19 @@ template <typename T, typename = void>
 struct maybeEmpty : std::false_type {};
 
 template <typename T>
-struct maybeEmpty<T, std::void_t<decltype(std::declval<T>().empty())>>: std::true_type {};
+struct maybeEmpty<T, std::void_t<decltype(std::declval<T>().points.empty())>>: std::true_type {};
+
+template<class SettingGroupT>
+bool differesEnough(const SettingGroupT& lhs, const SettingGroupT& rhs)
+{
+    if constexpr (maybeEmpty<SettingGroupT>())
+    {
+        if (lhs.points.empty() && rhs.points.empty())
+            return false;
+    }
+
+    return lhs != rhs;
+}
 
 //-------------------------------------------------------------------------------------------------
 

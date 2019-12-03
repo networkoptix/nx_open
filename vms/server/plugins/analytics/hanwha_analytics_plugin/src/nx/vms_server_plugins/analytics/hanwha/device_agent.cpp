@@ -96,88 +96,129 @@ static std::string dequote(const std::string& s)
     return s;
 }
 
-/*static*/ void DeviceAgent::replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
-    AnalyticsParamSpan params, const char* reason)
-{
-    for (const auto param: params)
-        errorMap->setItem(param.plugin, reason);
-}
-
 template<class S, class F>
-void retr2(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
-    const nx::sdk::IStringMap* settings,
+void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    const nx::sdk::IStringMap* sourceMap,
     S& previousState,
-    F f,
+    F sendingFunction,
     FrameSize frameSize,
+    int channelNumber,
     int objectIndex = 0)
 {
     S settingGroup;
-    if (!settingGroup.loadFromServer(settings, objectIndex))
-        settingGroup.replanishErrorMap(errorMap, "read failed");
-    else
+    if (!readSettingsFromServer(sourceMap, &settingGroup, objectIndex))
     {
-        if (settingGroup.differesEnoughFrom(previousState))
-        {
-            const std::string query = buildCameraRequestQuery(settingGroup, frameSize);
-                const std::string error = f(query);
-                if (!error.empty())
-                    settingGroup.replanishErrorMap(errorMap, error);
-                else
-                    previousState = settingGroup;
-        }
+        settingGroup.replanishErrorMap(errorMap, "read failed");
+        return;
     }
 
+    if (!differesEnough(settingGroup, previousState))
+        return;
+
+    const std::string settingQuery =
+        settingGroup.buildCameraWritingQuery(frameSize, channelNumber);
+    const std::string error = sendingFunction(settingQuery);
+    if (!error.empty())
+        settingGroup.replanishErrorMap(errorMap, error);
+    else
+        previousState = settingGroup;
 }
 
 constexpr const char* failedToReceiveError = "Failed to receive a value from server";
 
 void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* outResult, const IStringMap* settings)
+    Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
 {
+    if (!m_serverHasSentInitialSettings)
+    {
+        // we should ignore initial settings
+        m_serverHasSentInitialSettings = true;
+        return;
+    }
 
-    int c = settings->count();
+    int c = sourceMap->count();
     //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
     const auto sender = [this](const std::string& s) {return this->sendCommandToCamera(s); };
 
-    retr2(errorMap, settings, m_settings.shockDetection, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.motion, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.mdObjectSize, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.ivaObjectSize, sender, m_frameSize);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.motion, sender, m_frameSize, m_channelNumber);
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.mdObjectSize, sender, m_frameSize, m_channelNumber); //*
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.mdIncludeArea[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.mdIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.mdExcludeArea[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.mdExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
-    retr2(errorMap, settings, m_settings.tamperingDetection, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.defocusDetection, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.odObjects, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.odBestShot, sender, m_frameSize);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.odObjects, sender, m_frameSize, m_channelNumber);
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.odBestShot, sender, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.odExcludeArea[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.odExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.ivaLine[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.ivaIncludeArea[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
 
     for (int i = 0; i < 8; ++i)
-        retr2(errorMap, settings, m_settings.ivaExcludeArea[i], sender, m_frameSize, i + 1);
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
 
-    retr2(errorMap, settings, m_settings.audioDetection, sender, m_frameSize);
-    retr2(errorMap, settings, m_settings.soundClassification, sender, m_frameSize);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
+
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
 
     *outResult = errorMap.releasePtr();
 }
 
 void DeviceAgent::getPluginSideSettings(
-    Result<const ISettingsResponse*>* /*outResult*/) const
+    Result<const ISettingsResponse*>* outResult) const
 {
+    const auto response = new nx::sdk::SettingsResponse();
+    m_settings.shockDetection.writeToServer(response);
+
+    m_settings.audioDetection.writeToServer(response);
+    *outResult = response;
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -290,7 +331,7 @@ void DeviceAgent::setMonitor(MetadataMonitor* monitor)
     m_monitor = monitor;
 }
 
-std::string DeviceAgent::loadSunapiObject(const char* eventName)
+std::string DeviceAgent::loadSunapiGettingReply(const char* eventName)
 {
     std::string result;
     nx::utils::Url command(m_url);
@@ -314,53 +355,54 @@ std::string DeviceAgent::loadSunapiObject(const char* eventName)
         ;//NX_DEBUG(logTag, "makeActiRequest: Error getting response body.");
     return result; // nx::network::http::StatusCode::internalServerError;
 
-//    m_settings.shockDetection.loadFromSunapi(sss.c_str());
-
 }
 
 void DeviceAgent::readCameraSettings()
 {
-    std::string sunapiString = loadSunapiObject("shockdetection");
-    m_settings.shockDetection.loadFromSunapi(sunapiString, m_channelNumber);
+    std::string sunapiReply;
 
-    sunapiString = loadSunapiObject("tamperingdetection");
-    m_settings.tamperingDetection.loadFromSunapi(sunapiString, m_channelNumber);
+    sunapiReply = loadSunapiGettingReply("shockdetection");
+    readFromSunapiReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
 
-    sunapiString = loadSunapiObject("videoanalysis2");
-    m_settings.motion.loadFromSunapi(sunapiString, m_channelNumber);
-    m_settings.mdObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+    sunapiReply = loadSunapiGettingReply("tamperingdetection");
+    readFromSunapiReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
-        m_settings.mdIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+    sunapiReply = loadSunapiGettingReply("videoanalysis2");
+    readFromSunapiReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
-        m_settings.mdExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
-
-    m_settings.ivaObjectSize.loadFromSunapi(sunapiString, m_channelNumber);
+    readFromSunapiReply(sunapiReply, &m_settings.mdObjectSize, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        m_settings.ivaLine[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+        readFromSunapiReply(sunapiReply, &m_settings.mdIncludeArea[i], m_frameSize, m_channelNumber, i);
 
     for (int i = 0; i < 8; ++i)
-        m_settings.ivaIncludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+        readFromSunapiReply(sunapiReply, &m_settings.mdExcludeArea[i], m_frameSize, m_channelNumber, i);
+
+    readFromSunapiReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        m_settings.ivaExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+        readFromSunapiReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
 
-    sunapiString = loadSunapiObject("defocusdetection");
-    m_settings.defocusDetection.loadFromSunapi(sunapiString, m_channelNumber);
-
-    sunapiString = loadSunapiObject("objectdetection");
-    m_settings.odObjects.loadFromSunapi(sunapiString, m_channelNumber);
-    m_settings.odBestShot.loadFromSunapi(sunapiString, m_channelNumber);
     for (int i = 0; i < 8; ++i)
-        m_settings.odExcludeArea[i].loadFromSunapi(sunapiString, m_channelNumber, i + 1);
+        readFromSunapiReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    sunapiString = loadSunapiObject("audiodetection");
-    m_settings.audioDetection.loadFromSunapi(sunapiString, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        readFromSunapiReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
 
-    sunapiString = loadSunapiObject("audioanalysis");
-    m_settings.soundClassification.loadFromSunapi(sunapiString, m_channelNumber);
+    sunapiReply = loadSunapiGettingReply("defocusdetection");
+    readFromSunapiReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadSunapiGettingReply("objectdetection");
+    readFromSunapiReply(sunapiReply, &m_settings.odObjects, m_frameSize, m_channelNumber);
+    readFromSunapiReply(sunapiReply, &m_settings.odBestShot, m_frameSize, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        readFromSunapiReply(sunapiReply, &m_settings.odExcludeArea[i], m_frameSize, m_channelNumber, i);
+
+    sunapiReply = loadSunapiGettingReply("audiodetection");
+    readFromSunapiReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadSunapiGettingReply("audioanalysis");
+    readFromSunapiReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha
