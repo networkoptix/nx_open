@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/mac_address.h>
 
 #include "test_camera_ini.h"
