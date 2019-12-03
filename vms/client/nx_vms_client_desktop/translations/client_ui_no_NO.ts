@@ -3069,7 +3069,7 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation>Innspilling var aktivert på USB-lagringen</translation>
+      <translation>Innspilling aktivert på USB-lagringen</translation>
     </message>
     <message>
       <location/>

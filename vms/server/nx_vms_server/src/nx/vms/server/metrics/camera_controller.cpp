@@ -101,12 +101,12 @@ auto makeAvailabilityProviders()
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "streamIssues",
-            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
+            [](const auto& r) { return Value(r->getMetric(&Camera::Metrics::streamIssues)); },
             timerWatch<Camera*>(kIssuesRateUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "ipConflicts",
-            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
+            [](const auto& r) { return Value(r->getMetric(&Camera::Metrics::ipConflicts)); },
             timerWatch<Camera*>(kipConflictsRateUpdateInterval)
         )
     );

@@ -309,8 +309,9 @@ bool QnStorageDb::startDbFile()
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
+    using namespace nx::utils::url;
     NX_INFO(this, "Loading chunks from DB. storage: %1, file: %2",
-        nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
+        hidePassword(m_storage->getUrl()), hidePassword(m_dbFileName));
 
     nx::utils::promise<void> readyPromise;
     auto readyFuture = readyPromise.get_future();
@@ -321,12 +322,12 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             if (success)
             {
                 NX_INFO(this, "Finished loading chunks from DB. storage: %1, file: %2",
-                    nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
+                    hidePassword(m_storage->getUrl()), hidePassword(m_dbFileName));
             }
             else
             {
                 NX_WARNING(this, "Loading chunks from DB failed. storage: %1, file: %2",
-                    nx::utils::url::hidePassword(m_storage->getUrl()), m_dbFileName);
+                    hidePassword(m_storage->getUrl()), hidePassword(m_dbFileName));
             }
 
             readyPromise.set_value();
@@ -343,7 +344,7 @@ QByteArray QnStorageDb::dbFileContent()
     std::unique_ptr<QIODevice> file(m_storage->open(m_dbFileName, QIODevice::ReadOnly));
     if (!file)
     {
-        NX_DEBUG(this, lm("Failed to open DB file %1").args(m_dbFileName));
+        NX_DEBUG(this, "Failed to open DB file %1", nx::utils::url::hidePassword(m_dbFileName));
         return QByteArray();
     }
 
@@ -357,6 +358,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     auto parsedData = std::make_unique<nx::media_db::DbReader::Data>();
     auto fileContent = dbFileContent();
 
+    using namespace nx::utils::url;
     if (!measureTime(
             [&fileContent, &parsedData]()
             {
@@ -364,7 +366,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
             },
             QString("Vacuum: Parse DB:")))
     {
-        NX_WARNING(this, lm("Failed to parse DB file %1").args(m_dbFileName));
+        NX_WARNING(this, "Failed to parse DB file %1", hidePassword(m_dbFileName));
         startDbFile();
         return false;
     }
@@ -373,7 +375,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
             [this, &parsedData, data]() { return writeVacuumedData(std::move(parsedData), data); },
             QString("Vacuum: writeVacuumedData:")))
     {
-        NX_WARNING(this, lm("Failed to write vacuumed data. DB file %1").args(m_dbFileName));
+        NX_WARNING(this, "Failed to write vacuumed data. DB file %1", hidePassword(m_dbFileName));
         startDbFile();
         return false;
     }
@@ -413,7 +415,7 @@ bool QnStorageDb::writeVacuumedData(
     NX_ASSERT(res);
     if (!res)
     {
-        NX_WARNING(this, lm("Failed to remove DB file %1").args(m_dbFileName));
+        NX_WARNING(this, "Failed to remove DB file %1", nx::utils::url::hidePassword(m_dbFileName));
         return false;
     }
 

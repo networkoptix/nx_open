@@ -1098,13 +1098,11 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::checkQuality()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->liveDpHi &&
-       (d->quality == MEDIA_Quality_Low || d->quality == MEDIA_Quality_LowIframesOnly))
+    if (d->liveDpHi && isLowMediaQuality(d->quality))
     {
-        if (d->liveDpLow == 0) {
+        if (d->liveDpLow == nullptr) {
             d->quality = MEDIA_Quality_High;
-            NX_WARNING(this,
-                "Low quality not supported for camera %1",
+            NX_WARNING(this, "Low quality not supported for camera %1",
                 d->mediaRes->toResource()->getUniqueId());
         }
         else if (d->liveDpLow->isPaused()) {
@@ -1309,38 +1307,44 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
             return nx::network::http::StatusCode::notFound;
         }
 
-        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
-        int copySize = 0;
-        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && QnResource::isOnline(status))
+        auto fczHeader =
+            nx::network::http::getHeaderValue(d->request.headers, "x-fast-channel-zapping");
+        bool useFastChannelZapping = fczHeader.isNull() || fczHeader != "false";
+
+        if (useFastChannelZapping)
         {
-            const nx::vms::api::StreamIndex streamIndex =
-                (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
-                ? nx::vms::api::StreamIndex::primary
-                : nx::vms::api::StreamIndex::secondary;
-            bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
-            copySize = d->dataProcessor->copyLastGopFromCamera(
-                camera,
-                streamIndex,
-                0, /* skipTime */
-                iFramesOnly);
-        }
-
-        if (copySize == 0) {
-            // no data from the camera. Insert several empty packets to inform client about it
-            for (int i = 0; i < 3; ++i)
+            QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+            int copySize = 0;
+            if (!getResource()->toResource()->hasFlags(Qn::foreigner) && QnResource::isOnline(status))
             {
-                QnEmptyMediaDataPtr emptyData(new QnEmptyMediaData());
-                emptyData->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                if (i == 0)
-                    emptyData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-                emptyData->timestamp = DATETIME_NOW;
-                emptyData->opaque = d->lastPlayCSeq;
-
-                d->dataProcessor->addData(emptyData);
+                const nx::vms::api::StreamIndex streamIndex =
+                    (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
+                    ? nx::vms::api::StreamIndex::primary
+                    : nx::vms::api::StreamIndex::secondary;
+                bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
+                copySize = d->dataProcessor->copyLastGopFromCamera(
+                    camera,
+                    streamIndex,
+                    0, /* skipTime */
+                    iFramesOnly);
             }
-        }
 
-        dataQueueLock.unlock();
+            if (copySize == 0) {
+                // no data from the camera. Insert several empty packets to inform client about it
+                for (int i = 0; i < 3; ++i)
+                {
+                    QnEmptyMediaDataPtr emptyData(new QnEmptyMediaData());
+                    emptyData->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+                    if (i == 0)
+                        emptyData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+                    emptyData->timestamp = DATETIME_NOW;
+                    emptyData->opaque = d->lastPlayCSeq;
+
+                    d->dataProcessor->addData(emptyData);
+                }
+            }
+            dataQueueLock.unlock();
+        }
         /**
          * Ignore rest of the packets (in case if the previous PLAY command was used to play
          * archive) before new position to make switch from archive to LIVE mode more quicker.

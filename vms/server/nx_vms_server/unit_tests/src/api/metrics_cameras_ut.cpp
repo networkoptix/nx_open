@@ -195,7 +195,7 @@ TEST_F(MetricsCamerasApi, infoGroup)
     const auto cameraId = m_camera->getId().toSimpleString();
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][cameraId];
-    EXPECT_GE(4, cameraData.size());
+    EXPECT_GE(cameraData.size(), 4);
     EXPECT_EQ(cameraData["_"]["name"], "CMock 2");
 
     auto infoData = cameraData["info"];
@@ -221,7 +221,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     const auto cameraId = m_camera->getId().toSimpleString();
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto cameraData = systemValues["cameras"][m_camera->getId().toSimpleString()];
-    EXPECT_EQ(4, cameraData.size());
+    EXPECT_GE(cameraData.size(), 4);
 
     int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
     ASSERT_EQ(1, offlineEvents);

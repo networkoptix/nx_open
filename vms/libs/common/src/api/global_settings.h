@@ -66,6 +66,7 @@ const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
 
 /* Period to synchronize time via network */
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
+const QString kSyncTimeEpsilon(lit("syncTimeEpsilon"));
 
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameAutoDiscoveryResponseEnabled(lit("autoDiscoveryResponseEnabled"));
@@ -284,6 +285,9 @@ public:
     std::chrono::milliseconds syncTimeExchangePeriod() const;
     void setSyncTimeExchangePeriod(std::chrono::milliseconds value);
 
+    std::chrono::milliseconds syncTimeEpsilon() const;
+    void setSyncTimeEpsilon(std::chrono::milliseconds value);
+
     // -- (end) Time synchronization parameters.
 
     bool takeCameraOwnershipWithoutLock() const;
@@ -461,6 +465,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_osTimeChangeCheckPeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_syncTimeExchangePeriodAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_syncTimeEpsilonAdaptor = nullptr;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities>* m_backupQualitiesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_backupNewCamerasByDefaultAdaptor = nullptr;
 

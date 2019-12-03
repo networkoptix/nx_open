@@ -47,7 +47,7 @@ add_library(nx_sdk STATIC ${SDK_SRC})
 target_include_directories(nx_sdk PUBLIC ${SDK_SRC_DIR})
 target_link_libraries(nx_sdk PRIVATE nx_kit)
 
-target_compile_definitions(nx_sdk PRIVATE NX_PLUGIN_API="")
+target_compile_definitions(nx_sdk PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}) #< for nxLibContext()
 
 #--------------------------------------------------------------------------------------------------
 # Define nx_sdk_ut executable, depends on nx_sdk.
