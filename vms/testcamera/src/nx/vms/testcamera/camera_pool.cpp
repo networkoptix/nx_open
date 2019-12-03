@@ -157,9 +157,7 @@ bool CameraPool::addCamera(
         return false;
 
     m_cameraDiscoveryResponseByMacAddress.insert(
-        std::make_pair(
-            macAddress,
-            std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)));
+        {macAddress, std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)});
 
     return true;
 }
