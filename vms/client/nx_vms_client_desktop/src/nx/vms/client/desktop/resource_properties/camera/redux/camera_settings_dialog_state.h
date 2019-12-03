@@ -357,6 +357,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool canShowWebPage() const
     {
         return isSingleCamera()
+            && !singleCameraProperties.networkLink
             && (ini().showWebPageForAllCameras ||
                 !singleCameraProperties.settingsUrlPath.isEmpty());
     }

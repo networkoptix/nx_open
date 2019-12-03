@@ -174,9 +174,10 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->firmwareLabel->setHidden(isNetworkLink);
     ui->macAddressTitleLabel->setHidden(isNetworkLink);
     ui->macAddressLabel->setHidden(isNetworkLink);
-
-    const int spacerHeight = isNetworkLink ? 0 : 8;
-    ui->verticalSpacer->changeSize(1, spacerHeight, QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->webPageTitleLabel->setHidden(isNetworkLink);
+    ui->webPageLabel->setHidden(isNetworkLink);
+    ui->verticalSpacer1->setHidden(isNetworkLink);
+    ui->verticalSpacer2->setHidden(isNetworkLink);
 }
 
 void CameraInfoWidget::alignLabels()
