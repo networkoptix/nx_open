@@ -137,7 +137,7 @@ public:
             return QnIOStateData(portId, /*portState*/ false, timestamp);
         }
 
-        return {portId, commandData, timestamp};
+        return {portId, (bool) commandData, timestamp};
     }
 private:
     int m_ioDeviceDescriptor = -1;
