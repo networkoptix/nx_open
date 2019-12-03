@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.174",
+    "version": "1.0.1.180",
     "data": [
         {
             "keys": [
@@ -1344,7 +1344,8 @@
             "keys": [
                 "HIKVISION|DS-2TD1217-6/V1",
                 "HIKVISION|DFI6256A",
-                "hikvision|DS-2CD2955FWD*"
+                "hikvision|DS-2CD2955FWD*",
+                "HIKVISION|DS-2CD2135FWD*"
             ],
             "pullInputEventsAsOdm": true
         },
@@ -1375,7 +1376,8 @@
                 "ONVIF|NC328-VBZ",
                 "HIKVISION|DS-2TD1217-6/V1",
                 "HIKVISION|DFI6256A",
-                "hikvision|DS-2CD2955FWD*"
+                "hikvision|DS-2CD2955FWD*",
+                "HIKVISION|DS-2CD2135FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -3793,6 +3795,21 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "IPC-HDW4433*|XR",
+                "XR|IPC-HDW4433*"
+            ],
+            "onvifManufacturerReplacement": "Dahua",
+            "onvifVendorSubtype": "Dahua"
+        },
+        {
+            "keys": [
+                "hikvision|DS-2TD1217*",
+                "hikvision|DS-2TD4237*"
+            ],
+            "useOnvifPtz": true
         }
     ]
 }
