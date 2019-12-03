@@ -1,5 +1,7 @@
 #include "h264_utils.h"
 
+#include <nx/utils/log/log.h>
+
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
