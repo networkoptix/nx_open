@@ -154,13 +154,13 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
             if (!storage)
             {
                 NX_VERBOSE(this, "Failed to create storage with the optional path %1", url);
-                return nullptr;
+                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
             }
 
             if (storage->initOrUpdate() != Qn::StorageInit_Ok)
             {
                 NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
-                return nullptr;
+                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
             }
 
             storage->setStatus(Qn::Online);
@@ -169,7 +169,7 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
             if (!wouldBeWritableInPool(storage))
             {
                 NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
-                return nullptr;
+                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
             }
 
             NX_VERBOSE(this, "Optional storage %1 is operational", url);

@@ -4,6 +4,7 @@
 
 #include <nx/vms/server/nvr/i_powering_policy.h>
 #include <nx/vms/server/nvr/i_network_block_manager.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::server::nvr::hanwha {
 
@@ -11,7 +12,7 @@ class NetworkBlockController;
 class INetworkBlockPlatformAbstraction;
 
 class NetworkBlockManager: public INetworkBlockManager
-{    
+{
 public:
     NetworkBlockManager(
         QnMediaServerResourcePtr currentServer,
