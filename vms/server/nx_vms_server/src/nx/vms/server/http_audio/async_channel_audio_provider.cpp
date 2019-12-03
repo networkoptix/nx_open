@@ -1,37 +1,44 @@
-#include "http_audio_provider.h"
+#include "async_channel_audio_provider.h"
 #include <camera/video_camera.h>
 
 using namespace std::placeholders;
 
 namespace nx::vms::server::http_audio {
 
-HttpAudioProvider::HttpAudioProvider(
-    nx::network::aio::AsyncChannelPtr socket):
+AsyncChannelAudioProvider::AsyncChannelAudioProvider(
+    nx::network::aio::AsyncChannelPtr socket,
+    const std::optional<FfmpegAudioDemuxer::StreamConfig>& config):
     QnAbstractStreamDataProvider(QnResourcePtr()),
+    m_config(config),
     m_syncReader(std::move(socket))
 {
 }
 
-HttpAudioProvider::~HttpAudioProvider()
+AsyncChannelAudioProvider::~AsyncChannelAudioProvider()
 {
     m_syncReader.cancel();
     stop();
 }
 
-bool HttpAudioProvider::openStream(const FfmpegAudioDemuxer::StreamConfig* config)
+bool AsyncChannelAudioProvider::openStream()
 {
     FfmpegIoContextPtr ioContext = std::make_unique<FfmpegIoContext>(1024 * 16, false);
     ioContext->readHandler = std::bind(&SyncReader::read, &m_syncReader, _1, _2);
-    return m_demuxer.open(std::move(ioContext), config);
+    return m_demuxer.open(std::move(ioContext), m_config);
 }
 
-void HttpAudioProvider::run()
+void AsyncChannelAudioProvider::run()
 {
+    if (!openStream())
+    {
+        NX_WARNING(this, "Failed to open audio stream, close connection");
+        return;
+    }
     while (!needToStop())
     {
         if (!dataCanBeAccepted())
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
@@ -46,6 +53,7 @@ void HttpAudioProvider::run()
         putData(std::move(data));
     }
     QnAbstractMediaDataPtr eofData(new QnEmptyMediaData());
+    eofData->flags.setFlag(QnAbstractMediaData::MediaFlags_AfterEOF);
     eofData->dataProvider = this;
     putData(eofData);
 }

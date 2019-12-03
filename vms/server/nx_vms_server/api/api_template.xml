@@ -244,6 +244,40 @@
                         <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
+                <function>
+                    <name>api/http_audio</name>
+                    <caption>Web audio backchannel streaming</caption>
+                    <description>
+                        Open websocket audio stream to a camera.
+                        Example:
+                        ws://&lt;server_ip&gt;:&lt;port&gt;/api/http_audio?camera_id=2a4717bb-1d3e-4878-a28b-af4eaedbfb89&amp;format=f32le&amp;sample_rate=44100&amp;channels=1</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>camera_id</name>
+                            <description>Camera id</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>format</name>
+                            <description>Audio sample format, possible values: u8 s16be s16le s32be s32le f32be f32le f64be f64le</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sample_rate</name>
+                            <description>Audio sample rate, integer value</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>channels</name>
+                            <description>Audio channels count. 1- for mono, 2 - for stereo</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>
