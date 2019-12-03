@@ -6625,7 +6625,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Kan ikke behandle hendelsen på fjernet kamera.</translation>
     </message>
   </context>
   <context>

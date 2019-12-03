@@ -257,6 +257,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
             }
         };
 
+    dstQueue.clear();
     int rez = 0;
     if (iFramesOnly)
     {

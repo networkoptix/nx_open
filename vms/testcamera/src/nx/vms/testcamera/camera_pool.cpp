@@ -5,6 +5,7 @@
 #include <nx/kit/utils.h>
 #include <nx/network/nettools.h>
 #include <nx/vms/testcamera/test_camera_ini.h>
+#include <nx/vms/testcamera/discovery_response.h>
 
 #include "logger.h"
 #include "frame_logger.h"
@@ -156,7 +157,9 @@ bool CameraPool::addCamera(
         return false;
 
     m_cameraDiscoveryResponseByMacAddress.insert(
-        {macAddress, std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)});
+        std::make_pair(
+            macAddress,
+            std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)));
 
     return true;
 }

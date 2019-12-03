@@ -9,8 +9,6 @@
 
 #include <network/tcp_listener.h>
 
-#include <nx/vms/testcamera/discovery_response.h>
-
 #include "camera.h"
 #include "video_layout.h"
 
@@ -21,6 +19,7 @@ namespace nx::vms::testcamera {
 class FileCache;
 class FrameLogger; //< private
 class CameraDiscoveryListener; //< private
+class CameraDiscoveryResponse;
 
 /**
  * Runs discovery service which processes camera discovery messages, and creates the cameras in
