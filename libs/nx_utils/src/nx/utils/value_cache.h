@@ -18,7 +18,8 @@ class CachedValue
 {
 public:
     /**
-     *  @param valueGenerator This functor is called from get() and update() to get value.
+     *  @param valueGenerator This functor is called from get() and update() to get value, the
+     *      call to valueGenerator is synchronized by mutex.
      *  @param expirationTime CachedValue will automatically update value on get() or
      *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
      *  @note valueGenerator is not called here!
@@ -40,8 +41,7 @@ public:
                     || !m_timer.hasExpired(m_expirationTime)))
             return *m_value;
         }
-
-        ValueType value = m_valueGenerator();
+        ValueType value = getValue();
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
             m_value = value;
@@ -58,7 +58,7 @@ public:
 
     void update()
     {
-        ValueType value = m_valueGenerator();
+        ValueType value = getValue();
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
             m_value = std::move(value);
@@ -67,7 +67,14 @@ public:
     }
 
 private:
+    ValueType getValue()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutexGenerator);
+        return m_valueGenerator();
+    }
+
     mutable nx::utils::Mutex m_mutex;
+    mutable nx::utils::Mutex m_mutexGenerator;
 
     mutable std::optional<ValueType> m_value;
     const MoveOnlyFunc<ValueType()> m_valueGenerator;
