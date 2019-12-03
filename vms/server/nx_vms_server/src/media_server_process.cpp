@@ -5165,7 +5165,7 @@ void MediaServerProcess::updateSpecificFeatures() const
     {
         const auto parts = line.split('=');
         if (parts.size() == 2)
-            values[parts[0].trimmed()] = parts[1].toInt();
+            values[parts[0].trimmed()] = parts[1].trimmed().toInt();
         else
             NX_WARNING(this, "Syntax error in %1 on line: %2", file.fileName(), line);
     }
