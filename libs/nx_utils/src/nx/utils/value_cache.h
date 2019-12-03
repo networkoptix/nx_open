@@ -44,7 +44,7 @@ public:
         ValueType value = getValue();
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            m_value = value;
+            m_value = std::move(value);
             m_timer.restart();
         }
         return value;
@@ -67,7 +67,7 @@ public:
     }
 
 private:
-    ValueType getValue()
+    ValueType getValue() const
     {
         NX_MUTEX_LOCKER lock(&m_mutexGenerator);
         return m_valueGenerator();
