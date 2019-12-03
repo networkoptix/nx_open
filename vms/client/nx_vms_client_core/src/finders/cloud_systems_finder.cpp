@@ -278,8 +278,8 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     url.setHost(moduleInformation.cloudId());
                     url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
-                    NX_DEBUG(this, lm("Cloud system <%1>: set sever <%2> url to %3"),
-                        cloudSystemId, serverId.toString(), url.toString());
+                    NX_DEBUG(this, lm("Cloud system <%1>: set server <%2> url to %3"),
+                        cloudSystemId, serverId.toString(), url.toString(QUrl::RemovePassword));
                 }); //< executeInThread
             reply->pleaseStopSync();
 
