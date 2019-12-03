@@ -90,6 +90,7 @@ const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2
 const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
 const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
 const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
+const std::chrono::milliseconds kSyncTimeEpsilonDefault(100);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
 const bool kEnableEdgeRecordingDefault(true);
@@ -405,6 +406,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
             duration_cast<milliseconds>(kSyncTimeExchangePeriodDefault).count(),
             this);
     timeSynchronizationAdaptors << m_syncTimeExchangePeriodAdaptor;
+
+    m_syncTimeEpsilonAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kSyncTimeEpsilon,
+            duration_cast<milliseconds>(kSyncTimeEpsilonDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_syncTimeEpsilonAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -1500,6 +1508,16 @@ std::chrono::milliseconds QnGlobalSettings::syncTimeExchangePeriod() const
 void QnGlobalSettings::setSyncTimeExchangePeriod(std::chrono::milliseconds value)
 {
     m_syncTimeExchangePeriodAdaptor->setValue(value.count());
+}
+
+std::chrono::milliseconds QnGlobalSettings::syncTimeEpsilon() const
+{
+    return std::chrono::milliseconds(m_syncTimeEpsilonAdaptor->value());
+}
+
+void QnGlobalSettings::setSyncTimeEpsilon(std::chrono::milliseconds value)
+{
+    m_syncTimeEpsilonAdaptor->setValue(value.count());
 }
 
 QString QnGlobalSettings::cloudAccountName() const
