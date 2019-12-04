@@ -147,12 +147,18 @@ struct CameraWebPageWidget::Private
     QnMutex mutex;
     AttemptCounter authCounter;
     AttemptCounter authDialodCounter;
+    QUrl testPageUrl;
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget(new WebWidget(parent)),
     parent(parent)
 {
+    // For testing purposes only.
+    const QByteArray testPageUrlValue = qgetenv("VMS_CAMERA_SETTINGS_WEB_PAGE_URL");
+    if (!testPageUrlValue.isEmpty())
+        testPageUrl = QUrl(QString::fromLocal8Bit(testPageUrlValue));
+
     auto webView = webWidget->webEngineView();
     webView->setIgnoreSslErrors(true);
     webView->setUseActionsForLinks(true);
@@ -387,7 +393,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
             return;
 
-        d->lastRequestUrl = targetUrl;
+        d->lastRequestUrl = d->testPageUrl.isValid() ? d->testPageUrl : targetUrl;
         d->lastCamera = state.singleCameraProperties;
     }
 
