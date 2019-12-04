@@ -251,7 +251,7 @@ void BitStreamWriter::skipBits(uint32_t cnt)
     putBits(cnt, reader.getBits(cnt));
 }
 
-void BitStreamWriter::putBytes(uint8_t* data, uint32_t size)
+void BitStreamWriter::putBytes(const uint8_t* data, uint32_t size)
 {
     if (m_totalBits < size)
         THROW_BITSTREAM_ERR;

@@ -11,7 +11,7 @@ namespace nx::vms::server::http_audio {
 
 struct UtcTimestamp
 {
-    int64_t getTimestamp(int64_t timestamp, const AVRational& timescale);
+    int64_t getTimestampUs(int64_t timestamp, const AVRational& timescale);
 
 private:
     int64_t m_firstTimestamp = -1;
@@ -35,7 +35,7 @@ public:
     FfmpegAudioDemuxer& operator=(const FfmpegAudioDemuxer&) = delete;
     ~FfmpegAudioDemuxer();
 
-    bool open(FfmpegIoContextPtr ioContext, const StreamConfig* config = nullptr);
+    bool open(FfmpegIoContextPtr ioContext, const std::optional<StreamConfig>& config);
     void close();
     QnAbstractMediaDataPtr getNextData();
 

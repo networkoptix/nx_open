@@ -24,7 +24,7 @@ protected:
     virtual void run() override;
 
 private:
-    QnVideoCameraPtr getVideoCamera(const QnUuid& cameraId);
+    QnVideoCameraPtr getVideoCamera(const QString& cameraId);
     void startAudioStreaming(
         nx::network::aio::AsyncChannelPtr socket, const QnVideoCameraPtr& camera);
 };

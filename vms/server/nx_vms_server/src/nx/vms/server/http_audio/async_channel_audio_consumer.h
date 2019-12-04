@@ -5,11 +5,11 @@
 
 namespace nx::vms::server::http_audio {
 
-class HttpAudioConsumer: public QnAbstractDataConsumer
+class AsyncChannelAudioConsumer: public QnAbstractDataConsumer
 {
 public:
-    HttpAudioConsumer(nx::network::aio::AsyncChannelPtr socket);
-    ~HttpAudioConsumer();
+    AsyncChannelAudioConsumer(nx::network::aio::AsyncChannelPtr socket);
+    ~AsyncChannelAudioConsumer();
     virtual void putData(const QnAbstractDataPacketPtr& nonConstData) override;
 
 protected:

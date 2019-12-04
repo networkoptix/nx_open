@@ -1,5 +1,4 @@
-
-#include "http_audio_consumer.h"
+#include "async_channel_audio_consumer.h"
 
 namespace {
 
@@ -40,19 +39,19 @@ SystemError::ErrorCode syncWrite(
 
 namespace nx::vms::server::http_audio {
 
-HttpAudioConsumer::HttpAudioConsumer(nx::network::aio::AsyncChannelPtr socket):
+AsyncChannelAudioConsumer::AsyncChannelAudioConsumer(nx::network::aio::AsyncChannelPtr socket):
     QnAbstractDataConsumer(32),
     m_socket(std::move(socket))
 {
 }
 
-HttpAudioConsumer::~HttpAudioConsumer()
+AsyncChannelAudioConsumer::~AsyncChannelAudioConsumer()
 {
     stop();
 }
 
 
-void HttpAudioConsumer::putData(const QnAbstractDataPacketPtr& data)
+void AsyncChannelAudioConsumer::putData(const QnAbstractDataPacketPtr& data)
 {
     const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!mediaData)
@@ -64,7 +63,7 @@ void HttpAudioConsumer::putData(const QnAbstractDataPacketPtr& data)
     QnAbstractDataConsumer::putData(data);
 }
 
-bool HttpAudioConsumer::initializeTranscoder(const QnAbstractDataPacketPtr& data)
+bool AsyncChannelAudioConsumer::initializeTranscoder(const QnAbstractDataPacketPtr& data)
 {
     m_transcoder = std::make_unique<QnFfmpegTranscoder>(QnFfmpegTranscoder::Config(), nullptr);
     m_transcoder->setContainer("adts");
@@ -79,7 +78,7 @@ bool HttpAudioConsumer::initializeTranscoder(const QnAbstractDataPacketPtr& data
     return true;
 }
 
-bool HttpAudioConsumer::processData(const QnAbstractDataPacketPtr& data)
+bool AsyncChannelAudioConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
     if (!transcodeAndSend(data))
     {
@@ -89,7 +88,7 @@ bool HttpAudioConsumer::processData(const QnAbstractDataPacketPtr& data)
     return true;
 }
 
-bool HttpAudioConsumer::transcodeAndSend(const QnAbstractDataPacketPtr& data)
+bool AsyncChannelAudioConsumer::transcodeAndSend(const QnAbstractDataPacketPtr& data)
 {
     const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!mediaData)
@@ -104,7 +103,7 @@ bool HttpAudioConsumer::transcodeAndSend(const QnAbstractDataPacketPtr& data)
         return false;
     }
 
-    QnByteArray transcodedPacket(32, 0);
+    QnByteArray transcodedPacket(CL_MEDIA_ALIGNMENT, /*capacity*/ 0);
     int status = m_transcoder->transcodePacket(mediaData, &transcodedPacket);
     if (status != 0)
     {
