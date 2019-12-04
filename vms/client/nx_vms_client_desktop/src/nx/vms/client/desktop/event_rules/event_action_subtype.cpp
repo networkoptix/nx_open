@@ -1,5 +1,7 @@
 #include "event_action_subtype.h"
 
+#include <nx/utils/log/assert.h>
+
 using namespace nx::vms::api;
 
 namespace nx::vms::client::desktop {

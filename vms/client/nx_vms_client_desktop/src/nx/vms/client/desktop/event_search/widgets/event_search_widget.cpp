@@ -98,19 +98,17 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     setupTypeSelection();
 
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this,
+    const auto updateServerEventsMenuIfNeeded =
         [this](const QnResourcePtr& resource)
         {
             if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
                 updateServerEventsMenu();
-        });
+        };
 
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
-                updateServerEventsMenu();
-        });
+    connect(q->resourcePool(), &QnResourcePool::resourceAdded,
+        this, updateServerEventsMenuIfNeeded);
+    connect(q->resourcePool(), &QnResourcePool::resourceRemoved,
+        this, updateServerEventsMenuIfNeeded);
 
     auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
         [this]

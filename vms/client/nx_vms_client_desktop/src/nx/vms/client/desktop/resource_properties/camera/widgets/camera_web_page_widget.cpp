@@ -11,6 +11,8 @@
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkInterface>
 #include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineScript>
+#include <QtWebEngineWidgets/QWebEngineScriptCollection>
 #include <QtWebEngineCore/QWebEngineCookieStore>
 
 #include <common/common_module.h>
@@ -145,12 +147,18 @@ struct CameraWebPageWidget::Private
     QnMutex mutex;
     AttemptCounter authCounter;
     AttemptCounter authDialodCounter;
+    QUrl testPageUrl;
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget(new WebWidget(parent)),
     parent(parent)
 {
+    // For testing purposes only.
+    const QByteArray testPageUrlValue = qgetenv("VMS_CAMERA_SETTINGS_WEB_PAGE_URL");
+    if (!testPageUrlValue.isEmpty())
+        testPageUrl = QUrl(QString::fromLocal8Bit(testPageUrlValue));
+
     auto webView = webWidget->webEngineView();
     webView->setIgnoreSslErrors(true);
     webView->setUseActionsForLinks(true);
@@ -173,6 +181,29 @@ void CameraWebPageWidget::Private::createNewPage()
     auto webView = webWidget->webEngineView();
     webView->createPageWithUserAgent(kUserAgentForCameraPage);
     webView->page()->profile()->clearHttpCache();
+
+    if (lastCamera.overrideXmlHttpRequestTimeout > 0)
+    {
+        // Inject script that overrides the timeout before sending the XMLHttpRequest.
+        QWebEngineScript script;
+        const QString s = QString::fromUtf8(R"JS(
+            (function() {
+                XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
+                var newSend = function(data) {
+                    if (this.timeout !== 0 && this.timeout < %1)
+                        this.timeout = %1;
+                    this.realSend(data);
+                };
+                XMLHttpRequest.prototype.send = newSend;
+            })()
+            )JS").arg(lastCamera.overrideXmlHttpRequestTimeout);
+        script.setName("overrideXmlHttpRequestTimeout");
+        script.setSourceCode(s);
+        script.setInjectionPoint(QWebEngineScript::DocumentCreation);
+        script.setRunsOnSubFrames(true);
+        script.setWorldId(QWebEngineScript::ApplicationWorld);
+        webView->page()->profile()->scripts()->insert(script);
+    }
 
     // Special actions list for context menu for links.
     webView->insertActions(nullptr, {
@@ -362,7 +393,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
             return;
 
-        d->lastRequestUrl = targetUrl;
+        d->lastRequestUrl = d->testPageUrl.isValid() ? d->testPageUrl : targetUrl;
         d->lastCamera = state.singleCameraProperties;
     }
 

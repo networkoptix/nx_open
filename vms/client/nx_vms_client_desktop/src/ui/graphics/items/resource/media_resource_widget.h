@@ -45,6 +45,7 @@ class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
 class AreaHighlightOverlayWidget;
 class AreaSelectOverlayWidget;
+class RoiFiguresOverlayWidget;
 class WatermarkPainter;
 class SoftwareTriggerButton;
 
@@ -340,7 +341,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateAreaHighlightVisibility();
+    Q_SLOT void updateAnalyticsVisibility();
 
     void updateCompositeOverlayMode();
 
@@ -393,7 +394,7 @@ private:
     void initSoftwareTriggers();
     void initIoModuleOverlay();
     void initAreaSelectOverlay();
-    void initAreaHighlightOverlay();
+    void initAnalyticsOverlays();
     void initStatusOverlayController();
 
     inline SoftwareTriggerInfo makeTriggerInfo(const nx::vms::event::RulePtr& rule) const;
@@ -484,6 +485,7 @@ private:
 
     QScopedPointer<nx::vms::client::desktop::WatermarkPainter> m_watermarkPainter;
 
+    nx::vms::client::desktop::RoiFiguresOverlayWidget* m_roiFiguresOverlayWidget = nullptr;
     nx::vms::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
     nx::vms::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
 

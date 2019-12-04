@@ -207,14 +207,16 @@ TEST(CachedValue, Concurrency)
     auto guard = nx::utils::makeScopeGuard(
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
-    expectSpecialFunctionCalls(catcherMock, 1, -1, 2, 0);
+    expectSpecialFunctionCalls(catcherMock, -1, -1, 2, 0);
+    nx::utils::Mutex mutex;
     CachedValue<SomeType> value(
-        [&timeShift, n = 0]() mutable
+        [&timeShift, &mutex]() mutable
         {
-            timeShift.applyRelativeShift(std::chrono::milliseconds(7));
-            return SomeType(n++);
+            NX_MUTEX_LOCKER lock(&mutex);
+            timeShift.applyRelativeShift(std::chrono::milliseconds(1));
+            return SomeType(0);
         });
-    std::thread t1([&value](){ EXPECT_EQ(value.get().m_value, 0); });;
+    std::thread t1([&value](){ EXPECT_EQ(value.get().m_value, 0); });
     std::thread t2([&value](){ EXPECT_EQ(value.get().m_value, 0); });
 
     t1.join();

@@ -43,6 +43,7 @@ public:
 private:
     std::unique_ptr<nx::vms::server::PlatformMonitor> m_monitorBase = nullptr;
 
+    nx::utils::Mutex m_mutex;
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
     nx::utils::CachedValue<qreal> m_cachedThisProcessCpuUsage;
