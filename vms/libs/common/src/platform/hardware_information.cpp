@@ -56,37 +56,14 @@ const QString& compileCpuArchicture()
     #endif
 }
 
-static void detectCoreCount(int& logicalCores, int& physicalCores)
+static int runProcessAndReadParamValue(
+    const QString& cmdLine, const QByteArray& paramName, char delimiter)
 {
-    logicalCores = std::thread::hardware_concurrency();
-    physicalCores = logicalCores;
-
-    QString cmdLine;
-    QByteArray paramName;
-    char delimiter = 0;
-    bool isRelative = false;
-
-    #if defined(Q_OS_WIN)
-        cmdLine = "wmic CPU Get NumberOfCores /Format:List";
-        paramName = "numberofcores";
-        delimiter = '=';
-        isRelative = false; //< Value has number of core count.
-    #elif defined(Q_OS_LINUX)
-        cmdLine = "lscpu";
-        paramName = "per core";
-        delimiter = ':';
-        isRelative = true;  //< Value has decimeter between logical and physical cores.
-    #elif defined(Q_OS_OSX)
-        // TODO: implement me. May be mac has 'lscpu'?
-    #else
-    #endif
-
     QProcess process;
     process.start(cmdLine);
     process.waitForFinished();
-    auto outputData = process.readAllStandardOutput();
+    const auto outputData = process.readAllStandardOutput();
 
-    int paramValue = 0;
     for (auto line: outputData.split('\n'))
     {
         line = line.trimmed().toLower();
@@ -94,17 +71,25 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
         {
             auto values = line.split(delimiter);
             if (values.size() > 1)
-                paramValue = values[1].trimmed().toInt();
-            break;
+                return values[1].trimmed().toInt();
         }
     }
-    if (paramValue)
-    {
-        if (isRelative)
-            physicalCores = logicalCores / paramValue;
-        else
-            physicalCores = paramValue;
-    }
+    return 0;
+}
+
+static void detectCoreCount(int& logicalCores, int& physicalCores)
+{
+    logicalCores = std::thread::hardware_concurrency();
+    physicalCores = logicalCores;
+
+    #if defined(Q_OS_WIN)
+        const auto cmdLine = "wmic CPU Get NumberOfCores /Format:List";
+        if (auto result = runProcessAndReadParamValue(cmdLine, "numberofcores", '='))
+            physicalCores = result; //< Result has absolute value.
+    #elif defined(Q_OS_LINUX)
+        if (auto result = runProcessAndReadParamValue("lscpu", "per core", ':'))
+            physicalCores = logicalCores / result;  //< Result has relative value.
+    #endif
 }
 
 #if defined(Q_OS_WIN)
