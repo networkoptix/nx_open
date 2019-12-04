@@ -127,6 +127,25 @@ AVPixelFormat sdkToAvPixelFormat(IUncompressedVideoFrame::PixelFormat pixelForma
     }
 }
 
+AVPixelFormat apiToAvPixelFormat(nx::vms::api::analytics::PixelFormat pixelFormat)
+{
+    using PixelFormat = nx::vms::api::analytics::PixelFormat;
+    switch (pixelFormat)
+    {
+        case PixelFormat::yuv420: return AV_PIX_FMT_YUV420P;
+        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
+        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
+        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
+        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
+        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
+        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
+
+        default:
+            NX_ASSERT(false, "Unsupported PixelFormat value: %1", (int) pixelFormat);
+            return AV_PIX_FMT_NONE;
+    }
+}
+
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
     AVPixelFormat avPixelFormat)
 {
