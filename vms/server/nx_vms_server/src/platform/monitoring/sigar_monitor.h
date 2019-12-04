@@ -24,6 +24,7 @@ public:
 private:
     Q_DECLARE_PRIVATE(QnSigarMonitor)
     QScopedPointer<QnSigarMonitorPrivate> d_ptr;
+    nx::utils::Mutex m_mutex;
 };
 
 
