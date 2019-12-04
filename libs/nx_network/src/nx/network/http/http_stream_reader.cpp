@@ -327,7 +327,13 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                 nx::network::http::StringType headerName;
                 nx::network::http::StringType headerValue;
                 if (!parseHeader(&headerName, &headerValue, data))
-                    return m_parseHeadersStrict ? false : true;
+                {
+                    if (m_parseHeadersStrict)
+                        return false;
+                    // Since we consider this data valid, proxy without dropping the data.
+                    headerName = "";
+                    headerValue = data;
+                }
                 m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
                 return true;
             }
