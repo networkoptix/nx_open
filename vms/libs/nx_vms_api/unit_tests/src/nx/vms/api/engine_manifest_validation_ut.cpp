@@ -113,6 +113,22 @@ protected:
     {
         makeIncorrectManifest(&m_manifest.objectActions, [](auto entry) { entry->name = "name"; });
     }
+
+    //---------------------------------------------------------------------------------------------
+
+    void givenManifestWithRequestUncompressedVideoStreamAndUnspecifiedPixelFormat()
+    {
+        givenCorrectManifest();
+        m_manifest.capabilities = EngineManifest::Capabilities();
+        m_manifest.streamTypeFilter = StreamType::uncompressedVideo;
+    }
+
+    void givenManifestWithoutRequestedUncompressedVideoStreamButWithSpecifiedPixelFormat()
+    {
+        givenCorrectManifest();
+        m_manifest.capabilities = EngineManifest::Capability::needUncompressedVideoFrames_abgr;
+        m_manifest.streamTypeFilter = StreamType::compressedVideo;
+    }
 };
 
 TEST_F(EngineManifestValidationTest, correctManifestProducesNoErrors)
@@ -238,6 +254,23 @@ TEST_F(EngineManifestValidationTest, manifestWithDuplicatedObjectActionNamesProd
     givenManifestWithDuplicatedObjectActionNames();
     whenValidatingManifest();
     makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectActionName});
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(EngineManifestValidationTest, manifestWithMissingPixelFormat)
+{
+    givenManifestWithRequestUncompressedVideoStreamAndUnspecifiedPixelFormat();
+    whenValidatingManifest();
+    makeSureErrorsAreCaught({ManifestErrorType::uncompressedFramePixelFormatIsNotSpecified});
+}
+
+TEST_F(EngineManifestValidationTest, manifestWithExcessivePixelFormatSpecification)
+{
+    givenManifestWithoutRequestedUncompressedVideoStreamButWithSpecifiedPixelFormat();
+    whenValidatingManifest();
+    makeSureErrorsAreCaught(
+        {ManifestErrorType::excessiveUncompressedFramePixelFormatSpecification});
 }
 
 } // namespace nx::vms::api::analytics
