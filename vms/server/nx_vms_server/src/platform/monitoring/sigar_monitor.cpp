@@ -238,17 +238,14 @@ QnSigarMonitor::QnSigarMonitor():
     INVOKE(sigar_open(&d->sigar));
 }
 
-QnSigarMonitor::~QnSigarMonitor()
-{
+QnSigarMonitor::~QnSigarMonitor() {
     Q_D(QnSigarMonitor);
 
     if(d->sigar)
         INVOKE(sigar_close(d->sigar));
 }
 
-qreal QnSigarMonitor::totalCpuUsage()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
+qreal QnSigarMonitor::totalCpuUsage() {
     Q_D(QnSigarMonitor);
 
     if (!d->sigar)
@@ -274,9 +271,7 @@ qreal QnSigarMonitor::totalCpuUsage()
     return result.combined;
 }
 
-quint64 QnSigarMonitor::totalRamUsageBytes()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
+quint64 QnSigarMonitor::totalRamUsageBytes() {
     Q_D(QnSigarMonitor);
 
     if (!d->sigar)
@@ -291,7 +286,6 @@ quint64 QnSigarMonitor::totalRamUsageBytes()
 
 qreal QnSigarMonitor::thisProcessCpuUsage()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     Q_D(QnSigarMonitor);
 
     if (!d->sigar)
@@ -307,7 +301,6 @@ qreal QnSigarMonitor::thisProcessCpuUsage()
 
 quint64 QnSigarMonitor::thisProcessRamUsageBytes()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     Q_D(QnSigarMonitor);
 
     if(!d->sigar)
@@ -321,9 +314,7 @@ quint64 QnSigarMonitor::thisProcessRamUsageBytes()
     return mem.resident;
 }
 
-QList<PlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
+QList<PlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     Q_D(QnSigarMonitor);
 
     QList<HddLoad> result;
@@ -349,9 +340,7 @@ QList<PlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad()
     return result;
 }
 
-QList<PlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
+QList<PlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo() {
     Q_D(QnSigarMonitor);
 
     QList<PartitionSpace> result;
@@ -368,9 +357,7 @@ QList<PlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo()
     return result;
 }
 
-QList<PlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
+QList<PlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     Q_D(QnSigarMonitor);
 
     QList<NetworkLoad> result;

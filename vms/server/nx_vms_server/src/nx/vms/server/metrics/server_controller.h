@@ -37,7 +37,6 @@ private:
     QString dateTimeToString(const QDateTime& datetime) const;
 
 private:
-    nx::utils::Mutex m_mutex;
     std::atomic<int> m_timeChangeEvents = 0;
     nx::utils::CachedValue<QDateTime> m_currentDateTime;
 };

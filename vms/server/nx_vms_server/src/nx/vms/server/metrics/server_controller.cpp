@@ -23,12 +23,7 @@ static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_currentDateTime(
-        [&mutex = m_mutex]()
-        {
-            NX_MUTEX_LOCKER lock(&mutex);
-            return QDateTime::currentDateTime();
-        })
+    m_currentDateTime(&QDateTime::currentDateTime)
 {
     Qn::directConnect(
         serverModule->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
