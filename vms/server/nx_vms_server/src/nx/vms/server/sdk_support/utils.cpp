@@ -21,8 +21,11 @@
 
 #include <nx/sdk/helpers/list.h>
 #include <nx/sdk/analytics/helpers/timestamped_object_metadata.h>
-#include <nx/vms/server/analytics/frame_converter.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
+#include <nx/vms/server/analytics/data_converter.h>
+#include <nx/vms/server/analytics/data_packet_adapter.h>
+
+#include <nx/streaming/uncompressed_video_packet.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -222,23 +225,27 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     nx::vms::api::analytics::PixelFormat pixelFormat,
     int rotationAngle)
 {
-    bool compressedFrameWarningIssued = false;
-    nx::vms::server::analytics::FrameConverter frameConverter(
-        /*compressedFrame*/ nullptr,
-        frame,
-        &compressedFrameWarningIssued);
+    nx::vms::server::analytics::DataConverter dataConverter(rotationAngle);
+    nx::vms::server::analytics::StreamRequirements streamRequirements;
 
-    const std::optional<IUncompressedVideoFrame::PixelFormat> sdkPixelFormat =
-        toSdkPixelFormat(pixelFormat);
-    if (!NX_ASSERT(sdkPixelFormat, lm("Wrong pixel format %1").args((int) pixelFormat)))
+    streamRequirements.uncompressedFramePixelFormat =  apiToAvPixelFormat(pixelFormat);
+    streamRequirements.requiredStreamTypes |=
+        nx::vms::api::analytics::StreamType::uncompressedVideo;
+
+    const auto dataPacket = dataConverter.convert(
+        std::make_shared<nx::streaming::UncompressedVideoPacket>(frame),
+        streamRequirements);
+
+    const auto dataPacketAdapter =
+        std::dynamic_pointer_cast<nx::vms::server::analytics::DataPacketAdapter>(dataPacket);
+
+    if (!dataPacketAdapter)
         return nullptr;
 
-    const auto dataPacket = frameConverter.getDataPacket(sdkPixelFormat, rotationAngle);
+    if (const auto sdkPacket = dataPacketAdapter->packet())
+        return sdkPacket->queryInterface<nx::sdk::analytics::IUncompressedVideoFrame>();
 
-    if (!dataPacket)
-        return nullptr;
-
-    return dataPacket->queryInterface<IUncompressedVideoFrame>();
+    return nullptr;
 }
 
 std::map<QString, QString> attributesMap(
