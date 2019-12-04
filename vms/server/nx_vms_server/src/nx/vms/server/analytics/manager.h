@@ -55,7 +55,7 @@ public:
         const QnResourcePtr& deviceResource,
         QWeakPointer<QnAbstractDataReceptor> metadataSink);
 
-    QWeakPointer<AbstractVideoDataReceptor> registerMediaSource(const QnUuid& deviceId);
+    QWeakPointer<IStreamDataReceptor> registerMediaSource(const QnUuid& deviceId);
 
     void setSettings(const QString& deviceId,
         const QString& engineId,
@@ -97,9 +97,9 @@ private:
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;
     QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& deviceId) const;
-    QWeakPointer<ProxyVideoDataReceptor> mediaSource(
+    QWeakPointer<ProxyStreamDataReceptor> mediaSource(
         const QnVirtualCameraResourcePtr& device) const;
-    QWeakPointer<ProxyVideoDataReceptor> mediaSource(const QnUuid& deviceId) const;
+    QWeakPointer<ProxyStreamDataReceptor> mediaSource(const QnUuid& deviceId) const;
 
     nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
     QnVirtualCameraResourceList localDevices() const;
@@ -120,7 +120,7 @@ private:
 
     // TODO: Switch to std pointers.
     std::map<QnUuid, QWeakPointer<QnAbstractDataReceptor>> m_metadataSinks;
-    std::map<QnUuid, QSharedPointer<ProxyVideoDataReceptor>> m_mediaSources;
+    std::map<QnUuid, QSharedPointer<ProxyStreamDataReceptor>> m_mediaSources;
 };
 
 } // namespace nx::vms::server::analytics

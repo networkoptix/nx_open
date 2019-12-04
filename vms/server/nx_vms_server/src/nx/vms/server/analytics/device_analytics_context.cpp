@@ -5,26 +5,30 @@
 #include <plugins/vms_server_plugins_ini.h>
 #include <utils/common/synctime.h>
 
-#include <nx/vms/server/resource/analytics_plugin_resource.h>
-#include <nx/vms/server/resource/analytics_engine_resource.h>
-#include <nx/vms/server/analytics/device_analytics_binding.h>
-#include <nx/vms/server/analytics/frame_converter.h>
-#include <nx/vms/server/analytics/data_packet_adapter.h>
-#include <nx/vms/server/analytics/event_rule_watcher.h>
-#include <nx/vms/server/sdk_support/conversion_utils.h>
-#include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/interactive_settings/json_engine.h>
-#include <nx/vms/server/event/event_connector.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
 
-#include <nx/sdk/helpers/to_string.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/resource/analytics_engine_resource.h>
 
-#include <nx/utils/log/log.h>
+#include <nx/vms/server/analytics/device_analytics_binding.h>
+#include <nx/vms/server/analytics/data_converter.h>
+#include <nx/vms/server/analytics/data_packet_adapter.h>
+#include <nx/vms/server/analytics/event_rule_watcher.h>
+
+#include <nx/vms/server/sdk_support/conversion_utils.h>
+#include <nx/vms/server/sdk_support/utils.h>
+
+#include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/event/event_connector.h>
 
 namespace nx::vms::server::analytics {
 
 using namespace nx::vms::server;
+
+using StreamType = nx::vms::api::analytics::StreamType;
+using StreamTypes = nx::vms::api::analytics::StreamTypes;
 
 static const std::chrono::seconds kMinSkippedFramesReportingInterval(30);
 
@@ -77,16 +81,9 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     subscribeToRulesChanges();
 }
 
-bool DeviceAnalyticsContext::isEngineAlreadyBound(
-    const QnUuid& engineId) const
+bool DeviceAnalyticsContext::isEngineAlreadyBound(const QnUuid& engineId) const
 {
     return m_bindings.find(engineId) != m_bindings.cend();
-}
-
-bool DeviceAnalyticsContext::isEngineAlreadyBound(
-    const resource::AnalyticsEngineResourcePtr& engine) const
-{
-    return isEngineAlreadyBound(engine->getId());
 }
 
 void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
@@ -108,12 +105,16 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     const bool deviceIsAlive = isDeviceAlive();
     for (const auto& engine: engines)
     {
-        if (isEngineAlreadyBound(engine))
+        if (isEngineAlreadyBound(engine->getId()))
             continue;
 
         auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-        binding->setMetadataSink(m_metadataSink);
-        m_bindings.emplace(engine->getId(), binding);
+
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            binding->setMetadataSink(m_metadataSink);
+            m_bindings.emplace(engine->getId(), binding);
+        }
 
         if (deviceIsAlive)
         {
@@ -123,31 +124,32 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         }
     }
 
-    updateSupportedFrameTypes();
+    updateStreamRequirements();
 }
 
 void DeviceAnalyticsContext::addEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
     auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
     binding->setMetadataSink(m_metadataSink);
     m_bindings.emplace(engine->getId(), binding);
-    updateSupportedFrameTypes();
+    updateStreamRequirements();
 }
 
 void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_bindings.erase(engine->getId());
-    updateSupportedFrameTypes();
+    updateStreamRequirements();
 }
 
 void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_metadataSink = std::move(metadataSink);
-    for (auto& entry: m_bindings)
-    {
-        auto& binding = entry.second;
+    for (auto& [_, binding]: m_bindings)
         binding->setMetadataSink(m_metadataSink);
-    }
 }
 
 void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObject& settings)
@@ -158,7 +160,7 @@ void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObj
 
     std::shared_ptr<DeviceAnalyticsBinding> binding;
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         binding = analyticsBinding(analyticsEngineId);
     }
     if (!binding)
@@ -260,7 +262,7 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
     std::shared_ptr<DeviceAnalyticsBinding> binding;
     QnUuid analyticsEngineId(engineId);
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         binding = analyticsBinding(analyticsEngineId);
     }
 
@@ -309,23 +311,12 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
 
 std::map<QnUuid, bool> DeviceAnalyticsContext::bindingStatuses() const
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     std::map<QnUuid, bool> result;
     for (const auto& [engineId, binding]: m_bindings)
         result[engineId] = binding->hasAliveDeviceAgent();
 
     return result;
-}
-
-bool DeviceAnalyticsContext::needsCompressedFrames() const
-{
-    return m_cachedNeedCompressedFrames;
-}
-
-AbstractVideoDataReceptor::NeededUncompressedPixelFormats
-    DeviceAnalyticsContext::neededUncompressedPixelFormats() const
-{
-    return m_cachedUncompressedPixelFormats;
 }
 
 static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engineId)
@@ -366,57 +357,82 @@ static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     return sdk_support::pixelFormatFromEngineManifest(*engineManifest, engineLogLabel);
 }
 
-void DeviceAnalyticsContext::putFrame(
-    const QnConstCompressedVideoDataPtr& compressedFrame,
-    const CLConstVideoDecoderOutputPtr& uncompressedFrame)
+void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
 {
-    if (!NX_ASSERT(compressedFrame))
+    struct DataConversionContext
+    {
+        StreamRequirements requirements;
+        QnAbstractDataPacketPtr convertedData;
+    };
+
+    NX_VERBOSE(this, "Processing data, timestamp %1 us", data->timestamp);
+
+    if (!NX_ASSERT(data))
         return;
 
-    NX_VERBOSE(this, "putVideoFrame(\"%1\", compressedFrame, %2)", m_device->getId(),
-        uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
+    std::map</*engineId*/ QnUuid, DataConversionContext> dataConversionContextByEngineId;
 
-    FrameConverter frameConverter(
-        compressedFrame, uncompressedFrame, &m_missingUncompressedFrameWarningIssued);
-
-    for (auto& entry: m_bindings)
     {
-        const QnUuid engineId = entry.first;
-        if (m_skippedFrameCountByEngine[engineId] > 0)
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        for (const auto& [engineId, binding]: m_bindings)
         {
-            if (m_throwPluginEvent(m_skippedFrameCountByEngine[engineId], engineId))
-                m_skippedFrameCountByEngine[engineId] = 0;
+            if (m_skippedPacketCountByEngine[engineId] > 0)
+            {
+                // Report skipped frames.
+                if (m_throwPluginEvent(m_skippedPacketCountByEngine[engineId], engineId))
+                    m_skippedPacketCountByEngine[engineId] = 0;
+            }
+
+            const std::optional<StreamRequirements> requirements = binding->streamRequirements();
+            if (!requirements)
+            {
+                NX_DEBUG(this, "Unable to get stream requirements for the Engine %1", engineId);
+                continue;
+            }
+
+            dataConversionContextByEngineId.emplace(
+                engineId,
+                DataConversionContext{*requirements, nullptr});
+        }
+    }
+
+    DataConverter dataConverter(m_device->getProperty(QnMediaResource::rotationKey()).toInt());
+    for (const auto& [engineId, context]: dataConversionContextByEngineId)
+    {
+        dataConversionContextByEngineId[engineId].convertedData =
+            dataConverter.convert(data, context.requirements);
+    }
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (const auto& [engineId, conversionContext]: dataConversionContextByEngineId)
+    {
+        if (!conversionContext.convertedData)
+        {
+            NX_VERBOSE(this, "No data has been converted for the Engine %1", engineId);
+            continue;
         }
 
-        auto& binding = entry.second;
-        if (!binding->isStreamConsumer())
-            continue;
-
-        bool gotPixelFormat = false;
-        const auto pixelFormat = pixelFormatForEngine(
-            serverModule(), engineId, binding, &gotPixelFormat);
-        if (!gotPixelFormat)
-            continue;
-
-        const int rotationAngle = m_device->getProperty(QnMediaResource::rotationKey()).toInt();
-        if (const auto dataPacket = frameConverter.getDataPacket(pixelFormat, rotationAngle))
+        if (auto binding = analyticsBinding(engineId))
         {
             if (binding->canAcceptData()
-                && NX_ASSERT(dataPacket->timestampUs() >= 0))
+                && NX_ASSERT(conversionContext.convertedData->timestamp >= 0))
             {
-                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket));
+                binding->putData(conversionContext.convertedData);
             }
             else
             {
-                // TODO: Skip frames until a next key frame (if case of using compressed frames).
-                ++m_skippedFrameCountByEngine[engineId];
+                NX_VERBOSE(this, "The binding for the Engine %1 is unable to accept data",
+                    engineId);
+                ++m_skippedPacketCountByEngine[engineId];
             }
         }
-        else
-        {
-            NX_VERBOSE(this, "Video frame not sent to DeviceAgent: see the log above.");
-        }
     }
+}
+
+StreamTypes DeviceAnalyticsContext::requiredStreamTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_cachedRequiredStreamTypes;
 }
 
 void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
@@ -469,10 +485,8 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
         return;
 
     const auto isAlive = isDeviceAlive();
-    for (auto& entry: m_bindings)
+    for (auto& [engineId, binding]: m_bindings)
     {
-        auto engineId = entry.first;
-        auto binding = entry.second;
         if (isAlive)
         {
             binding->restartAnalytics(
@@ -483,7 +497,7 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
             binding->stopAnalytics();
         }
 
-        updateSupportedFrameTypes();
+        updateStreamRequirements();
     }
 }
 
@@ -519,11 +533,8 @@ void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResourc
         return;
     }
 
-    for (auto& entry: m_bindings)
-    {
-        auto& binding = entry.second;
+    for (auto& [_, binding]: m_bindings)
         binding->updateNeededMetadataTypes();
-    }
 }
 
 void DeviceAnalyticsContext::subscribeToDeviceChanges()
@@ -564,31 +575,20 @@ bool DeviceAnalyticsContext::isDeviceAlive() const
         && !flags.testFlag(Qn::desktop_camera);
 }
 
-void DeviceAnalyticsContext::updateSupportedFrameTypes()
+void DeviceAnalyticsContext::updateStreamRequirements()
 {
-    AbstractVideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
-    bool needsCompressedFrames = false;
-    for (auto& entry: m_bindings)
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    StreamTypes totalRequiredStreamTypes;
+    for (const auto& [engineId, binding]: m_bindings)
     {
-        const QnUuid engineId = entry.first;
-
-        auto binding = entry.second;
-        if (!binding->isStreamConsumer())
+        const std::optional<StreamRequirements> requirements = binding->streamRequirements();
+        if (!requirements)
             continue;
 
-        bool gotPixelFormat = false;
-        const auto pixelFormat = pixelFormatForEngine(
-            serverModule(), engineId, binding, &gotPixelFormat);
-        if (!gotPixelFormat)
-            continue;
-        if (!pixelFormat)
-            needsCompressedFrames = true;
-        else
-            neededUncompressedPixelFormats.insert(*pixelFormat);
+        totalRequiredStreamTypes |= requirements->requiredStreamTypes;
     }
 
-    m_cachedNeedCompressedFrames = needsCompressedFrames;
-    m_cachedUncompressedPixelFormats = std::move(neededUncompressedPixelFormats);
+    m_cachedRequiredStreamTypes = totalRequiredStreamTypes;
 }
 
 std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding(

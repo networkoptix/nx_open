@@ -14,16 +14,18 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 
+#include <nx/analytics/metadata_logger.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/vms/server/resource/resource_fwd.h>
-#include <nx/vms/server/analytics/metadata_handler.h>
-#include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/analytics/device_agent_handler.h>
 #include <nx/vms/server/sdk_support/types.h>
+#include <nx/vms/server/resource/resource_fwd.h>
+#include <nx/vms/server/server_module_aware.h>
 
+#include <nx/vms/server/analytics/stream_requirements.h>
+#include <nx/vms/server/analytics/device_agent_handler.h>
+#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/wrappers/fwd.h>
-#include <nx/analytics/metadata_logger.h>
 
 namespace nx::vms::server::analytics {
 
@@ -59,6 +61,8 @@ public:
 
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
+    std::optional<StreamRequirements> streamRequirements() const;
+
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
@@ -81,6 +85,8 @@ private:
 
     bool updatePluginInfo() const;
 
+    std::optional<StreamRequirements> calculateStreamRequirements();
+
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
@@ -91,6 +97,7 @@ private:
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;
     std::optional<sdk_support::MetadataTypes> m_lastNeededMetadataTypes;
+    std::optional<StreamRequirements> m_cachedStreamRequirements;
 };
 
 } // namespace nx::vms::server::analytics

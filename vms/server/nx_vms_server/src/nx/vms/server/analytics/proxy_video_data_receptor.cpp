@@ -2,43 +2,31 @@
 
 namespace nx::vms::server::analytics {
 
-ProxyVideoDataReceptor::ProxyVideoDataReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor):
+ProxyStreamDataReceptor::ProxyStreamDataReceptor(QWeakPointer<IStreamDataReceptor> receptor):
     m_proxiedReceptor(std::move(receptor))
 {
 }
 
-void ProxyVideoDataReceptor::setProxiedReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor)
+void ProxyStreamDataReceptor::setProxiedReceptor(QWeakPointer<IStreamDataReceptor> receptor)
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_proxiedReceptor = std::move(receptor);
 }
 
-bool ProxyVideoDataReceptor::needsCompressedFrames() const
+void ProxyStreamDataReceptor::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (auto proxied = m_proxiedReceptor.toStrongRef())
-        return proxied->needsCompressedFrames();
-
-    return false;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (const auto proxiedReceptor = m_proxiedReceptor.toStrongRef())
+        proxiedReceptor->putData(data);
 }
 
-AbstractVideoDataReceptor::NeededUncompressedPixelFormats
-    ProxyVideoDataReceptor::neededUncompressedPixelFormats() const
+nx::vms::api::analytics::StreamTypes ProxyStreamDataReceptor::requiredStreamTypes() const
 {
-    QnMutexLocker lock(&m_mutex);
-    if (auto proxied = m_proxiedReceptor.toStrongRef())
-        return proxied->neededUncompressedPixelFormats();
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (const auto proxiedReceptor = m_proxiedReceptor.toStrongRef())
+        return proxiedReceptor->requiredStreamTypes();
 
-    return NeededUncompressedPixelFormats();
-}
-
-void ProxyVideoDataReceptor::putFrame(
-    const QnConstCompressedVideoDataPtr& compressedFrame,
-    const CLConstVideoDecoderOutputPtr& uncompressedFrame)
-{
-    QnMutexLocker lock(&m_mutex);
-    if (auto proxied = m_proxiedReceptor.toStrongRef())
-        proxied->putFrame(compressedFrame, uncompressedFrame);
+    return {};
 }
 
 } // namespace nx::vms::server::analytics

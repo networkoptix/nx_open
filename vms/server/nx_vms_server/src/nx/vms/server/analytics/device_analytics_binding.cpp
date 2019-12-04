@@ -44,10 +44,11 @@ using namespace nx::vms::api::analytics;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-template<typename T>
-using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
-
 static const int kMaxQueueSize = 100;
+
+using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
+using StreamType = nx::vms::api::analytics::StreamType;
+using StreamTypes = nx::vms::api::analytics::StreamTypes;
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     QnMediaServerModule* serverModule,
@@ -164,6 +165,8 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
         m_device->saveProperties();
     }
 
+    m_cachedStreamRequirements = calculateStreamRequirements();
+
     if (!m_deviceAgent)
     {
         NX_ERROR(
@@ -277,6 +280,63 @@ bool DeviceAnalyticsBinding::updatePluginInfo() const
     }
 
     return true;
+}
+
+std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequirements()
+{
+    if (!isStreamConsumer())
+        return std::nullopt;
+
+    const nx::vms::api::analytics::EngineManifest manifest = m_engine->manifest();
+    AVPixelFormat avPixelFormat = AV_PIX_FMT_NONE;
+    StreamTypes requiredStreamTypes = manifest.streamTypeFilter;
+    const std::optional<PixelFormat> pixelFormat =
+        sdk_support::pixelFormatFromEngineManifest(
+            manifest,
+            lm("Engine %1 (%2)").args(m_engine->getName(), m_engine->getId()));
+
+    if (pixelFormat)
+    {
+        avPixelFormat = sdk_support::sdkToAvPixelFormat(*pixelFormat);
+        if (!NX_ASSERT(avPixelFormat != AV_PIX_FMT_NONE,
+            "Unable to convert SDK pixel format %1 to Ffmpeg pixel format", (int)*pixelFormat))
+        {
+            return std::nullopt;
+        }
+
+        if (!requiredStreamTypes)
+        {
+            NX_DEBUG(this, "Pixel format is specified but no stream type filter is defined in the"
+                "manifest of the Engine %1 (%2). Adding `uncompressedVideo` stream type to "
+                "requirements. Device: %3 (%4)",
+                m_engine->getName(), m_engine->getId(),
+                m_device->getUserDefinedName(), m_device->getId());
+
+            requiredStreamTypes |= StreamType::uncompressedVideo;
+        }
+
+    }
+    else if (requiredStreamTypes.testFlag(StreamType::uncompressedVideo))
+    {
+        NX_DEBUG(this, "Uncompressed video is requested via stream type filter in the manifest of "
+            "the Engine %1 (%2), but no pixel format is specified. Device %3 (%4)",
+            m_engine->getName(), m_engine->getId(),
+            m_device->getUserDefinedName(), m_device->getId());
+
+        return std::nullopt;
+    }
+    else if (!requiredStreamTypes)
+    {
+        NX_DEBUG(this, "No stream type filter is specified in the manifest of the Engine %1 (%2), "
+            "and pixel format is not specified."
+            "Adding `compressedVideo` stream type to requirements. Device: %3 (%4)",
+            m_engine->getName(), m_engine->getId(),
+            m_device->getUserDefinedName(), m_device->getId());
+
+        requiredStreamTypes |= StreamType::compressedVideo;
+    }
+
+   return StreamRequirements{requiredStreamTypes, avPixelFormat};
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
@@ -429,6 +489,12 @@ void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)
         start();
 
     base_type::putData(data);
+}
+
+std::optional<StreamRequirements> DeviceAnalyticsBinding::streamRequirements() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_cachedStreamRequirements;
 }
 
 bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
