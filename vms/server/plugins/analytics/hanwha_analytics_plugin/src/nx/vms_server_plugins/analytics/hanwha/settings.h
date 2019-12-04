@@ -702,7 +702,7 @@ struct SoundClassification: public SettingGroup
     std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
-    std::string SoundClassification::buildSoundType() const;
+    std::string buildSoundType() const;
 };
 
 //-------------------------------------------------------------------------------------------------
