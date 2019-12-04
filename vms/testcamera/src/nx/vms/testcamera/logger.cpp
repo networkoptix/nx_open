@@ -14,6 +14,14 @@ QString us(std::chrono::microseconds value)
     return lm("%1 us").args(value.count());
 }
 
+QString us(std::optional<std::chrono::microseconds> value)
+{
+    if (!NX_ASSERT(value))
+        return "UNKNOWN us";
+
+    return us(*value);
+}
+
 QString us(int64_t valueUs)
 {
     return us(std::chrono::microseconds(valueUs));

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdint>
+#include <optional>
+#include <chrono>
 
 namespace nx::vms::testcamera {
 
@@ -9,10 +10,14 @@ namespace nx::vms::testcamera {
  */
 struct CameraOptions
 {
+    using OptionalUs = std::optional<std::chrono::microseconds>;
+
     bool includePts = false;
+    OptionalUs shiftPts;
     bool unloopPts = false;
-    int64_t shiftPtsPrimaryPeriodUs = -1;
-    int64_t shiftPtsSecondaryPeriodUs = -1;
+    OptionalUs shiftPtsFromNow;
+    OptionalUs shiftPtsPrimaryPeriod;
+    OptionalUs shiftPtsSecondaryPeriod;
     int offlineFreq = 0;
 };
 

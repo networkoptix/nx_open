@@ -32,10 +32,12 @@ static CameraOptions makeCameraOptions(
 {
     CameraOptions result;
 
+    result.shiftPts = options.shiftPts;
     result.includePts = options.includePts;
     result.unloopPts = options.unloopPts;
-    result.shiftPtsPrimaryPeriodUs = options.shiftPtsPrimaryPeriodUs;
-    result.shiftPtsSecondaryPeriodUs = options.shiftPtsSecondaryPeriodUs;
+    result.shiftPtsFromNow = options.shiftPtsFromNow;
+    result.shiftPtsPrimaryPeriod = options.shiftPtsPrimaryPeriod;
+    result.shiftPtsSecondaryPeriod = options.shiftPtsSecondaryPeriod;
 
     result.offlineFreq = cameraSet.offlineFreq;
 

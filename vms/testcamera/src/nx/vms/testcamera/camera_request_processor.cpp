@@ -19,8 +19,8 @@ CameraRequestProcessor::CameraRequestProcessor(
     CameraPool* cameraPool,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     bool noSecondaryStream,
-    int fpsPrimary,
-    int fpsSecondary)
+    std::optional<int> fpsPrimary,
+        std::optional<int> fpsSecondary)
     :
     QnTCPConnectionProcessor(std::move(socket), /*owner*/ cameraPool),
     m_logger(new Logger(lm("CameraRequestProcessor(%1)").args(getForeignAddress()))),
@@ -117,10 +117,10 @@ void CameraRequestProcessor::run()
         return;
     }
 
-    const int overridingFps =
+    const std::optional<int>& overridingFps =
         (streamIndex == StreamIndex::secondary) ? m_fpsSecondary : m_fpsPrimary;
-    if (overridingFps != -1)
-        fps = overridingFps;
+    if (overridingFps)
+        fps = *overridingFps;
 
     camera->performStreaming(d->socket.get(), streamIndex, fps);
 }

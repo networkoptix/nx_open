@@ -69,7 +69,7 @@ microseconds FileStreamer::framePts(const QnCompressedVideoData* frame) const
         // Log the warning only once for each such frame.
         if (const auto& [it, absent] = m_framesWithDifferentPtsAndTimestamp.insert(frame); absent)
         {
-            NX_LOGGER_WARNING(m_logger, "B-frame suspected: timestamp %1, pts %2.",
+            NX_LOGGER_WARNING(m_logger, "B-frame suspected: timestamp %1, PTS %2.",
                 us(frame->timestamp), us(frame->pts));
         }
     }
@@ -135,6 +135,22 @@ void FileStreamer::obtainUnloopingPeriod(microseconds pts) const
         return;
     PtsUnloopingContext& context = *m_ptsUnloopingContext;
 
+    if (!NX_ASSERT(context.firstFramePts))
+        return;
+
+    if (!context.prevPrevPts || !context.prevPts)
+    {
+        NX_LOGGER_ERROR(m_logger, "Unlooping: The file seems to have less than 3 frames.");
+        return;
+    }
+
+    if (context.prevPrevPts >= context.prevPts || context.prevPrevPts <= context.firstFramePts)
+    {
+        NX_LOGGER_ERROR(m_logger, "Unlooping: Bad ptses of file's last 3 frames: %1, %2, %3.",
+            us(context.prevPrevPts), us(context.prevPts), us(pts));
+        return;
+    }
+
     if (context.prevPrevPts < 0s
         || context.prevPts < 0s
         || context.prevPrevPts >= context.prevPts
@@ -145,10 +161,55 @@ void FileStreamer::obtainUnloopingPeriod(microseconds pts) const
         return;
     }
 
-    const microseconds delayBetweenLoops = context.prevPts - context.prevPrevPts;
-    context.unloopingPeriod = context.prevPts - context.firstFramePts + delayBetweenLoops;
+    const microseconds delayBetweenLoops = *context.prevPts - *context.prevPrevPts;
+    context.unloopingPeriod = *context.prevPts - *context.firstFramePts + delayBetweenLoops;
 
     NX_LOGGER_INFO(m_logger, "Unlooping: File period is %1.", us(context.unloopingPeriod));
+}
+
+void FileStreamer::obtainRequestedShift() const
+{
+    if (!NX_ASSERT(m_ptsUnloopingContext))
+        return;
+    PtsUnloopingContext& context = *m_ptsUnloopingContext;
+
+    context.requestedShift = microseconds(0); //< Makes sure this method will execute only once.
+
+    const std::optional<microseconds> shiftPtsPeriod = (m_streamIndex == StreamIndex::secondary)
+        ? m_cameraOptions.shiftPtsSecondaryPeriod
+        : m_cameraOptions.shiftPtsPrimaryPeriod;
+
+    if (!m_cameraOptions.shiftPtsFromNow && !shiftPtsPeriod)
+        return; //< No shift has been requested.
+
+    const auto now = std::chrono::duration_cast<microseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
+
+    if (!NX_ASSERT(!(shiftPtsPeriod && m_cameraOptions.shiftPtsFromNow)))
+        return;
+
+    if (m_cameraOptions.shiftPtsFromNow)
+        context.requestedShift = now + *m_cameraOptions.shiftPtsFromNow;
+    else if (shiftPtsPeriod)
+        context.requestedShift = (now / *shiftPtsPeriod - 1) * *shiftPtsPeriod;
+
+    NX_LOGGER_INFO(m_logger, "Unlooping: Shifting unlooped PTSes by %1.",
+        us(context.requestedShift));
+}
+
+microseconds FileStreamer::processPtsIfNeeded(const microseconds pts) const
+{
+    const microseconds newPts = unloopAndShiftPtsIfNeeded(pts);
+
+    if (m_cameraOptions.shiftPts)
+    {
+        if (!NX_ASSERT(!m_cameraOptions.shiftPtsFromNow))
+            return newPts;
+
+        return newPts + *m_cameraOptions.shiftPts;
+    }
+
+    return newPts;
 }
 
 microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) const
@@ -173,31 +234,17 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
         if (context.loopIndex == 1)
             obtainUnloopingPeriod(pts);
 
-        context.unloopingShift += context.unloopingPeriod;
+        context.unloopingShift += *context.unloopingPeriod;
 
         NX_LOGGER_DEBUG(m_logger, "Unlooping: Starting new loop with unlooping shift %1.",
             us(context.unloopingShift));
     }
     const microseconds unloopedPts = pts + context.unloopingShift;
 
-    const microseconds shiftPeriod{(m_streamIndex == StreamIndex::secondary)
-        ? m_cameraOptions.shiftPtsSecondaryPeriodUs
-        : m_cameraOptions.shiftPtsPrimaryPeriodUs};
+    if (!context.requestedShift) //< The very first frame of this file streaming session.
+        obtainRequestedShift();
 
-    if (shiftPeriod < 0s) //< Shifting was not requested in the options.
-        return unloopedPts;
-
-    if (context.shiftingShift == 0s) //< The very first frame of this file streaming session.
-    {
-        const auto now = std::chrono::system_clock::now().time_since_epoch();
-
-        context.shiftingShift = (now / shiftPeriod - 1) * shiftPeriod;
-
-        NX_LOGGER_INFO(m_logger, "Unlooping: Shifting unlooped ptses by %1.",
-            us(context.shiftingShift));
-    }
-
-    return unloopedPts + context.shiftingShift;
+    return unloopedPts + *context.requestedShift;
 }
 
 /** @throws SocketError */
@@ -248,12 +295,12 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
     header->setCodecId(frame->compressionType);
     header->setDataSize((int) frame->dataSize());
 
-    QString ptsLogText = "without pts";
+    QString ptsLogText = "without PTS";
     if (flags & packet::Flag::ptsIncluded)
     {
-        const microseconds pts = unloopAndShiftPtsIfNeeded(framePts(frame));
+        const microseconds pts = processPtsIfNeeded(framePts(frame));
         packet::makeAppended<packet::PtsUs>(&buffer, pts.count());
-        ptsLogText = lm("with pts %1").args(us(pts));
+        ptsLogText = lm("with PTS %1").args(us(pts));
     }
 
     m_frameLogger->logFrameIfNeeded(

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <optional>
 
 #include <QtCore/QMutex>
 #include <QtCore/QStringList>
@@ -37,8 +38,8 @@ public:
         QStringList localInterfacesToListen,
         QnCommonModule* commonModule,
         bool noSecondaryStream,
-        int fpsPrimary,
-        int fpsSecondary);
+        std::optional<int> fpsPrimary,
+        std::optional<int> fpsSecondary);
 
     virtual ~CameraPool();
 
@@ -88,8 +89,8 @@ private:
     mutable QMutex m_mutex;
     std::unique_ptr<CameraDiscoveryListener> m_discoveryListener;
     const bool m_noSecondaryStream;
-    const int m_fpsPrimary;
-    const int m_fpsSecondary;
+    const std::optional<int> m_fpsPrimary;
+    const std::optional<int> m_fpsSecondary;
 };
 
 } // namespace nx::vms::testcamera
