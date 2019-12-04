@@ -145,7 +145,7 @@ private:
     CameraDiagnostics::Result registerAddressIfNeeded(
         const QnRtspIoDevice::AddressInfo& addressInfo);
 
-    bool QnMulticodecRtpReader::isFormatSupported(const nx::streaming::Sdp::Media media) const;
+    bool isFormatSupported(const nx::streaming::Sdp::Media media) const;
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
