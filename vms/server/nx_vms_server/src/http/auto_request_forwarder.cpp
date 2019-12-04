@@ -29,11 +29,19 @@ namespace detail {
 
 QString hidePassword(const nx::network::http::RequestLine& requestLine)
 {
+    static const QRegularExpression urlRegExpEncoded("%3A%2F%2F.+%3A(.+)%40");
+    static const QRegularExpression urlRegExp(":\\/\\/.+:(.+)@");
+
     auto result = requestLine.toString();
-    bool b = result.contains("storageStatus");
-    static const QRegularExpression urlRegExp("%3A%2F%2F.+%3A(.+)%40");
-    if (auto match = urlRegExp.match(result); match.hasMatch())
-        result.replace(match.captured(1), "");
+    for (const auto& rx: {urlRegExpEncoded, urlRegExp})
+    {
+        if (auto match = rx.match(result); match.hasMatch())
+        {
+            result.replace(match.captured(1), "");
+            break;
+        }
+    }
+
     return result;
 }
 
