@@ -136,7 +136,7 @@ void QnAbstractArchiveStreamReader::run()
             continue;
         }
 
-        checkTime(data);
+        checkAndFixTimeFromCamera(data);
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 

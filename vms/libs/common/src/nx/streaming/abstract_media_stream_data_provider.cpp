@@ -160,7 +160,7 @@ void QnAbstractMediaStreamDataProvider::resetTimeCheck()
         m_lastMediaTime[i] = AV_NOPTS_VALUE;
 }
 
-void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& media)
+void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& media)
 {
     if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
@@ -196,34 +196,6 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         }
         m_lastMediaTime[channel] = media->timestamp;
     }
-}
-
-void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
-    const QnAbstractMediaDataPtr& media)
-{
-    const int modulusUs = nxStreamingIni().unloopCameraPtsWithModulus;
-    if (modulusUs <= 0)
-    {
-        checkTime(media);
-        return;
-    }
-
-    if (!m_isCamera || !media || media->dataType != QnAbstractMediaData::VIDEO)
-        return;
-
-    const int channel = media->channelNumber;
-    const qint64 pts = media->timestamp;
-    media->timestamp = nx::utils::TimeHelper::unloopCameraPtsWithModulus(
-        []() { return std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()); },
-        AV_NOPTS_VALUE,
-        modulusUs,
-        pts,
-        m_lastMediaTime[channel],
-        &m_unloopingPeriodStartUs);
-
-    NX_VERBOSE(this, "Unlooped PTS %1 to %2", pts, media->timestamp);
-
-    m_lastMediaTime[channel] = pts;
 }
 
 QnConstMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
