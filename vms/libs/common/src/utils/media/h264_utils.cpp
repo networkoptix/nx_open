@@ -141,9 +141,6 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     return nalUnits;
 }
 
-} // namespace h264
-
-
 void getSpsPps(const uint8_t* data, int32_t size,
     std::vector<std::vector<uint8_t>>& spsVector,
     std::vector<std::vector<uint8_t>>& ppsVector)
@@ -185,19 +182,19 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
         return std::vector<uint8_t>();
     }
 
-    // Get extra data size
-    int extradataSize = 5; // version, profile, profile compat, level, nal size length
-    extradataSize += 1; // sps count
+    // Get extra data size.
+    int extradataSize = 5; // Version, profile, profile compat, level, nal size length.
+    extradataSize += 1; // Sps count.
     for(const auto& sps: spsVector)
     {
-        extradataSize += sizeof(uint16_t); // sps size
-        extradataSize += sps.size(); // sps data
+        extradataSize += sizeof(uint16_t); // Sps size.
+        extradataSize += sps.size(); // Sps data.
     }
     extradataSize += 1; // pps count
     for(const auto& pps: ppsVector)
     {
-        extradataSize += sizeof(uint16_t); // pps size
-        extradataSize += pps.size(); // pps data
+        extradataSize += sizeof(uint16_t); // Pps size.
+        extradataSize += pps.size(); // Pps data.
     }
 
     auto sps = spsVector[0];
@@ -206,21 +203,21 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
     BitStreamWriter bitstream(extradata.data(), extradata.data() + extradataSize);
     try
     {
-        bitstream.putBits(8, 1); // version
-        bitstream.putBits(8, sps[1]); // profile
-        bitstream.putBits(8, sps[2]); // profile compat
-        bitstream.putBits(8, sps[3]); // profile level
-        bitstream.putBits(8, 0xff); // 6 bits reserved (111111) + 2 bits nal size length - 1: 3 (11)
+        bitstream.putBits(8, 1); // Version.
+        bitstream.putBits(8, sps[1]); // Profile.
+        bitstream.putBits(8, sps[2]); // Profile compat.
+        bitstream.putBits(8, sps[3]); // Profile level.
+        bitstream.putBits(8, 0xff); // 6 bits reserved(111111) + 2 bits nal size length - 1: 3(11).
 
         uint8_t numSps = uint8_t(spsVector.size()) | 0xe0;
-        bitstream.putBits(8, numSps); // 3 bits reserved (111) + 5 bits number of sps
+        bitstream.putBits(8, numSps); // 3 bits reserved (111) + 5 bits number of sps.
 
         for(const auto& spsData: spsVector)
         {
             bitstream.putBits(16, spsData.size());
             bitstream.putBytes(spsData.data(), spsData.size());
         }
-        bitstream.putBits(8, ppsVector.size()); // number of pps
+        bitstream.putBits(8, ppsVector.size()); // Number of pps.
         for(const auto& ppsData: ppsVector)
         {
             bitstream.putBits(16, ppsData.size());
@@ -236,5 +233,5 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
     return extradata;
 }
 
-
+} // namespace h264
 } // namespace nx::media_utils

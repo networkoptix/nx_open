@@ -2,8 +2,6 @@
 
 #include <utils/media/h264_utils.h>
 
-using namespace nx::media_utils;
-
 TEST(media_utils, extradata_build_h264)
 {
     uint8_t frameData[] = {
@@ -14,7 +12,9 @@ TEST(media_utils, extradata_build_h264)
     const int kSpsSize = 18;
     const int kPpsSize = 4;
 
-    std::vector<uint8_t> extradata = buildExtraData(frameData, sizeof(frameData));
+    std::vector<uint8_t> extradata = nx::media_utils::h264::buildExtraData(
+        frameData, sizeof(frameData));
+
     ASSERT_EQ(extradata.size(), 33);
     ASSERT_EQ(extradata[6], 0); // sps size first byte
     ASSERT_EQ(extradata[7], kSpsSize); // sps size second byte

@@ -16,11 +16,14 @@ void readNALUsFromAnnexBStream(
 
 void convertStartCodesToSizes(const uint8_t* data, int32_t size);
 
-std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
+QnAbstractDataPacketPtr convertStartCodesToSizes(const QnAbstractDataPacketPtr& data);
 
 namespace h264 {
 
-std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(const QnConstCompressedVideoDataPtr& videoData);
+std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
+
+std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
+    const QnConstCompressedVideoDataPtr& videoData);
 
 bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps);
 
