@@ -33,9 +33,9 @@ QString hidePassword(const nx::network::http::RequestLine& requestLine)
     static const QRegularExpression urlRegExp(":\\/\\/.+:(.+)@");
 
     auto result = requestLine.toString();
-    for (const auto& rx: {urlRegExpEncoded, urlRegExp})
+    for (const auto* rx: {&urlRegExpEncoded, &urlRegExp})
     {
-        if (auto match = rx.match(result); match.hasMatch())
+        if (auto match = rx->match(result); match.hasMatch())
         {
             result.replace(match.captured(1), "");
             break;
