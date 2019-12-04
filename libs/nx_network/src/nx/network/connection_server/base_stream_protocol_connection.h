@@ -183,6 +183,9 @@ public:
         return m_messagesReceivedCount;
     }
 
+    const Parser& parser() const { return m_parser; }
+    Parser& parser() { return m_parser; }
+
 protected:
     virtual void processMessage(Message message) = 0;
     virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}

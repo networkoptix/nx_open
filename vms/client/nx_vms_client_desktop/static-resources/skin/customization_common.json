@@ -319,8 +319,14 @@
         }
     },
 
-    "nx::vms::client::desktop::node_view::ResourceNodeViewItemDelegate": {
+    "nx::vms::client::desktop::node_view::NodeViewItemDelegate": {
         "colors": {
+            "chartColor": "brand_d3"
+        }
+    },
+
+    "nx::vms::client::desktop::node_view::ResourceNodeViewItemDelegate": {
+        "resourceColors": {
             "mainText":          "light10",
             "mainTextSelected":  "light4",
             "mainTextAccented":  "brand_core",

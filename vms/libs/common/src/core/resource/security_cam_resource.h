@@ -130,6 +130,8 @@ public:
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
+    void setForcedLicenseType(Qn::LicenseType licenseType);
+
     /**
      * Returns true if all cameras in a same camera group should share 1 license
      */
@@ -296,7 +298,7 @@ public:
      *      be edited by client. TODO: This should be fixed by using different properties!
      * @return true Merge has happend, false otherwise.
      */
-    bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
+    virtual bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
 
     /**
      * @param type Filters ports by type, does not filter if Qn::PT_Unknown.

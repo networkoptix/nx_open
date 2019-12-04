@@ -27,31 +27,16 @@ private:
     void beforeValues(utils::metrics::Scope requestScope, bool formatted) override;
     void beforeAlarms(utils::metrics::Scope requestScope) override;
 
-    enum class Metrics
-    {
-        transactions,
-        timeChanged,
-        decodedPixels,
-        encodedPixels,
-        ruleActionsTriggered,
-        thumbnailsRequested,
-        apiCalls,
-        count
-    };
-
     utils::metrics::ValueGroupProviders<Resource> makeProviders();
     utils::metrics::ValueProviders<Resource> makeAvailabilityProviders();
     utils::metrics::ValueProviders<Resource> makeLoadProviders();
     utils::metrics::ValueProviders<Resource> makeInfoProviders();
     utils::metrics::ValueProviders<Resource> makeActivityProviders();
 
-    qint64 getMetric(Metrics parameter);
-    qint64 getDelta(Metrics key, qint64 value);
     nx::vms::server::PlatformMonitor* platform() const;
     QString dateTimeToString(const QDateTime& datetime) const;
 
 private:
-    std::vector<std::atomic<qint64>> m_counters;
     std::atomic<int> m_timeChangeEvents = 0;
     nx::utils::CachedValue<QDateTime> m_currentDateTime;
 };

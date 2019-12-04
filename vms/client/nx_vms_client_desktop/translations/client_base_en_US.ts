@@ -986,6 +986,10 @@ to view more bookmarks</source>
         <source>Page...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connect to this Server</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1362,6 +1366,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All</source>
+        <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
@@ -2080,6 +2085,21 @@ to view more bookmarks</source>
             <numerusform>%n Servers</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Select server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras</source>
+        <translation type="unfinished">
+            <numerusform>%n camera</numerusform>
+            <numerusform>%n cameras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -2202,6 +2222,13 @@ to view more bookmarks</source>
     <message>
         <source>Interval of Action</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+        <source>Servers that support buzzer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3242,6 +3269,13 @@ to %1</source>
     <message>
         <source>Select cameras to setup failover priority</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+        <source>Servers that support fan diagnostic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4455,6 +4489,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+        <source>Servers that support PoE monitoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
         <source>Manage Bookmarks</source>
@@ -4709,15 +4750,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>less than an hour</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 Mbps</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>empty</source>
         <translation></translation>
     </message>
     <message>
@@ -4738,10 +4771,6 @@ to %1</source>
     </message>
     <message>
         <source>Current Bitrate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>no data for forecast</source>
         <translation></translation>
     </message>
 </context>
@@ -5193,6 +5222,10 @@ to %1</source>
     <message>
         <source>Plugins</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>PoE</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6467,13 +6500,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Muted</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnWebPage</name>
-    <message>
-        <source>DOWNLOADING&lt;br&gt;STARTED</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8356,6 +8382,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+        <source>The proxy %1 requires a username and password.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select folder to upload</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
         <source>Click to read more</source>
@@ -8443,6 +8480,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Custom number that can be assigned to a layout for quick identification and access</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8892,6 +8933,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+        <source>Sign In</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
         <source>The server is taking too long to respond</source>
@@ -8988,6 +9036,63 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>This OS version is no longer supported.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Powered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty</source>
+        <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt; Unknown device %1 &gt;</source>
+        <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Consumption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9130,6 +9235,24 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Only client-server video traffic can be encrypted</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+        <source>%n cameras</source>
+        <translation type="unfinished">
+            <numerusform>%n camera</numerusform>
+            <numerusform>%n cameras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>There are no compatible servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -22,7 +22,12 @@
 
 #include <nx/vms/server/network/multicast_address_registry.h>
 
-namespace nx::streaming::rtp  { class StreamParser; }
+namespace nx::streaming::rtp {
+
+class StreamParser;
+class IRtpParserFactory;
+
+} // namespace nx::streaming::rtp
 
 class QnMulticodecRtpReader:
     public QObject,
@@ -96,6 +101,9 @@ public:
 
     nx::vms::api::RtpTransportType getRtpTransport() const;
 
+    void setCustomTrackParserFactory(
+        std::unique_ptr<nx::streaming::rtp::IRtpParserFactory> parserFactory);
+
 signals:
     void networkIssue(
         const QnResourcePtr&,
@@ -136,6 +144,8 @@ private:
     CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
     CameraDiagnostics::Result registerAddressIfNeeded(
         const QnRtspIoDevice::AddressInfo& addressInfo);
+
+    bool isFormatSupported(const nx::streaming::Sdp::Media media) const;
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
@@ -181,6 +191,8 @@ private:
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
     std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
         m_registeredMulticastAddresses;
+
+    std::unique_ptr<nx::streaming::rtp::IRtpParserFactory> m_customTrackParserFactory;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

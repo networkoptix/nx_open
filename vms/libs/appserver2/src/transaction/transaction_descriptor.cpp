@@ -688,6 +688,8 @@ struct ReadResourceParamAccessOut
 
 struct ModifyResourceParamAccess
 {
+    static const std::set<QString> kSystemAccessOnlyProperties;
+
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
     ErrorCode operator()(
@@ -697,6 +699,9 @@ struct ModifyResourceParamAccess
     {
         if (hasSystemAccess(accessData))
             return ErrorCode::ok;
+
+        if (kSystemAccessOnlyProperties.find(param.name) != kSystemAccessOnlyProperties.cend())
+            return ErrorCode::forbidden;
 
         if (isRemove)
         {
@@ -716,6 +721,10 @@ struct ModifyResourceParamAccess
     }
 
     bool isRemove;
+};
+
+const std::set<QString> ModifyResourceParamAccess::kSystemAccessOnlyProperties = {
+    ResourcePropertyKey::kForcedLicenseType
 };
 
 struct ReadFootageDataAccess

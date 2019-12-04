@@ -315,7 +315,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
-        oldStatus, newStatus, reason, getName(), getUrl());
+        oldStatus, newStatus, reason, getName(), nx::utils::url::hidePassword(getUrl()));
 
     commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
@@ -507,8 +507,9 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     NX_ASSERT(!getId().isNull());
     NX_ASSERT(commonModule());
 
-    bool isModified = commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
-        getId(), key, value, markDirty, replaceIfExists);
+    const bool isModified =
+        commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
+            getId(), key, value, markDirty, replaceIfExists);
 
     if (isModified)
         emitPropertyChanged(key);

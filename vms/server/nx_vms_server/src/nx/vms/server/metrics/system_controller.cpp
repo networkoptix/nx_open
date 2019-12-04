@@ -23,11 +23,18 @@ void SystemResourceController::start()
         globalSettings(), &QnGlobalSettings::localSystemIdChanged,
         [&]()
         {
-            if (m_lastId)
-                remove(*m_lastId);
+            const auto newId = globalSettings()->localSystemId();
+            auto& lastId = *m_lastId.lock();
+            if (lastId)
+            {
+                if (*lastId == newId)
+                    return; //< Nothing has changed!
 
-            m_lastId = globalSettings()->localSystemId();
-            add(nullptr, m_lastId->toSimpleString(), utils::metrics::Scope::system);
+                remove(*lastId);
+            }
+
+            lastId = newId;
+            add(nullptr, newId.toSimpleString(), utils::metrics::Scope::system);
         });
 }
 

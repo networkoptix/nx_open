@@ -65,11 +65,8 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
 
     for (QnAbstractResourceSearcher* as : commonModule()->resourceDiscoveryManager()->plugins())
     {
-        QnAbstractNetworkResourceSearcher* ns =
-            dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-        NX_CRITICAL(ns);
-
-        result.push_back(ns);
+        if (auto* const ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as))
+            result.push_back(ns);
     }
 
     return result;

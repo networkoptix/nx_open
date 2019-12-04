@@ -9,7 +9,7 @@
 
 #include "testcamera_resource.h"
 
-namespace nx::vms::testcamera::packet { class Header; } //< private
+namespace nx::vms::testcamera::packet { struct Header; } //< private
 
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
@@ -40,7 +40,9 @@ private:
         return true;
     }
 
-    QnAbstractMediaDataPtr receiveFrame(
+    QnAbstractMediaDataPtr receivePacket();
+
+    QnAbstractMediaDataPtr receiveFramePacketBody(
         const nx::vms::testcamera::packet::Header& header);
 
 private:

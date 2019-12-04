@@ -71,13 +71,13 @@
                     },
                     "vmsTime": {
                         "name": "VMS Time",
-                        "display": "table|panel"
+                        "display": "panel"
                     },
                     "vmsTimeChanged24h": {
                         "name": "Events: Time Changed (24h)",
                         "description": "Events count: Time Changed (24h)",
                         "display": "table|panel",
-                        "calculate": "sum %vmsTimeChanged 24h",
+                        "calculate": "counterDelta %vmsTimeChanged 24h",
                         "insert": "timeChanged",
                         "alarms": [
                             {
@@ -206,7 +206,6 @@
                     },
                     "threads": {
                         "name": "Server threads",
-                        "description": "The number of threads inside Server processes.",
                         "display": "panel"
                     },
                     "encodingThreads": {
@@ -232,14 +231,14 @@
                         "name": "Decoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "deltaAvg %decodedPixels 3s",
+                        "calculate": "counterToAvg %decodedPixels 3s",
                         "insert": "decodedPixels"
                     },
                     "encodingSpeed3s": {
                         "name": "Encoding Speed",
                         "display": "panel",
                         "format": "MPix/s",
-                        "calculate": "deltaAvg %encodedPixels 3s",
+                        "calculate": "counterToAvg %encodedPixels 3s",
                         "insert": "encodedPixels"
                     },
                     "primaryStreams": {
@@ -256,31 +255,32 @@
                 "values": {
                     "transactionsPerSecond1m": {
                         "name": "Transactions/s",
+                        "description": "Transactions per second",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s",
-                        "calculate": "deltaAvg %transactionsPerSecond 1m",
+                        "format": "Tr/s",
+                        "calculate": "counterToAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
                     "actionsTriggered1m": {
                         "name": "Rules Activations/s",
                         "description": "Event Rules activations per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %actionsTriggered 1m",
+                        "calculate": "counterToAvg %actionsTriggered 1m",
                         "insert": "actionsTriggered"
                     },
                     "apiCalls1m": {
                         "name": "API Calls/s",
                         "description": "REST API calls per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %apiCalls 1m",
+                        "calculate": "counterToAvg %apiCalls 1m",
                         "insert": "apiCalls"
                     },
                     "thumbnails1m": {
                         "name": "Thumbnails/s",
                         "description": "Thumbnails per second",
                         "display": "panel",
-                        "calculate": "deltaAvg %thumbnails 1m",
+                        "calculate": "counterToAvg %thumbnails 1m",
                         "insert": "thumbnails"
                     },
                     "activePlugins": {
@@ -375,7 +375,7 @@
                         "name": "Events: Stream Issues (1h)",
                         "description": "Events count: Stream Issues (1h)",
                         "display": "table|panel",
-                        "calculate": "sum %streamIssues 1h",
+                        "calculate": "counterDelta %streamIssues 1h",
                         "insert": "streamIssues",
                         "alarms": [
                             {
@@ -394,7 +394,7 @@
                         "name": "Events: IP Conflicts (3 min)",
                         "description": "Events count: IP Conflicts (3 min)",
                         "display": "panel",
-                        "calculate": "sum %ipConflicts 3m",
+                        "calculate": "counterDelta %ipConflicts 3m",
                         "insert": "ipConflicts",
                         "alarms": [
                             {
@@ -451,7 +451,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Mbps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -465,10 +465,13 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "resolutionGreaterOrEqualThan %resolution 1280x720",
-                                "text": " Secondary stream Resolution is too high: '%resolution'. It's not recommended to put Secondray stream Resolution more than 1280x720."
+                                "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
+                                "text": " Secondary stream Resolution is too high: %resolution. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
                             }
                         ]
+                    },
+                    "recommendedMaxSecondaryResolution": {
+                        "calculate": "const 1280x720"
                     },
                     "targetFps": {
                         "name": "Target FPS",
@@ -495,7 +498,7 @@
                         "name": "Bitrate",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Mbps"
+                        "format": "Mbit/s"
                     }
                 }
             },
@@ -513,7 +516,7 @@
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "Mbps"
+                        "format": "Mbit/s"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
@@ -569,9 +572,9 @@
                     },
                     "issues24h": {
                         "name": "Issues (24h)",
-                        "description": "Events Count: Storage Issues (24h)",
+                        "description": "Events count: Storage Issues (24h)",
                         "display": "table|panel",
-                        "calculate": "sum %issues 24h",
+                        "calculate": "counterDelta %issues 24h",
                         "insert": "issues"
                     }
                 }
@@ -581,15 +584,15 @@
                     "readRateBps1m": {
                         "name": "Read Rate",
                         "display": "table|panel",
-                        "format": "KBps",
-                        "calculate": "deltaAvg %readRateBps 1m",
+                        "format": "KB/s",
+                        "calculate": "counterToAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                 "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
-                        "format": "KBps",
-                        "calculate": "deltaAvg %writeRateBps 1m",
+                        "format": "KB/s",
+                        "calculate": "counterToAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
                 "transactionsPerSecond": {
@@ -597,7 +600,7 @@
                         "description": "Analytics DB transactions per second",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "Transactions/s"
+                        "format": "Tr/s"
                     }
                 }
             },
@@ -605,21 +608,26 @@
                 "values": {
                     "totalSpaceB": {
                         "name": "Total",
-                        "description": "Total space",
+                        "description": "Total Space",
                         "display": "table|panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     },
                     "mediaSpaceP": {
                         "name": "VMS Media(%)",
                         "description": "Space Used by VMS media (%)",
                         "display": "table|panel",
-                        "format": "%"
+                        "format": "%",
+                        "calculate": "divide %mediaSpaceB %totalSpaceB",
+                        "insert": "mediaSpaceB",
+                        "isOptional": true
                     },
                     "mediaSpaceB": {
                         "name": "VMS Media",
                         "description": "Space Used by VMS media",
                         "display": "panel",
-                        "format": "GB"
+                        "format": "GB",
+                        "isOptional": true
                     }
                 }
             }
@@ -669,7 +677,7 @@
                     "inBps1m": {
                         "name": "IN Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "KB/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %inBps 1m",
                         "insert": "inBps"
@@ -677,7 +685,7 @@
                     "outBps1m": {
                         "name": "OUT Rate",
                         "isOptional": true,
-                        "format": "kbps",
+                        "format": "KB/s",
                         "display": "table|panel",
                         "calculate": "sampleAvg %outBps 1m",
                         "insert": "outBps"

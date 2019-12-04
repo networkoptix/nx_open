@@ -22,7 +22,8 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     const QHostAddress& address,
     int port,
     int maxConnections,
-    bool useSsl)
+    bool useSsl,
+    bool useTwoSockets)
 :
     QnHttpConnectionListener(
         commonModule,
@@ -31,7 +32,8 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         maxConnections,
         useSsl),
     m_boundToCloud(false),
-    m_httpModManager(new nx::network::http::HttpModManager())
+    m_httpModManager(new nx::network::http::HttpModManager()),
+    m_useTwoSockets(useTwoSockets)
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
 }
@@ -82,7 +84,7 @@ std::unique_ptr<nx::network::AbstractStreamServerSocket> QnUniversalTcpListener:
     const nx::network::SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
-    auto tcpSockets = createAndPrepareTcpSockets(localAddress);
+    auto tcpSockets = createAndPrepareTcpSockets(localAddress, m_useTwoSockets);
 
     if (tcpSockets.empty())
         return nullptr;
@@ -224,36 +226,41 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
 
 
 std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
-    QnUniversalTcpListener::createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress)
+    QnUniversalTcpListener::createAndPrepareTcpSockets(
+        const nx::network::SocketAddress& localAddress,
+        bool createTwoSockets)
 {
     uint16_t assignedPort = 0;
     std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets;
     const auto addSocket =
-        [&](nx::network::SocketAddress localAddress, int ipVersion)
+        [&](nx::network::SocketAddress localAddress, int ipVersion, bool createTwoSockets)
         {
-            if (assignedPort)
-                localAddress.port = assignedPort;
-
             auto socket = nx::network::SocketFactory::createStreamServerSocket(
                 false,
                 nx::network::NatTraversalSupport::enabled,
                 ipVersion);
 
-            if (!socket->setReuseAddrFlag(true))
+            if (localAddress.port || createTwoSockets)
             {
-                NX_DEBUG(
-                    typeid(QnUniversalTcpListener),
-                    "setReuseAddrFlag(true) unexpectedly failed. %1",
-                    SystemError::getLastOSErrorText());
+                if (!socket->setReuseAddrFlag(true))
+                {
+                    NX_DEBUG(
+                        typeid(QnUniversalTcpListener),
+                        "setReuseAddrFlag(true) unexpectedly failed. %1",
+                        SystemError::getLastOSErrorText());
+                }
+
+                if (!socket->setReusePortFlag(true))
+                {
+                    NX_DEBUG(
+                        typeid(QnUniversalTcpListener),
+                        "setReusePortFlag(true) failed, probably because of unsupported. %1",
+                        SystemError::getLastOSErrorText());
+                }
             }
 
-            if (!socket->setReusePortFlag(true))
-            {
-                NX_DEBUG(
-                    typeid(QnUniversalTcpListener),
-                    "setReusePortFlag(true) failed, probably because of unsupported. %1",
-                    SystemError::getLastOSErrorText());
-            }
+            if (assignedPort)
+                localAddress.port = assignedPort;
 
             if (!socket->bind(localAddress) ||
                 !socket->listen())
@@ -271,11 +278,15 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
         };
 
     const bool isAnyHost = localAddress.address.toString() == nx::network::HostAddress::anyHost.toString();
-    if (isAnyHost || (bool) localAddress.address.ipV4())
-        addSocket(localAddress, AF_INET);
 
-    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
-        addSocket(localAddress, AF_INET6);
+    if (isAnyHost || (bool)localAddress.address.isPureIpV6())
+    {
+        if (addSocket(localAddress, AF_INET6, createTwoSockets) && !createTwoSockets)
+            return sockets;
+    }
+
+    if (isAnyHost || (bool) localAddress.address.ipV4())
+        addSocket(localAddress, AF_INET, createTwoSockets);
 
     return sockets;
 }

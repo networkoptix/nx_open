@@ -1,10 +1,11 @@
 #include "h264_utils.h"
 
+#include <nx/utils/log/log.h>
+
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
-namespace nx {
-namespace media_utils {
+namespace nx::media_utils {
 
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
@@ -61,14 +62,14 @@ void readH264NALUsFromExtraData(
 }
 
 void readNALUsFromAnnexBStream(
-    const QnConstCompressedVideoDataPtr& data,
+    const uint8_t* data,
+    int32_t size,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
-    const quint8* dataStart = reinterpret_cast<const quint8*>(data->data());
-    const quint8* dataEnd = dataStart + data->dataSize();
-    const quint8* naluEnd = nullptr;
-    for (const quint8
-        *curNalu = NALUnit::findNALWithStartCodeEx(dataStart, dataEnd, &naluEnd),
+    const uint8_t* dataEnd = data + size;
+    const uint8_t* naluEnd = nullptr;
+    for (const uint8_t
+        *curNalu = NALUnit::findNALWithStartCodeEx(data, dataEnd, &naluEnd),
         *nextNalu = NULL;
         curNalu < dataEnd;
         curNalu = nextNalu)
@@ -80,6 +81,26 @@ void readNALUsFromAnnexBStream(
             --naluEnd;
         if (naluEnd > curNalu)
             nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
+    }
+}
+
+void readNALUsFromAnnexBStream(
+    const QnConstCompressedVideoDataPtr& data,
+    std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
+{
+    readNALUsFromAnnexBStream((const uint8_t*)data->data(), data->dataSize(), nalUnits);
+}
+
+void convertStartCodesToSizes(const uint8_t* data, int32_t size)
+{
+    std::vector<std::pair<const quint8*, size_t>> nalUnits;
+    readNALUsFromAnnexBStream(data, size, &nalUnits);
+    for (const auto& nalu: nalUnits)
+    {
+        if (nalu.second < 4)
+            break;
+        uint32_t* ptr = (uint32_t*)(nalu.first - 4);
+        *ptr = htonl(nalu.second);
     }
 }
 
@@ -120,7 +141,97 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     return nalUnits;
 }
 
-} // namespace h264
+void getSpsPps(const uint8_t* data, int32_t size,
+    std::vector<std::vector<uint8_t>>& spsVector,
+    std::vector<std::vector<uint8_t>>& ppsVector)
+{
+    std::vector<std::pair<const quint8*, size_t>> nalUnits;
+    readNALUsFromAnnexBStream(data, size, &nalUnits);
+    for (const auto& nalu: nalUnits)
+    {
+        if ((*nalu.first & 0x1f) == nuSPS)
+        {
+            if (nalu.second < 4)
+            {
+                NX_WARNING(NX_SCOPE_TAG, "Invalid sps found");
+                continue;
+            }
+            spsVector.emplace_back(nalu.first, nalu.first + nalu.second);
+        }
+        if ((*nalu.first & 0x1f) == nuPPS)
+        {
+            if (nalu.second < 4)
+            {
+                NX_WARNING(NX_SCOPE_TAG, "Invalid pps found");
+                continue;
+            }
+            ppsVector.emplace_back(nalu.first, nalu.first + nalu.second);
+        }
+    }
+}
 
-} // namespace media_utils
-} // namespace nx
+std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
+{
+    std::vector<std::vector<uint8_t>> spsVector;
+    std::vector<std::vector<uint8_t>> ppsVector;
+    getSpsPps(data, size, spsVector, ppsVector);
+
+    if (spsVector.empty() || ppsVector.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to write extra data, no sps/pps found");
+        return std::vector<uint8_t>();
+    }
+
+    // Get extra data size.
+    int extradataSize = 5; // Version, profile, profile compat, level, nal size length.
+    extradataSize += 1; // Sps count.
+    for(const auto& sps: spsVector)
+    {
+        extradataSize += sizeof(uint16_t); // Sps size.
+        extradataSize += sps.size(); // Sps data.
+    }
+    extradataSize += 1; // pps count
+    for(const auto& pps: ppsVector)
+    {
+        extradataSize += sizeof(uint16_t); // Pps size.
+        extradataSize += pps.size(); // Pps data.
+    }
+
+    auto sps = spsVector[0];
+    auto pps = ppsVector[0];
+    std::vector<uint8_t> extradata(extradataSize);
+    BitStreamWriter bitstream(extradata.data(), extradata.data() + extradataSize);
+    try
+    {
+        bitstream.putBits(8, 1); // Version.
+        bitstream.putBits(8, sps[1]); // Profile.
+        bitstream.putBits(8, sps[2]); // Profile compat.
+        bitstream.putBits(8, sps[3]); // Profile level.
+        bitstream.putBits(8, 0xff); // 6 bits reserved(111111) + 2 bits nal size length - 1: 3(11).
+
+        uint8_t numSps = uint8_t(spsVector.size()) | 0xe0;
+        bitstream.putBits(8, numSps); // 3 bits reserved (111) + 5 bits number of sps.
+
+        for(const auto& spsData: spsVector)
+        {
+            bitstream.putBits(16, spsData.size());
+            bitstream.putBytes(spsData.data(), spsData.size());
+        }
+        bitstream.putBits(8, ppsVector.size()); // Number of pps.
+        for(const auto& ppsData: ppsVector)
+        {
+            bitstream.putBits(16, ppsData.size());
+            bitstream.putBytes(ppsData.data(), ppsData.size());
+        }
+        bitstream.flushBits();
+    }
+    catch(const BitStreamException&)
+    {
+        NX_ERROR(NX_SCOPE_TAG, "Failed to write extra data");
+        return std::vector<uint8_t>();
+    }
+    return extradata;
+}
+
+} // namespace h264
+} // namespace nx::media_utils

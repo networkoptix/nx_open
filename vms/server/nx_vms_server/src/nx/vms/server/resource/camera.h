@@ -210,7 +210,7 @@ public:
 
     void atStreamIssue();
     void atIpConflict();
-    qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
+    qint64 getMetric(std::atomic<qint64> Metrics::* parameter);
     std::chrono::milliseconds nxOccupiedDuration() const;
     std::chrono::milliseconds calendarDuration() const;
     qint64 recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;

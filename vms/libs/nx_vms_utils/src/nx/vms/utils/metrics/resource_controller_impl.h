@@ -66,11 +66,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
-                if (!valueRule.name.isEmpty())
-                    existing->name = valueRule.name;
-                existing->description = valueRule.description;
-                existing->display = valueRule.display;
-                existing->format = valueRule.format;
+                api::metrics::apply(valueRule, &*existing);
                 continue;
             }
 
@@ -78,8 +74,9 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             const auto position = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
                 [r = &valueRule](const auto& m) { return m.id == r->insert; });
-            groupIt->values.insert(position, api::metrics::ValueManifest{
-                {valueId, valueRule.name}, valueRule.display, valueRule.format});
+            api::metrics::ValueManifest newManifest(valueId, valueRule.name);
+            api::metrics::apply(valueRule, &newManifest);
+            groupIt->values.insert(position, std::move(newManifest));
         }
     }
 

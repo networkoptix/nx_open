@@ -9,6 +9,8 @@
 
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/uncompressed_video_packet.h>
+#include <nx/streaming/in_stream_compressed_metadata.h>
 
 #include <core/dataconsumer/conditional_data_proxy.h>
 #include <core/resource/camera_resource.h>
@@ -34,11 +36,14 @@
 
 #include <nx/analytics/analytics_logging_ini.h>
 
-using nx::vms::server::analytics::AbstractVideoDataReceptorPtr;
+using namespace nx::vms::server::analytics;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
 static const int SAVE_BITRATE_FRAME = 300; // value TBD
+
+using StreamType = nx::vms::api::analytics::StreamType;
+using StreamTypes = nx::vms::api::analytics::StreamTypes;
 
 class QnLiveStreamProvider::MetadataDataReceptor: public QnAbstractDataReceptor
 {
@@ -157,7 +162,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
     if (role == roleForAnalytics && serverModule())
     {
-        m_videoDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
+        m_streamDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId());
 
         serverModule()->analyticsManager()->registerMetadataSink(
@@ -382,35 +387,26 @@ void QnLiveStreamProvider::onStreamReopen()
 }
 
 /**
- * @param outNeedUncompressedFrame Set to true if a non-null VideoDataReceptor is returned and
- *     the uncompressed frame has to be passed to the returned VideoDataReceptor.
- * @return Stored m_videoDataReceptor, if it exists and sending the frame to metadata plugins is
+ * @param outNeedUncompressedFrame Set to true if a non-null IStreamDataReceptor is returned and
+ *     the uncompressed frame has to be passed to the returned IStreamDataReceptor.
+ * @return Stored m_streamDataReceptor, if it exists and sending the frame to metadata plugins is
  *     needed; null otherwise.
  */
-AbstractVideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPluginsIfNeeded(
-    const QnCompressedVideoDataPtr& compressedFrame,
-    bool* outNeedUncompressedFrame)
+QSharedPointer<IStreamDataReceptor>
+    QnLiveStreamProvider::getStreamDataReceptorForMetadataPluginsIfNeeded()
 {
-    AbstractVideoDataReceptorPtr videoDataReceptor;
-    if (ini().enableMetadataProcessing)
-    {
-        const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly
-            || compressedFrame->flags & QnAbstractMediaData::MediaFlags_AVKey;
+    QSharedPointer<IStreamDataReceptor> streamDataReceptor;
 
-        const auto roleForAnalytics = ini().analyzeSecondaryStream
-            ? Qn::ConnectionRole::CR_SecondaryLiveVideo
-            : Qn::ConnectionRole::CR_LiveVideo;
+    const auto roleForAnalytics = ini().analyzeSecondaryStream
+        ? Qn::ConnectionRole::CR_SecondaryLiveVideo
+        : Qn::ConnectionRole::CR_LiveVideo;
 
-        const bool needToAnalyzeStream = roleForAnalytics == getRole();
+    const bool needToAnalyzeStream = roleForAnalytics == getRole();
 
-        if (needToAnalyzeFrame && needToAnalyzeStream)
-            videoDataReceptor = m_videoDataReceptor.toStrongRef();
-    }
+    if (needToAnalyzeStream)
+        streamDataReceptor = m_streamDataReceptor.toStrongRef();
 
-    *outNeedUncompressedFrame =
-        videoDataReceptor && !videoDataReceptor->neededUncompressedPixelFormats().empty();
-
-    return videoDataReceptor;
+    return streamDataReceptor;
 }
 
 void QnLiveStreamProvider::onGotVideoFrame(
@@ -462,40 +458,60 @@ void QnLiveStreamProvider::processMetadata(
         }
     }
 
-    bool needUncompressedFrame = false;
-    auto videoDataReceptor = getVideoDataReceptorForMetadataPluginsIfNeeded(
-        compressedFrame, &needUncompressedFrame);
+    const auto streamDataReceptor = getStreamDataReceptorForMetadataPluginsIfNeeded();
+
+    StreamTypes neededStreamTypes;
+    if (streamDataReceptor)
+        neededStreamTypes = streamDataReceptor->requiredStreamTypes();
 
     const int channel = compressedFrame->channelNumber;
     auto& motionEstimation = m_motionEstimation[channel];
+
     CLConstVideoDecoderOutputPtr uncompressedFrame;
     if (needToAnalyzeMotion)
     {
         NX_VERBOSE(this, "Analyzing motion (Role: [%1]); needUncompressedFrame: %2",
-            getRole(), needUncompressedFrame);
-        if (motionEstimation->analyzeFrame(compressedFrame,
-            needUncompressedFrame ? &uncompressedFrame : nullptr))
+            getRole(), neededStreamTypes.testFlag(StreamType::uncompressedVideo));
+
+        if (motionEstimation->analyzeFrame(
+                compressedFrame,
+                neededStreamTypes.testFlag(StreamType::uncompressedVideo)
+                    ? &uncompressedFrame
+                    : nullptr))
         {
             updateStreamResolution(channel, motionEstimation->videoResolution());
         }
     }
-    else if (needUncompressedFrame)
+    else if (neededStreamTypes.testFlag(StreamType::uncompressedVideo))
     {
         NX_VERBOSE(this) << lm("Decoding frame for metadata plugins");
         uncompressedFrame = motionEstimation->decodeFrame(compressedFrame);
         if (!uncompressedFrame)
         {
-            NX_WARNING(this) << "Unable to decode frame for metadata plugins, timestamp:"
-               << compressedFrame->timestamp;
+            // TODO: #dmishin this logic seems suspicious, investigate it.
+            NX_DEBUG(this,
+                "Unable to get decoded frame for metadata plugins, compressed frame timestamp: %1",
+                compressedFrame->timestamp);
         }
     }
 
-    if (videoDataReceptor)
+    if (streamDataReceptor)
     {
-        NX_VERBOSE(this, "Pushing frame (%2) to receptor, timestamp: %1",
-            compressedFrame->timestamp,
-            uncompressedFrame ? "compressed and uncompressed" : "compressed");
-        videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
+        if (neededStreamTypes.testFlag(StreamType::uncompressedVideo) && uncompressedFrame)
+        {
+            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1",
+                compressedFrame->timestamp);
+
+            streamDataReceptor->putData(
+                std::make_shared<nx::streaming::UncompressedVideoPacket>(uncompressedFrame));
+        }
+
+        if (neededStreamTypes.testFlag(StreamType::compressedVideo))
+        {
+            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1",
+                compressedFrame->timestamp);
+            streamDataReceptor->putData(compressedFrame);
+        }
     }
 }
 
@@ -518,6 +534,19 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
         {
             m_cameraRes->setProperty(ResourcePropertyKey::kAudioCodec, actualCodec);
             m_cameraRes->saveProperties();
+        }
+    }
+}
+
+void QnLiveStreamProvider::onGotInStreamMetadata(
+    const std::shared_ptr<nx::streaming::InStreamCompressedMetadata>& metadata)
+{
+    if (auto streamDataReceptor = m_streamDataReceptor.toStrongRef())
+    {
+        if (streamDataReceptor->requiredStreamTypes().testFlag(StreamType::metadata))
+        {
+            NX_VERBOSE(this, "Pushing in-stream metadata to the plugins");
+            streamDataReceptor->putData(metadata);
         }
     }
 }

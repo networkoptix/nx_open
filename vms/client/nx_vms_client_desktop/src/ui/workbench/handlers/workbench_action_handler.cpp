@@ -2752,7 +2752,9 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     url.setPassword(QString());
     url.setPath(path);
     url.setFragment(fragment);
-    url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
+
+    QnNetworkProxyFactory proxyFactory(commonModule());
+    url = proxyFactory.urlToResource(url, server, "proxy");
     QDesktopServices::openUrl(url.toQUrl());
 }
 
@@ -2766,7 +2768,8 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    nx::utils::Url proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
+    QnNetworkProxyFactory proxyFactory(commonModule());
+    nx::utils::Url proxyUrl = proxyFactory.urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -2806,6 +2809,8 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         return;
     }
 
+    QnNetworkProxyFactory proxyFactory(commonModule());
+
     for (const auto& request: requests)
     {
         const auto appserverUrl = commonModule()->currentUrl();
@@ -2818,7 +2823,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
-        targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
+        targetUrl = proxyFactory.urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
         targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")

@@ -172,7 +172,8 @@ enum class MetadataType
 {
     Motion,
     ObjectDetection,
-    MediaStreamEvent
+    MediaStreamEvent,
+    InStream,
 };
 
 // TODO: #dmishin get rid of implementations and members in this class

@@ -14,12 +14,12 @@ extern "C" {
 
 namespace nx::vms::server::http_audio {
 
-int64_t UtcTimestamp::getTimestamp(int64_t timestamp, const AVRational& timescale)
+int64_t UtcTimestamp::getTimestampUs(int64_t timestamp, const AVRational& timescale)
 {
     if (m_firstTimestamp == -1)
     {
         m_firstTimestamp = timestamp;
-        m_utcStartTime = qnSyncTime->currentTimePoint().count();
+        m_utcStartTime = qnSyncTime->currentUSecsSinceEpoch();
         return m_utcStartTime;
     }
     int64_t pts = av_rescale_q(timestamp - m_firstTimestamp, timescale, m_usecTimescale);
@@ -40,7 +40,8 @@ void FfmpegAudioDemuxer::close()
     }
 }
 
-bool FfmpegAudioDemuxer::open(FfmpegIoContextPtr ioContext, const StreamConfig* config)
+bool FfmpegAudioDemuxer::open(
+    FfmpegIoContextPtr ioContext, const std::optional<StreamConfig>& config)
 {
     close();
 
@@ -58,12 +59,12 @@ bool FfmpegAudioDemuxer::open(FfmpegIoContextPtr ioContext, const StreamConfig* 
     if (config)
     {
         NX_DEBUG(this, "Open ffmpeg demuxer with params: %1 %2 %3",
-            config->format, config->sampleRate, config->channelsNumber);
+            config->format, config->sampleRate, config.value().channelsNumber);
         AVDictionary *options = NULL;
-        av_dict_set(&options, "sample_rate", config->sampleRate.c_str(), 0);
-        av_dict_set(&options, "channels", config->channelsNumber.c_str(), 0);
+        av_dict_set(&options, "sample_rate", config.value().sampleRate.c_str(), 0);
+        av_dict_set(&options, "channels", config.value().channelsNumber.c_str(), 0);
         status = avformat_open_input(
-            &m_formatContext, "", av_find_input_format(config->format.c_str()), &options);
+            &m_formatContext, "", av_find_input_format(config.value().format.c_str()), &options);
     }
     else
     {
@@ -113,11 +114,10 @@ QnAbstractMediaDataPtr FfmpegAudioDemuxer::getNextData()
     QnConstMediaContextPtr codecContext(new QnAvCodecMediaContext(stream->codec));
     QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(
         CL_MEDIA_ALIGNMENT, packet.size, codecContext);
-    double time_base = av_q2d(stream->time_base)*1e+6;
-    audioData->duration = int64_t(time_base * packet.duration);
+    audioData->duration = av_rescale_q(packet.duration, stream->time_base, AVRational{1, 1000000});
     data = QnAbstractMediaDataPtr(audioData);
     audioData->channelNumber = 0;
-    audioData->timestamp = m_utcTimestamp.getTimestamp(packet.pts, stream->time_base);
+    audioData->timestamp = m_utcTimestamp.getTimestampUs(packet.pts, stream->time_base);
     audioData->m_data.write((const char*) packet.data, packet.size);
     data->compressionType = stream->codecpar->codec_id;
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);

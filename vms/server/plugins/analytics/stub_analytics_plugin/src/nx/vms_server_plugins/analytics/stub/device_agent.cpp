@@ -101,7 +101,7 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
     m_engine(engine)
 {
     m_pluginDiagnosticEventThread =
@@ -261,6 +261,13 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
         m_frameTimestampUsQueue.push_back(frameTimestamp);
 }
 
+void DeviceAgent::processCustomMetadataPacket(
+    const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket,
+    const char* func)
+{
+    NX_OUTPUT << func << "(): timestamp " << customMetadataPacket->timestampUs() << " us;";
+}
+
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (m_engine->needUncompressedVideoFrames())
@@ -283,6 +290,19 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 
     processVideoFrame(videoFrame, __func__);
     return checkVideoFrame(videoFrame);
+}
+
+bool DeviceAgent::pushCustomMetadataPacket(
+    const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket)
+{
+    if (!ini().needMetadata)
+    {
+        NX_PRINT << "ERROR: Received a custom metadata packet, contrary to the manifest.";
+        return false;
+    }
+
+    processCustomMetadataPacket(customMetadataPacket, __func__);
+    return true;
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)

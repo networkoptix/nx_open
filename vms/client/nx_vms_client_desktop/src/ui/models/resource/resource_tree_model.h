@@ -80,6 +80,8 @@ public:
 
     bool resetInProgress() const;
 
+    bool allowHiddenEdgeServers() const;
+
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -142,7 +144,7 @@ private slots:
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix);
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix);
 
-    void at_server_redundancyChanged(const QnResourcePtr &resource);
+    void updateEdgeServerHiddenState(const QnResourcePtr& serverResource);
     void at_systemNameChanged();
 
     void at_autoDiscoveryEnabledChanged();

@@ -66,8 +66,6 @@ public:
         incompatibleServer
     };
 
-    static const std::chrono::milliseconds kMaxJitterForLocalClock;
-
     static const QString kTimeSyncUrlPath;
 
     /**

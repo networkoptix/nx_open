@@ -34,7 +34,8 @@ using namespace std::chrono;
 namespace {
 
 constexpr milliseconds kHttpAuthSmallInterval = 10s;
-constexpr int kHttpAuthAttemptsLimit = 3;
+constexpr int kHttpAuthAttemptsLimit = 2;
+constexpr int kHttpAuthDialogAttemptsLimit = 3;
 
 /**
  * Allows to monitor if certain number of attemps is exceeded withing a time perdiod.
@@ -66,11 +67,11 @@ public:
 
     void registerAttempt()
     {
-        if (m_count < m_timeStamps.size())
+        if (m_count < limit())
             ++m_count;
 
         m_timeStamps[m_next] = steady_clock::now();
-        m_next = (m_next + 1) % m_count;
+        m_next = (m_next + 1) % limit();
     }
 
     milliseconds timeFrame() const
@@ -78,7 +79,7 @@ public:
         if (m_count == 0)
             return milliseconds::zero();
 
-        size_t first = m_next % m_count;
+        size_t first = m_next % limit();
         size_t last = m_next == 0 ? m_count - 1 : m_next - 1;
 
         return duration_cast<milliseconds>(m_timeStamps[last] - m_timeStamps[first]);
@@ -86,7 +87,7 @@ public:
 
     bool exceeded(milliseconds time) const
     {
-        return m_count == m_timeStamps.size() && time > timeFrame();
+        return m_count == limit() && timeFrame() < time;
     }
 
 private:
@@ -138,7 +139,7 @@ struct CameraWebPageWidget::Private
     CameraWebPageWidget* parent;
     CameraSettingsDialogState::Credentials credentials;
     QUrl lastRequestUrl;
-    QnUuid lastCameraId;
+    CameraSettingsDialogState::SingleCameraProperties lastCamera;
     bool loadNeeded = false;
 
     QnMutex mutex;
@@ -180,22 +181,30 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
     authCounter.setLimit(kHttpAuthAttemptsLimit);
-    authDialodCounter.setLimit(kHttpAuthAttemptsLimit);
+    authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
         [this](const QUrl& requestUrl, QAuthenticator* authenticator)
         {
             QnMutexLocker lock(&mutex);
 
-            if (lastRequestUrl == requestUrl)
+            // Camera may redirect to another path and ask for credentials,
+            // so just check that host matches.
+            if (lastRequestUrl.host() == requestUrl.host())
             {
-                authCounter.registerAttempt();
-                if (!authCounter.exceeded(kHttpAuthSmallInterval))
+                const bool emptyCredentials =
+                    credentials.login().isEmpty() && credentials.password().isEmpty();
+                if (!emptyCredentials)
                 {
-                    NX_ASSERT(credentials.login.hasValue() && credentials.password.hasValue());
-                    authenticator->setUser(credentials.login());
-                    authenticator->setPassword(credentials.password());
-                    return;
+                    authCounter.registerAttempt();
+                    if (!authCounter.exceeded(kHttpAuthSmallInterval))
+                    {
+                        authenticator->setUser(credentials.login());
+                        authenticator->setPassword(credentials.password());
+                        return;
+                    }
+                    // If credentials are requested again within kHttpAuthSmallInterval
+                    // assume that they are invalid and fallthrough to showing a request dialog.
                 }
             }
 
@@ -210,6 +219,14 @@ void CameraWebPageWidget::Private::createNewPage()
             // Hide credentials.
             url.setUserName(QString());
             url.setPassword(QString());
+
+            // Replace server address with camera address.
+            const auto serverHost = parent->commonModule()->currentUrl().host();
+            if (serverHost == url.host())
+            {
+                url.setHost(lastCamera.ipAddress);
+                url.setPort(-1); //< Hide server port.
+            }
 
             dialog.setText(url.toString());
 
@@ -259,7 +276,7 @@ void CameraWebPageWidget::Private::resetPage()
     createNewPage();
 
     lastRequestUrl = QUrl();
-    lastCameraId = {};
+    lastCamera = {};
     loadNeeded = false;
 }
 
@@ -300,7 +317,7 @@ void CameraWebPageWidget::Private::setupProxy()
 
 void CameraWebPageWidget::Private::setupCameraCookie()
 {
-    QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCameraId.toByteArray());
+    QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCamera.id.toUtf8());
     QUrl origin(lastRequestUrl);
     origin.setUserName(QString());
     origin.setPassword(QString());
@@ -340,13 +357,13 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
         NX_ASSERT(targetUrl.isValid());
 
-        const auto cameraId = QnUuid(state.singleCameraProperties.id);
+        const auto cameraId = state.singleCameraProperties.id;
 
-        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCameraId)
+        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
             return;
 
         d->lastRequestUrl = targetUrl;
-        d->lastCameraId = cameraId;
+        d->lastCamera = state.singleCameraProperties;
     }
 
     const bool visible = isVisible();

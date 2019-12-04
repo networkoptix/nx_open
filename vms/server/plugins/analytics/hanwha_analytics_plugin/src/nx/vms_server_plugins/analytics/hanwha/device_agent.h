@@ -58,12 +58,10 @@ private:
     void stopFetchingMetadata();
 
 private:
-    static void replanishErrorMap(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
-        AnalyticsParamSpan params, const char* reason);
 
     std::string sendCommandToCamera(const std::string& query);
 
-    std::string loadSunapiObject(const char* eventName);
+    std::string loadSunapiGettingReply(const char* eventName);
 
     Engine* const m_engine;
 
@@ -84,6 +82,7 @@ private:
     Settings m_settings;
     FrameSize m_frameSize = { 3840, 2160 };
     nx::network::http::HttpClient m_settingsHttpClient;
+    bool m_serverHasSentInitialSettings = false;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

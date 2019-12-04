@@ -16,6 +16,8 @@
 #include <nx/analytics/frame_info.h>
 #include <utils/common/synctime.h>
 
+#include <nx/streaming/in_stream_compressed_metadata.h>
+
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
 static const int kErrorDelayTimeoutMs = 100;
@@ -135,10 +137,12 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     return m_openStreamResult;
 }
 
-void CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& data)
+bool CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& data)
 {
     QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
+    std::shared_ptr<nx::streaming::InStreamCompressedMetadata> metadata =
+        std::dynamic_pointer_cast<nx::streaming::InStreamCompressedMetadata>(data);
 
     QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
     if (videoData)
@@ -148,12 +152,20 @@ void CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& dat
         if (lp)
             lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
     }
-    else
-        if (audioData)
-        {
-            if (lp)
-                lp->onGotAudioFrame(audioData);
-        }
+    else if (audioData)
+    {
+        if (lp)
+            lp->onGotAudioFrame(audioData);
+    }
+    else if (metadata)
+    {
+        if (lp)
+            lp->onGotInStreamMetadata(metadata);
+
+        return false;
+    }
+
+    return true;
 }
 
 void CLServerPushStreamReader::run()
@@ -240,7 +252,8 @@ void CLServerPushStreamReader::run()
         if(data)
             data->dataProvider = this;
 
-        postProcessData(data);
+        if (!postProcessData(data))
+            continue;
 
         if (data && getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;

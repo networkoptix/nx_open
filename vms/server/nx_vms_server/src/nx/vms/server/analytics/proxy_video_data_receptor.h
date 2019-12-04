@@ -1,30 +1,27 @@
 #pragma once
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/server/analytics/abstract_video_data_receptor.h>
+#include <nx/vms/server/analytics/i_stream_data_receptor.h>
 
 namespace nx::vms::server::analytics {
 
-class ProxyVideoDataReceptor: public AbstractVideoDataReceptor
+class ProxyStreamDataReceptor: public IStreamDataReceptor
 {
 public:
-    ProxyVideoDataReceptor() = default;
-    ProxyVideoDataReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor);
+    ProxyStreamDataReceptor() = default;
+    ProxyStreamDataReceptor(QWeakPointer<IStreamDataReceptor> receptor);
 
-    void setProxiedReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor);
+    void setProxiedReceptor(QWeakPointer<IStreamDataReceptor> receptor);
 
-    virtual bool needsCompressedFrames() const override;
-    virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
-    virtual void putFrame(
-        const QnConstCompressedVideoDataPtr& compressedFrame,
-        const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
+    virtual nx::vms::api::analytics::StreamTypes requiredStreamTypes() const override;
 
 private:
     mutable QnMutex m_mutex;
-    QWeakPointer<AbstractVideoDataReceptor> m_proxiedReceptor;
+    QWeakPointer<IStreamDataReceptor> m_proxiedReceptor;
 };
 
-using ProxyVideoDataReceptorPtr = QSharedPointer<ProxyVideoDataReceptor>;
+using ProxyStreamDataReceptorPtr = QSharedPointer<ProxyStreamDataReceptor>;
 
 } // namespace nx::vms::server::analytics

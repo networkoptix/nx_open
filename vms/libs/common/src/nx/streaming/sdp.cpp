@@ -9,10 +9,28 @@ static Sdp::MediaType mediaTypeFromString(const QString& value)
         return Sdp::MediaType::Audio;
     else if (trackTypeStr == "video")
         return Sdp::MediaType::Video;
-    else if (trackTypeStr == "metadata")
+    else if (trackTypeStr == "metadata" || trackTypeStr == "application")
         return Sdp::MediaType::Metadata;
     else
         return Sdp::MediaType::Unknown;
+}
+
+static QString toString(Sdp::MediaType mediaType)
+{
+    switch (mediaType)
+    {
+        case Sdp::MediaType::Audio:
+            return "audio";
+        case Sdp::MediaType::Video:
+            return "video";
+        case Sdp::MediaType::Metadata:
+            return "metadata";
+        case Sdp::MediaType::Unknown:
+            return "unknown";
+        default:
+            NX_ASSERT(false, "All values should be covered");
+            return QString();
+    }
 }
 
 // see rfc1890 for full RTP predefined codec list
@@ -160,6 +178,35 @@ void Sdp::parse(const QString& sdpData)
                 mediaIter.connectionAddress = sessionConnectionAddress;
         }
     }
+}
+
+QString Sdp::RtpMap::toString() const
+{
+    return lm("{codecName: %1; clockRate: %2; channels: %3}").args(codecName, clockRate, channels);
+}
+
+QString Sdp::Fmtp::toString() const
+{
+    return "[" + params.join(", ") + "]";
+}
+
+QString Sdp::Media::toString() const
+{
+    return "{serverPort: " + QString::number(serverPort)
+        + "; payloadType: " + QString::number(payloadType)
+        + "; mediaType: " + nx::streaming::toString(mediaType)
+        + "; control: " + control
+        + "; sendOnly: " + QString::number(sendOnly)
+        + "; ssrc: " + QString::number(ssrc)
+        + "; rtpmap: " + rtpmap.toString()
+        + "; fmtp: " + fmtp.toString()
+        + "; sdpAttributes: [" + sdpAttributes.join(", ") + "]"
+        + "; connectionAddress: " + connectionAddress.toString() + "}";
+}
+
+QString Sdp::toString() const
+{
+    return lm("{controlUrl: %1; media: [%2]").args(controlUrl, containerString(media));
 }
 
 } // namespace nx::streaming

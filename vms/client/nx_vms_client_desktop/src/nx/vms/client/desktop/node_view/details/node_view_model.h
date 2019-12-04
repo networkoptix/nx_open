@@ -23,6 +23,8 @@ public:
 
     QModelIndex index(const ViewNodePath& path, int column) const;
 
+    QModelIndex index(const NodePtr& node, int column = 0) const;
+
 public: // Overrides section
     virtual QModelIndex index(
         int row,

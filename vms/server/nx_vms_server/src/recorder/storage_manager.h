@@ -197,8 +197,6 @@ public:
     static Qn::StorageStatuses storageStatus(
         QnMediaServerModule* serverModule, const QnStorageResourcePtr& storage);
 
-    static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
-
     int64_t nxOccupiedSpace(const QnStorageResourcePtr& storage) const;
     std::chrono::milliseconds nxOccupiedDuration(const QnVirtualCameraResourcePtr& camera) const;
     bool hasArchiveRotated(const QnVirtualCameraResourcePtr& camera) const;

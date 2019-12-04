@@ -13,7 +13,7 @@
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource/storage_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/server_backup_schedule.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
@@ -642,8 +642,34 @@ bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
 
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
 {
+    // EDGE server may be represented as single camera item if:
+    // 1. It have no child cameras except single non-virtual one with the same host address.
+    // 2. Redundancy set off.
+
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return server->getServerFlags().testFlag(vms::api::SF_Edge) && !server->isRedundancy();
+    {
+        if (!server->getServerFlags().testFlag(vms::api::SF_Edge) || server->isRedundancy())
+            return false;
+
+        const auto resourcePool = server->resourcePool();
+        if (!resourcePool || server->hasFlags(Qn::removed))
+            return false;
+
+        const auto childCameras =
+            resourcePool->getAllCameras(server, /*ignoreDesktopCameras*/ true);
+        if (childCameras.size() != 1)
+            return false;
+
+        const auto onlyCamera = childCameras.first();
+        if (onlyCamera->hasFlags(Qn::wearable_camera))
+            return false;
+
+        for (const auto& serverAddress: server->getNetAddrList())
+        {
+            if (serverAddress.address == onlyCamera->getHostAddress())
+                return true;
+        }
+    }
     return false;
 }
 

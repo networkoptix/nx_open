@@ -898,7 +898,10 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? PlatformMonitor::LocalDiskPartition : PlatformMonitor::NetworkPartition);
+        serverModule(),
+        local
+            ? nx::vms::server::PlatformMonitor::LocalDiskPartition
+            : nx::vms::server::PlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
         return baseSpaceLimit;
@@ -913,9 +916,11 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     return baseSpaceLimit;
 }
 
-qint64 QnFileStorageResource::calcSpaceLimit(PlatformMonitor::PartitionType ptype) const
+qint64 QnFileStorageResource::calcSpaceLimit(
+    QnMediaServerModule* serverModule,
+    nx::vms::server::PlatformMonitor::PartitionType ptype)
 {
-    const qint64 defaultStorageSpaceLimit = serverModule()->settings().minStorageSpace();
+    const qint64 defaultStorageSpaceLimit = serverModule->settings().minStorageSpace();
     const bool isLocal =
         ptype == PlatformMonitor::LocalDiskPartition
         || ptype == PlatformMonitor::RemovableDiskPartition;

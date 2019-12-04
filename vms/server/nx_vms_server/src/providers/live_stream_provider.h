@@ -15,7 +15,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/vms/server/analytics/abstract_video_data_receptor.h>
+#include <nx/vms/server/analytics/i_stream_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -26,6 +26,8 @@
 static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
+
+namespace nx::streaming { class InStreamCompressedMetadata; }
 
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider,
@@ -61,6 +63,9 @@ public:
         bool isCameraControlRequired);
 
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
+
+    virtual void onGotInStreamMetadata(
+        const std::shared_ptr<nx::streaming::InStreamCompressedMetadata>& metadata);
 
     virtual void updateSoftwareMotion();
 
@@ -103,13 +108,10 @@ private:
         const QnLiveStreamParams& liveParams,
         bool isCameraConfigured);
 
-    void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 
-    nx::vms::server::analytics::AbstractVideoDataReceptorPtr
-        getVideoDataReceptorForMetadataPluginsIfNeeded(
-            const QnCompressedVideoDataPtr& compressedFrame,
-            bool* outNeedUncompressedFrame);
+    QSharedPointer<nx::vms::server::analytics::IStreamDataReceptor>
+        getStreamDataReceptorForMetadataPluginsIfNeeded();
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
@@ -134,7 +136,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::vms::server::analytics::AbstractVideoDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::vms::server::analytics::IStreamDataReceptor> m_streamDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

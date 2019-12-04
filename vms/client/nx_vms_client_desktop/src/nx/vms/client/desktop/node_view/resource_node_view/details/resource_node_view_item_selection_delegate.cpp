@@ -1,7 +1,7 @@
 #include "resource_node_view_item_selection_delegate.h"
 
 #include "../resource_view_node_helpers.h"
-#include "../../details/node/view_node_helpers.h"
+#include "../../details/node/view_node_helper.h"
 #include "../../selection_node_view/selection_view_node_helpers.h"
 
 #include <QtCore/QtMath>
@@ -21,11 +21,10 @@ namespace node_view {
 using namespace details;
 
 ResourceNodeViewItemSelectionDelegate::ResourceNodeViewItemSelectionDelegate(
-    QTreeView* owner,
     const ColumnSet& selectionColumns,
     QObject* parent)
     :
-    base_type(owner, parent),
+    base_type(parent),
     m_selectionColumns(selectionColumns)
 {
 }
@@ -39,14 +38,14 @@ void ResourceNodeViewItemSelectionDelegate::paint(
     const QStyleOptionViewItem &styleOption,
     const QModelIndex &index) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     const bool checked = std::any_of(m_selectionColumns.begin(), m_selectionColumns.end(),
         [node](int column)
         {
-            return checkedState(node, column) != Qt::Unchecked;
+            return ViewNodeHelper(node).checkedState(column) != Qt::Unchecked;
         });
 
-    const auto& targetColors = colors();
+    const auto& targetColors = resourceColors();
     const bool highlighted = checked || selectedChildrenCount(node) > 0;
     const auto extraColor = highlighted ? targetColors.extraTextSelected : targetColors.extraText;
     const auto mainColor = highlighted ? targetColors.mainTextSelected : targetColors.mainText;

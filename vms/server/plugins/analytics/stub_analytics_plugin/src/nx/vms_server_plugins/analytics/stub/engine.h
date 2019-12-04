@@ -29,6 +29,7 @@ public:
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
+
     PixelFormat pixelFormat() const { return m_pixelFormat; }
 
 protected:
@@ -65,6 +66,7 @@ private:
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
+    std::string m_streamTypeFilter;
     bool m_needUncompressedVideoFrames = false;
     PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };

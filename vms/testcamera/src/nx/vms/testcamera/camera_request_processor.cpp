@@ -1,5 +1,7 @@
 #include "camera_request_processor.h"
 
+#include <QtCore/QList>
+
 #include <nx/kit/utils.h>
 #include <network/tcp_connection_priv.h>
 
@@ -59,7 +61,7 @@ QByteArray CameraRequestProcessor::receiveCameraUrl()
 
     QByteArray cameraUrl((const char*) buffer, bytesRead);
 
-    NX_LOGGER_VERBOSE(m_logger, "Received Camera URL: %1", nx::kit::utils::toString(cameraUrl));
+    NX_LOGGER_DEBUG(m_logger, "Received Camera URL: %1", nx::kit::utils::toString(cameraUrl));
 
     if (!cameraUrl.isEmpty() && cameraUrl[0] == '/')
         cameraUrl = cameraUrl.mid(1);
@@ -74,13 +76,21 @@ void CameraRequestProcessor::run()
     const QByteArray cameraUrl = receiveCameraUrl();
 
     const int pos = cameraUrl.indexOf('?');
-    const QByteArray macAddress = cameraUrl.left(pos);
     const QList<QByteArray> params = cameraUrl.mid(pos+1).split('&');
+    const QByteArray macAddressString = cameraUrl.left(pos);
+
+    const nx::utils::MacAddress macAddress(macAddressString);
+    if (macAddress.isNull())
+    {
+        NX_LOGGER_ERROR(m_logger, "Invalid MAC address %1 in received URL %2.",
+            nx::kit::utils::toString(macAddressString), nx::kit::utils::toString(cameraUrl));
+        return;
+    }
 
     auto* const camera = m_cameraPool->findCamera(macAddress);
     if (camera == nullptr)
     {
-        NX_LOGGER_VERBOSE(m_logger, "No Camera found with MAC %1.", macAddress);
+        NX_LOGGER_VERBOSE(m_logger, "No Camera found with MAC %1.", macAddressString);
         return;
     }
 
@@ -89,7 +99,7 @@ void CameraRequestProcessor::run()
     int fps = 10;
     for (int i = 0; i < params.size(); ++ i)
     {
-        QList<QByteArray> paramVal = params[i].split('=');
+        const QList<QByteArray> paramVal = params[i].split('=');
         if (paramVal[0] == "primary" && paramVal.size() == 2)
         {
             if (paramVal[1] != "1")

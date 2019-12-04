@@ -100,7 +100,7 @@ TEST_F(MetricsGenerators, AlarmErrors)
     EXPECT_EQ(alarm->level, nx::vms::api::metrics::AlarmLevel::error);
     EXPECT_EQ(alarm->text, kAlarmText);
 
-    errorToThrow = std::make_exception_ptr(MetricsError(kErrorMessage));
+    errorToThrow = std::make_exception_ptr(BaseError(kErrorMessage));
     EXPECT_DEATH(monitor.alarm(), kErrorMessage);
 
     errorToThrow = std::make_exception_ptr(NullValueError(kNullErrorMessage));
@@ -225,183 +225,168 @@ TEST_F(MetricsGenerators, ValueCounts)
 TEST_F(MetricsGenerators, ValueFloat)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-    const auto sum = parseFormulaOrThrow("sum %b 1m", monitors).generator;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
-    const auto deltaAvg = parseFormulaOrThrow("deltaAvg %b 30s", monitors).generator;
+    const auto counterDelta = parseFormulaOrThrow("counterDelta %b 40s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
 
     resource.update("b", 0);
 
-    EXPECT_EQ(sum(), 0);
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_EQ(counterDelta(), api::metrics::Value(0));
     EXPECT_EQ(counterToAvg(), api::metrics::Value());
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(10));
     resource.update("b", 100);
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_VALUE(sampleAvg(), 0);
-    EXPECT_VALUE(deltaAvg(), 10);
-    EXPECT_EQ(counterToAvg(), 10);
+    EXPECT_VALUE(counterDelta(), 100);
+    EXPECT_VALUE(counterToAvg(), 10);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(20));
     resource.update("b", 200);
 
-    EXPECT_VALUE(sum(), 300);
     EXPECT_VALUE(sampleAvg(), 50);
-    EXPECT_VALUE(deltaAvg(), 15);
-    EXPECT_EQ(counterToAvg(), 10);
+    EXPECT_VALUE(counterDelta(), 200);
+    EXPECT_VALUE(counterToAvg(), 10);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(40));
     resource.update("b", 600);
 
-    EXPECT_VALUE(sum(), 900);
     EXPECT_VALUE(sampleAvg(), 125);
-    EXPECT_VALUE(deltaAvg(), 26.6);
-    EXPECT_EQ(counterToAvg(), 20);
+    EXPECT_VALUE(counterDelta(), 600);
+    EXPECT_VALUE(counterToAvg(), 20);
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(1));
     resource.update("b", 30);
 
-    EXPECT_VALUE(sum(), 930);
     EXPECT_VALUE(sampleAvg(), 283.3);
-    EXPECT_VALUE(deltaAvg(), 21);
-    EXPECT_EQ(counterToAvg(), -28.5);
+    EXPECT_VALUE(counterDelta(), 30 - 200);
+    EXPECT_VALUE(counterToAvg(), -28.5);
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(1) + std::chrono::seconds(30));
 
-    EXPECT_VALUE(sum(), 630);
     EXPECT_VALUE(sampleAvg(), 248.3);
-    EXPECT_VALUE(deltaAvg(), 0); //< Out of calculation range.
-    EXPECT_EQ(counterToAvg(), 0); //< Out of calculation range.
+    EXPECT_VALUE(counterDelta(), 30 - 600);
+    EXPECT_VALUE(counterToAvg(), 0);
 }
 
 TEST_F(MetricsGenerators, ValueSpike)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-    const auto sum = parseFormulaOrThrow("sum %b 10s", monitors).generator;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 10s", monitors).generator;
-    const auto deltaAvg = parseFormulaOrThrow("deltaAvg %b 10s", monitors).generator;
+    const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
+    const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 10s", monitors).generator;
 
     resource.update("b", 0);
 
-    EXPECT_EQ(sum(), api::metrics::Value(0));
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_EQ(counterDelta(), api::metrics::Value(0));
+    EXPECT_EQ(counterToAvg(), api::metrics::Value());
 
     for (int i = 1; i <= 4; ++i)
     {
         timeShift.applyAbsoluteShift(std::chrono::seconds(i));
         resource.update("b", 0);
 
-        EXPECT_EQ(sum(), 0);
         EXPECT_EQ(sampleAvg(), 0);
-        EXPECT_EQ(deltaAvg(), 0);
+        EXPECT_EQ(counterDelta(), 0);
+        EXPECT_EQ(counterToAvg(), 0);
     }
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(4));
     resource.update("b", 100);
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_VALUE(sampleAvg(), 0);
-    EXPECT_VALUE(deltaAvg(), 25);
+    EXPECT_VALUE(counterDelta(), 100);
+    EXPECT_VALUE(counterToAvg(), 25);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(6));
     resource.update("b", 0);
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_VALUE(sampleAvg(), 100.0 * 2 / 6);
-    EXPECT_VALUE(deltaAvg(), 16.6);
+    EXPECT_VALUE(counterDelta(), 0);
+    EXPECT_VALUE(counterToAvg(), 0);
 
     for (int i = 6; i <= 10; ++i)
     {
         timeShift.applyAbsoluteShift(std::chrono::seconds(i));
 
-        EXPECT_VALUE(sum(), 100);
         EXPECT_VALUE(sampleAvg(), 100.0 * 2 / i);
-        EXPECT_VALUE(deltaAvg(), 100.0 / i);
+        EXPECT_VALUE(counterDelta(), 0); // ??
+        EXPECT_VALUE(counterToAvg(), 0);
     }
 
     for (int i = 1; i <= 3; ++i)
     {
         timeShift.applyAbsoluteShift(std::chrono::seconds(10 + i));
 
-        EXPECT_VALUE(sum(), 100);
         EXPECT_VALUE(sampleAvg(), 20);
-        EXPECT_VALUE(deltaAvg(), 10);
+        EXPECT_VALUE(counterDelta(), 0);
+        EXPECT_VALUE(counterToAvg(), 0);
     }
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(15));
 
-    EXPECT_VALUE(sum(), 0);
     EXPECT_VALUE(sampleAvg(), 10);
-    EXPECT_VALUE(deltaAvg(), 0);
+    EXPECT_VALUE(counterDelta(), -100);
+    EXPECT_VALUE(counterToAvg(), -10);
 
     for (int i = 1; i <= 5; ++i)
     {
         timeShift.applyAbsoluteShift(std::chrono::seconds(15 + i));
 
-        EXPECT_VALUE(sum(), 0);
         EXPECT_VALUE(sampleAvg(), 0);
-        EXPECT_VALUE(deltaAvg(), 0);
+        EXPECT_VALUE(counterDelta(), 0);
+        EXPECT_VALUE(counterToAvg(), 0);
     }
 }
 
 TEST_F(MetricsGenerators, ValueBlanks)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-    const auto sum = parseFormulaOrThrow("sum %b 1m", monitors).generator;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
-    const auto deltaAvg = parseFormulaOrThrow("deltaAvg %b 30s", monitors).generator;
+    const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
 
-    EXPECT_EQ(sum(), 0);
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_EQ(counterDelta(), api::metrics::Value());
     EXPECT_EQ(counterToAvg(), api::metrics::Value());
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(10));
     resource.update("b", 100);
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(20));
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_VALUE(sampleAvg(), 100);
-    EXPECT_VALUE(deltaAvg(), 10);
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 
     resource.update("b", api::metrics::Value());
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(30));
 
-    EXPECT_VALUE(sum(), 100);
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
-    EXPECT_EQ(deltaAvg(), api::metrics::Value());
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 
     resource.update("b", 200);
 
-    EXPECT_VALUE(sum(), 300);
     EXPECT_EQ(sampleAvg(), 100);
-    EXPECT_EQ(deltaAvg(), 15);
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 5);
 
     timeShift.applyAbsoluteShift(std::chrono::seconds(40));
 
-    EXPECT_VALUE(sum(), 300);
     EXPECT_EQ(sampleAvg(), 150);
-    EXPECT_EQ(deltaAvg(), 10);
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 }
 

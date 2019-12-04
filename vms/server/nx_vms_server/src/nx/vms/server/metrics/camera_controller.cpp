@@ -101,15 +101,25 @@ auto makeAvailabilityProviders()
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "streamIssues",
-            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
+            [](const auto& r) { return Value(r->getMetric(&Camera::Metrics::streamIssues)); },
             timerWatch<Camera*>(kIssuesRateUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "ipConflicts",
-            [](const auto& r) { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
+            [](const auto& r) { return Value(r->getMetric(&Camera::Metrics::ipConflicts)); },
             timerWatch<Camera*>(kipConflictsRateUpdateInterval)
         )
     );
+}
+
+static bool isCameraControlEnabled(const Resource& camera)
+{
+    return !(
+        camera->getCameraCapabilities().testFlag(Qn::FixedQualityCapability)
+        || camera->isCameraControlDisabled()
+        || !camera->hasVideo()
+    );
+
 }
 
 auto makeStreamProviders(StreamIndex streamIndex)
@@ -139,12 +149,8 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "targetFps",
             [streamIndex](const auto& r)
             {
-                const bool fixedQuality =
-                    r->getCameraCapabilities().testFlag(Qn::FixedQualityCapability);
-                if (r->isCameraControlDisabled() || !r->hasVideo() || fixedQuality)
-                    return Value();
-                if (auto params = r->targetParams(streamIndex))
-                    return Value(params->fps);
+                if (auto p = r->targetParams(streamIndex); isCameraControlEnabled(r) && p && p->fps > 0)
+                    return Value(p->fps);
                 return Value();
             }
         ),
@@ -152,9 +158,8 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "actualFps",
             [streamIndex](const auto& r)
             {
-                auto params = r->actualParams(streamIndex);
-                if (params && params->fps > 0)
-                    return Value(params->fps);
+                if (auto p = r->actualParams(streamIndex); p && p->fps > 0)
+                    return Value(p->fps);
                 return Value();
             }
         ),
@@ -162,10 +167,10 @@ auto makeStreamProviders(StreamIndex streamIndex)
             "fpsDelta",
             [streamIndex](const auto& r)
             {
-                const auto targetParams = r->targetParams(streamIndex);
-                const auto actualParams = r->actualParams(streamIndex);
-                if (targetParams && actualParams && actualParams->fps > 0)
-                    return Value(targetParams->fps - actualParams->fps);
+                const auto target = r->targetParams(streamIndex).value_or(QnLiveStreamParams{});
+                const auto actual = r->actualParams(streamIndex).value_or(QnLiveStreamParams{});
+                if (isCameraControlEnabled(r) && target.fps > 0 && actual.fps > 0)
+                    return Value(target.fps - actual.fps);
                 return Value();
             },
             timerWatch<Camera*>(kFpsDeltaCheckInterval)

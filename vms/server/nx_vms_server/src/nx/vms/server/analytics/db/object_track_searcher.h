@@ -47,7 +47,7 @@ public:
     /**
      * Throws on failure.
      */
-    std::vector<ObjectTrack> lookup(nx::sql::QueryContext* queryContext);
+    std::vector<ObjectTrackEx> lookup(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(nx::sql::SqlQuery* query);
 
@@ -70,7 +70,7 @@ public:
 private:
     struct TrackQueryResult
     {
-        std::vector<ObjectTrack> tracks;
+        std::vector<ObjectTrackEx> tracks;
         std::set<QnUuid> ids;
     };
 
@@ -84,7 +84,7 @@ private:
         nx::sql::QueryContext* queryContext,
         const QnUuid& trackGuid);
 
-    std::vector<ObjectTrack> lookupTracksUsingArchive(nx::sql::QueryContext* queryContext);
+    std::vector<ObjectTrackEx> lookupTracksUsingArchive(nx::sql::QueryContext* queryContext);
 
     void fetchTracksFromDb(
         nx::sql::QueryContext* queryContext,

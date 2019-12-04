@@ -54,11 +54,22 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     if (needMetadata())
         return getMetadata();
 
+    const auto result = receivePacket();
+    if (!result)
+    {
+        closeStream();
+        return nullptr;
+    }
+
+    return result;
+}
+
+QnAbstractMediaDataPtr QnTestCameraStreamReader::receivePacket()
+{
     const auto error = //< Intended to be called as `return error("message template", ...);`.
         [this](auto... args)
         {
             NX_ERROR(this, args...);
-            closeStream();
             return nullptr;
         };
 
@@ -76,7 +87,12 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 
     if (header.flags() & Flag::mediaContext)
     {
-        if (header.flags() & Flag::ptsIncluded)
+        // Receive and process the media context packet, and then call this function recursively to
+        // receive the next packet (hopefully a frame packet).
+        //
+        // ATTENTION: If a large number of media context packets is sent, stack overflow may occur.
+
+        if (header.flags() & Flag::ptsIncluded || header.flags() & Flag::channelNumberIncluded)
             return error("Invalid packet flags received: %1", header.flagsAsHex());
 
         QByteArray mediaContext(header.dataSize(), /*filler*/ 0);
@@ -86,13 +102,11 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(mediaContext));
         return getNextData(); //< recursion
     }
-    else
-    {
-        return receiveFrame(header);
-    }
+
+    return receiveFramePacketBody(header);
 }
 
-QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFrame(
+QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFramePacketBody(
     const nx::vms::testcamera::packet::Header& header)
 {
     using namespace nx::vms::testcamera::packet;
@@ -108,6 +122,13 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFrame(
     else
     {
         frame->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    }
+
+    if (header.flags() & Flag::channelNumberIncluded)
+    {
+        if (!receiveData<uint8_t>(&frame->channelNumber, "channel number"))
+            return nullptr;
+        NX_VERBOSE(this, "Received channel number %1.", frame->channelNumber);
     }
 
     frame->compressionType = header.codecId();

@@ -50,7 +50,7 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor*
     }
     else
     {
-        NX_WARNING(this, "Data processor is already added: %1", dp);
+        NX_DEBUG(this, "Data processor is already added: %1", dp);
     }
 }
 

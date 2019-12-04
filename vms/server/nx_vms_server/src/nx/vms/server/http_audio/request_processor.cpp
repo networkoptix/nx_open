@@ -6,49 +6,25 @@
 
 #include <nx/vms/api/protocol_version.h>
 #include <nx/network/websocket/websocket_handshake.h>
-
+#include <api/helpers/camera_id_helper.h>
 
 // Streaming from camera
 #include <nx/vms/server/resource/camera.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/server/http_audio/http_audio_consumer.h>
+#include <nx/vms/server/http_audio/async_channel_audio_consumer.h>
 #include <camera/camera_pool.h>
 
 // Streaming to camera
 #include <streaming/audio_streamer_pool.h>
 #include <network/tcp_connection_priv.h>
-#include <nx/vms/server/http_audio/http_audio_provider.h>
+#include <nx/vms/server/http_audio/async_channel_audio_provider.h>
+#include <nx/network/aio/async_channel_adapter.h>
+
+namespace {
+    constexpr std::chrono::milliseconds kIdleTime {10};
+}
 
 namespace nx::vms::server::http_audio {
-
-class SocketToAsyncChannelAdapter : public nx::network::aio::AbstractAsyncChannel
-{
-public:
-    SocketToAsyncChannelAdapter(std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket) :
-        m_socket(std::move(socket))
-    {
-    }
-
-    virtual void readSomeAsync(
-        nx::Buffer* const buffer, nx::network::IoCompletionHandler handler) override
-    {
-        m_socket->readSomeAsync(buffer, std::move(handler));
-    }
-
-    virtual void sendAsync(
-        const nx::Buffer& /*buffer*/, nx::network::IoCompletionHandler /*handler*/) override
-    {
-        return;
-    }
-
-    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
-    {
-        m_socket->cancelIOSync(eventType);
-    }
-
-private:
-    std::unique_ptr<nx::network::AbstractCommunicatingSocket> m_socket;
-};
 
 AudioRequestProcessor::AudioRequestProcessor(
     QnMediaServerModule* serverModule,
@@ -67,9 +43,11 @@ AudioRequestProcessor::~AudioRequestProcessor()
     stop();
 }
 
-QnVideoCameraPtr AudioRequestProcessor::getVideoCamera(const QnUuid& cameraId)
+QnVideoCameraPtr AudioRequestProcessor::getVideoCamera(const QString& cameraId)
 {
-    auto resource = serverModule()->resourcePool()->getResourceById<resource::Camera>(cameraId);
+    QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+        commonModule()->resourcePool(), cameraId);
+
     if (!resource)
     {
         NX_WARNING(this, "Resource not found %1", cameraId);
@@ -80,7 +58,23 @@ QnVideoCameraPtr AudioRequestProcessor::getVideoCamera(const QnUuid& cameraId)
     {
         NX_DEBUG(this,
             "Trying to initialize resource if it was not initialized for some unknown reason");
-        resource->init();
+        if (!resource->init())
+        {
+            NX_WARNING(this, "Failed to initialize camera resource %1", cameraId);
+            return QnVideoCameraPtr();
+        }
+        if (!resource->isInitialized())
+        {
+            NX_WARNING(this, "Camera still not initialized, resource %1", cameraId);
+            return QnVideoCameraPtr();
+        }
+    }
+    nx::vms::server::resource::Camera* camRes =
+        dynamic_cast<nx::vms::server::resource::Camera*>(resource.get());
+    if (!camRes || !camRes->hasCameraCapabilities(Qn::AudioTransmitCapability))
+    {
+        NX_WARNING(this, "Camera does not support backchannel audio, resource %1", cameraId);
+        return QnVideoCameraPtr();
     }
 
     auto camera = videoCameraPool()->getVideoCamera(resource);
@@ -101,15 +95,53 @@ void AudioRequestProcessor::startAudioStreaming(
         NX_WARNING(this, "Failed to obtain live stream reader %1", camera);
         return;
     }
-    auto audioConsumer = std::make_unique<HttpAudioConsumer>(std::move(socket));
+    auto audioConsumer = std::make_unique<AsyncChannelAudioConsumer>(std::move(socket));
     liveReader->addDataProcessor(audioConsumer.get());
     liveReader->startIfNotRunning();
     audioConsumer->start();
 
     while (!needToStop() && audioConsumer->isRunning())
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(kIdleTime);
 
     liveReader->removeDataProcessor(audioConsumer.get());
+}
+
+
+void AudioRequestProcessor::startAudioReceiving(
+    nx::network::aio::AsyncChannelPtr streamChannel,
+    const QnVideoCameraPtr& camera,
+    const QUrlQuery& query)
+{
+    std::optional<FfmpegAudioDemuxer::StreamConfig> config;
+    if (!query.queryItemValue("format").toStdString().empty())
+    {
+        config.emplace();
+        config.value().format = query.queryItemValue("format").toStdString();
+        config.value().sampleRate = query.queryItemValue("sample_rate").toStdString();
+        config.value().channelsNumber = query.queryItemValue("channels").toStdString();
+    }
+
+    QSharedPointer<AsyncChannelAudioProvider> httpProvider(
+        new AsyncChannelAudioProvider(std::move(streamChannel), config));
+
+    QString errorMessage;
+    bool result = audioStreamPool()->startStopStreamToResource(
+        httpProvider,
+        camera->resource()->getId(),
+        QnAudioStreamerPool::Action::Start,
+        errorMessage);
+    if (!result)
+    {
+        NX_WARNING(this, "Failed to start streaming audio to camera: %1, error: %2",
+            camera->resource(), errorMessage);
+        return;
+    }
+
+    VideoCameraLocker locker(camera);
+    while (httpProvider->isRunning() && !needToStop())
+        std::this_thread::sleep_for(kIdleTime);
+
+    httpProvider->pleaseStop();
 }
 
 void AudioRequestProcessor::run()
@@ -125,20 +157,17 @@ void AudioRequestProcessor::run()
 
     parseRequest();
     auto query = QUrlQuery(d->request.requestLine.url.query().toLower());
-    QString cameraIdStr = query.queryItemValue("camera_id");
-    QnUuid cameraId = QnUuid::fromStringSafe(cameraIdStr);
-    if (cameraId.isNull())
+    QString cameraId = query.queryItemValue("camera_id");
+    auto videoCamera = getVideoCamera(cameraId);
+    if (!videoCamera)
     {
-        NX_WARNING(this, "Invalid camera id specified: '%1'", cameraIdStr);
-        sendResponse(http::StatusCode::badRequest, http::StringType());
+        NX_WARNING(this, "Invalid video camera %1", cameraId);
+        sendResponse(http::StatusCode::notFound, http::StringType());
         return;
     }
 
     nx::network::aio::AsyncChannelPtr streamChannel;
     d->socket->setNonBlockingMode(true);
-    unsigned int millis = 0;
-    d->socket->getRecvTimeout(&millis);
-    NX_DEBUG(this, "recv timeout: %1", millis);
     auto error = websocket::validateRequest(d->request, &d->response, true /*disableCompression*/);
     if (error == websocket::Error::noError) // websocket
     {
@@ -155,46 +184,10 @@ void AudioRequestProcessor::run()
     {
         // TODO
         //sendResponse(http::StatusCode::ok, nx::network::http::StringType());
-        streamChannel = std::make_unique<SocketToAsyncChannelAdapter>(std::move(d->socket));
+        streamChannel = nx::network::aio::makeAsyncChannelAdapter(std::move(d->socket));
     }
 
-    auto videoCamera = getVideoCamera(cameraId);
-    if (!videoCamera)
-    {
-        sendResponse(http::StatusCode::notFound, http::StringType());
-        return;
-    }
-
-    QSharedPointer<HttpAudioProvider> httpProvider(
-        new HttpAudioProvider(std::move(streamChannel)));
-    FfmpegAudioDemuxer::StreamConfig config;
-    config.format = query.queryItemValue("format").toStdString();
-    config.sampleRate = query.queryItemValue("sample_rate").toStdString();
-    config.channelsNumber = query.queryItemValue("channels").toStdString();
-    if (!httpProvider->openStream(config.format.empty() ? nullptr : &config))
-    {
-        NX_WARNING(this, "Failed to open audio stream for camera: %1", cameraId);
-        return;
-    }
-
-    QString errorMessage;
-    bool result = audioStreamPool()->startStopStreamToResource(
-        httpProvider, cameraId, QnAudioStreamerPool::Action::Start, errorMessage);
-    if (!result)
-    {
-        NX_WARNING(this, "Failed to start streaming audio to camera: %1, error: %2",
-            cameraId, errorMessage);
-        return;
-    }
-
-    videoCamera->inUse(this);
-    while (httpProvider->isRunning() && !needToStop())
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    //audioStreamPool()->startStopStreamToResource(
-      //  httpProvider, cameraId, QnAudioStreamerPool::Action::Stop, errorMessage);
-    httpProvider->pleaseStop();
-    videoCamera->notInUse(this);
+    startAudioReceiving(std::move(streamChannel), videoCamera, query);
 }
 
 } // namespace nx::vms::server::http_audio

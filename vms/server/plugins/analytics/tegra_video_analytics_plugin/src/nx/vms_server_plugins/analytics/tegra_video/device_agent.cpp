@@ -22,7 +22,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
     m_engine(engine)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;

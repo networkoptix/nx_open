@@ -252,7 +252,8 @@ namespace ec2
         {
             if( httpClient->failed() || !httpClient->response() )
                 return handler( ErrorCode::ioError );
-            switch( httpClient->response()->statusLine.statusCode )
+            const auto statusCode = httpClient->response()->statusLine.statusCode;
+            switch (statusCode)
             {
                 case nx::network::http::StatusCode::ok:
                     return handler( ErrorCode::ok );
@@ -263,6 +264,7 @@ namespace ec2
                 case nx::network::http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported );
                 default:
+                    NX_DEBUG(this, "Unexpected server error %1", statusCode);
                     return handler( ErrorCode::serverError );
             }
         }

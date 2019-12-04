@@ -48,12 +48,6 @@ void StorageController::start()
         });
 }
 
-static Value ioRate(const Resource& resource, std::atomic<qint64> StorageResource::Metrics::* metric)
-{
-    const auto bytes = resource->getAndResetMetric(metric);
-    return api::metrics::Value(double(bytes) / double(kIoRateUpdateInterval.count()));
-}
-
 static auto transactionsPerSecond(const Resource& storage)
 {
     const auto ownMediaServer = storage->commonModule()->resourcePool()->getOwnMediaServerOrThrow();
@@ -79,7 +73,7 @@ static auto infoGroupProvider()
                 "pool",
                 [](const auto& r)
                 {
-                    if (!r->isWritable())
+                    if (!r->isUsedForWriting())
                         return "Reserved";
                     return r->isBackup() ? "Backup" : "Main";
                 }
@@ -112,10 +106,7 @@ static auto stateGroupProvider()
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "issues",
-                [](const auto& r)
-                {
-                    return Value(r->getAndResetMetric(&StorageResource::Metrics::issues));
-                },
+                [](const auto& r) { return Value(r->getMetric(&StorageResource::Metrics::issues)); },
                 timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
             )
         );
@@ -128,12 +119,12 @@ static auto activityGroupProvider()
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "readRateBps",
-                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::bytesRead); },
                 timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "writeRateBps",
-                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesWritten); },
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::bytesWritten); },
                 timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -150,15 +141,21 @@ static auto spaceGroupProvider()
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "totalSpaceB",
-                [](const auto& r) { return r->getTotalSpace(); }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceP",
-                [](const auto& r) { return r->nxOccupedSpace() / (double) r->getTotalSpace(); }
+                [](const auto& r)
+                {
+                    if (const auto space = r->getTotalSpace(); space > 0)
+                        return Value(space);
+                    return Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "mediaSpaceB",
-                [](const auto& r) { return r->nxOccupedSpace(); }
+                [](const auto& r)
+                {
+                    if (const auto space = r->nxOccupedSpace(); space > 0)
+                        return Value(space);
+                    return Value();
+                }
             )
         );
 }

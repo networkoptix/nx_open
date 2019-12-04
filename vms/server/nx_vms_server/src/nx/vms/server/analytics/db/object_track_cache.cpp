@@ -106,6 +106,8 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
         trackUpdate.lastAppearanceTimeUs = ctx.track.lastAppearanceTimeUs;
         trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
         trackUpdate.allAttributes = ctx.track.attributes;
+        if (ctx.track.bestShot.initialized())
+            trackUpdate.bestShot = ctx.track.bestShot;
 
         result.push_back(std::move(trackUpdate));
     }
@@ -113,12 +115,16 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     return result;
 }
 
-std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
+std::optional<ObjectTrackEx> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
     if (auto it = m_tracksById.find(trackId); it != m_tracksById.end())
-        return it->second.track;
+    {
+        ObjectTrackEx result(it->second.track);
+        result.objectPositionSequence = it->second.allPositionSequence;
+        return result;
+    }
 
     return std::nullopt;
 }
@@ -206,12 +212,14 @@ void ObjectTrackCache::updateObject(
     if (trackContext.track.objectTypeId.isEmpty())
         trackContext.track.objectTypeId = objectMetadata.typeId;
 
-    if (objectMetadata.bestShot)
+    if (objectMetadata.bestShot || !trackContext.track.bestShot.initialized())
     {
         // "Best shot" packet contains only information about the best shot, not a real object movement.
         trackContext.track.bestShot.timestampUs = packet.timestampUs;
         trackContext.track.bestShot.rect = objectMetadata.boundingBox;
-        return;
+
+        if (objectMetadata.bestShot)
+            return;
     }
 
     trackContext.track.lastAppearanceTimeUs = packet.timestampUs;
@@ -219,6 +227,14 @@ void ObjectTrackCache::updateObject(
     addNewAttributes(objectMetadata.attributes, &trackContext);
 
     trackContext.track.objectPosition.add(objectMetadata.boundingBox);
+
+    ObjectPosition objectPosition;
+    objectPosition.deviceId = packet.deviceId;
+    objectPosition.timestampUs = packet.timestampUs;
+    objectPosition.durationUs = packet.durationUs;
+    objectPosition.boundingBox = objectMetadata.boundingBox;
+    objectPosition.attributes = objectMetadata.attributes;
+    trackContext.allPositionSequence.emplace_back(objectPosition);
 }
 
 void ObjectTrackCache::addNewAttributes(

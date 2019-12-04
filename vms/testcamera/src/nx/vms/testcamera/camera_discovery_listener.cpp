@@ -15,11 +15,11 @@ namespace nx::vms::testcamera {
 
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
-    QByteArray discoveryResponseData,
+    std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
     QStringList localInterfacesToListen)
     :
     m_logger(logger),
-    m_discoveryResponseData(std::move(discoveryResponseData)),
+    m_obtainDiscoveryResponseMessageFunc(std::move(obtainDiscoveryResponseMessageFunc)),
     m_localInterfacesToListen(std::move(localInterfacesToListen))
 {
 }
@@ -62,7 +62,7 @@ bool CameraDiscoveryListener::initialize()
 bool CameraDiscoveryListener::serverAddressIsAllowed(
     const nx::network::SocketAddress& serverAddress)
 {
-    if (m_allowedIpRanges.isEmpty()) //< All Server IPs are allowed.
+    if (m_allowedIpRanges.empty()) //< All Server IPs are allowed.
         return true;
 
     const auto addr = serverAddress.address.ipV4();
@@ -81,7 +81,7 @@ bool CameraDiscoveryListener::serverAddressIsAllowed(
         });
 }
 
-/** @return Empty string if  or on error, having logged the error message. */
+/** @return Empty string on error, having logged the error message. */
 QByteArray CameraDiscoveryListener::receiveDiscoveryMessage(
     QByteArray* buffer,
     nx::network::SocketAddress* outServerAddress,
@@ -112,10 +112,7 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     nx::network::AbstractDatagramSocket* discoverySocket,
     const nx::network::SocketAddress& serverAddress) const
 {
-    QByteArray response(ini().discoveryResponseMessage);
-    response.append('\n');
-    response.append(';');
-    response.append(m_discoveryResponseData);
+    const QByteArray response = m_obtainDiscoveryResponseMessageFunc();
 
     discoverySocket->setDestAddr(serverAddress);
     const int bytesSent = discoverySocket->send(response.data(), response.size());
@@ -131,7 +128,8 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     }
     else
     {
-        NX_LOGGER_VERBOSE(m_logger, "Sent discovery response message to Server %1", serverAddress);
+        NX_LOGGER_VERBOSE(m_logger, "Sent discovery response message to Server %1: %2",
+            serverAddress, nx::kit::utils::toString(response));
     }
 }
 

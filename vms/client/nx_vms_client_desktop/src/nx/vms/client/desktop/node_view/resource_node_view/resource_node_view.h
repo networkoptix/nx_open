@@ -2,15 +2,15 @@
 
 #include <QtCore/QScopedPointer>
 
-#include "../node_view/node_view.h"
+#include "../node_view/tree_node_view.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class ResourceNodeView: public NodeView
+class ResourceNodeView: public TreeNodeView
 {
     Q_OBJECT
-    using base_type = NodeView;
+    using base_type = TreeNodeView;
 
 public:
     ResourceNodeView(QWidget* parent = nullptr);

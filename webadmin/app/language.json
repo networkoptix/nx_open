@@ -119,7 +119,8 @@
 
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod":  "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
 
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
 

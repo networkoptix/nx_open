@@ -20,6 +20,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::showPopupAction:
         case ActionType::openLayoutAction:
         case ActionType::exitFullscreenAction:
+        case ActionType::buzzerAction:
             return false;
 
         case ActionType::playSoundOnceAction:
@@ -61,6 +62,7 @@ bool requiresUserResource(ActionType actionType)
         case ActionType::openLayoutAction:
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
+        case ActionType::buzzerAction:
             return false;
 
         case ActionType::acknowledgeAction:
@@ -92,6 +94,7 @@ bool requiresAdditionalUserResource(ActionType actionType)
         case ActionType::openLayoutAction:
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
+        case ActionType::buzzerAction:
             return false;
 
         case ActionType::bookmarkAction:
@@ -103,6 +106,17 @@ bool requiresAdditionalUserResource(ActionType actionType)
 
         default:
             NX_ASSERT(false, "All action types must be handled.");
+            return false;
+    }
+}
+
+bool requiresServerResource(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case ActionType::buzzerAction:
+            return true;
+        default:
             return false;
     }
 }
@@ -132,6 +146,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::bookmarkAction:
         case ActionType::showTextOverlayAction:
         case ActionType::fullscreenCameraAction:
+        case ActionType::buzzerAction:
             return true;
 
         default:
@@ -158,6 +173,7 @@ bool supportsDuration(ActionType actionType)
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
         case ActionType::fullscreenCameraAction:
+        case ActionType::buzzerAction:
             return true;
         default:
             return false;
@@ -193,6 +209,7 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
         case ActionType::fullscreenCameraAction:
+        case ActionType::buzzerAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -224,6 +241,7 @@ QList<ActionType> userAvailableActions()
         ActionType::execHttpRequestAction,
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction,
+        ActionType::buzzerAction,
     };
 
     return result;

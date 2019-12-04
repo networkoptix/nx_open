@@ -347,6 +347,12 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!camera)
         return false;
 
+    if (camera->hasCameraCapabilities(Qn::CameraCapability::ServerBoundCapability)
+        && camera->getParentId() != commonModule()->moduleGUID())
+    {
+        return false;
+    }
+
     if (camera->failoverPriority() == Qn::FailoverPriority::never)
         return false;
 

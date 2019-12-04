@@ -36,11 +36,19 @@ Label::Label(QString id, QString name):
 {
 }
 
-ValueManifest::ValueManifest(Label label, Displays display, QString format):
-    Label(std::move(label)),
-    display(display),
-    format(std::move(format))
+ValueManifest::ValueManifest(QString id, QString name):
+    Label(std::move(id), std::move(name))
 {
+}
+
+void apply(const ValueRule& rule, ValueManifest* manifest)
+{
+    if (!rule.name.isEmpty())
+        manifest->name = rule.name;
+
+    manifest->description = rule.description;
+    manifest->display = rule.display;
+    manifest->format = rule.format;
 }
 
 static QString durationString(int64_t duration)
@@ -100,43 +108,43 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "durationS")
         return [](Value v) { return Value(durationString((int64_t) v.toDouble())); };
 
-    if (targetFormat == "b" || targetFormat == "bps")
+    if (targetFormat == "bit" || targetFormat == "bit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8; });
 
-    if (targetFormat == "Kb" || targetFormat == "Kbps")
+    if (targetFormat == "Kbit" || targetFormat == "Kbit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0); });
 
     if (targetFormat == "KPix/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1000.0); });
 
-    if (targetFormat == "KB"|| targetFormat == "KBps")
+    if (targetFormat == "KB"|| targetFormat == "KB/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0); });
 
-    if (targetFormat == "Mb" || targetFormat == "Mbps")
+    if (targetFormat == "Mbit" || targetFormat == "Mbit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000); });
 
     if (targetFormat == "MPix/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1000.0 * 1000); });
 
-    if (targetFormat == "MB" || targetFormat == "MBps")
+    if (targetFormat == "MB" || targetFormat == "MB/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0 * 1024); });
 
-    if (targetFormat == "Gb" || targetFormat == "Gbps")
+    if (targetFormat == "Gbit" || targetFormat == "Gbit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000 * 1000); });
 
     if (targetFormat == "GPix/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1000.0 * 1000 * 1000); });
 
-    if (targetFormat == "GB" || targetFormat == "GBps")
+    if (targetFormat == "GB" || targetFormat == "GB/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0 * 1024 * 1024); });
 
-    if (targetFormat == "Tb" || targetFormat == "Tbps")
+    if (targetFormat == "Tbit" || targetFormat == "Tbit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8 / double(1000.0 * 1000 * 1000 * 1000); });
 
     if (targetFormat == "TPix/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1000.0 * 1000 * 1000 * 1000); });
 
-    if (targetFormat == "TB" || targetFormat == "TBps")
+    if (targetFormat == "TB" || targetFormat == "TB/s")
         return numericFormatter(targetFormat, [](double v) { return v / double(1024.0 * 1024 * 1024 * 1024); });
 
     // All unknown formats stay unchanged, but rounded.

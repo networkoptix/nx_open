@@ -149,6 +149,40 @@ void validateList(
         [](const auto& entry) { return entry.name; });
 }
 
+static bool isPixelFormatSpecified(const EngineManifest& manifest)
+{
+    using Capability = EngineManifest::Capability;
+
+    return manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_yuv420)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_rgba)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_rgb)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_bgra)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_bgr)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_argb)
+        || manifest.capabilities.testFlag(Capability::needUncompressedVideoFrames_abgr);
+}
+
+static void validatePixelFormats(
+    std::vector<ManifestError>* inOutErrorList,
+    const EngineManifest& manifest)
+{
+    const bool pixelFormatIsSpecified = isPixelFormatSpecified(manifest);
+
+    if (manifest.streamTypeFilter.testFlag(StreamType::uncompressedVideo)
+        && !pixelFormatIsSpecified)
+    {
+        inOutErrorList->push_back(
+            ManifestError(ManifestErrorType::uncompressedFramePixelFormatIsNotSpecified));
+    }
+    else if (manifest.streamTypeFilter
+        && !manifest.streamTypeFilter.testFlag(StreamType::uncompressedVideo)
+        && pixelFormatIsSpecified)
+    {
+        inOutErrorList->push_back(
+            ManifestError(ManifestErrorType::excessiveUncompressedFramePixelFormatSpecification));
+    }
+}
+
 std::vector<ManifestError> validate(const EngineManifest& manifest)
 {
     std::vector<ManifestError> result;
@@ -195,6 +229,8 @@ std::vector<ManifestError> validate(const EngineManifest& manifest)
             ManifestErrorType::duplicatedObjectActionName,
             "Object Action"
         });
+
+    validatePixelFormats(&result, manifest);
 
     return result;
 }

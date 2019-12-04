@@ -17,16 +17,17 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IMediaContext"); }
 
     /**
-     * @return pointer to codec specific blob of extradata or nullptr (if no extradata needed).
+     * @return Pointer to the codec-specific blob of extradata, or null if no extradata is
+     *     available.
      */
-    virtual const char* extradata() const;
+    virtual const char* extradata() const = 0;
 
     /**
-     * @return size of blob returned by extradata call (in bytes).
+     * @return Size of the data returned by the extradata(), in bytes.
      */
-    virtual int extradataSize() const;
+    virtual int extradataSize() const = 0;
 };
 
 } // namespace analytics
-} // namesapce sdk
+} // namespace sdk
 } // namespace nx

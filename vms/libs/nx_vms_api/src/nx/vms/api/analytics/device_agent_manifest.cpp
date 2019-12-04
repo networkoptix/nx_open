@@ -175,6 +175,7 @@ std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManife
         });
 
     if (!deviceAgentManifest.deviceAgentSettingsModel.isUndefined()
+        && !deviceAgentManifest.deviceAgentSettingsModel.isNull()
         && !deviceAgentManifest.deviceAgentSettingsModel.isObject())
     {
         result.emplace_back(ManifestErrorType::deviceAgentSettingsModelIsIncorrect);

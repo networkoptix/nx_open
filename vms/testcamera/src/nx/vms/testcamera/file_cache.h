@@ -1,9 +1,12 @@
 #pragma once
 
-#include <QMap>
+#include <set>
+#include <vector>
+#include <map>
+#include <memory>
+
 #include <QFile>
 
-#include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -23,9 +26,10 @@ class FileCache
 public:
     struct File
     {
-        QString filename;
+        QString filename = "UNINITIALIZED";
         int index = -1; //< Used for logging.
-        QList<QnConstCompressedVideoDataPtr> frames;
+        int channelCount = -1; //< Number of independent video channels in the file.
+        std::vector<std::shared_ptr<const QnCompressedVideoData>> frames;
     };
 
     FileCache(QnCommonModule* commonModule, int maxFileSizeMegabytes);
@@ -37,19 +41,20 @@ public:
     /** If the file was not previously loaded, an assertion fails. */
     const File& getFile(const QString& filename) const;
 
-    int fileCount() const { return m_filesByFilename.size(); }
+    int fileCount() const { return (int) m_filesByFilename.size(); }
 
 private:
     bool loadVideoFrames(
         const QString& filename,
-        QList<QnConstCompressedVideoDataPtr>* frames);
+        std::vector<std::shared_ptr<const QnCompressedVideoData>>* frames,
+        std::set<int>* channelNumbers) const;
 
 private:
     QnCommonModule* const m_commonModule;
     const int m_maxFileSizeMegabytes;
     const std::unique_ptr<Logger> m_logger;
 
-    QMap<QString, File> m_filesByFilename;
+    std::map<QString, File> m_filesByFilename;
     mutable QnMutex m_mutex;
 
     const File m_undefinedFile; //< Returned by ref on assertion failures.

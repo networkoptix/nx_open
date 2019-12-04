@@ -39,6 +39,9 @@ public:
     /** Resets parse state and prepares for parsing different data. */
     virtual void reset() override;
 
+    const HttpStreamReader& streamReader() const;
+    HttpStreamReader& streamReader();
+
 private:
     HttpStreamReader m_httpStreamReader;
     Message* m_message = nullptr;

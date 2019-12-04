@@ -7,7 +7,7 @@
 namespace nx {
 namespace sdk {
 
-/** Error codes used both by Plugin methods and Server callbacks. */
+/** Error codes used by Plugin methods. */
 enum class ErrorCode: int
 {
     noError = 0,

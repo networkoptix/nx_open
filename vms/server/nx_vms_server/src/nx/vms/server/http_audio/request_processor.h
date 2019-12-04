@@ -24,9 +24,13 @@ protected:
     virtual void run() override;
 
 private:
-    QnVideoCameraPtr getVideoCamera(const QnUuid& cameraId);
+    QnVideoCameraPtr getVideoCamera(const QString& cameraId);
     void startAudioStreaming(
         nx::network::aio::AsyncChannelPtr socket, const QnVideoCameraPtr& camera);
+    void startAudioReceiving(
+        nx::network::aio::AsyncChannelPtr streamChannel,
+        const QnVideoCameraPtr& camera,
+        const QUrlQuery& query);
 };
 
 } // namespace nx::vms::server::http_audio

@@ -85,7 +85,7 @@ if platform.system() != "Windows":
 
 
 ini_definition = {
-    "virtualCameraCount": {"type": "intList", "range": [1, 999], "default": 4},
+    "virtualCameraCount": {"type": "intList", "range": [1, 999], "default": [4]},
     "liveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 1.0},
     "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
     "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},

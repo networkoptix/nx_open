@@ -27,6 +27,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, overrideSettingsModelInDeviceAgent,
         "If set, Device Agents will declare its own settings model in their manifests");
+
+    NX_INI_FLAG(1, needMetadata,
+        "If set, Engine will declare the corresponding stream type filter in the manifest");
 };
 
 inline Ini& ini()

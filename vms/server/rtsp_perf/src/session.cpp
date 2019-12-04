@@ -54,6 +54,8 @@ void Session::run(const QString& url, const Config& config, bool live)
     rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     rtspClient.setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     rtspClient.setAdditionAttribute("Speed", "1");
+    rtspClient.setAdditionAttribute("x-fast-channel-zapping", "false");
+
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)
     {

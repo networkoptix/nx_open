@@ -5,7 +5,7 @@
 #include "../details/node_view_state.h"
 #include "../details/node_view_store.h"
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_helper.h"
 #include "../node_view/node_view_state_reducer.h"
 
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
@@ -32,7 +32,7 @@ SelectionNodeView::Private::Private(
     :
     owner(q),
     selectionColumns(selectionColumns),
-    checkableCheck([q](const QModelIndex& index) { return checkable(index); })
+    checkableCheck([q](const QModelIndex& index) { return ViewNodeHelper(index).checkable(index.column()); })
 {
 }
 
@@ -63,19 +63,19 @@ SelectionNodeView::SelectionNodeView(
             if (!d->selectionColumns.contains(topLeft.column()))
                 return;
 
-            const auto node = nodeFromIndex(topLeft);
+            const auto node = ViewNodeHelper::nodeFromIndex(topLeft);
             if (!node)
                 return;
 
             // Checks if we have emitted signal already. Just check if all other columns have
             // another value.
-            const auto currentCheckedState = checkedState(topLeft);
+            const auto currentCheckedState = ViewNodeHelper(topLeft).checkedState(topLeft.column());
             const bool hasEmittedSignal =
                 std::any_of(d->selectionColumns.begin(), d->selectionColumns.end(),
                     [node, currentCheckedState, baseColumn = topLeft.column()](int column)
                     {
                         return column != baseColumn
-                            && currentCheckedState == checkedState(node, column);
+                            && currentCheckedState == ViewNodeHelper(node).checkedState(column);
                     });
             emit selectionChanged(node->path(), currentCheckedState);
         });
@@ -110,14 +110,14 @@ void SelectionNodeView::handleDataChangeRequest(
     int role)
 {
     if (role != Qt::CheckStateRole //< Base implementation possibly can handle other role.
-        || !checkable(index)
+        || !ViewNodeHelper(index).checkable(index.column())
         || !d->selectionColumns.contains(index.column()))
     {
         base_type::handleDataChangeRequest(index, value, role);
         return;
     }
 
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     const auto checkedState = value.value<Qt::CheckState>();
     applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
         state(), d->selectionColumns, node->path(), checkedState));

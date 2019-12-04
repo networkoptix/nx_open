@@ -224,7 +224,9 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         SET track_detail = ?,
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),
-            track_end_ms = max(track_end_ms, ?)
+            track_end_ms = max(track_end_ms, ?),
+            best_shot_timestamp_ms = coalesce(?, best_shot_timestamp_ms),
+            best_shot_rect = coalesce(?, best_shot_rect)
         WHERE id = ?
     )sql");
 
@@ -243,13 +245,23 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         ObjectRegion region = loadExistingRegion(dbId);
         region.add(trackUpdate.appendedTrack);
 
-        updateObjectQuery->bindValue(0, region.boundingBoxGrid);
-        updateObjectQuery->bindValue(1, (long long) newAttributesId);
-        updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, dbId);
-        updateObjectQuery->exec();
+        updateObjectQuery->addBindValue(region.boundingBoxGrid);
+        updateObjectQuery->addBindValue((long long) newAttributesId);
+        updateObjectQuery->addBindValue(trackMinTimestamp / kUsecInMs);
+        updateObjectQuery->addBindValue(trackMaxTimestamp / kUsecInMs);
+        if (trackUpdate.bestShot.initialized())
+        {
+            updateObjectQuery->addBindValue(trackUpdate.bestShot.timestampUs / kUsecInMs);
+            updateObjectQuery->addBindValue(TrackSerializer::serialized(trackUpdate.bestShot.rect));
+        }
+        else
+        {
+            updateObjectQuery->addBindValue(QVariant());
+            updateObjectQuery->addBindValue(QVariant());
+        }
+        updateObjectQuery->addBindValue(dbId);
 
+        updateObjectQuery->exec();
         m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);
     }
 }

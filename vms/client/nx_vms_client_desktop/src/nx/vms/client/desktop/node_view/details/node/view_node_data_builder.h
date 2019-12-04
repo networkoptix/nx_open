@@ -15,14 +15,27 @@ class NX_VMS_CLIENT_DESKTOP_API ViewNodeDataBuilder
 public:
     explicit ViewNodeDataBuilder();
     explicit ViewNodeDataBuilder(ViewNodeData& data);
+    explicit ViewNodeDataBuilder(const ViewNodeData& data);
+
     ~ViewNodeDataBuilder();
 
     ViewNodeDataBuilder& separator();
 
     ViewNodeDataBuilder& withText(int column, const QString& value);
-    ViewNodeDataBuilder& withCheckedState(int column, Qt::CheckState value);
-    ViewNodeDataBuilder& withCheckedState(const ColumnSet& columns, Qt::CheckState value);
-    ViewNodeDataBuilder& withCheckedState(int column, const OptionalCheckedState& value);
+
+    ViewNodeDataBuilder& withCheckedState(
+        int column,
+        Qt::CheckState value,
+        bool isUserAction = false);
+    ViewNodeDataBuilder& withCheckedState(
+        const ColumnSet& columns,
+        Qt::CheckState value,
+        bool isUserAction = false);
+    ViewNodeDataBuilder& withCheckedState(
+        int column,
+        const OptionalCheckedState& value,
+        bool isUserAction = false);
+
     ViewNodeDataBuilder& withIcon(int column, const QIcon& value);
     /**
     * Assuming that the sort order is ascending, nodes with lesser group sort order property will go
@@ -39,6 +52,10 @@ public:
 
     ViewNodeDataBuilder& withFlag(int column, Qt::ItemFlag flag, bool value = true);
     ViewNodeDataBuilder& withFlags(int column, Qt::ItemFlags flags);
+
+    ViewNodeDataBuilder& withNodeData(const ViewNodeData& data);
+
+    ViewNodeDataBuilder& withProperty(int id, const QVariant& value);
 
     ViewNodeData data() const;
 
