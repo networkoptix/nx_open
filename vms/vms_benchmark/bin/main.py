@@ -119,6 +119,7 @@ ini_definition = {
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
     "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
     "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
+    "enableSwapThreshold": {"type": "bool", "default": False},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
@@ -738,7 +739,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         if swapped_initially_kilobytes is not None and swapped_kilobytes is not None:
                             swapped_during_test_kilobytes = swapped_kilobytes - swapped_initially_kilobytes
-                            if swapped_during_test_kilobytes > ini['swapThresholdKilobytes']:
+                            if (
+                                ini['enableSwapThreshold'] and
+                                swapped_during_test_kilobytes > ini['swapThresholdKilobytes']
+                            ):
                                 issues.append(exceptions.BoxStateError(
                                     f"More than {ini['swapThresholdKilobytes']} KB swapped at the "
                                     f"box during the tests: {swapped_during_test_kilobytes} KB."))
