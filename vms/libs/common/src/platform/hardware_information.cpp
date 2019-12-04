@@ -1,3 +1,5 @@
+#include <QtCore/QProcess>
+
 #include "hardware_information.h"
 
 #include <thread>
@@ -59,17 +61,50 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
     logicalCores = std::thread::hardware_concurrency();
     physicalCores = logicalCores;
 
-    #if !defined(__arm__) && !defined(__aarch64__)
-        int cpuinfo[4];
-        #if defined(_MSC_VER)
-            __cpuid(cpuinfo, 1);
-        #else
-            __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
-        #endif
-        const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
-        if (hasHyperThreading)
-            physicalCores /= 2;
+    QString cmdLine;
+    QByteArray paramName;
+    char delimiter = 0;
+    bool isRelative = false;
+
+    #if defined(Q_OS_WIN)
+        cmdLine = "wmic CPU Get NumberOfCores /Format:List";
+        paramName = "numberofcores";
+        delimiter = '=';
+        isRelative = false; //< Value has number of core count.
+    #elif defined(Q_OS_LINUX)
+        cmdLine = "lscpu";
+        paramName = "per core";
+        delimiter = ':';
+        isRelative = true;  //< Value has decimeter between logical and physical cores.
+    #elif defined(Q_OS_OSX)
+        // TODO: implement me. May be mac has 'lscpu'?
+    #else
     #endif
+
+    QProcess process;
+    process.start(cmdLine);
+    process.waitForFinished();
+    auto outputData = process.readAllStandardOutput();
+
+    int paramValue = 0;
+    for (auto line: outputData.split('\n'))
+    {
+        line = line.trimmed().toLower();
+        if (line.contains(paramName))
+        {
+            auto values = line.split(delimiter);
+            if (values.size() > 1)
+                paramValue = values[1].trimmed().toInt();
+            break;
+        }
+    }
+    if (paramValue)
+    {
+        if (isRelative)
+            physicalCores = logicalCores / paramValue;
+        else
+            physicalCores = paramValue;
+    }
 }
 
 #if defined(Q_OS_WIN)
