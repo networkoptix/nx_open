@@ -95,6 +95,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QString ipAddress;
         QString webPage;
         QString settingsUrlPath;
+        int overrideXmlHttpRequestTimeout = 0;
         bool hasVideo = true;
         bool editableStreamUrls = false;
         bool networkLink = false;

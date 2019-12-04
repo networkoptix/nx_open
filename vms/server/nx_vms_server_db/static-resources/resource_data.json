@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.180",
+    "version": "1.0.1.181",
     "data": [
         {
             "keys": [
@@ -3810,6 +3810,12 @@
                 "hikvision|DS-2TD4237*"
             ],
             "useOnvifPtz": true
+        },
+        {
+            "keys": [
+                "Hanwha|*"
+            ],
+            "overrideXmlHttpRequestTimeout": 30000
         }
     ]
 }
