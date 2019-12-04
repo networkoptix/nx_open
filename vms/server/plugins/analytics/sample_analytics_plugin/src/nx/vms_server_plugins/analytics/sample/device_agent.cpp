@@ -23,7 +23,7 @@ using namespace nx::sdk::analytics;
  */
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     // Call the DeviceAgent helper class constructor telling it to verbosely report to stderr.
-    VideoFrameProcessingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
 {
 }
 

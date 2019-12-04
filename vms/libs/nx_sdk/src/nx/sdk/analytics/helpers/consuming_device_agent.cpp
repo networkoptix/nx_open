@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "video_frame_processing_device_agent.h"
+#include "consuming_device_agent.h"
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
@@ -28,7 +28,7 @@ static std::string makePrintPrefix(const IDeviceInfo* deviceInfo)
         (!deviceInfo ? "" : (std::string("_") + deviceInfo->id())) + "] ";
 }
 
-VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
+ConsumingDeviceAgent::ConsumingDeviceAgent(
     const IDeviceInfo* deviceInfo, bool enableOutput)
     :
     logUtils(enableOutput, makePrintPrefix(deviceInfo))
@@ -37,7 +37,7 @@ VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
     NX_PRINT << "Created " << this;
 }
 
-VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
+ConsumingDeviceAgent::~ConsumingDeviceAgent()
 {
     NX_PRINT << "Destroyed " << this;
 }
@@ -45,14 +45,14 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 
-void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void ConsumingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     handler->addRef();
     m_handler.reset(handler);
 }
 
-void VideoFrameProcessingDeviceAgent::doPushDataPacket(
+void ConsumingDeviceAgent::doPushDataPacket(
     Result<void>* outResult, IDataPacket* dataPacket)
 {
     const auto logError =
@@ -85,6 +85,11 @@ void VideoFrameProcessingDeviceAgent::doPushDataPacket(
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
             return logError(ErrorCode::otherError, "pushUncompressedVideoFrame() failed.");
     }
+    else if (const auto customMetadataPacket = dataPacket->queryInterface<ICustomMetadataPacket>())
+    {
+        if (!pushCustomMetadataPacket(customMetadataPacket.get()))
+            return logError(ErrorCode::otherError, "pushCustomMetadataPacket() failed.");
+    }
     else
     {
         return logError(ErrorCode::invalidParams, "Unsupported frame supplied; ignored.");
@@ -102,7 +107,7 @@ void VideoFrameProcessingDeviceAgent::doPushDataPacket(
     NX_OUTPUT << __func__ << "() END";
 }
 
-void VideoFrameProcessingDeviceAgent::processMetadataPackets(
+void ConsumingDeviceAgent::processMetadataPackets(
     const std::vector<IMetadataPacket*>& metadataPackets)
 {
     if (!metadataPackets.empty())
@@ -118,7 +123,7 @@ void VideoFrameProcessingDeviceAgent::processMetadataPackets(
     }
 }
 
-void VideoFrameProcessingDeviceAgent::processMetadataPacket(
+void ConsumingDeviceAgent::processMetadataPacket(
     IMetadataPacket* metadataPacket, int packetIndex = -1)
 {
     const std::string packetIndexName =
@@ -141,12 +146,12 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-void VideoFrameProcessingDeviceAgent::getManifest(Result<const IString*>* outResult) const
+void ConsumingDeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     *outResult = new String(manifestString());
 }
 
-void VideoFrameProcessingDeviceAgent::doSetSettings(
+void ConsumingDeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
@@ -155,7 +160,7 @@ void VideoFrameProcessingDeviceAgent::doSetSettings(
         *outResult = settingsReceived();
 }
 
-void VideoFrameProcessingDeviceAgent::getPluginSideSettings(
+void ConsumingDeviceAgent::getPluginSideSettings(
     Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }
@@ -163,7 +168,7 @@ void VideoFrameProcessingDeviceAgent::getPluginSideSettings(
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 
-void VideoFrameProcessingDeviceAgent::pushMetadataPacket(
+void ConsumingDeviceAgent::pushMetadataPacket(
     IMetadataPacket* metadataPacket)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -171,7 +176,7 @@ void VideoFrameProcessingDeviceAgent::pushMetadataPacket(
     metadataPacket->releaseRef();
 }
 
-void VideoFrameProcessingDeviceAgent::pushPluginDiagnosticEvent(
+void ConsumingDeviceAgent::pushPluginDiagnosticEvent(
     IPluginDiagnosticEvent::Level level,
     std::string caption,
     std::string description)
@@ -190,12 +195,12 @@ void VideoFrameProcessingDeviceAgent::pushPluginDiagnosticEvent(
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.
-std::string VideoFrameProcessingDeviceAgent::settingValue(const std::string& paramName)
+std::string ConsumingDeviceAgent::settingValue(const std::string& paramName)
 {
     return m_settings[paramName];
 }
 
-void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
+void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     const IMetadataPacket* metadataPacket,
     const std::string& packetIndexName) const
 {

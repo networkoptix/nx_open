@@ -10,7 +10,7 @@
 #include <string>
 #include <deque>
 
-#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
@@ -22,7 +22,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
