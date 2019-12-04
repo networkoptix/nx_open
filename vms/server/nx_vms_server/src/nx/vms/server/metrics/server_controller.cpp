@@ -23,8 +23,12 @@ static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
-    m_counters((int) Metrics::count),
-    m_currentDateTime(&QDateTime::currentDateTime)
+    m_currentDateTime(
+        [&mutex = m_mutex]()
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            return QDateTime::currentDateTime();
+        })
 {
     Qn::directConnect(
         serverModule->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
@@ -154,7 +158,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "decodedPixels",
-            [this](const auto&) { return Value(getMetric(Metrics::decodedPixels)); },
+            [](const auto& r) { return Value(r->commonModule()->metrics()->decodedPixels()); },
             timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
@@ -163,7 +167,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "encodedPixels",
-            [this](const auto&) { return Value(getMetric(Metrics::encodedPixels)); },
+            [](const auto& r) { return Value(r->commonModule()->metrics()->encodedPixels()); },
             timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
@@ -211,7 +215,7 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTimeChanged",
-            [this](const auto&) { return Value(getMetric(Metrics::timeChanged)); },
+            [this](const auto&) { return Value(m_timeChangeEvents.load()); },
             timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
@@ -234,22 +238,26 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeLocalValueProvider<Resource>(
             "transactionsPerSecond",
-            [this](const auto&)
-            { return Value( getMetric(Metrics::transactions)); },
+            [](const auto& r)
+            {
+                const auto& transactions = r->commonModule()->metrics()->transactions();
+                return Value(transactions.success() + transactions.errors());
+            },
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "actionsTriggered",
-            [this](const auto&) { return Value(getMetric(Metrics::ruleActionsTriggered)); },
+            [](const auto& r) { return Value(r->commonModule()->metrics()->ruleActions()); },
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
-            "apiCalls", [this](const auto&) { return Value(getMetric(Metrics::apiCalls)); },
+            "apiCalls",
+            [](const auto& r) { return Value(r->commonModule()->metrics()->apiCalls()); },
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "thumbnails",
-            [this](const auto&) { return Value(getMetric(Metrics::thumbnailsRequested)); },
+            [](const auto& r) { return Value(r->commonModule()->metrics()->thumbnails()); },
             timerWatch<QnMediaServerResource*>(kUpdateInterval)
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
@@ -263,41 +271,6 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             }
         )
     );
-}
-
-qint64 ServerController::getMetric(Metrics parameter)
-{
-    auto metrics = serverModule()->commonModule()->metrics();
-    switch (parameter)
-    {
-        case Metrics::transactions:
-        {
-            const auto counter = metrics->transactions().success() + metrics->transactions().errors();
-            return getDelta(parameter, counter);
-        }
-        case Metrics::timeChanged:
-            return getDelta(parameter, m_timeChangeEvents.load());
-        case Metrics::decodedPixels:
-            return getDelta(parameter, metrics->decodedPixels());
-        case Metrics::encodedPixels:
-            return getDelta(parameter, metrics->encodedPixels());
-        case Metrics::ruleActionsTriggered:
-            return getDelta(parameter, metrics->ruleActions());
-        case Metrics::thumbnailsRequested:
-            return getDelta(parameter, metrics->thumbnails());
-        case Metrics::apiCalls:
-            return getDelta(parameter, metrics->apiCalls());
-        default:
-            return 0;
-    }
-}
-
-qint64 ServerController::getDelta(Metrics key, qint64 value)
-{
-    auto& counter = m_counters[(int)key];
-    qint64 result = value - counter;
-    counter = value;
-    return result;
 }
 
 nx::vms::server::PlatformMonitor* ServerController::platform() const

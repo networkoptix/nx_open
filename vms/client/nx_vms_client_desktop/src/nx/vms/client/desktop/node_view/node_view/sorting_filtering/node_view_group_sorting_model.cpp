@@ -1,6 +1,6 @@
 #include "node_view_group_sorting_model.h"
 
-#include "../../details/node/view_node_helpers.h"
+#include "../../details/node/view_node_helper.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -16,8 +16,8 @@ bool NodeViewGroupSortingModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const int leftGroupOrder = groupSortOrder(sourceLeft);
-    const int rightGroupOrder = groupSortOrder(sourceRight);
+    const int leftGroupOrder = ViewNodeHelper(sourceLeft).groupSortOrder();
+    const int rightGroupOrder = ViewNodeHelper(sourceRight).groupSortOrder();
     return leftGroupOrder == rightGroupOrder
         ? nextLessThan(sourceLeft, sourceRight)
         : leftGroupOrder < rightGroupOrder;

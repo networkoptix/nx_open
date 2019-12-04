@@ -152,9 +152,18 @@ std::unique_ptr<nx::network::AbstractStreamServerSocket> QnTcpListener::createAn
     const nx::network::SocketAddress& localAddress)
 {
     auto serverSocket = nx::network::SocketFactory::createStreamServerSocket(sslNeeded);
-    if (!serverSocket->setReuseAddrFlag(true) ||
-        !serverSocket->setReusePortFlag(true) ||
-        !serverSocket->bind(localAddress) ||
+
+    if (localAddress.port)
+    {
+        if (!serverSocket->setReuseAddrFlag(true) ||
+            !serverSocket->setReusePortFlag(true))
+        {
+            setLastError(SystemError::getLastOSErrorCode());
+            return nullptr;
+        }
+    }
+
+    if (!serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
         setLastError(SystemError::getLastOSErrorCode());

@@ -19,6 +19,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, LicenseType)
 
 // ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them. Such values
 // should go before the correct ones, so both versions are supported on input, and only deprecated

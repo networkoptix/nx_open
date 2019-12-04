@@ -147,6 +147,7 @@ public:
         NO_ALLOW_EMPTY      = 1 << 2,
     };
 
+    /** @return Whether the stored property value has been modified by this call. */
     virtual bool setProperty(
         const QString &key,
         const QString &value,

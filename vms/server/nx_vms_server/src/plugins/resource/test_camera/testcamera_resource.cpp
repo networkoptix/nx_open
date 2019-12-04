@@ -1,6 +1,6 @@
-#ifdef ENABLE_TEST_CAMERA
-
 #include "testcamera_resource.h"
+#if defined(ENABLE_TEST_CAMERA)
+
 #include "testcamera_stream_reader.h"
 
 QnTestCameraResource::QnTestCameraResource(QnMediaServerModule* serverModule):
@@ -43,4 +43,4 @@ void QnTestCameraResource::setHostAddress(const QString &ip)
     setUrl(url.toString());
 }
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)

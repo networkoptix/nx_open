@@ -139,14 +139,11 @@ public:
         if (function() == "-" || function() == "sub")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
-        if (function() == "+" || function() == "multiply")
+        if (function() == "*" || function() == "multiply")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 * v2; });
 
-        if (function() == "+" || function() == "divide")
+        if (function() == "/" || function() == "divide")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v2 ? Value(v1 / v2) : Value(); });
-
-        if (function() == "-" || function() == "sub")
-            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
         if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
@@ -235,6 +232,7 @@ public:
             });
     }
 
+    // TODO: Refactor!
     ValueGenerator getDurationOperation() const
     {
         if (function() == "history")
@@ -264,9 +262,6 @@ public:
                 });
         }
 
-        if (function() == "sum")
-            return durationAggregation(1, 2, Border::drop(), [](double v, double) { return v; });
-
         if (function() == "sampleAvg") //< sum(v * dt) / t
         {
             return durationAggregation(
@@ -274,11 +269,27 @@ public:
                 /*divideByTime*/ true, /*mustExist*/ true);
         }
 
-        if (function() == "deltaAvg") //< sum(v) / t
+        if (function() == "counterDelta") //< dv
         {
-            return durationAggregation(
-                1, 2, Border::hardcode(0), [](double v, double) { return v; },
-                /*divideByTime*/ true, /*mustExist*/ true);
+            return durationOperation(
+                1, 2, Border::move(),
+                [](const auto& forEach)
+                {
+                    std::optional<double> first;
+                    double last = 0;
+                    forEach(
+                        [&](const Value& value, Duration)
+                        {
+                            if (value != Value())
+                            {
+                                last = value.toDouble();
+                                if (!first)
+                                    first = last;
+                            }
+                        });
+
+                    return first ? Value(last - *first) : Value();
+                });
         }
 
         if (function() == "counterToAvg") //< dv / t

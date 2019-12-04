@@ -837,3 +837,45 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 {
     m_layout = layout;
 }
+
+bool QnBuzzerPolicy::isServerValid(const QnMediaServerResourcePtr& server)
+{
+    if (!server)
+        return false;
+
+    using namespace nx::vms::api;
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasBuzzer);
+}
+
+QString QnBuzzerPolicy::infoText()
+{
+    return tr("Servers that support buzzer");
+}
+
+bool QnPoeOverBudgetPolicy::isServerValid(const QnMediaServerResourcePtr& server)
+{
+    if (!server)
+        return false;
+
+    using namespace nx::vms::api;
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasPoeManagementCapability);
+}
+
+QString QnPoeOverBudgetPolicy::infoText()
+{
+    return tr("Servers that support PoE monitoring");
+}
+
+bool QnFanErrorPolicy::isServerValid(const QnMediaServerResourcePtr& server)
+{
+    if (!server)
+        return false;
+
+    using namespace nx::vms::api;
+    return server->getServerFlags().testFlag(ServerFlag::SF_HasFanMonitoringCapability);
+}
+
+QString QnFanErrorPolicy::infoText()
+{
+    return tr("Servers that support fan diagnostic");
+}

@@ -7,6 +7,7 @@
 
 #include <nx/kit/utils.h>
 #include <nx/utils/log/assert.h>
+#include <nx/streaming/config.h> //< for CL_MAX_CHANNELS
 
 #include <nx/vms/testcamera/test_camera_ini.h>
 
@@ -32,6 +33,11 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Optional. Files for the secondary stream. The part after `=` may be enclosed in `"` or `'`.
  offline=0..100
      Optional. Frequency of the camera going offline. Default: 0 - never go offline.
+ video-layout=<channelNumber>[,<channelNumber>]...[/<channelNumber>[,<channelNumber>]...]...
+     Optional. Defines the layout of channels in multi-channel video files, row-by-row, rows are
+     separated with `/`, items in a row are separated with `,`. Each channel may occur in the
+     matrix only once. If omitted and multi-channel files exist, a default video layout is assumed:
+     channels are laid out horizontally, increasing their numbers.
 
 <option> is one of the following:
  -h, --help
@@ -214,7 +220,10 @@ static QString cameraSetToJsonString(const CliOptions::CameraSet& cameraSet, con
         result += (i == cameraSet.secondaryFileNames.size() - 1) ? "" : ",";
         result += "\n";
     }
-    result += prefix + "    ]\n";
+    result += prefix + "    ],\n";
+
+    result += prefix + "    videoLayout: " + enquoteAndEscape(
+        cameraSet.videoLayout ? cameraSet.videoLayout->toUrlParamString() : QString()) + "\n";
 
     result += prefix + "}";
 
@@ -269,6 +278,18 @@ static QString optionsToJsonString(const CliOptions& options)
 }
 
 /** @throws InvalidArgs */
+static VideoLayout parseVideoLayoutCameraSetParameter(
+    const QString& name, const QString& value)
+{
+    QString errorMessage;
+    const VideoLayout videoLayout(value, &errorMessage);
+    if (!errorMessage.isEmpty())
+        throw InvalidArgs(lm("Parameter '%1=' is invalid: %2").args(name, errorMessage));
+
+    return videoLayout;
+}
+
+/** @throws InvalidArgs */
 static CliOptions::CameraSet parseCameraSet(const QString& arg)
 {
     CliOptions::CameraSet cameraSet;
@@ -288,6 +309,8 @@ static CliOptions::CameraSet parseCameraSet(const QString& arg)
             cameraSet.primaryFileNames = unquote(value).split(',');
         else if (name == "secondary-files")
             cameraSet.secondaryFileNames = unquote(value).split(',');
+        else if (name == "video-layout")
+            cameraSet.videoLayout = parseVideoLayoutCameraSetParameter(name, value);
         else
             throw InvalidArgs("Unknown parameter '" + name + "='.");
     }

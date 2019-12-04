@@ -72,7 +72,7 @@ namespace {
         explicit SortRulesProxyModel(QObject* parent = nullptr):
             QSortFilterProxyModel(parent),
             m_filterText(),
-            m_lexComparator(new QnBusinessTypesComparator(true))
+            m_lexComparator(new QnBusinessTypesComparator())
         {
         }
 

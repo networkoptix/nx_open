@@ -98,8 +98,11 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<ObjectTrack> tracksFound)
+                std::vector<ObjectTrackEx> result)
             {
+                std::vector<ObjectTrack> tracksFound;
+                for (const auto& value: result)
+                    tracksFound.push_back(value);
                 m_lookupResultQueue.push(LookupResult{resultCode, std::move(tracksFound)});
             });
     }
@@ -471,12 +474,30 @@ private:
         const Filter& filter,
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& packets)
     {
+        auto firstRect =
+            [&packets](const QnUuid& id)
+            {
+                for (const auto& packet: packets)
+                {
+                    if (packet->objectMetadataList.empty())
+                        continue;;
+                    if (packet->objectMetadataList[0].trackId == id)
+                        return packet->objectMetadataList[0].boundingBox;
+                }
+                return QRectF();
+            };
+
         auto objectMetadataPackets = toObjectMetadataPackets(packets);
         objectMetadataPackets = filterObjectTracksAndApplySortOrder(filter, std::move(objectMetadataPackets));
         for (auto& packet : objectMetadataPackets)
         {
             packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
             packet.lastAppearanceTimeUs -= packet.lastAppearanceTimeUs % 1000;
+            if (!packet.bestShot.initialized())
+            {
+                packet.bestShot.timestampUs = packet.firstAppearanceTimeUs;
+                packet.bestShot.rect = firstRect(packet.id);
+            }
         }
 
         return objectMetadataPackets;

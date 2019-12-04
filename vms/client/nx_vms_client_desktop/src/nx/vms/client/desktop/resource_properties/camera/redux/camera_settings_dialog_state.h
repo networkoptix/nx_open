@@ -97,6 +97,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QString settingsUrlPath;
         bool hasVideo = true;
         bool editableStreamUrls = false;
+        bool networkLink = false;
 
         int maxFpsWithoutMotion = 0;
 
@@ -356,6 +357,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool canShowWebPage() const
     {
         return isSingleCamera()
+            && !singleCameraProperties.networkLink
             && (ini().showWebPageForAllCameras ||
                 !singleCameraProperties.settingsUrlPath.isEmpty());
     }

@@ -30,11 +30,16 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
+
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 struct QnServerSettingsDialog::Private
 {
+    void updatePoeSettingsPageVisibility();
+
+    QnServerSettingsDialog* const q;
     QnMediaServerResourcePtr server;
     const QPointer<ServerSettingsDialogStore> store;
     const QPointer<ServerPluginDataWatcher> pluginDataWatcher;
@@ -42,15 +47,18 @@ struct QnServerSettingsDialog::Private
     QnServerSettingsWidget* const generalPage;
     QnStorageAnalyticsWidget* const statisticsPage;
     QnStorageConfigWidget* const storagesPage;
+    PoeSettingsWidget* const poeSettingsPage;
     ServerPluginsSettingsWidget* const pluginsPage;
     QLabel* const webPageLink;
 
     Private(QnServerSettingsDialog* q):
+        q(q),
         store(new ServerSettingsDialogStore(q)),
         pluginDataWatcher(new ServerPluginDataWatcher(store, q)),
         generalPage(new QnServerSettingsWidget(q)),
         statisticsPage(new QnStorageAnalyticsWidget(q)),
         storagesPage(new QnStorageConfigWidget(q)),
+        poeSettingsPage(new PoeSettingsWidget(q)),
         pluginsPage(ini().pluginInformationInServerSettings
             ? new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)
             : nullptr),
@@ -78,6 +86,15 @@ struct QnServerSettingsDialog::Private
     };
 };
 
+void QnServerSettingsDialog::Private::updatePoeSettingsPageVisibility()
+{
+    q->setPageVisible(
+        PoePage,
+        server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPoeManagementCapability));
+}
+
+//--------------------------------------------------------------------------------------------------
+
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
@@ -89,6 +106,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(SettingsPage, d->generalPage, tr("General"));
     addPage(StorageManagmentPage, d->storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
+    addPage(PoePage, d->poeSettingsPage, tr("PoE"));
+    d->updatePoeSettingsPageVisibility();
 
     if (ini().pluginInformationInServerSettings)
         addPage(PluginsPage, new Private::PluginSettingsAdapter(d.get()), tr("Plugins"));
@@ -171,6 +190,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     d->generalPage->setServer(server);
     d->statisticsPage->setServer(server);
     d->storagesPage->setServer(server);
+    d->poeSettingsPage->setServerId(server ? server->getId() : QnUuid());
 
     if (d->server)
     {
@@ -180,6 +200,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
 
     loadDataToUi();
     updateWebPageLink();
+    d->updatePoeSettingsPageVisibility();
 }
 
 void QnServerSettingsDialog::retranslateUi()
@@ -220,6 +241,15 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
         return QDialogButtonBox::No;
 
     return QDialogButtonBox::Cancel;
+}
+
+bool QnServerSettingsDialog::event(QEvent* e)
+{
+    const auto type = e->type();
+    if (type == QEvent::Hide || type == QEvent::Show)
+        d->poeSettingsPage->setAutoUpdate(type == QEvent::Show);
+
+    return base_type::event(e);
 }
 
 void QnServerSettingsDialog::updateWebPageLink()

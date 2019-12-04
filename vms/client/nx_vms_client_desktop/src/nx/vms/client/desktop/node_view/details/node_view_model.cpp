@@ -3,7 +3,8 @@
 #include "node_view_state.h"
 #include "node_view_state_patch.h"
 #include "node/view_node.h"
-#include "node/view_node_helpers.h"
+#include "node/view_node_helper.h"
+#include "node/view_node_constants.h"
 
 #include <QtCore/QAbstractProxyModel>
 
@@ -17,8 +18,6 @@ struct NodeViewModel::Private
 {
     Private(NodeViewModel* owner, int columnCount);
 
-    QModelIndex getModelIndex(const NodePtr& node, int column = 0);
-
     NodeViewModel* const q;
     const int columnCount;
     NodeViewState state;
@@ -31,19 +30,6 @@ NodeViewModel::Private::Private(
     q(owner),
     columnCount(columnCount)
 {
-}
-
-QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
-{
-    const auto parentNode = node ? node->parent() : NodePtr();
-    if (!parentNode) //< It is invisible root node.
-        return QModelIndex();
-
-    const auto parentIndex = parentNode->parent()
-        ? getModelIndex(parentNode, column)
-        : QModelIndex(); //< It is top-level node
-
-    return q->index(parentNode->indexOf(node), column, parentIndex);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -65,32 +51,46 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
     const auto getNodeOperationGuard =
         [this](const PatchStep& step) -> utils::SharedGuardPtr
         {
-            switch (step.operation)
+            switch (step.operationData.operation)
             {
-                case AppendNodeOperation:
+                case appendNodeOperation:
                 {
                     const auto parentPath = step.path;
                     const auto parentNode = d->state.nodeByPath(parentPath);
-                    const auto parentIndex = d->getModelIndex(parentNode);
+                    const auto parentIndex = index(parentNode);
                     const int row = parentNode->childrenCount();
                     return utils::SharedGuardPtr(
                         new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
                 }
-                case ChangeNodeOperation:
+                case updateDataOperation:
+                case removeDataOperation:
                 {
-                    return utils::makeSharedGuard(
-                        [this, step]()
+                    const auto rolesHash =
+                        [step]()
                         {
-                            const auto node = d->state.rootNode->nodeAt(step.path);
-                            for (const int column: step.data.usedColumns())
+                            if (step.operationData.operation == removeDataOperation)
+                                return step.operationData.data.value<ColumnRoleHash>();
+
+                            const auto& data = step.operationData.data.value<ViewNodeData>();
+                            ColumnRoleHash result;
+                            for (const auto column: data.usedColumns())
+                                result.insert(column, data.rolesForColumn(column));
+
+                            return result;
+                        }();
+
+                    return utils::makeSharedGuard(
+                        [this, path = step.path, rolesHash]()
+                        {
+                            const auto node = d->state.rootNode->nodeAt(path);
+                            for (const auto column: rolesHash.keys())
                             {
-                                const auto nodeIndex = d->getModelIndex(node, column);
-                                emit dataChanged(nodeIndex, nodeIndex,
-                                    step.data.rolesForColumn(column));
+                                const auto nodeIndex = index(node, column);
+                                emit dataChanged(nodeIndex, nodeIndex, rolesHash.value(column));
                             }
                         });
                 }
-                case RemoveNodeOperation:
+                case removeNodeOperation:
                 {
                     const auto node = d->state.nodeByPath(step.path);
                     const auto parent = node->parent();
@@ -113,7 +113,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const
 {
     const auto node = d->state.nodeByPath(path);
-    return node ? d->getModelIndex(node, column) : QModelIndex();
+    return node ? index(node, column) : QModelIndex();
 }
 
 QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent) const
@@ -122,7 +122,7 @@ QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent)
         return QModelIndex();
 
     const auto node = parent.isValid()
-        ? nodeFromIndex(parent)->nodeAt(row).data()
+        ? ViewNodeHelper::nodeFromIndex(parent)->nodeAt(row).data()
         : d->state.rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
@@ -133,21 +133,21 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
     if (!child.isValid())
         QModelIndex();
 
-    const auto node = nodeFromIndex(child);
+    const auto node = ViewNodeHelper::nodeFromIndex(child);
     const auto parent = node ? node->parent() : NodePtr();
     const bool rootOrFirstLevelNode = !parent || !parent->parent();
 
     // Parent is always index with first column.
-    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent());
+    return rootOrFirstLevelNode ? QModelIndex() : index(node->parent());
 }
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->state.rootNode;
+    const auto node = parent.isValid() ? ViewNodeHelper::nodeFromIndex(parent) : d->state.rootNode;
     return node ? node->childrenCount() : 0;
 }
 
-int NodeViewModel::columnCount(const QModelIndex& parent) const
+int NodeViewModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return d->columnCount;
 }
@@ -165,15 +165,38 @@ bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int
 
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
-    const auto node = nodeFromIndex(index);
-    return node ? node->data(index.column(), role) : QVariant();
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
+    if (!node)
+        return QVariant();
+
+    const int column = index.column();
+    if (role != Qt::CheckStateRole)
+        return node->data(column, role);
+
+    return ViewNodeHelper(index).checkable(column)
+        ? ViewNodeHelper(index).checkedState(column, true)
+        : QVariant();
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = ViewNodeHelper::nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
 }
+
+QModelIndex NodeViewModel::index(const NodePtr& node, int column) const
+{
+    const auto parentNode = node ? node->parent() : NodePtr();
+    if (!parentNode) //< It is invisible root node.
+        return QModelIndex();
+
+    const auto parentIndex = parentNode->parent()
+        ? index(parentNode, column)
+        : QModelIndex(); //< It is top-level node
+
+    return index(parentNode->indexOf(node), column, parentIndex);
+}
+
 
 } // namespace details
 } // node_view

@@ -1,13 +1,16 @@
 #pragma once
+#if defined(ENABLE_TEST_CAMERA)
 
-#ifdef ENABLE_TEST_CAMERA
-
+#include <QtCore/QSet>
+#include <QtCore/QString>
 #include <QtCore/QCoreApplication>
 #include <QHostAddress>
 
-#include "core/resource_management/resource_searcher.h"
+#include <core/resource_management/resource_searcher.h>
 #include <nx/network/socket.h>
+#include <nx/utils/mac_address.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnMediaServerModule;
 
@@ -16,6 +19,7 @@ class QnTestCameraResourceSearcher:
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
+
 public:
     QnTestCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnTestCameraResourceSearcher();
@@ -31,10 +35,21 @@ public:
         const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 private:
-
     void sendBroadcast();
     bool updateSocketList();
     void clearSocketList();
+
+    void processDiscoveryResponseMessage(
+        const QByteArray& discoveryResponseMessage,
+        const QString& serverAddress,
+        QnResourceList* resources,
+        QSet<nx::utils::MacAddress>* processedMacAddresses) const;
+
+    QnTestCameraResourcePtr createTestCameraResource(
+        const nx::utils::MacAddress& macAddress,
+        const QString& videoLayoutString,
+        int mediaPort,
+        const QString& serverAddress) const;
 
 private:
     struct DiscoveryInfo
@@ -48,4 +63,4 @@ private:
     qint64 m_sockUpdateTime = 0;
 };
 
-#endif // #ifdef ENABLE_TEST_CAMERA
+#endif // defined(ENABLE_TEST_CAMERA)

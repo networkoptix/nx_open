@@ -1263,7 +1263,12 @@ void QnResourceTreeModel::handleDrop(
         if (mimeData->data(pureTreeResourcesOnlyMimeType) != QByteArray("1"))
             return;
 
-        const auto cameras = sourceResources.filtered<QnVirtualCameraResource>();
+        const auto cameras = sourceResources.filtered<QnVirtualCameraResource>(
+            [](const QnVirtualCameraResourcePtr& camera)
+            {
+                return !camera->hasCameraCapabilities(Qn::ServerBoundCapability);
+            });
+
         if (!cameras.empty())
         {
             menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)

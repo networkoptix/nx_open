@@ -135,14 +135,14 @@ void doExecuteGet(const nx::utils::Url& url,
 {
     auto httpClient = createHttpClient(authName, authPassword);
 
-    NX_INFO(typeid(FunctionsTag), lm("GET %1").arg(url.path()));
-
+    NX_INFO(typeid(FunctionsTag), "GET %1", url);
     ASSERT_TRUE(httpClient->doGet(url));
+
+    NX_INFO(typeid(FunctionsTag), "GET STATUS: %1", httpClient->response()->statusLine);
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());
-    NX_INFO(typeid(FunctionsTag), lm("GET_RESPONSE: %1").arg(*outResponse));
-    NX_INFO(typeid(FunctionsTag), lm("GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
+    NX_INFO(typeid(FunctionsTag), "GET RESPONSE: %1", *outResponse);
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }

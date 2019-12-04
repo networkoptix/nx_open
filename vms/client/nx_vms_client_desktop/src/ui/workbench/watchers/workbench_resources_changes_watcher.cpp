@@ -10,6 +10,16 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+
+bool isUserVisibleResource(const QnResourcePtr& resource)
+{
+    return !resource->getName().isEmpty()
+        && !resource->hasFlags(Qn::desktop_camera);
+}
+
+} // namespace
+
 QnWorkbenchResourcesChangesWatcher::QnWorkbenchResourcesChangesWatcher(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -25,12 +35,16 @@ QnWorkbenchResourcesChangesWatcher::~QnWorkbenchResourcesChangesWatcher() {
 
 void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList& resources)
 {
+    const auto visibleResources = resources.filtered(isUserVisibleResource);
+    if (visibleResources.empty())
+        return;
+
     const auto extras = (commonModule()->isReadOnly()
         ? tr("System is in Safe Mode. It is not allowed "
             "to make any changes except license activation.")
-            + L'\n' + tr("The following %n items are not saved:", "", resources.size())
+            + L'\n' + tr("The following %n items are not saved:", "", visibleResources.size())
 
-        : tr("The following %n items are not saved:", "", resources.size()));
+        : tr("The following %n items are not saved:", "", visibleResources.size()));
 
     const auto icon = static_cast<QnMessageBoxIcon>(commonModule()->isReadOnly()
         ? QnMessageBoxIcon::Warning
@@ -43,16 +57,20 @@ void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList&
     QnMessageBox dialog(icon, text, extras,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindowWidget());
-    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
+    dialog.addCustomWidget(new QnResourceListView(visibleResources, &dialog));
     dialog.exec();
 }
 
 void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceList& resources)
 {
+    const auto visibleResources = resources.filtered(isUserVisibleResource);
+    if (visibleResources.empty())
+        return;
+
     const auto extras = (commonModule()->isReadOnly()
         ? tr("System is in Safe Mode. It is not allowed to "
             "make any changes except license activation.")
-        + L'\n' + tr("The following %n items are not deleted:", "", resources.size())
+        + L'\n' + tr("The following %n items are not deleted:", "", visibleResources.size())
 
         : QString());
 
@@ -62,11 +80,11 @@ void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceL
 
     const auto text = (commonModule()->isReadOnly()
         ? tr("Deleting objects not allowed in Safe Mode")
-        : tr("Failed to delete %n items:", "", resources.size()));
+        : tr("Failed to delete %n items:", "", visibleResources.size()));
 
     QnMessageBox dialog(icon, text, extras,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindowWidget());
-    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
+    dialog.addCustomWidget(new QnResourceListView(visibleResources, &dialog));
     dialog.exec();
 }

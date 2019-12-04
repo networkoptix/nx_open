@@ -87,10 +87,10 @@ QString calculateWebPage(const Camera& camera)
 
     QString webPageAddress = lit("http://") + camera->getHostAddress();
 
-    QUrl url = QUrl::fromUserInput(camera->getUrl());
+    const auto url = nx::utils::Url::fromUserInput(camera->getUrl());
     if (url.isValid())
     {
-        const QUrlQuery query(url);
+        const QUrlQuery query(url.query());
         int port = query.queryItemValue(lit("http_port")).toInt();
         if (port == 0)
             port = url.port(80);
@@ -639,8 +639,10 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
         singleProperties.hasVideo = firstCamera->hasVideo();
-        singleProperties.editableStreamUrls =
-            firstCamera->hasCameraCapabilities(Qn::CustomMediaUrlCapability);
+        singleProperties.editableStreamUrls = firstCamera->hasCameraCapabilities(
+            Qn::CustomMediaUrlCapability);
+        singleProperties.networkLink = firstCamera->hasCameraCapabilities(
+            {Qn::CustomMediaUrlCapability | Qn::FixedQualityCapability});
 
         const auto macAddress = firstCamera->getMAC();
         singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();

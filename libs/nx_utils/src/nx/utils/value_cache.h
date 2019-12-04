@@ -10,16 +10,16 @@
 namespace nx::utils {
 
 /**
- *  Allows caching of the value and automatical cache invalidation. get() and update() may be
- *  called safely fom different threads.
+ *  Allows caching of the value and automatic cache invalidation. Methods get(), reset() and
+ *  update() can be called safely from different threads.
  */
 template<class ValueType>
 class CachedValue
 {
 public:
     /**
-     *  @param valueGenerator This functor is called from get() and update() to get value, the
-     *      call to valueGenerator is synchronised by mutex.
+     *  @param valueGenerator This functor is called from get() and update() to get value, it
+     *      must be thread-safe.
      *  @param expirationTime CachedValue will automatically update value on get() or
      *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
      *  @note valueGenerator is not called here!
@@ -35,18 +35,19 @@ public:
 
     ValueType get() const
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        bool shouldGenerateValue = !m_value.has_value()
-            || (m_expirationTime != std::chrono::milliseconds::zero()
-            && m_timer.hasExpired(m_expirationTime));
-
-        if (shouldGenerateValue)
         {
-            m_value = m_valueGenerator();
-            m_timer.restart();
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (m_value.has_value() && (m_expirationTime == std::chrono::milliseconds::zero()
+                    || !m_timer.hasExpired(m_expirationTime)))
+            return *m_value;
         }
-
-        return *m_value;
+        ValueType value = m_valueGenerator();
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            m_value = std::move(value);
+            m_timer.restart();
+            return *m_value;
+        }
     }
 
     void reset()
@@ -57,16 +58,19 @@ public:
 
     void update()
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_value = m_valueGenerator();
-        m_timer.restart();
+        ValueType value = m_valueGenerator();
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            m_value = std::move(value);
+            m_timer.restart();
+        }
     }
 
 private:
     mutable nx::utils::Mutex m_mutex;
 
     mutable std::optional<ValueType> m_value;
-    MoveOnlyFunc<ValueType()> m_valueGenerator;
+    const MoveOnlyFunc<ValueType()> m_valueGenerator;
 
     mutable ElapsedTimer m_timer;
     const std::chrono::milliseconds m_expirationTime;

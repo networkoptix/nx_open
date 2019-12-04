@@ -44,7 +44,7 @@ QString QnAudioRecorderSettings::kNoDevice = "<none>";
 
 QnAudioRecorderSettings::QnAudioRecorderSettings(QObject* parent):
     QObject(parent),
-    m_devices([](){ return fetchDevicesList(); })
+    m_devices([&mutex = m_mutex](){ NX_MUTEX_LOCKER lock(&mutex); return fetchDevicesList(); })
 {
     m_settings.beginGroup("videoRecording"); //< Don't rename, backward compatibility.
 }

@@ -31,7 +31,8 @@ public:
         const QHostAddress& address,
         int port,
         int maxConnections,
-        bool useSsl);
+        bool useSsl,
+        bool useTwoSockets);
     ~QnUniversalTcpListener();
 
     void setupAuthorizer(
@@ -52,7 +53,9 @@ public:
     void enableUnauthorizedForwarding(const QString& path);
 
     static std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
-        createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress);
+        createAndPrepareTcpSockets(
+            const nx::network::SocketAddress& localAddress,
+            bool createTwoSockets);
     virtual void stop() override;
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
@@ -71,6 +74,7 @@ private:
     std::atomic<int> m_cloudSocketIndex{0};
 
     std::set<QString> m_unauthorizedForwardingPaths;
+    bool m_useTwoSockets = false;
 
     void onCloudBindingStatusChanged(
         std::optional<nx::hpm::api::SystemCredentials> cloudCredentials);

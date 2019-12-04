@@ -203,8 +203,6 @@ private:
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
     nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
     nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
-
-    mutable QnMutex m_cacheMutex;
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);

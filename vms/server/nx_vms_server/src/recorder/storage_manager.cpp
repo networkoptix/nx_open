@@ -2827,11 +2827,6 @@ StorageResourcePtr QnStorageManager::extractStorageFromFileName(
     return ret;
 }
 
-bool QnStorageManager::canStorageBeUsedByVms(const QnStorageResourcePtr& storage)
-{
-    return storage->getTotalSpace() > storage->getSpaceLimit();
-}
-
 QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)
 {
     QnMutexLocker lock(&m_mutexStorages);

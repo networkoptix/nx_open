@@ -11,22 +11,7 @@ class QnBusinessTypesComparator: public QObject, public QnConnectionContextAware
 {
     using base_type = QObject;
 public:
-    enum class EventSubType
-    {
-        user,
-        failure,
-        success,
-        any
-    };
-
-    enum class ActionSubType
-    {
-        server,
-        client,
-        any
-    };
-
-    explicit QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject *parent = nullptr);
+    explicit QnBusinessTypesComparator(QObject* parent = nullptr);
 
     bool lexicographicalLessThan(nx::vms::api::EventType left, nx::vms::api::EventType right) const;
     bool lexicographicalLessThan(nx::vms::api::ActionType left, nx::vms::api::ActionType right) const;
@@ -42,17 +27,15 @@ public:
     int toLexActionType(nx::vms::api::ActionType actionType) const;
 
     QList<nx::vms::api::EventType> lexSortedEvents(
-        EventSubType subtype = EventSubType::any) const;
+        const QList<nx::vms::api::EventType>& events) const;
+
     QList<nx::vms::api::ActionType> lexSortedActions(
-        ActionSubType subtype = ActionSubType::any) const;
+        const QList<nx::vms::api::ActionType>& actions) const;
 
 private:
     void initLexOrdering();
 
-    QList<nx::vms::api::ActionType> getAllActions() const;
-
 private:
     QVector<int> m_eventTypeToLexOrder;
     QVector<int> m_actionTypeToLexOrder;
-    const bool m_onlyUserAvailableActions;
 };

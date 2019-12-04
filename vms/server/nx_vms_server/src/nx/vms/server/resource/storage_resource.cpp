@@ -13,9 +13,9 @@ StorageResource::StorageResource(QnMediaServerModule* serverModule):
 {
 }
 
-qint64 StorageResource::getAndResetMetric(std::atomic<qint64> Metrics::* parameter)
+qint64 StorageResource::getMetric(std::atomic<qint64> Metrics::* parameter)
 {
-    return (*m_metrics.*parameter).exchange(0);
+    return (*m_metrics.*parameter).load();
 }
 
 QIODevice* StorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)

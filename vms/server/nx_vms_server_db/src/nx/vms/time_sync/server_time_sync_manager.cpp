@@ -19,6 +19,8 @@ namespace nx {
 namespace vms {
 namespace time_sync {
 
+using namespace std::chrono;
+
 static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
 /** Requesting same server twice to greatly reduce chance of receiving corrupted time value. */
@@ -148,7 +150,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
         return false; //< Sync already in progress.
 
     m_internetTimeSynchronizer->getTimeAsync(
-        [this](const qint64 newValue, SystemError::ErrorCode errorCode, std::chrono::milliseconds rtt)
+        [this](const qint64 newValue, SystemError::ErrorCode errorCode, milliseconds rtt)
         {
             if (errorCode)
             {
@@ -167,7 +169,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
                 return;
             }
 
-            setSyncTime(std::chrono::milliseconds(newValue), rtt);
+            setSyncTime(milliseconds(newValue), rtt);
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;
@@ -219,8 +221,9 @@ void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
 {
     const auto ownId = commonModule()->moduleGUID();
     qint64 systemTimeDeltaMs = getPrimaryTimeServerId() == ownId ? 0 :
-        qAbs(std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
-    if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) > kMaxJitterForLocalClock.count())
+        qAbs(milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
+    const auto epsilonMs = duration_cast<milliseconds>(globalSettings()->syncTimeEpsilon());
+    if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) >  epsilonMs.count())
         saveSystemTimeDeltaMs(systemTimeDeltaMs);
 }
 
@@ -291,7 +294,7 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
         NX_WARNING(this, "Failed to load time delta parameter from the database");
     }
     m_systemTimeDeltaMs = deltaData.value.toLongLong();
-    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + std::chrono::milliseconds(m_systemTimeDeltaMs));
+    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + milliseconds(m_systemTimeDeltaMs));
 }
 
 } // namespace time_sync

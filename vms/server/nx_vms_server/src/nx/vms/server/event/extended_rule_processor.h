@@ -46,6 +46,7 @@ private:
     bool executePtzAction(const vms::event::AbstractActionPtr& action);
     bool executeSayTextAction(const vms::event::AbstractActionPtr& action);
     bool executePlaySoundAction(const vms::event::AbstractActionPtr& action);
+    bool executeBuzzerAction(const vms::event::AbstractActionPtr& action);
 
 private:
     class SendEmailAggregationData

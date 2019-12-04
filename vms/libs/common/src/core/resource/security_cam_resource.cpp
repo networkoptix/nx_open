@@ -25,6 +25,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <utils/crypt/symmetrical.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -154,7 +155,8 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kDeviceType)
+            else if (key == ResourcePropertyKey::kDeviceType
+                || key == ResourcePropertyKey::kForcedLicenseType)
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
@@ -337,6 +339,23 @@ bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataPro
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 {
+    const QByteArray encryptedForcedLicenseType =
+        QByteArray::fromBase64(getProperty(ResourcePropertyKey::kForcedLicenseType).toUtf8());
+
+    if (!encryptedForcedLicenseType.isEmpty())
+    {
+        const QByteArray decoded = nx::utils::decodeAES128CBC(encryptedForcedLicenseType);
+        const auto split = decoded.split(':');
+
+        Qn::LicenseType forcedLicenseType = Qn::LicenseType::LC_Invalid;
+        if (split.size() == 2
+            && QnUuid::fromStringSafe(split[0]) == getId()
+            && QnLexical::deserialize(split[1], &forcedLicenseType))
+        {
+            return forcedLicenseType;
+        }
+    }
+
     if (isIOModule())
         return Qn::LC_IO;
 
@@ -582,6 +601,19 @@ void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceT
 Qn::LicenseType QnSecurityCamResource::licenseType() const
 {
     return m_cachedLicenseType.get();
+}
+
+void QnSecurityCamResource::setForcedLicenseType(Qn::LicenseType licenseType)
+{
+    const QnUuid id = getId();
+    if (!NX_ASSERT(!id.isNull()))
+        return;
+
+    const QString dataToCypher = id.toString() + ":" + QnLexical::serialized(licenseType);
+    const QByteArray encryptedData = nx::utils::encodeAES128CBC(dataToCypher.toUtf8());
+    setProperty(
+        ResourcePropertyKey::kForcedLicenseType,
+        QString::fromLatin1(encryptedData.toBase64()));
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {

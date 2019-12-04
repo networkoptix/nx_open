@@ -12,18 +12,23 @@ public:
     static details::NodeViewStatePatch setNodeChecked(
         const details::NodePtr& node,
         const details::ColumnSet& columns,
-        Qt::CheckState checkedState);
+        Qt::CheckState checkedState,
+        bool isUserAction = false);
 
     static details::NodeViewStatePatch setNodeChecked(
         const details::NodeViewState& state,
         const details::ViewNodePath& path,
         const details::ColumnSet& columns,
-        Qt::CheckState checkedState);
+        Qt::CheckState checkedState,
+        bool isUserAction = false);
 
     static details::NodeViewStatePatch setNodeExpandedPatch(
         const details::NodeViewState& state,
         const details::ViewNodePath& path,
         bool expanded);
+
+    static details::NodeViewStatePatch applyUserChangesPatch(
+        const details::NodeViewState& state);
 
 private:
     NodeViewStateReducer() = default;

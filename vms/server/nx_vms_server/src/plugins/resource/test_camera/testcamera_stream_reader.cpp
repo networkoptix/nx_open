@@ -128,6 +128,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFramePacketBody(
     {
         if (!receiveData<uint8_t>(&frame->channelNumber, "channel number"))
             return nullptr;
+        NX_VERBOSE(this, "Received channel number %1.", frame->channelNumber);
     }
 
     frame->compressionType = header.codecId();

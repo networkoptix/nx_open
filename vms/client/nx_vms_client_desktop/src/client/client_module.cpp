@@ -110,6 +110,7 @@
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -257,9 +258,6 @@ QnClientModule::~QnClientModule()
     if (m_resourceDirectoryBrowser)
         m_resourceDirectoryBrowser->stop();
 
-    m_networkProxyFactory = nullptr; // Object will be deleted by QNetworkProxyFactory
-    QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
-
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
@@ -320,11 +318,6 @@ void QnClientModule::startLocalSearchers()
 {
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->resourceDiscoveryManager()->start();
-}
-
-QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
-{
-    return m_networkProxyFactory;
 }
 
 void QnClientModule::initMetaInfo()
@@ -461,10 +454,6 @@ void QnClientModule::initSingletons()
     m_cloudStatusWatcher = commonModule->store(
         new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
 
-    //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
-    QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
-
     m_uploadManager = new UploadManager(commonModule);
     m_wearableManager = new WearableManager(commonModule);
 
@@ -489,6 +478,7 @@ void QnClientModule::initSingletons()
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
+    commonModule->store(new AnalyticsSettingsManager());
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 

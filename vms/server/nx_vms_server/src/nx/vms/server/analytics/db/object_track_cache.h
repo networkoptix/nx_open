@@ -23,6 +23,7 @@ struct ObjectTrackUpdate
     std::vector<common::metadata::Attribute> appendedAttributes;
     /** All object's attributes. */
     std::vector<common::metadata::Attribute> allAttributes;
+    BestShot bestShot;
 
     qint64 firstAppearanceTimeUs = 0;
     qint64 lastAppearanceTimeUs = 0;

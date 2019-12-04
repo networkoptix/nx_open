@@ -22,7 +22,6 @@ namespace vms {
 namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
-const std::chrono::milliseconds TimeSyncManager::kMaxJitterForLocalClock(250);
 
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule)
@@ -95,7 +94,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
 
-    if (setSyncTime(newValue, kMaxJitterForLocalClock))
+    if (setSyncTime(newValue, std::chrono::milliseconds::zero()))
     {
         NX_DEBUG(this, lm("Set time %1 from the local clock")
             .arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
@@ -209,7 +208,7 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
 {
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
-    if (timeDelta < rtt)
+    if (timeDelta <= rtt + globalSettings()->syncTimeEpsilon())
         return false;
 
     NX_INFO(this,

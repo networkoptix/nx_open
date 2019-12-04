@@ -8,7 +8,6 @@
 #include "interfaces.h"
 
 #include "entropix/reconstruct_resolution.h"
-#include "internal/roi_visualization.h"
 
 namespace nx::vms::client::desktop::integrations {
 
@@ -57,9 +56,6 @@ void initialize(QObject* storageParent)
 				storage));
 		}
     }
-
-    if (config().enableRoiVisualization)
-        storage->addIntegration(new internal::RoiVisualizationIntegration(storage));
 }
 
 void connectionEstablished(ec2::AbstractECConnectionPtr connection)

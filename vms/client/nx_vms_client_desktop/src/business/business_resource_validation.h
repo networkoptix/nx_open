@@ -301,3 +301,27 @@ private:
     const QnUserRolesManager* m_rolesManager;
     QnLayoutResourcePtr m_layout;
 };
+
+class QnBuzzerPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnBuzzerPolicy)
+public:
+    static bool isServerValid(const QnMediaServerResourcePtr& server);
+    static QString infoText();
+};
+
+class QnPoeOverBudgetPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnPoeOverBudgetPolicy)
+public:
+    static bool isServerValid(const QnMediaServerResourcePtr& server);
+    static QString infoText();
+};
+
+class QnFanErrorPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnFanErrorPolicy)
+public:
+    static bool isServerValid(const QnMediaServerResourcePtr& server);
+    static QString infoText();
+};

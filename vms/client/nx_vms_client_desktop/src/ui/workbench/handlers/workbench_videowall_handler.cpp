@@ -1499,7 +1499,9 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
     // Deleting one-by-one to avoid invalid layouts which cannot be deleted for whatever reason
     for (auto layout: layoutsToDelete)
     {
-        if (!menu()->triggerIfPossible(action::RemoveFromServerAction, layout))
+        // If request was successfully sent, remove layout from the pool at once to make sure we
+        // will not try to remove it again.
+        if (menu()->triggerIfPossible(action::RemoveFromServerAction, layout))
             resourcePool()->removeResource(layout);
     }
 }
@@ -1695,6 +1697,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     }
 
     saveVideowalls(videoWalls, true);
+    cleanupUnusedLayouts();
 }
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()

@@ -7,6 +7,8 @@
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
+#include <nx/vms/event/events/poe_over_budget_event.h>
+#include <nx/vms/event/events/fan_error_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/server/event/event_connector.h>
 
@@ -77,6 +79,8 @@
 #include <nx/vms/rules/action_parameters_processing.h>
 #include <nx/utils/app_info.h>
 
+#include <nx/vms/server/nvr/i_service.h>
+
 namespace {
 
 static const QString tpProductLogo(lit("logo"));
@@ -123,6 +127,10 @@ static const QString tpUser(lit("user"));
 
 static const QString tpCaption(lit("caption"));
 static const QString tpDescription(lit("description"));
+
+static const QString tpCurrentPowerConsumptionWatts("currentPowerConsumptionWatts");
+static const QString tpUpperPowerConsumptionLimitWatts("upperPowerConsumptionLimitWatts");
+static const QString tpLowerPowerconsumptionLimitWatts("lowerPowerConsumptionLimitWatts");
 
 static const QSize SCREENSHOT_SIZE(640, 480);
 static const unsigned int MS_PER_SEC = 1000;
@@ -202,6 +210,14 @@ struct EmailAttachmentData
                 break;
             case EventType::softwareTriggerEvent:
                 templatePath = lit(":/email_templates/software_trigger.mustache");
+                break;
+            case EventType::poeOverBudgetEvent:
+                templatePath = ":/email_templates/poe_over_budget.mustache";
+                imageName = "server.png";
+                break;
+            case EventType::fanErrorEvent:
+                templatePath = ":/email_templates/fan_error.mustache";
+                imageName = "server.png";
                 break;
             default:
                 NX_ASSERT(false, "All cases must be implemented.");
@@ -303,6 +319,10 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
                 result = executePlaySoundAction(action);
+                break;
+            case ActionType::buzzerAction:
+                result = executeBuzzerAction(action);
+                break;
             default:
                 break;
         }
@@ -376,6 +396,49 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
     return true;
 
+}
+
+bool ExtendedRuleProcessor::executeBuzzerAction(const vms::event::AbstractActionPtr& action)
+{
+    using namespace std::chrono;
+
+    nvr::IService* const nvrService = serverModule()->nvrService();
+    if (!nvrService)
+    {
+        NX_WARNING(this,
+            "Got an NVR buzzer action but the Server doesn't provide the NVR service");
+        return false;
+    }
+
+    nvr::IBuzzerManager* const buzzerManager = nvrService->buzzerManager();
+    if (!buzzerManager)
+    {
+        NX_WARNING(this,
+            "Got an NVR buzzer action but the Server doesn't provide the buzzer manager");
+        return false;
+    }
+
+    if (const auto durationMs = action->getParams().durationMs; durationMs > 0)
+    {
+        NX_DEBUG(this, "Enabling the NVR buzzer for %1ms", durationMs);
+        buzzerManager->setState(nvr::BuzzerState::enabled, milliseconds(durationMs));
+    }
+    else
+    {
+        // TODO: #dmishin make sure the event is prolonged.
+        if (action->getToggleState() == vms::api::EventState::active)
+        {
+            NX_DEBUG(this, "Enabling the NVR buzzer");
+            buzzerManager->setState(nvr::BuzzerState::enabled);
+        }
+        else if (action->getToggleState() == vms::api::EventState::inactive)
+        {
+            NX_DEBUG(this, "Disabling the NVR buzzer");
+            buzzerManager->setState(nvr::BuzzerState::disabled);
+        }
+    }
+
+    return true;
 }
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
@@ -1018,7 +1081,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
             break;
         }
-
         default:
             break;
     }
@@ -1195,6 +1257,26 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             detailsMap[lit("msConflicts")] = conflictsList;
             break;
         }
+        case EventType::poeOverBudgetEvent:
+        {
+            nx::vms::event::PoeOverBudgetEvent::Parameters parameters;
+            if (!QJson::deserialize(params.inputPortId, &parameters))
+            {
+                NX_WARNING(this, "Unable to deserialize 'PoE over budget' event parameters");
+                break;
+            }
+
+            detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpCurrentPowerConsumptionWatts] =
+                QString::number(parameters.currentConsumptionWatts, 'f', 1);
+            detailsMap[tpUpperPowerConsumptionLimitWatts] =
+                QString::number(parameters.upperLimitWatts, 'f', 1);
+            detailsMap[tpLowerPowerconsumptionLimitWatts] =
+                QString::number(parameters.lowerLimitWatts, 'f', 1);
+            break;
+        }
+        case EventType::fanErrorEvent:
+            detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
 
         default:
             break;

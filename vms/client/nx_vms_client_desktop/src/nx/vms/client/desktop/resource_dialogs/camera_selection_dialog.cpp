@@ -292,7 +292,7 @@ void CameraSelectionDialog::Private::reloadViewData()
         filterModel->setFilteringEnabled(false);
 
     if (view->state().rootNode)
-        view->applyPatch(NodeViewStatePatch::clearNodeView());
+        view->applyPatch(NodeViewStatePatch::clearNodeViewPatch());
 
     const auto root = createCamerasTree(showInvalidCameras, data, q->resourcePool());
     view->applyPatch(NodeViewStatePatch::fromRootNode(root));

@@ -4,6 +4,7 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/mac_address.h>
 
 #include <nx/vms/api/types/motion_types.h> //< For StreamIndex.
 using nx::vms::api::StreamIndex;
@@ -37,7 +38,7 @@ public:
     ~Camera();
 
     int number() const { return m_number; }
-    const QByteArray& mac() const { return m_mac; }
+    nx::utils::MacAddress macAddress() const { return m_macAddress; }
 
     /**
      * Streams the files for the specified stream in an infinite loop. Exits only on error.
@@ -60,7 +61,7 @@ private:
     const FrameLogger* const m_frameLogger;
     const FileCache* const m_fileCache;
     const int m_number;
-    const QByteArray m_mac;
+    const nx::utils::MacAddress m_macAddress;
     const CameraOptions m_cameraOptions;
     const QStringList m_primaryFileNames;
     const QStringList m_secondaryFileNames;

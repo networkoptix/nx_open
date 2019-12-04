@@ -126,7 +126,8 @@
             timeSynchronizationEnabled: {type: 'checkbox'},
             primaryTimeServer: {type: 'static'},
             osTimeChangeCheckPeriodMs: {type: 'number'},
-            syncTimeExchangePeriod: {type: 'number'},
+            syncTimeExchangePeriod: { type: 'number' },
+            syncTimeEpsilon: { type: 'number' },
 
             maxWearableArchiveSynchronizationThreads: {type: 'number'},
             maxEventLogRecords: {type: 'number'},

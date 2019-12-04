@@ -19,3 +19,5 @@
 #include "storage_failure_event.h"
 #include "analytics_sdk_event.h"
 #include "plugin_diagnostic_event.h"
+#include "poe_over_budget_event.h"
+#include "fan_error_event.h"

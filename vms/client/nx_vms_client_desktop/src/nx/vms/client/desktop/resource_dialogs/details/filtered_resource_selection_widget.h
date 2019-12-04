@@ -17,6 +17,8 @@ class FilteredResourceSelectionWidget: public QWidget
         NOTIFY detailsVisibleChanged)
     Q_PROPERTY(QString invalidMessage READ invalidMessage WRITE setInvalidMessage
         NOTIFY invalidMessageChanged)
+    Q_PROPERTY(QString infoMessage READ infoMessage WRITE setInfoMessage)
+
 public:
     FilteredResourceSelectionWidget(QWidget* parent = nullptr);
     virtual ~FilteredResourceSelectionWidget() override;
@@ -26,6 +28,10 @@ public:
     QString invalidMessage() const;
     void setInvalidMessage(const QString& text);
     void clearInvalidMessage();
+
+    QString infoMessage() const;
+    void setInfoMessage(const QString& text);
+    void clearInfoMessage();
 
     bool detailsVisible() const;
     void setDetailsVisible(bool visible);

@@ -100,3 +100,10 @@ using QnFlirOnvifResourcePtr = QnSharedResourcePointer<OnvifResource> ;
 } // namespace flir
 } // namespace plugins
 } // namespace nx
+
+namespace nx::vms::server::nvr::hanwha {
+
+class IoModuleResource;
+using IoModuleResourcePtr = QnSharedResourcePointer<IoModuleResource>;
+
+} // namespace nx::vms::server::nvr::hanwha

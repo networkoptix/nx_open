@@ -42,6 +42,8 @@ EventType parentEvent(EventType eventType)
         case EventType::serverStartEvent:
         case EventType::licenseIssueEvent:
         case EventType::backupFinishedEvent:
+        case EventType::poeOverBudgetEvent:
+        case EventType::fanErrorEvent:
             return EventType::anyServerEvent;
 
         case EventType::anyEvent:
@@ -72,7 +74,9 @@ QList<EventType> childEvents(EventType eventType)
                 EventType::serverConflictEvent,
                 EventType::serverStartEvent,
                 EventType::licenseIssueEvent,
-                EventType::backupFinishedEvent
+                EventType::backupFinishedEvent,
+                EventType::poeOverBudgetEvent,
+                EventType::fanErrorEvent
             };
 
         // All events except already mentioned.
@@ -107,6 +111,8 @@ QList<EventType> allEvents()
         EventType::serverStartEvent,
         EventType::licenseIssueEvent,
         EventType::backupFinishedEvent,
+        EventType::poeOverBudgetEvent,
+        EventType::fanErrorEvent,
         EventType::softwareTriggerEvent,
         EventType::analyticsSdkEvent,
         EventType::pluginDiagnosticEvent,
@@ -134,6 +140,7 @@ bool hasToggleState(
     case EventType::cameraInputEvent:
     case EventType::userDefinedEvent:
     case EventType::softwareTriggerEvent:
+    case EventType::poeOverBudgetEvent:
         return true;
     case EventType::analyticsSdkEvent:
     {
@@ -191,8 +198,14 @@ bool requiresCameraResource(EventType eventType)
 // Check if server required for this event to setup a rule. Server selector will be displayed.
 bool requiresServerResource(EventType eventType)
 {
-    // TODO: #GDM #Business possibly will never be required.
-    return false;
+    switch (eventType)
+    {
+        case EventType::poeOverBudgetEvent:
+        case EventType::fanErrorEvent:
+            return true;
+        default:
+            return false;
+    }
 }
 
 // Check if camera required for this event to OCCUR.

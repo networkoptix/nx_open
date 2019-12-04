@@ -53,15 +53,26 @@ TEST_F(StorageTest, StorageMetrics)
         file->read(kPattern.length() * 2); //< Try to read more than file length.
     }
 
-    auto bytesWritten = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
-    auto bytesRead = storage->getAndResetMetric(&StorageResource::Metrics::bytesRead);
+    auto bytesWritten = storage->getMetric(&StorageResource::Metrics::bytesWritten);
+    auto bytesRead = storage->getMetric(&StorageResource::Metrics::bytesRead);
     ASSERT_EQ(kPattern.length() * kIterations, bytesWritten);
     ASSERT_EQ(kPattern.length() * kIterations, bytesRead);
 
-    bytesWritten = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
-    bytesRead = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
-    ASSERT_EQ(0, bytesWritten);
-    ASSERT_EQ(0, bytesRead);
+    for (int i = 0; i < kIterations; ++i)
+    {
+        auto file = std::unique_ptr<QIODevice>(
+            storage->open(lm("file%1").arg(i), QIODevice::WriteOnly | QIODevice::Truncate));
+        file->write(kPattern);
+
+        file = std::unique_ptr<QIODevice>(
+            storage->open(lm("file%1").arg(i), QIODevice::ReadOnly));
+        file->read(kPattern.length() * 2); //< Try to read more than file length.
+    }
+
+    bytesWritten = storage->getMetric(&StorageResource::Metrics::bytesWritten);
+    bytesRead = storage->getMetric(&StorageResource::Metrics::bytesRead);
+    ASSERT_EQ(kPattern.length() * kIterations * 2, bytesWritten);
+    ASSERT_EQ(kPattern.length() * kIterations * 2, bytesRead);
 }
 
 } // nx::vms::server::test

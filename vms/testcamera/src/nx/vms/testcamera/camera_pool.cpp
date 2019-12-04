@@ -5,6 +5,7 @@
 #include <nx/kit/utils.h>
 #include <nx/network/nettools.h>
 #include <nx/vms/testcamera/test_camera_ini.h>
+#include <nx/vms/testcamera/discovery_response.h>
 
 #include "logger.h"
 #include "frame_logger.h"
@@ -16,6 +17,7 @@
 namespace nx::vms::testcamera {
 
 CameraPool::CameraPool(
+    const FileCache* const fileCache,
     QStringList localInterfacesToListen,
     QnCommonModule* commonModule,
     bool noSecondaryStream,
@@ -29,6 +31,7 @@ CameraPool::CameraPool(
             : QHostAddress(localInterfacesToListen[0]),
         ini().mediaPort
     ),
+    m_fileCache(fileCache),
     m_localInterfacesToListen(std::move(localInterfacesToListen)),
     m_logger(new Logger("CameraPool")),
     m_frameLogger(new FrameLogger()),
@@ -78,32 +81,92 @@ void CameraPool::reportAddingCameras(
         cameraCountMessagePart, offlineFreqMessagePart, filesMessagePart);
 }
 
+/**
+ * @return Empty string if no video layout is needed, or a string representation of the appropriate
+ *     video layout in the format required for the discovery response message. On error, returns no
+ *     value, having logged the error message.
+ */
+std::optional<QByteArray> CameraPool::obtainVideoLayoutString(
+    const std::optional<VideoLayout>& specifiedVideoLayout,
+    QStringList fileNames) const
+{
+    int minChannelCount = INT_MAX;
+    for (const QString& filename: fileNames)
+        minChannelCount = std::min(minChannelCount, m_fileCache->getFile(filename).channelCount);
+
+    if (minChannelCount <= 1) //< No multi-channel files: yield no video layout.
+        return "";
+
+    // Otherwise, if there is a specified video layout, yield it, and if not, yield a default video
+    // layout for the minimum channel count for all files of both streams.
+    const VideoLayout& videoLayout =
+        specifiedVideoLayout ? *specifiedVideoLayout : VideoLayout(minChannelCount);
+
+    for (const auto& filename: fileNames)
+    {
+        const auto& file = m_fileCache->getFile(filename);
+
+        // Produce a warning if some file has more channels than this video layout mentions.
+        if (file.channelCount > videoLayout.maxChannelNumber() + 1)
+        {
+            NX_LOGGER_WARNING(m_logger,
+                "File #%1 has %2 channels but video layout contains channels up to %3.",
+                file.index, file.channelCount, videoLayout.maxChannelNumber());
+        }
+
+        // Produce a fatal error if some file does not have enough channels for this video layout.
+        if (file.channelCount < videoLayout.maxChannelNumber() + 1)
+        {
+            NX_LOGGER_ERROR(m_logger,
+                "File #%1 has %2 channels but video layout contains channels up to %3.",
+                file.index, file.channelCount, videoLayout.maxChannelNumber());
+            return std::nullopt;
+        }
+    }
+
+    return videoLayout.toUrlParamString();
+}
+
 bool CameraPool::addCamera(
-    const FileCache* fileCache,
+    const std::optional<VideoLayout>& videoLayout,
     const CameraOptions& cameraOptions,
     QStringList primaryFileNames,
     QStringList secondaryFileNames)
 {
+    const QStringList actualSecondaryFileNames =
+        m_noSecondaryStream ? QStringList() : secondaryFileNames;
+
     auto camera = std::make_unique<Camera>(
         m_frameLogger.get(),
-        fileCache,
-        (int) m_cameraByMac.size() + 1,
+        m_fileCache,
+        (int) m_cameraByMacAddress.size() + 1,
         cameraOptions,
         primaryFileNames,
-        m_noSecondaryStream ? QStringList() : secondaryFileNames);
+        actualSecondaryFileNames);
 
-    const QString mac = camera->mac();
-    const auto [_, success] = m_cameraByMac.insert({mac, std::move(camera)});
-    if (!NX_ASSERT(success, "Unable to add camera: duplicate MAC %1.", mac))
+    const auto macAddress = camera->macAddress();
+    if (!NX_ASSERT(!macAddress.isNull()))
+        return false;
+    const auto [_, success] = m_cameraByMacAddress.insert({macAddress, std::move(camera)});
+    if (!NX_ASSERT(success, "Unable to add camera: duplicate MAC %1.", macAddress))
         return false;
 
-    m_discoveryResponseDataByMac.insert({mac, mac}); //< Currently, the response data has only mac.
+    const std::optional<QByteArray> videoLayoutString = obtainVideoLayoutString(
+        videoLayout, primaryFileNames + actualSecondaryFileNames);
+    if (!videoLayoutString)
+        return false;
+
+    m_cameraDiscoveryResponseByMacAddress.insert(
+        std::make_pair(
+            macAddress,
+            std::make_shared<CameraDiscoveryResponse>(macAddress, *videoLayoutString)));
 
     return true;
 }
 
 bool CameraPool::addCameraSet(
     const FileCache* fileCache,
+    const std::optional<VideoLayout>& videoLayout,
     bool cameraForEachFile,
     const CameraOptions& cameraOptions,
     int count,
@@ -119,8 +182,11 @@ bool CameraPool::addCameraSet(
     {
         for (int i = 0; i < count; ++i)
         {
-            if (!addCamera(fileCache, cameraOptions, primaryFileNames, secondaryFileNames))
+            if (!addCamera(
+                videoLayout, cameraOptions, primaryFileNames, secondaryFileNames))
+            {
                 return false;
+            }
         }
     }
     else // Run one camera for each primary-secondary pair of video files.
@@ -131,7 +197,7 @@ bool CameraPool::addCameraSet(
         for (int i = 0; i < primaryFileNames.size(); i++)
         {
             if (!addCamera(
-                fileCache, cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
+                videoLayout, cameraOptions, {primaryFileNames[i]}, {secondaryFileNames[i]}))
             {
                 return false;
             }
@@ -141,33 +207,29 @@ bool CameraPool::addCameraSet(
     return true;
 }
 
-QByteArray CameraPool::obtainDiscoveryResponseData() const
+QByteArray CameraPool::obtainDiscoveryResponseMessage() const
 {
     QMutexLocker lock(&m_mutex);
 
-    QByteArray discoveryResponseData = QByteArray::number(ini().mediaPort);
-
-    for (const auto& [mac, camera]: m_cameraByMac)
+    DiscoveryResponse discoveryResponse(ini().mediaPort);
+    for (const auto& [macAddress, camera]: m_cameraByMacAddress)
     {
         if (camera->isEnabled())
         {
-            discoveryResponseData.append(';');
-
-            const auto it = m_discoveryResponseDataByMac.find(mac);
-            if (!NX_ASSERT(it != m_discoveryResponseDataByMac.end()))
+            const auto it = m_cameraDiscoveryResponseByMacAddress.find(macAddress);
+            if (!NX_ASSERT(it != m_cameraDiscoveryResponseByMacAddress.end()))
                 continue;
-            discoveryResponseData.append(it->second);
+            discoveryResponse.addCameraDiscoveryResponse(it->second);
         }
     }
-
-    return discoveryResponseData;
+    return discoveryResponse.makeDiscoveryResponseMessage();
 }
 
 bool CameraPool::startDiscovery()
 {
     m_discoveryListener = std::make_unique<CameraDiscoveryListener>(
         m_logger.get(),
-        [this]() { return obtainDiscoveryResponseData(); },
+        [this]() { return obtainDiscoveryResponseMessage(); },
         m_localInterfacesToListen);
 
     if (!m_discoveryListener->initialize())
@@ -188,12 +250,12 @@ QnTCPConnectionProcessor* CameraPool::createRequestProcessor(
         this, std::move(clientSocket), m_noSecondaryStream, m_fpsPrimary, m_fpsSecondary);
 }
 
-Camera* CameraPool::findCamera(const QString& mac) const
+Camera* CameraPool::findCamera(const nx::utils::MacAddress& macAddress) const
 {
     QMutexLocker lock(&m_mutex);
 
-    const auto& it = m_cameraByMac.find(mac);
-    if (it != m_cameraByMac.end())
+    const auto& it = m_cameraByMacAddress.find(macAddress);
+    if (it != m_cameraByMacAddress.end())
         return it->second.get();
     return nullptr;
 }
