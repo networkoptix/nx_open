@@ -191,22 +191,17 @@ QJsonObject RealNumberItem::serialize() const
 //-------------------------------------------------------------------------------------------------
 // Specific components.
 
-Settings::Settings(QObject* parent) :
-    Group(QStringLiteral("Settings"), parent)
+QQmlListProperty<Section> SectionContainer::sections()
 {
+    return QQmlListProperty<Section>(this, m_sections);
 }
 
-QQmlListProperty<Settings> Settings::sections()
-{
-    return QQmlListProperty<Settings>(this, m_sections);
-}
-
-const QList<Settings*> Settings::sectionList() const
+const QList<Section*> SectionContainer::sectionList() const
 {
     return m_sections;
 }
 
-QJsonObject Settings::serialize() const
+QJsonObject SectionContainer::serialize() const
 {
     auto result = base_type::serialize();
 
@@ -218,13 +213,18 @@ QJsonObject Settings::serialize() const
     return result;
 }
 
-GroupBox::GroupBox(QObject* parent):
-    Group(QStringLiteral("GroupBox"), parent)
+Section::Section(QObject* parent):
+    base_type(QStringLiteral("Section"), parent)
 {
 }
 
-Section::Section(QObject* parent):
-    Group(QStringLiteral("Section"), parent)
+Settings::Settings(QObject* parent):
+    base_type(QStringLiteral("Settings"), parent)
+{
+}
+
+GroupBox::GroupBox(QObject* parent):
+    Group(QStringLiteral("GroupBox"), parent)
 {
 }
 

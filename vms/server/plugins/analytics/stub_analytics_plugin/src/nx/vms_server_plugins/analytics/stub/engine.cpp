@@ -438,7 +438,7 @@ std::string Engine::manifestString() const
         ],
         "sections": [
             {
-                "type": "Settings",
+                "type": "Section",
                 "name": "Example",
                 "items": [
                     {
@@ -488,7 +488,7 @@ std::string Engine::manifestString() const
                 ]
             },
             {
-                "type": "Settings",
+                "type": "Section",
                 "name": "ROI",
                 "items": [
                     {

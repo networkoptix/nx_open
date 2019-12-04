@@ -71,27 +71,27 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
             else
                 return result;
         }
+    }
 
-        if (const auto settings = qobject_cast<Settings*>(group))
+    if (const auto sectionContainer = qobject_cast<SectionContainer*>(item.get()))
+    {
+        auto sectionsProperty = sectionContainer->sections();
+
+        for (const QJsonValue sectionValue: object["sections"].toArray())
         {
-            auto sectionsProperty = settings->sections();
+            const auto result = createItem(item.get(), sectionValue.toObject());
+            const auto childItem = std::get_if<Item*>(&result);
+            if (!childItem)
+                return result;
 
-            for (const QJsonValue sectionValue: object["sections"].toArray())
+            const auto childSection = qobject_cast<Section*>(*childItem);
+            if (!childSection)
             {
-                const auto result = createItem(item.get(), sectionValue.toObject());
-                const auto childItem = std::get_if<Item*>(&result);
-                if (!childItem)
-                    return result;
-
-                const auto childSettings = qobject_cast<Settings*>(*childItem);
-                if (!childSettings)
-                {
-                    return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
-                        lm("A section must be of type \"Settings\""));
-                }
-
-                sectionsProperty.append(&sectionsProperty, childSettings);
+                return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
+                    lm("A section must be of type \"Section\""));
             }
+
+            sectionsProperty.append(&sectionsProperty, childSection);
         }
     }
 
