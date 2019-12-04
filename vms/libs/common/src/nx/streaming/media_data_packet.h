@@ -173,7 +173,7 @@ enum class MetadataType
     Motion,
     ObjectDetection,
     MediaStreamEvent,
-    Onvif,
+    InStream,
 };
 
 // TODO: #dmishin get rid of implementations and members in this class
