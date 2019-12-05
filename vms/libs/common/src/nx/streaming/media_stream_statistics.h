@@ -2,6 +2,8 @@
 
 #include <nx/sdk/helpers/media_stream_statistics.h>
 
+#include <memory>
+
 struct QnAbstractMediaData;
 using QnAbstractMediaDataPtr = std::shared_ptr<QnAbstractMediaData>;
 
