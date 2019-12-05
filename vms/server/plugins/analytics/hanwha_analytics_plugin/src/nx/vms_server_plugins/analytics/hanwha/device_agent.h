@@ -57,11 +57,18 @@ private:
 
     void stopFetchingMetadata();
 
+    std::string sendWritingRequestToDeviceSync(const std::string& query);
+
+    std::string sendReadingRequestToDeviceSync(
+        const char* domain, const char* submenu, const char* action);
+
+    std::string loadEventSettings(const char* eventName);
+
+    void loadFrameSize();
+
+    void loadSupportedEventTypes(); // page 9 Application Programmers Guide
+
 private:
-
-    std::string sendCommandToCamera(const std::string& query);
-
-    std::string loadSunapiGettingReply(const char* eventName);
 
     Engine* const m_engine;
 
@@ -80,7 +87,7 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
     Settings m_settings;
-    FrameSize m_frameSize = { 3840, 2160 };
+    FrameSize m_frameSize;
     nx::network::http::HttpClient m_settingsHttpClient;
     bool m_serverHasSentInitialSettings = false;
 };
