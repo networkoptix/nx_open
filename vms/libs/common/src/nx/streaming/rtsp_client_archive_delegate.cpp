@@ -66,7 +66,10 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     :
     QnAbstractArchiveDelegate(),
     m_rtspSession(new QnRtspClient(
-        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false})),
+        QnRtspClient::Config{
+            /*shouldGuessAuthDigest*/ true,
+            /*backChannelAudioOnly*/ false,
+            /*disableKeepAlive*/ true })),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
