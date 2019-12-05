@@ -103,90 +103,119 @@ Item
         {
             model: analyticsEngines
 
-            Column
+            Rectangle
             {
-                width: parent.width
-
                 readonly property var thisEngineId: modelData.id
                 readonly property bool isActive: enabledAnalyticsEngines.indexOf(thisEngineId) !== -1
 
-                MenuItem
+                width: parent.width
+                height: column.height
+                color: currentEngineId === thisEngineId ? ColorTheme.colors.dark9 : "transparent"
+
+                Column
                 {
-                    id: menuItem
+                    id: column
+                    width: parent.width
 
-                    itemId: thisEngineId.toString()
-                    text: modelData.name
-                    active: isActive
-                    navigationMenu: menu
-
-                    onClicked:
+                    MenuItem
                     {
-                        currentSection = ""
-                        store.setCurrentAnalyticsEngineId(thisEngineId)
-                        settingsView.contentItem.sectionsItem.currentIndex = 0
-                    }
+                        id: menuItem
 
-                    readonly property bool collapsible:
-                        !!modelData.settingsModel.sections && modelData.settingsModel.sections.length > 0
-
-                    MouseArea
-                    {
-                        id: expandCollapseButton
-
-                        width: 20
-                        height: parent.height
-                        anchors.right: parent.right
-                        acceptedButtons: Qt.LeftButton
-                        visible: parent.collapsible
-                        hoverEnabled: true
-
-                        ArrowIcon
-                        {
-                            anchors.centerIn: parent
-                            rotation: sectionsView.collapsed ? 0 : 180
-                            color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
-                                ? ColorTheme.lighter(menuItem.color, 2)
-                                : menuItem.color
-                        }
+                        height: 28
+                        itemId: thisEngineId.toString()
+                        text: modelData.name
+                        active: isActive
+                        navigationMenu: menu
 
                         onClicked:
                         {
-                            if (currentEngineId === thisEngineId)
-                                parent.click()
-
-                            sectionsView.collapsed = !sectionsView.collapsed
+                            currentSection = ""
+                            store.setCurrentAnalyticsEngineId(thisEngineId)
+                            settingsView.contentItem.sectionsItem.currentIndex = 0
                         }
-                    }
-                }
 
-                // Only 1 level of submenu items is supported at the moment.
-                Column
-                {
-                    id: sectionsView
-                    width: parent.width
-                    clip: true
+                        readonly property bool collapsible:
+                            !!modelData.settingsModel.sections && modelData.settingsModel.sections.length > 0
 
-                    property bool collapsed: false
-                    height: collapsed ? 0 : implicitHeight
-
-                    Repeater
-                    {
-                        model: modelData.settingsModel.sections
-
-                        MenuItem
+                        MouseArea
                         {
-                            itemId: thisEngineId.toString() + modelData.name
-                            text: "   " + modelData.name
-                            navigationMenu: menu
-                            font.pixelSize: 12
-                            active: isActive
+                            id: expandCollapseButton
+
+                            width: 20
+                            height: parent.height
+                            anchors.right: parent.right
+                            acceptedButtons: Qt.LeftButton
+                            visible: parent.collapsible
+                            hoverEnabled: true
+
+                            ArrowIcon
+                            {
+                                anchors.centerIn: parent
+                                rotation: sectionsView.collapsed ? 0 : 180
+                                color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
+                                    ? ColorTheme.lighter(menuItem.color, 2)
+                                    : menuItem.color
+                            }
 
                             onClicked:
                             {
-                                currentSection = modelData.name
-                                store.setCurrentAnalyticsEngineId(thisEngineId)
-                                settingsView.contentItem.sectionsItem.currentIndex = index + 1
+                                if (currentEngineId === thisEngineId)
+                                    parent.click()
+
+                                sectionsView.collapsed = !sectionsView.collapsed
                             }
+                        }
+                    }
+
+                    // Only 1 level of submenu items is supported at the moment.
+                    Column
+                    {
+                        id: sectionsView
+                        width: parent.width
+                        clip: true
+
+                        property bool collapsed: false
+                        height: collapsed ? 0 : implicitHeight
+
+                        Repeater
+                        {
+                            model: modelData.settingsModel.sections
+
+                            MenuItem
+                            {
+                                height: 28
+                                itemId: thisEngineId.toString() + modelData.name
+                                text: modelData.name
+                                leftPadding: 24
+                                navigationMenu: menu
+                                font.pixelSize: 12
+                                active: isActive
+
+                                onClicked:
+                                {
+                                    currentSection = modelData.name
+                                    store.setCurrentAnalyticsEngineId(thisEngineId)
+                                    settingsView.contentItem.sectionsItem.currentIndex = index + 1
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle
+                    {
+                        id: separator
+
+                        width: parent.width
+                        height: 1
+                        color: ColorTheme.colors.dark7
+
+                        Rectangle
+                        {
+                            y: 1
+                            z: 1
+                            width: parent.width
+                            height: 1
+                            color: ColorTheme.colors.dark9
                         }
                     }
                 }
