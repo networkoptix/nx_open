@@ -4,6 +4,7 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/frequency_restricted_call.h>
