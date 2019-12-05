@@ -63,6 +63,7 @@ private:
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 private:
+    void updateDevice(const QnResourcePtr& resource);
     void subscribeToDeviceChanges();
     void subscribeToRulesChanges();
 
