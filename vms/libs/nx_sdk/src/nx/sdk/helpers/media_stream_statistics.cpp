@@ -42,7 +42,7 @@ void MediaStreamStatistics::onData(
         };
 
     std::lock_guard<std::mutex> locker(m_mutex);
-    m_data.insert(toIterator(timestamp), Data{ timestamp, dataSize, isKeyFrame });
+    m_data.insert(toIterator(timestamp), {timestamp, dataSize, isKeyFrame});
     m_totalSizeBytes += dataSize;
 
     // Remove old and future data in case of media stream time has been changed.
@@ -78,7 +78,7 @@ float MediaStreamStatistics::getFrameRate() const
         return 0;
     const auto interval = intervalUnsafe().count();
     if (interval > 0)
-        return (m_data.size() - 1) * 1000000.0 / interval;
+        return (m_data.size() - 1) * 1000000.0F / interval;
     return 0;
 }
 
@@ -90,7 +90,7 @@ microseconds MediaStreamStatistics::intervalUnsafe() const
 float MediaStreamStatistics::getAverageGopSize() const
 {
     std::lock_guard<std::mutex> locker(m_mutex);
-    int keyFrames = std::count_if(m_data.begin(), m_data.end(),
+    const size_t keyFrames = std::count_if(m_data.begin(), m_data.end(),
         [](const auto& value) { return value.isKeyFrame; });
     return keyFrames > 0 ? m_data.size() / (float) keyFrames : 0;
 }
