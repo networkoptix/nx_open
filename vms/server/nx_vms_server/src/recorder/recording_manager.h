@@ -27,7 +27,7 @@ namespace ec2 {
     class QnDistributedMutex;
 }
 
-class RecorderData
+struct RecorderData
 {
 public:
     RecorderData() = default;
@@ -43,6 +43,7 @@ public:
 
     std::unique_ptr<QnServerStreamRecorder> recorder;
     std::unique_ptr<nx::vms::server::PutInOrderDataProvider> reorderingProvider;
+    bool isStarted = false;
 };
 
 struct Recorders
@@ -155,6 +156,15 @@ private:
         const QString uniqueCameraId,
         qint64 currentTime);
     void disableLicensesIfNeed();
+    void startRecording(
+        const QnVideoCameraPtr& camera,
+        RecorderData* recorder,
+        const QnLiveStreamProviderPtr& provider);
+    void stopRecording(
+        const QnVideoCameraPtr& camera,
+        RecorderData* recorder,
+        const QnLiveStreamProviderPtr& provider);
+
 private:
     mutable QnMutex m_mutex;
     std::map<QnResourcePtr, Recorders> m_recordMap;

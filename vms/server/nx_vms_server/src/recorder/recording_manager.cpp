@@ -154,9 +154,9 @@ std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
 
     auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(
             reader,
-            std::chrono::milliseconds(0),
-            std::chrono::milliseconds(0),
-            std::chrono::seconds(5),
+            std::chrono::milliseconds(0) /*minSize*/,
+            std::chrono::seconds(5) /*maxSize*/,
+            std::chrono::seconds(0)  /*initialSize*/,
             PutInOrderDataProvider::BufferingPolicy::increaseOnly);
     reorderingDataProvider->addDataProcessor(recorder.get());
 
@@ -251,6 +251,42 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
     return true;
 }
 
+void QnRecordingManager::startRecording(
+    const QnVideoCameraPtr& camera,
+    RecorderData* recorder,
+    const QnLiveStreamProviderPtr& provider)
+{
+    if (!recorder || !provider)
+        return;
+    if (!recorder->isStarted)
+    {
+        NX_INFO(this, "Recording started for camera %1", camera->resource()->getUniqueId());
+        // Reset eof time from recorder
+        recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+        recorder->recorder->start();
+        camera->inUse(recorder->recorder.get());
+        recorder->isStarted = true;
+    }
+    provider->startIfNotRunning();
+}
+
+void QnRecordingManager::stopRecording(
+    const QnVideoCameraPtr& camera,
+    RecorderData* recorder,
+    const QnLiveStreamProviderPtr& provider)
+{
+    if (recorder && recorder->isStarted)
+    {
+        const auto lastTimestamp = recorder->reorderingProvider->flush();
+        if (lastTimestamp) //< Record reordering buffer before stop.
+            recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, lastTimestamp->count());
+        else
+            recorder->recorder->pleaseStop();
+        camera->notInUse(recorder->recorder.get());
+        recorder->isStarted = false;
+    }
+}
+
 bool QnRecordingManager::startOrStopRecording(
     const QnResourcePtr& res, const QnVideoCameraPtr& camera, const Recorders& recorders)
 {
@@ -277,15 +313,7 @@ bool QnRecordingManager::startOrStopRecording(
 
         someRecordingIsPresent = true;
 
-        if (recorderHiRes && providerHi)
-        {
-            if (!recorderHiRes->isRunning()) {
-                NX_INFO(this, QString(lit("Recording started for camera %1")).arg(res->getUniqueId()));
-                recorderHiRes->start();
-                camera->inUse(recorderHiRes);
-            }
-            providerHi->startIfNotRunning();
-        }
+        startRecording(camera, recorders.recorderHiRes.get(), providerHi);
 
         if (recorderLowRes)
         {
@@ -295,22 +323,9 @@ bool QnRecordingManager::startOrStopRecording(
             bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
                                     cameraRes->hasDualStreaming() && providerLow;
             if (runSecondStream)
-            {
-                if (recorderLowRes) {
-                    if (!recorderLowRes->isRunning()) {
-                        NX_INFO(this, QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()));
-                        recorderLowRes->start();
-                        camera->inUse(recorderLowRes);
-                    }
-                }
-                providerLow->startIfNotRunning();
-            }
-            else {
-                if (recorderLowRes && recorderLowRes->isRunning()) {
-                    recorderLowRes->pleaseStop();
-                    camera->notInUse(recorderLowRes);
-                }
-            }
+                startRecording(camera, recorders.recorderLowRes.get(), providerLow);
+            else
+                stopRecording(camera, recorders.recorderLowRes.get(), providerLow);
         }
     }
     else
@@ -321,17 +336,11 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi || needStopLow)
             someRecordingIsPresent = true;
 
-        if (needStopHi) {
-            recorderHiRes->pleaseStop();
-            camera->notInUse(recorderHiRes);
-            //if (providerHi)
-            //    providerHi->setFps(cameraRes->getMaxFps());
-        }
+        if (needStopHi)
+            stopRecording(camera, recorders.recorderHiRes.get(), providerHi);
 
-        if (needStopLow) {
-            recorderLowRes->pleaseStop();
-            camera->notInUse(recorderLowRes);
-        }
+        if (needStopLow)
+            stopRecording(camera, recorders.recorderLowRes.get(), providerLow);
 
         if (needStopHi) {
             NX_INFO(this, QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()));

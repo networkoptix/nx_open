@@ -306,6 +306,56 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     return AV_NOPTS_VALUE;
 }
 
+void QnStreamRecorder::addSignatureFrameIfNeed()
+{
+    if (!m_endOfData)
+    {
+        bool isOk = true;
+        if (m_needCalcSignature && !m_firstTime)
+            isOk = addSignatureFrame();
+
+        if (isOk)
+        {
+            m_lastError = StreamRecorderErrorStruct(
+                StreamRecorderError::noError,
+                QnStorageResourcePtr()
+            );
+        }
+
+        m_recordingFinished = true;
+        m_endOfData = true;
+        NX_VERBOSE(this,
+            "END: Stopping; m_endOfData: false; error: %1", isOk ? "true" : "false");
+    }
+    else
+    {
+        NX_VERBOSE(this, "END: Stopping; m_endOfData: true");
+    }
+}
+
+void QnStreamRecorder::updateProgress(qint64 timestampUs)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_bofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs != qint64(AV_NOPTS_VALUE)
+        && m_eofDateTimeUs > m_bofDateTimeUs)
+    {
+        int progress =
+            ((timestampUs - m_bofDateTimeUs) * 100LL) / (m_eofDateTimeUs - m_bofDateTimeUs);
+
+        // That happens quite often.
+        if (progress > 100)
+            progress = 100;
+
+        if (progress != m_lastProgress && progress >= 0)
+        {
+            NX_VERBOSE(this, "Recording progress", progress);
+            m_lastProgress = progress;
+            lock.unlock();
+            emit recordingProgress(progress);
+        }
+    }
+}
+
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     #define VERBOSE(S) NX_VERBOSE(this, lm("%1 %2").args(__func__, (S)))
@@ -325,32 +375,16 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         VERBOSE("EXIT: Unknown data");
         return true; //< skip unknown data
     }
-    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
+
     {
-        if (!m_endOfData)
+        QnMutexLocker lock(&m_mutex);
+        if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
         {
-            bool isOk = true;
-            if (m_needCalcSignature && !m_firstTime)
-                isOk = addSignatureFrame();
-
-            if (isOk)
-                m_lastError = StreamRecorderErrorStruct(
-                    StreamRecorderError::noError,
-                    QnStorageResourcePtr()
-                );
-
-            m_recordingFinished = true;
-            m_endOfData = true;
-            VERBOSE(
-                lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
+            if (m_role == StreamRecorderRole::fileExport)
+                addSignatureFrameIfNeed();
+            pleaseStop();
+            return true;
         }
-        else
-        {
-            VERBOSE("END: Stopping; m_endOfData: true");
-        }
-
-        pleaseStop();
-        return true;
     }
 
     if (md->dataType == QnAbstractMediaData::META_V1)
@@ -415,24 +449,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         m_waitEOF = false;
     }
 
-    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs > m_bofDateTimeUs)
-    {
-        int progress =
-            ((md->timestamp - m_bofDateTimeUs) * 100LL) / (m_eofDateTimeUs - m_bofDateTimeUs);
-
-        // That happens quite often.
-        if (progress > 100)
-        {
-            progress = 100;
-        }
-
-        if (progress != m_lastProgress && progress >= 0)
-        {
-            VERBOSE("progress");
-            emit recordingProgress(progress);
-            m_lastProgress = progress;
-        }
-    }
+    updateProgress(md->timestamp);
 
     VERBOSE("END");
     return true;
@@ -1174,6 +1191,7 @@ QString QnStreamRecorder::fixedFileName() const
 
 void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
 {
+    QnMutexLocker lock(&m_mutex);
     m_endOfData = false;
     m_bofDateTimeUs = bof;
     m_eofDateTimeUs = eof;
