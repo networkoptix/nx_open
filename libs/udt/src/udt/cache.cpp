@@ -52,6 +52,11 @@ Yunhong Gu, last updated 05/05/2009
 
 using namespace std;
 
+CInfoBlock::CInfoBlock()
+{
+    memset(m_piIP, 0, sizeof(m_piIP));
+}
+
 CInfoBlock& CInfoBlock::operator=(const CInfoBlock& obj)
 {
     std::copy(obj.m_piIP, obj.m_piIP + 3, m_piIP);

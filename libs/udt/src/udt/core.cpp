@@ -92,6 +92,8 @@ constexpr const int kMinRecvWindowSize = 32;
 
 CUDT::CUDT()
 {
+    memset(m_piSelfIP, 0, sizeof(m_piSelfIP));
+
     m_Linger.l_onoff = 1;
     m_Linger.l_linger = 180;
 

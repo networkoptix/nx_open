@@ -60,7 +60,7 @@ class CUDT;
 struct CUnit
 {
     CPacket m_Packet;        // packet
-    int m_iFlag;            // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped
+    int m_iFlag = 0;            // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped
 };
 
 class ServerSideConnectionAcceptor;
@@ -117,23 +117,24 @@ public:
 private:
     struct CQEntry
     {
-        CUnit* m_pUnit;        // unit queue
-        char* m_pBuffer;        // data buffer
-        int m_iSize;        // size of each queue
+        CUnit* m_pUnit = nullptr;        // unit queue
+        char* m_pBuffer = nullptr;        // data buffer
+        int m_iSize = 0;        // size of each queue
 
-        CQEntry* next;
-    }
-    *m_pQEntry,            // pointer to the first unit queue
-        *m_pCurrQueue,        // pointer to the current available queue
-        *m_pLastQueue;        // pointer to the last unit queue
+        CQEntry* next = nullptr;
+    };
 
-    CUnit* m_pAvailUnit;         // recent available unit
+    CQEntry* m_pQEntry = nullptr;            // pointer to the first unit queue
+    CQEntry* m_pCurrQueue = nullptr;        // pointer to the current available queue
+    CQEntry* m_pLastQueue = nullptr;        // pointer to the last unit queue
 
-    int m_iSize;            // total size of the unit queue, in number of packets
-    int m_iCount;        // total number of valid packets in the queue
+    CUnit* m_pAvailUnit = nullptr;         // recent available unit
 
-    int m_iMSS;            // unit buffer size
-    int m_iIPversion;        // IP version
+    int m_iSize = 0;            // total size of the unit queue, in number of packets
+    int m_iCount = 0;        // total number of valid packets in the queue
+
+    int m_iMSS = 0;            // unit buffer size
+    int m_iIPversion = 0;        // IP version
 
 private:
     CUnitQueue(const CUnitQueue&);
