@@ -2,7 +2,7 @@
 
 #include <string>
 #include <functional>
-#include <boost/optional.hpp>
+#include <optional>
 
 namespace nx {
 
@@ -46,8 +46,8 @@ public:
     MountCode mount(
         const std::string& url,
         const std::string& directory,
-        const boost::optional<std::string>& username,
-        const boost::optional<std::string>& password);
+        const std::optional<std::string>& maybeUsername,
+        const std::optional<std::string>& maybePassword);
 
     /** Unounts NAS from directory. */
     UnmountCode unmount(const std::string& directory);
