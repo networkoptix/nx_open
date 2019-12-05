@@ -145,8 +145,6 @@ Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path
                 }
             };
 
-        using namespace boost;
-
         auto uncString = "//" + url.host() + url.path();
         if (m_ignoreTool)
         {
@@ -154,8 +152,8 @@ Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path
             auto password = url.password().toStdString();
             auto mountResult = systemCommands.mount(
                 uncString.toStdString(), path.toStdString(),
-                userName.empty() ? none : boost::optional<std::string>(userName),
-                password.empty() ? none : boost::optional<std::string>(password));
+                userName.empty() ? std::nullopt : std::optional<std::string>(userName),
+                password.empty() ? std::nullopt : std::optional<std::string>(password));
 
             logMountResult(mountResult, false);
             return mountResultToStorageInitResult(mountResult);

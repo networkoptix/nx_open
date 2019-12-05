@@ -1,6 +1,6 @@
 #include "system_commands.h"
-#include "system_commands/domain_socket/send_linux.h"
-#include "system_commands/detail/mount_helper.h"
+#include <nx/system_commands/domain_socket/send_linux.h>
+#include <nx/system_commands/system_commands_ini.h>
 
 #include <algorithm>
 #include <assert.h>
@@ -28,6 +28,8 @@
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include <nx/kit/debug.h>
 
 namespace nx {
 
@@ -100,20 +102,129 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
-static std::string makeCredentialsFile(
-    const std::string& userName, const std::string& password, std::string* outError)
+enum MountParamIndex
 {
-    const std::string fileName = "/tmp/cifs_credentials_" + std::to_string(syscall(SYS_gettid));
-    std::ofstream file(fileName.c_str());
-    file << "username=" << userName << std::endl;
-    file << "password=" << password << std::endl;
-    if (!file.fail())
-        return fileName;
+    Ind_username = 0,
+    Ind_domain,
+    Ind_password,
+    Ind_ver,
+    Ind_url,
+    Ind_localPath,
+};
 
-    if (outError)
-        *outError = "Unable to create credentials file: " + fileName;
+using MountParams = std::tuple<
+    std::optional<std::string>, std::optional<std::string>, std::optional<std::string>,
+    std::string, std::string, std::string>;
 
-    return "";
+namespace detail {
+
+template<typename T>
+void combineImpl(std::vector<T>& r, T& t)
+{
+    r.push_back(t);
+}
+
+template<typename T, typename Head, typename ... Tail>
+void combineImpl(
+    std::vector<T>& r, T& tuple, const std::vector<Head>& head, const std::vector<Tail>& ... tail)
+{
+    for (const auto& h: head)
+    {
+        constexpr size_t currentIndex = std::tuple_size_v<T> - sizeof...(Tail) - 1;
+        std::get<currentIndex>(tuple) = h;
+        combineImpl(r, tuple, tail...);
+    }
+}
+
+} // namespace detail
+
+template<typename... Args>
+auto combine(const std::vector<Args>& ... args) -> std::vector<std::tuple<Args...>>
+{
+    std::vector<std::tuple<Args...>> result;
+    std::tuple<Args...> t;
+    detail::combineImpl(result, t, args...);
+    return result;
+}
+
+std::string escapeSingleQuotes(const std::string& arg)
+{
+    std::stringstream ss;
+    for (const char c: arg)
+    {
+        if (c == '\'')
+            ss << "'\\''";
+        else
+            ss << c;
+    }
+
+    return ss.str();
+}
+
+std::string makeMountCommand(const MountParams& params)
+{
+    std::ostringstream ss;
+    ss << "mount -t cifs '" << std::get<Ind_url>(params) << "' '" << std::get<Ind_localPath>(params) << "' -o ";
+
+    if (std::get<Ind_username>(params))
+        ss << " username='" << escapeSingleQuotes(*std::get<Ind_username>(params)) << "',";
+    else
+        ss << "guest,";
+
+    if (std::get<Ind_password>(params))
+        ss << "password='" << escapeSingleQuotes(*std::get<Ind_password>(params)) << "',";
+    else
+        ss << "password='',";
+
+    if (std::get<Ind_domain>(params))
+        ss << "domain='" << escapeSingleQuotes(*std::get<Ind_domain>(params)) << "',";
+
+    ss << "vers=" << std::get<Ind_ver>(params);
+
+    return ss.str();
+}
+
+std::pair<std::optional<std::string>, std::optional<std::string>> extractNameDomain(
+    const std::optional<std::string>& username)
+{
+    static const std::string kWorkgroupDomain = "WORKGROUP";
+    if (!username)
+        return {std::nullopt, kWorkgroupDomain};
+
+    const auto sep = username->find('\\');
+    if (sep == std::string::npos
+        || sep == username->size() - 1
+        || sep == 0)
+    {
+        return {username, kWorkgroupDomain};
+    }
+
+    return {username->substr(0, sep), username->substr(sep + 1)};
+}
+
+auto generateMountParams(
+    const std::string& url,
+    const std::string& localPath,
+    const std::optional<std::string>& maybeUsername,
+    const std::optional<std::string>& maybePassword)
+{
+    #define vecS std::vector<std::string>
+    #define vecMS std::vector<std::optional<std::string>>
+    const auto [username, domain] = extractNameDomain(maybeUsername);
+    const vecS versions = {
+        /*Win10*/"3.1",
+        /*Win7*/"2.1",
+        /*Win2012, Win8*/"3.0",
+        /*Win2008, Vista*/"2.0",
+        /*NT, old linux kernels*/"1.0"
+    };
+
+    return combine(
+        vecMS{username}, vecMS{domain, std::nullopt}, vecMS{maybePassword}, versions,
+        vecS{url}, vecS{localPath});
+
+    #undef vecS
+    #undef vecMS
 }
 
 } // namespace
@@ -122,7 +233,6 @@ bool SystemCommands::checkMountPermissions(const std::string& directory)
 {
     static const std::string kAllowedMountPointPreffix("/tmp/");
     static const std::string kAllowedMountPointSuffix("_temp_folder_");
-
 
     if (directory.find(kAllowedMountPointPreffix) != 0
         || directory.find(kAllowedMountPointSuffix) == std::string::npos)
@@ -195,36 +305,35 @@ bool SystemCommands::execute(
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url,
-    const std::string& directory,
-    const boost::optional<std::string>& username,
-    const boost::optional<std::string>& password)
+    const std::string& localPath,
+    const std::optional<std::string>& maybeUsername,
+    const std::optional<std::string>& maybePassword)
 {
-    system_commands::MountHelperDelegates delegates;
-    std::string credentialsFile;
-    delegates.credentialsFileName =
-        [this, &credentialsFile](const std::string& username, const std::string& password)
-        {
-            credentialsFile = makeCredentialsFile(username, password, &m_lastError);
-            return credentialsFile;
-        };
-    delegates.isPathAllowed =
-        [this](const std::string& path) { return checkMountPermissions(path); };
-    delegates.osMount =
-        [this](const std::string& command)
-        {
-            if (execute(command))
-                return MountCode::ok;
+    if (!checkMountPermissions(localPath))
+    {
+        NX_OUTPUT << "It's forbidden to mount a remote folder to " << localPath;
+        return SystemCommands::MountCode::otherError;
+    }
 
-            return (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
-                ? MountCode::wrongCredentials
-                : MountCode::otherError;
-        };
+    for (const auto& t: generateMountParams(url, localPath, maybeUsername, maybePassword))
+    {
+        const auto command = makeMountCommand(t);
+        if (execute(command))
+        {
+            NX_OUTPUT << "Mount command \"" << command << "\" succeeded";
+            return SystemCommands::MountCode::ok;
+        }
 
-    system_commands::MountHelper mountHelper(username, password, delegates);
-    auto result = mountHelper.mount(url, directory);
-    if (!credentialsFile.empty())
-        unlink(credentialsFile.c_str());
-    return result;
+        if (m_lastError.find("13") != std::string::npos)
+        {
+            NX_OUTPUT << "Mount command \"" << command << "\" failed with 'permission denied'";
+            return SystemCommands::MountCode::wrongCredentials;
+        }
+
+        NX_OUTPUT << "Mount command \"" << command << "\" failed";
+    }
+
+    return SystemCommands::MountCode::otherError;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
