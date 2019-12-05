@@ -63,7 +63,7 @@ bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterat
 
 template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
-    boost::optional<std::string>* head, Tail... tail);
+    std::optional<std::string>* head, Tail... tail);
 
 inline bool parseCommandImpl(std::string::const_iterator* /*it*/, std::string::const_iterator /*end*/)
 {
@@ -72,7 +72,7 @@ inline bool parseCommandImpl(std::string::const_iterator* /*it*/, std::string::c
 
 template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
-    boost::optional<std::string>* head, Tail... tail)
+    std::optional<std::string>* head, Tail... tail)
 {
     advanceWhile(it, end, &isspace);
     if (*it != end)

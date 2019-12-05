@@ -5,8 +5,8 @@
 namespace nx {
 
 SystemCommands::MountCode SystemCommands::mount(const std::string& /*url*/,
-    const std::string& /*directory*/, const boost::optional<std::string>& /*username*/,
-    const boost::optional<std::string>& /*password*/)
+    const std::string& /*directory*/, const std::optional<std::string>& /*username*/,
+    const std::optional<std::string>& /*password*/)
 {
     return MountCode::otherError;
 }

@@ -25,7 +25,7 @@ public:
 
     ExecutableCommandContextPtr get(
         const std::string &commandString,
-        boost::optional<int> transportFd) const;
+        std::optional<int> transportFd) const;
     std::string help() const;
 
 private:
