@@ -54,6 +54,7 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     const QnVirtualCameraResourcePtr& device)
     :
     base_type(serverModule),
+    m_mutex(QnMutex::Recursive),
     m_device(device),
     m_throwPluginEvent(
         [this](int framesSkipped, QnUuid engineId)
