@@ -37,7 +37,7 @@ struct ExecutableCommandContext: CommandContext
     ExecutableCommandContext(
             const CommandContext& commandContext,
             const std::string& commandString,
-            boost::optional<int> transportFd)
+            std::optional<int> transportFd)
             :
             CommandContext(commandContext),
             commandString(commandString),
@@ -46,7 +46,7 @@ struct ExecutableCommandContext: CommandContext
     }
 
     std::string commandString;
-    boost::optional<int> transportFd;
+    std::optional<int> transportFd;
 };
 
 CommandsFactory::CommandsFactory() = default;
@@ -82,7 +82,7 @@ CommandsFactory& CommandsFactory::reg(
  */
 ExecutableCommandContextPtr CommandsFactory::get(
     const std::string& commandString,
-    boost::optional<int> transportFd) const
+    std::optional<int> transportFd) const
 {
     std::string baseCmd;
     auto begin = commandString.cbegin();
