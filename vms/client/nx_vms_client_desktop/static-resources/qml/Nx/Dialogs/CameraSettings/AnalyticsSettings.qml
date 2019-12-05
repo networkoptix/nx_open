@@ -107,10 +107,12 @@ Item
             {
                 readonly property var thisEngineId: modelData.id
                 readonly property bool isActive: enabledAnalyticsEngines.indexOf(thisEngineId) !== -1
+                readonly property bool selectedBlock: currentEngineId === thisEngineId
+                readonly property real textAlpha: isActive ? 1.0 : 0.3
 
                 width: parent.width
                 height: column.height
-                color: currentEngineId === thisEngineId ? ColorTheme.colors.dark9 : "transparent"
+                color: selectedBlock ? ColorTheme.colors.dark9 : "transparent"
 
                 Column
                 {
@@ -126,6 +128,12 @@ Item
                         text: modelData.name
                         active: isActive
                         navigationMenu: menu
+
+                        color: ColorTheme.transparent(
+                            current || selectedBlock
+                                ? ColorTheme.colors.light1
+                                : ColorTheme.colors.light10,
+                            textAlpha);
 
                         onClicked:
                         {
@@ -190,6 +198,10 @@ Item
                                 navigationMenu: menu
                                 font.pixelSize: 12
                                 active: isActive
+
+                                color: ColorTheme.transparent(
+                                    current ? ColorTheme.colors.light1 : ColorTheme.colors.light10,
+                                    textAlpha);
 
                                 onClicked:
                                 {
