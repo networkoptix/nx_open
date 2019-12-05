@@ -16,7 +16,7 @@ MediaStreamStatistics::MediaStreamStatistics()
 
 void MediaStreamStatistics::reset()
 {
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     m_data.clear();
     m_totalSizeBytes = 0;
     m_lastDataTimer = steady_clock::now();
@@ -41,7 +41,7 @@ void MediaStreamStatistics::onData(
             m_data.erase(left, right);
         };
 
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     m_data.insert(toIterator(timestamp), Data{ timestamp, dataSize, isKeyFrame });
     m_totalSizeBytes += dataSize;
 
@@ -53,7 +53,7 @@ void MediaStreamStatistics::onData(
 
 int64_t MediaStreamStatistics::bitrateBitsPerSecond() const
 {
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     const auto elapsed = steady_clock::now() - m_lastDataTimer;
     if (m_data.empty() || elapsed > kWindowSize)
         return 0;
@@ -66,13 +66,13 @@ int64_t MediaStreamStatistics::bitrateBitsPerSecond() const
 
 bool MediaStreamStatistics::hasMediaData() const
 {
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     return m_totalSizeBytes > 0;
 }
 
 float MediaStreamStatistics::getFrameRate() const
 {
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     const auto elapsed = steady_clock::now() - m_lastDataTimer;
     if (m_data.empty() || elapsed > kWindowSize)
         return 0;
@@ -89,7 +89,7 @@ microseconds MediaStreamStatistics::intervalUnsafe() const
 
 float MediaStreamStatistics::getAverageGopSize() const
 {
-    std::lock_guard locker(m_mutex);
+    std::lock_guard<std::mutex> locker(m_mutex);
     int keyFrames = std::count_if(m_data.begin(), m_data.end(),
         [](const auto& value) { return value.isKeyFrame; });
     return keyFrames > 0 ? m_data.size() / (float) keyFrames : 0;
