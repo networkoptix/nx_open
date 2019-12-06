@@ -130,8 +130,11 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
 
 void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_bindings.erase(engine->getId());
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_bindings.erase(engine->getId());
+    }
+
     updateSupportedFrameTypes();
 }
 
