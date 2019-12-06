@@ -11,6 +11,7 @@ FocusScope
     property Item contentItem: null
 
     property real spacing: 8
+    property alias labelY: label.y
 
     // This property is used to calculate labels column width.
     readonly property alias implicitCaptionWidth: label.implicitWidth
@@ -25,6 +26,8 @@ FocusScope
     Label
     {
         id: label
+
+        y: 4
         height: parent.height
         horizontalAlignment: Text.AlignRight
         wrapMode: Text.WordWrap
