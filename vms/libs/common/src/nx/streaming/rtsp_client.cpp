@@ -514,8 +514,11 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
-    if (!sendSetupIfNotPlaying())
+    if (!m_playNowMode && !sendSetup())
+    {
+        NX_WARNING(this, "Failed to send SETUP command");
         return false;
+    }
 
     if (!sendPlay(positionStart, positionEnd, scale))
     {
@@ -656,6 +659,11 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
 
 bool QnRtspClient::sendSetup()
 {
+    if (m_sdpTracks.empty())
+    {
+        NX_WARNING(this, "Failed to start rtsp session, empty SDP");
+        return false;
+    }
     m_keepAliveTimeOut = std::chrono::seconds(60);
     int audioNum = 0;
     for (uint32_t i = 0; i < m_sdpTracks.size(); ++i)
@@ -1017,14 +1025,6 @@ bool QnRtspClient::sendKeepAlive()
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
-}
-
-bool QnRtspClient::sendSetupIfNotPlaying()
-{
-    if (m_playNowMode)
-        return true;
-
-    return sendSetup() && !m_sdpTracks.empty();
 }
 
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)

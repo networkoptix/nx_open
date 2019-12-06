@@ -279,7 +279,6 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendOptions();
     bool sendKeepAlive();
-    bool sendSetupIfNotPlaying();
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx::network::http::Request* const request );
