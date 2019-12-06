@@ -85,6 +85,8 @@ LabeledItem
 
                             onResourceIdChanged:
                             {
+                                backgroundImage.source = ""
+
                                 if (!thumbnailProvider)
                                     return
 
