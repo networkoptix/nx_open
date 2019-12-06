@@ -54,7 +54,6 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     const QnVirtualCameraResourcePtr& device)
     :
     base_type(serverModule),
-    m_mutex(QnMutex::Recursive),
     m_device(device),
     m_throwPluginEvent(
         [this](int framesSkipped, QnUuid engineId)
@@ -478,8 +477,6 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
     const QnResourcePtr& resource,
     const QString& propertyName)
 {
-    QnMutexLocker lock(&m_mutex);
-
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
     if (!device)
     {
@@ -494,6 +491,7 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
             lm("Credentials have been changed for the Device %1 (%2)")
                 .args(device->getName(), device->getId()));
 
+        QnMutexLocker lock(&m_mutex);
         updateDevice(device);
     }
 }
@@ -521,19 +519,23 @@ void DeviceAnalyticsContext::subscribeToDeviceChanges()
 {
     connect(
         m_device, &QnResource::statusChanged,
-        this, &DeviceAnalyticsContext::at_deviceStatusChanged);
+        this, &DeviceAnalyticsContext::at_deviceStatusChanged,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnResource::urlChanged,
-        this, &DeviceAnalyticsContext::at_deviceUpdated);
+        this, &DeviceAnalyticsContext::at_deviceUpdated,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnVirtualCameraResource::logicalIdChanged,
-        this, &DeviceAnalyticsContext::at_deviceUpdated);
+        this, &DeviceAnalyticsContext::at_deviceUpdated,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnResource::propertyChanged,
-        this, &DeviceAnalyticsContext::at_devicePropertyChanged);
+        this, &DeviceAnalyticsContext::at_devicePropertyChanged,
+        Qt::QueuedConnection);
 }
 
 void DeviceAnalyticsContext::subscribeToRulesChanges()
