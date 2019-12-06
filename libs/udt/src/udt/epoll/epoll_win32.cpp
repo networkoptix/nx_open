@@ -147,6 +147,7 @@ Result<int> EpollWin32::poll(
 void EpollWin32::interrupt()
 {
     char buf[128];
+    memset(buf, 0, sizeof(buf));
     sendto(
         m_interruptionSocket,
         buf, sizeof(buf),

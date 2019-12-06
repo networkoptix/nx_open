@@ -6,8 +6,8 @@ from io import StringIO
 from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 
 
-# plink (used on Windows) tool hasn't option to disable ssh host key checking. Instead of this it has only option to
-# pass the key. Thus on Windows we should preliminary obtain the ssh host key.
+# plink (used on Windows) tool hasn't option to disable ssh host key checking. Instead of this it
+# has only option to pass the key. Thus on Windows we should preliminarily obtain the ssh host key.
 class SshHostKeyObtainer:
     def __init__(self, dev, conf_file):
         self.dev = dev
@@ -40,7 +40,9 @@ class SshHostKeyObtainer:
             if not res or res.return_code != 0:
                 logging.error('Connecting via ssh failed: ssh reported:\n%r', error_messages)
                 raise BoxCommandError(
-                    f'Unable to connect to the box via ssh; check box credentials in {repr(self.conf_file)}.')
+                    f'Unable to connect to the box via ssh; ' +
+                        'check box credentials in {repr(self.conf_file)}.'
+                )
 
             return host_key
         else:

@@ -89,7 +89,7 @@ public:
     int32_t& m_iID;            // alias: socket ID
     char*& m_pcData;                     // alias: data/control information
 
-    static const int m_iPktHdrSize;    // packet header size
+    static constexpr int m_iPktHdrSize = 16;    // packet header size
 
 public:
     CPacket();
@@ -210,7 +210,7 @@ protected:
     uint32_t m_nHeader[4];               // The 128-bit header field
     iovec m_PacketVector[2];             // The 2-demension vector of UDT packet [header, data]
 
-    int32_t __pad;
+    int32_t __pad = 0;
 
 protected:
     CPacket& operator=(const CPacket&);
@@ -227,17 +227,17 @@ public:
     int deserialize(const char* buf, int size);
 
 public:
-    static const int m_iContentSize;    // Size of hand shake data
+    static constexpr int m_iContentSize = 48;    // Size of hand shake data
 
 public:
-    int32_t m_iVersion;          // UDT version
-    int32_t m_iType;             // UDT socket type
-    int32_t m_iISN;              // random initial sequence number
-    int32_t m_iMSS;              // maximum segment size
-    int32_t m_iFlightFlagSize;   // flow control window size
-    int32_t m_iReqType;          // connection request type: 1: regular connection request, 0: rendezvous connection request, -1/-2: response
-    int32_t m_iID;        // socket ID
-    int32_t m_iCookie;        // cookie
+    int32_t m_iVersion = 0;          // UDT version
+    int32_t m_iType = 0;             // UDT socket type
+    int32_t m_iISN = 0;              // random initial sequence number
+    int32_t m_iMSS = 0;              // maximum segment size
+    int32_t m_iFlightFlagSize = 0;   // flow control window size
+    int32_t m_iReqType = 0;          // connection request type: 1: regular connection request, 0: rendezvous connection request, -1/-2: response
+    int32_t m_iID = 0;        // socket ID
+    int32_t m_iCookie = 0;        // cookie
     uint32_t m_piPeerIP[4];    // The IP address that the peer's UDP port is bound to
 };
 

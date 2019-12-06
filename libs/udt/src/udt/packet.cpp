@@ -120,9 +120,9 @@ Yunhong Gu, last updated 02/12/2011
 //              Add. Info:    Error code
 //              Control Info: None
 //      0x7FFF: Explained by bits 16 - 31
-//              
+//
 //   bit 16 - 31:
-//      This space is used for future expansion or user defined control packets. 
+//      This space is used for future expansion or user defined control packets.
 //
 //    0                   1                   2                   3
 //    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -147,21 +147,16 @@ Yunhong Gu, last updated 02/12/2011
 #include "packet.h"
 
 
-const int CPacket::m_iPktHdrSize = 16;
-const int CHandShake::m_iContentSize = 48;
-
-
 // Set up the aliases in the constructure
 CPacket::CPacket():
     m_iSeqNo((int32_t&)(m_nHeader[0])),
     m_iMsgNo((int32_t&)(m_nHeader[1])),
     m_iTimeStamp((int32_t&)(m_nHeader[2])),
     m_iID((int32_t&)(m_nHeader[3])),
-    m_pcData((char*&)(m_PacketVector[1].iov_base)),
-    __pad()
+    m_pcData((char*&)(m_PacketVector[1].iov_base))
 {
-    for (int i = 0; i < 4; ++i)
-        m_nHeader[i] = 0;
+    memset(m_nHeader, 0, sizeof(m_nHeader));
+
     m_PacketVector[0].iov_base = (char *)m_nHeader;
     m_PacketVector[0].iov_len = CPacket::m_iPktHdrSize;
     m_PacketVector[1].iov_base = NULL;
@@ -195,7 +190,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
             if (NULL != lparam)
                 m_nHeader[1] = *(int32_t *)lparam;
 
-            // data ACK seq. no. 
+            // data ACK seq. no.
             // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
             m_PacketVector[1].iov_base = (char *)rparam;
             m_PacketVector[1].iov_len = size;
@@ -252,7 +247,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
             break;
 
         case ControlPacketType::MsgDropRequest: //0111 - Message Drop Request
-                                         // msg id 
+                                         // msg id
             m_nHeader[1] = *(int32_t *)lparam;
 
             //first seq no, last seq no
@@ -354,18 +349,9 @@ CPacket* CPacket::clone() const
     return pkt;
 }
 
-CHandShake::CHandShake():
-    m_iVersion(0),
-    m_iType(0),
-    m_iISN(0),
-    m_iMSS(0),
-    m_iFlightFlagSize(0),
-    m_iReqType(0),
-    m_iID(0),
-    m_iCookie(0)
+CHandShake::CHandShake()
 {
-    for (int i = 0; i < 4; ++i)
-        m_piPeerIP[i] = 0;
+    memset(m_piPeerIP, 0, sizeof(m_piPeerIP));
 }
 
 int CHandShake::serialize(char* buf, int& size) const

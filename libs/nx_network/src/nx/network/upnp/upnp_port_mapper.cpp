@@ -35,17 +35,19 @@ PortMapper::PortMapper(
     m_description(description),
     m_checkMappingsInterval(checkMappingsInterval)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    // NOTE: onTimer can be invoked before returned value is saved to m_timerId.
     m_timerId = deviceSearcher->timerManager()->addTimer(
         this, std::chrono::milliseconds(m_checkMappingsInterval));
 }
 
 PortMapper::~PortMapper()
 {
-    quint64 timerId;
+    quint64 timerId = 0;
     {
         QnMutexLocker lock(&m_mutex);
-        timerId = m_timerId;
-        m_timerId = 0;
+        std::swap(m_timerId, timerId);
     }
 
     deviceSearcher()->timerManager()->joinAndDeleteTimer(timerId);

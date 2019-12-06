@@ -164,8 +164,7 @@ public: // for CUDT to acknowledge IO status
 private:
     typedef std::map<int, std::unique_ptr<EpollImpl>> CEPollDescMap;
 
-    int m_iIDSeed;                            // seed to generate a new ID
-    pthread_mutex_t m_SeedLock;
+    int m_iIDSeed = 0;                            // seed to generate a new ID
 
     CEPollDescMap m_mPolls;       // all epolls
     mutable std::mutex m_EPollLock;
