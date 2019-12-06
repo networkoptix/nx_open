@@ -56,6 +56,7 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>

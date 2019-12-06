@@ -1,4 +1,9 @@
 #include "commands.h"
+
+#include <nx/system_commands.h>
+#include <nx/system_commands/domain_socket/read_linux.h>
+#include <nx/system_commands/domain_socket/send_linux.h>
+
 #include <assert.h>
 #include <string>
 #include <fstream>
@@ -19,9 +24,7 @@
 #include <sys/poll.h>
 #include <fcntl.h>
 #include <grp.h>
-#include <nx/system_commands.h>
-#include <nx/system_commands/domain_socket/read_linux.h>
-#include <nx/system_commands/domain_socket/send_linux.h>
+#include <unistd.h>
 
 using namespace nx::system_commands::domain_socket;
 

@@ -162,13 +162,18 @@ Qn::StorageInitResult RootFileSystem::mount(const QUrl& url, const QString& path
         QString commandString = "mount " + enquote(uncString) + " " +  enquote(path);
 
         if (!url.userName().isEmpty())
-            commandString += " " + url.userName();
+            commandString += " " + enquote(url.userName());
+        else
+            commandString += " ''";
 
         if (!url.password().isEmpty())
-            commandString += " " + url.password();
+            commandString += " " + enquote(url.password());
+        else
+            commandString += " ''";
 
         return mountResultToStorageInitResult(
             (SystemCommands::MountCode) execViaRootTool(commandString, &receiveInt64Action));
+
     #else
         return Qn::StorageInitResult::StorageInit_WrongPath;
     #endif
