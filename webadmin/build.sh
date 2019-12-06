@@ -42,7 +42,16 @@ popd
 
 # Save the repository info.
 echo "Create version.txt" >&2
-hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
+
+REP_ROOT_DIR="$SOURCE_DIR/.."
+if [ -d "$REP_ROOT_DIR/.hg" ]; then
+    hg log -r . --repository "$REP_ROOT_DIR" > static/version.txt
+elif [ -d "$REP_ROOT_DIR/.git" ]; then
+    git -C "$REP_ROOT_DIR" log -n 1 > static/version.txt
+else
+    echo "Neither git nor hg has been detected in $REP_ROOT_DIR" && exit 1
+fi
+
 cat static/version.txt >&2
 
 #Pack

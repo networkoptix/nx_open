@@ -28,7 +28,13 @@ dir=../skins/$SKIN
         npm run build
         # Save the repository info.
         echo "Create version.txt"
-        hg log -r . --repository "$2" | head -n 7 > dist/version.txt
+        if [ -d "$2/.hg" ]; then
+            hg log -r . --repository "$2" | head -n 7 > dist/version.txt
+        elif [ -d "$2/.git" ]; then
+            git -C "$2" log -n 1 > dist/version.txt
+        else
+            echo "Neither git nor hg has been detected in $2" && exit 1
+        fi
         cat dist/version.txt
     popd
 

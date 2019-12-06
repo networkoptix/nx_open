@@ -1,5 +1,5 @@
 function(nx_fetch_cloud_build_number buildNumberVarName)
-    set(get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
+    set(get_build_number_cmd "curl -s -XPOST la-old.lan.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
     execute_process(
         COMMAND bash -c ${get_build_number_cmd}
             OUTPUT_VARIABLE buildNumber)

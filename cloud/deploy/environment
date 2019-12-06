@@ -18,8 +18,15 @@ fi
 export VERSION QT_VERSION
 
 # Build variables. No need to export.
+echo "============ $NX_VMS_DIR ================"
+if [ -d "$NX_VMS_DIR/.hg" ]; then
+    REVISION="$(cd $NX_VMS_DIR; hg id -i)";
+elif [ -d "$NX_VMS_DIR/.git" ]; then
+    REVISION="$(cd $NX_VMS_DIR; git rev-parse --short=12 HEAD)"
+else
+    echo "cannot get revision either from git or from hg" && exit 1
+fi
 
-REVISION="$(cd $NX_VMS_DIR; hg id -i)"
 BUILD_DATE="$(TZ=GMT date)"
 BUILD_HOST="$(hostname)"
 BUILD_USER="$(id -un)"

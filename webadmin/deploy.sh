@@ -4,7 +4,6 @@ set -e
 
 SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR="$SOURCE_DIR/.."
-BRANCH_FILE="$ROOT_DIR"/.hg/branch
 RDEP="$ROOT_DIR"/build_utils/python/rdep.py
 WEBADMIN_FILE="$PWD"/server-external/bin/external.dat
 PACKAGES_DIR="$environment"/packages
@@ -46,14 +45,19 @@ function check_file()
     fi
 }
 
-check_file "$BRANCH_FILE"
 check_file "$RDEP"
 check_file "$WEBADMIN_FILE" \
     "$WEBADMIN_FILE is not found. Build webadmin project before deploying it."
 check_file "$PACKAGES_DIR"/.rdep \
     "RDep repository is not found in $PACKAGES_DIR."
 
-BRANCH=$(cat $BRANCH_FILE)
+if [ -d "$ROOT_DIR/.hg" ]; then
+    BRANCH=$(hg branch --repository $ROOT_DIR)
+elif [ -d "$ROOT_DIR/.git" ]; then
+    BRANCH=$(git -C $ROOT_DIR branch | head -n 1 | cut -b 3-)
+else
+    echo "Neither git nor hg has been detected in $ROOT_DIR" && exit 1
+fi
 
 deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"
 if [ $DEPLOY_RELEASE_VERSION = 1 ]

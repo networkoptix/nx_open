@@ -15,7 +15,7 @@ function(nx_add_cloud_deploy_target name)
 
     add_custom_command(
         TARGET ${name}-docker-build
-        COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_CURRENT_SOURCE_DIR} VERSION=${cloudVersion} ./make.sh pack)
+        COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} VERSION=${cloudVersion} ./make.sh pack)
 
     add_custom_target(
         ${name}-docker-push DEPENDS ${name}-docker-build
@@ -58,23 +58,23 @@ nx_define_cloud_group_targets(frontend ${cloudFrontendModules})
 add_subdirectory(deployment_verification_tests)
 
 add_custom_target(
-    cloud-docker-build 
-    DEPENDS cloud-backend-docker-build 
+    cloud-docker-build
+    DEPENDS cloud-backend-docker-build
         cloud-frontend-docker-build
         deployment_verification_tests-docker-build)
 
 add_custom_target(
     cloud-docker-push
-    DEPENDS cloud-docker-build 
-        cloud-backend-docker-push 
-        cloud-frontend-docker-push 
+    DEPENDS cloud-docker-build
+        cloud-backend-docker-push
+        cloud-frontend-docker-push
         deployment_verification_tests-docker-push)
 
 add_custom_target(
     cloud-docker-clean
     DEPENDS
-        cloud-backend-docker-clean 
-        cloud-frontend-docker-clean 
+        cloud-backend-docker-clean
+        cloud-frontend-docker-clean
         deployment_verification_tests-docker-clean)
 
 add_subdirectory(cloud_connect_test_util)
