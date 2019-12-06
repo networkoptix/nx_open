@@ -54,7 +54,7 @@ check_file "$PACKAGES_DIR"/.rdep \
 if [ -d "$ROOT_DIR/.hg" ]; then
     BRANCH=$(hg branch --repository $ROOT_DIR)
 elif [ -d "$ROOT_DIR/.git" ]; then
-    BRANCH=$(git -C $ROOT_DIR branch | head -n 1 | cut -b 3-)
+    BRANCH=$(git -C $ROOT_DIR branch | grep "*" | cut -b 3-)
 else
     echo "Neither git nor hg has been detected in $ROOT_DIR" && exit 1
 fi
