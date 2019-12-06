@@ -99,9 +99,18 @@ LabeledItem
                     FigurePreview
                     {
                         id: preview
-                        anchors.fill:
-                            backgroundImage.status === Image.Ready ? backgroundImage : parent
-                        rotation: backgroundImage.rotation
+
+                        readonly property size size:
+                        {
+                            const rotated = Geometry.isRotated90(videoPositioner.videoRotation)
+                            return rotated
+                                ? Qt.size(parent.height, parent.width)
+                                : Qt.size(parent.width, parent.height)
+                        }
+                        width: size.width
+                        height: size.height
+                        rotation: videoPositioner.videoRotation
+                        anchors.centerIn: parent
 
                         figure: control.figure
                         figureType: control.figureType
