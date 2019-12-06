@@ -386,7 +386,7 @@
                             {
                                 "level": "error",
                                 "condition": "greaterThan %streamIssues1h 5",
-                                "text": "had %streamIssues1h stream issues in the last hour"
+                                "text": "had %streamIssues1h Stream Issues in the last hour"
                             }
                         ]
                     },
@@ -400,7 +400,7 @@
                             {
                                 "level": "error",
                                 "condition": "greaterThan %ipConflicts3min 0",
-                                "text": "has an IP conflict. Conflicting IP: %ipConflicts"
+                                "text": "has an IP Conflict."
                             }
                         ]
                     }
@@ -524,7 +524,7 @@
                     },
                     "minArchiveLengthS": {
                         "name": "Min Archive length",
-                        "description": "Minimum Archive Length",
+                        "description": "Minimum Archive length",
                         "isOptional": true,
                         "display": "panel",
                         "format": "durationS",
