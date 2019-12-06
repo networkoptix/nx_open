@@ -4,6 +4,7 @@ import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Dialogs 1.0
 import Nx.Core.Items 1.0
+import nx.client.core 1.0
 
 LabeledItem
 {
@@ -32,11 +33,28 @@ LabeledItem
 
             Item
             {
-                implicitWidth: 120
-                implicitHeight: 80
+                readonly property size implicitSize:
+                {
+                    const rotated = Geometry.isRotated90(videoPositioner.videoRotation)
+                    const defaultSize = rotated ? Qt.size(80, 120) : Qt.size(120, 80)
+
+                    if (backgroundImage.status !== Image.Ready)
+                        return defaultSize
+
+                    const maxSize = Qt.size(120, 120)
+                    const imageSize = rotated
+                        ? Qt.size(backgroundImage.implicitHeight, backgroundImage.implicitWidth)
+                        : Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
+
+                    return Geometry.bounded(imageSize, maxSize)
+                }
+                implicitWidth: implicitSize.width
+                implicitHeight: implicitSize.height
 
                 VideoPositioner
                 {
+                    id: videoPositioner
+
                     anchors.fill: parent
                     item: backgroundImage
                     sourceSize: Qt.size(

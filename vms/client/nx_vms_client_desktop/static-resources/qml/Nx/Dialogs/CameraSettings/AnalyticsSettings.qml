@@ -83,6 +83,7 @@ Item
     {
         id: thumbnailProvider
         rotation: 0
+        thumbnailsHeight: 80
     }
 
     MediaResourceHelper
