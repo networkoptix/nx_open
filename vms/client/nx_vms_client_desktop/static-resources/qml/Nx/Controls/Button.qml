@@ -19,6 +19,9 @@ Button
         isAccentButton ? ColorTheme.darker(hoveredColor, 1) : backgroundColor
     property color outlineColor: ColorTheme.darker(backgroundColor, 2)
 
+    property color textColor:
+        control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
+
     property string iconUrl
     property string hoveredIconUrl
     property string pressedIconUrl
@@ -60,7 +63,7 @@ Button
         }
 
         font: control.font
-        color: control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
+        color: control.textColor
 
         function nonEmptyIcon(target, base)
         {
