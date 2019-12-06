@@ -71,3 +71,8 @@ function findSnapPoint(p, points, snapDistance)
 
     return pointIndex
 }
+
+function isEmptyObject(json)
+{
+    return !json || Object.keys(json).length === 0
+}

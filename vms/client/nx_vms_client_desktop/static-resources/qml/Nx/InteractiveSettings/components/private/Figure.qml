@@ -9,123 +9,153 @@ LabeledItem
 {
     id: control
 
-    property var value: ""
-    property var defaultValue: ""
-
     property string figureType: ""
     property var figureSettings
+    property var figure
 
-    contentItem: Row
+    signal valueChanged()
+
+    contentItem: Column
     {
-        spacing: 8
+        spacing: 12
 
-        Item
+        TextField
         {
-            implicitWidth: 120
-            implicitHeight: 80
+            id: figureNameEdit
+            width: parent.width
+            onTextChanged: valueChanged()
+        }
 
-            VideoPositioner
+        Row
+        {
+            spacing: 8
+
+            Item
             {
-                anchors.fill: parent
-                item: backgroundImage
-                sourceSize: Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
-                videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
+                implicitWidth: 120
+                implicitHeight: 80
 
-                visible: preview.hasFigure
-
-                Image
+                VideoPositioner
                 {
-                    id: backgroundImage
+                    anchors.fill: parent
+                    item: backgroundImage
+                    sourceSize: Qt.size(
+                        backgroundImage.implicitWidth, backgroundImage.implicitHeight)
+                    videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
 
-                    Connections
+                    visible: preview.hasFigure
+
+                    Image
                     {
-                        target: thumbnailProvider
-                        ignoreUnknownSignals: true
+                        id: backgroundImage
 
-                        onThumbnailUpdated:
+                        Connections
                         {
-                            if (cameraId.toString() === settingsView.resourceId.toString())
-                                backgroundImage.source = thumbnailUrl
+                            target: thumbnailProvider
+                            ignoreUnknownSignals: true
+
+                            onThumbnailUpdated:
+                            {
+                                if (cameraId.toString() === settingsView.resourceId.toString())
+                                    backgroundImage.source = thumbnailUrl
+                            }
+                        }
+
+                        Connections
+                        {
+                            target: settingsView
+
+                            onResourceIdChanged:
+                            {
+                                if (!thumbnailProvider)
+                                    return
+
+                                if (settingsView.resourceId.isNull())
+                                    return
+
+                                thumbnailProvider.refresh(settingsView.resourceId)
+                            }
                         }
                     }
 
-                    Connections
+                    FigurePreview
                     {
-                        target: settingsView
+                        id: preview
+                        anchors.fill:
+                            backgroundImage.status === Image.Ready ? backgroundImage : parent
+                        rotation: backgroundImage.rotation
 
-                        onResourceIdChanged:
+                        figure: control.figure
+                        figureType: control.figureType
+                    }
+                }
+
+                Rectangle
+                {
+                    id: noShapeDummy
+
+                    anchors.fill: parent
+                    visible: !preview.hasFigure
+
+                    color: "transparent"
+                    border.color: ColorTheme.colors.dark11
+                    border.width: 1
+
+                    Column
+                    {
+                        anchors.centerIn: parent
+
+                        Text
                         {
-                            if (!thumbnailProvider)
-                                return
+                            text: qsTr("No shape")
+                            color: ColorTheme.colors.dark11
+                            font.pixelSize: 11
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
 
-                            if (settingsView.resourceId.isNull())
-                                return
-
-                            thumbnailProvider.refresh(settingsView.resourceId)
+                        Text
+                        {
+                            text: qsTr("click to add")
+                            color: ColorTheme.colors.dark11
+                            font.pixelSize: 9
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                 }
 
-                FigurePreview
+                MouseArea
                 {
-                    id: preview
-                    anchors.fill: backgroundImage.status === Image.Ready ? backgroundImage : parent
-                    rotation: backgroundImage.rotation
+                    anchors.fill: parent
+                    onClicked: openEditDialog()
                 }
             }
 
-            Rectangle
+            Column
             {
-                id: noShapeDummy
+                spacing: 8
 
-                anchors.fill: parent
-                visible: !preview.hasFigure
-
-                color: "transparent"
-                border.color: ColorTheme.colors.dark11
-                border.width: 1
-
-                Column
+                Button
                 {
-                    anchors.centerIn: parent
-
-                    Text
-                    {
-                        text: qsTr("No shape")
-                        color: ColorTheme.colors.dark11
-                        font.pixelSize: 11
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Text
-                    {
-                        text: qsTr("click to add")
-                        color: ColorTheme.colors.dark11
-                        font.pixelSize: 9
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                    text: qsTr("Edit")
+                    onClicked: openEditDialog()
                 }
-            }
 
-            MouseArea
-            {
-                anchors.fill: parent
-                onClicked:
+                Button
                 {
-                    dialogLoader.active = true
-                    var dialog = dialogLoader.item
-                    dialog.deserializeFigure(value)
-                    dialog.show()
+                    text: qsTr("Delete")
+                    onClicked: figure = null
+                    visible: preview.hasFigure
+                    backgroundColor: ColorTheme.colors.red_core
                 }
             }
         }
 
-        Button
+        CheckBox
         {
-            padding: 0
-            iconUrl: "qrc:/skin/buttons/delete.png"
-            onClicked: value = ""
-            visible: preview.hasFigure
+            id: showOnCameraCheckBox
+            text: qsTr("Display on camera")
+            onCheckedChanged: valueChanged()
+            topPadding: 0
         }
     }
 
@@ -143,22 +173,40 @@ LabeledItem
                 figureSettings: control.figureSettings
                 resourceId: settingsView.resourceId
 
-                onAccepted:
-                {
-                    value = serializeFigure()
-                }
+                onAccepted: figure = serializeFigure()
             }
         }
     }
 
-    onValueChanged:
+    onFigureChanged: valueChanged()
+
+    function openEditDialog()
     {
-        var obj = null
-        if (value)
-        {
-            obj = JSON.parse(JSON.stringify(value))
-            obj.type = figureType
-        }
-        preview.figure = obj
+        dialogLoader.active = true
+        var dialog = dialogLoader.item
+        dialog.title = figureNameEdit.text || qsTr("Figure")
+        dialog.deserializeFigure(figure)
+        dialog.show()
+    }
+
+    function getValue()
+    {
+        // Our agreement is that figure without points is an invalid figure. It should not be sent
+        // to server.
+        if (!figure || !figure.points || figure.points.length === 0)
+            return null
+
+        // Clone the figure object and fill the rest of fields.
+        var obj = JSON.parse(JSON.stringify(figure))
+        obj.name = figureNameEdit.text
+        obj.showOnCamera = showOnCameraCheckBox.checked
+        return obj
+    }
+
+    function setValue(value)
+    {
+        figureNameEdit.text = (value && value.name) || ""
+        showOnCameraCheckBox.checked = value && value.showOnCamera !== false
+        figure = value
     }
 }

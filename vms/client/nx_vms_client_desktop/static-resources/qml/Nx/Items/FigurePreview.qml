@@ -5,6 +5,7 @@ Item
     id: preview
 
     property var figure: null
+    property string figureType
     readonly property bool hasFigure: loader.item && loader.item.hasFigure
 
     Loader
@@ -16,7 +17,10 @@ Item
         onLoaded: item.figureJson = Qt.binding(function() { return preview.figure })
     }
 
-    onFigureChanged:
+    onFigureChanged: updateFigure()
+    onFigureTypeChanged: updateFigure()
+
+    function updateFigure()
     {
         if (!figure)
         {
@@ -24,11 +28,11 @@ Item
             return
         }
 
-        if (figure.type === "line")
+        if (figureType === "line")
             loader.source = "private/FigurePreview/Line.qml"
-        else if (figure.type === "box")
+        else if (figureType === "box")
             loader.source = "private/FigurePreview/Box.qml"
-        else if (figure.type === "polygon")
+        else if (figureType === "polygon")
             loader.source = "private/FigurePreview/Polygon.qml"
         else
             loader.source = ""

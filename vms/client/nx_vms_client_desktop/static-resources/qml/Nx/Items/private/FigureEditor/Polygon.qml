@@ -306,14 +306,14 @@ Figure
     {
         pointMakerInstrument.finish()
 
-        if (!json)
+        if (F.isEmptyObject(json))
         {
             pointMakerInstrument.clear()
             return
         }
 
-        color = json.color
-        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points))
+        color = json.color || ""
+        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points || []))
     }
 
     function serialize()
