@@ -532,7 +532,7 @@
                             {
                                 "level": "error",
                                 "condition": "and %isArchiveTooSmall %hasArchiveRotated",
-                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS days."
+                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS."
                             }
                         ]
                     }
