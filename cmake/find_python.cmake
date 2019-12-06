@@ -1,13 +1,12 @@
 if(WIN32)
     find_program(PYTHON_EXECUTABLE python.exe)
-    if(PYTHON_EXECUTABLE)
-        message(STATUS "Found python executable: ${PYTHON_EXECUTABLE}")
-    endif()
 else()
-    find_package(PythonInterp 2 REQUIRED)
+    find_program(PYTHON_EXECUTABLE python)
 endif()
 
-if(NOT PYTHON_EXECUTABLE)
+if(PYTHON_EXECUTABLE)
+    message(STATUS "Found python executable: ${PYTHON_EXECUTABLE}")
+else()
     message(FATAL_ERROR "Python executable not found.")
 endif()
 
