@@ -92,34 +92,38 @@ LabeledItem
 
                 Rectangle
                 {
-                    id: noShapeDummy
+                    id: border
 
                     anchors.fill: parent
-                    visible: !preview.hasFigure
+                    visible: backgroundImage.status !== Image.Ready
 
                     color: "transparent"
                     border.color: ColorTheme.colors.dark11
                     border.width: 1
 
-                    Column
+                }
+
+                Column
+                {
+                    id: noShapeDummy
+
+                    anchors.centerIn: parent
+                    visible: !preview.hasFigure
+
+                    Text
                     {
-                        anchors.centerIn: parent
+                        text: qsTr("No shape")
+                        color: ColorTheme.colors.dark11
+                        font.pixelSize: 11
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
 
-                        Text
-                        {
-                            text: qsTr("No shape")
-                            color: ColorTheme.colors.dark11
-                            font.pixelSize: 11
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        Text
-                        {
-                            text: qsTr("click to add")
-                            color: ColorTheme.colors.dark11
-                            font.pixelSize: 9
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                    Text
+                    {
+                        text: qsTr("click to add")
+                        color: ColorTheme.colors.dark11
+                        font.pixelSize: 9
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
 
