@@ -91,10 +91,6 @@ private:
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
     DeviceAgentContext m_deviceAgentContext;
 
-    /*
-    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
-    wrappers::DeviceAgentPtr m_deviceAgent;*/
-
     QnAbstractDataReceptorPtr m_metadataSink;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;
