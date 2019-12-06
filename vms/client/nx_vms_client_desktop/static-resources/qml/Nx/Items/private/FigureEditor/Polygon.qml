@@ -210,7 +210,8 @@ Figure
     {
         id: temporaryGrip
 
-        visible: hoverInstrument.edgeHovered && pointMakerInstrument.count < maxPoints
+        visible: hoverInstrument.edgeHovered
+            && (maxPoints <= 0 || pointMakerInstrument.count < maxPoints)
         color: figure.color
         ghost: !pressed
 
