@@ -82,9 +82,10 @@ QHash<QString, FigureType> findFigureKeys(const QJsonObject& model)
 void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
 {
     item.color = object.value(QStringLiteral("color")).toString();
+    item.visible = object.value(QStringLiteral("showOnCamera")).toBool();
 
     item.points.clear();
-    for (const auto& p: object.value(QStringLiteral("points")).toArray())
+    for (const auto p: object.value(QStringLiteral("points")).toArray())
     {
         if (!p.isArray())
             continue;
@@ -190,7 +191,7 @@ void RoiFiguresOverlayWidget::Private::setupPainter(QPainter* painter, const Ite
 
 void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& line)
 {
-    if (line.points.size() < 2)
+    if (line.points.size() < 2 || !line.visible)
         return;
 
     setupPainter(painter, line);
@@ -211,7 +212,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& l
 
 void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box)
 {
-    if (box.points.size() != 2)
+    if (box.points.size() != 2 || !box.visible)
         return;
 
     QRectF rect(absolutePos(box.points.first()), absolutePos(box.points.last()));
@@ -225,7 +226,7 @@ void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box
 
 void RoiFiguresOverlayWidget::Private::drawPolygon(QPainter* painter, const Polygon& polygon)
 {
-    if (polygon.points.empty())
+    if (polygon.points.empty() || !polygon.visible)
         return;
 
     setupPainter(painter, polygon);
