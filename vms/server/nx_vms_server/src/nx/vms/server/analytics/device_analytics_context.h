@@ -33,6 +33,7 @@ class DeviceAnalyticsContext:
     Q_OBJECT
 
     using base_type = nx::vms::server::ServerModuleAware;
+    using BindingMap = std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>>;
 
 public:
     DeviceAnalyticsContext(
@@ -41,7 +42,6 @@ public:
 
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
-    void addEngine(const resource::AnalyticsEngineResourcePtr& engine);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
@@ -70,9 +70,11 @@ private:
     bool isDeviceAlive() const;
     void updateStreamRequirements();
 
-    std::shared_ptr<DeviceAnalyticsBinding> analyticsBinding(const QnUuid& engineId) const;
+    BindingMap analyticsBindingsSafe() const;
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingUnsafe(const QnUuid& engineId) const;
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingSafe(const QnUuid& engineId) const;
 
-    bool isEngineAlreadyBound(const QnUuid& engineId) const;
+    bool isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const;
 
     QJsonObject prepareSettings(const QnUuid& engineId, const QJsonObject& settings);
     std::optional<QJsonObject> loadSettingsFromFile(
@@ -87,13 +89,12 @@ private:
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
-    std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>> m_bindings;
+    BindingMap m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
 
     nx::vms::api::analytics::StreamTypes m_cachedRequiredStreamTypes;
 
-    bool m_missingUncompressedFrameWarningIssued = false;
-    Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
+    std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
     std::map<QnUuid, int> m_skippedPacketCountByEngine;
 };

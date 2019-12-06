@@ -81,7 +81,7 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     subscribeToRulesChanges();
 }
 
-bool DeviceAnalyticsContext::isEngineAlreadyBound(const QnUuid& engineId) const
+bool DeviceAnalyticsContext::isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const
 {
     return m_bindings.find(engineId) != m_bindings.cend();
 }
@@ -93,25 +93,28 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     for (const auto& engine: engines)
         engineIds.insert(engine->getId());
 
-    // Remove bindings that aren't on the list.
-    for (auto itr = m_bindings.begin(); itr != m_bindings.cend();)
     {
-        if (engineIds.find(itr->first) == engineIds.cend())
-            itr = m_bindings.erase(itr);
-        else
-            ++itr;
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        // Remove bindings that aren't on the list.
+        for (auto itr = m_bindings.begin(); itr != m_bindings.cend();)
+        {
+            if (engineIds.find(itr->first) == engineIds.cend())
+                itr = m_bindings.erase(itr);
+            else
+                ++itr;
+        }
     }
 
     const bool deviceIsAlive = isDeviceAlive();
     for (const auto& engine: engines)
     {
-        if (isEngineAlreadyBound(engine->getId()))
-            continue;
-
-        auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-
+        std::shared_ptr<DeviceAnalyticsBinding> binding;
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
+            if (isEngineAlreadyBoundUnsafe(engine->getId()))
+                continue;
+
+            binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
             binding->setMetadataSink(m_metadataSink);
             m_bindings.emplace(engine->getId(), binding);
         }
@@ -127,28 +130,26 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     updateStreamRequirements();
 }
 
-void DeviceAnalyticsContext::addEngine(const resource::AnalyticsEngineResourcePtr& engine)
-{
-    auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    binding->setMetadataSink(m_metadataSink);
-    m_bindings.emplace(engine->getId(), binding);
-    updateStreamRequirements();
-}
-
 void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_bindings.erase(engine->getId());
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_bindings.erase(engine->getId());
+    }
+
     updateStreamRequirements();
 }
 
 void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_metadataSink = std::move(metadataSink);
-    for (auto& [_, binding]: m_bindings)
+    BindingMap bindings;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_metadataSink = std::move(metadataSink);
+        bindings = m_bindings;
+    }
+
+    for (auto& [_, binding]: bindings)
         binding->setMetadataSink(m_metadataSink);
 }
 
@@ -158,11 +159,9 @@ void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObj
     const QJsonObject effectiveSettings = prepareSettings(analyticsEngineId, settings);
     m_device->setDeviceAgentSettingsValues(analyticsEngineId, effectiveSettings);
 
-    std::shared_ptr<DeviceAnalyticsBinding> binding;
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        binding = analyticsBinding(analyticsEngineId);
-    }
+    const std::shared_ptr<DeviceAnalyticsBinding> binding =
+        analyticsBindingSafe(analyticsEngineId);
+
     if (!binding)
         return;
 
@@ -259,13 +258,7 @@ std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
 
 QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
-    std::shared_ptr<DeviceAnalyticsBinding> binding;
-    QnUuid analyticsEngineId(engineId);
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        binding = analyticsBinding(analyticsEngineId);
-    }
-
+    const QnUuid analyticsEngineId(engineId);
     const auto engine = serverModule()
         ->resourcePool()
         ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
@@ -295,6 +288,9 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
 
     jsonEngine.loadModelFromJsonObject(*deviceAgentSettingsModel);
     jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
+
+    const std::shared_ptr<DeviceAnalyticsBinding> binding =
+        analyticsBindingSafe(analyticsEngineId);
 
     if (!binding)
     {
@@ -412,7 +408,7 @@ void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
             continue;
         }
 
-        if (auto binding = analyticsBinding(engineId))
+        if (auto binding = analyticsBindingUnsafe(engineId))
         {
             if (binding->canAcceptData()
                 && NX_ASSERT(conversionContext.convertedData->timestamp >= 0))
@@ -469,9 +465,10 @@ void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resourc
     if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
-    const auto currentDeviceStatus = device->getStatus();
-    const auto previousDeviceStatus = m_previousDeviceStatus;
-    m_previousDeviceStatus = currentDeviceStatus;
+    const Qn::ResourceStatus currentDeviceStatus = device->getStatus();
+    const Qn::ResourceStatus previousDeviceStatus =
+        m_previousDeviceStatus.exchange(currentDeviceStatus);
+
     if (isAliveStatus(currentDeviceStatus) == isAliveStatus(previousDeviceStatus))
         return;
 
@@ -484,8 +481,9 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
     if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
+    BindingMap bindings = analyticsBindingsSafe();
     const auto isAlive = isDeviceAlive();
-    for (auto& [engineId, binding]: m_bindings)
+    for (auto& [engineId, binding]: bindings)
     {
         if (isAlive)
         {
@@ -496,9 +494,9 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
         {
             binding->stopAnalytics();
         }
-
-        updateStreamRequirements();
     }
+
+    updateStreamRequirements();
 }
 
 void DeviceAnalyticsContext::at_devicePropertyChanged(
@@ -533,7 +531,8 @@ void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResourc
         return;
     }
 
-    for (auto& [_, binding]: m_bindings)
+    BindingMap bindings = analyticsBindingsSafe();
+    for (auto& [_, binding]: bindings)
         binding->updateNeededMetadataTypes();
 }
 
@@ -541,19 +540,23 @@ void DeviceAnalyticsContext::subscribeToDeviceChanges()
 {
     connect(
         m_device, &QnResource::statusChanged,
-        this, &DeviceAnalyticsContext::at_deviceStatusChanged);
+        this, &DeviceAnalyticsContext::at_deviceStatusChanged,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnResource::urlChanged,
-        this, &DeviceAnalyticsContext::at_deviceUpdated);
+        this, &DeviceAnalyticsContext::at_deviceUpdated,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnVirtualCameraResource::logicalIdChanged,
-        this, &DeviceAnalyticsContext::at_deviceUpdated);
+        this, &DeviceAnalyticsContext::at_deviceUpdated,
+        Qt::QueuedConnection);
 
     connect(
         m_device, &QnResource::propertyChanged,
-        this, &DeviceAnalyticsContext::at_devicePropertyChanged);
+        this, &DeviceAnalyticsContext::at_devicePropertyChanged,
+        Qt::QueuedConnection);
 }
 
 void DeviceAnalyticsContext::subscribeToRulesChanges()
@@ -577,9 +580,9 @@ bool DeviceAnalyticsContext::isDeviceAlive() const
 
 void DeviceAnalyticsContext::updateStreamRequirements()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    BindingMap bindings = analyticsBindingsSafe();
     StreamTypes totalRequiredStreamTypes;
-    for (const auto& [engineId, binding]: m_bindings)
+    for (const auto& [engineId, binding]: bindings)
     {
         const std::optional<StreamRequirements> requirements = binding->streamRequirements();
         if (!requirements)
@@ -588,10 +591,17 @@ void DeviceAnalyticsContext::updateStreamRequirements()
         totalRequiredStreamTypes |= requirements->requiredStreamTypes;
     }
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_cachedRequiredStreamTypes = totalRequiredStreamTypes;
 }
 
-std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding(
+DeviceAnalyticsContext::BindingMap DeviceAnalyticsContext::analyticsBindingsSafe() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_bindings;
+}
+
+std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBindingUnsafe(
     const QnUuid& engineId) const
 {
     auto itr = m_bindings.find(engineId);
@@ -599,6 +609,13 @@ std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding
         return nullptr;
 
     return itr->second;
+}
+
+std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBindingSafe(
+    const QnUuid& engineId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return analyticsBindingUnsafe(engineId);
 }
 
 } // namespace nx::vms::server::analytics
