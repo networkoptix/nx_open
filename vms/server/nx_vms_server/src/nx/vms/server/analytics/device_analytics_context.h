@@ -32,7 +32,7 @@ class DeviceAnalyticsContext:
     Q_OBJECT
 
     using base_type = nx::vms::server::ServerModuleAware;
-
+    using BindingMap = std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>>;
 public:
     DeviceAnalyticsContext(
         QnMediaServerModule* severModule,
@@ -40,7 +40,6 @@ public:
 
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
-    void addEngine(const resource::AnalyticsEngineResourcePtr& engine);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
@@ -70,10 +69,12 @@ private:
     bool isDeviceAlive() const;
     void updateSupportedFrameTypes();
 
-    std::shared_ptr<DeviceAnalyticsBinding> analyticsBinding(const QnUuid& engineId) const;
 
-    bool isEngineAlreadyBound(const QnUuid& engineId) const;
-    bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
+    BindingMap analyticsBindingsSafe() const;
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingSafe(const QnUuid& engineId) const;
+
+    bool isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const;
+    bool isEngineAlreadyBoundUnsafe(const resource::AnalyticsEngineResourcePtr& engine) const;
 
     QVariantMap prepareSettings(const QnUuid& engineId, const QVariantMap& settings);
     std::optional<QVariantMap> loadSettingsFromFile(
@@ -88,13 +89,13 @@ private:
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
-    std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>> m_bindings;
+    BindingMap m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
 
     bool m_cachedNeedCompressedFrames{false};
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
     bool m_missingUncompressedFrameWarningIssued = false;
-    Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
+    std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
     std::map<QnUuid, int> m_skippedFrameCountByEngine;
 };

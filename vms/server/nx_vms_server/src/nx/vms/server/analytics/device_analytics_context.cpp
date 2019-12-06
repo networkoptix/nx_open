@@ -26,6 +26,8 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::vms::server;
 
+using BindingMap = std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>>;
+
 static const std::chrono::seconds kMinSkippedFramesReportingInterval(30);
 
 static bool isAliveStatus(Qn::ResourceStatus status)
@@ -70,45 +72,50 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     subscribeToRulesChanges();
 }
 
-bool DeviceAnalyticsContext::isEngineAlreadyBound(
+bool DeviceAnalyticsContext::isEngineAlreadyBoundUnsafe(
     const QnUuid& engineId) const
 {
     return m_bindings.find(engineId) != m_bindings.cend();
 }
 
-bool DeviceAnalyticsContext::isEngineAlreadyBound(
+bool DeviceAnalyticsContext::isEngineAlreadyBoundUnsafe(
     const resource::AnalyticsEngineResourcePtr& engine) const
 {
-    return isEngineAlreadyBound(engine->getId());
+    return isEngineAlreadyBoundUnsafe(engine->getId());
 }
 
 void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     const resource::AnalyticsEngineResourceList& engines)
 {
-    QnMutexLocker lock(&m_mutex);
-
     std::set<QnUuid> engineIds;
     for (const auto& engine: engines)
         engineIds.insert(engine->getId());
 
-    // Remove bindings that aren't on the list.
-    for (auto itr = m_bindings.begin(); itr != m_bindings.cend();)
     {
-        if (engineIds.find(itr->first) == engineIds.cend())
-            itr = m_bindings.erase(itr);
-        else
-            ++itr;
+        QnMutexLocker lock(&m_mutex);
+        // Remove bindings that aren't on the list.
+        for (auto itr = m_bindings.begin(); itr != m_bindings.cend();)
+        {
+            if (engineIds.find(itr->first) == engineIds.cend())
+                itr = m_bindings.erase(itr);
+            else
+                ++itr;
+        }
     }
 
     const bool deviceIsAlive = isDeviceAlive();
     for (const auto& engine: engines)
     {
-        if (isEngineAlreadyBound(engine))
-            continue;
+        std::shared_ptr<DeviceAnalyticsBinding> binding;
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (isEngineAlreadyBoundUnsafe(engine))
+                continue;
 
-        auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-        binding->setMetadataSink(m_metadataSink);
-        m_bindings.emplace(engine->getId(), binding);
+            binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
+            binding->setMetadataSink(m_metadataSink);
+            m_bindings.emplace(engine->getId(), binding);
+        }
 
         if (deviceIsAlive)
         {
@@ -121,45 +128,33 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     updateSupportedFrameTypes();
 }
 
-void DeviceAnalyticsContext::addEngine(const resource::AnalyticsEngineResourcePtr& engine)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-    binding->setMetadataSink(m_metadataSink);
-    m_bindings.emplace(engine->getId(), binding);
-    updateSupportedFrameTypes();
-}
-
 void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
     QnMutexLocker lock(&m_mutex);
-
     m_bindings.erase(engine->getId());
     updateSupportedFrameTypes();
 }
 
 void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    m_metadataSink = std::move(metadataSink);
-    for (auto& entry: m_bindings)
+    BindingMap bindings;
     {
-        auto& binding = entry.second;
-        binding->setMetadataSink(m_metadataSink);
+        QnMutexLocker lock(&m_mutex);
+        m_metadataSink = std::move(metadataSink);
+        bindings = m_bindings;
     }
+
+    for (auto& [_, binding]: bindings)
+        binding->setMetadataSink(m_metadataSink);
 }
 
 void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariantMap& settings)
 {
-    QnMutexLocker lock(&m_mutex);
-
     QnUuid analyticsEngineId(engineId);
     const QVariantMap effectiveSettings = prepareSettings(analyticsEngineId, settings);
     m_device->setDeviceAgentSettingsValues(analyticsEngineId, effectiveSettings);
 
-    const std::shared_ptr<DeviceAnalyticsBinding> binding = analyticsBinding(analyticsEngineId);
+    std::shared_ptr<DeviceAnalyticsBinding> binding = analyticsBindingSafe(analyticsEngineId);
     if (!binding)
         return;
 
@@ -256,11 +251,7 @@ std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
 
 QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
-    QnMutexLocker lock(&m_mutex);
-
     const QnUuid analyticsEngineId(engineId);
-    const std::shared_ptr<DeviceAnalyticsBinding> binding = analyticsBinding(analyticsEngineId);
-
     const auto engine = serverModule()
         ->resourcePool()
         ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
@@ -278,6 +269,7 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
     jsonEngine.loadModelFromJsonObject(engine->manifest().deviceAgentSettingsModel);
     jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
 
+    std::shared_ptr<DeviceAnalyticsBinding> binding = analyticsBindingSafe(analyticsEngineId);
     if (!binding)
     {
         NX_DEBUG(this, "No DeviceAnalyticsBinding for the Device %1 and the Engine %2",
@@ -427,15 +419,14 @@ void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engin
 
 void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resource)
 {
-    QnMutexLocker lock(&m_mutex);
-
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
     if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
-    const auto currentDeviceStatus = device->getStatus();
-    const auto previousDeviceStatus = m_previousDeviceStatus;
-    m_previousDeviceStatus = currentDeviceStatus;
+    const Qn::ResourceStatus currentDeviceStatus = device->getStatus();
+    const Qn::ResourceStatus previousDeviceStatus =
+        m_previousDeviceStatus.exchange(currentDeviceStatus);
+
     if (isAliveStatus(currentDeviceStatus) == isAliveStatus(previousDeviceStatus))
         return;
 
@@ -444,7 +435,6 @@ void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resourc
 
 void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
 {
-    QnMutexLocker lock(&m_mutex);
     updateDevice(resource);
 }
 
@@ -454,11 +444,10 @@ void DeviceAnalyticsContext::updateDevice(const QnResourcePtr& resource)
     if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
+    BindingMap bindings = analyticsBindingsSafe();
     const auto isAlive = isDeviceAlive();
-    for (auto& entry: m_bindings)
+    for (auto& [engineId, binding]: bindings)
     {
-        const auto& engineId = entry.first;
-        const auto& binding = entry.second;
         if (isAlive)
         {
             binding->restartAnalytics(
@@ -491,15 +480,12 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
             lm("Credentials have been changed for the Device %1 (%2)")
                 .args(device->getName(), device->getId()));
 
-        QnMutexLocker lock(&m_mutex);
         updateDevice(device);
     }
 }
 
 void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 {
-    QnMutexLocker lock(&m_mutex);
-
     NX_DEBUG(this, "Rules have been updated, affected resources %1", affectedResources);
     if (!affectedResources.contains(m_device->getId()))
     {
@@ -508,11 +494,9 @@ void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResourc
         return;
     }
 
-    for (auto& entry: m_bindings)
-    {
-        auto& binding = entry.second;
+    BindingMap bindings = analyticsBindingsSafe();
+    for (auto& [_, binding]: bindings)
         binding->updateNeededMetadataTypes();
-    }
 }
 
 void DeviceAnalyticsContext::subscribeToDeviceChanges()
@@ -543,7 +527,8 @@ void DeviceAnalyticsContext::subscribeToRulesChanges()
     auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
     connect(
         ruleWatcher, &EventRuleWatcher::rulesUpdated,
-        this, &DeviceAnalyticsContext::at_rulesUpdated);
+        this, &DeviceAnalyticsContext::at_rulesUpdated,
+        Qt::QueuedConnection);
 }
 
 bool DeviceAnalyticsContext::isDeviceAlive() const
@@ -561,11 +546,11 @@ void DeviceAnalyticsContext::updateSupportedFrameTypes()
 {
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
     bool needsCompressedFrames = false;
-    for (auto& entry: m_bindings)
-    {
-        const QnUuid engineId = entry.first;
 
-        auto binding = entry.second;
+    QnMutexLocker lock(&m_mutex);
+
+    for (auto& [engineId, binding]: m_bindings)
+    {
         if (!binding->isStreamConsumer())
             continue;
 
@@ -584,9 +569,16 @@ void DeviceAnalyticsContext::updateSupportedFrameTypes()
     m_cachedUncompressedPixelFormats = std::move(neededUncompressedPixelFormats);
 }
 
-std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding(
+DeviceAnalyticsContext::BindingMap DeviceAnalyticsContext::analyticsBindingsSafe() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_bindings;
+}
+
+std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBindingSafe(
     const QnUuid& engineId) const
 {
+    QnMutexLocker lock(&m_mutex);
     auto itr = m_bindings.find(engineId);
     if (itr == m_bindings.cend())
         return nullptr;
