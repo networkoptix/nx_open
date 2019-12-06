@@ -107,7 +107,9 @@ public:
     QString idForToStringFromPtr() const;
     QString lastErrorMessage() const { return m_lastErrorMessage; }
 
-    void setMaxBufferSize(int value) { m_maxBufferSize = value; }
+    void setMaxSendBufferSize(size_t value) { m_maxBufferSize = value; }
+    size_t maxSendBufferSize() const { return m_maxBufferSize; }
+    size_t sendBufferSize() const { return m_dataToSend.dataSize(); }
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -163,7 +165,7 @@ private:
 
     private:
         std::deque<nx::Buffer> m_queue;
-        size_t m_dataSize = 0;
+        std::atomic<size_t> m_dataSize = 0;
     };
 
     Dequeue m_dataToSend;
@@ -200,7 +202,7 @@ private:
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
     QString m_lastErrorMessage;
-    int m_maxBufferSize = 0;
+    size_t m_maxBufferSize = 0;
 };
 
 QString toString(ConnectionBase::State value);

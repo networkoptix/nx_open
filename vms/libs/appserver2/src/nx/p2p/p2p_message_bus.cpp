@@ -299,7 +299,7 @@ void MessageBus::createOutgoingConnections(
                 std::make_unique<ConnectionContext>(),
                 std::move(connectionLockGuard),
                 [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
-            connection->setMaxBufferSize(commonModule()->globalSettings()->maxRecorderQueueSizeBytes());
+            connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxRecorderQueueSizeBytes());
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
@@ -927,6 +927,18 @@ void MessageBus::sendTransactionImpl(
 
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
         printTran(connection, tran, Connection::Direction::outgoing);
+
+#if 0
+    // TODO: it is improvement to handle persistent transactions in case of buffer overflow.
+    if (descriptor->isPersistent && connection->maxSendBufferSize() > 0
+        && connection->sendBufferSize() > connection->maxSendBufferSize() / 2)
+    {
+        // Switch from live mode to the DB selection mode.
+        // Keep extra buffer size for non persistent transactions.
+        context->sendDataInProgress = true;
+        return;
+    }
+#endif
 
     switch (connection->remotePeer().dataFormat)
     {

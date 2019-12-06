@@ -472,7 +472,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
-    connection->setMaxBufferSize(commonModule()->globalSettings()->maxP2pQueueSizeBytes());
+    connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxP2pQueueSizeBytes());
     QnMutexLocker lock(&m_mutex);
 
     if (!isStarted())
