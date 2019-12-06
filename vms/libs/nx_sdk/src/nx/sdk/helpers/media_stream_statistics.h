@@ -22,6 +22,12 @@ public:
 private:
     struct Data
     {
+        Data() = default;
+        Data(std::chrono::microseconds timestamp, size_t dataSize, bool isKeyFrame):
+            timestamp(timestamp), size(size), isKeyFrame(isKeyFrame)
+        {
+        }
+
         std::chrono::microseconds timestamp{};
         size_t size = 0;
         bool isKeyFrame = false;

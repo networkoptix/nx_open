@@ -42,7 +42,7 @@ void MediaStreamStatistics::onData(
         };
 
     std::lock_guard<std::mutex> locker(m_mutex);
-    m_data.insert(toIterator(timestamp), {timestamp, dataSize, isKeyFrame});
+    m_data.insert(toIterator(timestamp), Data(timestamp, dataSize, isKeyFrame));
     m_totalSizeBytes += dataSize;
 
     // Remove old and future data in case of media stream time has been changed.
