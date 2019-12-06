@@ -95,8 +95,7 @@ LabeledItem
                     id: border
 
                     anchors.fill: parent
-                    visible: backgroundImage.status !== Image.Ready
-
+                    visible: !preview.hasFigure || backgroundImage.status !== Image.Ready
                     color: "transparent"
                     border.color: ColorTheme.colors.dark11
                     border.width: 1
