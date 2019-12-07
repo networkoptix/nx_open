@@ -1,0 +1,22 @@
+# All text files must be with LF end-of-line everywhere
+* text=auto eol=lf
+
+# Except those ones...
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.vcproj text eol=crlf
+*.wixproj text eol=crlf
+*.def text eol=crlf
+*.wxs text eol=crlf
+*/Autounattend.xml text eol=crlf
+
+# And those are definitely binary ones
+*.jpg binary
+*.bmp binary
+*.dll binary
+*.lib binary
+*.exe binary
+*.icns binary
+*.ico binary
+
