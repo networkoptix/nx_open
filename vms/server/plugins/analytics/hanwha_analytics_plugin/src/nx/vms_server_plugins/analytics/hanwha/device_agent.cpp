@@ -12,9 +12,13 @@
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/timestamped_object_metadata.h>
+#include <nx/sdk/analytics/i_custom_metadata_packet.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
@@ -148,9 +152,10 @@ void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
 
 } // namespace
 
-DeviceAgent::DeviceAgent(Engine* engine):
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     m_engine(engine)
 {
+    this->setDeviceInfo(deviceInfo);
 }
 
 DeviceAgent::~DeviceAgent()
@@ -180,6 +185,30 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
     if (eventTypeIds->count() != 0)
         *outResult = startFetchingMetadata(neededMetadataTypes);
+}
+
+void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
+{
+    const auto packet = dataPacket->queryInterface<ICustomMetadataPacket>();
+    std::string data(packet->data(), packet->dataSize());
+    // parseMetadata(data);
+    static int i = 0;
+    std::cout << ++i << std::endl << data << std::endl << std::endl << std::endl;
+
+    auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+    objectMetadataPacket->setTimestampUs(dataPacket->timestampUs());
+    objectMetadataPacket->setDurationUs(1000);
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
+    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+    if (NX_ASSERT(m_handler))
+        m_handler->handleMetadata(objectMetadataPacket.get());
+
 }
 
 void DeviceAgent::doSetSettings(

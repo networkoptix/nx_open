@@ -1,4 +1,5 @@
 {
+    "streamTypeFilter": "metadata",
     "capabilities": "deviceDependent",
     "objectTypes":
     [

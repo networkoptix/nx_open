@@ -10,6 +10,8 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
 #include <nx/network/http/http_client.h>
 
@@ -21,12 +23,12 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 
 class DeviceAgent:
     public QObject,
-    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IConsumingDeviceAgent>
 {
     Q_OBJECT
 
 public:
-    DeviceAgent(Engine* engine);
+    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent();
 
     virtual void setHandler(
@@ -50,6 +52,9 @@ protected:
     virtual void doSetNeededMetadataTypes(
         nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+
+    virtual void doPushDataPacket(
+        nx::sdk::Result<void>* outResult, nx::sdk::analytics::IDataPacket* dataPacket) override;
 
 private:
     nx::sdk::Result<void> startFetchingMetadata(

@@ -120,8 +120,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
-    const auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(deviceInfo);
+    const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->readCameraSettings();
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
