@@ -217,6 +217,10 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
 
 }
 
+/**
+ * Reads settings from `sourceMap` and writes them into the agent's device. If a setting can not
+ * be written, its name is added to `outResult` error map.h
+*/
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
 {
