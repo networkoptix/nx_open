@@ -187,6 +187,12 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
+/**
+ * Receives `dataPacket` from Server. This packet is a `CustomMetadataPacket`, that contains xml
+ * with the information about events occurred. The function parses the xml and extracts
+ * the information about objects. Then it creates `objectMetadataPacket, attaches `objectMetadata`
+ * (with object information) to it and sends to server using `m_handler`.
+*/
 void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
 {
     const auto packet = dataPacket->queryInterface<ICustomMetadataPacket>();
