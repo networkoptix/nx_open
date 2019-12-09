@@ -14,7 +14,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifes
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
     (nx::vms::api::analytics::EngineManifest::Capability::deviceDependent, "deviceDependent")
-    (nx::vms::api::analytics::EngineManifest::Capability::needMotionMetadata, "needMotionMetadata")
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capability, (numeric)(debug))
 
@@ -28,7 +27,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifes
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
     (nx::vms::api::analytics::EngineManifest::Capability::deviceDependent, "deviceDependent")
-    (nx::vms::api::analytics::EngineManifest::Capability::needMotionMetadata, "needMotionMetadata")
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capabilities, (numeric)(debug))
 

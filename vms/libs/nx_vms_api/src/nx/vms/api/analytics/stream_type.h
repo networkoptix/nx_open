@@ -10,6 +10,7 @@ enum class StreamType
     compressedVideo = 1 << 0,
     uncompressedVideo = 1 << 1,
     metadata = 1 << 2,
+    motion = 1 << 3,
 };
 
 Q_DECLARE_FLAGS(StreamTypes, StreamType);
