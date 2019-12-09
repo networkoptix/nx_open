@@ -32,7 +32,7 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
  secondary-files=<filename>[,<filename>]...
      Optional. Files for the secondary stream. The part after `=` may be enclosed in `"` or `'`.
  offline=0..100
-     Optional. Frequency of the camera going offline. Default: 0 - never go offline.
+     Optional. Frequency of the Camera going offline. Default: 0 - never go offline.
  video-layout=<channelNumber>[,<channelNumber>]...[/<channelNumber>[,<channelNumber>]...]...
      Optional. Defines the layout of channels in multi-channel video files, row-by-row, rows are
      separated with `/`, items in a row are separated with `,`. Each channel may occur in the
@@ -51,18 +51,28 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Local interface to listen. Can be specified multiple times to form a list. By default, all
      interfaces are listened to.
  -S, --camera-for-file
-     Run separate camera for each primary file. If specified, the 'count' parameter must be
+     Run a separate Camera for each primary file. If specified, the 'count' parameter must be
      omitted, and if not --no-secondary, the number of primary and secondary files must be the
      same.
  --pts
      Include PTS values from the video file into the stream. If omitted, ignore those PTS values.
+ --shift-pts-us[=]<ptsAbsoluteIncrement>
+     Shift PTS axis for all streams and cameras so that 0 becomes the specified value (which can be
+     negative). Such shift is performed after the possible PTS "unlooping", and cannot be requested
+     if any other pts shifting is requested.
  --unloop-pts
      "Unloop" PTS sequence to be monotonous - after the last PTS is processed, the next one will
      differ from it by the difference between the last PTS and the one before it. May not work well
-     with files containing B-frames (reordered frames).
+     with files containing B-frames (reordered frames). Can be specified only when each Camera
+     streams one file.
+ --shift-pts-from-now-us[=]<ptsRelativeIncrement>
+     Shift PTS axis for all streams and cameras so that 0 becomes the current time plus the
+     specified value (which can be negative). Such shift is performed after PTS "unlooping", thus
+     requires --unloop-pts, and cannot be specified if any other pts shifting is requested.
  --shift-pts-primary-period-us[=]<period>
  --shift-pts-secondary-period-us[=]<period>
-     Shift PTS axis so that 0 becomes `(now / period - 1) * period`. Use only with --unloop-pts.
+     Shift PTS axis so that 0 becomes `(now / period - 1) * period`.
+     Cannot be specified without --unloop-pts or if any other PTS shifting is requested.
      Makes `unloopedPts % period == originalPts`, which allows to identify video frames by PTS.
      The period value for a file can be learned from the console when running with --unloop-pts.
  --no-secondary
@@ -137,16 +147,31 @@ static int64_t nonNegativeIntArg(const QString& argName, const QString& argValue
 }
 
 /** @throws InvalidArgs */
-static int64_t positiveInt64Arg(const QString& argName, const QString& argValue)
+static std::chrono::microseconds positiveUsArg(const QString& argName, const QString& argValue)
 {
-    const int64_t value = argValue.toLongLong(); //< Returns 0 on failure.
-    if (value <= 0)
+    const int64_t intValue = argValue.toLongLong(); //< Returns 0 on failure.
+    if (intValue <= 0)
     {
         throw InvalidArgs(
-            "Invalid value (expected positive 64-bit integer) for arg '" + argName + "': "
+            "Invalid value (expected positive integer) for arg '" + argName + "': "
                 + enquoteAndEscape(argValue) + ".");
     }
-    return value;
+    return std::chrono::microseconds{intValue};
+}
+
+/** @throws InvalidArgs */
+static std::optional<std::chrono::microseconds> usArg(
+    const QString& argName, const QString& argValue)
+{
+    bool ok = false;
+    const int64_t intValue = argValue.toLongLong(&ok);
+    if (!ok)
+    {
+        throw InvalidArgs(
+            "Invalid value (expected integer) for arg '" + argName + "': "
+                + enquoteAndEscape(argValue) + ".");
+    }
+    return std::chrono::microseconds(intValue);
 }
 
 /** @throws InvalidArgs */
@@ -230,11 +255,29 @@ static QString cameraSetToJsonString(const CliOptions::CameraSet& cameraSet, con
     return result;
 }
 
+static QString boolToJson(bool value)
+{
+    return value ? "true" : "false";
+}
+
+static QString optionalIntToJson(std::optional<int> value)
+{
+    if (!value)
+        return "null";
+    return QString::number(*value);
+}
+
+static QString optionalUsToJson(std::optional<std::chrono::microseconds> value)
+{
+    if (!value)
+        return "null";
+    return lm("\"%1 us\"").args(value->count()); //< Make a JSON value of type "string".
+}
+
+
 /** Intended for debug. A valid JSON is not guaranteed. */
 static QString optionsToJsonString(const CliOptions& options)
 {
-    const auto boolToJson = [](bool value) ->QString { return value ? "true" : "false"; };
-
     QString result = "{\n";
 
     result += "    \"showHelp\": " + boolToJson(options.showHelp) + ",\n";
@@ -243,14 +286,16 @@ static QString optionsToJsonString(const CliOptions& options)
         + QString::number(options.maxFileSizeMegabytes) + ",\n";
     result += "    \"cameraForFile\": " + boolToJson(options.cameraForFile) + ",\n";
     result += "    \"includePts\": " + boolToJson(options.includePts) + ",\n";
+    result += "    \"shiftPts\": " + optionalUsToJson(options.shiftPts) + ",\n";
     result += "    \"noSecondary\": " + boolToJson(options.noSecondary) + ",\n";
-    result += "    \"fpsPrimary\": " + QString::number(options.fpsPrimary) + ",\n";
-    result += "    \"fpsSecondary\": " + QString::number(options.fpsSecondary) + ",\n";
+    result += "    \"fpsPrimary\": " + optionalIntToJson(options.fpsPrimary) + ",\n";
+    result += "    \"fpsSecondary\": " + optionalIntToJson(options.fpsSecondary) + ",\n";
     result += "    \"unloopPts\": " + boolToJson(options.unloopPts) + ",\n";
-    result += "    \"shiftPtsPrimaryPeriodUs\": "
-        + QString::number(options.shiftPtsPrimaryPeriodUs) + ",\n";
-    result += "    \"shiftPtsSecondaryPeriodUs\": "
-        + QString::number(options.shiftPtsSecondaryPeriodUs) + ",\n";
+    result += "    \"shiftPtsFromNow\": " + optionalUsToJson(options.shiftPtsFromNow) + ",\n";
+    result += "    \"shiftPtsPrimaryPeriod\": "
+        + optionalUsToJson(options.shiftPtsPrimaryPeriod) + ",\n";
+    result += "    \"shiftPtsSecondaryPeriod\": "
+        + optionalUsToJson(options.shiftPtsSecondaryPeriod) + ",\n";
 
     result += "    \"localInterfaces\":\n";
     result += "    [\n";
@@ -395,7 +440,6 @@ static std::optional<bool> parseFlag(
     const QString& shortArgName = QString())
 {
     const QString arg = validatedArg(argv, argp, longArgName, shortArgName);
-
     if (arg == longArgName || arg == shortArgName)
         return true;
 
@@ -403,7 +447,8 @@ static std::optional<bool> parseFlag(
 }
 
 /** @throws InvalidArgs */
-static void parseOption(CliOptions* options, const char* const argv[], int* argp, int* outFps)
+static void parseOption(
+    CliOptions* options, const char* const argv[], int* argp, std::optional<int>* outFps)
 {
     const QString arg = argv[*argp];
 
@@ -423,12 +468,16 @@ static void parseOption(CliOptions* options, const char* const argv[], int* argp
         options->noSecondary = *v;
     else if (const auto v = parseFlag(argv, argp, "--pts"))
         options->includePts = *v;
+    else if (const auto v = parse(argv, argp, usArg, "--shift-pts-us"))
+        options->shiftPts = *v;
     else if (const auto v = parseFlag(argv, argp, "--unloop-pts"))
         options->unloopPts = *v;
-    else if (const auto v = parse(argv, argp, positiveInt64Arg, "--shift-pts-primary-period-us"))
-        options->shiftPtsPrimaryPeriodUs = *v;
-    else if (const auto v = parse(argv, argp, positiveInt64Arg, "--shift-pts-secondary-period-us"))
-        options->shiftPtsSecondaryPeriodUs = *v;
+    else if (const auto v = parse(argv, argp, usArg, "--shift-pts-from-now-us"))
+        options->shiftPtsFromNow = *v;
+    else if (const auto v = parse(argv, argp, positiveUsArg, "--shift-pts-primary-period-us"))
+        options->shiftPtsPrimaryPeriod = *v;
+    else if (const auto v = parse(argv, argp, positiveUsArg, "--shift-pts-secondary-period-us"))
+        options->shiftPtsSecondaryPeriod = *v;
     else if (const auto v = parse(argv, argp, nonNegativeIntArg, "--max-file-size-megabytes"))
         options->maxFileSizeMegabytes = *v;
     else if (const auto v = parse(argv, argp, logLevelArg, "--log-level", "-L"))
@@ -458,20 +507,30 @@ static void validateCameraSet(const CliOptions::CameraSet& cameraSet, const CliO
         && (cameraSet.primaryFileNames.size() > 1 || cameraSet.secondaryFileNames.size() > 1))
     {
         throw InvalidArgs(
-            "PTS unlooping is not supported when some camera is assigned multiple files.");
+            "PTS unlooping is not supported when some Camera is assigned multiple files.");
     }
 }
 
 /** @throws InvalidArgs */
 static void validateOptions(const CliOptions& options)
 {
+    if (options.shiftPts.has_value()
+        + options.shiftPtsFromNow.has_value()
+        + (options.shiftPtsPrimaryPeriod || options.shiftPtsSecondaryPeriod) > 1)
+    {
+        throw InvalidArgs("More than one PTS shifting option is specified.");
+    }
+
     if (options.unloopPts && !options.includePts)
         throw InvalidArgs("Option '--unloop-pts' requires '--pts'.");
 
-    if (!options.unloopPts && options.shiftPtsPrimaryPeriodUs != -1)
+    if (!options.unloopPts && options.shiftPtsFromNow)
+        throw InvalidArgs("Option '--shift-pts-from-now-us' requires '--unloop-pts'.");
+
+    if (!options.unloopPts && options.shiftPtsPrimaryPeriod)
         throw InvalidArgs("Option '--shift-pts-primary-period-us' requires '--unloop-pts'.");
 
-    if (!options.unloopPts && options.shiftPtsSecondaryPeriodUs != -1)
+    if (!options.unloopPts && options.shiftPtsSecondaryPeriod)
         throw InvalidArgs("Option '--shift-pts-secondary-period-us' requires '--unloop-pts'.");
 
     for (const auto& cameraSet: options.cameraSets)
@@ -490,7 +549,7 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
 
     try
     {
-        int fps = -1;
+        std::optional<int> fps;
         for (int i = 1; i < argc; ++i)
             parseOption(options, argv, &i, &fps);
 
@@ -500,9 +559,9 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
             exit(0);
         }
 
-        if (fps != -1)
+        if (fps)
         {
-            if (options->fpsPrimary != -1 || options->fpsSecondary != -1)
+            if (options->fpsPrimary || options->fpsSecondary)
             {
                 throw InvalidArgs("Arg '--fps' must not be specified together with "
                     "'--fps-primary' or '--fps-secondary'.");
@@ -511,13 +570,13 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
             options->fpsSecondary = fps;
         }
 
-        validateOptions(*options);
-
         if (ini().printOptions)
         {
             std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
                 optionsToJsonString(*options)).toStdString();
         }
+
+        validateOptions(*options);
 
         return true;
     }

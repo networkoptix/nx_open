@@ -124,7 +124,7 @@ QN_HELP_TOPIC(UserRoles_Help,                                   "roles_managemen
 
 QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm")
 
-QN_HELP_TOPIC(CameraSettings_Help,								"opening_camera_settings_dialog.htm")
+QN_HELP_TOPIC(CameraSettings_Help,                              "setting_up_cameras_and_devices.htm")
 QN_HELP_TOPIC(CameraSettings_Multi_Help,                        "setting_same_parameters_for_multiple_cameras_(admi.htm")
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
 QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")

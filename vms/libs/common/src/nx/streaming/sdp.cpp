@@ -1,5 +1,7 @@
 #include "sdp.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::streaming {
 
 static Sdp::MediaType mediaTypeFromString(const QString& value)

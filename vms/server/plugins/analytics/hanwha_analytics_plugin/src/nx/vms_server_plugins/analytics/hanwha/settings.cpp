@@ -24,18 +24,18 @@ nx::kit::Json getChannelInfoOrThrow(
     std::string err;
     nx::kit::Json json = nx::kit::Json::parse(cameraReply, err);
     if (!json.is_object())
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 
     const nx::kit::Json& jsonChannels = json[eventName];
     if (!jsonChannels.is_array())
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 
     for (const auto& channel: jsonChannels.array_items())
     {
         if (const auto& j = channel["Channel"]; j.is_number() && j.int_value() == channelNumber)
             return channel;
     }
-    throw SunapiValueError{};
+    throw DeviceValueError{};
 }
 
 /**
@@ -185,7 +185,7 @@ void SettingGroup::replanishErrorMap(
 void serverReadOrThrow(const char* source, bool* destination)
 {
     if(!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     if (strcmp(source, "true") == 0)
     {
@@ -198,7 +198,7 @@ void serverReadOrThrow(const char* source, bool* destination)
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 
 std::string serverWrite(bool value)
@@ -212,14 +212,14 @@ std::string serverWrite(bool value)
 void serverReadOrThrow(const char* source, int* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     const char* end = source + strlen(source);
     std::from_chars_result conversionResult = std::from_chars(source, end, *destination);
     if (conversionResult.ptr == end)
         return;
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 
 std::string serverWrite(int value)
@@ -230,7 +230,7 @@ std::string serverWrite(int value)
 void serverReadOrThrow(const char* source, std::string* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     *destination = source;
     if (destination->size() >= 2 && destination->front() == '"' && destination->back() == '"')
@@ -239,7 +239,7 @@ void serverReadOrThrow(const char* source, std::string* destination)
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 
 std::string serverWrite(std::string value)
@@ -250,7 +250,7 @@ std::string serverWrite(std::string value)
 void serverReadOrThrow(const char* source, std::vector<PluginPoint>* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     std::optional<std::vector<PluginPoint>> tmp = ServerStringToPluginPoints(source);
     if (tmp)
@@ -259,13 +259,13 @@ void serverReadOrThrow(const char* source, std::vector<PluginPoint>* destination
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 
 void serverReadOrThrow(const char* source, Direction* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     std::optional<Direction> tmp = ServerStringToDirection(source);
     if (tmp)
@@ -274,13 +274,13 @@ void serverReadOrThrow(const char* source, Direction* destination)
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 
 void serverReadOrThrow(const char* source, Width* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     std::optional<Width> tmp = ServerStringToWidth(source);
     if (tmp)
@@ -289,13 +289,21 @@ void serverReadOrThrow(const char* source, Width* destination)
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
+}
+
+std::string serverWrite(std::pair<Width, Height> pair)
+{
+    std::optional<std::vector<PluginPoint>> points = WidthHeightToPluginPoints(
+        pair.first, pair.second);
+    std::string result = pluginPointsToServerJson(*points);
+    return result;
 }
 
 void serverReadOrThrow(const char* source, Height* destination)
 {
     if (!source)
-        throw PluginValueError();
+        throw ServerValueError();
 
     std::optional<Height> tmp = ServerStringToHeight(source);
     if (tmp)
@@ -304,7 +312,7 @@ void serverReadOrThrow(const char* source, Height* destination)
         return;
     }
 
-    throw PluginValueError();
+    throw ServerValueError();
 }
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
@@ -316,7 +324,7 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*f
     if (const auto& param = json[key]; param.is_bool())
         *result = param.bool_value();
     else
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, int* result)
@@ -326,7 +334,7 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*f
     if (const auto& param = json[key]; param.is_number())
         *result = param.int_value();
     else
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, std::string* result)
@@ -336,7 +344,7 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*f
     if (const auto& param = json[key]; param.is_string())
         *result = param.string_value();
     else
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, PluginPoint* result)
@@ -345,12 +353,12 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
 
     const auto& param = json[key];
     if (!param.is_string())
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 
     const std::string value = param.string_value();
 
     if (!result->fromSunapiString(value, frameSize))
-        throw SunapiValueError();
+        throw DeviceValueError();
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, Width* result)
@@ -373,13 +381,13 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
 
     const auto& points = json[key];
     if (!points.is_array())
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 
     result->reserve(points.array_items().size());
     for (const nx::kit::Json& point: points.array_items())
     {
         if (!point["x"].is_number() || !point["y"].is_number())
-            throw SunapiValueError{};
+            throw DeviceValueError{};
 
         const int ix = point["x"].int_value();
         const int iy = point["y"].int_value();
@@ -400,10 +408,10 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
         else if (param.string_value() == "BothDirections")
             *result = Direction::Both;
         else if (param.string_value() != "Off")
-            throw SunapiValueError{}; //< unknown direction
+            throw DeviceValueError{}; //< unknown direction
     }
     else
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, bool* result, const char* desired)
@@ -423,7 +431,7 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*f
         }
     }
     else
-        throw SunapiValueError{};
+        throw DeviceValueError{};
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -530,8 +538,7 @@ void Motion::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, in
     initialized = true;
 }
 
-void Motion::writeToServer(
-    nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void Motion::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
 {
     NX_WRITE_TO_SERVER(settingsDestination, detectionType);
 }
@@ -576,6 +583,14 @@ void MdObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSour
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxWidth);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxHeight);
     initialized = true;
+}
+
+void MdObjectSize::writeToServer(
+    nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+{
+    settingsDestination->setValue("MotionDetection.MinObjectSize.Points",
+        serverWrite(std::pair(minWidth, minHeight)));
+
 }
 
 void MdObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)

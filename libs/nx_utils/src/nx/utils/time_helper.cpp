@@ -131,33 +131,5 @@ qint64 TimeHelper::getTimeUsInternal(const qint64 cameraTimeUs, bool recursionAl
     return resultUs;
 }
 
-/*static*/ qint64 TimeHelper::unloopCameraPtsWithModulus(
-    GetCurrentTimeFunc getCurrentTimeFunc,
-    qint64 absentPtsUsValue,
-    int modulusUs,
-    qint64 ptsUs,
-    qint64 prevPtsUs,
-    qint64* periodStartUs)
-{
-    if (ptsUs < 0)
-        NX_PRINT << "WARNING: PTS is less than zero: " << ptsUs;
-
-    if (prevPtsUs == absentPtsUsValue)
-    {
-        // First frame received.
-        const qint64 nowUs = std::chrono::microseconds(getCurrentTimeFunc()).count();
-        *periodStartUs = (nowUs / modulusUs - 1) * modulusUs;
-        NX_PRINT << "First frame: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
-    }
-    else if (prevPtsUs > ptsUs)
-    {
-        // Looping - first frame of the period received.
-        *periodStartUs += modulusUs;
-        NX_PRINT << "Looping: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
-    }
-
-    return *periodStartUs + ptsUs % modulusUs;
-}
-
 } // namespace utils
 } // namespace nx

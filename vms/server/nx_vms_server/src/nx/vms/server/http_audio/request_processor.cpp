@@ -69,9 +69,8 @@ QnVideoCameraPtr AudioRequestProcessor::getVideoCamera(const QString& cameraId)
             return QnVideoCameraPtr();
         }
     }
-    nx::vms::server::resource::Camera* camRes =
-        dynamic_cast<nx::vms::server::resource::Camera*>(resource.get());
-    if (!camRes || !camRes->hasCameraCapabilities(Qn::AudioTransmitCapability))
+    auto camRes = dynamic_cast<QnSecurityCamResource*>(resource.get());
+    if (!camRes || !camRes->hasTwoWayAudio())
     {
         NX_WARNING(this, "Camera does not support backchannel audio, resource %1", cameraId);
         return QnVideoCameraPtr();

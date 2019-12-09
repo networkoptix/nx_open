@@ -18,6 +18,13 @@ struct FrameSize
 {
     int width = 1;
     int height = 1;
+    FrameSize() = default;
+    FrameSize(int width, int height) : width(width), height(height) {}
+
+    bool operator<(const FrameSize other) const
+    {
+        return width * height < other.width*other.height;
+    }
 
     int xRelativeToAbsolute(double x) const
     {
@@ -52,6 +59,9 @@ struct PluginPoint
     PluginPoint(const nx::kit::Json& json);
     bool operator==(PluginPoint rhs) const { return x == rhs.x && y == rhs.y; }
     bool operator!=(PluginPoint rhs) const { return !(*this == rhs); }
+
+    nx::kit::Json toJson() const;
+
     std::ostream& toSunapiStream(std::ostream& os, FrameSize frameSize) const;
 
     bool fromSunapiString(const std::string& value, FrameSize frameSize);
@@ -74,6 +84,8 @@ struct Height
     operator double() const { return value; }
 };
 
+std::optional<std::vector<PluginPoint>> WidthHeightToPluginPoints(Width width, Height height);
+
 enum class Direction { Right, Left, Both };
 
 /**
@@ -94,6 +106,8 @@ std::optional<Direction> ServerStringToDirection(const char* value);
  * are translated from relative values [0 .. 1) into absolute values [0 .. frame size].
  */
 std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize);
+
+std::string pluginPointsToServerJson(const std::vector<PluginPoint>& points);
 
 //-------------------------------------------------------------------------------------------------
 

@@ -244,6 +244,14 @@
                         <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Audio API</groupName>
+            <groupDescription>
+                This group contains information about audio streaming.
+            </groupDescription>
+            <functions>
                 <function>
                     <name>api/http_audio</name>
                     <caption>Web audio backchannel streaming</caption>

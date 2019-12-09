@@ -35,7 +35,7 @@ QString calculateHostAddress(const QString& url)
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_cachedHostAddress([this] { return calculateHostAddress(m_url); })
+    m_cachedHostAddress([this] { return calculateHostAddress(getUrl()); })
 {
     addFlags(Qn::network);
 }
@@ -64,7 +64,7 @@ void QnNetworkResource::setUrl(const QString& url)
 
 QString QnNetworkResource::getHostAddress() const
 {
-    QnMutexLocker mutexLocker(&m_mutex);
+    // Secured by the same mutex as ::setUrl(), so thread-safe.
     return m_cachedHostAddress.get();
 }
 

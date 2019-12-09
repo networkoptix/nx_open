@@ -2730,7 +2730,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].actions List of JSON objects, each describing a set of actions from a
      *             particular analytics plugin.
      *         %param:stringArray reply[].actions[].actionIds List of action ids.
-     *         %param:string reply[].actions[].pluginId Id of a analytics plugin which offers the
+     *         %param:string reply[].actions[].pluginId Id of an analytics plugin which offers the
      *             actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());

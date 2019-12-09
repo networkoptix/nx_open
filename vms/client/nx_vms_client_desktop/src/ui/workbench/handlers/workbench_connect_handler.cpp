@@ -56,6 +56,7 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -421,7 +422,11 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     if (connection)
         connectionInfo = connection->connectionInfo();
 
+    const bool serverSwitch = m_connecting.storeConnection
+        && m_logicalState == LogicalState::connecting_to_target;
+
     const bool silent = m_logicalState == LogicalState::reconnecting
+        || serverSwitch
         || !qnRuntime->isDesktopMode();
 
     auto status = silent
@@ -429,6 +434,10 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         : QnConnectionDiagnosticsHelper::validateConnection(
             connectionInfo, errorCode, mainWindowWidget(),
             commonModule()->engineVersion());
+
+    if (serverSwitch && status != Qn::ConnectionResult::SuccessConnectionResult)
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to connect to the selected server"));
+
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
     NX_DEBUG(this, lm("handleConnectReply: connection status %1").arg(status));
 

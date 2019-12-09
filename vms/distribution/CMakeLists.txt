@@ -68,6 +68,8 @@ elseif(targetDevice MATCHES "bpi|edge1")
     add_subdirectory(tar)
 endif()
 
+add_subdirectory(standalone)
+
 if(withUnitTestsArchive)
     add_subdirectory(unit_tests)
 endif()

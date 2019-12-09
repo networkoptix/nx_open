@@ -122,6 +122,7 @@ function(nx_add_target name type)
                 configure_file(
                     "${rc_source_file}"
                     "${rc_file}")
+                nx_store_known_file(${rc_file})
             endif()
         endif()
 
@@ -188,6 +189,10 @@ function(nx_add_target name type)
         set_target_properties(${name} PROPERTIES FOLDER ${NX_FOLDER})
     elseif("${type}" STREQUAL "LIBRARY")
         set_target_properties(${name} PROPERTIES FOLDER libs)
+    endif()
+
+    if(WINDOWS)
+        nx_store_known_file("${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.pdb")
     endif()
 endfunction()
 

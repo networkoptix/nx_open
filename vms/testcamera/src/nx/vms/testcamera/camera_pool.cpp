@@ -21,8 +21,8 @@ CameraPool::CameraPool(
     QStringList localInterfacesToListen,
     QnCommonModule* commonModule,
     bool noSecondaryStream,
-    int fpsPrimary,
-    int fpsSecondary)
+    std::optional<int> fpsPrimary,
+    std::optional<int> fpsSecondary)
     :
     QnTcpListener(
         commonModule,

@@ -38,9 +38,10 @@ nx_generate_package_json(${client_update_files_directory}/package.json
 nx_generate_package_json(${server_update_files_directory}/package.json
     INSTALL_SCRIPT "install.bat")
 
-file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
-file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(WRITE ${bin_source_dir}/${launcher.version.file} "${releaseVersion.full}")
+nx_store_known_file(${bin_source_dir}/${launcher.version.file})
+
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
@@ -196,6 +197,7 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_vms_utils
             nx_vms_api
             nx_kit
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_kit.pdb
             udt
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py

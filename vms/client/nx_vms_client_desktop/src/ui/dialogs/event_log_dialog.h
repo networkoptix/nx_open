@@ -69,6 +69,9 @@ private:
     void updateAnalyticsEvents();
     void updateServerEventsMenu();
 
+    QModelIndex findServerEventsMenuIndexByEventType(const QModelIndex& rootIndex,
+        nx::vms::api::EventType eventType) const;
+
     bool isFilterExist() const;
     void requestFinished();
     void updateActionList(bool instantOnly);

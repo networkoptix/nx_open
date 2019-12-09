@@ -110,6 +110,7 @@
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -477,6 +478,7 @@ void QnClientModule::initSingletons()
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
+    commonModule->store(new AnalyticsSettingsManager());
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1107</width>
-    <height>366</height>
+    <height>370</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
@@ -173,7 +173,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="moreInfoPage">
-      <layout class="QGridLayout" name="moreInfoLayout" rowminimumheight="20,20,20,8,20,20,20,0,8,20,20,20">
+      <layout class="QGridLayout" name="moreInfoLayout">
        <property name="leftMargin">
         <number>8</number>
        </property>
@@ -229,6 +229,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="text">
              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
@@ -292,6 +298,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="text">
              <string notr="true">&lt;192.168.1.1&gt;</string>
@@ -377,6 +389,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="text">
              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
             </property>
@@ -421,20 +439,20 @@
         </widget>
        </item>
        <item row="8" column="0">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QWidget" name="verticalSpacer2" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>8</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
+         <property name="minimumSize">
           <size>
-           <width>20</width>
+           <width>0</width>
            <height>8</height>
           </size>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="nx::vms::client::desktop::OptionalLabel" name="vendorDetailLabel">
@@ -443,6 +461,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string notr="true">&lt;ACTI&gt;</string>
@@ -478,7 +502,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="4" column="0" alignment="Qt::AlignVCenter">
         <widget class="QLabel" name="ipAddressDetailTitleLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -512,6 +536,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
          <property name="text">
           <string notr="true">&lt;E96&gt;</string>
          </property>
@@ -540,6 +570,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string notr="true">&lt;A1D-500-V6.05.16-AC&gt;</string>
@@ -580,6 +616,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="text">
              <string notr="true">&lt;cf5bac1d-6b93-e517-41ab-6f13bbc7a2af&gt;</string>
@@ -652,6 +694,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
          <property name="text">
           <string notr="true">&lt;00-0F-7C-0C-76-E9&gt;</string>
          </property>
@@ -694,6 +742,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
          <property name="text">
           <string notr="true">&lt;1&gt;</string>
          </property>
@@ -709,6 +763,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string notr="true">&lt;http://192.168.1.1/&gt;</string>
@@ -732,20 +792,26 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QWidget" name="verticalSpacer1" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
+         <property name="minimumSize">
           <size>
-           <width>20</width>
+           <width>0</width>
            <height>8</height>
           </size>
          </property>
-        </spacer>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>8</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

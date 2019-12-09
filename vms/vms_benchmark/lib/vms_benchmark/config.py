@@ -74,7 +74,8 @@ class ConfigParser:
                 raise InvalidConfigFileContent(f'Missing "=" in {filename!r}, line {line_number}.')
             name = line[:equals_pos].strip()
             if not name:
-                raise InvalidConfigFileContent(f'Missing option name in {filename!r}, line {line_number}.')
+                raise InvalidConfigFileContent(
+                    f'Missing option name in {filename!r}, line {line_number}.')
             if name in options:
                 raise InvalidConfigFileContent(
                     f'Duplicate option {name!r} in {filename!r}, line {line_number}.')
@@ -106,7 +107,8 @@ class ConfigParser:
                     value, filename, name, option_definition['type'], range_)
             else:
                 if 'default' not in option_definition:
-                    raise ConfigOptionNotFound(f"Mandatory option {name!r} is not defined in {filename!r}.")
+                    raise ConfigOptionNotFound(
+                        f"Mandatory option {name!r} is not defined in {filename!r}.")
                 options[name] = option_definition['default']
 
     @staticmethod
@@ -123,7 +125,8 @@ class ConfigParser:
             if type_ == "str":
                 return ConfigParser._str_value(value)
         except ValueError as e:
-            raise InvalidConfigOption(f"Invalid option {name!r} value {value!r} in {filename!r}: {e}")
+            raise InvalidConfigOption(
+                f"Invalid option {name!r} value {value!r} in {filename!r}: {e}")
         raise InvalidConfigDefinition(
             f"Unexpected type {type_!r} in option {name!r} in the definition for {filename!r}.")
 

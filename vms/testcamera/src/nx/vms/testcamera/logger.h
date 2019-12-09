@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <vector>
+#include <optional>
 
 #include <QtCore/QString>
 #include <QtCore/QDateTime>
@@ -62,6 +63,7 @@ private:
 };
 
 QString us(std::chrono::microseconds value);
+QString us(std::optional<std::chrono::microseconds> value); /**< If missing, an assertion fails. */
 QString us(int64_t valueUs);
 
 /**

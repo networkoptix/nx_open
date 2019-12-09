@@ -307,7 +307,7 @@ void WorkbenchUi::updateCursor()
 {
 #ifndef Q_OS_MACX
     bool curtained = m_inactive;
-    if (display()->view())
+    if (display()->view() && !m_timeline->isHovered())
         display()->view()->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
 #endif
 }

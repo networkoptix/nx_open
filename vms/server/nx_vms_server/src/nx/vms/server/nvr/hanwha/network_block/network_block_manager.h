@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/nvr/i_powering_policy.h>
 #include <nx/vms/server/nvr/i_network_block_manager.h>
 #include <nx/utils/thread/mutex.h>

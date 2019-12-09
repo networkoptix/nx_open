@@ -7,6 +7,7 @@
 #include <utils/common/delayed.h>
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/vms/utils/transaction_data_to_string.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -471,7 +472,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
-
+    connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxP2pQueueSizeBytes());
     QnMutexLocker lock(&m_mutex);
 
     if (!isStarted())

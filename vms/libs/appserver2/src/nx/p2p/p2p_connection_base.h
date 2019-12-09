@@ -106,6 +106,10 @@ public:
 
     QString idForToStringFromPtr() const;
     QString lastErrorMessage() const { return m_lastErrorMessage; }
+
+    void setMaxSendBufferSize(size_t value) { m_maxBufferSize = value; }
+    size_t maxSendBufferSize() const { return m_maxBufferSize; }
+    size_t sendBufferSize() const { return m_dataToSend.dataSize(); }
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -138,7 +142,33 @@ private:
 protected:
     const Direction m_direction;
 private:
-    std::deque<nx::Buffer> m_dataToSend;
+
+    class Dequeue
+    {
+    public:
+        void push_back(const nx::Buffer& data)
+        {
+            m_dataSize += data.size();
+            m_queue.push_back(data);
+        }
+
+        void pop_front()
+        {
+            m_dataSize -= m_queue.front().size();
+            m_queue.pop_front();
+        }
+
+        const nx::Buffer& front() const { return m_queue.front(); }
+        size_t dataSize() const { return m_dataSize; }
+        size_t size() const { return m_queue.size(); }
+        bool empty() const { return m_queue.empty(); }
+
+    private:
+        std::deque<nx::Buffer> m_queue;
+        std::atomic<size_t> m_dataSize = 0;
+    };
+
+    Dequeue m_dataToSend;
     QByteArray m_readBuffer;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
@@ -172,6 +202,7 @@ private:
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
     QString m_lastErrorMessage;
+    size_t m_maxBufferSize = 0;
 };
 
 QString toString(ConnectionBase::State value);

@@ -11,8 +11,6 @@ struct Config: nx::kit::IniConfig
     NX_INI_STRING("", enableEntropixZoomWindowReconstructionOn,
         "Enable Entropix 'Reconstruct Resolution' integration on the cameras, which model matches "
         "the provided string, counted as a regular expression.");
-
-    NX_INI_FLAG(0, enableRoiVisualization, "Enable ROI visualization over the video.");
 };
 
 inline Config& config()

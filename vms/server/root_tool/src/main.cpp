@@ -1,4 +1,9 @@
 #include "commands.h"
+
+#include <nx/system_commands.h>
+#include <nx/system_commands/domain_socket/read_linux.h>
+#include <nx/system_commands/domain_socket/send_linux.h>
+
 #include <assert.h>
 #include <string>
 #include <fstream>
@@ -19,9 +24,7 @@
 #include <sys/poll.h>
 #include <fcntl.h>
 #include <grp.h>
-#include <nx/system_commands.h>
-#include <nx/system_commands/domain_socket/read_linux.h>
-#include <nx/system_commands/domain_socket/send_linux.h>
+#include <unistd.h>
 
 using namespace nx::system_commands::domain_socket;
 
@@ -54,7 +57,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path, uid, gid;
-            boost::optional<std::string> isRecursive;
+            std::optional<std::string> isRecursive;
 
             if (!parseCommand(command, &path, &uid, &gid, &isRecursive))
                 return Result::invalidArg;
@@ -69,7 +72,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string url, path;
-            boost::optional<std::string> user, password;
+            std::optional<std::string> user, password;
 
             if (!parseCommand(command, &url, &path, &user, &password))
                 return Result::invalidArg;
@@ -199,7 +202,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
          [systemCommands](const std::string& command, int /*transportFd*/)
          {
              std::string debPath;
-             boost::optional<std::string> force;
+             std::optional<std::string> force;
              if (!parseCommand(command, &debPath, &force))
                  return Result::invalidArg;
 
@@ -396,7 +399,7 @@ static std::string makeCommandString(const char** argv)
 static int executeCommand(
     const CommandsFactory& commandsFactory,
     const std::string& commandString,
-    boost::optional<int> transportSocket)
+    std::optional<int> transportSocket)
 {
     auto command = commandsFactory.get(commandString, transportSocket);
     if (!command)
@@ -457,7 +460,7 @@ int main(int argc, const char** argv)
     {
         if (!setupIds())
             return -1;
-        return executeCommand(commandsFactory, makeCommandString(argv), boost::none);
+        return executeCommand(commandsFactory, makeCommandString(argv), std::nullopt);
     }
 
     WorkerPool workerPool;

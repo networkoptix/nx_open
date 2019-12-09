@@ -5,6 +5,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace std::string_literals;
+
 namespace nx::vms_server_plugins::analytics::hanwha {
 
 //-------------------------------------------------------------------------------------------------
@@ -26,6 +28,15 @@ std::ostream& PluginPoint::toSunapiStream(std::ostream& os, FrameSize frameSize)
 
 //-------------------------------------------------------------------------------------------------
 
+nx::kit::Json PluginPoint::toJson() const
+{
+    nx::kit::Json jx(x);
+    nx::kit::Json jy(y);
+    nx::kit::Json::array coordArray{ jx, jy };
+    return nx::kit::Json(coordArray);
+}
+
+//-------------------------------------------------------------------------------------------------
 bool PluginPoint::fromSunapiString(const char*& begin, const char* end, FrameSize frameSize)
 {
     // correct data is {int, comma, int}
@@ -108,6 +119,23 @@ std::optional<Height> ServerStringToHeight(const char* value)
     return Height{ std::abs((*box)[0].y - (*box)[1].y) };
 }
 
+/** Make a vector of two points that set a centered rectangle with definite width and height. */
+std::optional<std::vector<PluginPoint>> WidthHeightToPluginPoints(Width width, Height height)
+{
+    NX_ASSERT(width <= 1.0 && height <= 1.0);
+    std::vector<PluginPoint> result;
+
+    const double x0 = (1.0 - width) / 2.0;
+    const double x1 = x0 + width;
+
+    const double y0 = (1.0 - height) / 2.0;
+    const double y1 = y0 + height;
+
+    result.emplace_back(x0, y0);
+    result.emplace_back(x1, y1);
+    return result;
+}
+
 std::optional<Direction> ServerStringToDirection(const char* value)
 {
     NX_ASSERT(value);
@@ -139,6 +167,25 @@ std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, F
     for (size_t i = 1; i < points.size(); ++i)
         points[i].toSunapiStream(stream << ',', frameSize);
     return stream.str();
+}
+
+std::string pluginPointsToServerJson(const std::vector<PluginPoint>& points)
+{
+    nx::kit::Json::array jPointArray;
+    jPointArray.reserve(points.size());
+    for (const auto& point: points)
+    {
+        nx::kit::Json jPoint = point.toJson();
+        jPointArray.push_back(jPoint);
+    }
+
+    nx::kit::Json::object m;
+    m.insert(std::pair("points"s, jPointArray));
+
+    nx::kit::Json jo(m);
+    std::string result = jo.dump();
+    return result;
+
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -80,3 +80,9 @@ private:
         nx::network::http::Request* const request,
         const QnMediaServerResourcePtr& serverRes);
 };
+
+namespace detail {
+
+QString hidePassword(const nx::network::http::RequestLine& requestLine);
+
+} // namespace detail

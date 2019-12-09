@@ -113,6 +113,7 @@ public:
     {
         bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
+        bool disableKeepAlive = false;
     };
 
     static const QByteArray kPlayCommand;
@@ -181,9 +182,7 @@ public:
 
     const nx::streaming::Sdp& getSdp() const;
 
-    void setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout);
-
-    bool sendKeepAliveIfNeeded();
+    void sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
 
@@ -282,7 +281,6 @@ private:
     nx::network::http::Request createDescribeRequest();
     bool sendOptions();
     bool sendKeepAlive();
-    bool sendSetupIfNotPlaying();
 
     bool readTextResponse(QByteArray &response);
     void addAuth( nx::network::http::Request* const request );

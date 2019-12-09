@@ -108,8 +108,24 @@ PutInOrderDataProvider::~PutInOrderDataProvider()
     stop();
 }
 
+std::optional<std::chrono::microseconds> PutInOrderDataProvider::flush()
+{
+    QnMutexLocker lock(& m_mutex);
+    std::optional<std::chrono::microseconds> lastFlushTime;
+    while (!m_dataQueue.empty())
+    {
+        auto data = std::move(m_dataQueue.front());
+        QnAbstractStreamDataProvider::putData(data);
+        lastFlushTime = microseconds(data->timestamp);
+        m_dataQueue.pop_front();
+    }
+    return lastFlushTime;
+}
+
 void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
 {
+    QnMutexLocker lock(& m_mutex);
+
     auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
         return;
@@ -129,7 +145,6 @@ void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
     {
         auto data = std::move(m_dataQueue.front());
         QnAbstractStreamDataProvider::putData(data);
-        m_lastOutputTime = data->timestamp;
         m_dataQueue.pop_front();
     }
 }

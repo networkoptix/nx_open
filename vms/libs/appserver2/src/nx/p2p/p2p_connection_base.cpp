@@ -463,6 +463,14 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 #else
             m_dataToSend.push_back(data);
 #endif
+            if (m_maxBufferSize > 0 && m_dataToSend.dataSize() > m_maxBufferSize)
+            {
+                NX_WARNING(this,
+                    "p2p send queue overflow for peer %1, queue size: %2. Close connection.",
+                    remotePeer().id, m_dataToSend.dataSize());
+                setState(State::Error);
+                return;
+            }
 
             if (m_dataToSend.size() == 1)
             {

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <set>
+#include <optional>
 
 #include <QtCore/QString>
 #include <QtCore/QtEndian>
@@ -28,16 +29,17 @@ class FileStreamer
 {
 public:
     using microseconds = std::chrono::microseconds;
+    using OptionalUs = std::optional<std::chrono::microseconds>;
 
     struct PtsUnloopingContext
     {
-        microseconds firstFramePts{-1};
+        OptionalUs firstFramePts;
         int loopIndex = 0;
-        microseconds prevPts{-1};
-        microseconds prevPrevPts{-1};
-        microseconds unloopingPeriod{-1};
-        microseconds unloopingShift{0}; /**< Shift caused by the current unlooping iteration. */
-        microseconds shiftingShift{0}; /**< Shift caused by the requested shifting; set once. */
+        OptionalUs prevPts;
+        OptionalUs prevPrevPts;
+        OptionalUs unloopingPeriod;
+        microseconds unloopingShift{0}; /**< Caused by the current unlooping iteration. */
+        OptionalUs requestedShift; /**< Caused by the explicitly requested shifting; set once */
     };
 
     /** @param ptsUnloopingContext Must be null if unlooping is not requested. */
@@ -63,6 +65,8 @@ private:
     void send(const void* data, int size, const QString& dataCaptionForErrorMessage) const;
 
     void obtainUnloopingPeriod(microseconds pts) const;
+    void obtainRequestedShift() const;
+    microseconds processPtsIfNeeded(const microseconds pts) const;
     microseconds unloopAndShiftPtsIfNeeded(const microseconds pts) const;
     void sendMediaContextPacket(const QnCompressedVideoData* frame) const;
     void sendFramePacket(const QnCompressedVideoData* frame) const;

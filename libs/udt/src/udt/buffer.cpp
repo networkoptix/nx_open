@@ -366,7 +366,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
     int lastack = m_iLastAckPos;
     int rs = len;
 
-    while ((p != lastack) && (rs > 0))
+    while ((p != lastack) && (rs > 0) && m_pUnit[p] != NULL)
     {
         int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
         if (unitsize > rs)
@@ -403,7 +403,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
     int lastack = m_iLastAckPos;
     int rs = len;
 
-    while ((p != lastack) && (rs > 0))
+    while ((p != lastack) && (rs > 0) && (m_pUnit[p] != NULL))
     {
         int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
         if (unitsize > rs)
@@ -475,7 +475,7 @@ int CRcvBuffer::readMsg(char* data, int len)
         return 0;
 
     int rs = len;
-    while (p != (q + 1) % m_iSize)
+    while ((p != (q + 1) % m_iSize) && m_pUnit[p] != NULL)
     {
         int unitsize = m_pUnit[p]->m_Packet.getLength();
         if ((rs >= 0) && (unitsize > rs))

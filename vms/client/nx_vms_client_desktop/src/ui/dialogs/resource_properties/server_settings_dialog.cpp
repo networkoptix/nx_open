@@ -141,6 +141,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
 
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
+
+    setHelpTopic(this, Qn::ServerSettings_General_Help);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog()

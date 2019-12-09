@@ -120,11 +120,14 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
-    const auto deviceAgent = new DeviceAgent(this);
-    deviceAgent->setDeviceInfo(deviceInfo);
+    // DeviceAgent should understand all engine's object types.
+    deviceAgentManifest.supportedObjectTypeIds.reserve(m_engineManifest.objectTypes.size());
+    for (const nx::vms::api::analytics::ObjectType& objectType: m_engineManifest.objectTypes)
+        deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
+
+    const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->readCameraSettings();
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
-    deviceAgent->setEngineManifest(engineManifest());
 
     ++sharedRes->deviceAgentCount;
 

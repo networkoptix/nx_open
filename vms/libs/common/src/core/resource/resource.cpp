@@ -452,8 +452,7 @@ QString QnResource::getProperty(const QString &key) const
     if (value.isNull())
     {
         // find default value in resourceType
-        QnMutexLocker lk(&m_mutex);
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
         if (resType)
             return resType->defaultValue(key);
     }

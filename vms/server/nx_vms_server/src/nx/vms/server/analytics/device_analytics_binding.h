@@ -70,8 +70,8 @@ private:
     bool startAnalyticsUnsafe(const QJsonObject& settings);
     void stopAnalyticsUnsafe();
 
-    wrappers::DeviceAgentPtr createDeviceAgent();
-    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
+    wrappers::DeviceAgentPtr createDeviceAgentUnsafe();
+    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandlerUnsafe();
 
     bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
     bool updateDescriptorsWithManifest(
@@ -87,12 +87,20 @@ private:
 
     std::optional<StreamRequirements> calculateStreamRequirements();
 
+    bool isStreamConsumerUnsafe() const;
+
 private:
+    struct DeviceAgentContext
+    {
+        nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> handler;
+        wrappers::DeviceAgentPtr deviceAgent;
+    };
+
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
-    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
-    wrappers::DeviceAgentPtr m_deviceAgent;
+    DeviceAgentContext m_deviceAgentContext;
+
     QnAbstractDataReceptorPtr m_metadataSink;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;

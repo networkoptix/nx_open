@@ -190,7 +190,8 @@ private:
     void updateSignatureAttr(StreamRecorderContext* context);
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
-
+    void addSignatureFrameIfNeed();
+    void updateProgress(qint64 timestampUs);
 protected:
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
@@ -251,6 +252,7 @@ private:
     bool m_interleavedStream = false;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
+    QnMutex m_mutex;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

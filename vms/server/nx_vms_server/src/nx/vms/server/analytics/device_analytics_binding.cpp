@@ -71,31 +71,31 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
 
 bool DeviceAnalyticsBinding::startAnalytics(const QJsonObject& settings)
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return startAnalyticsUnsafe(settings);
 }
 
 void DeviceAnalyticsBinding::stopAnalytics()
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     stopAnalyticsUnsafe();
 }
 
 bool DeviceAnalyticsBinding::restartAnalytics(const QJsonObject& settings)
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     stopAnalyticsUnsafe();
-    m_deviceAgent.reset();
+    m_deviceAgentContext = DeviceAgentContext();
     return startAnalyticsUnsafe(settings);
 }
 
 bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     NX_DEBUG(this, "Updating needed metadata types for the Device %1 (%2) and Engine %3 (%4)",
         m_device->getUserDefinedName(), m_device->getId(), m_engine->getName(), m_engine->getId());
 
-    if (!m_deviceAgent)
+    if (!m_deviceAgentContext.deviceAgent)
     {
         NX_DEBUG(
             this,
@@ -122,7 +122,9 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
         m_device->getUserDefinedName(), m_device->getId(),
         m_engine->getName(), m_engine->getId());
 
-    const bool result = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
+    const bool result = m_deviceAgentContext.deviceAgent->setNeededMetadataTypes(
+        neededMetadataTypes);
+
     if (result)
         m_lastNeededMetadataTypes = std::move(neededMetadataTypes);
 
@@ -136,10 +138,11 @@ bool DeviceAnalyticsBinding::hasAliveDeviceAgent() const
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
 {
-    if (!m_deviceAgent)
+    if (!m_deviceAgentContext.deviceAgent)
     {
-        const auto deviceAgent = createDeviceAgent();
-        if (!deviceAgent)
+        DeviceAgentContext deviceAgentContext;
+        deviceAgentContext.deviceAgent = createDeviceAgentUnsafe();
+        if (!deviceAgentContext.deviceAgent)
         {
             NX_ERROR(this,
                 "DeviceAgent creation failed for the Engine %1 (%2) and the Device %3 (%4)",
@@ -148,26 +151,26 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
             return false;
         }
 
-        const auto manifest = deviceAgent->manifest();
+        const auto manifest = deviceAgentContext.deviceAgent->manifest();
         if (!manifest)
             return false;
 
         if (!updateDescriptorsWithManifest(*manifest))
             return false;
 
-        m_handler = createHandler();
-        deviceAgent->setHandler(m_handler);
+        deviceAgentContext.handler = createHandlerUnsafe();
+        deviceAgentContext.deviceAgent->setHandler(deviceAgentContext.handler);
         if (!updatePluginInfo())
             return false;
 
         updateDeviceWithManifest(*manifest);
-        m_deviceAgent = deviceAgent;
+        m_deviceAgentContext = deviceAgentContext;
         m_device->saveProperties();
     }
 
     m_cachedStreamRequirements = calculateStreamRequirements();
 
-    if (!m_deviceAgent)
+    if (!m_deviceAgentContext.deviceAgent)
     {
         NX_ERROR(
             this,
@@ -186,7 +189,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
     {
         m_lastNeededMetadataTypes.reset();
         auto neededMetadataTypes = this->neededMetadataTypes();
-        m_started = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
+        m_started = m_deviceAgentContext.deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
         if (m_started)
             m_lastNeededMetadataTypes = std::move(neededMetadataTypes);
     }
@@ -197,22 +200,22 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
 void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
 {
     m_started = false;
-    if (!m_deviceAgent)
+    if (!m_deviceAgentContext.deviceAgent)
         return;
 
     m_lastNeededMetadataTypes.reset();
-    m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
+    m_deviceAgentContext.deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
 QJsonObject DeviceAnalyticsBinding::getSettings() const
 {
-    decltype(m_deviceAgent) deviceAgent;
+    DeviceAgentContext deviceAgentContext;
     {
-        QnMutexLocker lock(&m_mutex);
-        deviceAgent = m_deviceAgent;
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        deviceAgentContext = m_deviceAgentContext;
     }
 
-    if (!deviceAgent)
+    if (!deviceAgentContext.deviceAgent)
     {
         NX_WARNING(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(),
@@ -223,19 +226,19 @@ QJsonObject DeviceAnalyticsBinding::getSettings() const
         return {};
     }
 
-    const auto settingsResponse = deviceAgent->pluginSideSettings();
+    const auto settingsResponse = deviceAgentContext.deviceAgent->pluginSideSettings();
     return settingsResponse ? settingsResponse->settingValues : QJsonObject();
 }
 
 void DeviceAnalyticsBinding::setSettings(const QJsonObject& settings)
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     setSettingsInternal(settings);
 }
 
 void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
 {
-    if (!m_deviceAgent)
+    if (!m_deviceAgentContext.deviceAgent)
     {
         NX_DEBUG(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(),
@@ -246,7 +249,7 @@ void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
         return;
     }
 
-    m_deviceAgent->setSettings(settings);
+    m_deviceAgentContext.deviceAgent->setSettings(settings);
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(Ptr<IDataPacket> frame)
@@ -284,7 +287,7 @@ bool DeviceAnalyticsBinding::updatePluginInfo() const
 
 std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequirements()
 {
-    if (!isStreamConsumer())
+    if (!isStreamConsumerUnsafe())
         return std::nullopt;
 
     const nx::vms::api::analytics::EngineManifest manifest = m_engine->manifest();
@@ -341,27 +344,33 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequire
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_metadataSink = std::move(metadataSink);
-    if (m_handler)
-        m_handler->setMetadataSink(m_metadataSink.get());
+    if (m_deviceAgentContext.handler)
+        m_deviceAgentContext.handler->setMetadataSink(m_metadataSink.get());
 }
 
 bool DeviceAnalyticsBinding::isStreamConsumer() const
 {
-    return m_deviceAgent && m_deviceAgent->isConsumer();
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return isStreamConsumerUnsafe();
+}
+
+bool DeviceAnalyticsBinding::isStreamConsumerUnsafe() const
+{
+    return m_deviceAgentContext.deviceAgent && m_deviceAgentContext.deviceAgent->isConsumer();
 }
 
 std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     if (!NX_ASSERT(m_engine))
         return std::nullopt;
 
     return m_engine->manifest();
 }
 
-wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgent()
+wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgentUnsafe()
 {
     if (!NX_ASSERT(m_device, "Device is empty"))
         return nullptr;
@@ -389,7 +398,7 @@ wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgent()
     return deviceAgent;
 }
 
-nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
+nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandlerUnsafe()
 {
     if (!NX_ASSERT(m_engine, "No Analytics Engine is set"))
         return nullptr;
@@ -436,7 +445,7 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     NX_DEBUG(this, "Fetching needed metadata types from RuleWatcher for the Device %1 (%2)",
         m_device->getUserDefinedName(), m_device->getId());
 
-    const auto deviceAgentManifest = m_deviceAgent->manifest();
+    const auto deviceAgentManifest = m_deviceAgentContext.deviceAgent->manifest();
     if (!deviceAgentManifest)
         return {};
 
@@ -484,7 +493,6 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 
 void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnMutexLocker lock(&m_mutex);
     if (!isRunning())
         start();
 
@@ -499,8 +507,14 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::streamRequirements() c
 
 bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 {
+    DeviceAgentContext deviceAgentContext;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        deviceAgentContext = m_deviceAgentContext;
+    }
+
     // Returning true means the data has been processed.
-    if (!m_deviceAgent)
+    if (!deviceAgentContext.deviceAgent)
     {
         NX_WARNING(this, lm("DeviceAgent is not created for the Device %1 (%2) and the Engine %3")
             .args(m_device->getUserDefinedName(), m_device->getId(), m_engine->getName()));
@@ -508,7 +522,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
 
-    if (!NX_ASSERT(m_deviceAgent->isConsumer()))
+    if (!NX_ASSERT(deviceAgentContext.deviceAgent->isConsumer()))
         return true;
 
     auto packetAdapter = std::dynamic_pointer_cast<DataPacketAdapter>(data);
@@ -516,7 +530,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
         return true;
 
     logIncomingFrame(packetAdapter->packet());
-    m_deviceAgent->pushDataPacket(packetAdapter->packet());
+    deviceAgentContext.deviceAgent->pushDataPacket(packetAdapter->packet());
     return true;
 }
 

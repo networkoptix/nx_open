@@ -689,8 +689,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         m_RtpSession.setAdditionalSupportedCodecs(std::move(additionalSupportedCodecs));
     }
 
-    // Keep alive timeout will be overridden after SETUP request.
-    m_RtpSession.setKeepAliveTimeout(std::chrono::milliseconds::zero());
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());

@@ -147,16 +147,7 @@ static SendedPacketVerifier packetVerifier;
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
 
-CUnitQueue::CUnitQueue():
-    m_pQEntry(nullptr),
-    m_pCurrQueue(nullptr),
-    m_pLastQueue(nullptr),
-    m_iSize(0),
-    m_iCount(0),
-    m_iMSS(),
-    m_iIPversion()
-{
-}
+CUnitQueue::CUnitQueue() = default;
 
 CUnitQueue::~CUnitQueue()
 {
@@ -209,6 +200,9 @@ int CUnitQueue::init(int size, int mss, int version)
 
 int CUnitQueue::increase()
 {
+    if (!m_pQEntry)
+        return -1;
+
     // adjust/correct m_iCount
     int real_count = 0;
     CQEntry* p = m_pQEntry;
@@ -797,10 +791,7 @@ CRcvQueue::CRcvQueue(
 
 CRcvQueue::~CRcvQueue()
 {
-    m_bClosing = true;
-
-    if (m_WorkerThread.joinable())
-        m_WorkerThread.join();
+    stop();
 
     m_pRcvUList.reset();
     m_pRendezvousQueue.reset();

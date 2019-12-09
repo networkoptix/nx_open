@@ -59,14 +59,9 @@ Yunhong Gu, last updated 01/01/2011
 
 using namespace std;
 
-CEPoll::CEPoll():
-    m_iIDSeed(0)
-{
-}
+CEPoll::CEPoll() = default;
 
-CEPoll::~CEPoll()
-{
-}
+CEPoll::~CEPoll() = default;
 
 Result<int> CEPoll::create()
 {

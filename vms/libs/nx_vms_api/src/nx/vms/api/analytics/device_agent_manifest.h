@@ -18,10 +18,10 @@ namespace nx::vms::api::analytics {
  */
 struct NX_VMS_API DeviceAgentManifest
 {
-    /** Whitelist of Event types for types declared in the owner Engine manifest. */
+    /** Whitelist (filter) of Event types for types declared in the owner Engine manifest. */
     QList<QString> supportedEventTypeIds;
 
-    /** Whitelist of Object types for types declared in the owner Engine manifest. */
+    /** Whitelist (filter) of Object types for types declared in the owner Engine manifest. */
     QList<QString> supportedObjectTypeIds;
 
     /**

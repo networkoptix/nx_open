@@ -51,8 +51,13 @@ void apply(const ValueRule& rule, ValueManifest* manifest)
     manifest->format = rule.format;
 }
 
-static QString durationString(int64_t duration)
+static Value durationString(const Value& value, bool hoursOnly)
 {
+    if (!value.isDouble())
+        return value;
+
+    int64_t duration(value.toDouble());
+
     const auto seconds = duration % 60;
     duration /= 60;
 
@@ -62,8 +67,12 @@ static QString durationString(int64_t duration)
     const auto hours = duration % 24;
     duration /= 24;
 
+    const auto daysString = duration ? QString("%1d ").arg(duration) : QString();
+    if (hoursOnly)
+        return QString("%1%2h").arg(daysString).arg(hours);
+
     return QString("%1%2:%3:%4")
-        .arg(duration ? QString("%1 day(s) ").arg(duration) : QString())
+        .arg(daysString)
         .arg(hours, 2, 10, QChar('0'))
         .arg(minutes, 2, 10, QChar('0'))
         .arg(seconds, 2, 10, QChar('0'));
@@ -73,7 +82,7 @@ template<typename Convert>
 std::function<Value(const Value&)> numericFormatter(const QString& units, Convert convert)
 {
     return
-        [units, convert = std::move(convert)](Value value)
+        [units, convert = std::move(convert)](const Value& value)
         {
             if (!value.isDouble())
                 return value;
@@ -105,8 +114,11 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
     if (targetFormat == "%")
         return numericFormatter(targetFormat, [](double v) { return v * 100; });
 
-    if (targetFormat == "durationS")
-        return [](Value v) { return Value(durationString((int64_t) v.toDouble())); };
+    if (targetFormat == "duration")
+        return [](const Value& v) { return durationString(v, /*hoursOnly*/ false); };
+
+    if (targetFormat == "durationDh")
+        return [](const Value& v) { return durationString(v, /*hoursOnly*/ true); };
 
     if (targetFormat == "bit" || targetFormat == "bit/s")
         return numericFormatter(targetFormat, [](double v) { return v * 8; });

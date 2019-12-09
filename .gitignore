@@ -1,23 +1,22 @@
-HDWitness.xcworkspace
-.hg
-
 # IDE and misc software files.
+*.xcworkspace
 .idea
+.vs
 .vscode
 *~*.TMP
 *.kdev4
 .DS_Store
 *.swp
 CMakeLists.txt.user
+CMakeSettings.json
+.vim*
+.ccls*
+compile_commands.json
 
 # Precompiled files.
 *.pyc
 *.qmlc
 *.jsc
-
-# Repository temp files.
-*.orig
-*.rej
 
 # Build folders in the repository root.
 /build/

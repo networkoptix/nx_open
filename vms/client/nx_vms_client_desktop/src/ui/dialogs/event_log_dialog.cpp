@@ -202,18 +202,17 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_delayUpdateTimer.setInterval(kUpdateDelayMs);
     connect(&m_delayUpdateTimer, &QTimer::timeout, this, &QnEventLogDialog::updateData);
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+    const auto updateServerEventsMenuIfNeeded =
         [this](const QnResourcePtr& resource)
         {
             if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
                 updateServerEventsMenu();
-        });
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
-                updateServerEventsMenu();
-        });
+        };
+
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
+        this, updateServerEventsMenuIfNeeded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
+        this, updateServerEventsMenuIfNeeded);
 
     ItemViewAutoHider::create(ui->gridEvents, tr("No events"));
 
@@ -322,30 +321,8 @@ void QnEventLogDialog::updateAnalyticsEvents()
 
 void QnEventLogDialog::updateServerEventsMenu()
 {
-    std::function<QModelIndex(const QModelIndex&, EventType)> findIndexByEventType;
-    findIndexByEventType =
-        [this, &findIndexByEventType]
-        (const QModelIndex& rootIndex, EventType eventType) -> QModelIndex
-        {
-            for (int row = 0; row < m_eventTypesModel->rowCount(rootIndex); ++row)
-            {
-                const auto rowIndex = m_eventTypesModel->index(row, 0, rootIndex);
-                const auto eventTypeData = rowIndex.data(EventTypeRole);
-                if (eventTypeData.isNull())
-                    continue;
-
-                if (eventTypeData.value<EventType>() == eventType)
-                    return rowIndex;
-
-                const auto childIndex = findIndexByEventType(rowIndex, eventType);
-                if (childIndex != QModelIndex())
-                    return childIndex;
-            }
-            return QModelIndex();
-        };
-
     const auto anyServerEventIndex =
-        findIndexByEventType(QModelIndex(), EventType::anyServerEvent);
+        findServerEventsMenuIndexByEventType(QModelIndex(), EventType::anyServerEvent);
     if (anyServerEventIndex == QModelIndex())
         return;
 
@@ -363,8 +340,29 @@ void QnEventLogDialog::updateServerEventsMenu()
     {
         if (!accessibleEvents.contains(selectedEventType))
             selectedEventType = EventType::anyServerEvent;
-        ui->eventComboBox->setCurrentIndex(findIndexByEventType(QModelIndex(), selectedEventType));
+        ui->eventComboBox->setCurrentIndex(
+            findServerEventsMenuIndexByEventType(QModelIndex(), selectedEventType));
     }
+}
+
+QModelIndex QnEventLogDialog::findServerEventsMenuIndexByEventType(const QModelIndex& rootIndex,
+    EventType eventType) const
+{
+    for (int row = 0; row < m_eventTypesModel->rowCount(rootIndex); ++row)
+    {
+        const auto rowIndex = m_eventTypesModel->index(row, 0, rootIndex);
+        const auto eventTypeData = rowIndex.data(EventTypeRole);
+        if (eventTypeData.isNull())
+            continue;
+
+        if (eventTypeData.value<EventType>() == eventType)
+            return rowIndex;
+
+        const auto childIndex = findServerEventsMenuIndexByEventType(rowIndex, eventType);
+        if (childIndex != QModelIndex())
+            return childIndex;
+    }
+    return QModelIndex();
 }
 
 bool QnEventLogDialog::isFilterExist() const

@@ -130,19 +130,34 @@ GlobalMonitor::GlobalMonitor(
     nx::vms::server::PlatformMonitor(),
     m_monitorBase(std::move(base)),
     m_cachedTotalCpuUsage(
-        [this]() { return m_monitorBase->totalCpuUsage(); }),
+        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalCpuUsage(); }),
     m_cachedTotalRamUsage(
-        [this]() { return m_monitorBase->totalRamUsageBytes(); }, kCacheExpirationTime),
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            return m_monitorBase->totalRamUsageBytes();
+        },
+        kCacheExpirationTime),
     m_cachedThisProcessCpuUsage(
-        [this]() { return m_monitorBase->thisProcessCpuUsage(); }),
+        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->thisProcessCpuUsage(); }),
     m_cachedThisProcessRamUsage(
-        [this]() { return m_monitorBase->thisProcessRamUsageBytes(); }, kCacheExpirationTime),
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex); 
+            return m_monitorBase->thisProcessRamUsageBytes();
+        },
+        kCacheExpirationTime),
     m_cachedTotalHddLoad(
-        [this]() { return m_monitorBase->totalHddLoad(); }),
+        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalHddLoad(); }),
     m_cachedTotalNetworkLoad(
-        [this]() { return m_monitorBase->totalNetworkLoad(); }),
+        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalNetworkLoad(); }),
     m_cachedTotalPartitionSpaceInfo(
-        [this]() { return m_monitorBase->totalPartitionSpaceInfo(); }, kCacheExpirationTime)
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex); 
+            return m_monitorBase->totalPartitionSpaceInfo();
+        },
+        kCacheExpirationTime)
 {
     NX_CRITICAL(m_monitorBase);
     NX_CRITICAL(m_monitorBase->thread() == thread(),

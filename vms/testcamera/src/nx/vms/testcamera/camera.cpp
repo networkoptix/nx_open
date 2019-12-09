@@ -72,7 +72,7 @@ bool Camera::performStreamingFile(
     for (int i = 0; i < (int) frames.size(); ++i)
     {
         const auto frameLoggerContext = logger->pushContext(
-            lm("frame #%1 with pts %2").args(i, us(fileStreamer->framePts(frames[i].get()))));
+            lm("frame #%1 with PTS %2").args(i, us(fileStreamer->framePts(frames[i].get()))));
 
         makeOfflineFloodIfNeeded();
         if (!m_isEnabled)
