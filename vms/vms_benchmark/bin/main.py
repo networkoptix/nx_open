@@ -10,7 +10,6 @@ import os
 import time
 import uuid
 from typing import List, Tuple, Optional
-from io import StringIO
 
 from vms_benchmark.camera import Camera
 
@@ -86,7 +85,7 @@ conf_definition = {
     "boxLogin": {"type": "str"},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
-    "boxSshKey": {"type": "str", "default": None},
+    "boxSshKey": {"type": "str", "default": ""},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},

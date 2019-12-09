@@ -43,7 +43,7 @@ class BoxConnection:
                 '-batch',
             ]
 
-        if ssh_key is not None:
+        if ssh_key:
             self.ssh_args += ['-i', ssh_key]
 
         logging.info("SSH command:\n    " + '\n    '.join(self.ssh_args))
@@ -78,7 +78,9 @@ class BoxConnection:
         eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
 
         if not eth_name_check_result or eth_name_check_result.return_code != 0:
-            raise exceptions.BoxCommandError(f'Unable to find box network adapter info dir {repr(eth_dir)}.')
+            raise exceptions.BoxCommandError(
+                f'Unable to find box network adapter info dir {eth_dir!r}.'
+            )
 
         self.eth_name = eth_name
         eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
