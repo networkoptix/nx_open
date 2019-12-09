@@ -492,8 +492,11 @@ TEST(Metrics, Formatting)
     EXPECT_FORMAT("MPix/s", 6000666000.0, "6001 MPix/s");
     EXPECT_FORMAT("Gbit/s", 7000777000.0, "56 Gbit/s");
 
-    EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
-    EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");
+    EXPECT_FORMAT("duration", ((11 * 60 + 12) * 60) + 13, "11:12:13");
+    EXPECT_FORMAT("duration", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2d 01:02:03");
+
+    EXPECT_FORMAT("durationDh", ((11 * 60 + 12) * 60) + 13, "11h");
+    EXPECT_FORMAT("durationDh", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2d 1h");
 
     #undef EXPECT_FORMAT
 }

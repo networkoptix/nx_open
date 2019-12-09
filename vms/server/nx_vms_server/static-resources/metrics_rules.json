@@ -128,7 +128,7 @@
                     },
                     "uptimeS": {
                         "name": "Uptime",
-                        "format": "durationS",
+                        "format": "duration",
                         "display": "table|panel"
                     }
                 }
@@ -511,7 +511,7 @@
                         "description": "Current Archive length",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "durationS"
+                        "format": "durationDh"
                     },
                     "recordingBitrateBps": {
                         "name": "Recording Bitrate (5min)",
@@ -528,7 +528,7 @@
                         "description": "Minimum Archive length",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "durationS",
+                        "format": "durationDh",
                         "alarms": [
                             {
                                 "level": "error",
