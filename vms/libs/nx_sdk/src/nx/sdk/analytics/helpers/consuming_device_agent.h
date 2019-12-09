@@ -17,13 +17,14 @@
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_custom_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
 /**
- * Base class for a typical implementation of DeviceAgent which receives video frames and sends
+ * Base class for a typical implementation of DeviceAgent which receives a stream and sends
  * back constructed metadata packets. Hides many technical details of Analytics SDK, but may
  * limit DeviceAgent capabilities - use only when suitable.
  *
@@ -34,7 +35,7 @@ namespace analytics {
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
-class VideoFrameProcessingDeviceAgent: public RefCountable<IConsumingDeviceAgent>
+class ConsumingDeviceAgent: public RefCountable<IConsumingDeviceAgent>
 {
 protected:
     const LogUtils logUtils;
@@ -43,7 +44,7 @@ protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
      */
-    VideoFrameProcessingDeviceAgent(const IDeviceInfo* deviceInfo, bool enableOutput);
+    ConsumingDeviceAgent(const IDeviceInfo* deviceInfo, bool enableOutput);
 
     virtual std::string manifestString() const = 0;
 
@@ -62,6 +63,15 @@ protected:
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* /*videoFrame*/)
+    {
+        return true;
+    }
+
+    /**
+     * Override to accept next custom metadata for processing.
+     * @param customMetadataPacket Contains a pointer to the custom metadata packet.
+     */
+    virtual bool pushCustomMetadataPacket(const ICustomMetadataPacket* /*customMetadataPacket*/)
     {
         return true;
     }
@@ -112,7 +122,7 @@ protected:
     std::string settingValue(const std::string& paramName);
 
 public:
-    virtual ~VideoFrameProcessingDeviceAgent() override;
+    virtual ~ConsumingDeviceAgent() override;
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.

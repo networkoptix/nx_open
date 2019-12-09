@@ -4,6 +4,7 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/frequency_restricted_call.h>
@@ -11,7 +12,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/analytics/abstract_video_data_receptor.h>
+#include <nx/vms/server/analytics/i_stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
@@ -27,11 +28,12 @@ class DeviceAnalyticsBinding;
 class DeviceAnalyticsContext:
     public Connective<QObject>,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
-    public AbstractVideoDataReceptor
+    public IStreamDataReceptor
 {
     Q_OBJECT
 
     using base_type = nx::vms::server::ServerModuleAware;
+    using BindingMap = std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>>;
 
 public:
     DeviceAnalyticsContext(
@@ -40,7 +42,6 @@ public:
 
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
-    void addEngine(const resource::AnalyticsEngineResourcePtr& engine);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
@@ -50,11 +51,8 @@ public:
     // @return map Engine id -> has alive DeviceAgent
     std::map<QnUuid, bool> bindingStatuses() const;
 
-    virtual bool needsCompressedFrames() const override;
-    virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
-    virtual void putFrame(
-        const QnConstCompressedVideoDataPtr& compressedFrame,
-        const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    virtual nx::vms::api::analytics::StreamTypes requiredStreamTypes() const override;
 
 signals:
     void pluginDiagnosticEventTriggered(const nx::vms::event::PluginDiagnosticEventPtr&) const;
@@ -70,12 +68,13 @@ private:
     void subscribeToRulesChanges();
 
     bool isDeviceAlive() const;
-    void updateSupportedFrameTypes();
+    void updateStreamRequirements();
 
-    std::shared_ptr<DeviceAnalyticsBinding> analyticsBinding(const QnUuid& engineId) const;
+    BindingMap analyticsBindingsSafe() const;
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingUnsafe(const QnUuid& engineId) const;
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingSafe(const QnUuid& engineId) const;
 
-    bool isEngineAlreadyBound(const QnUuid& engineId) const;
-    bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
+    bool isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const;
 
     QJsonObject prepareSettings(const QnUuid& engineId, const QJsonObject& settings);
     std::optional<QJsonObject> loadSettingsFromFile(
@@ -90,15 +89,14 @@ private:
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
-    std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>> m_bindings;
+    BindingMap m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
 
-    bool m_cachedNeedCompressedFrames{false};
-    AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
-    bool m_missingUncompressedFrameWarningIssued = false;
-    Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
+    nx::vms::api::analytics::StreamTypes m_cachedRequiredStreamTypes;
+
+    std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
-    std::map<QnUuid, int> m_skippedFrameCountByEngine;
+    std::map<QnUuid, int> m_skippedPacketCountByEngine;
 };
 
 } // namespace nx::vms::server::analytics

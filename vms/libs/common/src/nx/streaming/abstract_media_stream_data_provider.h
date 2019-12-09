@@ -50,7 +50,6 @@ protected:
 
     virtual bool beforeGetData() { return true; }
 
-    void checkTime(const QnAbstractMediaDataPtr& data);
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
     void onEvent(std::chrono::microseconds timestamp, CameraDiagnostics::Result event);
@@ -66,7 +65,6 @@ private:
     mutable int m_numberOfchannels;
     qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
     bool m_isCamera;
-    qint64 m_unloopingPeriodStartUs = 0;
     std::atomic<int> m_numberOfErrors{};
 };
 

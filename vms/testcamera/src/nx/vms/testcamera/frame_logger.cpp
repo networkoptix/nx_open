@@ -1,6 +1,7 @@
 #include "frame_logger.h"
 
 #include <QtCore/QString>
+#include <QtCore/QFileInfo>
 
 #include <nx/vms/testcamera/test_camera_ini.h>
 
@@ -33,7 +34,8 @@ FrameLogger::FrameLogger()
             return;
         }
 
-        NX_LOGGER_INFO(logger, "INI: Logging frames to file: %1", logFramesFilename);
+        NX_LOGGER_INFO(logger, "INI: Logging frames to file: %1",
+            QFileInfo(*m_logFramesFile).absoluteFilePath());
     }
 }
 
@@ -51,7 +53,10 @@ void FrameLogger::logFrameIfNeeded(const QString& message, const Logger* logger)
         + message + logger->context() + "\n";
 
     if (m_logFramesFile->write(line.toUtf8()) <= 0)
-        NX_LOGGER_ERROR(logger, "Unable to log frame to file: %1", m_logFramesFile->fileName());
+    {
+        NX_LOGGER_ERROR(logger, "Unable to log frame to file: %1",
+            QFileInfo(*m_logFramesFile).absoluteFilePath());
+    }
 }
 
 } // namespace nx::vms::testcamera

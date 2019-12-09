@@ -97,7 +97,7 @@ TEST(Sdp, h264AndMetadata)
     ASSERT_EQ(sdp.media[0].fmtp.params[2], "sprop-parameter-sets=Z2QAKK2EBUViuKxUdCAqKxXFYqOhAVFYrisVHQgKisVxWKjoQFRWK4rFR0ICorFcVio6ECSFITk8nyfk/k/J8nm5s00IEkKQnJ5Pk/J/J+T5PNzZprQFAW0qQAAAAwCAAAAPGBAAD0JAAAiVQve+F4RCNQAAAAE=,aO48sA==");
 
     ASSERT_EQ(sdp.media[1].payloadType, 98);
-    ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Unknown);
+    ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Metadata);
     ASSERT_EQ(sdp.media[1].control, "track2");
     ASSERT_EQ(sdp.media[1].sendOnly, true);
     ASSERT_EQ(sdp.media[1].rtpmap.codecName, "vnd.onvif.metadata");

@@ -222,11 +222,11 @@ int HevcParser::calculateFullRtpHeaderSize(
 
     if (rtpHeader->extension)
     {
-        if (bufferSize < headerSize + RtpHeaderExtension::kSize)
+        if (bufferSize < headerSize + RtpHeaderExtensionHeader::kSize)
             return kInvalidHeaderSize;
 
-        auto extension = (RtpHeaderExtension*)(rtpHeaderStart + headerSize);
-        headerSize += RtpHeaderExtension::kSize;
+        auto extension = (RtpHeaderExtensionHeader*)(rtpHeaderStart + headerSize);
+        headerSize += RtpHeaderExtensionHeader::kSize;
 
         const int kWordSize = 4;
         headerSize += ntohs(extension->length) * kWordSize;

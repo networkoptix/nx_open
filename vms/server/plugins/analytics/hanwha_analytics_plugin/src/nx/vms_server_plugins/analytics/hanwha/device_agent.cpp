@@ -12,9 +12,13 @@
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/timestamped_object_metadata.h>
+#include <nx/sdk/analytics/i_custom_metadata_packet.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
@@ -27,9 +31,131 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
+namespace {
+
+/**
+ * Extract frameSize from json string. If fail, returns std::nullopt.
+ * \return error message, if jsonReply indicates an error and contains an error message
+ *     empty string, if jsonReply indicates an error and contains no error message
+ *     std::nullopt, if jsonReply does not indicates an error
+ */
+std::optional<std::string> parseError(const std::string& jsonReply)
+{
+    std::string error;
+    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
+    if (!json.is_object())
+        return std::nullopt; //< not an error
+
+    if (json["Response"].string_value() == "Fail")
+        return json["Error"]["Details"].string_value(); //< may be empty
+
+    return std::nullopt; //< not an error
+}
+
+/** Extract frameSize from json string. If fail, returns std::nullopt. */
+static std::optional<FrameSize> parseFrameSize(const std::string& jsonReply)
+{
+    std::string error;
+    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
+    if (!json.is_object())
+        return std::nullopt;
+
+    const std::vector<nx::kit::Json>& videoProfiles = json["VideoProfiles"].array_items();
+    if (videoProfiles.empty())
+        return std::nullopt;
+
+    const std::vector<nx::kit::Json>& profiles = videoProfiles[0]["Profiles"].array_items();
+    if (videoProfiles.empty())
+        return std::nullopt;
+
+    FrameSize maxFrameSize;
+    for (const nx::kit::Json& profile : profiles)
+    {
+        std::string resolution = profile["Resolution"].string_value();
+        std::istringstream stream(resolution);
+        FrameSize profileFrameSize;
+        char x;
+        stream >> profileFrameSize.width >> x >> profileFrameSize.height;
+        bool bad = !stream;
+
+        if (!bad && x == 'x' && maxFrameSize < profileFrameSize)
+            maxFrameSize = profileFrameSize;
+
+    }
+    return maxFrameSize;
+}
+
+/** Extract frameSize from json string. If fail, returns std::nullopt. */
+static std::optional<SupportedEventCategories> parseSupportedEventCategories(
+    const std::string& jsonReply)
+{
+    SupportedEventCategories result = {false};
+
+    std::string error;
+    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
+    if (!json.is_object())
+        return std::nullopt;
+
+    json = json["ChannelEvent"];
+    if (!json.is_array() || json.array_items().empty())
+        return std::nullopt;
+    json = json.array_items().front();
+
+    result[int(EventCategory::motionDetection)] = json["MotionDetection"].is_bool();
+    result[int(EventCategory::faceDetection)] = json["FaceDetection"].is_bool();
+    result[int(EventCategory::tampering)] = json["Tampering"].is_bool();
+    result[int(EventCategory::audioDetection)] = json["AudioDetection"].is_bool();
+    result[int(EventCategory::defocusDetection)] = json["DefocusDetection"].is_bool();
+    result[int(EventCategory::fogDetection)] = json["FogDetection"].is_bool();
+    result[int(EventCategory::videoAnalytics)] = json["VideoAnalytics"].is_bool();
+    result[int(EventCategory::audioAnalytics)] = json["AudioAnalytics"].is_bool();
+    result[int(EventCategory::queues)] = json["QueueEvent"].is_bool();
+    result[int(EventCategory::shockDetection)] = json["ShockDetection"].is_bool();
+    result[int(EventCategory::objectDetection)] = json["ObjectDetection"].is_bool();
+
+    return result;
+}
+
+/**
+ * The core function - transfers settings from server to device.
+ * Read a bunch of settings `settingGroup` from the server (from `sourceMap`) and write it
+ * to the agent's device, using `sendingFunction`.
+ */
+template<class SettingGroupT, class SendingFunctor>
+void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
+    const nx::sdk::IStringMap* sourceMap,
+    SettingGroupT& previousState,
+    SendingFunctor sendingFunctor,
+    FrameSize frameSize,
+    int channelNumber,
+    int objectIndex = -1)
+{
+    SettingGroupT settingGroup;
+    if (!readSettingsFromServer(sourceMap, &settingGroup, objectIndex))
+    {
+        settingGroup.replanishErrorMap(errorMap, "read failed");
+        return;
+    }
+
+    if (!differesEnough(settingGroup, previousState))
+        return;
+
+    const std::string settingQuery =
+        settingGroup.buildCameraWritingQuery(frameSize, channelNumber);
+
+    const std::string error = sendingFunctor(settingQuery);
+    if (!error.empty())
+        settingGroup.replanishErrorMap(errorMap, error);
+    else
+        previousState = settingGroup;
+}
+
+} // namespace
+
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     m_engine(engine)
 {
+    this->setDeviceInfo(deviceInfo);
 }
 
 DeviceAgent::~DeviceAgent()
@@ -61,71 +187,40 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-bool endsWith(std::string_view string, std::string_view ending) //< remove in C++20
+/**
+ * Receives `dataPacket` from Server. This packet is a `CustomMetadataPacket`, that contains xml
+ * with the information about events occurred. The function parses the xml and extracts
+ * the information about objects. Then it creates `objectMetadataPacket, attaches `objectMetadata`
+ * (with object information) to it and sends to server using `m_handler`.
+*/
+void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
 {
-    return
-        ending.size() <= string.size()
-        && std::equal(cbegin(ending), cend(ending), cend(string) - ending.size());
+    const auto packet = dataPacket->queryInterface<ICustomMetadataPacket>();
+    std::string data(packet->data(), packet->dataSize());
+    // parseMetadata(data);
+    static int i = 0;
+    std::cout << ++i << std::endl << data << std::endl << std::endl << std::endl;
+
+    auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+    objectMetadataPacket->setTimestampUs(dataPacket->timestampUs());
+    objectMetadataPacket->setDurationUs(1000);
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
+    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+    if (NX_ASSERT(m_handler))
+        m_handler->handleMetadata(objectMetadataPacket.get());
+
 }
 
-std::string DeviceAgent::sendCommandToCamera(const std::string& query)
-{
-    nx::utils::Url command(m_url);
-    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
-    command.setPath(kEventPath);
-    command.setQuery(QString::fromStdString(query));
-
-    const bool isSent = m_settingsHttpClient.doGet(command);
-    if (!isSent)
-        return "Failed to send command to camera";
-
-    auto* response = m_settingsHttpClient.response();
-    const bool isApproved = (response->statusLine.statusCode == 200);
-    if (!isApproved)
-        return response->statusLine.toString().toStdString();
-
-    return {};
-}
-
-static std::string dequote(const std::string& s)
-{
-    if (s.size() >= 2 && s.front() == '"' && s.back() == '"')
-    {
-        return s.substr(1, s.size() - 2);
-    }
-    return s;
-}
-
-template<class S, class F>
-void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
-    const nx::sdk::IStringMap* sourceMap,
-    S& previousState,
-    F sendingFunction,
-    FrameSize frameSize,
-    int channelNumber,
-    int objectIndex = 0)
-{
-    S settingGroup;
-    if (!readSettingsFromServer(sourceMap, &settingGroup, objectIndex))
-    {
-        settingGroup.replanishErrorMap(errorMap, "read failed");
-        return;
-    }
-
-    if (!differesEnough(settingGroup, previousState))
-        return;
-
-    const std::string settingQuery =
-        settingGroup.buildCameraWritingQuery(frameSize, channelNumber);
-    const std::string error = sendingFunction(settingQuery);
-    if (!error.empty())
-        settingGroup.replanishErrorMap(errorMap, error);
-    else
-        previousState = settingGroup;
-}
-
-constexpr const char* failedToReceiveError = "Failed to receive a value from server";
-
+/**
+ * Reads settings from `sourceMap` and writes them into the agent's device. If a setting can not
+ * be written, its name is added to `outResult` error map.h
+*/
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
 {
@@ -141,72 +236,72 @@ void DeviceAgent::doSetSettings(
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
-    const auto sender = [this](const std::string& s) {return this->sendCommandToCamera(s); };
+    const auto sender = [this](const std::string& s) {return this->sendWritingRequestToDeviceSync(s); };
 
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.motion, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.motion, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.mdObjectSize, sender, m_frameSize, m_channelNumber); //*
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.mdObjectSize, sender, m_frameSize, m_channelNumber); //*
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
 
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.mdIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    }
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.mdExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
-    }
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.mdIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //}
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.mdExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    //}
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.odObjects, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.odObjects, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.odBestShot, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.odBestShot, sender, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.odExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    }
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.odExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //}
 
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i); //*
-    }
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i); //*
+    //}
 
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    }
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //}
 
-    for (int i = 0; i < 8; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    }
+    //for (int i = 0; i < 8; ++i)
+    //{
+    //    copySettingsFromServerToCamera(errorMap, sourceMap,
+    //        m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //}
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
 
     *outResult = errorMap.releasePtr();
 }
@@ -217,7 +312,11 @@ void DeviceAgent::getPluginSideSettings(
     const auto response = new nx::sdk::SettingsResponse();
     m_settings.shockDetection.writeToServer(response);
 
-    m_settings.audioDetection.writeToServer(response);
+    //m_settings.motion.writeToServer(response);
+
+    //m_settings.mdObjectSize.writeToServer(response);
+
+    //m_settings.audioDetection.writeToServer(response);
     *outResult = response;
 }
 
@@ -294,10 +393,10 @@ void DeviceAgent::stopFetchingMetadata()
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    if (m_deviceAgentManifest.isEmpty())
+    if (m_manifest.isEmpty())
         *outResult = error(ErrorCode::internalError, "DeviceAgent manifest is empty");
     else
-        *outResult = new nx::sdk::String(m_deviceAgentManifest);
+        *outResult = new nx::sdk::String(m_manifest);
 }
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
@@ -318,12 +417,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
 {
-    m_deviceAgentManifest = manifest;
-}
-
-void DeviceAgent::setEngineManifest(const Hanwha::EngineManifest& manifest)
-{
-    m_engineManifest = manifest;
+    m_manifest = manifest;
 }
 
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
@@ -331,14 +425,69 @@ void DeviceAgent::setMonitor(MetadataMonitor* monitor)
     m_monitor = monitor;
 }
 
-std::string DeviceAgent::loadSunapiGettingReply(const char* eventName)
+/**
+ * Synchronously send the request that should change analytics settings on the agent's device.
+ * \return empty string, if the request is successful
+ *     string with error message, if not
+ */
+std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query)
+{
+    nx::utils::Url command(m_url);
+    constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
+    command.setPath(kEventPath);
+    command.setQuery(QString::fromStdString(query));
+
+    const bool isSent = m_settingsHttpClient.doGet(command);
+    if (!isSent)
+        return "Failed to send command to camera";
+
+    auto* response = m_settingsHttpClient.response();
+    if (response->statusLine.statusCode != 200)
+        return response->statusLine.toString().toStdString();
+
+    /* Camera may return 200 OK, and contain error description in the body:
+    {
+        "Response": "Fail",
+        "Error" :
+         {
+            "Code": 600,
+            "Details" : "Submenu Not Found"
+        }
+    }
+    */
+    auto messageBodyOptional = m_settingsHttpClient.fetchEntireMessageBody();
+    if (messageBodyOptional.has_value())
+    {
+        std::string body = messageBodyOptional->toStdString();
+        auto errorMessage = parseError(body);
+        if (!errorMessage)
+            return {};
+
+        if (errorMessage->empty())
+            return "Device answered with undescribed error";
+        else
+            return *errorMessage;
+    }
+    return {};
+}
+
+/**
+ * Synchronously send reading request to the agent's device.
+ * Typical parameter tuples for `domain/submenu/action`:
+ *     eventstatus/eventstatus/check
+ *     eventsources/tamperingdetection/view
+ *     media/videoprofile/view
+ * /return the answer from the device or empty string, if no answer received.
+*/
+std::string DeviceAgent::sendReadingRequestToDeviceSync(
+    const char* domain, const char* submenu, const char* action)
 {
     std::string result;
     nx::utils::Url command(m_url);
-    constexpr const char* kPath = "/stw-cgi/eventsources.cgi";
-    constexpr const char* kQueryPattern = "msubmenu=%1&action=view&Channel=%2";
-    command.setPath(kPath);
-    command.setQuery(QString::fromStdString(kQueryPattern).arg(eventName).arg(m_channelNumber));
+    constexpr const char* kPathPattern = "/stw-cgi/%1.cgi";
+    constexpr const char* kQueryPattern = "msubmenu=%1&action=%2&Channel=%3";
+    command.setPath(QString::fromStdString(kPathPattern).arg(domain));
+    command.setQuery(QString::fromStdString(kQueryPattern).arg(submenu).arg(action).arg(m_channelNumber));
 
     const bool isSent = m_settingsHttpClient.doGet(command);
     if (!isSent)
@@ -354,6 +503,29 @@ std::string DeviceAgent::loadSunapiGettingReply(const char* eventName)
     else
         ;//NX_DEBUG(logTag, "makeActiRequest: Error getting response body.");
     return result; // nx::network::http::StatusCode::internalServerError;
+}
+
+std::string DeviceAgent::loadEventSettings(const char* eventName)
+{
+    return sendReadingRequestToDeviceSync("eventsources", eventName, "view");
+}
+
+/** Load max resolution from the device. */
+void DeviceAgent::loadFrameSize()
+{
+    /* http://<ip>/stw-cgi/media.cgi?msubmenu=videoprofile&action=view&Channel=0 */
+    std::string jsonReply = sendReadingRequestToDeviceSync("media", "videoprofile", "view");
+
+    std::optional<FrameSize> frameSize = parseFrameSize(jsonReply);
+    if (frameSize)
+        m_frameSize = *frameSize;
+}
+
+void DeviceAgent::loadSupportedEventTypes()
+{
+    /* http://<ip>/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=check&Channel=0 */
+    std::string jsonReply = sendReadingRequestToDeviceSync("eventstatus", "eventstatus", "check");
+    std::optional<SupportedEventCategories> cats = parseSupportedEventCategories(jsonReply);
 
 }
 
@@ -361,48 +533,52 @@ void DeviceAgent::readCameraSettings()
 {
     std::string sunapiReply;
 
-    sunapiReply = loadSunapiGettingReply("shockdetection");
-    readFromSunapiReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
+    loadFrameSize();
 
-    sunapiReply = loadSunapiGettingReply("tamperingdetection");
-    readFromSunapiReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
+    loadSupportedEventTypes();
 
-    sunapiReply = loadSunapiGettingReply("videoanalysis2");
-    readFromSunapiReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
+    sunapiReply = loadEventSettings("shockdetection");
+    readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
 
-    readFromSunapiReply(sunapiReply, &m_settings.mdObjectSize, m_frameSize, m_channelNumber);
+    sunapiReply = loadEventSettings("tamperingdetection");
+    readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.mdIncludeArea[i], m_frameSize, m_channelNumber, i);
+    sunapiReply = loadEventSettings("videoanalysis2");
+    readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.mdExcludeArea[i], m_frameSize, m_channelNumber, i);
-
-    readFromSunapiReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.mdObjectSize, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.mdIncludeArea[i], m_frameSize, m_channelNumber, i);
 
     for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.mdExcludeArea[i], m_frameSize, m_channelNumber, i);
+
+    readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
 
-    sunapiReply = loadSunapiGettingReply("defocusdetection");
-    readFromSunapiReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
-
-    sunapiReply = loadSunapiGettingReply("objectdetection");
-    readFromSunapiReply(sunapiReply, &m_settings.odObjects, m_frameSize, m_channelNumber);
-    readFromSunapiReply(sunapiReply, &m_settings.odBestShot, m_frameSize, m_channelNumber);
     for (int i = 0; i < 8; ++i)
-        readFromSunapiReply(sunapiReply, &m_settings.odExcludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    sunapiReply = loadSunapiGettingReply("audiodetection");
-    readFromSunapiReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
 
-    sunapiReply = loadSunapiGettingReply("audioanalysis");
-    readFromSunapiReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
+    sunapiReply = loadEventSettings("defocusdetection");
+    readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadEventSettings("objectdetection");
+    readFromDeviceReply(sunapiReply, &m_settings.odObjects, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.odBestShot, m_frameSize, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+        readFromDeviceReply(sunapiReply, &m_settings.odExcludeArea[i], m_frameSize, m_channelNumber, i);
+
+    sunapiReply = loadEventSettings("audiodetection");
+    readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadEventSettings("audioanalysis");
+    readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

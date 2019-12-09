@@ -2730,7 +2730,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].actions List of JSON objects, each describing a set of actions from a
      *             particular analytics plugin.
      *         %param:stringArray reply[].actions[].actionIds List of action ids.
-     *         %param:string reply[].actions[].pluginId Id of a analytics plugin which offers the
+     *         %param:string reply[].actions[].pluginId Id of an analytics plugin which offers the
      *             actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
@@ -3807,19 +3807,37 @@ void MediaServerProcess::stopObjects()
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
         m_dumpSystemResourceUsageTaskId = 0;
     }
+
     if (dumpSystemResourceUsageTaskID)
+    {
+        NX_DEBUG(this, "Cancelling the dump system resource usage timer");
         commonModule()->timerManager()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+    }
 
     commonModule()->setNeedToStop(true);
+
+    NX_DEBUG(this, "Stopping the universal TCP listener");
     m_universalTcpListener->stop();
+
+    NX_DEBUG(this, "Stopping the server module");
     serverModule()->stop();
 
+    NX_DEBUG(this, "Resetting the check analytics timer");
     m_checkAnalyticsTimer.reset();
+
+    NX_DEBUG(this, "Resetting the general task timer");
     m_generalTaskTimer.reset();
+
+    NX_DEBUG(this, "Resetting the \"server started\" timer");
     m_serverStartedTimer.reset();
+
+    NX_DEBUG(this, "Resetting the UDT traffic timer");
     m_udtInternetTrafficTimer.reset();
+
+    NX_DEBUG(this, "Resetting the DB creation timer");
     m_createDbBackupTimer.reset();
 
+    NX_DEBUG(this, "Disconnecting different media server objects");
     safeDisconnect(commonModule()->globalSettings(), this);
     safeDisconnect(m_universalTcpListener->authenticator(), this);
     safeDisconnect(commonModule()->resourceDiscoveryManager(), this);
@@ -3834,61 +3852,113 @@ void MediaServerProcess::stopObjects()
         safeDisconnect(m_ec2Connection->timeNotificationManager().get(), this);
     safeDisconnect(m_ec2Connection.get(), this);
     safeDisconnect(m_updatePiblicIpTimer.get(), this);
+
+    NX_DEBUG(this, "Resetting public IP update timer");
     m_updatePiblicIpTimer.reset();
     safeDisconnect(m_ipDiscovery.get(), this);
     safeDisconnect(commonModule()->moduleDiscoveryManager(), this);
 
+    NX_DEBUG(this, "Waiting until event queue is empty");
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
 
+    NX_DEBUG(this, "Resetting the discovery monitor");
     m_discoveryMonitor.reset();
+
+    NX_DEBUG(this, "Resetting the crash reporter");
     m_crashReporter.reset();
+
+    NX_DEBUG(this, "Resetting the public IP searcher");
     m_ipDiscovery.reset(); // stop it before IO deinitialized
+
+    NX_DEBUG(this, "Resetting the multicast HTTP server");
     m_multicastHttp.reset();
 
     if (const auto manager = commonModule()->moduleDiscoveryManager())
+    {
+        NX_DEBUG(this, "Stopping the module discovery manager");
         manager->stop();
+    }
 
+    NX_DEBUG(this, "Stopping the resource command processor");
     serverModule()->resourceCommandProcessor()->stop();
     if (m_initStoragesAsyncPromise)
+    {
+        NX_DEBUG(this, "Waiting on the asynchronous storage initialization promise");
         m_initStoragesAsyncPromise->get_future().wait();
+    }
+
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
+    NX_DEBUG(this, "Stopping the timer manager");
     commonModule()->timerManager()->stop();
 
     // Remove all stream recorders.
+    NX_DEBUG(this, "Stopping the remote archive synchronizer");
     m_remoteArchiveSynchronizer.reset();
 
+    NX_DEBUG(this, "Stopping the media server resource searcher");
     m_mserverResourceSearcher.reset();
 
+    NX_DEBUG(this, "Stopping the resource discovery manager");
     commonModule()->resourceDiscoveryManager()->stop();
+
+    NX_DEBUG(this, "Stopping the analytics manager");
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
+
+    NX_DEBUG(this, "Stopping the plugin manager");
     serverModule()->pluginManager()->unloadPlugins();
+
+    NX_DEBUG(this, "Stopping the event rule processor");
     serverModule()->eventRuleProcessor()->stop();
+
+    NX_DEBUG(this, "Stopping the P2P downloader");
     serverModule()->p2pDownloader()->stopDownloads();
     if (nx::vms::server::nvr::IService* const nvrService = serverModule()->nvrService())
+    {
+        NX_DEBUG(this, "Stopping the NVR service");
         nvrService->stop();
+    }
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
+    NX_DEBUG(this, "Stopping the server resource processor");
     m_serverResourceProcessor.reset();
 
+    NX_DEBUG(this, "Waiting for resource pool thread pool");
     serverModule()->resourcePool()->threadPool()->waitForDone();
 
+    NX_DEBUG(this, "Shutting down the EC2 connection factory");
     m_ec2ConnectionFactory->shutdown();
+
+    NX_DEBUG(this, "Deleting message processor");
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     if (m_universalTcpListener)
+    {
+        NX_DEBUG(this, "Resetting the universal TCP listener");
         m_universalTcpListener.reset();
+    }
 
+    NX_DEBUG(this, "Clearing resource pool");
     commonModule()->resourcePool()->clear();
 
     //disconnecting from EC2
+    NX_DEBUG(this, "Disconnecting from EC2 connection");
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
 
+    NX_DEBUG(this, "Resetting the cloud integration manager");
     m_cloudIntegrationManager.reset();
+
+    NX_DEBUG(this, "Resetting the media server status watcher");
     m_mediaServerStatusWatcher.reset();
+
+    NX_DEBUG(this, "Resetting the time based nonce provider");
     m_timeBasedNonceProvider.reset();
+
+    NX_DEBUG(this, "Resetting the EC2 connection");
     m_ec2Connection.reset();
+
+    NX_DEBUG(this, "Resetting the EC2 connection factory");
     m_ec2ConnectionFactory.reset();
 
     // This method will set flag on message channel to threat next connection close as normal
@@ -3897,6 +3967,8 @@ void MediaServerProcess::stopObjects()
 
     if (m_mediaServer)
         m_mediaServer->beforeDestroy();
+
+    NX_DEBUG(this, "Resetting the media server resource");
     m_mediaServer.clear();
 
     performActionsOnExit();
@@ -3904,9 +3976,16 @@ void MediaServerProcess::stopObjects()
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().clearOwnPeerIdIfEqual(
         "ms", commonModule()->moduleGUID());
 
+    NX_DEBUG(this, "Resetting the auto request forwarder");
     m_autoRequestForwarder.reset();
+
+    NX_DEBUG(this, "Resetting the audio streamer pool");
     m_audioStreamerPool.reset();
+
+    NX_DEBUG(this, "Resetting the UPnP port mapper");
     m_upnpPortMapper.reset();
+
+    NX_DEBUG(this, "Resetting the metrics controller");
     m_metricsController.reset();
 
     stopAsync();

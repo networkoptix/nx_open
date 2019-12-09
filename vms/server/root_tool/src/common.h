@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <string>
-#include <boost/optional.hpp>
+#include <assert.h>
 
 enum class Result
 {
@@ -45,11 +45,16 @@ void extractWord(std::string::const_iterator* it, std::string::const_iterator en
         ++(*it);
         pred = &isNotQuote;
     }
+
     auto wordStartIt = *it;
     advanceWhile(it, end, pred);
     std::string result(wordStartIt, *it);
-    ++(*it);
-    *outBuf = result;
+
+    if (*it != end && **it == '\'')
+        ++(*it);
+
+    if (!result.empty())
+        *outBuf = result;
 }
 
 template<typename... Tail>
@@ -58,7 +63,7 @@ bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterat
 
 template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
-    boost::optional<std::string>* head, Tail... tail);
+    std::optional<std::string>* head, Tail... tail);
 
 inline bool parseCommandImpl(std::string::const_iterator* /*it*/, std::string::const_iterator /*end*/)
 {
@@ -67,7 +72,7 @@ inline bool parseCommandImpl(std::string::const_iterator* /*it*/, std::string::c
 
 template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
-    boost::optional<std::string>* head, Tail... tail)
+    std::optional<std::string>* head, Tail... tail)
 {
     advanceWhile(it, end, &isspace);
     if (*it != end)

@@ -50,7 +50,8 @@ private:
     virtual bool isCameraControlRequired() const;
 
     bool processOpenStreamResult();
-    void postProcessData(const QnAbstractMediaDataPtr& data);
+    bool postProcessData(const QnAbstractMediaDataPtr& data);
+
 private:
     const nx::vms::server::resource::CameraPtr m_camera;
     bool m_needReopen = false;

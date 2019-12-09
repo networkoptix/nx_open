@@ -72,6 +72,8 @@ namespace nx::vms::server {
 
         virtual void putData(const QnAbstractDataPacketPtr& data) override;
         virtual bool canAcceptData() const override { return true; }
+
+        std::optional<std::chrono::microseconds> flush();
     private:
         void updateBufferSize(const QnAbstractDataPacketPtr& data);
     private:
@@ -95,7 +97,7 @@ namespace nx::vms::server {
         std::chrono::microseconds m_maxQueueDuration{};
         nx::utils::QueueWithMax<JitterInfo> m_lastJitter;
         BufferingPolicy m_policy = BufferingPolicy::increaseAndDescrease;
-        qint64 m_lastOutputTime = 0;
+        QnMutex m_mutex;
     };
 
     using PutInOrderDataProviderPtr = QSharedPointer<PutInOrderDataProvider>;

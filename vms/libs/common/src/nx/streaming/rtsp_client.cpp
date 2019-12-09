@@ -28,7 +28,7 @@ using namespace std::chrono;
 
 namespace {
 
-const seconds kReservedTimeoutTime(10);
+const float kKeepAliveGuardInterval = 0.8;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
 constexpr int kSocketBufferSize = 512 * 1024;
 
@@ -231,7 +231,8 @@ void QnRtspIoDevice::updateSockets()
             if (m_transport == nx::vms::api::RtpTransportType::multicast)
                 result->setReuseAddrFlag(true);
 
-            const auto res = result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
+            // TODO check return values?
+            result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
             result->setRecvTimeout(500);
             result->setRecvBufferSize(kSocketBufferSize);
             result->setNonBlockingMode(true);
@@ -513,9 +514,11 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
-    setKeepAliveTimeout(milliseconds::zero());
-    if (!sendSetupIfNotPlaying())
+    if (!m_playNowMode && !sendSetup())
+    {
+        NX_WARNING(this, "Failed to send SETUP command");
         return false;
+    }
 
     if (!sendPlay(positionStart, positionEnd, scale))
     {
@@ -656,17 +659,29 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
 
 bool QnRtspClient::sendSetup()
 {
+    using namespace nx::streaming;
+	
+    if (m_sdpTracks.empty())
+    {
+        NX_WARNING(this, "Failed to start rtsp session, empty SDP");
+        return false;
+    }
+    m_keepAliveTimeOut = std::chrono::seconds(60);
     int audioNum = 0;
     for (uint32_t i = 0; i < m_sdpTracks.size(); ++i)
     {
         auto& track = m_sdpTracks[i];
-        if (track.sdpMedia.mediaType == nx::streaming::Sdp::MediaType::Audio)
+        const QString codecName = track.sdpMedia.rtpmap.codecName;
+
+        const bool isAdditionalSupportedCodec = codecName == METADATA_STR
+            || m_additionalSupportedCodecs.find(codecName) != m_additionalSupportedCodecs.cend();
+
+        if (track.sdpMedia.mediaType == Sdp::MediaType::Audio)
         {
             if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
                 continue;
         }
-        else if (track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Video &&
-            track.sdpMedia.rtpmap.codecName != METADATA_STR)
+        else if (track.sdpMedia.mediaType != Sdp::MediaType::Video && !isAdditionalSupportedCodec)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -762,9 +777,17 @@ bool QnRtspClient::sendSetup()
                     QStringList tmpParams = tmpList[i].split(QLatin1Char('='));
                     if (tmpParams.size() > 1)
                     {
-                        const auto timeoutS = tmpParams[1].toInt();
-                        if (timeoutS > 0 && timeoutS < 5000)
-                            m_keepAliveTimeOut = seconds(timeoutS);
+                        const auto timeoutSec = tmpParams[1].toInt();
+                        if (timeoutSec > 0 && timeoutSec < 5000)
+                        {
+                            m_keepAliveTimeOut = seconds(timeoutSec);
+                        }
+                        else
+                        {
+                            NX_DEBUG(this,
+                                "Invalid session timeout specified: [%1], will used %2 seconds",
+                                tmpParams[1], duration_cast<seconds>(m_keepAliveTimeOut));
+                        }
                     }
                 }
             }
@@ -985,27 +1008,18 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-void QnRtspClient::setKeepAliveTimeout(std::chrono::milliseconds keepAliveTimeout)
+void QnRtspClient::sendKeepAliveIfNeeded()
 {
-    m_keepAliveTimeOut = std::move(keepAliveTimeout);
-}
+    if (m_config.disableKeepAlive || m_keepAliveTimeOut == std::chrono::milliseconds::zero())
+        return;
 
-bool QnRtspClient::sendKeepAliveIfNeeded()
-{
-    // send rtsp keep alive
-    if (m_keepAliveTimeOut == std::chrono::milliseconds::zero())
-        return true;
+    if (milliseconds(m_keepAliveTime.elapsed()) < m_keepAliveTimeOut * kKeepAliveGuardInterval)
+        return;
 
-    if (milliseconds(m_keepAliveTime.elapsed()) < m_keepAliveTimeOut - kReservedTimeoutTime)
-    {
-        return true;
-    }
-    else
-    {
-        bool res= sendKeepAlive();
-        m_keepAliveTime.restart();
-        return res;
-    }
+    if (!sendKeepAlive())
+        NX_WARNING(this, "Failed to send keep alive message");
+
+    m_keepAliveTime.restart();
 }
 
 bool QnRtspClient::sendKeepAlive()
@@ -1017,14 +1031,6 @@ bool QnRtspClient::sendKeepAlive()
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
-}
-
-bool QnRtspClient::sendSetupIfNotPlaying()
-{
-    if (m_playNowMode)
-        return true;
-
-    return sendSetup() && !m_sdpTracks.empty();
 }
 
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
@@ -1296,6 +1302,11 @@ void QnRtspClient::updateTransportHeader(QByteArray& response)
 void QnRtspClient::setTransport(nx::vms::api::RtpTransportType transport)
 {
     m_transport = transport;
+}
+
+void QnRtspClient::setAdditionalSupportedCodecs(std::set<QString> additionalSupportedCodecs)
+{
+    m_additionalSupportedCodecs = std::move(additionalSupportedCodecs);
 }
 
 QString QnRtspClient::getTrackCodec(int rtpChannelNum)

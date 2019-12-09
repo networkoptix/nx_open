@@ -343,6 +343,7 @@ public:
 
     static bool isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param);
 
+    int maxP2pQueueSizeBytes() const;
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
@@ -525,6 +526,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
 
+    QnResourcePropertyAdaptor<int>* m_maxP2pQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
 

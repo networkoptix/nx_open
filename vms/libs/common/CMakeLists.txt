@@ -29,6 +29,7 @@ nx_add_target(common LIBRARY
         nx_utils
         nx_sql
         nx_fusion
+        nx_sdk
         cloud_db_client
 )
 

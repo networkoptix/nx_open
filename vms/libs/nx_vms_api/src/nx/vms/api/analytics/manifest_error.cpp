@@ -139,6 +139,13 @@ QString toHumanReadableString(ManifestErrorType errorType)
             return "Multiple Groups have the same name";
         case ManifestErrorType::deviceAgentSettingsModelIsIncorrect:
             return "DeviceAgent settings model is defined but is not a correct JSON object";
+        case ManifestErrorType::uncompressedFramePixelFormatIsNotSpecified:
+        {
+            return "Uncompressed video stream is requested by the Plugin but its pixel format is "
+                "not specified";
+        }
+        case ManifestErrorType::excessiveUncompressedFramePixelFormatSpecification:
+            return "Pixel format is specified but uncompressed video stream is not requested";
         default:
             NX_ASSERT(false);
             return QString();

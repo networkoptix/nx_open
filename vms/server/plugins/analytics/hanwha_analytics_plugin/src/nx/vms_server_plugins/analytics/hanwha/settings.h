@@ -2,6 +2,7 @@
 
 #include "point.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -13,6 +14,25 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
+//-------------------------------------------------------------------------------------------------
+
+enum class EventCategory
+{
+    motionDetection,
+    faceDetection, //< not supported
+    tampering,
+    audioDetection,
+    defocusDetection,
+    fogDetection, //< not supported
+    videoAnalytics, //< includes Passing, Intrusion, Entering, Exiting, Appearing, Loitering
+    audioAnalytics, //< includes Scream, Gunshot, Explosion, GlassBreak
+    queues, //< not supported //< include queue1, queue1, queue3
+    shockDetection,
+    objectDetection, //< includes Person, Vehicle, Face, LicensePlate
+    count //< number event of categories
+};
+
+using SupportedEventCategories = std::array<bool, int(EventCategory::count)>;
 //-------------------------------------------------------------------------------------------------
 
 struct SettingGroup
@@ -100,6 +120,10 @@ struct ShockDetection: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
+    // The following functions perhaps should be moved to the inheritor-class.
+    // The idea is that the current class interacts with the server only,
+    // and the inheritor interacts with the device.
+    // The decision will be made during other plugins construction.
     void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
     std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
@@ -160,7 +184,7 @@ struct MdObjectSize: public SettingGroup
     bool operator!=(const MdObjectSize& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
-    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
     void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
     std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
@@ -220,7 +244,7 @@ struct MdIncludeArea: public SettingGroup
     int minimumDuration = 0;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -238,7 +262,7 @@ struct MdIncludeArea: public SettingGroup
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
     MdIncludeArea(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
     bool operator==(const MdIncludeArea& rhs) const;
@@ -258,7 +282,7 @@ struct MdExcludeArea: public SettingGroup
     std::vector<PluginPoint> points;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 9;
+    static constexpr int kStartDeviceRoiIndexFrom = 9;
 
     enum class ServerParamIndex {
         points,
@@ -270,7 +294,7 @@ struct MdExcludeArea: public SettingGroup
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
     MdExcludeArea(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
@@ -446,7 +470,7 @@ struct OdExcludeArea : public SettingGroup
     std::vector<PluginPoint> points;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -458,7 +482,7 @@ struct OdExcludeArea : public SettingGroup
     static constexpr const char* kSunapiEventName = "objectdetection";
 
     OdExcludeArea(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
     bool operator == (const OdExcludeArea& rhs) const;
@@ -484,7 +508,7 @@ struct IvaLine : public SettingGroup
     bool crossing = false;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -507,7 +531,7 @@ struct IvaLine : public SettingGroup
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
     IvaLine(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
     bool operator==(const IvaLine& rhs) const;
@@ -544,7 +568,7 @@ struct IvaIncludeArea: public SettingGroup
     int loiteringDuration = 10;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
 
     enum class ServerParamIndex {
         points,
@@ -578,7 +602,7 @@ struct IvaIncludeArea: public SettingGroup
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
     IvaIncludeArea(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
@@ -603,7 +627,7 @@ struct IvaExcludeArea: public SettingGroup
     std::vector<PluginPoint> points;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartSunapiRoiIndexFrom = 9;
+    static constexpr int kStartDeviceRoiIndexFrom = 9;
 
     enum class ServerParamIndex {
         points,
@@ -615,7 +639,7 @@ struct IvaExcludeArea: public SettingGroup
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
     IvaExcludeArea(int roiIndex = -1):
-    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartSunapiRoiIndexFrom)
+    SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
@@ -706,8 +730,8 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-struct PluginValueError {};
-struct SunapiValueError {};
+struct ServerValueError {};
+struct DeviceValueError {};
 //-------------------------------------------------------------------------------------------------
 template<class SettingsGroupT>
 bool readSettingsFromServer(const nx::sdk::IStringMap* from, SettingsGroupT* to,
@@ -718,7 +742,7 @@ bool readSettingsFromServer(const nx::sdk::IStringMap* from, SettingsGroupT* to,
     {
         tmp.readFromServerOrThrow(from, roiIndex);
     }
-    catch (PluginValueError&)
+    catch (ServerValueError&)
     {
         return false;
     }
@@ -730,7 +754,7 @@ nx::kit::Json getChannelInfoOrThrow(
     const std::string& cameraReply, const char* eventName, int channelNumber);
 //-------------------------------------------------------------------------------------------------
 template<class SettingGroupT>
-bool readFromSunapiReply(const std::string& from, SettingGroupT* to,
+bool readFromDeviceReply(const std::string& from, SettingGroupT* to,
     FrameSize frameSize, int channelNumber, int roiIndex = -1)
 {
     SettingGroupT tmp(roiIndex);
@@ -741,23 +765,13 @@ bool readFromSunapiReply(const std::string& from, SettingGroupT* to,
 
         tmp.readFromCameraOrThrow(channelInfo, frameSize);
     }
-    catch (SunapiValueError&)
+    catch (DeviceValueError&)
     {
         return false;
     }
     *to = std::move(tmp);
     return true;
 }
-//-------------------------------------------------------------------------------------------------
-//template<class SettingGroupT, class LoadingFunction>
-//bool readFromCamera(const std::string& from, SettingGroupT* to,
-//    LoadingFunction loadingFunction,
-//    FrameSize frameSize, int channelNumber, int roiIndex = -1)
-//{
-//    std::string reply = (SettingGroupT::kSunapiEventName);
-//    return readFromSunapiReply(reply, to, frameSize, channelNumber, roiIndex);
-//}
-
 //-------------------------------------------------------------------------------------------------
 struct Settings
 {
@@ -777,6 +791,8 @@ struct Settings
     IvaExcludeArea ivaExcludeArea[8];
     AudioDetection audioDetection;
     SoundClassification soundClassification;
+    SupportedEventCategories supportedCategories = {false};
+//    std::array<bool, int(EventCategory::count)> supportedCategories = { false };
 };
 
 //-------------------------------------------------------------------------------------------------

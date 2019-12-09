@@ -1,3 +1,5 @@
+#include <QtCore/QProcess>
+
 #include "hardware_information.h"
 
 #include <thread>
@@ -54,21 +56,39 @@ const QString& compileCpuArchicture()
     #endif
 }
 
+static int runProcessAndReadParamValue(
+    const QString& cmdLine, const QByteArray& paramName, char delimiter)
+{
+    QProcess process;
+    process.start(cmdLine);
+    process.waitForFinished();
+    const auto outputData = process.readAllStandardOutput();
+
+    for (auto line: outputData.split('\n'))
+    {
+        line = line.trimmed().toLower();
+        if (line.contains(paramName))
+        {
+            auto values = line.split(delimiter);
+            if (values.size() > 1)
+                return values[1].trimmed().toInt();
+        }
+    }
+    return 0;
+}
+
 static void detectCoreCount(int& logicalCores, int& physicalCores)
 {
     logicalCores = std::thread::hardware_concurrency();
     physicalCores = logicalCores;
 
-    #if !defined(__arm__) && !defined(__aarch64__)
-        int cpuinfo[4];
-        #if defined(_MSC_VER)
-            __cpuid(cpuinfo, 1);
-        #else
-            __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
-        #endif
-        const bool hasHyperThreading = (cpuinfo[3] & (1 << 28)) > 0;
-        if (hasHyperThreading)
-            physicalCores /= 2;
+    #if defined(Q_OS_WIN)
+        const auto cmdLine = "wmic CPU Get NumberOfCores /Format:List";
+        if (auto result = runProcessAndReadParamValue(cmdLine, "numberofcores", '='))
+            physicalCores = result; //< Result has absolute value.
+    #elif defined(Q_OS_LINUX)
+        if (auto result = runProcessAndReadParamValue("lscpu", "per core", ':'))
+            physicalCores = logicalCores / result;  //< Result has relative value.
     #endif
 }
 

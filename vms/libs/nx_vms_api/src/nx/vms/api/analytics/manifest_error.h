@@ -34,6 +34,9 @@ enum class ManifestErrorType
     duplicatedGroupName = 1 << 20,
 
     deviceAgentSettingsModelIsIncorrect = 1 << 21,
+
+    uncompressedFramePixelFormatIsNotSpecified = 1 << 22,
+    excessiveUncompressedFramePixelFormatSpecification = 1 << 23,
 };
 
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)

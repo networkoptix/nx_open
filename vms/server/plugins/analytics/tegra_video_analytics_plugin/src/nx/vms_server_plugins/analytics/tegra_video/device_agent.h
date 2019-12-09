@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
@@ -19,7 +19,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace tegra_video {
 
-class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);

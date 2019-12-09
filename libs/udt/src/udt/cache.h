@@ -258,17 +258,18 @@ class CInfoBlock
 {
 public:
     uint32_t m_piIP[4];        // IP address, machine read only, not human readable format
-    int m_iIPversion;        // IP version
-    uint64_t m_ullTimeStamp;    // last update time
-    int m_iRTT;            // RTT
-    int m_iBandwidth;        // estimated bandwidth
-    int m_iLossRate;        // average loss rate
-    int m_iReorderDistance;    // packet reordering distance
-    double m_dInterval;        // inter-packet time, congestion control
-    double m_dCWnd;        // congestion window size, congestion control
+    int m_iIPversion = 0;        // IP version
+    uint64_t m_ullTimeStamp = 0;    // last update time
+    int m_iRTT = 0;            // RTT
+    int m_iBandwidth = 0;        // estimated bandwidth
+    int m_iLossRate = 0;        // average loss rate
+    int m_iReorderDistance = 0;    // packet reordering distance
+    double m_dInterval = 0.0;        // inter-packet time, congestion control
+    double m_dCWnd = 0.0;        // congestion window size, congestion control
 
 public:
-    virtual ~CInfoBlock() {}
+    CInfoBlock();
+    virtual ~CInfoBlock() = default;
     virtual CInfoBlock& operator=(const CInfoBlock& obj);
     virtual bool operator==(const CInfoBlock& obj);
     virtual CInfoBlock* clone();

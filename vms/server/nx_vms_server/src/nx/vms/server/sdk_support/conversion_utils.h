@@ -131,4 +131,6 @@ AVPixelFormat sdkToAvPixelFormat(
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
     AVPixelFormat avPixelFormat);
 
+AVPixelFormat apiToAvPixelFormat(nx::vms::api::analytics::PixelFormat pixelFormat);
+
 } // namespace nx::vms::server::sdk_support

@@ -6,10 +6,10 @@ import platform
 import re
 import signal
 import sys
+import os
 import time
 import uuid
 from typing import List, Tuple, Optional
-from io import StringIO
 
 from vms_benchmark.camera import Camera
 
@@ -62,6 +62,18 @@ from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
 
+vms_version = None
+
+try:
+    from vms_benchmark_release.version import vms_version
+except ImportError:
+    def assign_vms_version():
+        def _vms_version():
+            return 'development'
+        global vms_version
+        vms_version = _vms_version
+    assign_vms_version()
+
 import urllib
 import urllib.error
 import click
@@ -73,7 +85,7 @@ conf_definition = {
     "boxLogin": {"type": "str"},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
-    "boxSshKey": {"type": "str", "default": None},
+    "boxSshKey": {"type": "str", "default": ""},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
@@ -106,6 +118,7 @@ ini_definition = {
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
     "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
     "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
+    "enableSwapThreshold": {"type": "bool", "default": False},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
@@ -725,7 +738,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                         if swapped_initially_kilobytes is not None and swapped_kilobytes is not None:
                             swapped_during_test_kilobytes = swapped_kilobytes - swapped_initially_kilobytes
-                            if swapped_during_test_kilobytes > ini['swapThresholdKilobytes']:
+                            if (
+                                ini['enableSwapThreshold'] and
+                                swapped_during_test_kilobytes > ini['swapThresholdKilobytes']
+                            ):
                                 issues.append(exceptions.BoxStateError(
                                     f"More than {ini['swapThresholdKilobytes']} KB swapped at the "
                                     f"box during the tests: {swapped_during_test_kilobytes} KB."))
@@ -1013,7 +1029,11 @@ def main(conf_file, ini_file, log_file):
         format='%(asctime)s %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    report(f"VMS Benchmark started; logging to {log_file_ref}.")
+    report(f"VMS Benchmark (version: {vms_version()}) started; logging to {log_file_ref}.")
+
+    if os.path.exists('./build_info.txt'):
+        with open('./build_info.txt', 'r') as f:
+            logging.info('build_info.txt\n' + ''.join(f.readlines()))
 
     conf, ini = load_configs(conf_file, ini_file)
 

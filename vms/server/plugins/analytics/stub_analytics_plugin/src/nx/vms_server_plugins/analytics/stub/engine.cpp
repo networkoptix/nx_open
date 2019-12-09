@@ -107,6 +107,8 @@ void Engine::initCapabilities()
     if (ini().deviceDependent)
         m_capabilities += "|deviceDependent";
 
+    m_streamTypeFilter = "compressedVideo";
+
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
     {
@@ -119,8 +121,12 @@ void Engine::initCapabilities()
         {
             m_needUncompressedVideoFrames = true;
             m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
+            m_streamTypeFilter = "uncompressedVideo";
         }
     }
+
+    if (ini().needMetadata)
+        m_streamTypeFilter += "|metadata";
 
     // Delete first '|', if any.
     if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
@@ -164,6 +170,7 @@ std::string Engine::manifestString() const
         }
     ],
     "capabilities": ")json" + m_capabilities + R"json(",
+    "streamTypeFilter": ")json" + m_streamTypeFilter + R"json(",
     "objectActions": [
         {
             "id": "nx.stub.addToList",

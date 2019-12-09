@@ -23,11 +23,15 @@ struct Sdp
         QString codecName;
         int clockRate = 0;
         int channels = 0;
+
+        QString toString() const;
     };
 
     struct Fmtp
     {
         QStringList params;
+
+        QString toString() const;
     };
 
     struct Media
@@ -42,6 +46,8 @@ struct Sdp
         Fmtp fmtp;
         QStringList sdpAttributes;
         QHostAddress connectionAddress;
+
+        QString toString() const;
     };
 
     /**
@@ -54,6 +60,8 @@ struct Sdp
 
     QString controlUrl;
     std::vector<Media> media;
+
+    QString toString() const;
 };
 
 } // namespace nx::streaming

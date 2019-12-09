@@ -2,11 +2,13 @@
  * Commands abstraction support. Aimed to simplify command name-to-action management (registration,
  * execution, getting help).
  */
+#include "commands.h"
+
 #include <assert.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include "commands.h"
+#include <unistd.h>
 
 /**
  * Command context stored in cache. 'argNames' and 'isDirect' fields are used only for documentation
@@ -37,7 +39,7 @@ struct ExecutableCommandContext: CommandContext
     ExecutableCommandContext(
             const CommandContext& commandContext,
             const std::string& commandString,
-            boost::optional<int> transportFd)
+            std::optional<int> transportFd)
             :
             CommandContext(commandContext),
             commandString(commandString),
@@ -46,7 +48,7 @@ struct ExecutableCommandContext: CommandContext
     }
 
     std::string commandString;
-    boost::optional<int> transportFd;
+    std::optional<int> transportFd;
 };
 
 CommandsFactory::CommandsFactory() = default;
@@ -82,7 +84,7 @@ CommandsFactory& CommandsFactory::reg(
  */
 ExecutableCommandContextPtr CommandsFactory::get(
     const std::string& commandString,
-    boost::optional<int> transportFd) const
+    std::optional<int> transportFd) const
 {
     std::string baseCmd;
     auto begin = commandString.cbegin();

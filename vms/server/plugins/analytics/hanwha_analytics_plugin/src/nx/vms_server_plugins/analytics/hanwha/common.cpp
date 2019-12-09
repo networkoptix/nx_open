@@ -84,6 +84,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx::vms_server_plugins::analytics::hanwha::Hanwha::EventType,
     (json), HanwhaEventType_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    nx::vms_server_plugins::analytics::hanwha::Hanwha::ObjectType,
+    (json), HanwhaObjectType_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx::vms_server_plugins::analytics::hanwha::Hanwha::EngineManifest,
     (json), HanwhaEngineManifest_Fields)
 

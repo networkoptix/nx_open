@@ -10,7 +10,7 @@
 #include <string>
 #include <deque>
 
-#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
@@ -22,7 +22,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
@@ -46,6 +46,9 @@ protected:
     virtual bool pushUncompressedVideoFrame(
         const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
 
+    virtual bool pushCustomMetadataPacket(
+        const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket) override;
+
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
@@ -65,6 +68,10 @@ private:
     int64_t usSinceEpoch() const;
 
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
+
+    void processCustomMetadataPacket(
+        const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket,
+        const char* func);
 
     bool checkVideoFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
 

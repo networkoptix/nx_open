@@ -73,7 +73,7 @@ static auto infoGroupProvider()
                 "pool",
                 [](const auto& r)
                 {
-                    if (!r->isWritable())
+                    if (!r->isUsedForWriting())
                         return "Reserved";
                     return r->isBackup() ? "Backup" : "Main";
                 }
