@@ -53,13 +53,13 @@ Example:
         "recommendedServers": { "calculate": "const 100" },
         "servers": { "alarms": [{
           "level": "warning",
-          "condition": "greaterThen %servers %recommendedServers",
+          "condition": "greaterThan %servers %recommendedServers",
           "text": "The maximum number of %recommendedServers servers per system is reached. Create another system to use more servers"
         }]},
         "recommendedCameraChannels": { "calculate": "const 1000" },
         "cameraChannels": { "alarms": [{
           "level": "warning",
-          "condition": "greaterThen %cameraChannels %recommendedCameraChannels",
+          "condition": "greaterThan %cameraChannels %recommendedCameraChannels",
           "text": "The maximum number of %recommendedCameraChannels cameras per system is reached. Create another system to use more cameras"
         }]}
       },
@@ -67,11 +67,11 @@ Example:
         "professional": { "alarms": [
           {
             "level": "error",
-            "condition": "greaterThen %requiredProfessional 0",
+            "condition": "greaterThan %requiredProfessional 0",
             "text": "%requiredProfessional Professional License Channels are required"
           }, {
             "level": "warning",
-            "condition": "greaterThen %expiringProfessional 0",
+            "condition": "greaterThan %expiringProfessional 0",
             "text": "expiringProfessional Professional License Channels expiring within 30 days"
           }
         ]},
@@ -85,13 +85,13 @@ Example:
     "values": {
       "availability": {
         "status": { "alarms": [{ "level": "error", "condition": "notEqual %status Online" }]},
-        "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThen %offlineEvents 0" }]},
+        "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThan %offlineEvents 0" }]},
       },
       "load": {
         "recommendedCpuUsageP": { "calculate": "const 95" },
         "totalCpuUsageP": { "alarms": [{
           "level": "warning",
-          "condition": "greaterThen %totalCpuUsageP %recommendedCpuUsageP",
+          "condition": "greaterThan %totalCpuUsageP %recommendedCpuUsageP",
           "text": "CPU usage is %totalCpuUsageP"
         }]},
         ...
@@ -110,13 +110,13 @@ Example:
         ]}
       },
       "issues": { "group": {
-        "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThen offlineEvents 0" }] },
-        "streamIssues": { "alarms": [{ "level": "warning", "condition": "greaterThen streamIssues 0" }] },
-        "ipConflicts": { "alarms": [{ "level": "warning", "condition": "greaterThen ipConflicts 0" }] }
+        "offlineEvents": { "alarms": [{ "level": "warning", "condition": "greaterThan offlineEvents 0" }] },
+        "streamIssues": { "alarms": [{ "level": "warning", "condition": "greaterThan streamIssues 0" }] },
+        "ipConflicts": { "alarms": [{ "level": "warning", "condition": "greaterThan ipConflicts 0" }] }
       }},
       "primaryStream": { "group": {
         "bitrate": { "alarms": [{ "level": "error", "condition": "equal bitrate 0" }] },
-        "actualFps": { "alarms": [{ "level": "warning", "condition": "greaterThen fpsDrops 0" }] }
+        "actualFps": { "alarms": [{ "level": "warning", "condition": "greaterThan fpsDrops 0" }] }
       }},
       ...
     }

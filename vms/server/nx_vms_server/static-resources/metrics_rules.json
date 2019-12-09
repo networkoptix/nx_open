@@ -23,7 +23,7 @@
                         "calculate": "const 10000"
                     },
                     "cameras": {
-                        "name": "Camera Channels",
+                        "name": "Camera channels",
                         "display": "panel",
                         "alarms": [{
                             "level": "warning",
@@ -39,6 +39,7 @@
                         "display": "panel"
                     },
                     "version": {
+                        "name": "System Name",
                         "display": "panel"
                     }
                 }
@@ -135,7 +136,7 @@
             "load": {
                 "values": {
                     "logLevel": {
-                        "name": "Logging Level",
+                        "name": "Logging level",
                         "display": "panel",
                         "alarms": [
                             {
@@ -197,11 +198,11 @@
                         "display": "table|panel"
                     },
                     "incomingConnections": {
-                        "name": "Incoming Connections",
+                        "name": "Incoming connections",
                         "display": "panel"
                     },
                     "outgoingConnections": {
-                        "name": "Outgoing Connections",
+                        "name": "Outgoing connections",
                         "display": "panel"
                     },
                     "threads": {
@@ -209,7 +210,7 @@
                         "display": "panel"
                     },
                     "encodingThreads": {
-                        "name": "Encoding Threads",
+                        "name": "Encoding threads",
                         "display": "panel",
                         "alarms": [
                             {
@@ -220,7 +221,7 @@
                         ]
                     },
                     "decodingThreads": {
-                        "name": "Decoding Threads",
+                        "name": "Decoding threads",
                         "display": "panel"
                     },
                     "cameras": {
@@ -235,18 +236,18 @@
                         "insert": "decodedPixels"
                     },
                     "encodingSpeed3s": {
-                        "name": "Encoding Speed",
+                        "name": "Encoding speed",
                         "display": "panel",
                         "format": "MPix/s",
                         "calculate": "counterToAvg %encodedPixels 3s",
                         "insert": "encodedPixels"
                     },
                     "primaryStreams": {
-                        "name": "Primary Streams",
+                        "name": "Primary streams",
                         "display": "panel"
                     },
                     "secondaryStreams": {
-                        "name": "Secondary Streams",
+                        "name": "Secondary streams",
                         "display": "panel"
                     }
                 }
