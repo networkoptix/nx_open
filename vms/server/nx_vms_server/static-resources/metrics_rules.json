@@ -13,11 +13,13 @@
                     },
                     "servers": {
                         "display": "panel",
-                        "alarms": [{
-                            "level": "warning",
-                            "condition": "greaterOrEqual %servers %recommendedMaxServers",
-                            "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
-                        }]
+                        "alarms": [
+                            {
+                                "level": "warning",
+                                "condition": "greaterOrEqual %servers %recommendedMaxServers",
+                                "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
+                            }
+                        ]
                     },
                     "recommendedMaxCameras": {
                         "calculate": "const 10000"
@@ -25,12 +27,14 @@
                     "cameras": {
                         "name": "Camera channels",
                         "display": "panel",
-                        "alarms": [{
-                            "level": "warning",
-                            "condition": "greaterOrEqual %cameras %recommendedMaxCameras",
-                            "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
-                            }]
-                        },
+                        "alarms": [
+                            {
+                                "level": "warning",
+                                "condition": "greaterOrEqual %cameras %recommendedMaxCameras",
+                                "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
+                            }
+                        ]
+                    },
                     "storages": {
                         "name": "Storage locations",
                         "display": "panel"
@@ -108,11 +112,13 @@
                 "values": {
                     "status": {
                         "display": "table|panel",
-                        "alarms": [{
-                            "level": "error",
-                            "condition": "notEqual %status Online",
-                            "text": "is %status"
-                        }]
+                        "alarms": [
+                            {
+                                "level": "error",
+                                "condition": "notEqual %status Online",
+                                "text": "is %status"
+                            }
+                        ]
                     },
                     "offlineEvents": {
                         "name": "Events: Server Offline (24h)",
@@ -120,11 +126,13 @@
                         "display": "table|panel",
                         "calculate": "countValues %status 24h Offline",
                         "insert": "uptimeS",
-                        "alarms": [{
-                            "level": "warning",
-                            "condition": "greaterThan %offlineEvents 1",
-                            "text": "went Offline %offlineEvents times in the last 24 hours"
-                        }]
+                        "alarms": [
+                            {
+                                "level": "warning",
+                                "condition": "greaterThan %offlineEvents 1",
+                                "text": "went Offline %offlineEvents times in the last 24 hours"
+                            }
+                        ]
                     },
                     "uptimeS": {
                         "name": "Uptime",
@@ -156,11 +164,13 @@
                         "description": "Total CPU Usage (%)",
                         "format": "%",
                         "display": "table|panel",
-                        "alarms": [{
-                            "level": "warning",
-                            "condition": "greaterThan %cpuUsageP 0.9",
-                            "text": "Total CPU Usage is %cpuUsageP. VMS is using %serverCpuUsageP."
-                        }]
+                        "alarms": [
+                            {
+                                "level": "warning",
+                                "condition": "greaterThan %cpuUsageP 0.9",
+                                "text": "Total CPU Usage is %cpuUsageP. VMS is using %serverCpuUsageP."
+                            }
+                        ]
                     },
                     "serverCpuUsageP": {
                         "name": "CPU (VMS Server) %",
@@ -179,11 +189,13 @@
                         "description": "Total RAM Usage (%)",
                         "format": "%",
                         "display": "table|panel",
-                        "alarms": [{
-                            "level": "warning",
-                            "condition": "greaterThan %ramUsageP 0.8",
-                            "text": "Total RAM usage is %ramUsageP. VMS is using %serverRamUsageP."
-                        }]
+                        "alarms": [
+                            {
+                                "level": "warning",
+                                "condition": "greaterThan %ramUsageP 0.8",
+                                "text": "Total RAM usage is %ramUsageP. VMS is using %serverRamUsageP."
+                            }
+                        ]
                     },
                     "serverRamUsage": {
                         "name": "RAM (VMS Server)",
@@ -436,16 +448,16 @@
                         "calculate": "sampleAvg %fpsDelta 10m",
                         "insert": "fpsDelta",
                         "alarms": [
-                        {
-                            "level": "warning",
-                            "condition": "greaterThan %fpsDeltaAverage10m 5",
-                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
-                        },
-                        {
-                            "level": "error",
-                            "condition": "greaterThan %fpsDeltaAverage10m 10",
-                            "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
-                        }
+                            {
+                                "level": "warning",
+                                "condition": "greaterThan %fpsDeltaAverage10m 5",
+                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
+                            },
+                            {
+                                "level": "error",
+                                "condition": "greaterThan %fpsDeltaAverage10m 10",
+                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
+                            }
                         ]
                     },
                     "actualBitrateBps": {
@@ -511,7 +523,14 @@
                         "description": "Current Archive length",
                         "isOptional": true,
                         "display": "table|panel",
-                        "format": "durationDh"
+                        "format": "durationDh",
+                        "alarms": [
+                            {
+                                "level": "error",
+                                "condition": "and %isArchiveTooSmall %hasArchiveRotated",
+                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS."
+                            }
+                        ]
                     },
                     "recordingBitrateBps": {
                         "name": "Recording Bitrate (5min)",
@@ -528,14 +547,7 @@
                         "description": "Minimum Archive length",
                         "isOptional": true,
                         "display": "panel",
-                        "format": "durationDh",
-                        "alarms": [
-                            {
-                                "level": "error",
-                                "condition": "and %isArchiveTooSmall %hasArchiveRotated",
-                                "text": "current Archive retention is %archiveLengthS. Minimum Archive length was set to %minArchiveLengthS."
-                            }
-                        ]
+                        "format": "durationDh"
                     }
                 }
             }
@@ -589,14 +601,14 @@
                         "calculate": "counterToAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
-                "writeRateBps1m": {
+                    "writeRateBps1m": {
                         "name": "Write Rate",
                         "display": "table|panel",
                         "format": "KB/s",
                         "calculate": "counterToAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
-                "transactionsPerSecond": {
+                    "transactionsPerSecond": {
                         "name": "Transactions/s",
                         "description": "Analytics DB transactions per second",
                         "isOptional": true,

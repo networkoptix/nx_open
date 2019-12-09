@@ -275,7 +275,7 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     EXPECT_EQ(analyticsData["minArchiveLengthS"], 24 * 3600 * kMinDays);
 
     auto systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::none);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.archiveLengthS.0"].level, AlarmLevel::none);
     ASSERT_FALSE(analyticsData["hasArchiveCleanup"].toBool());
 
     auto catalog = launcher->serverModule()->normalStorageManager()->getFileCatalog(
@@ -297,7 +297,7 @@ TEST_F(MetricsCamerasApi, analyticsGroup)
     ASSERT_TRUE(analyticsData["hasArchiveRotated"].toBool());
 
     systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
-    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.minArchiveLengthS.0"].level, AlarmLevel::error);
+    EXPECT_EQ(systemAlarms["cameras." + cameraId + ".storage.archiveLengthS.0"].level, AlarmLevel::error);
 
     m_camera->setLicenseUsed(false);
 }
