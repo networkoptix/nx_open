@@ -297,7 +297,7 @@
                         "insert": "thumbnails"
                     },
                     "activePlugins": {
-                        "name": "Active Plugins",
+                        "name": "Active plugins list",
                         "isOptional": true,
                         "display": "panel"
                     }
