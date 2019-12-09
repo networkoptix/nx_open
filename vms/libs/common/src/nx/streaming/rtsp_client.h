@@ -280,6 +280,7 @@ private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
     bool sendOptions();
+    CameraDiagnostics::Result sendDescribe(int port);
     bool sendKeepAlive();
 
     bool readTextResponse(QByteArray &response);
@@ -288,7 +289,7 @@ private:
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
     void updateTransportHeader(QByteArray &response);
 
-    void parseSDP(const QByteArray& data);
+    bool parseSDP(const QByteArray& response);
 
     void addAdditionAttrs( nx::network::http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
