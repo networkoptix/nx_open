@@ -5,7 +5,7 @@
             "info": {
                 "values": {
                     "name": {
-                        "name": "System Name",
+                        "name": "Name",
                         "display": "panel"
                     },
                     "recommendedMaxServers": {
