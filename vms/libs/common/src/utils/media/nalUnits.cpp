@@ -609,9 +609,9 @@ int SPSUnit::deserialize()
         bitReader.setBuffer(m_nalBuffer + 4, m_nalBuffer + m_nalBufferLen);
         seq_parameter_set_id = extractUEGolombCode();
         pic_order_cnt_type = 0;
-        if( profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc  ==  244
-            || profile_idc == 44 || profile_idc == 83 || profile_idc == 86 || profile_idc == 118
-            || profile_idc == 128)
+        if( profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc == 144
+            || profile_idc == 244 || profile_idc == 44 || profile_idc == 83 || profile_idc == 86
+            || profile_idc == 118 || profile_idc == 128)
         {
             chroma_format_idc = extractUEGolombCode();
             if(chroma_format_idc == 3)
