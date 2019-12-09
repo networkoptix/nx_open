@@ -237,11 +237,11 @@
                         "display": "panel"
                     },
                     "cameras": {
-                        "name": "Camera Channels",
+                        "name": "Camera channels",
                         "display": "panel"
                     },
                     "decodingSpeed3s": {
-                        "name": "Decoding Speed",
+                        "name": "Decoding speed",
                         "display": "panel",
                         "format": "MPix/s",
                         "calculate": "counterToAvg %decodedPixels 3s",
