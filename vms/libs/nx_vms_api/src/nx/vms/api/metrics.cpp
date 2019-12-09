@@ -111,6 +111,12 @@ std::function<Value(const Value&)> numericFormatter(const QString& units, Conver
 
 std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
 {
+    if (targetFormat == "text" || targetFormat == "shortText" || targetFormat == "longText")
+        return [](const Value& v) { return v.toVariant().toString(); }; // String without units.
+
+    if (targetFormat == "number")
+        return numericFormatter("", [](double v) { return v; }); // Rounded number without units.
+
     if (targetFormat == "%")
         return numericFormatter(targetFormat, [](double v) { return v * 100; });
 
