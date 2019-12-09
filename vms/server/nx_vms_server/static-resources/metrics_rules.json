@@ -36,14 +36,14 @@
                         ]
                     },
                     "storages": {
-                        "name": "Storage locations",
+                        "name": "Storage Locations",
                         "display": "panel"
                     },
                     "users": {
                         "display": "panel"
                     },
                     "version": {
-                        "name": "System Name",
+                        "name": "System version",
                         "display": "panel"
                     }
                 }
