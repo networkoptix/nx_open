@@ -36,8 +36,6 @@ public:
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
-    void setEngineManifest(const Hanwha::EngineManifest& manifest);
-
     void setMonitor(MetadataMonitor* monitor);
 
     void readCameraSettings();
@@ -77,8 +75,8 @@ private:
 
     Engine* const m_engine;
 
-    Hanwha::EngineManifest m_engineManifest;
-    QByteArray m_deviceAgentManifest;
+    // Json string representation of nx::vms::api::analytics::DeviceAgentManifest.
+    QByteArray m_manifest;
 
     nx::utils::Url m_url;
     QString m_model;

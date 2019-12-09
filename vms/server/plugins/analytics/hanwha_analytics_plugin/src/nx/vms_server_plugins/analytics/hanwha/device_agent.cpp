@@ -393,10 +393,10 @@ void DeviceAgent::stopFetchingMetadata()
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    if (m_deviceAgentManifest.isEmpty())
+    if (m_manifest.isEmpty())
         *outResult = error(ErrorCode::internalError, "DeviceAgent manifest is empty");
     else
-        *outResult = new nx::sdk::String(m_deviceAgentManifest);
+        *outResult = new nx::sdk::String(m_manifest);
 }
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
@@ -417,12 +417,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
 {
-    m_deviceAgentManifest = manifest;
-}
-
-void DeviceAgent::setEngineManifest(const Hanwha::EngineManifest& manifest)
-{
-    m_engineManifest = manifest;
+    m_manifest = manifest;
 }
 
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
