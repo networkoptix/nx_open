@@ -591,13 +591,13 @@
                         "insert": "issues",
                         "alarms": [
                             {
-                                "level": "error",
-                                "condition": "> %issues24h 10",
+                                "level": "warning",
+                                "condition": "greaterThan %issues24h 0",
                                 "text": "has %issues24h Storage Issue events in the last 24 hours."
                             },
                             {
-                                "level": "warning",
-                                "condition": "> %issues24h 0",
+                                "level": "error",
+                                "condition": "greaterThan %issues24h 10",
                                 "text": "has %issues24h Storage Issue events in the last 24 hours."
                             }
                         ]
