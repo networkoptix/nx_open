@@ -185,6 +185,7 @@ QnStorageResourceList QnStorageSpaceRestHandler::storageListFrom(
                 return QnStorageResourcePtr();
             }
 
+            storage->setIdUnsafe(QnUuid::createUuid());
             storage->setStatus(Qn::Online);
             storage->setSpaceLimit(storage->calcInitialSpaceLimit());
             storage->setUrl(url);
