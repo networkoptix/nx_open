@@ -427,7 +427,7 @@ Qn::RecordingType fixupRecordingType(const State& state)
 
 std::optional<State::ScheduleAlert> calculateScheduleAlert(const State& state)
 {
-    if (state.supportsMotionPlusLQ())
+    if (state.supportsMotionPlusLQ() || state.devicesCount == 0)
         return {};
 
     const bool hasMotion = state.isMotionDetectionEnabled();

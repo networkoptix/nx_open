@@ -235,8 +235,8 @@ Figure
             return
         }
 
-        color = json.color
-        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points))
+        color = json.color || ""
+        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points || []))
     }
 
     function serialize()

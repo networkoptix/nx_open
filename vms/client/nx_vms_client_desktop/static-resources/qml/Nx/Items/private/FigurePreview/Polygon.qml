@@ -53,7 +53,7 @@ Item
 
     onFigureJsonChanged:
     {
-        if (figureJson)
+        if (!F.isEmptyObject(figureJson))
         {
             color = figureJson.color
             points = figureJson.points

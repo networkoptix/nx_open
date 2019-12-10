@@ -17,6 +17,7 @@ public:
     {
         QVector<QPointF> points;
         QColor color;
+        bool visible = true;
 
         bool isValid() const { return !points.isEmpty(); }
     };

@@ -4,90 +4,139 @@ import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Dialogs 1.0
 import Nx.Core.Items 1.0
+import nx.client.core 1.0
 
 LabeledItem
 {
     id: control
 
-    property var value: ""
-    property var defaultValue: ""
-
     property string figureType: ""
     property var figureSettings
+    property var figure
 
-    contentItem: Row
+    signal valueChanged()
+
+    contentItem: Column
     {
-        spacing: 8
+        spacing: 12
 
-        Item
+        TextField
         {
-            implicitWidth: 120
-            implicitHeight: 80
+            id: figureNameEdit
+            width: parent.width
+            onTextChanged: valueChanged()
+        }
 
-            VideoPositioner
+        Row
+        {
+            spacing: 8
+
+            Item
             {
-                anchors.fill: parent
-                item: backgroundImage
-                sourceSize: Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
-                videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
-
-                visible: preview.hasFigure
-
-                Image
+                readonly property size implicitSize:
                 {
-                    id: backgroundImage
+                    const rotated = Geometry.isRotated90(videoPositioner.videoRotation)
+                    const defaultSize = rotated ? Qt.size(80, 120) : Qt.size(120, 80)
 
-                    Connections
+                    if (backgroundImage.status !== Image.Ready)
+                        return defaultSize
+
+                    const maxSize = Qt.size(120, 120)
+                    const imageSize = rotated
+                        ? Qt.size(backgroundImage.implicitHeight, backgroundImage.implicitWidth)
+                        : Qt.size(backgroundImage.implicitWidth, backgroundImage.implicitHeight)
+
+                    return Geometry.bounded(imageSize, maxSize)
+                }
+                implicitWidth: implicitSize.width
+                implicitHeight: implicitSize.height
+
+                VideoPositioner
+                {
+                    id: videoPositioner
+
+                    anchors.fill: parent
+                    item: backgroundImage
+                    sourceSize: Qt.size(
+                        backgroundImage.implicitWidth, backgroundImage.implicitHeight)
+                    videoRotation: mediaResourceHelper ? mediaResourceHelper.customRotation : 0
+
+                    visible: preview.hasFigure
+
+                    Image
                     {
-                        target: thumbnailProvider
-                        ignoreUnknownSignals: true
+                        id: backgroundImage
 
-                        onThumbnailUpdated:
+                        Connections
                         {
-                            if (cameraId.toString() === settingsView.resourceId.toString())
-                                backgroundImage.source = thumbnailUrl
+                            target: thumbnailProvider
+                            ignoreUnknownSignals: true
+
+                            onThumbnailUpdated:
+                            {
+                                if (cameraId.toString() === settingsView.resourceId.toString())
+                                    backgroundImage.source = thumbnailUrl
+                            }
+                        }
+
+                        Connections
+                        {
+                            target: settingsView
+
+                            onResourceIdChanged:
+                            {
+                                backgroundImage.source = ""
+
+                                if (!thumbnailProvider)
+                                    return
+
+                                if (settingsView.resourceId.isNull())
+                                    return
+
+                                thumbnailProvider.refresh(settingsView.resourceId)
+                            }
                         }
                     }
 
-                    Connections
+                    FigurePreview
                     {
-                        target: settingsView
+                        id: preview
 
-                        onResourceIdChanged:
+                        readonly property size size:
                         {
-                            if (!thumbnailProvider)
-                                return
-
-                            if (settingsView.resourceId.isNull())
-                                return
-
-                            thumbnailProvider.refresh(settingsView.resourceId)
+                            const rotated = Geometry.isRotated90(videoPositioner.videoRotation)
+                            return rotated
+                                ? Qt.size(parent.height, parent.width)
+                                : Qt.size(parent.width, parent.height)
                         }
+                        width: size.width
+                        height: size.height
+                        rotation: videoPositioner.videoRotation
+                        anchors.centerIn: parent
+
+                        figure: control.figure
+                        figureType: control.figureType
                     }
                 }
 
-                FigurePreview
+                Rectangle
                 {
-                    id: preview
-                    anchors.fill: backgroundImage.status === Image.Ready ? backgroundImage : parent
-                    rotation: backgroundImage.rotation
+                    id: border
+
+                    anchors.fill: parent
+                    visible: !preview.hasFigure || backgroundImage.status !== Image.Ready
+                    color: "transparent"
+                    border.color: ColorTheme.colors.dark11
+                    border.width: 1
+
                 }
-            }
-
-            Rectangle
-            {
-                id: noShapeDummy
-
-                anchors.fill: parent
-                visible: !preview.hasFigure
-
-                color: "transparent"
-                border.color: ColorTheme.colors.dark11
-                border.width: 1
 
                 Column
                 {
+                    id: noShapeDummy
+
                     anchors.centerIn: parent
+                    visible: !preview.hasFigure
 
                     Text
                     {
@@ -105,27 +154,40 @@ LabeledItem
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
+
+                MouseArea
+                {
+                    anchors.fill: parent
+                    onClicked: openEditDialog()
+                }
             }
 
-            MouseArea
+            Column
             {
-                anchors.fill: parent
-                onClicked:
+                spacing: 8
+
+                Button
                 {
-                    dialogLoader.active = true
-                    var dialog = dialogLoader.item
-                    dialog.deserializeFigure(value)
-                    dialog.show()
+                    text: qsTr("Edit")
+                    onClicked: openEditDialog()
+                }
+
+                Button
+                {
+                    text: qsTr("Delete")
+                    onClicked: figure = null
+                    visible: preview.hasFigure
+                    backgroundColor: ColorTheme.colors.red_core
                 }
             }
         }
 
-        Button
+        CheckBox
         {
-            padding: 0
-            iconUrl: "qrc:/skin/buttons/delete.png"
-            onClicked: value = ""
-            visible: preview.hasFigure
+            id: showOnCameraCheckBox
+            text: qsTr("Display on camera")
+            onCheckedChanged: valueChanged()
+            topPadding: 0
         }
     }
 
@@ -143,22 +205,40 @@ LabeledItem
                 figureSettings: control.figureSettings
                 resourceId: settingsView.resourceId
 
-                onAccepted:
-                {
-                    value = serializeFigure()
-                }
+                onAccepted: figure = serializeFigure()
             }
         }
     }
 
-    onValueChanged:
+    onFigureChanged: valueChanged()
+
+    function openEditDialog()
     {
-        var obj = null
-        if (value)
-        {
-            obj = JSON.parse(JSON.stringify(value))
-            obj.type = figureType
-        }
-        preview.figure = obj
+        dialogLoader.active = true
+        var dialog = dialogLoader.item
+        dialog.title = figureNameEdit.text || qsTr("Figure")
+        dialog.deserializeFigure(figure)
+        dialog.show()
+    }
+
+    function getValue()
+    {
+        // Our agreement is that figure without points is an invalid figure. It should not be sent
+        // to server.
+        if (!figure || !figure.points || figure.points.length === 0)
+            return null
+
+        // Clone the figure object and fill the rest of fields.
+        var obj = JSON.parse(JSON.stringify(figure))
+        obj.name = figureNameEdit.text
+        obj.showOnCamera = showOnCameraCheckBox.checked
+        return obj
+    }
+
+    function setValue(value)
+    {
+        figureNameEdit.text = (value && value.name) || ""
+        showOnCameraCheckBox.checked = value && value.showOnCamera !== false
+        figure = value
     }
 }
