@@ -1,5 +1,7 @@
 #include "value_group_monitor.h"
 
+#include <nx/utils/std/algorithm.h>
+
 #include "rule_monitors.h"
 
 namespace nx::vms::utils::metrics {
@@ -42,7 +44,17 @@ api::metrics::ValueGroupAlarms ValueGroupMonitor::alarms(Scope requiredScope) co
                 continue;
 
             if (auto alarm = monitor->alarm())
+            {
+                // TODO: Remove as soon as alarms support more complex syntax, so we can override
+                // warnings by errors by conditions.
+                if (alarm->level == api::metrics::AlarmLevel::error)
+                {
+                    nx::utils::remove_if(alarms[id],
+                        [](const auto& a) { return a.level != api::metrics::AlarmLevel::error; });
+                }
+
                 alarms[id].push_back(std::move(*alarm));
+            }
         }
     }
 

@@ -60,6 +60,17 @@ QString Hanwha::EngineManifest::eventTypeIdByName(const QString& eventName) cons
     return QString();
 }
 
+void Hanwha::EngineManifest::InitializeObjectTypeMap()
+{
+    for (const ObjectType& objectType: objectTypes)
+        m_objectTypeIdByInternalName.insert(objectType.internalName, objectType.id);
+}
+
+QString Hanwha::EngineManifest::objectTypeIdByInternalName(const QString& objectName) const
+{
+    return m_objectTypeIdByInternalName.value(objectName);
+}
+
 const Hanwha::EventType& Hanwha::EngineManifest::eventTypeDescriptorById(
     const QString& id) const
 {

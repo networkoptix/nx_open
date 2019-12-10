@@ -13,7 +13,7 @@ CheckBox
 
     indicator: Image
     {
-        anchors.verticalCenter: control.verticalCenter
+        y: topPadding + 1
 
         source:
         {

@@ -655,7 +655,12 @@ QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
 
 QnFileStorageResource::~QnFileStorageResource()
 {
-    const auto localPath = getLocalPathSafe();
+    QString localPath;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        localPath = m_localPath;
+    }
+
     if (localPath.isEmpty())
         return;
 

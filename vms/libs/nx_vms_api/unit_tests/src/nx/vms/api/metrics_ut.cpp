@@ -477,6 +477,12 @@ TEST(Metrics, Formatting)
     #define EXPECT_FORMAT(FORMAT, VALUE, RESULT) \
         EXPECT_EQ(makeFormatter(FORMAT)(Value(VALUE)), Value(RESULT))
 
+    EXPECT_FORMAT("shortText", "hello", "hello");
+    EXPECT_FORMAT("longText", "world", "world");
+    EXPECT_FORMAT("text", "!", "!");
+
+    EXPECT_FORMAT("number", 123.45, "123");
+
     EXPECT_FORMAT("", 100.0, "100");
     EXPECT_FORMAT("pixels", 100.0, "100 pixels");
 

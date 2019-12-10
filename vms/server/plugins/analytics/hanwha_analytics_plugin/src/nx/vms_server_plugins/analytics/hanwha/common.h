@@ -48,24 +48,26 @@ public:
 
     struct ObjectType: public nx::vms::api::analytics::ObjectType
     {
-        // Empty class, reserved for future use.
+        QString internalName;
     };
-    #define HanwhaObjectType_Fields ObjectType_Fields
+    #define HanwhaObjectType_Fields ObjectType_Fields (internalName)
 
     struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
     {
         QList<EventType> eventTypes;
         QList<ObjectType> objectTypes;
 
-        /** @return Null if not found. */
         QString eventTypeIdByName(const QString& eventName) const;
-
         const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
+
+        void InitializeObjectTypeMap();
+        QString objectTypeIdByInternalName(const QString& eventName) const;
 
     private:
         mutable QMap<QString, QString> m_eventTypeIdByInternalName;
         mutable QMap<QString, EventType> m_eventTypeDescriptorById;
 
+        QMap<QString, QString> m_objectTypeIdByInternalName;
     };
     #define HanwhaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)(objectTypes)
 };

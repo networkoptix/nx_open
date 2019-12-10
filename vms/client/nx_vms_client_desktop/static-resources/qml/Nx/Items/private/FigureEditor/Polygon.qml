@@ -210,7 +210,8 @@ Figure
     {
         id: temporaryGrip
 
-        visible: hoverInstrument.edgeHovered && pointMakerInstrument.count < maxPoints
+        visible: hoverInstrument.edgeHovered
+            && (maxPoints <= 0 || pointMakerInstrument.count < maxPoints)
         color: figure.color
         ghost: !pressed
 
@@ -306,14 +307,14 @@ Figure
     {
         pointMakerInstrument.finish()
 
-        if (!json)
+        if (F.isEmptyObject(json))
         {
             pointMakerInstrument.clear()
             return
         }
 
-        color = json.color
-        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points))
+        color = json.color || ""
+        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points || []))
     }
 
     function serialize()

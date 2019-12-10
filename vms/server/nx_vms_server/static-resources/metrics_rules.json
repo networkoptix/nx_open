@@ -5,7 +5,7 @@
             "info": {
                 "values": {
                     "name": {
-                        "name": "System Name",
+                        "name": "Name",
                         "display": "panel"
                     },
                     "recommendedMaxServers": {
@@ -36,14 +36,14 @@
                         ]
                     },
                     "storages": {
-                        "name": "Storage locations",
+                        "name": "Storage Locations",
                         "display": "panel"
                     },
                     "users": {
                         "display": "panel"
                     },
                     "version": {
-                        "name": "System Name",
+                        "name": "System version",
                         "display": "panel"
                     }
                 }
@@ -237,11 +237,11 @@
                         "display": "panel"
                     },
                     "cameras": {
-                        "name": "Camera Channels",
+                        "name": "Camera channels",
                         "display": "panel"
                     },
                     "decodingSpeed3s": {
-                        "name": "Decoding Speed",
+                        "name": "Decoding speed",
                         "display": "panel",
                         "format": "MPix/s",
                         "calculate": "counterToAvg %decodedPixels 3s",
@@ -297,7 +297,7 @@
                         "insert": "thumbnails"
                     },
                     "activePlugins": {
-                        "name": "Active Plugins",
+                        "name": "Active plugins list",
                         "isOptional": true,
                         "display": "panel"
                     }
@@ -588,7 +588,19 @@
                         "description": "Events count: Storage Issues (24h)",
                         "display": "table|panel",
                         "calculate": "counterDelta %issues 24h",
-                        "insert": "issues"
+                        "insert": "issues",
+                        "alarms": [
+                            {
+                                "level": "error",
+                                "condition": "> %issues24h 10",
+                                "text": "has %issues24h Storage Issue events in the last 24 hours."
+                            },
+                            {
+                                "level": "warning",
+                                "condition": "> %issues24h 0",
+                                "text": "has %issues24h Storage Issue events in the last 24 hours."
+                            }
+                        ]
                     }
                 }
             },

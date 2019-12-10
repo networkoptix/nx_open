@@ -41,7 +41,9 @@ nx_generate_package_json(${server_update_files_directory}/package.json
 file(WRITE ${bin_source_dir}/${launcher.version.file} "${releaseVersion.full}")
 nx_store_known_file(${bin_source_dir}/${launcher.version.file})
 
-nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
