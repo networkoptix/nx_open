@@ -52,17 +52,17 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     QString xmlMessage = QString::fromUtf16(reinterpret_cast<ushort*>(&buffer.front()));
     xmlMessage.replace(QRegExp("\\s+"), " "); //< removing space sequences
 
-    NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+    NX_DEBUG(systemEventLogReader, systemEventLogReader->makeDebugMessage(
         "System event notification read: %1.").arg(xmlMessage));
 
     const SystemEventNotificationInfo info = systemEventLogReader->parseXmlMessage(xmlMessage);
-    NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+    NX_DEBUG(systemEventLogReader, systemEventLogReader->makeDebugMessage(
         "Notification parameters: provider = %1, level = %2, event id = %3, message = %4.")
         .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
 
     if (systemEventLogReader->isMessageSignificant(xmlMessage, info))
     {
-        NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+        NX_DEBUG(systemEventLogReader, systemEventLogReader->makeDebugMessage(
             "System event notification is significant and is retransmitted to server: "
             "provider = %1, level = %2, event id = %3, message = %4.")
             .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
@@ -71,7 +71,7 @@ DWORD WINAPI SystemEventLogReader::SubscriptionCallback(
     }
     else
     {
-        NX_INFO(systemEventLogReader, systemEventLogReader->makeDebugMessage(
+        NX_DEBUG(systemEventLogReader, systemEventLogReader->makeDebugMessage(
             "System event notification is not significant and ignored: "
             "provider = %1, level = %2, event id = %3, message = %4.")
             .arg(info.providerName, QString::number(info.level), QString::number(info.eventId), info.data));
@@ -113,7 +113,7 @@ bool SystemEventLogReader::subscribe()
 
         if (m_hSubscription != nullptr)
         {
-            NX_INFO(this, makeDebugMessage(
+            NX_DEBUG(this, makeDebugMessage(
                 "Subscription to system log event notifications succeeded."));
             return true;
         }
