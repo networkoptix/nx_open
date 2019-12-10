@@ -581,7 +581,19 @@
             "state": {
                 "values": {
                     "status": {
-                        "display": "table|panel"
+                        "display": "table|panel",
+                        "alarms": [
+                            {
+                                "level": "error",
+                                "condition": "equal %status Offline",
+                                "text": "is Offline"
+                            },
+                            {
+                                "level": "error",
+                                "condition": "equal %status Server_Offline",
+                                "text": "is Unavailable: parent Server is Offline"
+                            }
+                        ]
                     },
                     "issues24h": {
                         "name": "Issues (24h)",

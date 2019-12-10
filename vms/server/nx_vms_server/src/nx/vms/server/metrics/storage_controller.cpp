@@ -91,18 +91,21 @@ static auto stateGroupProvider()
         utils::metrics::makeValueGroupProvider<Resource>(
             "state",
             utils::metrics::makeSystemValueProvider<Resource>(
+                "systemStatus",
+                [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
+                qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r)
                 {
                     auto status = r->getStatus();
+                    if (status == Qn::Offline && isServerOffline(r))
+                        return Value("Server Offline");
                     if (status == Qn::Online && r->isUsedForWriting())
                         status = Qn::Recording;
                     return Value(QnLexical::serialized(status));
-                },
-                qtSignalWatch<Resource>(
-                    &QnStorageResource::statusChanged,
-                    &QnStorageResource::isUsedForWritingChanged
-                )
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "issues",
