@@ -8,7 +8,7 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, enableMallocStatisticsLogging,
         "Enables info-level logging of malloc statistics. Only Linux is supported.");
-    NX_INI_FLAG(0, verboseAutoRequestForwarder, 
+    NX_INI_FLAG(0, verboseAutoRequestForwarder,
         "Sets log level to Verbose for AutoRequestForwarder.");
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");
     NX_INI_FLAG(0, enableApiDebug, "Enables /api/debug RestAPI method.");
@@ -61,6 +61,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, disableArchiveIntegrityWatcher, "Disables media files integrity check.");
 
     NX_INI_INT(100, stopTimeoutS, "Timeout to wait on server stop before crash.");
+
+    NX_INI_FLAG(0, pushNotifyOnPopup, "Sends push notifications on popup actions.");
 };
 
 inline Ini& ini()

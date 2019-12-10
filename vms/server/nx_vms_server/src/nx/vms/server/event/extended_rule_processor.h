@@ -67,6 +67,7 @@ private:
     void sendAggregationEmail(const QnUuid& ruleId);
     bool sendMailInternal(const vms::event::SendMailActionPtr& action, int aggregatedResCount);
     void sendEmailAsync(vms::event::SendMailActionPtr action, QStringList recipients, int aggregatedResCount);
+    bool sendPushNotification(const vms::event::AbstractActionPtr& action);
 
     /**
      * This method is called once per action, calculates all recipients and packs them into
@@ -102,6 +103,8 @@ private:
         const vms::event::AbstractActionPtr& action,
         const QList<vms::event::InfoDetail>& aggregationDetailList,
         Qn::ResourceInfoLevel detailLevel) const;
+
+    std::set<QString> cloudUsers(std::vector<QnUuid> filter) const;
 };
 
 } // namespace event

@@ -80,6 +80,8 @@
 #include <nx/utils/app_info.h>
 
 #include <nx/vms/server/nvr/i_service.h>
+#include <nx_vms_server_ini.h>
+#include <nx/network/http/http_client.h>
 
 namespace {
 
@@ -288,6 +290,9 @@ void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::Abstra
 bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)
 {
     bool result = base_type::executeActionInternal(action);
+    if (action->actionType() == ActionType::showPopupAction && ini().pushNotifyOnPopup)
+        sendPushNotification(action);
+
     if (!result)
     {
         switch (action->actionType())
@@ -899,6 +904,69 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     aggregatedActionIter->periodicTaskID = 0;
 }
 
+struct PushNotification
+{
+    QString title;
+    QString body;
+    // TODO: payload, options.
+};
+#define PushNotification_Fields (title)(body)
+QN_FUSION_DECLARE_FUNCTIONS(PushNotification, (json));
+
+struct PushNotificationMessage
+{
+    QString systemId;
+    std::set<QString> targets;
+    PushNotification notification;
+};
+#define PushNotificationMessage_Fields (systemId)(targets)(notification)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (PushNotification)(PushNotificationMessage), (json), _Fields);
+
+bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
+{
+    PushNotificationMessage message;
+    const auto settings = serverModule()->commonModule()->globalSettings();
+
+    message.systemId = settings->cloudSystemId();
+    if (message.systemId.isEmpty())
+    {
+        NX_DEBUG(this, "Not sending push notification, system is not connected to cloud");
+        return true;
+    }
+
+    message.targets = cloudUsers(action->getParams().additionalResources);
+    if (message.targets.empty())
+    {
+        NX_DEBUG(this, "Not sending push notification, no targets found");
+        return true;
+    }
+
+    const auto& event = action->getRuntimeParams();
+    // TODO: Work out normal messages for all cases.
+    message.notification = PushNotification{
+        event.caption.isEmpty() ? QString(QJson::serialized(event.eventType)) : event.caption,
+        event.description.isEmpty() ? QString(QJson::serialized(event.reasonCode)) : event.description
+    };
+
+    nx::utils::Url url("https://host/api/notifications/push_notification");
+    url.setHost(settings->cloudHost());
+
+    nx::network::http::HttpClient client;
+    client.setUserName(settings->cloudSystemId());
+    client.setUserPassword(settings->cloudAuthKey());
+    client.setAuthType(nx::network::http::AuthType::authBasic);
+
+    const auto serialized = QJson::serialized(message);
+    const auto result = client.doPost(url, "application/json", serialized);
+    NX_DEBUG(this, "Send push notification to %1: %2 -- %3", url, serialized, client.response()
+        ? client.response()->toString()
+        : SystemError::toString(client.lastSysErrorCode()));
+
+    return result;
+}
+
 QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     const vms::event::AbstractActionPtr& action,
     const vms::event::AggregationInfo &aggregationInfo,
@@ -1333,6 +1401,38 @@ void ExtendedRuleProcessor::updateRecipientsList(
 
     recipients.removeDuplicates();
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
+}
+
+
+std::set<QString> ExtendedRuleProcessor::cloudUsers(std::vector<QnUuid> filter) const
+{
+    std::set<QString> users;
+    const auto add =
+        [&users](const auto& user)
+        {
+            if (user && user->isEnabled() && user->isCloud())
+                users.insert(user->getName());
+        };
+
+    if (filter.empty())
+    {
+        for (const auto& user: serverModule()->resourcePool()->getResources<QnUserResource>())
+            add(user);
+        return users;
+    }
+
+    QList<QnUuid> userRoles;
+    QnUserResourceList userList;
+    userRolesManager()->usersAndRoles(filter, userList, userRoles);
+    for (const auto& user: userList)
+        add(user);
+    for (const auto& role: userRoles)
+    {
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
+            add(subject.user());
+    }
+
+    return users;
 }
 
 } // namespace event
