@@ -7,6 +7,7 @@
 *.kdev4
 .DS_Store
 *.swp
+*.orig
 CMakeLists.txt.user
 CMakeSettings.json
 
