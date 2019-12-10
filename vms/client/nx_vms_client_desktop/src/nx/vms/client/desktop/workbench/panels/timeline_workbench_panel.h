@@ -39,6 +39,7 @@ public:
 
 public:
     virtual bool isPinned() const override;
+    bool isPinnedManually() const;
 
     virtual bool isOpened() const override;
     virtual void setOpened(bool opened = true, bool animate = true) override;
@@ -74,6 +75,7 @@ private:
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
+    bool m_isPinnedManually;
 
     /** We are currently in the resize process. */
     bool m_resizing;
@@ -84,6 +86,7 @@ private:
 
     QPointer<CalendarWorkbenchPanel> m_calendar;
 
+    QnImageButtonWidget* m_pinButton;
     QnImageButtonWidget* m_showButton;
 
     QnResizerWidget* m_resizerWidget;

@@ -92,6 +92,30 @@ QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
     return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, actionId);
 }
 
+QnImageButtonWidget* newPinTimelineButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId)
+{
+    NX_ASSERT(context);
+    const auto action = context->menu()->action(actionId);
+
+    auto button = new QnImageButtonWidget(parent);
+    context->statisticsModule()->registerButton(alias(action), button);
+
+    if (action)
+        button->setDefaultAction(action);
+
+    button->setIcon(qnSkin->icon("panel/slide_pin_left.png"));
+    button->setFixedSize(QnSkin::maximumSize(button->icon()));
+
+    button->setProperty(Qn::NoHandScrollOver, true);
+    button->setProperty(Qn::BlockMotionSelection, true);
+
+    setHelpTopic(button, Qn::MainWindow_Pin_Help);
+    return button;
+}
+
 QnImageButtonWidget* newPinButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,

@@ -25,6 +25,11 @@ QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
     QnWorkbenchContext* context,
     nx::vms::client::desktop::ui::action::IDType actionId);
 
+QnImageButtonWidget* newPinTimelineButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    nx::vms::client::desktop::ui::action::IDType actionId);
+
 QnImageButtonWidget* newPinButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,
