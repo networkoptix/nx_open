@@ -1070,6 +1070,11 @@ enum IDType
     ToggleTimelineAction,
 
     /**
+     * Pins timeline.
+     */
+    PinTimelineAction,
+
+    /**
     * Shows/hides notification panel.
     */
     ToggleNotificationsAction,
