@@ -9,9 +9,9 @@ unsigned long getMaxFileDescriptors()
     return 0;
 }
 
-unsigned long setMaxFileDescriptors(unsigned long /*value*/)
+unsigned long setMaxFileDescriptors(unsigned long value)
 {
-    return 0;
+    return value;
 }
 
 } // namespace rlimit

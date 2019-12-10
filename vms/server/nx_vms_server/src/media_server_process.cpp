@@ -5153,7 +5153,13 @@ int MediaServerProcess::main(int argc, char* argv[])
 {
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    nx::utils::rlimit::setMaxFileDescriptors(32000);
+    static const int kMaxDescriptors = 32000;
+    int descriptorsCount = nx::utils::rlimit::setMaxFileDescriptors(kMaxDescriptors);
+    if (descriptorsCount == 0)
+    {
+        NX_WARNING(nx::utils::log::Tag(QString("MediaServerProcess")),
+            "failure to setup process descriptors count to %1", kMaxDescriptors);
+    }
 
     #if defined(_WIN32)
         win32_exception::installGlobalUnhandledExceptionHandler();
