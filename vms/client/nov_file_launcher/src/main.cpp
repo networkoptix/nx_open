@@ -170,6 +170,28 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     );
 }
 
+/**
+ * Unpack and launch client with nov file passed via command line.
+ * Packed file structure:
+ * /--------------------/
+ * / launcher.exe       /
+ * /--------------------/
+ * / library1.dll       /
+ * / library2.dll       /
+ * / ...                /
+ * / HD Witness.exe     /
+ * / ...                /
+ * / misc client files  /
+ * /--------------------/
+ * / INDEX table        /
+ * / INDEX PTR: 8bit    /
+ * /--------------------/
+ * / NOV file           /
+ * / NOV PTR: 8bit      /
+ * /--------------------/
+ * / MAGIC: 8bit        /
+ * /--------------------/
+ */
 int launchFile(const wstring& executePath)
 {
     logfile << L"Launch file " << executePath << "\n";
@@ -184,10 +206,8 @@ int launchFile(const wstring& executePath)
         return -1;
     }
 
-    // see seekg(-value, std::ios::end) is broken in MSVC2012 for x86 mode. Workaround it
-    srcFile.seekg(0, std::ios::end);
-    int64_t pos = (int64_t) srcFile.tellg() - sizeof(int64_t) * 2; // skip magic, and nov pos
-    srcFile.seekg(pos);
+    srcFile.seekg(-sizeof(int64_t) * 2, std::ios::end);
+    const int64_t novPosOffset = srcFile.tellg();
 
     int64_t magic = 0, novPos = 0, indexTablePos = 0;
 
@@ -200,10 +220,11 @@ int launchFile(const wstring& executePath)
     }
 
     srcFile.seekg(novPos-sizeof(int64_t)); // go to index_pos field
-    int64_t indexEofPos = (int64_t)srcFile.tellg(); // + sizeof(int64_t);
+    const int64_t indexEndOffset = novPos - sizeof(int64_t);
+
     srcFile.read((char*) &indexTablePos, sizeof(int64_t));
 
-    auto catalogSize = indexEofPos - indexTablePos;
+    auto catalogSize = indexEndOffset - indexTablePos;
     if (catalogSize > kMaximumFileCatalogSize)
     {
         logfile << L"Too long file catalog " << catalogSize << "\n";
@@ -217,11 +238,11 @@ int launchFile(const wstring& executePath)
         vector<wstring> fileNameList;
         srcFile.seekg(indexTablePos);
         int64_t curPos = indexTablePos;
-        while (srcFile.tellg() < indexEofPos)
+        while (srcFile.tellg() < indexEndOffset)
         {
             int64_t builtinFilePos;
             srcFile.read((char*)&builtinFilePos, sizeof(int64_t));
-            if (builtinFilePos > indexEofPos)
+            if (builtinFilePos > indexEndOffset)
             {
                 logfile << L"Invalid catalog" << "\n";
                 return -3;
