@@ -7,7 +7,6 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/mac_address.h>
-#include <nx/utils/log/assert.h>
 
 namespace nx::vms::testcamera {
 

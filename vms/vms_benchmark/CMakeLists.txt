@@ -38,7 +38,7 @@ add_custom_command(OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/
 
     COMMAND ${bash_command} -c " \
-        export PATH=\"${vms_benchmark_dev_dir}/python/bin:${vms_benchmark_dev_dir}/python:$PATH\"; \
+        export PATH=\"${vms_benchmark_dev_dir}/python/bin:${vms_benchmark_dev_dir}/python:/usr/bin:/bin\"; \
         export LD_LIBRARY_PATH=\"${vms_benchmark_dev_dir}/python/lib\"; \
         export PYTHONPATH=\"${vms_benchmark_dev_dir}/python/lib/python${benchmark_python_version}/site-packages\"; \
         python3${executable_extension} \
