@@ -477,6 +477,12 @@ TEST(Metrics, Formatting)
     #define EXPECT_FORMAT(FORMAT, VALUE, RESULT) \
         EXPECT_EQ(makeFormatter(FORMAT)(Value(VALUE)), Value(RESULT))
 
+    EXPECT_FORMAT("shortText", "hello", "hello");
+    EXPECT_FORMAT("longText", "world", "world");
+    EXPECT_FORMAT("text", "!", "!");
+
+    EXPECT_FORMAT("number", 123.45, "123");
+
     EXPECT_FORMAT("", 100.0, "100");
     EXPECT_FORMAT("pixels", 100.0, "100 pixels");
 
@@ -492,8 +498,11 @@ TEST(Metrics, Formatting)
     EXPECT_FORMAT("MPix/s", 6000666000.0, "6001 MPix/s");
     EXPECT_FORMAT("Gbit/s", 7000777000.0, "56 Gbit/s");
 
-    EXPECT_FORMAT("durationS", ((11 * 60 + 12) * 60) + 13, "11:12:13");
-    EXPECT_FORMAT("durationS", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2 day(s) 01:02:03");
+    EXPECT_FORMAT("duration", ((11 * 60 + 12) * 60) + 13, "11:12:13");
+    EXPECT_FORMAT("duration", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2d 01:02:03");
+
+    EXPECT_FORMAT("durationDh", ((11 * 60 + 12) * 60) + 13, "11h");
+    EXPECT_FORMAT("durationDh", (((2 * 24 + 01) * 60 + 02) * 60) + 03, "2d 1h");
 
     #undef EXPECT_FORMAT
 }

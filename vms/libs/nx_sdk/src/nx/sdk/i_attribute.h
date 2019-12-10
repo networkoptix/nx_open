@@ -16,7 +16,8 @@ public:
         number,
         boolean,
         string,
-        // TODO: Consider adding other specific types like DateTime, Coordinates, Temperature.
+        local_time_point, //< std::chrono::time_point<std::chrono::system_clock>
+        // TODO: Consider adding other specific types like Coordinates, Temperature.
     };
 
     static auto interfaceId() { return makeId("nx::sdk::IAttribute"); }

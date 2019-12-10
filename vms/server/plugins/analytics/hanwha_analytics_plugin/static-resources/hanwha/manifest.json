@@ -5,19 +5,33 @@
     [
         {
             "id": "nx.hanwha.ObjectDetection.Person",
-            "name": "Person"
+            "name": "Person tracking",
+            "internalName": "Person"
         },
         {
-            "id": "nx.hanwha.ObjectDetection.Vehicle",
-            "name": "Vehicle"
+            "id": "nx.hanwha.ObjectDetection.Human",
+            "name": "Human tracking",
+            "internalName": "Human_"
         },
         {
             "id": "nx.hanwha.ObjectDetection.Face",
-            "name": "Face"
+            "name": "Face tracking",
+            "internalName": "Face"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection.Head",
+            "name": "Head tracking",
+            "internalName": "Head_"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection.Vehicle",
+            "name": "Vehicle tracking",
+            "internalName": "Vehicle"
         },
         {
             "id": "nx.hanwha.ObjectDetection.LicensePlate",
-            "name": "LicensePlate"
+            "name": "LicensePlate tracking",
+            "internalName": "LicensePlate"
         }
     ],
     "deviceAgentSettingsModel":

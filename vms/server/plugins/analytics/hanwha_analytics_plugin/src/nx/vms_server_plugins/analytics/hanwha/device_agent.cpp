@@ -25,6 +25,7 @@
 #include <nx/sdk/helpers/string_map.h>
 
 #include "common.h"
+#include "objectMetadataXmlParser.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -195,26 +196,32 @@ void DeviceAgent::doSetNeededMetadataTypes(
 */
 void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
 {
-    const auto packet = dataPacket->queryInterface<ICustomMetadataPacket>();
-    std::string data(packet->data(), packet->dataSize());
-    // parseMetadata(data);
+    const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
+    QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
+
     static int i = 0;
-    std::cout << ++i << std::endl << data << std::endl << std::endl << std::endl;
+    std::cout << ++i << std::endl << (const char*)xmlData << std::endl << std::endl << std::endl;
 
-    auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-    objectMetadataPacket->setTimestampUs(dataPacket->timestampUs());
-    objectMetadataPacket->setDurationUs(1000);
+    const auto ts = incomingPacket->timestampUs();
+    Ptr<ObjectMetadataPacket> outcomingPacket = parseObjectMetadataXml(
+        xmlData, m_engine->engineManifest());
 
-    auto objectMetadata = makePtr<ObjectMetadata>();
-    static const Uuid trackId = UuidHelper::randomUuid();
-    objectMetadata->setTrackId(trackId);
-    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
-    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
+    if (outcomingPacket && outcomingPacket->count())
+    {
+        outcomingPacket->setTimestampUs(ts);
+        outcomingPacket->setDurationUs(1'000'000);
 
-    objectMetadataPacket->addItem(objectMetadata.get());
-    if (NX_ASSERT(m_handler))
-        m_handler->handleMetadata(objectMetadataPacket.get());
+        //auto objectMetadata = makePtr<ObjectMetadata>();
+        //static const Uuid trackId = id;
+        //objectMetadata->setTrackId(trackId);
+        //objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
+        //objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
 
+        //objectMetadataPacket->addItem(objectMetadata.get());
+
+        if (NX_ASSERT(m_handler))
+            m_handler->handleMetadata(outcomingPacket.get());
+    }
 }
 
 /**

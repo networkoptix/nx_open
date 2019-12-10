@@ -204,7 +204,7 @@ Example:
           { "id": "name", "name": "Name", "display": "table|panel" },
           { "id": "status", "name": "Status", "display": "table|panel" },
           { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
-          { "id": "uptimeS", "name": "Uptime", "format": "durationS", "display": "table|panel" },
+          { "id": "uptimeS", "name": "Uptime", "format": "duration", "display": "table|panel" },
           ...
         ],
       }, {
