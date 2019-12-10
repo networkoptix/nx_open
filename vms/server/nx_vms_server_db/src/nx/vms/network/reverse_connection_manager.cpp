@@ -223,7 +223,10 @@ cf::future<ReverseConnectionManager::Connection> ReverseConnectionManager::conne
         {
             NX_VERBOSE(this, "Connected directly to %1", route);
             if (code == SystemError::noError)
+            {
+                socket->cancelIOSync(nx::network::aio::etNone);
                 return promise.set_value(std::move(socket));
+            }
 
             NX_VERBOSE(this, "Unable to connect to %1: %2", route, SystemError::toString(code));
             socket.reset();
