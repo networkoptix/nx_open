@@ -6,6 +6,7 @@
 #include <utils/media/frame_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/helpers/list.h>
 
 extern "C" {
 
@@ -34,13 +35,20 @@ public:
      * @param clVideoDecoderOutput An existing AVFrame which is allocated and have one of the
      *     supported pixel formats.
      */
-    explicit UncompressedVideoFrame(CLConstVideoDecoderOutputPtr clVideoDecoderOutput);
+    explicit UncompressedVideoFrame(
+        CLConstVideoDecoderOutputPtr clVideoDecoderOutput,
+        QnConstMetaDataV1Ptr associatedMotionMetadata);
 
     /**
      * Creates and owns an instance of AVFrame, allocating its buffers and setting its fields. On
      * error, an assertion fails and the subsequent calls to avFrame() return null.
      */
-    explicit UncompressedVideoFrame(int width, int height, AVPixelFormat pixelFormat, int64_t dts);
+    explicit UncompressedVideoFrame(
+        int width,
+        int height,
+        AVPixelFormat pixelFormat,
+        int64_t dts,
+        QnConstMetaDataV1Ptr associatedMotionMetadata);
 
     /**
      * @return The frame, either owned or referenced, and null in case an assertion has failed
@@ -75,6 +83,8 @@ private:
     PixelFormat m_pixelFormat;
     const AVPixFmtDescriptor* m_avPixFmtDescriptor;
     std::vector<int> m_dataSize;
+
+    nx::sdk::Ptr<nx::sdk::List<nx::sdk::analytics::IMetadataPacket>> m_metadataPacketList;
 };
 
 } // namespace nx::vms::server::analytics

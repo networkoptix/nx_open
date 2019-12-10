@@ -497,9 +497,18 @@ void QnLiveStreamProvider::processMetadata(
 
     if (streamDataReceptor)
     {
+        if (const QnMetaDataV1Ptr motionMetadata = motionEstimation->getMotion();
+            motionMetadata && neededStreamTypes.testFlag(StreamType::motion))
+        {
+            NX_VERBOSE(this, "Pushing motion metadata to receptor, timestamp: %1 us",
+                motionMetadata->timestamp);
+
+            streamDataReceptor->putData(motionMetadata);
+        }
+
         if (neededStreamTypes.testFlag(StreamType::uncompressedVideo) && uncompressedFrame)
         {
-            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1",
+            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1 us",
                 compressedFrame->timestamp);
 
             streamDataReceptor->putData(
@@ -508,7 +517,7 @@ void QnLiveStreamProvider::processMetadata(
 
         if (neededStreamTypes.testFlag(StreamType::compressedVideo))
         {
-            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1",
+            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1 us",
                 compressedFrame->timestamp);
             streamDataReceptor->putData(compressedFrame);
         }

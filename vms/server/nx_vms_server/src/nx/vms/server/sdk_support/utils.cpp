@@ -234,6 +234,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
 
     const auto dataPacket = dataConverter.convert(
         std::make_shared<nx::streaming::UncompressedVideoPacket>(frame),
+        QnConstMetaDataV1Ptr(), //< No motion metadata is supported by this helper.
         streamRequirements);
 
     const auto dataPacketAdapter =

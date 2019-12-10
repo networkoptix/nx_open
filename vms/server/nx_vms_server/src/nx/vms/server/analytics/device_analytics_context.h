@@ -24,6 +24,7 @@ class QnAbstractDataReceptor;
 namespace nx::vms::server::analytics {
 
 class DeviceAnalyticsBinding;
+class StreamConverter;
 
 class DeviceAnalyticsContext:
     public Connective<QObject>,
@@ -97,6 +98,7 @@ private:
     std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
     std::map<QnUuid, int> m_skippedPacketCountByEngine;
+    std::unique_ptr<StreamConverter> m_streamConverter;
 };
 
 } // namespace nx::vms::server::analytics

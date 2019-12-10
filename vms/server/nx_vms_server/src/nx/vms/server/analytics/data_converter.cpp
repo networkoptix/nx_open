@@ -23,6 +23,7 @@ DataConverter::DataConverter(int rotationAngle):
 
 QnAbstractDataPacketPtr DataConverter::convert(
     const QnAbstractDataPacketPtr& dataPacket,
+    const QnConstMetaDataV1Ptr& associatedMotionMetadata,
     const StreamRequirements& requirements)
 {
     nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> result;
@@ -33,7 +34,9 @@ QnAbstractDataPacketPtr DataConverter::convert(
         compressedVideo && requiredStreamTypes.testFlag(StreamType::compressedVideo))
     {
         NX_VERBOSE(this, "Wrapping compressed frame, timestamp %1 us", compressedVideo->timestamp);
-        result = nx::sdk::makePtr<CompressedVideoPacket>(compressedVideo);
+        result = nx::sdk::makePtr<CompressedVideoPacket>(
+            compressedVideo,
+            associatedMotionMetadata);
     }
     else if (const auto inStreamMetadata =
         std::dynamic_pointer_cast<nx::streaming::InStreamCompressedMetadata>(dataPacket);
@@ -54,7 +57,7 @@ QnAbstractDataPacketPtr DataConverter::convert(
         NX_VERBOSE(this, "Converting uncompressed frame, timestamp %1 us",
             uncompressedVideo->timestamp);
 
-        return getUncompressedFrame(decoderOutput, requirements);
+        return getUncompressedFrame(decoderOutput, associatedMotionMetadata, requirements);
     }
 
     if (result)
@@ -65,6 +68,7 @@ QnAbstractDataPacketPtr DataConverter::convert(
 
 QnAbstractDataPacketPtr DataConverter::getUncompressedFrame(
     CLConstVideoDecoderOutputPtr decoderOutput,
+    const QnConstMetaDataV1Ptr& associatedMotionMetadata,
     const StreamRequirements& requirements)
 {
     if (const auto it = m_cachedUncompressedFrames.find(requirements.uncompressedFramePixelFormat);
@@ -91,7 +95,10 @@ QnAbstractDataPacketPtr DataConverter::getUncompressedFrame(
     if (requirements.uncompressedFramePixelFormat == rotatedDecoderOutput->format)
     {
         NX_VERBOSE(this, "Frame is already has the requested pixel format");
-        uncompressedSdkVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(rotatedDecoderOutput);
+        uncompressedSdkVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(
+            rotatedDecoderOutput,
+            associatedMotionMetadata);
+
         if (!uncompressedSdkVideoFrame->avFrame())
             return nullptr; //< Error is already logged.
     }
@@ -104,7 +111,8 @@ QnAbstractDataPacketPtr DataConverter::getUncompressedFrame(
             rotatedDecoderOutput->width,
             rotatedDecoderOutput->height,
             requirements.uncompressedFramePixelFormat,
-            rotatedDecoderOutput->pkt_dts);
+            rotatedDecoderOutput->pkt_dts,
+            associatedMotionMetadata);
 
         if (!uncompressedSdkVideoFrame->avFrame()
             || !rotatedDecoderOutput->convertTo(uncompressedSdkVideoFrame->avFrame()))

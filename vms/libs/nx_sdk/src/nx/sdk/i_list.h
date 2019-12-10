@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <nx/sdk/analytics/i_object_metadata.h>
-
 namespace nx {
 namespace sdk {
 

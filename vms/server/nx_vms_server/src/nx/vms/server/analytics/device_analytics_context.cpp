@@ -16,6 +16,7 @@
 #include <nx/vms/server/analytics/data_converter.h>
 #include <nx/vms/server/analytics/data_packet_adapter.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
+#include <nx/vms/server/analytics/stream_converter.h>
 
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -71,7 +72,8 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
         {
             reportSkippedFrames(framesSkipped, engineId);
         },
-        kMinSkippedFramesReportingInterval)
+        kMinSkippedFramesReportingInterval),
+    m_streamConverter(std::make_unique<StreamConverter>())
 {
     connect(this, &DeviceAnalyticsContext::pluginDiagnosticEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
@@ -355,16 +357,27 @@ static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 
 void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
 {
+    NX_VERBOSE(this, "Processing data, timestamp %1 us", data->timestamp);
+
+    if (!NX_ASSERT(data))
+        return;
+
+    m_streamConverter->updateRotation(
+        m_device->getProperty(QnMediaResource::rotationKey()).toInt());
+
+    if (!m_streamConverter->pushData(data))
+    {
+        NX_VERBOSE(this,
+            "Stream converter won't be able to produce data from the current packet,"
+            "no additional processing will be done");
+        return;
+    }
+
     struct DataConversionContext
     {
         StreamRequirements requirements;
         QnAbstractDataPacketPtr convertedData;
     };
-
-    NX_VERBOSE(this, "Processing data, timestamp %1 us", data->timestamp);
-
-    if (!NX_ASSERT(data))
-        return;
 
     std::map</*engineId*/ QnUuid, DataConversionContext> dataConversionContextByEngineId;
 
@@ -392,11 +405,10 @@ void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
         }
     }
 
-    DataConverter dataConverter(m_device->getProperty(QnMediaResource::rotationKey()).toInt());
     for (const auto& [engineId, context]: dataConversionContextByEngineId)
     {
         dataConversionContextByEngineId[engineId].convertedData =
-            dataConverter.convert(data, context.requirements);
+            m_streamConverter->getData(context.requirements);
     }
 
     NX_MUTEX_LOCKER lock(&m_mutex);

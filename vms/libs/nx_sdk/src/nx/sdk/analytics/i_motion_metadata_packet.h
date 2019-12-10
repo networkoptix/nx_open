@@ -4,24 +4,29 @@
 
 #include <nx/sdk/interface.h>
 
-#include <nx/sdk/analytics/i_motion_metadata.h>
-#include <nx/sdk/analytics/i_compound_metadata_packet.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
 /**
- * Metadata packet containing information about motion on the scene. Typically contains a single
- *     IMotionMetadata object.
+ * Metadata packet containing information about motion on the scene.
  */
-class IMotionMetadataPacket: public Interface<IMotionMetadataPacket, ICompoundMetadataPacket>
+class IMotionMetadataPacket: public Interface<IMotionMetadataPacket, IMetadataPacket>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IMotionMetadataPacket"); }
 
-protected: virtual IMotionMetadata* getAt(int index) const override = 0;
-public: Ptr<const IMotionMetadata> at(int index) const { return toPtr(getAt(index)); }
+    virtual const uint8_t* motionData() const = 0;
+
+    virtual int motionDataSize() const = 0;
+
+    virtual int rowCount() const = 0;
+
+    virtual int columnCount() const = 0;
+
+    virtual bool isMotionAt(int x, int y) const = 0;
 };
 
 } // namespace analytics

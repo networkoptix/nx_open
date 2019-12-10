@@ -3,24 +3,37 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
+#include <nx/vms/server/analytics/motion_metadata_packet.h>
 
 namespace nx::vms::server::analytics {
 
 using namespace nx::sdk;
 
 UncompressedVideoFrame::UncompressedVideoFrame(
-    CLConstVideoDecoderOutputPtr clVideoDecoderOutput)
+    CLConstVideoDecoderOutputPtr clVideoDecoderOutput,
+    QnConstMetaDataV1Ptr associatedMotionMetadata)
     :
-    m_clVideoDecoderOutput(std::move(clVideoDecoderOutput))
+    m_clVideoDecoderOutput(std::move(clVideoDecoderOutput)),
+    m_metadataPacketList(makePtr<List<nx::sdk::analytics::IMetadataPacket>>())
 {
     if (!NX_ASSERT(m_clVideoDecoderOutput))
         return;
+
+    if (associatedMotionMetadata)
+    {
+        m_metadataPacketList->addItem(
+            makePtr<MotionMetadataPacket>(associatedMotionMetadata).get());
+    }
 
     acceptAvFrame(m_clVideoDecoderOutput.get());
 }
 
 UncompressedVideoFrame::UncompressedVideoFrame(
-    int width, int height, AVPixelFormat pixelFormat, int64_t dts)
+    int width,
+    int height,
+    AVPixelFormat pixelFormat,
+    int64_t dts,
+    QnConstMetaDataV1Ptr associatedMotionMetadata)
     :
     m_ownedAvFrame(av_frame_alloc(),
         [](AVFrame* avFrame)
@@ -38,6 +51,12 @@ UncompressedVideoFrame::UncompressedVideoFrame(
         || !NX_ASSERT((int) pixelFormat >= 0, toString(pixelFormat)))
     {
         return;
+    }
+
+    if (associatedMotionMetadata)
+    {
+        m_metadataPacketList->addItem(
+            makePtr<MotionMetadataPacket>(associatedMotionMetadata).get());
     }
 
     m_ownedAvFrame->width = width;
@@ -195,8 +214,8 @@ void UncompressedVideoFrame::getPixelAspectRatio(PixelAspectRatio* outValue) con
 nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>*
     UncompressedVideoFrame::getMetadataList() const
 {
-    // TODO: #dmishin implement.
-    return nullptr;
+    m_metadataPacketList->addRef();
+    return m_metadataPacketList.get();
 }
 
 UncompressedVideoFrame::PixelFormat UncompressedVideoFrame::pixelFormat() const
