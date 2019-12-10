@@ -91,6 +91,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         }
     }
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
+    m_engineManifest.InitializeObjectTypeMap();
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)

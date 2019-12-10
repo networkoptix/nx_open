@@ -153,7 +153,7 @@ nx::kit::Json getOdRoiInfo(nx::kit::Json channelInfo, int sunapiIndex)
             return result;
         }
     }
-    return result;;
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------
