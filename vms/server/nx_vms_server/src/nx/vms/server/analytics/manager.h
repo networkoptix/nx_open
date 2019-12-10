@@ -72,8 +72,10 @@ public slots:
 private:
     using AnalyticsEngineResourcePtr = nx::vms::server::resource::AnalyticsEngineResourcePtr;
 
-    QSharedPointer<DeviceAnalyticsContext> context(const QnUuid& deviceId) const;
-    QSharedPointer<DeviceAnalyticsContext> context(const QnVirtualCameraResourcePtr& device) const;
+    QSharedPointer<DeviceAnalyticsContext> deviceAnalyticsContextUnsafe(
+        const QnUuid& deviceId) const;
+    QSharedPointer<DeviceAnalyticsContext> deviceAnalyticsContextUnsafe(
+        const QnVirtualCameraResourcePtr& device) const;
 
     void at_deviceAdded(const QnVirtualCameraResourcePtr& device);
     void at_deviceRemoved(const QnVirtualCameraResourcePtr& device);
@@ -94,12 +96,8 @@ private:
 
     void at_engineInitializationStateChanged(const AnalyticsEngineResourcePtr& engine);
 
-    QWeakPointer<QnAbstractDataReceptor> metadataSink(
-        const QnVirtualCameraResourcePtr& device) const;
-    QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& deviceId) const;
-    QWeakPointer<ProxyStreamDataReceptor> mediaSource(
-        const QnVirtualCameraResourcePtr& device) const;
-    QWeakPointer<ProxyStreamDataReceptor> mediaSource(const QnUuid& deviceId) const;
+    QWeakPointer<QnAbstractDataReceptor> metadataSinkUnsafe(const QnUuid& deviceId) const;
+    QWeakPointer<ProxyStreamDataReceptor> mediaSourceUnsafe(const QnUuid& deviceId) const;
 
     nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
     QnVirtualCameraResourceList localDevices() const;
@@ -112,9 +110,9 @@ private:
     void updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device);
 
 private:
-    mutable QnMutex m_contextMutex;
+    mutable nx::utils::Mutex m_mutex;
+
     QThread* m_thread;
-    nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
 
     std::map<QnUuid, QSharedPointer<DeviceAnalyticsContext>> m_deviceAnalyticsContexts;
 
