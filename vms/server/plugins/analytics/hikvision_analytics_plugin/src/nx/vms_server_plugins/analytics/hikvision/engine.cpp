@@ -127,6 +127,8 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
             }
         }
     }
+    QSet unique = QSet<QString>::fromList(result);
+    result = unique.toList();
     return result;
 }
 

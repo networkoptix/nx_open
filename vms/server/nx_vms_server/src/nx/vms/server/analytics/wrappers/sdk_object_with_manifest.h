@@ -19,7 +19,6 @@
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/method_timeouts.h>
 
-
 namespace nx::vms::server::analytics::wrappers {
 
 template<typename MainSdkObject, typename ManifestType>
