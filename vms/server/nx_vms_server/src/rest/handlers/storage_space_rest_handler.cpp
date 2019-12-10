@@ -163,6 +163,7 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
                 return QnSharedResourcePointer<nx::vms::server::StorageResource>();
             }
 
+            storage->setIdUnsafe(QnUuid::createUuid());
             storage->setStatus(Qn::Online);
             storage->setSpaceLimit(storage->calcInitialSpaceLimit());
             storage->setUrl(url);
