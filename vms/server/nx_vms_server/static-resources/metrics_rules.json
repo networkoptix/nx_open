@@ -36,7 +36,7 @@
                         ]
                     },
                     "storages": {
-                        "name": "Storage Locations",
+                        "name": "Storage locations",
                         "display": "panel"
                     },
                     "users": {
