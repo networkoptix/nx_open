@@ -17,7 +17,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterOrEqual %servers %recommendedMaxServers",
-                                "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
+                                "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers."
                             }
                         ]
                     },
@@ -31,7 +31,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterOrEqual %cameras %recommendedMaxCameras",
-                                "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
+                                "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras."
                             }
                         ]
                     },
@@ -88,7 +88,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %vmsTimeChanged24h 5",
-                                "text": "time was synchronized %vmsTimeChanged24h times in the last 24 hours. Check hardware"
+                                "text": "time was synchronized %vmsTimeChanged24h times in the last 24 hours. Check hardware."
                             }
                         ]
                     },
@@ -419,7 +419,7 @@
                             {
                                 "level": "error",
                                 "condition": "greaterThan %ipConflicts3min 0",
-                                "text": "has an IP Conflict."
+                                "text": "has an IP Conflict"
                             }
                         ]
                     }
@@ -457,12 +457,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %fpsDeltaAverage10m 5",
-                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
+                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %fpsDeltaAverage10m 10",
-                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes."
+                                "text": "dropped by an average of %fpsDeltaAverage10m FPS in the last 10 minutes"
                             }
                         ]
                     },
@@ -611,12 +611,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %issues24h 0",
-                                "text": "has %issues24h Storage Issue events in the last 24 hours."
+                                "text": "has %issues24h Storage Issue events in the last 24 hours"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %issues24h 10",
-                                "text": "has %issues24h Storage Issue events in the last 24 hours."
+                                "text": "has %issues24h Storage Issue events in the last 24 hours"
                             }
                         ]
                     }
