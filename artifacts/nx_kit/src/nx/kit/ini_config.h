@@ -22,8 +22,8 @@ namespace kit {
  * - Windows: "%NX_INI_DIR%\" (if NX_INI_DIR env var is defined), or "%LOCALAPPDATA%\nx_ini\"
  *     (otherwise). ATTENTION: If LOCALAPPDATA env var contains non-ASCII chars, it will yield a
  *     non-existing path.
- * - Linux, MacOS: "$NX_INI_DIR/" (if NX_INI_DIR env var is defined), or "$HOME/.config/nx_ini/" (if
- *     HOME env var is defined), "/etc/nx_ini/" (otherwise).
+ * - Linux, MacOS: "$NX_INI_DIR/" (if NX_INI_DIR env var is defined), or "$HOME/.config/nx_ini/"
+ *     (if HOME env var is defined), "/etc/nx_ini/" (otherwise).
  * - Android: "/sdcard/".
  * - iOS: Not supported yet.
  *
