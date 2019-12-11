@@ -5,10 +5,9 @@ set(zip_log ${logs_dir}/vms_benchmark_zip.log)
 
 if(targetDevice STREQUAL "windows-x64")
     set(executable_extension .exe)
-    set(bash_command ${vms_benchmark_dev_dir}/buildtools/sh.exe)
     set(benchmark_python_version 3.7)
 
-    set(benchmark_dependencies_list
+    set(dependencies
         ${ucrt_directory}/bin/api-ms-win-core-console-l1-1-0.dll
         ${ucrt_directory}/bin/api-ms-win-core-datetime-l1-1-0.dll
         ${ucrt_directory}/bin/api-ms-win-core-debug-l1-1-0.dll
@@ -82,10 +81,9 @@ if(targetDevice STREQUAL "windows-x64")
         ${CMAKE_BINARY_DIR}/bin/testcamera.exe
     )
 else()
-    set(bash_command bash)
     set(benchmark_python_version 3.6)
 
-    set(benchmark_dependencies_list
+    set(dependencies
         ${CMAKE_BINARY_DIR}/lib/libQt5Concurrent.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Core.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Gui.so*
@@ -119,37 +117,37 @@ else()
     )
 endif()
 
-list(JOIN benchmark_dependencies_list " " benchmark_dependencies)
+# Make one "copy" command for each file to avoid reaching the command line length limit on Windows.
+set(copy_dependency_commands)
+foreach(dependency ${dependencies})
+    file(GLOB dependency_file ${dependency})
+    list(APPEND copy_dependency_commands
+        COMMAND ${CMAKE_COMMAND} -E copy ${dependency_file} vms_benchmark/testcamera/
+    )
+endforeach()
 
 add_custom_command(OUTPUT ${zip_file}
-    VERBATIM
+    COMMAND ${CMAKE_COMMAND} -E echo "  Copying VMS Benchmark files"
+    
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -E remove_directory vms_benchmark
     COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/testcamera
-
-    COMMAND ${bash_command} -c " \
-        \"${CMAKE_COMMAND}\" -E copy \
-            \"${CMAKE_BINARY_DIR}/vms/vms_benchmark/high.ts\" \
-            \"${CMAKE_BINARY_DIR}/vms/vms_benchmark/low.ts\" \
-            \"${CMAKE_BINARY_DIR}/bin/vms_benchmark${executable_extension}\" \
-            \"${CMAKE_BINARY_DIR}/build_info.txt\" \
-            \"${CMAKE_CURRENT_SOURCE_DIR}/files/vms_benchmark.conf\" \
-            \"${CMAKE_CURRENT_SOURCE_DIR}/files/readme.md\" \
-            vms_benchmark/ \
-    "
-
-    COMMAND ${bash_command} -c " \
-        \"${CMAKE_COMMAND}\" -E copy \
-            ${benchmark_dependencies} vms_benchmark/testcamera/ \
-    "
-
+    
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_BINARY_DIR}/vms/vms_benchmark/high.ts
+        ${CMAKE_BINARY_DIR}/vms/vms_benchmark/low.ts
+        ${CMAKE_BINARY_DIR}/bin/vms_benchmark${executable_extension}
+        ${CMAKE_BINARY_DIR}/build_info.txt
+        ${CMAKE_CURRENT_SOURCE_DIR}/files/vms_benchmark.conf
+        ${CMAKE_CURRENT_SOURCE_DIR}/files/readme.md
+        vms_benchmark/
+ 
+    ${copy_dependency_commands}
+ 
     COMMAND ${CMAKE_COMMAND} -E echo "  Zipping VMS Benchmark - see ${zip_log}"
-    COMMAND ${bash_command} -c " \
-        \"${CMAKE_COMMAND}\" -E tar cvf \"${zip_file}\" --format=zip vms_benchmark >>\"${zip_log}\" 2>&1 \
-    "
+    COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip vms_benchmark >${zip_log}
 
-    DEPENDS
-        vms_benchmark
+    DEPENDS vms_benchmark
 )
 
 add_custom_target(distribution_vms_benchmark ALL DEPENDS ${zip_file})

@@ -7,6 +7,13 @@
 namespace nx::vms::server::metrics {
 
 template<typename ResourceType>
+bool isServerOffline(const ResourceType& r)
+{
+    const auto server = r->commonModule()->resourcePool()->getResourceById(r->getParentId());
+    return server->getStatus() == Qn::Offline;
+}
+
+template<typename ResourceType>
 utils::metrics::Watch<ResourceType> staticWatch()
 {
     return

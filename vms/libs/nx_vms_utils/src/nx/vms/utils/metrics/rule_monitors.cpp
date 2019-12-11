@@ -131,6 +131,14 @@ public:
         return result;
     }
 
+    static bool isEqual(const Value& left, const Value& right)
+    {
+        if (!left.isString() || !right.isString())
+            return left == right;
+
+        return left.toString() == right.toString().replace("_", " ");
+    }
+
     ValueGenerator getBinaryOperation() const
     {
         if (function() == "+" || function() == "add")
@@ -146,10 +154,10 @@ public:
             return numericOperation(1, 2, [](auto v1, auto v2) { return v2 ? Value(v1 / v2) : Value(); });
 
         if (function() == "=" || function() == "equal")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return isEqual(v1, v2); });
 
         if (function() == "!=" || function() == "notEqual")
-            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 != v2; });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return !isEqual(v1, v2); });
 
         if (function() == ">" || function() == "greaterThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });

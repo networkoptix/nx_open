@@ -95,9 +95,19 @@ auto makeAvailabilityProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueProviders<Resource>>(
         utils::metrics::makeSystemValueProvider<Resource>(
-            "status",
+            "systemStatus",
             [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
             qtSignalWatch<Resource>(&resource::Camera::statusChanged)
+        ),
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "status",
+            [](const auto& r)
+            {
+                const auto status = r->getStatus();
+                if (status == Qn::Offline && isServerOffline(r))
+                    return Value("Server Offline");
+                return Value(QnLexical::serialized(status));
+            }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "streamIssues",

@@ -204,6 +204,8 @@ const QList<Section*> SectionContainer::sectionList() const
 QJsonObject SectionContainer::serialize() const
 {
     auto result = base_type::serialize();
+    if (m_sections.empty())
+        return result;
 
     QJsonArray sections;
     for (const auto section: m_sections)
