@@ -460,7 +460,7 @@ int main(int argc, const char** argv)
     {
         if (!setupIds())
             return -1;
-        return executeCommand(commandsFactory, makeCommandString(argv), boost::none);
+        return executeCommand(commandsFactory, makeCommandString(argv), std::nullopt);
     }
 
     WorkerPool workerPool;
