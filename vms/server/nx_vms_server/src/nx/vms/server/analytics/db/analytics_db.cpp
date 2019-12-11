@@ -746,10 +746,10 @@ EventsStorageFactory& EventsStorageFactory::instance()
     return staticInstance;
 }
 
-AbstractEventsStorage* EventsStorageFactory::defaultFactoryFunction(
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
     QnMediaServerModule* mediaServerModule)
 {
-    return new MovableAnalyticsDb(mediaServerModule);
+    return std::make_unique<MovableAnalyticsDb>(mediaServerModule);
 }
 
 } // namespace nx::analytics::db
