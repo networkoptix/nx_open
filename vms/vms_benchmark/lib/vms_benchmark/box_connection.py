@@ -63,7 +63,8 @@ class BoxConnection:
         ssh_connection_var_value = self.eval('echo $SSH_CONNECTION')
         ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
         if not ssh_connection_var_value or len(ssh_connection_info) < 3:
-            raise exceptions.BoxCommandError(f'Unable to read SSH connection information.')
+            raise exceptions.BoxCommandError(
+                f'Unable to read SSH connection information. Check boxLogin and boxPassword in vms_benchmark.conf')
 
         self.ip = ssh_connection_info[2]
         self.local_ip = ssh_connection_info[0]
