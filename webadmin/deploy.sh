@@ -4,7 +4,8 @@ set -e
 
 SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR="$SOURCE_DIR/.."
-RDEP="$ROOT_DIR"/build_utils/python/rdep.py
+BRANCH_FILE="$ROOT_DIR"/.hg/branch
+RDEP="$ROOT_DIR"/build_utils/rdep/rdep.py
 WEBADMIN_FILE="$PWD"/server-external/bin/external.dat
 PACKAGES_DIR="$environment"/packages
 PACKAGE_BASE_NAME=server-external
@@ -52,11 +53,18 @@ check_file "$PACKAGES_DIR"/.rdep \
     "RDep repository is not found in $PACKAGES_DIR."
 
 if [ -d "$ROOT_DIR/.hg" ]; then
-    BRANCH=$(hg branch --repository $ROOT_DIR)
+    check_file "$BRANCH_FILE"
+    BRANCH=$(cat $BRANCH_FILE)
 elif [ -d "$ROOT_DIR/.git" ]; then
-    BRANCH=$(git -C $ROOT_DIR branch | grep "*" | cut -b 3-)
+    BRANCH=$(git -C "$ROOT_DIR" show -s --format=%B | grep '^Branch:' | tail -n1 | awk '{print $2}')
 else
-    echo "Neither git nor hg has been detected in $ROOT_DIR" && exit 1
+    echo "Error: Used VCS is not detected. Deploying without repository is not supported." >&2
+    exit 1
+fi
+
+if [ -z "$BRANCH" ]; then
+    echo "Error: Failed to get the branch from VCS."
+    exit 1
 fi
 
 deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"

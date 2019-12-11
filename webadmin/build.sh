@@ -42,16 +42,15 @@ popd
 
 # Save the repository info.
 echo "Create version.txt" >&2
-
-REP_ROOT_DIR="$SOURCE_DIR/.."
-if [ -d "$REP_ROOT_DIR/.hg" ]; then
-    hg log -r . --repository "$REP_ROOT_DIR" > static/version.txt
-elif [ -d "$REP_ROOT_DIR/.git" ]; then
-    git -C "$REP_ROOT_DIR" log -n 1 > static/version.txt
+if [ -d "$SOURCE_DIR/../.hg" ]; then
+    hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
+elif [ -d "$SOURCE_DIR/../.git" ]; then
+    format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
+    git -C "$SOURCE_DIR/.." show -s --format="$format" > static/version.txt
 else
-    echo "Neither git nor hg has been detected in $REP_ROOT_DIR" && exit 1
+    echo "Error: Used VCS is not detected. Building without repository is not supported." >&2
+    exit 1
 fi
-
 cat static/version.txt >&2
 
 #Pack
