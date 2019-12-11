@@ -38,7 +38,9 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     {
         QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
 
-        if (!resource && !data.resource.uniqueId.isEmpty())
+        if (!resource
+            && !data.resource.uniqueId.isEmpty()
+            && QFileInfo::exists(data.resource.uniqueId))
         {
             /* Try to load local resource. */
             resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId, commonModule()));

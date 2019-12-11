@@ -234,7 +234,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid())
 {
-    NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
+    NX_ASSERT(d->mediaResource, "Media resource widget was created with a non-media resource.");
     d->isExportedLayout = item
         && item->layout()
         && item->layout()->resource()
