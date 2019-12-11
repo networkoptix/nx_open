@@ -442,6 +442,82 @@ std::string Engine::manifestString() const
                     }
                 ]
             }
+        ],
+        "sections": [
+            {
+                "type": "Section",
+                "name": "Example",
+                "items": [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Example Stub DeviceAgent settings",
+                        "collapsible": false,
+                        "items": [
+                            {
+                                "type": "TextField",
+                                "name": "testTextField2",
+                                "caption": "Device Agent Text Field",
+                                "description": "A text field",
+                                "defaultValue": "a text"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "caption": "Device Agent SpinBox (plugin side)",
+                                "name": "pluginSideTestSpinBox2",
+                                "defaultValue": 42,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "Device Agent DoubleSpinBox",
+                                "name": "testDoubleSpinBox2",
+                                "defaultValue": 3.1415,
+                                "minValue": 0.0,
+                                "maxValue": 100.0
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "testComboBox2",
+                                "caption": "Device Agent ComboBox",
+                                "defaultValue": "value2",
+                                "range": ["value1", "value2", "value3"]
+                            },
+                            {
+                                "type": "CheckBox",
+                                "caption": "Device Agent CheckBox",
+                                "name": "testCheckBox2",
+                                "defaultValue": true,
+                                "value": true
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "ROI",
+                "items": [
+                    {
+                        "type": "PolygonFigure",
+                        "name": "testPolygon2",
+                        "caption": "Polygon",
+                        "value": { "points": [[0.1, 0.1], [0.5, 0.2], [0.2, 0.5]], "color": "#e040fb" }
+                    },
+                    {
+                        "type": "BoxFigure",
+                        "name": "testBox2",
+                        "caption": "Box",
+                        "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                    },
+                    {
+                        "type": "LineFigure",
+                        "name": "testLine2",
+                        "caption": "Line",
+                        "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                    }
+                ]
+            }
         ]
     }
 }

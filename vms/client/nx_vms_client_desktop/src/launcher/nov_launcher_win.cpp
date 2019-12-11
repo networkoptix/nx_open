@@ -57,16 +57,25 @@ bool appendFile(QFile& dstFile, const QString& srcFileName)
 
 bool writeIndex(QFile& dstFile, const std::vector<FileDescriptor>& files)
 {
-    qint64 indexStartPos = dstFile.pos();
-    for (int i = 1; i < files.size(); ++i)
+    const qint64 indexStartPos = dstFile.pos();
+    NX_VERBOSE(typeid(QnNovLauncher), "Index starts at %1", indexStartPos);
+    for (size_t i = 1; i < files.size(); ++i)
     {
+        // Reading file start position as the end of the previous file.
+        const qint64 filePosition = files[i - 1].position;
+        NX_VERBOSE(typeid(QnNovLauncher), "File %1 starts at %2",
+            files[i].filename,
+            filePosition);
+
         // No marshaling is required because of platform depending executable file.
-        dstFile.write((const char*)&files[i - 1].position, sizeof(qint64));
+        dstFile.write((const char*)&filePosition, sizeof(qint64));
         int strLen = files[i].filename.length();
         dstFile.write((const char*)&strLen, sizeof(int));
         dstFile.write((const char*)files[i].filename.data(), strLen * sizeof(wchar_t));
     }
 
+    const qint64 indexPtrPos = dstFile.pos();
+    NX_VERBOSE(typeid(QnNovLauncher), "Index ptr is located at %1", indexPtrPos);
     dstFile.write((const char*)&indexStartPos, sizeof(qint64));
 
     return true;
@@ -87,16 +96,23 @@ void populateFileListRecursive(QSet<QString>& result, const QDir& dir,
 /* Returns set of absolute file paths. */
 QSet<QString> calculateFileList(const QDir& sourceRoot)
 {
-    static const QStringList kNameFilters{lit("*.exe"), lit("*.dll"), lit("*.conf")};
+    static const QStringList kNameFilters{
+        "*.exe",
+        "*.dll",
+        "*.conf"
+    };
+
     static const QStringList kExtraDirs{
-        lit("vox"),
-        lit("fonts"),
-        lit("qml"),
-        lit("help")};
+        "vox",
+        "fonts",
+        "qml",
+        "help",
+        "resources",
+    };
 
     static const QStringList kIgnoredFiles{
 #ifdef _DEBUG
-        lit("mediaserver.exe"),
+        "mediaserver.exe",
 #endif
         QnClientAppInfo::applauncherBinaryName(),
         QnClientAppInfo::minilauncherBinaryName()
@@ -118,11 +134,33 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
 
 } // namespace
 
+// TODO: Sync with nov_file_launcher sources.
+/**
+ * Packed file structure:
+ * /--------------------/
+ * / launcher.exe       /
+ * /--------------------/
+ * / library1.dll       /
+ * / library2.dll       /
+ * / ...                /
+ * / HD Witness.exe     /
+ * / ...                /
+ * / misc client files  /
+ * /--------------------/
+ * / INDEX table        /
+ * / INDEX PTR: 8 bytes /
+ * /--------------------/
+ * / NOV file           /
+ * / NOV PTR: 8 bytes   /
+ * /--------------------/
+ * / MAGIC: 8 bytes     /
+ * /--------------------/
+ */
 QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
     const QString& dstName,
-    const QString& novFileName)
+    ExportMode exportMode)
 {
-    static const QString kLauncherFile(lit(":/launcher.exe"));
+    static const QString kLauncherFile(":/launcher.exe");
 
     QDir sourceRoot = qApp->applicationDirPath();
 
@@ -152,23 +190,18 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
         files.emplace_back(relativePath, dstFile.pos());
     }
 
-    if (!novFileName.isEmpty())
-        files.emplace_back(novFileName, dstFile.pos());
-
     if (!writeIndex(dstFile, files))
         return ErrorCode::WriteIndexError;
 
     // Position where video data will start.
-    qint64 novPos = dstFile.pos();
-    if (!novFileName.isEmpty())
-    {
-        // Append existing nov file to exe.
-        if (!appendFile(dstFile, novFileName))
-            return ErrorCode::WriteMediaError;
-    }
+    const qint64 novPos = dstFile.pos();
+    NX_VERBOSE(typeid(QnNovLauncher), "Nov file is located at %1", novPos);
 
-    dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
-    dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
+    if (exportMode == ExportMode::standaloneClient)
+    {
+        dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
+        dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
+    }
 
     return ErrorCode::Ok;
 }

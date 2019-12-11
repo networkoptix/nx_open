@@ -22,6 +22,7 @@ bool checkPassword(const QString& password, const FileInfo& fileInfo);
 
 constexpr int kMaxStreams = 256;
 
+// TODO: Sync with nov_launcher_win.cpp and nov_file_launcher project.
 constexpr quint64 kFileMagic = 0x73a0b934820d4055ull;
 
 constexpr quint64 kIndexMagic = 0xfed8260da9eebc04ll;

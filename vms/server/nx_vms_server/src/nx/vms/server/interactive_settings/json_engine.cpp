@@ -73,6 +73,28 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
         }
     }
 
+    if (const auto sectionContainer = qobject_cast<SectionContainer*>(item.get()))
+    {
+        auto sectionsProperty = sectionContainer->sections();
+
+        for (const QJsonValue sectionValue: object["sections"].toArray())
+        {
+            const auto result = createItem(item.get(), sectionValue.toObject());
+            const auto childItem = std::get_if<Item*>(&result);
+            if (!childItem)
+                return result;
+
+            const auto childSection = qobject_cast<Section*>(*childItem);
+            if (!childSection)
+            {
+                return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
+                    lm("A section must be of type \"Section\""));
+            }
+
+            sectionsProperty.append(&sectionsProperty, childSection);
+        }
+    }
+
     return item.release();
 }
 

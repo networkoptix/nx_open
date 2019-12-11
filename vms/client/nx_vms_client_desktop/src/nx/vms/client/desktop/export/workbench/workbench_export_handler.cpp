@@ -638,10 +638,10 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
 #ifdef Q_OS_WIN
-    const auto exeExtension = lit(".exe");
-    const auto tmpExtension = lit(".tmp");
+    const QString kExeExtension = ".exe";
+    const QString kTmpExtension = ".tmp";
 
-    // Lines are intentionally untranslatable.
+    // Lines are intentionally untranslatable for developer-only functionality.
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
         mainWindowWidget(),
         "Export Standalone Client",
@@ -654,19 +654,22 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
         return;
 
     QString targetFilename = dialog->selectedFile();
-    if (!targetFilename.endsWith(exeExtension))
-        targetFilename = targetFilename +exeExtension;
+    if (!targetFilename.endsWith(kExeExtension))
+        targetFilename = targetFilename + kExeExtension;
 
     QString temporaryFilename = targetFilename;
-    temporaryFilename.replace(exeExtension, tmpExtension);
-    if (QnNovLauncher::createLaunchingFile(temporaryFilename) != QnNovLauncher::ErrorCode::Ok)
+    temporaryFilename.replace(kExeExtension, kTmpExtension);
+    if (QnNovLauncher::createLaunchingFile(
+            temporaryFilename,
+            QnNovLauncher::ExportMode::standaloneClient) != QnNovLauncher::ErrorCode::Ok)
     {
-        QnMessageBox::critical(mainWindowWidget(), lit("File %1 cannot be written").arg(temporaryFilename));
+        QnMessageBox::critical(mainWindowWidget(),
+            QString("File %1 cannot be written").arg(temporaryFilename));
         return;
     }
 
     QFile::rename(temporaryFilename, targetFilename);
-    QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
+    QnMessageBox::success(mainWindowWidget(), QString("Export completed"));
 #endif
 }
 
