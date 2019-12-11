@@ -574,7 +574,7 @@ std::unique_ptr<MultiImageProvider> NotificationsWorkbenchPanel::multiImageProvi
 
     const bool precisePreview = index.data(Qn::ForcePrecisePreviewRole).toBool();
     const auto streamSelectionMode = index.data(Qn::PreviewStreamSelectionRole)
-        .value<nx::api::ImageRequest::StreamSelectionMode>();
+        .value<nx::api::CameraImageRequest::StreamSelectionMode>();
 
     MultiImageProvider::Providers providers;
 
