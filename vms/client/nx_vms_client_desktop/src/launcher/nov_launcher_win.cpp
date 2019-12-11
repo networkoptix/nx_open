@@ -148,12 +148,12 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
  * / misc client files  /
  * /--------------------/
  * / INDEX table        /
- * / INDEX PTR: 8bit    /
+ * / INDEX PTR: 8 bytes /
  * /--------------------/
  * / NOV file           /
- * / NOV PTR: 8bit      /
+ * / NOV PTR: 8 bytes   /
  * /--------------------/
- * / MAGIC: 8bit        /
+ * / MAGIC: 8 bytes     /
  * /--------------------/
  */
 QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
