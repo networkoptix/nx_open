@@ -234,13 +234,13 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
-    m_analyticsEventsStorage =
-        nx::analytics::db::EventsStorageFactory::instance().create(this);
+    m_analyticsEventsStorage = store(
+        nx::analytics::db::EventsStorageFactory::instance().create(this));
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
             this,
-            m_analyticsEventsStorage.get(),
+            m_analyticsEventsStorage,
             QnServer::StoragePool::Normal,
             "normalStorageManager"
         ));
@@ -506,7 +506,7 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
 
 nx::analytics::db::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
 {
-    return m_analyticsEventsStorage.get();
+    return m_analyticsEventsStorage;
 }
 
 nx::vms::server::RootFileSystem* QnMediaServerModule::rootFileSystem() const

@@ -173,7 +173,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>(QnMediaServerModule*);
+    AbstractEventsStorage* (QnMediaServerModule*);
 
 class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
@@ -186,7 +186,7 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(QnMediaServerModule*);
+    AbstractEventsStorage* defaultFactoryFunction(QnMediaServerModule*);
 };
 
 } // namespace nx::analytics::db

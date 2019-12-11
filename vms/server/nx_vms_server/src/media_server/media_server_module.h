@@ -196,7 +196,7 @@ private:
     nx::vms::server::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
-    std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
+    nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage = nullptr;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
     nx::vms::server::UpdateManager* m_updateManager = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
