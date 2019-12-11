@@ -209,10 +209,10 @@ void QnUserResource::setDigest(const QByteArray& digest)
         {
             if (m_userType == QnUserType::Ldap)
             {
-                m_ldapPasswordValid = false;
                 QnMutexLocker lk(&m_mutex);
                 if (m_ldapPasswordTimer)
                     m_ldapPasswordTimer->pleaseStopSync();
+                m_ldapPasswordValid = false;
             }
         };
 
