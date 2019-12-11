@@ -13,7 +13,7 @@ Item
 
     property Item contentItem: null
     property bool contentEnabled: true
-    property ScrollBar verticalScrollBar: null
+    property Item scrollBarParent: null
 
     property var resourceId
 
@@ -24,7 +24,7 @@ Item
 
         contentItem = Settings.createItems(settingsView, model)
         contentItem.contentEnabled = Qt.binding(function() { return contentEnabled })
-        contentItem.verticalScrollBar = Qt.binding(function() { return verticalScrollBar })
+        contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
 
         if (initialValues)
             setValues(initialValues)

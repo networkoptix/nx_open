@@ -19,6 +19,7 @@ Item
 
     property var currentEngineId
     property var currentEngineInfo
+    property var currentSection
     property bool loading: false
 
     readonly property bool isDeviceDependent: currentEngineInfo !== undefined
@@ -62,7 +63,7 @@ Item
 
                 currentEngineId = engineId
                 currentEngineInfo = engineInfo
-                menu.currentItemId = engineId
+                menu.currentItemId = engineId.toString() + currentSection
                 settingsView.loadModel(
                     engineInfo.settingsModel,
                     store.deviceAgentSettingsValues(engineInfo.id))
@@ -71,6 +72,7 @@ Item
             {
                 currentEngineId = undefined
                 currentEngineInfo = undefined
+                currentSection = ""
                 menu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
@@ -102,12 +104,134 @@ Item
         {
             model: analyticsEngines
 
-            MenuItem
+            Rectangle
             {
-                itemId: modelData.id
-                text: modelData.name
-                active: enabledAnalyticsEngines.indexOf(modelData.id) !== -1
-                onClicked: { store.setCurrentAnalyticsEngineId(modelData.id) }
+                readonly property var thisEngineId: modelData.id
+                readonly property bool isActive: enabledAnalyticsEngines.indexOf(thisEngineId) !== -1
+                readonly property bool selectedBlock: currentEngineId === thisEngineId
+                readonly property real textAlpha: isActive ? 1.0 : 0.3
+
+                width: parent.width
+                height: column.height
+                color: selectedBlock ? ColorTheme.colors.dark9 : "transparent"
+
+                Column
+                {
+                    id: column
+                    width: parent.width
+
+                    MenuItem
+                    {
+                        id: menuItem
+
+                        height: 28
+                        itemId: thisEngineId.toString()
+                        text: modelData.name
+                        active: isActive
+                        navigationMenu: menu
+
+                        color: ColorTheme.transparent(
+                            current || selectedBlock
+                                ? ColorTheme.colors.light1
+                                : ColorTheme.colors.light10,
+                            textAlpha);
+
+                        onClicked:
+                        {
+                            currentSection = ""
+                            store.setCurrentAnalyticsEngineId(thisEngineId)
+                            settingsView.contentItem.sectionsItem.currentIndex = 0
+                        }
+
+                        readonly property bool collapsible:
+                            !!modelData.settingsModel.sections && modelData.settingsModel.sections.length > 0
+
+                        MouseArea
+                        {
+                            id: expandCollapseButton
+
+                            width: 20
+                            height: parent.height
+                            anchors.right: parent.right
+                            acceptedButtons: Qt.LeftButton
+                            visible: parent.collapsible
+                            hoverEnabled: true
+
+                            ArrowIcon
+                            {
+                                anchors.centerIn: parent
+                                rotation: sectionsView.collapsed ? 0 : 180
+                                color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
+                                    ? ColorTheme.lighter(menuItem.color, 2)
+                                    : menuItem.color
+                            }
+
+                            onClicked:
+                            {
+                                if (currentEngineId === thisEngineId)
+                                    parent.click()
+
+                                sectionsView.collapsed = !sectionsView.collapsed
+                            }
+                        }
+                    }
+
+                    // Only 1 level of submenu items is supported at the moment.
+                    Column
+                    {
+                        id: sectionsView
+                        width: parent.width
+                        clip: true
+
+                        property bool collapsed: false
+                        height: collapsed ? 0 : implicitHeight
+
+                        Repeater
+                        {
+                            model: modelData.settingsModel.sections
+
+                            MenuItem
+                            {
+                                height: 28
+                                itemId: thisEngineId.toString() + modelData.name
+                                text: modelData.name
+                                leftPadding: 24
+                                navigationMenu: menu
+                                font.pixelSize: 12
+                                active: isActive
+
+                                color: ColorTheme.transparent(
+                                    current ? ColorTheme.colors.light1 : ColorTheme.colors.light10,
+                                    textAlpha);
+
+                                onClicked:
+                                {
+                                    currentSection = modelData.name
+                                    store.setCurrentAnalyticsEngineId(thisEngineId)
+                                    settingsView.contentItem.sectionsItem.currentIndex = index + 1
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle
+                    {
+                        id: separator
+
+                        width: parent.width
+                        height: 1
+                        color: ColorTheme.colors.dark7
+
+                        Rectangle
+                        {
+                            y: 1
+                            z: 1
+                            width: parent.width
+                            height: 1
+                            color: ColorTheme.colors.dark9
+                        }
+                    }
+                }
             }
         }
     }
@@ -147,7 +271,7 @@ Item
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: currentEngineId !== undefined && !isDeviceDependent
+            visible: currentEngineId !== undefined && !isDeviceDependent && currentSection == ""
 
             Binding
             {
@@ -184,20 +308,15 @@ Item
             onValuesEdited: { store.setDeviceAgentSettingsValues(currentEngineId, getValues()) }
 
             contentEnabled: enableSwitch.checked
-            verticalScrollBar: scrollBar
+            scrollBarParent: scrollBarsParent
         }
     }
 
-    ScrollBar
+    Item
     {
-        id: scrollBar
-
-        anchors
-        {
-            top: parent.top
-            right: parent.right
-            bottom: banner.top
-        }
+        id: scrollBarsParent
+        width: parent.width
+        height: banner.y
     }
 
     Banner
