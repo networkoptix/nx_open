@@ -33,12 +33,6 @@ struct Ini: nx::kit::IniConfig
         "When disabled, the aspect ratio of the zoom window is the same as the aspect ratio of\n"
         "the main camera window. If enabled, allows the user to specify the aspect ratio of the\n"
         "zoom window.");
-    NX_INI_INT(500, analyticsVideoBufferLengthMs,
-        "Length of the video buffer used when Analytics is enabled on a camera, milliseconds.\n"
-        "\n"
-        "Increases the video latency, but allows to work with the metadata with the timestamps\n"
-        "from the nearest past. The metadata with timestamps that are older than the\n"
-        "(currentTime - analyticsVideoBufferLengthMs) is ignored (not shown in the Client).");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hides enhanced video from the scene.");
     NX_INI_FLAG(1, enableObjectMetadataInterpolation,
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
