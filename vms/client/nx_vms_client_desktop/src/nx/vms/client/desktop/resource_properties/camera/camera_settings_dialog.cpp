@@ -10,6 +10,8 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
@@ -405,6 +407,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
                 singleCamera,
                 state.singleCameraSettings.fisheyeDewarping());
         });
+
+    setHelpTopic(this, Qn::CameraSettings_Help);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()
