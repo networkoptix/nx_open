@@ -450,11 +450,10 @@ Qn::ResourceStatus QnUserResource::getStatus() const
 
 void QnUserResource::prolongatePassword()
 {
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!m_ldapPasswordTimer)
-            m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
-    }
+    QnMutexLocker lk(&m_mutex);
+    if (!m_ldapPasswordTimer)
+        m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
+
     m_ldapPasswordTimer->pleaseStopSync();
     m_ldapPasswordValid = true;
     m_ldapPasswordTimer->start(
