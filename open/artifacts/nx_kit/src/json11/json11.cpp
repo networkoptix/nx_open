@@ -325,16 +325,18 @@ bool Json::operator< (const Json &other) const {
 
 /* strtod_dot(str)
  *
- * Parse number according the JSON schema using istringstream and "C" locale set to "C".
- * It is not correct to use ordinary strtod because it uses the locale, and in some locales for
- * example in ru_RU.UTF-8 the floating point delimiter is "," but not "." as in JSON schema.
+ * Parse the number according to the JSON grammar, ignoring the current locale assuming that the
+ * string is already validated to comply with the JSON grammar.
  */
 double strtod_dot(const char* str) {
+    // It is not correct to use ordinary strtod because it uses the locale and in some locales,
+    // for example, in ru_RU.UTF-8, the floating-point delimiter is "," but not "." as in JSON
+    // grammar.
     const size_t str_length = strspn(str, "0123456789.eE+-");
-    std::istringstream is(std::string(str, str_length));
-    is.imbue(std::locale("C"));
+    std::istringstream string_stream(std::string(str, str_length));
+    string_stream.imbue(std::locale("C"));
     double f = NAN;
-    is >> f;
+    string_stream >> f;
     return f;
 }
 
