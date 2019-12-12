@@ -43,7 +43,6 @@ public:
 
     std::unique_ptr<QnServerStreamRecorder> recorder;
     std::unique_ptr<nx::vms::server::PutInOrderDataProvider> reorderingProvider;
-    bool isStarted = false;
 };
 
 struct Recorders
@@ -143,7 +142,7 @@ private:
         const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,
         QnServer::ChunksCatalog catalog,
         const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
-    bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, const Recorders& recorders);
+    void startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, Recorders& recorders);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;
 
@@ -158,11 +157,13 @@ private:
     void disableLicensesIfNeed();
     void startRecording(
         const QnVideoCameraPtr& camera,
-        RecorderData* recorder,
-        const QnLiveStreamProviderPtr& provider);
-    void stopRecording(
+        std::unique_ptr<RecorderData>& recorder,
+        const QnLiveStreamProviderPtr& provider,
+        QnServer::ChunksCatalog quality,
+        const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
+    bool stopRecording(
         const QnVideoCameraPtr& camera,
-        RecorderData* recorder,
+        std::unique_ptr<RecorderData>& recorder,
         const QnLiveStreamProviderPtr& provider);
 
 private:
