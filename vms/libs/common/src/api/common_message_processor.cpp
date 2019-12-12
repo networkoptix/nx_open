@@ -966,9 +966,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     commonModule()->serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
-    resetResources(fullData);
     resetServerUserAttributesList(fullData.serversUserAttributesList);
     resetCameraUserAttributesList(fullData.cameraUserAttributesList);
+    resetResources(fullData);
     resetPropertyList(fullData.allProperties);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
