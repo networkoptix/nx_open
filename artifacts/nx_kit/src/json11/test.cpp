@@ -252,6 +252,18 @@ JSON11_TEST_CASE(json11_test) {
 
 }
 
+JSON11_TEST_CASE(json11_test_numbers) {
+    const std::string numbers =
+        R"({"numbers": [0, -0, 1, 42, 0.5, -0.5, 0.5e+1, 0.5E+1, 5.0e-1, 0.5e+12]})";
+    const std::string expected_numbers =
+        R"({"numbers": [0, 0, 1, 42, 0.5, -0.5, 5, 5, 0.5, 500000000000]})";
+
+    std::string err;
+    const std::string numbers_json = Json::parse(numbers, err).dump();
+    std::cout << "numbers_json: " << numbers_json;
+    JSON11_TEST_ASSERT(numbers_json == expected_numbers);
+}
+
 #if JSON11_TEST_STANDALONE_MAIN
 
 static void parse_from_stdin() {
