@@ -56,7 +56,7 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
     connect(layout, &QnLayoutResource::itemAdded, node,
         [this, node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
-            if (node->resourcePool()->getResourceById(item.resource.id))
+            if (node->resourcePool()->getResourceByDescriptor(item.resource))
             {
                 chainCall<QnResourceTreeModelLayoutNode>(
                     node, &QnResourceTreeModelLayoutNode::addItem, item);
