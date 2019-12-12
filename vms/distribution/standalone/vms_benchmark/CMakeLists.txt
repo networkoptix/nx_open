@@ -3,6 +3,9 @@ set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/build)
 set(zip_file ${distribution_output_dir}/${vms_benchmark_distribution_name}.zip)
 set(zip_log ${logs_dir}/vms_benchmark_zip.log)
 
+# Generated commands for add_custom_command() which copies the files - platform-dependent.
+set(copy_dependency_commands) 
+
 if(targetDevice STREQUAL "windows-x64")
     set(executable_extension .exe)
     set(benchmark_python_version 3.7)
@@ -80,6 +83,13 @@ if(targetDevice STREQUAL "windows-x64")
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf.exe
         ${CMAKE_BINARY_DIR}/bin/testcamera.exe
     )
+    
+    # Make one "copy" command for each file to avoid reaching the command line length limit.
+    foreach(dependency ${dependencies})
+        list(APPEND copy_dependency_commands
+            COMMAND ${CMAKE_COMMAND} -E copy ${dependency} vms_benchmark/testcamera/
+        )
+    endforeach()
 else()
     set(benchmark_python_version 3.6)
 
@@ -115,16 +125,14 @@ else()
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf
         ${CMAKE_BINARY_DIR}/bin/testcamera
     )
-endif()
-
-# Make one "copy" command for each file to avoid reaching the command line length limit on Windows.
-set(copy_dependency_commands)
-foreach(dependency ${dependencies})
-    file(GLOB dependency_file ${dependency})
+    
+    # Call via bash to resolve `*` used for .so symlinks.
+    list(JOIN dependencies " " dependencies_args) #< Assuming dependencies do not contain spaces.
     list(APPEND copy_dependency_commands
-        COMMAND ${CMAKE_COMMAND} -E copy ${dependency_file} vms_benchmark/testcamera/
+        COMMAND bash -c "cp -r ${dependencies_args} vms_benchmark/testcamera/"
     )
-endforeach()
+    
+endif()
 
 add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo "  Copying VMS Benchmark files"

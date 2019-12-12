@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
@@ -32,8 +34,9 @@ using CreateCursorCompletionHandler =
  * Generally, any error does not mean storage cannot continue.
  * New operations may be completed successfully.
  */
-class AbstractEventsStorage
+class AbstractEventsStorage: public QObject
 {
+    Q_OBJECT
 public:
     virtual ~AbstractEventsStorage() = default;
 
