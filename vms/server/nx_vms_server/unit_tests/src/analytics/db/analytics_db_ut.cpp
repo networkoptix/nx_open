@@ -17,6 +17,7 @@
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "attribute_dictionary.h"
+#include "utils.h"
 
 namespace nx::analytics::db::test {
 
@@ -140,7 +141,7 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
-    std::vector<ObjectTrack> toObjectMetadataPackets(
+    std::vector<ObjectTrack> toObjectTrack(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
         std::vector<ObjectTrack> objectTracks;
@@ -504,8 +505,9 @@ private:
         const Filter& filter,
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& packets)
     {
-        auto objectMetadataPackets = toObjectMetadataPackets(packets);
-        objectMetadataPackets = filterObjectTracksAndApplySortOrder(filter, std::move(objectMetadataPackets));
+        auto objectMetadataPackets = toObjectTrack(packets);
+        objectMetadataPackets = filterObjectTracksAndApplySortOrder(
+            filter, std::move(objectMetadataPackets));
 
         // NOTE: Object bbox is stored in the DB with limited precision.
         // So, lowering precision to that in the DB.
@@ -616,12 +618,14 @@ private:
                 track.objectTypeId = objectMetadata.typeId;
                 track.attributes = objectMetadata.attributes;
                 track.deviceId = packet->deviceId;
+
                 track.objectPositionSequence.push_back(ObjectPosition());
                 ObjectPosition& objectPosition = track.objectPositionSequence.back();
-                objectPosition.boundingBox = objectMetadata.boundingBox;
                 objectPosition.timestampUs = packet->timestampUs;
                 objectPosition.durationUs = packet->durationUs;
                 objectPosition.deviceId = packet->deviceId;
+                objectPosition.boundingBox = objectMetadata.boundingBox;
+                objectPosition.attributes = objectMetadata.attributes;
 
                 if (objectMetadata.bestShot)
                 {
@@ -875,7 +879,7 @@ protected:
     void addMaxObjectTracksLimitToFilter()
     {
         const auto filteredObjectCount = (int) filterObjectTracks(
-            toObjectMetadataPackets(analyticsDataPackets()), m_filter).size();
+            toObjectTrack(analyticsDataPackets()), m_filter).size();
 
         if (filteredObjectCount > 0)
         {
@@ -906,6 +910,11 @@ protected:
         }
 
         m_filter.freeText = text.mid(0, text.size() / 2);
+    }
+
+    void addTextToFilter(const QString& text)
+    {
+        m_filter.freeText = text;
     }
 
     void addRandomUnknownText()
@@ -1007,39 +1016,26 @@ protected:
 
     void givenObjectWithLongTrack()
     {
-        using namespace std::chrono;
+        saveAnalyticsDataPackets(generateObjectWithLongTrackPackets());
+    }
 
-        const auto startTime = system_clock::from_time_t(
-            analyticsDataPackets().back()->timestampUs / 1000000) + hours(1);
-        setAllowedTimeRange(startTime, startTime + hours(24));
+    std::vector<QString> givenObjectWithAttributeChangingInTime()
+    {
+        auto packets = generateObjectWithLongTrackPackets();
 
-        m_specificObjectTrackId = QnUuid::createUuid();
-        const auto deviceId = QnUuid::createUuid();
-        auto analyticsDataPackets = generateEventsByCriteria();
+        const QString attrName = "changeling";
+        std::vector<QString> attrValues;
 
-        qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
-        qint64 objectTrackEndTime = std::numeric_limits<qint64>::min();
-
-        for (auto& packet: analyticsDataPackets)
+        for (std::size_t i = 0; i < packets.size(); ++i)
         {
-            objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUs);
-            objectTrackEndTime =
-                std::max(objectTrackEndTime, packet->timestampUs + packet->durationUs);
-            packet->deviceId = deviceId;
-
-            for (auto& objectMetadata: packet->objectMetadataList)
-            {
-                objectMetadata.trackId = m_specificObjectTrackId;
-                objectMetadata.typeId = m_specificObjectTrackId.toString();
-            }
+            attrValues.push_back(lm("pos_%1").args(i));
+            packets[i]->objectMetadataList.front().attributes.emplace_back(
+                attrName, attrValues.back());
         }
 
-        m_specificObjectTrackTimePeriod.setStartTime(
-            duration_cast<milliseconds>(microseconds(objectTrackStartTime)));
-        m_specificObjectTrackTimePeriod.setDuration(
-            duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
+        saveAnalyticsDataPackets(packets);
 
-        saveAnalyticsDataPackets(analyticsDataPackets);
+        return attrValues;
     }
 
     void setSortOrder(Qt::SortOrder sortOrder)
@@ -1163,6 +1159,43 @@ private:
 
         saveAnalyticsDataPackets(generateEventsByCriteria());
     }
+
+    std::vector<common::metadata::ObjectMetadataPacketPtr> generateObjectWithLongTrackPackets()
+    {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUs / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
+        m_specificObjectTrackId = QnUuid::createUuid();
+        const auto deviceId = QnUuid::createUuid();
+        auto analyticsDataPackets = generateEventsByCriteria();
+
+        qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
+        qint64 objectTrackEndTime = std::numeric_limits<qint64>::min();
+
+        for (auto& packet : analyticsDataPackets)
+        {
+            objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUs);
+            objectTrackEndTime =
+                std::max(objectTrackEndTime, packet->timestampUs + packet->durationUs);
+            packet->deviceId = deviceId;
+
+            for (auto& objectMetadata : packet->objectMetadataList)
+            {
+                objectMetadata.trackId = m_specificObjectTrackId;
+                objectMetadata.typeId = m_specificObjectTrackId.toString();
+            }
+        }
+
+        m_specificObjectTrackTimePeriod.setStartTime(
+            duration_cast<milliseconds>(microseconds(objectTrackStartTime)));
+        m_specificObjectTrackTimePeriod.setDuration(
+            duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
+
+        return analyticsDataPackets;
+    }
 };
 
 TEST_F(AnalyticsDbLookup, empty_filter_matches_all_tracks)
@@ -1238,6 +1271,16 @@ TEST_F(AnalyticsDbLookup, full_text_search)
 TEST_F(AnalyticsDbLookup, full_text_search_by_prefix)
 {
     addRandomTextPrefixFoundInDataToFilter();
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, lookup_historic_attribute_value)
+{
+    const auto historicAttributeValues = givenObjectWithAttributeChangingInTime();
+    addTextToFilter(historicAttributeValues.front());
+
     whenLookupObjectTracks();
 
     thenResultMatchesExpectations();

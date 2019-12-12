@@ -232,15 +232,17 @@ void ObjectTrackCache::addNewAttributes(
 {
     for (const auto& attribute: attributes)
     {
-        auto it = trackContext->allAttributes.find(attribute.name);
+        auto it = trackContext->allAttributes.find(
+            std::make_pair(attribute.name, attribute.value));
         if (it == trackContext->allAttributes.end())
         {
             trackContext->track.attributes.push_back(attribute);
             trackContext->newAttributesSinceLastUpdate.push_back(attribute);
-            trackContext->allAttributes[attribute.name] = attribute.value;
+            trackContext->allAttributes.emplace(attribute.name, attribute.value);
             continue;
         }
 
+#if 0
         if (it->second == attribute.value)
             continue;
 
@@ -252,6 +254,7 @@ void ObjectTrackCache::addNewAttributes(
         }
 
         trackContext->newAttributesSinceLastUpdate.push_back(attribute);
+#endif
     }
 }
 

@@ -25,8 +25,6 @@ struct ObjectPosition
     QRectF boundingBox;
     /** Variable object attributes. E.g., car speed. */
     nx::common::metadata::Attributes attributes;
-
-    bool operator==(const ObjectPosition& right) const;
 };
 
 #define ObjectPosition_analytics_storage_Fields \
@@ -60,8 +58,6 @@ struct ObjectTrack
     qint64 lastAppearanceTimeUs = 0;
     std::vector<ObjectPosition> objectPositionSequence;
     BestShot bestShot;
-
-    bool operator==(const ObjectTrack& right) const;
 };
 
 #define ObjectTrack_analytics_storage_Fields \

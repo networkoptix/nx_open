@@ -10,6 +10,7 @@
 #include <test_support/mediaserver_launcher.h>
 
 #include "attribute_dictionary.h"
+#include "utils.h"
 
 namespace nx::analytics::db::test {
 

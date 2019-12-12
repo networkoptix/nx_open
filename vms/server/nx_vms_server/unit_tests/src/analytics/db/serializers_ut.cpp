@@ -8,6 +8,7 @@
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "attribute_dictionary.h"
+#include "utils.h"
 
 namespace nx::analytics::db::test {
 

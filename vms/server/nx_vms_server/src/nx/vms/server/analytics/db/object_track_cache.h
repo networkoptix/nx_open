@@ -102,7 +102,7 @@ private:
         bool insertionReported = false;
         bool modified = false;
 
-        std::map<QString, QString> allAttributes;
+        std::set<std::pair<QString, QString>> allAttributes;
     };
 
     const std::chrono::milliseconds m_aggregationPeriod;

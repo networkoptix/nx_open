@@ -46,30 +46,10 @@ bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
 } // namespace
 
 
-bool ObjectPosition::operator==(const ObjectPosition& right) const
-{
-    return deviceId == right.deviceId
-        && timestampUs == right.timestampUs
-        && durationUs == right.durationUs
-        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
-        && attributes == right.attributes;
-}
-
 bool BestShot::operator==(const BestShot& right) const
 {
     return timestampUs == right.timestampUs
         && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
-}
-
-bool ObjectTrack::operator==(const ObjectTrack& right) const
-{
-    return id == right.id
-        && objectTypeId == right.objectTypeId
-        //&& attributes == right.attributes
-        && firstAppearanceTimeUs == right.firstAppearanceTimeUs
-        && lastAppearanceTimeUs == right.lastAppearanceTimeUs
-        && objectPositionSequence == right.objectPositionSequence
-        && bestShot == right.bestShot;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -152,7 +132,19 @@ bool Filter::acceptsTrack(const ObjectTrack& track) const
     }
 
     if (!acceptsAttributes(track.attributes))
-        return false;
+    {
+        // Checking the track attributes.
+        if (!std::any_of(
+                track.objectPositionSequence.cbegin(),
+                track.objectPositionSequence.cend(),
+                [this](const ObjectPosition& position)
+                {
+                    return acceptsAttributes(position.attributes);
+                }))
+        {
+            return false;
+        }
+    }
 
     // Checking the track.
     if (!std::any_of(
