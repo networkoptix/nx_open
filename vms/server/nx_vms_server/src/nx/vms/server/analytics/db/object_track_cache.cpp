@@ -239,22 +239,7 @@ void ObjectTrackCache::addNewAttributes(
             trackContext->track.attributes.push_back(attribute);
             trackContext->newAttributesSinceLastUpdate.push_back(attribute);
             trackContext->allAttributes.emplace(attribute.name, attribute.value);
-            continue;
         }
-
-#if 0
-        if (it->second == attribute.value)
-            continue;
-
-        it->second = attribute.value;
-        for (auto& existingAttribute: trackContext->track.attributes)
-        {
-            if (existingAttribute.name == attribute.name)
-                existingAttribute.value = attribute.value;
-        }
-
-        trackContext->newAttributesSinceLastUpdate.push_back(attribute);
-#endif
     }
 }
 
