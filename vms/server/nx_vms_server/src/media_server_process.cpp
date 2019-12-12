@@ -5151,6 +5151,10 @@ void SIGUSR1_handler(int)
 
 int MediaServerProcess::main(int argc, char* argv[])
 {
+    // Set locale to default "C" locale to have no issues with locale dependend standard conversion
+    // functions. Using of QnTranslationManager::installTranslation is not enough as QLocale
+    // affects only Qt locale dependend functions.
+    setlocale(LC_ALL, "");
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
     static const int kMaxDescriptors = 32000;
