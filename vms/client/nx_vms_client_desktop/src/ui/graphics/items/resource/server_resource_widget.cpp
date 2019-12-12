@@ -462,6 +462,7 @@ private:
     QnServerResourceWidget *m_widget;
 };
 
+using HealthMonitoringButtons = QnServerResourceWidget::HealthMonitoringButtons;
 
 // -------------------------------------------------------------------------- //
 // QnServerResourceWidget
@@ -623,12 +624,14 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
     }
 }
 
-void QnServerResourceWidget::updateLegend() {
-    HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
+void QnServerResourceWidget::updateLegend()
+{
+    const auto checkedData = savedCheckedHealthMonitoringButtons();
 
     QHash<Qn::StatisticsDeviceType, int> indexes;
 
-    foreach (const QString &key, m_sortedKeys) {
+    for (const QString& key: m_sortedKeys)
+    {
         QnStatisticsData &stats = m_history[key];
 
         if (!m_graphDataByKey.contains(key)) {
@@ -643,11 +646,17 @@ void QnServerResourceWidget::updateLegend() {
             newButton->setProperty(legendKeyPropertyName, key);
             newButton->setChecked(data.visible);
 
-            connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
-                HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
-                value[key] = toggled;
-                this->item()->setData(Qn::ItemHealthMonitoringButtonsRole, qVariantFromValue<HealthMonitoringButtons>(value));
-            });
+            connect(newButton, &QnImageButtonWidget::toggled, this,
+                [this, key](bool toggled)
+                {
+                    if (!item())
+                        return;
+
+                    HealthMonitoringButtons value = savedCheckedHealthMonitoringButtons();
+                    value[key] = toggled;
+                    item()->setData(Qn::ItemHealthMonitoringButtonsRole,
+                        qVariantFromValue<HealthMonitoringButtons>(value));
+                });
 
             connect(newButton,  &QnImageButtonWidget::stateChanged, this, &QnServerResourceWidget::updateHoverKey);
 
@@ -807,8 +816,19 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
     return base_type::calculateStatusOverlay(status, true);
 }
 
-void QnServerResourceWidget::updateCheckedHealthMonitoringButtons() {
-    setCheckedHealthMonitoringButtons(item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>());
+HealthMonitoringButtons QnServerResourceWidget::savedCheckedHealthMonitoringButtons() const
+{
+    if (auto workbenchItem = this->item())
+    {
+        return workbenchItem->data(Qn::ItemHealthMonitoringButtonsRole)
+            .value<HealthMonitoringButtons>();
+    }
+    return {};
+}
+
+void QnServerResourceWidget::updateCheckedHealthMonitoringButtons()
+{
+    setCheckedHealthMonitoringButtons(savedCheckedHealthMonitoringButtons());
 }
 
 void QnServerResourceWidget::at_itemDataChanged(int role) {
