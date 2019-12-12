@@ -11,7 +11,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <limits>
+#include <sstream>
 
 namespace nx {
 namespace kit {
