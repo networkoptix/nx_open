@@ -5,7 +5,7 @@ set -e
 SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR="$SOURCE_DIR/.."
 BRANCH_FILE="$ROOT_DIR"/.hg/branch
-RDEP="$ROOT_DIR"/build_utils/rdep/rdep.py
+RDEP="$ROOT_DIR"/build_utils/python/rdep.py
 WEBADMIN_FILE="$PWD"/server-external/bin/external.dat
 PACKAGES_DIR="$environment"/packages
 PACKAGE_BASE_NAME=server-external
