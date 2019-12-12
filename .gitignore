@@ -13,6 +13,7 @@ CMakeSettings.json
 .vim*
 .ccls*
 compile_commands.json
+.clangd
 
 # Precompiled files.
 *.pyc
