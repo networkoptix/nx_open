@@ -1154,3 +1154,13 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     reader->addDataProcessor(m_liveCache[streamQuality].get());
     return true;
 }
+
+QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getPrimaryReader(bool autoStartReader) 
+{ 
+    return getLiveReader(QnServer::HiQualityCatalog, autoStartReader); 
+}
+
+QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getSecondaryReader(bool autoStartReader) 
+{ 
+    return getLiveReader(QnServer::LowQualityCatalog, autoStartReader); 
+}
