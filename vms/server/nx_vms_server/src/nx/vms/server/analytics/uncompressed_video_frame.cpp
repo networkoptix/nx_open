@@ -43,7 +43,8 @@ UncompressedVideoFrame::UncompressedVideoFrame(
                 av_freep(&avFrame->data[0]);
                 av_frame_free(&avFrame);
             }
-        })
+        }),
+    m_metadataPacketList(makePtr<List<nx::sdk::analytics::IMetadataPacket>>())
 {
     if (!NX_ASSERT(m_ownedAvFrame)
         || !NX_ASSERT(width > 0, width)
