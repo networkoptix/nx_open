@@ -100,6 +100,7 @@ include(ExternalProject)
 
 nx_option(codeSigning "Enable code signing" OFF)
 nx_option(notarization "Enable notarization" OFF)
+nx_option(usePython2 "Use depricated Python v2 version" OFF)
 
 include(target_detection)
 nx_init_known_files_list()
