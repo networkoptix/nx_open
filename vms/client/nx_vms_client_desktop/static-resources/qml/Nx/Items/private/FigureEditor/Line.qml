@@ -2,91 +2,12 @@ import QtQuick 2.10
 
 import "../figure_utils.js" as F
 
-Figure
+PolyFigure
 {
     id: figure
 
-    readonly property bool hasFigure: pointMakerInstrument.count === 2
-        || (pointMakerInstrument.enabled && pointMakerInstrument.count > 0)
-
     property string allowedDirections: (figureSettings && figureSettings.allowedDirections)
         ? figureSettings.allowedDirections : ""
-    acceptable: !pointMakerInstrument.enabled || pointMakerInstrument.count === 0
-
-    MouseArea
-    {
-        id: mouseArea
-
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
-        hoverEnabled: enabled
-        cursorShape: (dragInstrument.enabled || dragInstrument.dragging)
-            ? Qt.SizeAllCursor : Qt.ArrowCursor
-    }
-
-    PointMakerInstrument
-    {
-        id: pointMakerInstrument
-
-        item: mouseArea
-        maxPoints: 2
-    }
-
-    PathHoverInstrument
-    {
-        id: hoverInstrument
-        model: pointMakerInstrument.model
-        enabled: !pointMakerInstrument.enabled
-        item: mouseArea
-    }
-
-    hoverInstrument: hoverInstrument.enabled ? hoverInstrument : pointMakerInstrument
-
-    FigureDragInstrument
-    {
-        id: dragInstrument
-        pointMakerInstrument: pointMakerInstrument
-        pathHoverInstrument: hoverInstrument
-        item: mouseArea
-        target: figure
-        minX: -Math.min(pointMakerInstrument.startX, pointMakerInstrument.endX)
-        minY: -Math.min(pointMakerInstrument.startY, pointMakerInstrument.endY)
-        maxX: width - Math.max(pointMakerInstrument.startX, pointMakerInstrument.endX)
-        maxY: height - Math.max(pointMakerInstrument.startY, pointMakerInstrument.endY)
-    }
-
-    Rectangle
-    {
-        color: figure.color
-
-        antialiasing: true
-
-        x: pointMakerInstrument.startX
-        y: pointMakerInstrument.startY - height / 2
-        width: F.distance(pointMakerInstrument.startX, pointMakerInstrument.startY,
-            pointMakerInstrument.endX, pointMakerInstrument.endY)
-        height: 2
-
-        transformOrigin: Item.Left
-        rotation: Math.atan2(
-            pointMakerInstrument.endY - pointMakerInstrument.startY,
-            pointMakerInstrument.endX - pointMakerInstrument.startX) / Math.PI * 180
-    }
-
-    Repeater
-    {
-        model: pointMakerInstrument.model
-
-        PointGrip
-        {
-            enabled: !pointMakerInstrument.enabled
-            color: figure.color
-            x: F.absX(model.x, figure)
-            y: F.absY(model.y, figure)
-
-            onMoved: pointMakerInstrument.setPoint(index, Qt.point(x, y))
-        }
-    }
 
     LineArrow
     {
@@ -95,10 +16,9 @@ Figure
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
         color: figure.color
 
-        x1: pointMakerInstrument.startX
-        y1: pointMakerInstrument.startY
-        x2: pointMakerInstrument.endX
-        y2: pointMakerInstrument.endY
+        x: pathUtil.midAnchorPoint.x
+        y: pathUtil.midAnchorPoint.y
+        rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle)
 
         onToggled:
         {
@@ -120,10 +40,9 @@ Figure
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
         color: figure.color
 
-        x1: pointMakerInstrument.endX
-        y1: pointMakerInstrument.endY
-        x2: pointMakerInstrument.startX
-        y2: pointMakerInstrument.startY
+        x: pathUtil.midAnchorPoint.x
+        y: pathUtil.midAnchorPoint.y
+        rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle) + 180
 
         onToggled:
         {
@@ -147,11 +66,23 @@ Figure
         }
         else
         {
+            if (pathUtil.hasSelfIntersections)
+                return qsTr("Line is not valid. Remove self-intersections to proceed.")
+
+            if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
+                return qsTr("Maximum points count is reached (%n points).", "", maxPoints)
+
             if (allowedDirections !== "none")
                 return qsTr("Click arrows to toggle the desired directions.")
         }
 
         return ""
+    }
+    hintStyle:
+    {
+        if (!pointMakerInstrument.enabled && pathUtil.hasSelfIntersections)
+            return Banner.Style.Error
+        return Banner.Style.Info
     }
 
     function startCreation()
@@ -164,16 +95,10 @@ Figure
 
     function deserialize(json)
     {
-        pointMakerInstrument.finish()
+        baseDeserialize(json)
 
-        if (F.isEmptyObject(json))
-        {
-            pointMakerInstrument.clear()
+        if (!hasFigure)
             return
-        }
-
-        color = json.color || ""
-        pointMakerInstrument.setRelativePoints(F.deserializePoints(json.points || []))
 
         if (json.direction === "a")
         {
@@ -194,17 +119,14 @@ Figure
 
     function serialize()
     {
-        if (pointMakerInstrument.count === 0)
+        var json = baseSerialize()
+        if (!json)
             return null
 
-        const direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
+        json.direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
             ? arrowA.checked ? "a" : "b"
             : ""
 
-        return {
-            "points": F.serializePoints(pointMakerInstrument.getRelativePoints()),
-            "direction": direction,
-            "color": color.toString()
-        }
+        return json
     }
 }

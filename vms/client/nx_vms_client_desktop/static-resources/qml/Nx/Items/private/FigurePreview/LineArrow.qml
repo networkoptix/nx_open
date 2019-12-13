@@ -7,16 +7,10 @@ Item
     property color color: "white"
     property real padding: 2
 
-    property real x1
-    property real y1
-    property real x2
-    property real y2
-
-    x: (x1 + x2) / 2
-    y: (y1 + y2) / 2
-
     onPaddingChanged: canvas.requestPaint()
     onColorChanged: canvas.requestPaint()
+
+    transformOrigin: Item.Left
 
     Canvas
     {
@@ -25,9 +19,6 @@ Item
         y: -3.5
         width: 7 + arrow.padding
         height: 7
-
-        transformOrigin: Item.Left
-        rotation: Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180 - 90
 
         onPaint:
         {

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Nx 1.0
 import Nx.Items 1.0 as Items
+import nx.vms.client.core 1.0
 
 import "../figure_utils.js" as F
 
@@ -14,40 +15,57 @@ Item
     property var points: []
     property string direction: ""
 
-    readonly property bool hasFigure: points.length === 2
+    readonly property bool hasFigure: points.length >= 2
 
     clip: true
 
-    Items.Line
+    PathUtil
     {
-        id: line
+        id: pathUtil
+    }
 
-        visible: hasFigure
-        color: figure.color
-        lineWidth: 2
+    Canvas
+    {
+        id: canvas
 
-        startX: points.length === 2 ? F.absX(points[0][0], figure) : 0
-        startY: points.length === 2 ? F.absY(points[0][1], figure) : 0
-        endX: points.length === 2 ? F.absX(points[1][0], figure) : 0
-        endY: points.length === 2 ? F.absY(points[1][1], figure) : 0
+        anchors.fill: parent
+
+        onPaint:
+        {
+            var ctx = getContext("2d")
+            ctx.reset()
+
+            const points = pathUtil.points
+            if (points.length < 2)
+                return
+
+            ctx.strokeStyle = color
+            ctx.fillStyle = ColorTheme.transparent(color, 0.3)
+            ctx.fillRule = Qt.WindingFill
+            ctx.lineWidth = 2
+
+            ctx.moveTo(points[0].x, points[0].y)
+            for (var i = 0; i < points.length; ++i)
+                ctx.lineTo(points[i].x, points[i].y)
+
+            ctx.stroke()
+        }
     }
 
     LineArrow
     {
-        x1: line.startX
-        y1: line.startY
-        x2: line.endX
-        y2: line.endY
+        x: pathUtil.midAnchorPoint.x
+        y: pathUtil.midAnchorPoint.y
+        rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle)
         color: figure.color
         visible: !direction || direction === "a"
     }
 
     LineArrow
     {
-        x1: line.endX
-        y1: line.endY
-        x2: line.startX
-        y2: line.startY
+        x: pathUtil.midAnchorPoint.x
+        y: pathUtil.midAnchorPoint.y
+        rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle) + 180
         color: figure.color
         visible: !direction || direction === "b"
     }
@@ -60,11 +78,41 @@ Item
             points = figureJson.points
             direction = figureJson.direction || ""
             if (!points)
+            {
                 points = []
+            }
+            else
+            {
+                var absPoints = []
+                for (var i = 0; i < points.length; ++i)
+                {
+                    absPoints.push(
+                        Qt.point(F.absX(points[i][0], figure), F.absY(points[i][1], figure)))
+                }
+                pathUtil.points = absPoints
+            }
         }
         else
         {
             points = []
         }
+    }
+
+    onPointsChanged: canvas.requestPaint()
+    onColorChanged: canvas.requestPaint()
+
+    onWidthChanged: updatePoints()
+    onHeightChanged: updatePoints()
+
+    function updatePoints()
+    {
+        var absPoints = []
+        for (var i = 0; i < points.length; ++i)
+        {
+            absPoints.push(
+                Qt.point(F.absX(points[i][0], figure), F.absY(points[i][1], figure)))
+        }
+        pathUtil.points = absPoints
+        canvas.requestPaint()
     }
 }

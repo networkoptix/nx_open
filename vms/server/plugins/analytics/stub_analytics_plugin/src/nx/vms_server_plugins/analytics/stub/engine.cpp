@@ -515,6 +515,12 @@ std::string Engine::manifestString() const
                         "name": "testLine2",
                         "caption": "Line",
                         "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                    },
+                    {
+                        "type": "LineFigure",
+                        "name": "testPolyLine",
+                        "caption": "Polyline",
+                        "maxPoints": 8
                     }
                 ]
             }
