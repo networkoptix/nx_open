@@ -375,7 +375,7 @@
                         "name": "Events: Camera Offline (1h)",
                         "description": "Events count: Camera Offline (1h)",
                         "display": "table|panel",
-                        "calculate": "countValues %systemStatus 1h Offline",
+                        "calculate": "countValues %offlineFromOnlineStatus 1h Offline",
                         "insert": "streamIssues",
                         "alarms": [
                             {

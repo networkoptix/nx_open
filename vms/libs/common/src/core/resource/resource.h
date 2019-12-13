@@ -57,6 +57,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
+    Qn::ResourceStatus getPreviousStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
 
     bool isOnline() const { return isOnline(getStatus()); }
@@ -307,6 +308,7 @@ private:
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
     std::atomic<int> cTestStatus{0};
+    std::atomic<Qn::ResourceStatus> m_previousStatus = Qn::ResourceStatus::NotDefined;
 };
 
 template<class Resource>
