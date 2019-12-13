@@ -152,6 +152,9 @@ std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
     recorder->setDualStreamingHelper(dualStreamingHelper);
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
 
+    if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
+        recorder->updateCamera(camRes);
+
     auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(
             reader,
             std::chrono::milliseconds(0) /*minSize*/,
@@ -180,7 +183,6 @@ bool QnRecordingManager::startForcedRecording(
     int afterThresholdSec,
     int maxDurationSec)
 {
-    updateCamera(camRes); // ensure recorders are created
     auto camera = videoCameraPool()->getVideoCamera(camRes);
     if (!camera)
         return false;
@@ -195,27 +197,39 @@ bool QnRecordingManager::startForcedRecording(
 
     // update current schedule task
     Recorders& recorders = itrRec->second;
-    if (recorders.recorderHiRes)
-    {
-        recorders.recorderHiRes->recorder->startForcedRecording(
-            quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
-    }
-    if (recorders.recorderLowRes)
-    {
-        recorders.recorderLowRes->recorder->startForcedRecording(
-            quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
-    }
+
+    auto createOrUpdateRecorder =
+        [&](std::unique_ptr<RecorderData>& recorder,
+            QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& helper)
+        {
+            if (!recorder)
+            {
+                if (const auto provider = camera->getLiveReader(catalog))
+                {
+                    recorder = createRecorder(camera->resource(), provider, catalog, helper);
+                }
+                else
+                {
+                    NX_DEBUG(this, "Skip forced recording for catalog %1 for camera %2 "
+                        "because of no dataProvider", catalog, camRes->getUniqueId());
+                    return;
+                }
+            }
+            recorder->recorder->startForcedRecording(
+                quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
+        };
+
+    // Put recorder to the 'forced mode' before its thread is started. Create object if need first.
+    createOrUpdateRecorder(recorders.recorderHiRes, QnServer::HiQualityCatalog, recorders.dualStreamingHelper);
+    createOrUpdateRecorder(recorders.recorderLowRes, QnServer::LowQualityCatalog, recorders.dualStreamingHelper);
 
     // start recorder threads
     startOrStopRecording(camRes, camera, recorders);
-
-    // return true if recording started. if camera is not accessible e.t.c return false
     return true;
 }
 
 bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck)
 {
-    updateCamera(camRes); // ensure recorders are created
     auto camera = videoCameraPool()->getVideoCamera(camRes);
     if (!camera)
         return false;
@@ -265,11 +279,7 @@ void QnRecordingManager::startRecording(
         return;
     }
     if (!recorder)
-    {
         recorder = createRecorder(camera->resource(), provider, quality, dualStreamingHelper);
-        if (auto camRes = camera->resource().dynamicCast<QnSecurityCamResource>())
-            recorder->recorder->updateCamera(camRes);
-    }
 
     if (!recorder->recorder->isRunning())
     {
