@@ -57,7 +57,7 @@ Item
         x: pathUtil.midAnchorPoint.x
         y: pathUtil.midAnchorPoint.y
         rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle)
-        color: figure.color
+        color: "white"
         visible: !direction || direction === "a"
     }
 
@@ -66,7 +66,7 @@ Item
         x: pathUtil.midAnchorPoint.x
         y: pathUtil.midAnchorPoint.y
         rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle) + 180
-        color: figure.color
+        color: "white"
         visible: !direction || direction === "b"
     }
 

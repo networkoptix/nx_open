@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 Item
 {
@@ -20,6 +21,8 @@ Item
         width: 7 + arrow.padding
         height: 7
 
+        visible: false
+
         onPaint:
         {
             var ctx = getContext("2d")
@@ -34,5 +37,13 @@ Item
 
             ctx.fill()
         }
+    }
+
+    DropShadow
+    {
+        anchors.fill: canvas
+        source: canvas
+        color: "black"
+        radius: 3
     }
 }
