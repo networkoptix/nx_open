@@ -278,8 +278,8 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
-    processFrameMotion(videoFrame->metadataList());
     processVideoFrame(videoFrame, __func__);
+    processFrameMotion(videoFrame->metadataList());
     return true;
 }
 
@@ -291,8 +291,8 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         return false;
     }
 
-    processFrameMotion(videoFrame->metadataList());
     processVideoFrame(videoFrame, __func__);
+    processFrameMotion(videoFrame->metadataList());
     return checkVideoFrame(videoFrame);
 }
 
@@ -313,6 +313,8 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
 {
     if (!ini().visualizeMotion)
         return;
+
+    cleanUpTimestampQueue();
 
     if (!metadataPacketList)
         return;
@@ -366,17 +368,17 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    std::string logMessage = "No need to generate metadata packets";
-    if (m_deviceAgentSettings.needToGenerateObjects())
+    if (!m_deviceAgentSettings.needToGenerateObjects())
     {
-        *metadataPackets = cookSomeObjects();
-        logMessage =
-            nx::kit::utils::format("Generated %d metadata packet(s)", metadataPackets->size());
+        NX_OUTPUT << __func__ << "() END -> true: no need to generate object metadata packets";
+        return true;
     }
 
+    *metadataPackets = cookSomeObjects();
     m_lastVideoFrameTimestampUs = 0;
 
-    NX_OUTPUT << __func__ << "() END -> true: " << logMessage;
+    NX_OUTPUT << __func__ << "() END -> true: " <<
+        nx::kit::utils::format("generated %d metadata packet(s)", metadataPackets->size());
     return true;
 }
 
