@@ -16,6 +16,7 @@
 
 #include "engine.h"
 #include "objects/random.h"
+#include "stub_analytics_plugin_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -116,6 +117,9 @@ private:
 
     void updateEventGenerationParameters();
 
+    void processFrameMotion(
+        nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>> metadataPacketList);
+
 private:
     Engine* const m_engine;
 
@@ -142,7 +146,8 @@ private:
     {
         bool needToGenerateObjects() const
         {
-            return generateCars
+            return !ini().visualizeMotion
+                || generateCars
                 || generateTrucks
                 || generatePedestrians
                 || generateHumanFaces
@@ -151,7 +156,6 @@ private:
         }
 
         std::atomic<bool> generateEvents{true};
-
         std::atomic<bool> generateCars{true};
         std::atomic<bool> generateTrucks{true};
         std::atomic<bool> generatePedestrians{true};

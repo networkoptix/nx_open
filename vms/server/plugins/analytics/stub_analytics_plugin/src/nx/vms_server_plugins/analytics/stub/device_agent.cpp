@@ -14,6 +14,8 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/analytics/i_motion_metadata_packet.h>
+
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
@@ -276,6 +278,9 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
+    if (m_deviceAgentSettings.visualizeMotion)
+        processFrameMotion(videoFrame->metadataList());
+
     processVideoFrame(videoFrame, __func__);
     return true;
 }
@@ -287,6 +292,9 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
     }
+
+    if (m_deviceAgentSettings.visualizeMotion)
+        processFrameMotion(videoFrame->metadataList());
 
     processVideoFrame(videoFrame, __func__);
     return checkVideoFrame(videoFrame);
@@ -303,6 +311,59 @@ bool DeviceAgent::pushCustomMetadataPacket(
 
     processCustomMetadataPacket(customMetadataPacket, __func__);
     return true;
+}
+
+void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketList)
+{
+    if (!ini().visualizeMotion)
+        return;
+
+    if (!metadataPacketList)
+        return;
+
+    const int numberOfMetadataPackets = metadataPacketList->count();
+    if (numberOfMetadataPackets == 0)
+        return;
+
+    for (int i = 0; i < numberOfMetadataPackets; ++i)
+    {
+        const auto metadataPacket = metadataPacketList->at(i);
+        if (!NX_KIT_ASSERT(metadataPacket))
+            continue;
+
+        const auto motionPacket = metadataPacket->queryInterface<IMotionMetadataPacket>();
+        if (!motionPacket)
+            continue;
+
+        auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+        objectMetadataPacket->setTimestampUs(motionPacket->timestampUs());
+
+        const int columnCount = motionPacket->columnCount();
+        const int rowCount = motionPacket->rowCount();
+
+        for (int column = 0; column < columnCount; ++column)
+        {
+            for (int row = 0; row < rowCount; ++row)
+            {
+                if (!motionPacket->isMotionAt(column, row))
+                    continue;
+
+                const auto objectMetadata = makePtr<ObjectMetadata>();
+                objectMetadata->setBoundingBox(Rect(
+                    column / (float)columnCount,
+                    row / (float) rowCount,
+                    1.0F / columnCount,
+                    1.0F / rowCount));
+
+                objectMetadata->setTypeId(kMotionVisualizationObjectType);
+                objectMetadata->setTrackId(UuidHelper::randomUuid());
+                objectMetadata->setConfidence(1.0F);
+                objectMetadataPacket->addItem(objectMetadata.get());
+            }
+        }
+
+        pushMetadataPacket(objectMetadataPacket.releasePtr());
+    }
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
