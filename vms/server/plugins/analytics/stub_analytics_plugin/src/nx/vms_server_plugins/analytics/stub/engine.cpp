@@ -107,7 +107,7 @@ void Engine::initCapabilities()
     if (ini().deviceDependent)
         m_capabilities += "|deviceDependent";
 
-    m_streamTypeFilter = "compressedVideo";
+    m_streamTypeFilter = "motion|compressedVideo";
 
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
@@ -121,7 +121,7 @@ void Engine::initCapabilities()
         {
             m_needUncompressedVideoFrames = true;
             m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
-            m_streamTypeFilter = "uncompressedVideo";
+            m_streamTypeFilter = "motion|uncompressedVideo";
         }
     }
 
