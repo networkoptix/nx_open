@@ -30,6 +30,12 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(1, needMetadata,
         "If set, Engine will declare the corresponding stream type filter in the manifest");
+
+    NX_INI_FLAG(1, visualizeMotion,
+        "If set, the Engine will visualize motion metadata via object bounding boxes (each\n"
+        "active motion grid cell is dispalyed as a separate object), regular object generation\n"
+        "is disabled in this case, so the correspondent DeviceAgent settings won't work. Use\n"
+        "carefully since this option can affect performance very much");
 };
 
 inline Ini& ini()
