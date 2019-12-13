@@ -91,7 +91,8 @@ void OnlineRelaysClusterClient::findRelayInstanceForClient(
                 nx::utils::Url());
         }
 
-		auto& url = nx::utils::random::choice(relayUrls);
+        // Always choosing the closest relay to the client.
+        auto& url = relayUrls.front();
 
         NX_VERBOSE(this,
             "findRelayInstanceForClient() reporting relay url: %1 for listening peer: %2"
@@ -244,13 +245,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
         return m_settings.trafficRelay().urls;
     }
 
-    auto urls = findRelaysByContinent(location->continent);
-    if (!urls.empty())
-    {
-        NX_VERBOSE(this, "Found relays by continent: %1, reporting urls: %2",
-            location, containerString(urls));
-        return urls;
-    }
+    std::vector<nx::utils::Url> urls;
 
     NX_DEBUG(this, "Found 0 relays in %1. Falling back to relays by distance",
         location);

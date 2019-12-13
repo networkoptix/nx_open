@@ -48,6 +48,9 @@ private:
     std::vector<nx::utils::Url> findRelaysByContinent(
         nx::geo_ip::Continent continent) const;
 
+    /**
+     * @return List of relay URLs sorted by distance from geopoint ascending.
+     */
     std::vector<nx::utils::Url> findClosestRelays(
         const nx::geo_ip::Geopoint& geopoint) const;
 

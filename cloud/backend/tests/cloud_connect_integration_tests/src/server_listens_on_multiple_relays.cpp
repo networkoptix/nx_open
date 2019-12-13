@@ -102,7 +102,7 @@ protected:
 
         setRelayCount(3);
         m_clientRelayIndex = 2; //< Client connects to Australia relay.
-        m_hardCodedClientIp = "127.0.0.2";
+        m_hardCodedClientIp = "45.76.116.155"; // Some IP in Australia.
 
         discoveryServer().subscribeToNodeDiscovered(
             [this](const auto& clusterId, const auto& nodeInfo)
