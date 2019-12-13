@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.180",
+    "version": "1.0.1.181",
     "data": [
         {
             "keys": [
@@ -3804,6 +3804,34 @@
                 "hikvision|DS-2TD4237*"
             ],
             "useOnvifPtz": true
+        },
+		        {
+            "_comment1": "Mapping for firmware: V102_2019_03_15",
+            "keys": [
+                "GeoVision_2|GV-SD2722-IR"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, 90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.15, 0.23, 0.44, 0.64 , 0.76 , 1.000],
+                        "logical": [1, 3.55, 5.00, 8.56, 11.90, 13.57, 16.37],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
