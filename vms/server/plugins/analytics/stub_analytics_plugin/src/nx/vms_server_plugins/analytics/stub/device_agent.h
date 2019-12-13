@@ -147,12 +147,12 @@ private:
         bool needToGenerateObjects() const
         {
             return !ini().visualizeMotion
-                || generateCars
+                && (generateCars
                 || generateTrucks
                 || generatePedestrians
                 || generateHumanFaces
                 || generateBicycles
-                || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero();
+                || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero());
         }
 
         std::atomic<bool> generateEvents{true};

@@ -278,9 +278,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
-    if (m_deviceAgentSettings.visualizeMotion)
-        processFrameMotion(videoFrame->metadataList());
-
+    processFrameMotion(videoFrame->metadataList());
     processVideoFrame(videoFrame, __func__);
     return true;
 }
@@ -293,9 +291,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         return false;
     }
 
-    if (m_deviceAgentSettings.visualizeMotion)
-        processFrameMotion(videoFrame->metadataList());
-
+    processFrameMotion(videoFrame->metadataList());
     processVideoFrame(videoFrame, __func__);
     return checkVideoFrame(videoFrame);
 }
