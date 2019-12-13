@@ -156,16 +156,18 @@ void fillHardwareIds(
 #elif defined(__arm__) || defined(__aarch64__)
 
 // TODO: Use getMacFromPrimaryIF instead
-void mac_eth0(char  MAC_str[13], char** host)
+bool getInterfaceMac(const char* iface, char MAC_str[13], char** host)
 {
     #define HWADDR_len 6
     int s,i;
     struct ifreq ifr;
     s = socket(AF_INET, SOCK_DGRAM, 0);
-    strcpy(ifr.ifr_name, "eth0");
+    strcpy(ifr.ifr_name, iface);
+    bool result = false;
     if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
         for (i=0; i<HWADDR_len; i++)
             sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+        result = true;
     }
     if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
         const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
@@ -173,8 +175,23 @@ void mac_eth0(char  MAC_str[13], char** host)
             *host = inet_ntoa(ip->sin_addr);
     }
     close(s);
+    return result;
 }
 
+void getPrimaryMac(char MAC_str[13], char** host = nullptr)
+{
+    if (getInterfaceMac("eth0", MAC_str, host))
+        return;
+
+    for (const auto iface: QNetworkInterface::allInterfaces())
+    {
+        if (iface.flags().testFlag(QNetworkInterface::IsLoopBack))
+            continue;
+
+        if (getInterfaceMac(iface.name().toStdString().c_str(), MAC_str, host))
+            return;
+    }
+}
 
 void fillHardwareIds(
     QnMediaServerModule* /*serverModule*/,
@@ -182,7 +199,7 @@ void fillHardwareIds(
 {
     char MAC_str[13];
     memset(MAC_str, 0, sizeof(MAC_str));
-    mac_eth0( MAC_str, nullptr );
+    getPrimaryMac(MAC_str);
 
     // Historically hardware id is mac + '\0'
     QByteArray hardwareId = QByteArray(MAC_str, sizeof(MAC_str));
