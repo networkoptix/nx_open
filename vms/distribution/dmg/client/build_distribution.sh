@@ -56,7 +56,7 @@ buildDistribution()
 
     copyMacOsSpecificApplauncherStuff
 
-    if [ $USE_PYTHON2 = true]
+    if [ $USE_PYTHON2 = true ]
     then
         MAC_DEPLOY_SCRIPT="macdeployqt.py"
         NOTARIZATION_SCRIPT="notarize.py"
