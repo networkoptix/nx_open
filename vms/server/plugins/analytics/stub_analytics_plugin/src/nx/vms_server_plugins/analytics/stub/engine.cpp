@@ -416,31 +416,6 @@ std::string Engine::manifestString() const
                         "value": true
                     }
                 ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "ROI",
-                "collapsed": true,
-                "items": [
-                    {
-                      "type": "PolygonFigure",
-                      "name": "testPolygon",
-                      "caption": "Polygon",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2], [0.2, 0.5]], "color": "#e040fb" }
-                    },
-                    {
-                      "type": "BoxFigure",
-                      "name": "testBox",
-                      "caption": "Box",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
-                    },
-                    {
-                      "type": "LineFigure",
-                      "name": "testLine",
-                      "caption": "Line",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
-                    }
-                ]
             }
         ],
         "sections": [
@@ -500,21 +475,18 @@ std::string Engine::manifestString() const
                 "items": [
                     {
                         "type": "PolygonFigure",
-                        "name": "testPolygon2",
-                        "caption": "Polygon",
-                        "value": { "points": [[0.1, 0.1], [0.5, 0.2], [0.2, 0.5]], "color": "#e040fb" }
+                        "name": "testPolygon",
+                        "caption": "Polygon"
                     },
                     {
                         "type": "BoxFigure",
-                        "name": "testBox2",
-                        "caption": "Box",
-                        "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                        "name": "testBox",
+                        "caption": "Box"
                     },
                     {
                         "type": "LineFigure",
-                        "name": "testLine2",
-                        "caption": "Line",
-                        "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                        "name": "testLine",
+                        "caption": "Line"
                     },
                     {
                         "type": "LineFigure",
