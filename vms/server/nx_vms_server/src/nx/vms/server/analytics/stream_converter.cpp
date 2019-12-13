@@ -17,7 +17,9 @@ bool StreamConverter::pushData(QnAbstractDataPacketPtr dataPacket)
 {
     if (const auto motionMetadata = std::dynamic_pointer_cast<QnMetaDataV1>(dataPacket))
     {
-        NX_VERBOSE(this, "Motion metadata packet has arrived");
+        NX_VERBOSE(this, "Motion metadata packet has arrived, timestamp %1 us",
+            dataPacket->timestamp);
+
         m_lastStreamData.reset();
         m_motionMetadataExpirationTimer.restart();
         m_lastMotionMetadata = motionMetadata;
@@ -25,7 +27,9 @@ bool StreamConverter::pushData(QnAbstractDataPacketPtr dataPacket)
     }
 
     NX_VERBOSE(this,
-        "Got a media data packet (compressed or uncompressed) or in-stream metadata packet");
+        "Got a media data packet (compressed or uncompressed) or in-stream metadata packet, "
+        "timestamp %1 us",
+        dataPacket->timestamp);
 
     m_dataConverter = DataConverter(m_rotationAngleDegrees);
     m_lastStreamData = dataPacket;
