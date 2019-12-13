@@ -485,7 +485,7 @@
                             {
                                 "level": "error",
                                 "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
-                                "text": " Secondary stream Resolution is too high: %resolution. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
+                                "text": " Secondary stream Resolution is too high: %resolution. It's recommended to put Secondary stream Resolution less than %recommendedMaxSecondaryResolution."
                             }
                         ]
                     },
