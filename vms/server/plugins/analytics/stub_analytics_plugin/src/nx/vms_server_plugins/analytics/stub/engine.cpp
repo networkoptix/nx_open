@@ -161,6 +161,10 @@ std::string Engine::manifestString() const
         {
             "id": ")json" + kHumanFaceObjectType + R"json(",
             "name": "Human face"
+        },
+        {
+            "id": ")json" + kMotionVisualizationObjectType + R"json(",
+            "name": "Motion visualization object"
         }
     ],
     "groups": [
