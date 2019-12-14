@@ -40,64 +40,90 @@ QnFile::~QnFile()
         close();
 }
 
-bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDependentFlags)
+struct OpenAttrs
 {
-    // All files are opened in share mode (both read and write).
-    DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-
+    DWORD shareMode;
     int accessRights = 0;
-    if (openMode & QIODevice::ReadOnly)
-        accessRights |= GENERIC_READ;
-    if (openMode & QIODevice::WriteOnly) {
-        accessRights |= GENERIC_WRITE;
-        if (!(openMode & QIODevice::ReadOnly))
-            shareMode = FILE_SHARE_READ;
+    DWORD createDisp;
+    SECURITY_ATTRIBUTES securityAttrs;
+    unsigned int userFlags;
+
+    OpenAttrs(const QIODevice::OpenMode& openMode, unsigned int systemDependentFlags):
+        shareMode(FILE_SHARE_READ | FILE_SHARE_WRITE),
+        createDisp((openMode & QIODevice::WriteOnly) ? OPEN_ALWAYS : OPEN_EXISTING),
+        securityAttrs{ sizeof(SECURITY_ATTRIBUTES), NULL, FALSE },
+        userFlags(systemDependentFlags)
+    {
+        if (openMode & QIODevice::ReadOnly)
+        {
+            accessRights |= GENERIC_READ;
+        }
+        if (openMode & QIODevice::WriteOnly)
+        {
+            accessRights |= GENERIC_WRITE;
+            if (!(openMode & QIODevice::ReadOnly))
+                shareMode = FILE_SHARE_READ;
+        }
+    }
+};
+
+static HANDLE sysOpen(
+    OpenAttrs attrs, //< Intentional copy.
+    const QString& fileName)
+{
+    return CreateFileW(
+        (const wchar_t*)fileName.constData(),
+        attrs.accessRights,
+        attrs.shareMode,
+        &attrs.securityAttrs,
+        attrs.createDisp,
+        (DWORD)attrs.userFlags,
+        NULL);
+}
+
+static HANDLE openImpl(
+    const OpenAttrs& attrs,
+    const QIODevice::OpenMode& openMode,
+    const QString& fileName)
+{
+    HANDLE result = sysOpen(attrs, fileName);
+    if (result == INVALID_HANDLE_VALUE
+        && (openMode & QIODevice::WriteOnly)
+        && GetLastError() == ERROR_PATH_NOT_FOUND)
+    {
+        if (QDir().mkpath(QnFile::absolutePath(fileName)))
+            result = sysOpen(attrs, fileName);
     }
 
-    SECURITY_ATTRIBUTES securityAtts = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
-
-    // WriteOnly can create files, ReadOnly cannot.
-    DWORD creationDisp = (openMode & QIODevice::WriteOnly) ? OPEN_ALWAYS : OPEN_EXISTING;
-
-    if (systemDependentFlags == 0)
-        systemDependentFlags = FILE_ATTRIBUTE_NORMAL;
-
-    // Create the file handle.
-    m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-        accessRights,
-        shareMode,
-        &securityAtts,
-        creationDisp,
-        (DWORD) systemDependentFlags,
-        NULL);
-
-    if (m_impl == INVALID_HANDLE_VALUE && (openMode & QIODevice::WriteOnly) && GetLastError() == ERROR_PATH_NOT_FOUND)
+    if (result == INVALID_HANDLE_VALUE)
     {
-        QDir dir;
-        if (dir.mkpath(QnFile::absolutePath(m_fileName)))
+        NX_WARNING(
+            typeid(QnFile), "Failed to open file %1, mode is %2, error is %3",
+            fileName, openMode, qt_error_string());
+    }
+
+    return result;
+}
+
+bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDependentFlags)
+{
+    const auto attrs = OpenAttrs(openMode, systemDependentFlags);
+    const QStringList paths = {
+        m_fileName,
+        QString("\\\\?\\") + QDir::toNativeSeparators(m_fileName)};
+
+    for (const auto& p: paths)
+    {
+        if (m_impl = openImpl(attrs, openMode, p); m_impl != INVALID_HANDLE_VALUE)
         {
-            m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-                accessRights,
-                shareMode,
-                &securityAtts,
-                creationDisp,
-                (DWORD) systemDependentFlags,
-                NULL);
+            if (openMode & QIODevice::Truncate)
+                truncate(0);
+
+            return true;
         }
     }
 
-    // Bail out on error.
-    if (m_impl == INVALID_HANDLE_VALUE) {
-        NX_WARNING(this, lm("Failed to open file %1, mode is %2, error is %3")
-            .args(m_fileName, openMode, qt_error_string()));
-        return false;
-    }
-
-    // Truncate the file after successfully opening it if Truncate is passed.
-    if (openMode & QIODevice::Truncate)
-        truncate(0);
-
-    return true;
+    return false;
 }
 
 bool QnFile::eof() const
