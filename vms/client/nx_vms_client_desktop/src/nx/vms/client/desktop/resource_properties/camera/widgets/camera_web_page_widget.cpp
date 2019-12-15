@@ -219,8 +219,53 @@ void CameraWebPageWidget::Private::createNewPage()
         {
             QnMutexLocker lock(&mutex);
 
-            authenticator->setUser(credentials.login());
-            authenticator->setPassword(credentials.password());
+            // Camera may redirect to another path and ask for credentials,
+            // so just check that host matches.
+            if (lastRequestUrl.host() == requestUrl.host())
+            {
+                const bool emptyCredentials =
+                    credentials.login().isEmpty() && credentials.password().isEmpty();
+                if (!emptyCredentials)
+                {
+                    authCounter.registerAttempt();
+                    if (!authCounter.exceeded(kHttpAuthSmallInterval))
+                    {
+                        authenticator->setUser(credentials.login());
+                        authenticator->setPassword(credentials.password());
+                        return;
+                    }
+                    // If credentials are requested again within kHttpAuthSmallInterval
+                    // assume that they are invalid and fallthrough to showing a request dialog.
+                }
+            }
+
+            authDialodCounter.registerAttempt();
+            if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
+                return;
+
+            PasswordDialog dialog(parent);
+
+            auto url = requestUrl;
+
+            // Hide credentials.
+            url.setUserName(QString());
+            url.setPassword(QString());
+
+            // Replace server address with camera address.
+            const auto serverHost = parent->commonModule()->currentUrl().host();
+            if (serverHost == url.host())
+            {
+                url.setHost(lastCamera.ipAddress);
+                url.setPort(-1); //< Hide server port.
+            }
+
+            dialog.setText(url.toString());
+
+            if (dialog.exec() == QDialog::Accepted)
+            {
+                authenticator->setUser(dialog.username());
+                authenticator->setPassword(dialog.password());
+            }
         });
 
     QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
