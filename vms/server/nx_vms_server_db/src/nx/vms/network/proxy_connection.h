@@ -32,11 +32,10 @@ public:
     static bool isProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request);
     static bool isStandardProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request);
     static bool isCloudRequest(const nx::network::http::Request& request);
-
+    static bool isProxyForCamera(QnCommonModule* commonModule, const nx::network::http::Request& request);
 protected:
     virtual void run() override;
 private:
-    static bool isProxyForCamera(QnCommonModule* commonModule, const nx::network::http::Request& request);
 
     bool doProxyData(
         nx::network::AbstractStreamSocket* srcSocket,
