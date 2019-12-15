@@ -160,6 +160,10 @@ static void remove(const QnStorageResourcePtr& storage)
         stack.pop();
         if (node->childrenCount == 0)
         {
+            NX_DEBUG(
+                typeid(QnStorageManager), "Removing empty directory %1",
+                nx::utils::url::hidePassword(node->url));
+
             storage->removeDir(node->url);
             if (node->parent)
                 node->parent->childrenCount--;
