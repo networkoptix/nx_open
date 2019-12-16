@@ -175,11 +175,13 @@ bool getInterfaceMac(const char* iface, char MAC_str[13], char** host)
             *host = inet_ntoa(ip->sin_addr);
     }
     close(s);
+    NX_DEBUG(NX_SCOPE_TAG, "%1 mac %2", iface, MAC_str);
     return result;
 }
 
 void getPrimaryMac(char MAC_str[13], char** host = nullptr)
 {
+    // This is for compatibility with old versions, which tried eth0 only.
     if (getInterfaceMac("eth0", MAC_str, host))
         return;
 
