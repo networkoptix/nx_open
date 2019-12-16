@@ -150,12 +150,12 @@
                             {
                                 "level": "warning",
                                 "condition": "equal %logLevel debug",
-                                "text": "Current logging level is %logLevel. Recommended logging level is info."
+                                "text": "current logging level is %logLevel. Recommended logging level is info."
                             },
                             {
                                 "level": "warning",
                                 "condition": "equal %logLevel verbose",
-                                "text": "Current logging level is %logLevel. Recommended logging level is info."
+                                "text": "current logging level is %logLevel. Recommended logging level is info."
                             }
                         ]
                     },
