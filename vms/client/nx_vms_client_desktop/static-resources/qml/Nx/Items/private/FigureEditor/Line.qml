@@ -1,4 +1,5 @@
 import QtQuick 2.10
+import Nx.Controls 1.0
 
 import "../figure_utils.js" as F
 
