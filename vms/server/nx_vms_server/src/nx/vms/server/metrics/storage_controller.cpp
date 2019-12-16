@@ -99,9 +99,9 @@ static auto stateGroupProvider()
                 "status",
                 [](const auto& r)
                 {
-                    auto status = r->getStatus();
-                    if (status == Qn::Offline && isServerOffline(r))
+                    if (isServerOffline(r))
                         return Value("Server Offline");
+                    auto status = r->getStatus();
                     if (status == Qn::Online && r->isUsedForWriting())
                         status = Qn::Recording;
                     return Value(QnLexical::serialized(status));

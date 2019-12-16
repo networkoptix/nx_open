@@ -109,10 +109,9 @@ auto makeAvailabilityProviders()
             "status",
             [](const auto& r)
             {
-                const auto status = r->getStatus();
-                if (status == Qn::Offline && isServerOffline(r))
+                if (isServerOffline(r))
                     return Value("Server Offline");
-                return Value(QnLexical::serialized(status));
+                return Value(QnLexical::serialized(r->getStatus()));
             }
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
