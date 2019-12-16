@@ -39,7 +39,6 @@ using namespace std::chrono;
 namespace {
 
 constexpr milliseconds kHttpAuthSmallInterval = 10s;
-constexpr int kHttpAuthAttemptsLimit = 2;
 constexpr int kHttpAuthDialogAttemptsLimit = 3;
 
 /**
@@ -148,7 +147,6 @@ struct CameraWebPageWidget::Private
     bool loadNeeded = false;
 
     QnMutex mutex;
-    AttemptCounter authCounter;
     AttemptCounter authDialodCounter;
     QUrl testPageUrl;
 };
@@ -214,7 +212,6 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
-    authCounter.setLimit(kHttpAuthAttemptsLimit);
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
