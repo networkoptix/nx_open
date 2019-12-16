@@ -56,16 +56,7 @@ buildDistribution()
 
     copyMacOsSpecificApplauncherStuff
 
-    if [ $USE_PYTHON2 = true ]
-    then
-        MAC_DEPLOY_SCRIPT="macdeployqt.py"
-        NOTARIZATION_SCRIPT="notarize.py"
-    else
-        MAC_DEPLOY_SCRIPT="macdeployqt.py3"
-        NOTARIZATION_SCRIPT="notarize.py3"
-    fi
-
-    python "$MAC_DEPLOY_SCRIPT" \
+    python macdeployqt.py \
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
         "$QT_VERSION"
 
@@ -105,7 +96,7 @@ buildDistribution()
         # It can be usefull for development purposes.
         FINAL_USER="${NOTARIZATION_USER:-$KEYCHAIN_NOTARIZATION_USER}"
 
-        python "$NOTARIZATION_SCRIPT" notarize \
+        python notarize.py notarize \
             --user "$FINAL_USER" \
             --password "$FINAL_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
