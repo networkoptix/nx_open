@@ -196,7 +196,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct IvaObjectSize : public SettingGroup
+struct IvaObjectSize: public SettingGroup
 {
     Width minWidth;
     Height minHeight;
@@ -383,7 +383,108 @@ struct DefocusDetection: SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct OdObjects : public SettingGroup
+struct FogDetection: public SettingGroup
+{
+    bool enabled = false;
+    int thresholdLevel = 50;
+    int sensitivityLevel = 80;
+    int minimumDuration = 30;
+
+    enum class ServerParamIndex {
+        enabled,
+        thresholdLevel,
+        sensitivityLevel,
+        minimumDuration,
+    };
+    static constexpr const char* kServerKeys[] = {
+        "FogDetection.Enable",
+        "FogDetection.ThresholdLevel",
+        "FogDetection.SensitivityLevel",
+        "FogDetection.MinimumDuration",
+    };
+    static constexpr const char* kJsonEventName = "FogDetection";
+    static constexpr const char* kSunapiEventName = "fogdetection";
+
+    FogDetection(int /*roiIndex*/ = -1) : SettingGroup(kServerKeys) {}
+    bool operator==(const FogDetection& rhs) const;
+    bool operator!=(const FogDetection& rhs) const { return !(*this == rhs); }
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+};
+//-------------------------------------------------------------------------------------------------
+
+struct FaceDetection: public SettingGroup
+{
+    bool enabled = false;
+    int sensitivityLevel = 80;
+
+    enum class ServerParamIndex {
+        enabled,
+        sensitivityLevel,
+    };
+    static constexpr const char* kServerKeys[] = {
+        "FaceDetection.Enable",
+        "FaceDetection.SensitivityLevel",
+    };
+    static constexpr const char* kJsonEventName = "FaceDetection";
+    static constexpr const char* kSunapiEventName = "facedetection";
+
+    FaceDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
+    bool operator==(const FaceDetection& rhs) const;
+    bool operator!=(const FaceDetection& rhs) const { return !(*this == rhs); }
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    // The following functions perhaps should be moved to the inheritor-class.
+    // The idea is that the current class interacts with the server only,
+    // and the inheritor interacts with the device.
+    // The decision will be made during other plugins construction.
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+// Not implemented because of ambiguities in documentation.
+struct FaceDetectionExcludeArea : public SettingGroup
+{
+    std::vector<PluginPoint> points;
+
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
+
+    enum class ServerParamIndex {
+        points,
+    };
+    static constexpr const char* kServerKeys[] = {
+        "FaceDetection.DetectionArea#.Points",
+    };
+    static constexpr const char* kJsonEventName = "FaceDetection";
+    static constexpr const char* kSunapiEventName = "facedetection";
+
+    FaceDetectionExcludeArea(int roiIndex = -1) :
+        SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
+    {
+    }
+
+    bool operator == (const FaceDetectionExcludeArea& rhs) const;
+    bool operator!=(const FaceDetectionExcludeArea& rhs) const { return !(*this == rhs); }
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
+    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+};
+
+//-------------------------------------------------------------------------------------------------
+struct OdObjects: public SettingGroup
 {
     bool enabled = false;
     bool person = false;
@@ -427,7 +528,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct OdBestShot : public SettingGroup
+struct OdBestShot: public SettingGroup
 {
     bool person = false;
     bool vehicle = false;
@@ -465,7 +566,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct OdExcludeArea : public SettingGroup
+struct OdExcludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
 
@@ -497,7 +598,7 @@ struct OdExcludeArea : public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct IvaLine : public SettingGroup
+struct IvaLine: public SettingGroup
 {
 
     std::vector<PluginPoint> points;
@@ -655,7 +756,7 @@ struct IvaExcludeArea: public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct AudioDetection : public SettingGroup
+struct AudioDetection: public SettingGroup
 {
     bool enabled = false;
     int thresholdLevel = 50;
@@ -783,6 +884,9 @@ struct Settings
     MdExcludeArea mdExcludeArea[8];
     TamperingDetection tamperingDetection;
     DefocusDetection defocusDetection;
+    FogDetection fogDetection;
+    FaceDetection faceDetection;
+    //FaceDetectionExcludeArea faceDetectionExcludeArea[8];
     OdObjects odObjects;
     OdBestShot odBestShot;
     OdExcludeArea odExcludeArea[8];
@@ -799,7 +903,7 @@ struct Settings
 
 // Simple way to check, if T has a member function `empty()`
 template <typename T, typename = void>
-struct maybeEmpty : std::false_type {};
+struct maybeEmpty: std::false_type {};
 
 template <typename T>
 struct maybeEmpty<T, std::void_t<decltype(std::declval<T>().points.empty())>>: std::true_type {};

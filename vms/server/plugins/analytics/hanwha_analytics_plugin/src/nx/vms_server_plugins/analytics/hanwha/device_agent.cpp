@@ -108,6 +108,7 @@ static std::optional<SupportedEventCategories> parseSupportedEventCategories(
     result[int(EventCategory::audioDetection)] = json["AudioDetection"].is_bool();
     result[int(EventCategory::defocusDetection)] = json["DefocusDetection"].is_bool();
     result[int(EventCategory::fogDetection)] = json["FogDetection"].is_bool();
+    result[int(EventCategory::faceDetection)] = json["FaceDetection"].is_bool();
     result[int(EventCategory::videoAnalytics)] = json["VideoAnalytics"].is_bool();
     result[int(EventCategory::audioAnalytics)] = json["AudioAnalytics"].is_bool();
     result[int(EventCategory::queues)] = json["QueueEvent"].is_bool();
@@ -273,6 +274,12 @@ void DeviceAgent::doSetSettings(
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
+
+    //copySettingsFromServerToCamera(errorMap, sourceMap,
+    //    m_settings.faceDetection, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.odObjects, sender, m_frameSize, m_channelNumber);
@@ -574,6 +581,12 @@ void DeviceAgent::readCameraSettings()
 
     sunapiReply = loadEventSettings("defocusdetection");
     readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadEventSettings("fogdetection");
+    readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
+
+    sunapiReply = loadEventSettings("facedetection");
+    readFromDeviceReply(sunapiReply, &m_settings.faceDetection, m_frameSize, m_channelNumber);
 
     sunapiReply = loadEventSettings("objectdetection");
     readFromDeviceReply(sunapiReply, &m_settings.odObjects, m_frameSize, m_channelNumber);

@@ -933,6 +933,93 @@ std::string DefocusDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, i
 }
 
 //-------------------------------------------------------------------------------------------------
+bool FogDetection::operator==(const FogDetection& rhs) const
+{
+    return initialized == rhs.initialized
+        && enabled == rhs.enabled
+        && thresholdLevel == rhs.thresholdLevel
+        && sensitivityLevel == rhs.sensitivityLevel
+        && minimumDuration == rhs.minimumDuration
+        ;
+}
+
+void FogDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+{
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
+    initialized = true;
+}
+
+void FogDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+{
+    sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
+    sunapiReadOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
+    sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
+    sunapiReadOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
+    initialized = true;
+}
+
+std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        query
+            << "msubmenu=" << "fogdetection"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << buildBool(enabled)
+            << "&ThresholdLevel=" << thresholdLevel
+            << "&Sensitivity=" << sensitivityLevel
+            << "&Duration=" << minimumDuration
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool FaceDetection::operator==(const FaceDetection& rhs) const
+{
+    return initialized == rhs.initialized
+        && enabled == rhs.enabled
+        && sensitivityLevel == rhs.sensitivityLevel
+        ;
+}
+
+void FaceDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+{
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
+    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
+    initialized = true;
+}
+
+void FaceDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+{
+    sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
+    sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
+    initialized = true;
+}
+
+std::string FaceDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        query
+            << "msubmenu=" << "facedetection"
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << buildBool(enabled)
+            << "&Sensitivity=" << sensitivityLevel
+            ;
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 bool OdObjects::operator==(const OdObjects& rhs) const
 {
