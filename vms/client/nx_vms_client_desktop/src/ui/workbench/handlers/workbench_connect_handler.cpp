@@ -882,6 +882,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
+    NX_VERBOSE(this, "Connect to server triggered");
     if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setVisibleControls(true);
 
@@ -893,12 +894,17 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             ? DisconnectFlag::Force
             : DisconnectFlag::NoFlags;
 
+        NX_VERBOSE(this, "Disconnecting from the current server first");
         if (!disconnectFromServer(flags))
+        {
+            NX_VERBOSE(this, "User cancelled the disconnect");
             return;
+        }
     }
     else
     {
         // Break 'Connecting' state and clear workbench.
+        NX_VERBOSE(this, "Forcefully cleaning the state");
         disconnectFromServer(DisconnectFlag::Force);
     }
 
@@ -908,12 +914,21 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     NX_ASSERT(actionParameters.hasArgument(Qn::LogonParametersRole));
 
     const auto parameters = actionParameters.argument<LogonParameters>(Qn::LogonParametersRole);
+    NX_DEBUG(this, "Connecting to the server %1", parameters.url);
+    NX_VERBOSE(this,
+        "Connection flags: storeSession %1, storePassword %2, autoLogin %3, force %4, secondary %5",
+        parameters.storeSession,
+        parameters.storePassword,
+        parameters.autoLogin,
+        parameters.force,
+        parameters.secondaryInstance);
 
     if (directConnection)
     {
         // We don't have to test connection here.
         NX_ASSERT(parameters.url.isValid());
         setLogicalState(LogicalState::connecting_to_target);
+        NX_VERBOSE(this, "Directly connecting to the server");
         connectToServer(parameters.url);
     }
     else if (parameters.url.isValid())
@@ -930,11 +945,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         if (parameters.secondaryInstance)
             m_warnMessagesDisplayed = true;
 
+        NX_VERBOSE(this, "Connecting to the server with testing before");
         testConnectionToServer(parameters.url, options, parameters.force);
     }
     else if (qnSettings->saveCredentialsAllowed())
     {
         /* Try to load last used connection. */
+        NX_DEBUG(this, "Trying to load last saved connection");
         auto url = qnSettings->lastUsedConnection().url;
         const auto localSystemId = qnSettings->lastUsedConnection().localId;
 
@@ -952,7 +969,9 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             if (credentials.isValid())
             {
                 url.setPassword(credentials.password);
-                testConnectionToServer(url, AutoLogin, true);
+                NX_DEBUG(this, "Auto-login to the server %1", url);
+                NX_VERBOSE(this, "Connecting to the server with testing before");
+                testConnectionToServer(url, AutoLogin, /*force*/ true);
             }
         }
     }
@@ -968,6 +987,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 
     const auto parameters = menu()->currentParameters(sender());
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
+    NX_DEBUG(this, "Connecting to the cloud system %1", id);
 
     auto system = qnSystemsFinder->getSystem(id);
     if (!system || !system->isConnectable())
@@ -1003,6 +1023,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
 
     // Do not store connections in case of reconnection
     setLogicalState(LogicalState::connecting_to_target);
+    NX_VERBOSE(this, "Reconnecting to the server %1", currentUrl);
     connectToServer(currentUrl);
 }
 
@@ -1013,6 +1034,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     if (parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool())
         flags |= DisconnectFlag::Force;
 
+    NX_DEBUG(this, "Disconnecting from the server");
     disconnectFromServer(flags);
 }
 
@@ -1028,6 +1050,7 @@ void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
         return;
 
     setPhysicalState(PhysicalState::testing);
+    NX_VERBOSE(this, "Executing connect to the %1", url);
     m_connecting.handle = qnClientCoreModule->connectionFactory()->connect(
         url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
     m_connecting.url = url;
@@ -1107,8 +1130,9 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
 
     // TODO: Should enter 'updating' mode
 
-    auto status =  QnConnectionDiagnosticsHelper::validateConnection(
+    const auto status =  QnConnectionDiagnosticsHelper::validateConnection(
         connectionInfo, errorCode, mainWindowWidget(), commonModule()->engineVersion());
+    NX_VERBOSE(this, "Testing connection to the %1: result %2", url, status);
 
     switch (status)
     {
