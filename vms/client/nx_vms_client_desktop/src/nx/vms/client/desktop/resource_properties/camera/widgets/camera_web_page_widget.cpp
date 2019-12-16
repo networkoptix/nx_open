@@ -15,6 +15,9 @@
 #include <QtWebEngineWidgets/QWebEngineScriptCollection>
 #include <QtWebEngineCore/QWebEngineCookieStore>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <common/common_module.h>
 #include <utils/common/event_processors.h>
 
@@ -220,22 +223,18 @@ void CameraWebPageWidget::Private::createNewPage()
             QnMutexLocker lock(&mutex);
 
             // Camera may redirect to another path and ask for credentials,
-            // so just check that host matches.
+            // so check for host match.
             if (lastRequestUrl.host() == requestUrl.host())
             {
-                const bool emptyCredentials =
-                    credentials.login().isEmpty() && credentials.password().isEmpty();
-                if (!emptyCredentials)
+                const auto camera = parent->commonModule()
+                                        ->resourcePool()
+                                        ->getResourceById<QnVirtualCameraResource>(
+                                            QnUuid::fromStringSafe(lastCamera.id));
+                if (camera && camera->getStatus() != Qn::Unauthorized)
                 {
-                    authCounter.registerAttempt();
-                    if (!authCounter.exceeded(kHttpAuthSmallInterval))
-                    {
-                        authenticator->setUser(credentials.login());
-                        authenticator->setPassword(credentials.password());
-                        return;
-                    }
-                    // If credentials are requested again within kHttpAuthSmallInterval
-                    // assume that they are invalid and fallthrough to showing a request dialog.
+                    authenticator->setUser(credentials.login());
+                    authenticator->setPassword(credentials.password());
+                    return;
                 }
             }
 
