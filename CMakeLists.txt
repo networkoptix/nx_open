@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 include(cmake/utils.cmake)
 include(cmake/option.cmake)
@@ -108,7 +108,6 @@ include(find_sources)
 include(moc_utils)
 include(qrc_utils)
 include(cpp_utils)
-include(precompiled_header)
 include(strip_target)
 include(vms_protocol_version)
 include(customization_package)

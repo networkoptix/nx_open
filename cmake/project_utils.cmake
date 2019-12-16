@@ -172,7 +172,7 @@ function(nx_add_target name type)
     endif()
 
     if(has_pch)
-        add_precompiled_header(${name} ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+        target_precompile_headers(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
