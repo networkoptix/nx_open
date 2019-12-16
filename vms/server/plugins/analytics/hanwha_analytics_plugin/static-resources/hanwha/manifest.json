@@ -53,7 +53,7 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Motion detection object size",
+                        "caption": "Object size restraints for Motion detection",
                         "items":
                         [
                             {
@@ -70,18 +70,18 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "IVA [AI] object size",
+                        "caption": "Object size restraints for AI (Object detection and IVA)",
                         "items":
                         [
                             {
                                 "type": "BoxFigure",
                                 "name": "IVA.MinObjectSize.Points",
-                                "caption": "IVA [AI] - Minimum object size"
+                                "caption": "AI - Minimum object size"
                             },
                             {
                                 "type": "BoxFigure",
                                 "name": "IVA.MaxObjectSize.Points",
-                                "caption": "IVA [AI] - Maximum object size"
+                                "caption": "AI - Maximum object size"
                             }
                         ]
                     }
@@ -92,7 +92,7 @@
         [
             {
                 "type": "Section",
-                "name": "1 Shock detection settings",
+                "name": "1 Shock detection",
                 "items":
                 [
                     {
@@ -121,7 +121,7 @@
             },
             {
                 "type": "Section",
-                "name": "2 Motion detection settings",
+                "name": "2.1 Motion detection. Include areas",
                 "items":
                 [
                     {
@@ -427,7 +427,14 @@
                                 "maxValue": 5
                             }
                         ]
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "2.2 Motion detection. Exclude areas",
+                "items":
+                [
                     {
                         "type": "GroupBox",
                         "caption": "Exclude areas",
@@ -613,7 +620,7 @@
             },
             {
                 "type": "Section",
-                "name": "6 Face detection",
+                "name": "6 Face detection. General",
                 "items":
                 [
                     {
@@ -634,7 +641,7 @@
             },
             {
                 "type": "Section",
-                "name": "7.1 Object detection. Objects [AI]",
+                "name": "7.1 Object detection [AI]. General",
                 "items":
                 [
                     {
@@ -645,7 +652,7 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Object",
+                        "caption": "Object types",
                         "items":
                         [
                             {
@@ -725,7 +732,7 @@
             },
             {
                 "type": "Section",
-                "name": "7.2 Object detection. Exclude areas [AI]",
+                "name": "7.2 Object detection [AI]. Exclude areas",
                 "items":
                 [
                     {
@@ -788,7 +795,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.1 IVA lines [AI]",
+                "name": "8.1 IVA [AI]. Lines",
                 "items":
                 [
                     {
@@ -1083,7 +1090,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.2 IVA include areas [AI]",
+                "name": "8.2 IVA [AI]. Include areas",
                 "items":
                 [
                     {
@@ -1778,7 +1785,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.3 IVA Exclude areas [AI]",
+                "name": "8.3 IVA [AI]. Exclude areas",
                 "items":
                 [
                     {

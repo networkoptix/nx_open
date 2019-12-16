@@ -103,12 +103,12 @@ static std::optional<SupportedEventCategories> parseSupportedEventCategories(
     json = json.array_items().front();
 
     result[int(EventCategory::motionDetection)] = json["MotionDetection"].is_bool();
-    result[int(EventCategory::faceDetection)] = json["FaceDetection"].is_bool();
+    result[int(EventCategory::faceDetectionGeneral)] = json["FaceDetectionGeneral"].is_bool();
     result[int(EventCategory::tampering)] = json["Tampering"].is_bool();
     result[int(EventCategory::audioDetection)] = json["AudioDetection"].is_bool();
     result[int(EventCategory::defocusDetection)] = json["DefocusDetection"].is_bool();
     result[int(EventCategory::fogDetection)] = json["FogDetection"].is_bool();
-    result[int(EventCategory::faceDetection)] = json["FaceDetection"].is_bool();
+    result[int(EventCategory::faceDetectionGeneral)] = json["FaceDetection"].is_bool();
     result[int(EventCategory::videoAnalytics)] = json["VideoAnalytics"].is_bool();
     result[int(EventCategory::audioAnalytics)] = json["AudioAnalytics"].is_bool();
     result[int(EventCategory::queues)] = json["QueueEvent"].is_bool();
@@ -253,7 +253,7 @@ void DeviceAgent::doSetSettings(
     //    m_settings.motion, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.mdObjectSize, sender, m_frameSize, m_channelNumber); //*
+    //    m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber); //*
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
@@ -261,12 +261,12 @@ void DeviceAgent::doSetSettings(
     //for (int i = 0; i < 8; ++i)
     //{
     //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.mdIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //        m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
     //}
     //for (int i = 0; i < 8; ++i)
     //{
     //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.mdExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    //        m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
     //}
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
@@ -279,18 +279,18 @@ void DeviceAgent::doSetSettings(
     //    m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.faceDetection, sender, m_frameSize, m_channelNumber);
+    //    m_settings.faceDetectionGeneral, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.odObjects, sender, m_frameSize, m_channelNumber);
+    //    m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.odBestShot, sender, m_frameSize, m_channelNumber);
+    //    m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
 
     //for (int i = 0; i < 8; ++i)
     //{
     //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.odExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    //        m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
     //}
 
     //for (int i = 0; i < 8; ++i)
@@ -328,7 +328,7 @@ void DeviceAgent::getPluginSideSettings(
 
     //m_settings.motion.writeToServer(response);
 
-    //m_settings.mdObjectSize.writeToServer(response);
+    //m_settings.motionDetectionObjectSize.writeToServer(response);
 
     //m_settings.audioDetection.writeToServer(response);
     *outResult = response;
@@ -549,7 +549,7 @@ void DeviceAgent::readCameraSettings()
 
     loadFrameSize();
 
-    loadSupportedEventTypes();
+    ////loadSupportedEventTypes();
 
     sunapiReply = loadEventSettings("shockdetection");
     readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
@@ -560,13 +560,13 @@ void DeviceAgent::readCameraSettings()
     sunapiReply = loadEventSettings("videoanalysis2");
     readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
 
-    readFromDeviceReply(sunapiReply, &m_settings.mdObjectSize, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < 8; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.mdIncludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, m_channelNumber, i);
 
     for (int i = 0; i < 8; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.mdExcludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
 
     readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
 
@@ -586,13 +586,13 @@ void DeviceAgent::readCameraSettings()
     readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
 
     sunapiReply = loadEventSettings("facedetection");
-    readFromDeviceReply(sunapiReply, &m_settings.faceDetection, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);
 
     sunapiReply = loadEventSettings("objectdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.odObjects, m_frameSize, m_channelNumber);
-    readFromDeviceReply(sunapiReply, &m_settings.odBestShot, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
+    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
     for (int i = 0; i < 8; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.odExcludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
 
     sunapiReply = loadEventSettings("audiodetection");
     readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);

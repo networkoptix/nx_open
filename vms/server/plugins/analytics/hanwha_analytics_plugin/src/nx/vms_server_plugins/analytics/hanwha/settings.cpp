@@ -566,7 +566,7 @@ std::string Motion::buildCameraWritingQuery(FrameSize /*frameSize*/, int channel
 
 //-------------------------------------------------------------------------------------------------
 
-bool MdObjectSize::operator==(const MdObjectSize& rhs) const
+bool MotionDetectionObjectSize::operator==(const MotionDetectionObjectSize& rhs) const
 {
     return initialized == rhs.initialized
         && minWidth == rhs.minWidth
@@ -576,7 +576,7 @@ bool MdObjectSize::operator==(const MdObjectSize& rhs) const
         ;
 }
 
-void MdObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void MotionDetectionObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, minWidth);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, minHeight);
@@ -585,7 +585,7 @@ void MdObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSour
     initialized = true;
 }
 
-void MdObjectSize::writeToServer(
+void MotionDetectionObjectSize::writeToServer(
     nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
 {
     settingsDestination->setValue("MotionDetection.MinObjectSize.Points",
@@ -593,7 +593,7 @@ void MdObjectSize::writeToServer(
 
 }
 
-void MdObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void MotionDetectionObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "MotionDetection");
     sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minWidth);
@@ -603,7 +603,7 @@ void MdObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Frame
     initialized = true;
 }
 
-std::string MdObjectSize::buildMinObjectSize(FrameSize frameSize) const
+std::string MotionDetectionObjectSize::buildMinObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
@@ -613,7 +613,7 @@ std::string MdObjectSize::buildMinObjectSize(FrameSize frameSize) const
     return stream.str();
 }
 
-std::string MdObjectSize::buildMaxObjectSize(FrameSize frameSize) const
+std::string MotionDetectionObjectSize::buildMaxObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
@@ -623,7 +623,7 @@ std::string MdObjectSize::buildMaxObjectSize(FrameSize frameSize) const
     return stream.str();
 }
 
-std::string MdObjectSize::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string MotionDetectionObjectSize::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -712,7 +712,7 @@ std::string IvaObjectSize::buildCameraWritingQuery(FrameSize frameSize, int chan
 
 //-------------------------------------------------------------------------------------------------
 
-bool MdIncludeArea::operator==(const MdIncludeArea& rhs) const
+bool MotionDetectionIncludeArea::operator==(const MotionDetectionIncludeArea& rhs) const
 {
     return initialized == rhs.initialized
         && points == rhs.points
@@ -722,7 +722,7 @@ bool MdIncludeArea::operator==(const MdIncludeArea& rhs) const
         ;
 }
 
-void MdIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
@@ -731,14 +731,14 @@ void MdIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSou
     initialized = true;
 }
 
-void MdIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void MotionDetectionIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
         nx::kit::Json roiInfo = getMdRoiInfo(channelInfo, this->deviceIndex());
         if (roiInfo == nx::kit::Json())
         {
             // No roi info found for current channel => *this should be set into default state.
             // Current SettingGroup is considered to be uninitialized.
-            *this = MdIncludeArea(this->nativeIndex());
+            *this = MotionDetectionIncludeArea(this->nativeIndex());
             return;
         }
 
@@ -749,7 +749,7 @@ void MdIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Fram
         initialized = true;
 }
 
-std::string MdIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string MotionDetectionIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -780,32 +780,32 @@ std::string MdIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int chan
 
 }
 //-------------------------------------------------------------------------------------------------
-bool MdExcludeArea::operator==(const MdExcludeArea& rhs) const
+bool MotionDetectionExcludeArea::operator==(const MotionDetectionExcludeArea& rhs) const
 {
     return initialized == rhs.initialized
         && points == rhs.points
         ;
 }
 
-void MdExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
     initialized = true;
 }
 
-void MdExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void MotionDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json roiInfo = getMdRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json(this->deviceIndex()))
     {
-        *this = MdExcludeArea(this->nativeIndex());
+        *this = MotionDetectionExcludeArea(this->nativeIndex());
         return;
     }
     sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
     initialized = true;
 }
 
-std::string MdExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string MotionDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -981,7 +981,7 @@ std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int c
 
 //-------------------------------------------------------------------------------------------------
 
-bool FaceDetection::operator==(const FaceDetection& rhs) const
+bool FaceDetectionGeneral::operator==(const FaceDetectionGeneral& rhs) const
 {
     return initialized == rhs.initialized
         && enabled == rhs.enabled
@@ -989,21 +989,21 @@ bool FaceDetection::operator==(const FaceDetection& rhs) const
         ;
 }
 
-void FaceDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void FaceDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
     initialized = true;
 }
 
-void FaceDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void FaceDetectionGeneral::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
     sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
     initialized = true;
 }
 
-std::string FaceDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string FaceDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1021,7 +1021,7 @@ std::string FaceDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int 
 
 //-------------------------------------------------------------------------------------------------
 
-bool OdObjects::operator==(const OdObjects& rhs) const
+bool ObjectDetectionGeneral::operator==(const ObjectDetectionGeneral& rhs) const
 {
     return initialized == rhs.initialized
         && enabled == rhs.enabled
@@ -1033,7 +1033,7 @@ bool OdObjects::operator==(const OdObjects& rhs) const
         ;
 }
 
-void OdObjects::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void ObjectDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
@@ -1044,7 +1044,7 @@ void OdObjects::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource,
     initialized = true;
 }
 
-void OdObjects::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ObjectDetectionGeneral::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
     sunapiReadOrThrow(channelInfo, "ObjectTypes", frameSize, &person, "Person");
@@ -1055,7 +1055,7 @@ void OdObjects::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSiz
     initialized = true;
 }
 
-std::string OdObjects::buildObjectTypes() const
+std::string ObjectDetectionGeneral::buildObjectTypes() const
 {
     std::vector<const char*> mode;
 
@@ -1074,7 +1074,7 @@ std::string OdObjects::buildObjectTypes() const
     return concat(mode);
 }
 
-std::string OdObjects::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string ObjectDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1093,7 +1093,7 @@ std::string OdObjects::buildCameraWritingQuery(FrameSize /*frameSize*/, int chan
 
 //-------------------------------------------------------------------------------------------------
 
-bool OdBestShot::operator==(const OdBestShot& rhs) const
+bool ObjectDetectionBestShot::operator==(const ObjectDetectionBestShot& rhs) const
 {
     return initialized == rhs.initialized
         && person == rhs.person
@@ -1103,7 +1103,7 @@ bool OdBestShot::operator==(const OdBestShot& rhs) const
         ;
 }
 
-void OdBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void ObjectDetectionBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, vehicle);
@@ -1112,7 +1112,7 @@ void OdBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource
     initialized = true;
 }
 
-void OdBestShot::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ObjectDetectionBestShot::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     // This doesn't work in the PNO-A0981R now (bug in the camera).
     sunapiReadOrThrow(channelInfo, "BestShot", frameSize, &person, "Person");
@@ -1122,7 +1122,7 @@ void OdBestShot::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSi
     initialized = true;
 }
 
-std::string OdBestShot::buildObjectTypes() const
+std::string ObjectDetectionBestShot::buildObjectTypes() const
 {
     std::vector<const char*> mode;
 
@@ -1141,7 +1141,7 @@ std::string OdBestShot::buildObjectTypes() const
     return concat(mode);
 }
 
-std::string OdBestShot::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string ObjectDetectionBestShot::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1158,31 +1158,31 @@ std::string OdBestShot::buildCameraWritingQuery(FrameSize /*frameSize*/, int cha
 
 //-------------------------------------------------------------------------------------------------
 
-bool OdExcludeArea::operator==(const OdExcludeArea& rhs) const
+bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rhs) const
 {
     return initialized == rhs.initialized
         && points == rhs.points
         ;
 }
-void OdExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
 {
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
     initialized = true;
 }
 
-void OdExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ObjectDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json roiInfo = getOdRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
-        *this = OdExcludeArea(this->nativeIndex());
+        *this = ObjectDetectionExcludeArea(this->nativeIndex());
         return;
     }
     sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
     initialized = true;
 }
 
-std::string OdExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string ObjectDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)

@@ -19,7 +19,7 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 enum class EventCategory
 {
     motionDetection,
-    faceDetection, //< not supported
+    faceDetectionGeneral, //< not supported
     tampering,
     audioDetection,
     defocusDetection,
@@ -156,7 +156,7 @@ struct Motion: public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct MdObjectSize: public SettingGroup
+struct MotionDetectionObjectSize: public SettingGroup
 {
     Width minWidth;
     Height minHeight;
@@ -179,9 +179,9 @@ struct MdObjectSize: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdObjectSize(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
-    bool operator == (const MdObjectSize& rhs) const;
-    bool operator!=(const MdObjectSize& rhs) const { return !(*this == rhs); }
+    MotionDetectionObjectSize(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
+    bool operator == (const MotionDetectionObjectSize& rhs) const;
+    bool operator!=(const MotionDetectionObjectSize& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -236,7 +236,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct MdIncludeArea: public SettingGroup
+struct MotionDetectionIncludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
     int thresholdLevel = 50;
@@ -261,12 +261,12 @@ struct MdIncludeArea: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdIncludeArea(int roiIndex = -1):
+    MotionDetectionIncludeArea(int roiIndex = -1):
     SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
-    bool operator==(const MdIncludeArea& rhs) const;
-    bool operator!=(const MdIncludeArea& rhs) const { return !(*this == rhs); }
+    bool operator==(const MotionDetectionIncludeArea& rhs) const;
+    bool operator!=(const MotionDetectionIncludeArea& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -277,7 +277,7 @@ struct MdIncludeArea: public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct MdExcludeArea: public SettingGroup
+struct MotionDetectionExcludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
 
@@ -293,13 +293,13 @@ struct MdExcludeArea: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    MdExcludeArea(int roiIndex = -1):
+    MotionDetectionExcludeArea(int roiIndex = -1):
     SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
-    bool operator == (const MdExcludeArea& rhs) const;
-    bool operator!=(const MdExcludeArea& rhs) const { return !(*this == rhs); }
+    bool operator == (const MotionDetectionExcludeArea& rhs) const;
+    bool operator!=(const MotionDetectionExcludeArea& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -418,7 +418,7 @@ struct FogDetection: public SettingGroup
 };
 //-------------------------------------------------------------------------------------------------
 
-struct FaceDetection: public SettingGroup
+struct FaceDetectionGeneral: public SettingGroup
 {
     bool enabled = false;
     int sensitivityLevel = 80;
@@ -434,9 +434,9 @@ struct FaceDetection: public SettingGroup
     static constexpr const char* kJsonEventName = "FaceDetection";
     static constexpr const char* kSunapiEventName = "facedetection";
 
-    FaceDetection(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
-    bool operator==(const FaceDetection& rhs) const;
-    bool operator!=(const FaceDetection& rhs) const { return !(*this == rhs); }
+    FaceDetectionGeneral(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
+    bool operator==(const FaceDetectionGeneral& rhs) const;
+    bool operator!=(const FaceDetectionGeneral& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -484,7 +484,7 @@ struct FaceDetectionExcludeArea : public SettingGroup
 };
 
 //-------------------------------------------------------------------------------------------------
-struct OdObjects: public SettingGroup
+struct ObjectDetectionGeneral: public SettingGroup
 {
     bool enabled = false;
     bool person = false;
@@ -512,9 +512,9 @@ struct OdObjects: public SettingGroup
     static constexpr const char* kJsonEventName = "ObjectDetection";
     static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdObjects(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
-    bool operator == (const OdObjects& rhs) const;
-    bool operator!=(const OdObjects& rhs) const { return !(*this == rhs); }
+    ObjectDetectionGeneral(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
+    bool operator == (const ObjectDetectionGeneral& rhs) const;
+    bool operator!=(const ObjectDetectionGeneral& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -528,7 +528,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct OdBestShot: public SettingGroup
+struct ObjectDetectionBestShot: public SettingGroup
 {
     bool person = false;
     bool vehicle = false;
@@ -550,9 +550,9 @@ struct OdBestShot: public SettingGroup
     static constexpr const char* kJsonEventName = "ObjectDetection";
     static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdBestShot(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
-    bool operator == (const OdBestShot& rhs) const;
-    bool operator!=(const OdBestShot& rhs) const { return !(*this == rhs); }
+    ObjectDetectionBestShot(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
+    bool operator == (const ObjectDetectionBestShot& rhs) const;
+    bool operator!=(const ObjectDetectionBestShot& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -566,7 +566,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct OdExcludeArea: public SettingGroup
+struct ObjectDetectionExcludeArea: public SettingGroup
 {
     std::vector<PluginPoint> points;
 
@@ -582,12 +582,12 @@ struct OdExcludeArea: public SettingGroup
     static constexpr const char* kJsonEventName = "ObjectDetection";
     static constexpr const char* kSunapiEventName = "objectdetection";
 
-    OdExcludeArea(int roiIndex = -1):
+    ObjectDetectionExcludeArea(int roiIndex = -1):
     SettingGroup(kServerKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
-    bool operator == (const OdExcludeArea& rhs) const;
-    bool operator!=(const OdExcludeArea& rhs) const { return !(*this == rhs); }
+    bool operator == (const ObjectDetectionExcludeArea& rhs) const;
+    bool operator!=(const ObjectDetectionExcludeArea& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -878,18 +878,18 @@ struct Settings
 {
     ShockDetection shockDetection;
     Motion motion;
-    MdObjectSize mdObjectSize;
+    MotionDetectionObjectSize motionDetectionObjectSize;
     IvaObjectSize ivaObjectSize;
-    MdIncludeArea mdIncludeArea[8];
-    MdExcludeArea mdExcludeArea[8];
+    MotionDetectionIncludeArea motionDetectionIncludeArea[8];
+    MotionDetectionExcludeArea motionDetectionExcludeArea[8];
     TamperingDetection tamperingDetection;
     DefocusDetection defocusDetection;
     FogDetection fogDetection;
-    FaceDetection faceDetection;
+    FaceDetectionGeneral faceDetectionGeneral;
     //FaceDetectionExcludeArea faceDetectionExcludeArea[8];
-    OdObjects odObjects;
-    OdBestShot odBestShot;
-    OdExcludeArea odExcludeArea[8];
+    ObjectDetectionGeneral objectDetectionGeneral;
+    ObjectDetectionBestShot objectDetectionBestShot;
+    ObjectDetectionExcludeArea objectDetectionExcludeArea[8];
     IvaLine ivaLine[8];
     IvaIncludeArea ivaIncludeArea[8];
     IvaExcludeArea ivaExcludeArea[8];
