@@ -99,10 +99,12 @@ Figure
 
     property PointGrip lastHoveredGrip: null
 
-    Canvas
+    readonly property Canvas canvas: Canvas
     {
         id: canvas
 
+        // Visual item created in a property has an invalid visual parent.
+        parent: figure
         anchors.fill: parent
 
         onPaint:

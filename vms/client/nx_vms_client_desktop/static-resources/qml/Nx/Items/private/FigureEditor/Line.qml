@@ -10,6 +10,8 @@ PolyFigure
     property string allowedDirections: (figureSettings && figureSettings.allowedDirections)
         ? figureSettings.allowedDirections : ""
 
+    canvas.opacity: (arrowA.hovered || arrowB.hovered) ? 0.5 : 1.0
+
     LineArrow
     {
         id: arrowA
