@@ -578,6 +578,8 @@ public:
      */
     bool encodingIsAllowed(const nx::network::http::StringType& encodingName, double* q = nullptr) const;
 
+    const std::map<nx::network::http::StringType, double>& allEncodings() const;
+
 private:
     /** map<coding, qvalue>. */
     std::map<nx::network::http::StringType, double> m_codings;
