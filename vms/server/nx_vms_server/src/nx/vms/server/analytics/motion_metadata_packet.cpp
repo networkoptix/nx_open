@@ -41,6 +41,14 @@ int MotionMetadataPacket::columnCount() const
     return 0;
 }
 
+bool MotionMetadataPacket::isEmpty() const
+{
+    if (NX_ASSERT(m_motionMetadata))
+        return m_motionMetadata->isEmpty();
+
+    return false;
+}
+
 bool MotionMetadataPacket::isMotionAt(int x, int y) const
 {
     if (NX_ASSERT(m_motionMetadata))

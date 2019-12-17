@@ -21,6 +21,8 @@ public:
 
     virtual int columnCount() const override;
 
+    virtual bool isEmpty() const override;
+
     virtual bool isMotionAt(int x, int y) const override;
 
     virtual int64_t timestampUs() const override;

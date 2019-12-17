@@ -26,6 +26,8 @@ public:
 
     virtual int columnCount() const = 0;
 
+    virtual bool isEmpty() const = 0;
+
     virtual bool isMotionAt(int x, int y) const = 0;
 };
 
