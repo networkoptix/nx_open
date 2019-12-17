@@ -212,7 +212,7 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
         setJumpTime(skipTime ? skipTime : mksec);
     }
     bool rez = false;
-    for(const ReaderInfo& info: d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader->isEnabled())
             rez |= info.reader->jumpToEx(mksec, skipTime, nullptr, /*useDelegate*/ false);
