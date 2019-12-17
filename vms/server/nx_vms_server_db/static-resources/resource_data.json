@@ -2523,7 +2523,7 @@
 
         },
         {
-            "keys":["neutral|DSC-TVC-0200", "entropix|DSC-TVC-0200"],
+            "keys":["*|DSC-TVC-0200"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -2531,7 +2531,10 @@
                     "1,3",
                     "2,4"
                 ]
-            }
+            },
+            "onvifManufacturerReplacement": "entropix",
+            "onvifVendorSubtype": "entropix"
+
         },
         {
             "keys":["DW|DWC-PB6M4T"],
