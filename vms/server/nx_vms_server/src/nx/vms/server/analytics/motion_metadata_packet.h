@@ -23,7 +23,7 @@ public:
 
     virtual bool isEmpty() const override;
 
-    virtual bool isMotionAt(int x, int y) const override;
+    virtual bool isMotionAt(int columnIndex, int rowIndex) const override;
 
     virtual int64_t timestampUs() const override;
 

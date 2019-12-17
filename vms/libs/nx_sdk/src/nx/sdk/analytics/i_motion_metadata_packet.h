@@ -28,7 +28,7 @@ public:
 
     virtual bool isEmpty() const = 0;
 
-    virtual bool isMotionAt(int x, int y) const = 0;
+    virtual bool isMotionAt(int columnIndex, int rowIndex) const = 0;
 };
 
 } // namespace analytics

@@ -49,10 +49,10 @@ bool MotionMetadataPacket::isEmpty() const
     return false;
 }
 
-bool MotionMetadataPacket::isMotionAt(int x, int y) const
+bool MotionMetadataPacket::isMotionAt(int columnIndex, int rowIndex) const
 {
     if (NX_ASSERT(m_motionMetadata))
-        return m_motionMetadata->isMotionAt(x, y);
+        return m_motionMetadata->isMotionAt(columnIndex, rowIndex);
 
     return nullptr;
 }
