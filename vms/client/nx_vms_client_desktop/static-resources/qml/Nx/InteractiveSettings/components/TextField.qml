@@ -8,10 +8,16 @@ LabeledItem
 
     property alias value: textField.text
     property string defaultValue: ""
+    property string validationRegex: ""
+    property string validationRegexFlags: ""
 
     contentItem: TextField
     {
+        readonly property var validationRegex:
+            new RegExp(control.validationRegex, control.validationRegexFlags)
+
         id: textField
         text: defaultValue
+        warningState: control.validationRegex && !validationRegex.test(text)
     }
 }
