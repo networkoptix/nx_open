@@ -1001,7 +1001,7 @@ void QnStorageManager::scanMediaCatalog(
         closeDirPath(closeDirPath(storage->getUrl())
         + DeviceFileCatalog::prefixByCatalog(quality));
 
-    const auto cameraPath = QDir(qualityPath).absoluteFilePath(cameraUuid);
+    const auto cameraPath = closeDirPath(qualityPath) + cameraUuid;
     if (!storage->isDirExists(cameraPath))
     {
         DeviceFileCatalogPtr newCatalog(
