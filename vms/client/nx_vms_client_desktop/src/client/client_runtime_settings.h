@@ -45,6 +45,8 @@ public:
         /** Use OpenGL double buffering. */
         GL_DOUBLE_BUFFER,
 
+        GL_MULTISAMPLING_SAMPLES,
+
         /** Current locale. */
         LOCALE,
 
@@ -82,6 +84,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isAcsMode, setAcsMode, ACS_MODE, false)
         QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
         QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
+        QN_DECLARE_RW_PROPERTY(int, glMultisamplingSamples, setGlMultisamplingSamples, GL_MULTISAMPLING_SAMPLES, 8)
         QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
         QN_DECLARE_RW_PROPERTY(int, maxSceneItemsOverride, setMaxSceneItemsOverride,
             MAX_SCENE_ITEMS_OVERRIDE, 0)
