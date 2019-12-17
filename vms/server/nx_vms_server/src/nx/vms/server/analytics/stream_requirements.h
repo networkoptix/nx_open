@@ -17,4 +17,18 @@ struct StreamRequirements
     nx::vms::api::StreamIndex preferredStreamIndex = nx::vms::api::StreamIndex::undefined;
 };
 
+enum class MotionAnalysisPolicy
+{
+    automatic,
+    disabled,
+    forced,
+};
+
+struct StreamProviderRequirements
+{
+    nx::vms::api::analytics::StreamTypes requiredStreamTypes;
+    MotionAnalysisPolicy motionAnalysisPolicy = MotionAnalysisPolicy::automatic;
+
+};
+
 } // namespace nx::vms::server::analytics
