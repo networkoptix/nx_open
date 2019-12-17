@@ -468,9 +468,10 @@ void QnLiveStreamProvider::processMetadata(
 
     if (streamDataReceptor)
     {
-        if (const QnMetaDataV1Ptr motionMetadata = motionEstimation->getMotion();
-            motionMetadata && requirements.requiredStreamTypes.testFlag(StreamType::motion))
+        if (motionEstimation->existsMetadata()
+            && requirements.requiredStreamTypes.testFlag(StreamType::motion))
         {
+            const QnMetaDataV1Ptr motionMetadata = motionEstimation->getMotion();
             NX_VERBOSE(this, "Pushing motion metadata to receptor, timestamp: %1 us",
                 motionMetadata->timestamp);
 
