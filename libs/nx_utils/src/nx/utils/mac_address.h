@@ -24,7 +24,7 @@ public:
 
     bool isNull() const;
 
-    Data bytes() const;
+    const Data& bytes() const;
     QString toString() const;
 
     bool operator==(const MacAddress& other) const;

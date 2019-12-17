@@ -76,6 +76,8 @@ private:
     std::chrono::milliseconds m_connectionSendTimeout = network::kNoTimeout;
     std::unique_ptr<AbstractEncryptedStreamSocket> m_encryptedConnection;
 
+    void fixRequestHeaders();
+
     void startProxying(
         nx::network::http::StatusCode::Value resultCode,
         TargetHost proxyTarget);

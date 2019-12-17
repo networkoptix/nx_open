@@ -298,6 +298,11 @@ Qn::ResourceStatus QnResource::getStatus() const
     return statusDictionary->value(getId());
 }
 
+Qn::ResourceStatus QnResource::getPreviousStatus() const
+{
+    return m_previousStatus;
+}
+
 void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
@@ -316,7 +321,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
 
     NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus, newStatus, reason, getName(), nx::utils::url::hidePassword(getUrl()));
-
+    m_previousStatus = oldStatus;
     commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;

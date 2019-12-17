@@ -228,8 +228,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "caption": "CheckBox Parameter",
                                 "name": "testCheckBox",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             }
                         ]
                     }
@@ -259,36 +258,31 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateCarsSetting + R"json(",
                                 "caption": "Generate cars",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateTrucksSetting + R"json(",
                                 "caption": "Generate trucks",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGeneratePedestriansSetting + R"json(",
                                 "caption": "Generate pedestrians",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateHumanFacesSetting + R"json(",
                                 "caption": "Generate human faces",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateBicyclesSetting + R"json(",
                                 "caption": "Generate bicycles",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "SpinBox",
@@ -302,8 +296,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kBlinkingObjectInDedicatedPacketSetting + R"json(",
                                 "caption": "Put BlinkingObject into a dedicated MetadataPacket",
-                                "defaultValue": false,
-                                "value": false
+                                "defaultValue": false
                             },
                             {
                                 "type": "SpinBox",
@@ -325,8 +318,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
                                 "caption": "Generate preview packet",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "SpinBox",
@@ -350,23 +342,20 @@ std::string Engine::manifestString() const
                         "type": "CheckBox",
                         "name": ")json" + kGenerateEventsSetting + R"json(",
                         "caption": "Generate events",
-                        "defaultValue": true,
-                        "value": true
+                        "defaultValue": true
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json"
                         + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
                         "caption": "Throw plugin events from the DeviceAgent",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json" + kLeakFramesSetting + R"json(",
                         "caption": "Force a memory leak when processing a video frame",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "SpinBox",
@@ -418,7 +407,6 @@ std::string Engine::manifestString() const
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
                         "defaultValue": true,
-                        "value": true
                     }
                 ]
             },
@@ -430,20 +418,89 @@ std::string Engine::manifestString() const
                     {
                       "type": "PolygonFigure",
                       "name": "testPolygon",
-                      "caption": "Polygon",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2], [0.2, 0.5]], "color": "#e040fb" }
+                      "caption": "Polygon"
                     },
                     {
                       "type": "BoxFigure",
                       "name": "testBox",
-                      "caption": "Box",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                      "caption": "Box"
                     },
                     {
                       "type": "LineFigure",
                       "name": "testLine",
-                      "caption": "Line",
-                      "value": { "points": [[0.1, 0.1], [0.5, 0.2]], "color": "#e040fb" }
+                      "caption": "Line"
+                    }
+                ]
+            }
+        ],
+        "sections": [
+            {
+                "type": "Section",
+                "name": "Example",
+                "items": [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Example Stub DeviceAgent settings",
+                        "collapsible": false,
+                        "items": [
+                            {
+                                "type": "TextField",
+                                "name": "testTextField2",
+                                "caption": "Device Agent Text Field",
+                                "description": "A text field",
+                                "defaultValue": "a text"
+                            },
+                            {
+                                "type": "SpinBox",
+                                "caption": "Device Agent SpinBox (plugin side)",
+                                "name": "pluginSideTestSpinBox2",
+                                "defaultValue": 42,
+                                "minValue": 0,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "Device Agent DoubleSpinBox",
+                                "name": "testDoubleSpinBox2",
+                                "defaultValue": 3.1415,
+                                "minValue": 0.0,
+                                "maxValue": 100.0
+                            },
+                            {
+                                "type": "ComboBox",
+                                "name": "testComboBox2",
+                                "caption": "Device Agent ComboBox",
+                                "defaultValue": "value2",
+                                "range": ["value1", "value2", "value3"]
+                            },
+                            {
+                                "type": "CheckBox",
+                                "caption": "Device Agent CheckBox",
+                                "name": "testCheckBox2",
+                                "defaultValue": true
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "ROI",
+                "items": [
+                    {
+                        "type": "PolygonFigure",
+                        "name": "testPolygon2",
+                        "caption": "Polygon",
+                    },
+                    {
+                        "type": "BoxFigure",
+                        "name": "testBox2",
+                        "caption": "Box"
+                    },
+                    {
+                        "type": "LineFigure",
+                        "name": "testLine2",
+                        "caption": "Line"
                     }
                 ]
             }

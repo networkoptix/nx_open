@@ -29,6 +29,8 @@ void AbstractProxyHandler::processRequest(
 
     m_isIncomingConnectionEncrypted = requestContext.connection->isSsl();
 
+    fixRequestHeaders();
+
     detectProxyTarget(
         *requestContext.connection,
         &m_request,
@@ -45,6 +47,26 @@ void AbstractProxyHandler::setSslHandshakeTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
     m_sslHandshakeTimeout = timeout;
+}
+
+void AbstractProxyHandler::fixRequestHeaders()
+{
+    if (auto it = m_request.headers.find("Accept-Encoding");
+        it != m_request.headers.end())
+    {
+        header::AcceptEncodingHeader acceptEncoding(it->second);
+        m_request.headers.erase("Accept-Encoding");
+
+        QByteArrayList encodingsToForward;
+        for (const auto& [encoding, qValue]: acceptEncoding.allEncodings())
+        {
+            if (qValue > 0.0 && HttpStreamReader::isEncodingSupported(encoding))
+                encodingsToForward.append(encoding);
+        }
+
+        if (!encodingsToForward.isEmpty())
+            m_request.headers.emplace("Accept-Encoding", encodingsToForward.join(", "));
+    }
 }
 
 void AbstractProxyHandler::startProxying(

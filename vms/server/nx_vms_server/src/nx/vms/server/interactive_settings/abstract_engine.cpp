@@ -29,6 +29,15 @@ bool processValueItemsRecursively(Item* item, const std::function<bool(ValueItem
         }
     }
 
+    if (const auto sections = qobject_cast<SectionContainer*>(item))
+    {
+        for (const auto section: sections->sectionList())
+        {
+            if (!processValueItemsRecursively(section, f))
+                return false;
+        }
+    }
+
     return true;
 }
 

@@ -72,13 +72,19 @@ public:
                 result.append(address.ip().toString());
         }
 
+        if (result.empty())
+            return {};
         return result;
     }
 
     nx::vms::api::metrics::Value displayAddress() const
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        return displayAddressFromAddresses(m_interface.addressEntries()).toString();
+        const auto address = displayAddressFromAddresses(m_interface.addressEntries());
+
+        if (address.isNull())
+            return {};
+        return address.toString();
     }
 
     bool isUp() const
@@ -154,13 +160,13 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
                 "server", [this](const auto&) { return m_serverId; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "state", [this](const auto& r) { return r->isUp() ? "Up" : "Down"; }
+                "state", [](const auto& r) { return r->isUp() ? "Up" : "Down"; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "displayAddress", [this](const auto& r) { return r->displayAddress(); }
+                "displayAddress", [](const auto& r) { return r->displayAddress(); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "otherAddresses", [this](const auto& r) { return r->otherAddressesJson(); }
+                "otherAddresses", [](const auto& r) { return r->otherAddressesJson(); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

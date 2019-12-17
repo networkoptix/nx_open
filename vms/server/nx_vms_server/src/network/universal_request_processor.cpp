@@ -85,6 +85,12 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     {
         nx::utils::Url url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
+
+        // Latest chromium can't pass proxy authorization correctly due to bug.
+        // Allow to pass requests to the cameras without proxy authorization.
+        if (nx::vms::network::ProxyConnectionProcessor::isProxyForCamera(d->owner->commonModule(), d->request))
+            return true;
+
         const bool isProxy = nx::vms::network::ProxyConnectionProcessor::isStandardProxyNeeded(
             d->owner->commonModule(), d->request);
         QElapsedTimer t;

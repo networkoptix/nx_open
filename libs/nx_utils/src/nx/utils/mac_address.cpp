@@ -98,7 +98,7 @@ bool MacAddress::isNull() const
     return std::all_of(m_data.cbegin(), m_data.cend(), [](auto byte) { return byte == 0; });
 }
 
-std::array<quint8, MacAddress::kMacAddressLength> MacAddress::bytes() const
+const std::array<quint8, MacAddress::kMacAddressLength>& MacAddress::bytes() const
 {
     return m_data;
 }

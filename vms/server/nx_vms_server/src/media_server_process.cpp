@@ -5151,9 +5151,20 @@ void SIGUSR1_handler(int)
 
 int MediaServerProcess::main(int argc, char* argv[])
 {
+    // Set locale to default "C" locale to have no issues with locale dependent standard conversion
+    // functions. Using of QnTranslationManager::installTranslation is not enough as QLocale
+    // affects only Qt locale dependent functions.
+    setlocale(LC_ALL, "C");
+    std::locale::global(std::locale("C"));
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    nx::utils::rlimit::setMaxFileDescriptors(32000);
+    static const int kMaxDescriptors = 32000;
+    int descriptorsCount = nx::utils::rlimit::setMaxFileDescriptors(kMaxDescriptors);
+    if (descriptorsCount == 0)
+    {
+        NX_WARNING(nx::utils::log::Tag(QString("MediaServerProcess")),
+            "failure to setup process descriptors count to %1", kMaxDescriptors);
+    }
 
     #if defined(_WIN32)
         win32_exception::installGlobalUnhandledExceptionHandler();

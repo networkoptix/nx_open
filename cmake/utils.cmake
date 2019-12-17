@@ -287,3 +287,58 @@ function(nx_json_to_cmake json cmake prefix)
             ${json} ${cmake} -p ${prefix})
     endif()
 endfunction()
+
+# Intended for debug. Enquotes and escapes the string (C style) to the best of CMake feasibility. 
+function(nx_c_escape_string value out_var)
+    set(${out_var} "${value}")
+    string(REPLACE "\\" "\\\\" value "${value}")
+    string(REPLACE "\"" "\\\"" value "${value}")
+    string(REPLACE "\t" "\\t" value "${value}")
+    string(REPLACE "\r" "\\r" value "${value}")
+    string(REPLACE "\n" "\\n" value "${value}")
+    # There seems to be no way in CMake to escape other control chars, thus leaving them as is.
+    
+    set(${out_var} "\"${value}\"" PARENT_SCOPE)
+endfunction()
+
+# Intended for debug. Prints all arguments as strings.
+function(nx_print_args)
+    set(output "####### print_args(): ${ARGC} argument(s) (using C escaping):\n")
+    string(APPEND output "{\n")
+    if(${ARGC}) #< If ARGC is not zero.
+        math(EXPR last_arg_index "${ARGC} - 1")
+        foreach(arg_index RANGE 0 ${last_arg_index})
+            nx_c_escape_string("${ARGV${arg_index}}" c_escaped_arg)
+            string(APPEND output "    ${c_escaped_arg}\n")
+        endforeach()
+    endif()
+    string(APPEND output "}")
+    
+    message("${output}")
+endfunction()
+
+# Intended for debug. Prints the variable contents both as a string and as a list.
+function(nx_print_var some_var)
+    list(LENGTH ${some_var} list_length)
+    
+    if(NOT ${list_length}) #< If list_length is zero.
+        message("####### print_var(${some_var}): Zero length list.")
+        return()
+    endif()
+    
+    string(LENGTH "${${some_var}}" string_length)
+    set(output "####### print_var(${some_var}) (using C escaping):\n")
+    nx_c_escape_string("${${some_var}}" c_escaped_value)
+    string(APPEND output "    As string of length ${string_length}: ${c_escaped_value}\n")
+    string(APPEND output "    As list of length ${list_length}:\n")
+    string(APPEND output "    {\n")
+    math(EXPR last_list_item_index "${list_length} - 1")
+    foreach(list_item_index RANGE 0 ${last_list_item_index})
+        list(GET ${some_var} ${list_item_index} list_item)
+        nx_c_escape_string("${list_item}" c_escaped_list_item)
+        string(APPEND output "        ${c_escaped_list_item}\n")
+    endforeach()
+    string(APPEND output "    }\n")
+    
+    message("${output}")
+endfunction()

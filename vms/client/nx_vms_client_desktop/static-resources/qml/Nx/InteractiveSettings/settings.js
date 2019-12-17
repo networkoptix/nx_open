@@ -12,7 +12,7 @@ function _createItemsRecursively(parent, model, depth)
         return null
     }
 
-    var item = component.createObject(parent.childrenItem, model)
+    var item = component.createObject(parent, model)
 
     if (item)
     {
@@ -22,7 +22,13 @@ function _createItemsRecursively(parent, model, depth)
         if (item.childrenItem && model.items)
         {
             model.items.forEach(
-                function(model) { _createItemsRecursively(item, model, depth + 1) })
+                function(model) { _createItemsRecursively(item.childrenItem, model, depth + 1) })
+        }
+
+        if (item.sectionsItem && model.sections)
+        {
+            model.sections.forEach(
+                function(model) { _createItemsRecursively(item.sectionsItem, model, depth) })
         }
     }
     else
@@ -34,13 +40,13 @@ function _createItemsRecursively(parent, model, depth)
     return item
 }
 
-function createItems(parent, model)
+function createItems(parent, model, sections)
 {
     // Clone the model because we are going to modify it.
     var modelCopy = JSON.parse(JSON.stringify(model))
     modelCopy.type = "Settings"
 
-    var item = _createItemsRecursively(parent, modelCopy, 0)
+    var item = _createItemsRecursively(parent.childrenItem, modelCopy, 0)
     item.parent = parent
     item.anchors.fill = parent
 
@@ -55,6 +61,12 @@ function _processItemsRecursively(item, f)
     {
         for (var i = 0; i < item.childrenItem.children.length; ++i)
             _processItemsRecursively(item.childrenItem.children[i], f)
+    }
+
+    if (item.sectionsItem)
+    {
+        for (var i = 1; i < item.sectionsItem.children.length; ++i)
+            _processItemsRecursively(item.sectionsItem.children[i], f)
     }
 }
 

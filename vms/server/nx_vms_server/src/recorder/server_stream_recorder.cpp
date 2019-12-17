@@ -487,17 +487,23 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
     {
+        NX_VERBOSE(this, "skip recording data because secondaryStream is disabled on "
+            "expert tab. camera %1", m_resource->getUrl());
         close();
         return false;
     }
 
     if (m_catalog == QnServer::HiQualityCatalog && !metaData && !m_usePrimaryRecorder)
     {
+        NX_VERBOSE(this, "skip recording data because primaryStream is disabled on "
+            "expert tab. camera %1", m_resource->getUrl());
         close();
         return false;
     }
 
-    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder) {
+    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder)
+    {
+        NX_VERBOSE(this, "skip recording meta data camera %1", m_resource->getUrl());
         keepRecentlyMotion(media);
         return false;
     }
@@ -508,6 +514,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
         return true;
     else if (task.recordingType == Qn::RecordingType::never)
     {
+        NX_VERBOSE(this, "skip recording. Current scedule task is 'never'. Camera %1", m_resource->getUrl());
         close();
         if (media->dataType == QnAbstractMediaData::META_V1)
             keepRecentlyMotion(media);
@@ -529,6 +536,9 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
             m_endDateTimeUs += MIN_FRAME_DURATION_USEC;
         close();
     }
+    if (!isMotionContinue)
+        NX_VERBOSE(this, "skip recording. No motion. Camera %1", m_resource->getUrl());
+
     return isMotionContinue;
 }
 

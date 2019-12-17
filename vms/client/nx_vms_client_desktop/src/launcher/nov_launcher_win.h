@@ -14,6 +14,14 @@ public:
         WriteIndexError
     };
 
+    enum class ExportMode
+    {
+        withVideo,
+        standaloneClient
+    };
+
     // Creates valid (in the sense of layout::identifyFile) nov file containing client and exe header.
-    static ErrorCode createLaunchingFile(const QString& dstName, const QString& novFileName = QString());
+    static ErrorCode createLaunchingFile(
+        const QString& dstName,
+        ExportMode exportMode = ExportMode::withVideo);
 };

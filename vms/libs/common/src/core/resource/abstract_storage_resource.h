@@ -2,6 +2,7 @@
 
 #include "resource.h"
 #include <nx/utils/url.h>
+#include <utils/common/util.h>
 
 #include <QtCore/QtCore>
 #include <memory>
@@ -29,7 +30,7 @@ public:
     {
     public:
         explicit FileInfo(const QString& uri, qint64 size, bool isDir = false):
-            m_fpath(QDir::toNativeSeparators(uri)), m_size(size), m_isDir(isDir)
+            m_fpath(uri), m_size(size), m_isDir(isDir)
         {
         }
 
@@ -69,7 +70,7 @@ public:
             if (m_isDir)
                 return m_fpath;
 
-            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(getPathSeparator(m_fpath));
             if (lastSeparatorIndex == -1)
                 return m_fpath;
 
@@ -81,7 +82,7 @@ public:
             if (m_qFileInfo)
                 return m_qFileInfo->fileName();
 
-            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(getPathSeparator(m_fpath));
             if (lastSeparatorIndex == -1)
                 return m_fpath;
 

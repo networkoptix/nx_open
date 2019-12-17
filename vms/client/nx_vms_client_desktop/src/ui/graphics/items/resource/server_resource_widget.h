@@ -82,6 +82,7 @@ private:
 
     QColor getColor(Qn::StatisticsDeviceType deviceType, int index);
 
+    HealthMonitoringButtons savedCheckedHealthMonitoringButtons() const;
     void updateCheckedHealthMonitoringButtons();
 
     bool isLegendVisible() const;

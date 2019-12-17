@@ -222,6 +222,11 @@ void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
         return;
     const auto& buffer = m_monitorHttpClient->fetchMessageBodyBuffer();
     m_contentParser->processData(buffer);
+
+    // While processing this empty event HikvisionMetadataMonitor::addExpiredEvents finds
+    // expired state-dependent events, which then are sent to server with field `active=false`.
+    // This makes new-coming active state-dependent events not to be ignored by server.
+    processEvent(HikvisionEvent());
 }
 
 std::chrono::milliseconds HikvisionMetadataMonitor::reopenDelay() const

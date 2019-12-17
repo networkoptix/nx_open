@@ -21,6 +21,7 @@ public:
     State state = State::init;
     z_stream zStream;
     QByteArray outputBuffer;
+    bool deflateDecoding = false;
 };
 
 Uncompressor::Uncompressor(const std::shared_ptr<AbstractByteStreamFilter>& nextFilter):
@@ -55,7 +56,11 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
         {
             case Private::State::init:
             case Private::State::done: //< To support stream of gzipped files.
-                zResult = inflateInit2(&d->zStream, 16 + MAX_WBITS);
+                // Possible compressions are gzip, zlib or deflate, manipulated by windowBits
+                // parameter, see http://www.zlib.net/manual.html#Advanced. Http uses gzip or
+                // deflate.
+                zResult =
+                    inflateInit2(&d->zStream, d->deflateDecoding ? -MAX_WBITS : 16 + MAX_WBITS);
                 if (zResult != Z_OK)
                 {
                     NX_ASSERT(false);
@@ -196,6 +201,11 @@ size_t Uncompressor::flush()
         return (uInt) d->outputBuffer.size() - d->zStream.avail_out;
     }
     return 0;
+}
+
+void Uncompressor::setDeflateDecoding()
+{
+    d->deflateDecoding = true;
 }
 
 } // namespace nx::utils::bstream::gzip

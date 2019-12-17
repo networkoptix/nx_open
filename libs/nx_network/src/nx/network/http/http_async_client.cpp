@@ -1335,7 +1335,7 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx::network::http:
     {
         if (httpMethod == nx::network::http::Method::get || httpMethod == nx::network::http::Method::head)
         {
-            if (m_contentEncodingUsed)
+            if (m_contentEncodingUsed && m_additionalHeaders.count("Accept-Encoding") == 0)
             {
                 http::insertOrReplaceHeader(
                     &m_request.headers,

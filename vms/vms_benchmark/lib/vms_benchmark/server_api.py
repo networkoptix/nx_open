@@ -15,6 +15,30 @@ from vms_benchmark.license import License
 Response = namedtuple('Response', ['code', 'body'])
 
 
+def _catch_http_errors(action):
+    def result_func(*args, **kwargs):
+        try:
+            return action(*args, **kwargs)
+        except urllib.error.HTTPError as e:
+            if e.code == 401 or e.code == 403:
+                raise exceptions.ServerApiError(
+                    f"Server failed to execute API request: insufficient VMS user permissions (HTTP code {e.code}).",
+                    original_exception=e
+                )
+            if e.code == 400 or e.code == 404 or e.code == 406:
+                raise exceptions.ServerApiError(
+                    f"Server failed to execute API request: Server internal error (HTTP code {e.code}).",
+                    original_exception=e
+                )
+            if 500 <= e.code <= 599:
+                raise exceptions.ServerApiError(
+                    f"Server failed to execute API request: Server internal error (HTTP code {e.code}).",
+                    original_exception=e
+                )
+            raise exceptions.ServerApiError(e)
+    return result_func
+
+
 class ServerApi:
     class Response:
         def __init__(self, code):
@@ -47,7 +71,7 @@ class ServerApi:
     @staticmethod
     def _read_response(response):
         body = response.read()
-        logging.info(f"Got HTTP response {response.code}:\n    {body}")
+        logging.info(f"Got HTTP response {response.code}:\n    {body!r}")
         return Response(response.code, body)
 
     def ping(self):
@@ -59,23 +83,15 @@ class ServerApi:
                 result.payload = json.loads(response.body)
         except URLError:
             return None
-
         return result
 
+    @_catch_http_errors
     def get_module_information(self):
-        try:
-            request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
-            credentials = f"{self.user}:{self.password}"
-            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-            response = self.get_request(request)
-        except urllib.error.HTTPError as e:
-            if e.code == 401:
-                raise exceptions.ServerApiError(
-                    "API of Server is not working: "
-                    "authentication was not successful, "
-                    "check vmsUser and vmsPassword in vms_benchmark.conf.")
-            raise
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = self.get_request(request)
 
         result = self.Response(response.code)
         if 200 <= response.code < 300:
@@ -86,6 +102,7 @@ class ServerApi:
 
             return result.payload['reply']
 
+    @_catch_http_errors
     def get_server_id(self):
         module_information = self.get_module_information()
 
@@ -97,21 +114,15 @@ class ServerApi:
 
         return server_id
 
+    @_catch_http_errors
     def check_authentication(self):
-        try:
-            request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
-            credentials = f"{self.user}:{self.password}"
-            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-            self.get_request(request)
-        except urllib.error.HTTPError as e:
-            if e.code == 401:
-                raise exceptions.ServerApiError(
-                    "API of Server is not working: "
-                    "authentication was not successful, "
-                    "check vmsUser and vmsPassword in vms_benchmark.conf.")
-            raise
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        self.get_request(request)
 
+    @_catch_http_errors
     def get_test_cameras_all(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
@@ -138,6 +149,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def get_test_cameras(self) -> List[Camera]:
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
@@ -164,6 +176,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def get_licenses(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getLicenses")
         credentials = f"{self.user}:{self.password}"
@@ -182,6 +195,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def get_storage_spaces(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/storageSpace")
         credentials = f"{self.user}:{self.password}"
@@ -203,6 +217,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def get_events(self, ts_from):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
         credentials = f"{self.user}:{self.password}"
@@ -220,6 +235,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def get_statistics(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/statistics")
         credentials = f"{self.user}:{self.password}"
@@ -237,6 +253,7 @@ class ServerApi:
 
         return None
 
+    @_catch_http_errors
     def add_cameras(self, hostname, count):
         from pprint import pformat
         cameras = []
@@ -272,6 +289,7 @@ class ServerApi:
             ))
         return cameras
 
+    @_catch_http_errors
     def remove_camera(self, camera_id):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/removeResource")
         credentials = f"{self.user}:{self.password}"
@@ -288,6 +306,7 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    @_catch_http_errors
     def activate_license(self, license):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/addLicense")
         credentials = f"{self.user}:{self.password}"
@@ -305,6 +324,7 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    @_catch_http_errors
     def get_archive_start_time_ms(self, camera_id: str) -> int:
         request = urllib.request.Request(
             f"http://{self.ip}:{self.port}" +
