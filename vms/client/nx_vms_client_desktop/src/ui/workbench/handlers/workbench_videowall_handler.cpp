@@ -3047,9 +3047,20 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     return !videowalls.isEmpty();
 }
 
+std::set<QnUuid> QnWorkbenchVideoWallHandler::onlineScreens() const
+{
+    return m_onlineScreens;
+}
+
 void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool online)
 {
     NX_ASSERT(!instanceGuid.isNull());
+
+    if (online)
+        m_onlineScreens.insert(instanceGuid);
+    else
+        m_onlineScreens.erase(instanceGuid);
+    emit onlineScreensChanged();
 
     QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(instanceGuid);
     if (index.isNull())

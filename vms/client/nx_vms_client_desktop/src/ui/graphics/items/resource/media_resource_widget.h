@@ -333,6 +333,8 @@ private:
 
     qreal calculateVideoAspectRatio() const;
 
+    bool isVideoWallLicenseValid() const;
+
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
