@@ -41,7 +41,58 @@
         [
             {
                 "type": "GroupBox",
-                "caption": "1 Shock detection settings",
+                "caption": "Common settings: Motion and IVA",
+                "items":
+                [
+                    {
+                        "type": "ComboBox",
+                        "name": "MotionDetection.DetectionType",
+                        "caption": "Motion detection type",
+                        "range": ["Off", "MotionDetection", "IntelligentVideo", "MDAndIV"],
+                        "defaultValue": "MotionDetection"
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Object size restraints for Motion detection",
+                        "items":
+                        [
+                            {
+                                "type": "BoxFigure",
+                                "name": "MotionDetection.MinObjectSize.Points",
+                                "caption": "Motion - Minimum object size"
+                            },
+                            {
+                                "type": "BoxFigure",
+                                "name": "MotionDetection.MaxObjectSize.Points",
+                                "caption": "Motion - Maximum object size"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Object size restraints for AI (Object detection and IVA)",
+                        "items":
+                        [
+                            {
+                                "type": "BoxFigure",
+                                "name": "IVA.MinObjectSize.Points",
+                                "caption": "AI - Minimum object size"
+                            },
+                            {
+                                "type": "BoxFigure",
+                                "name": "IVA.MaxObjectSize.Points",
+                                "caption": "AI - Maximum object size"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "sections":
+        [
+            {
+                "type": "Section",
+                "name": "1 Shock detection",
                 "items":
                 [
                     {
@@ -69,56 +120,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "Common settings: Motion and IVA",
-                "items":
-                [
-                    {
-                        "type": "ComboBox",
-                        "name": "MotionDetection.DetectionType",
-                        "caption": "Motion detection type",
-                        "range": ["Off", "MotionDetection", "IntelligentVideo", "MDAndIV"],
-                        "defaultValue": "MotionDetection"
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Motion detection object size",
-                        "items":
-                        [
-                            {
-                                "type": "BoxFigure",
-                                "name": "MotionDetection.MinObjectSize.Points",
-                                "caption": "Motion - Minimum object size"
-                            },
-                            {
-                                "type": "BoxFigure",
-                                "name": "MotionDetection.MaxObjectSize.Points",
-                                "caption": "Motion - Maximum object size"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "IVA [AI] object size",
-                        "items":
-                        [
-                            {
-                                "type": "BoxFigure",
-                                "name": "IVA.MinObjectSize.Points",
-                                "caption": "IVA [AI] - Minimum object size"
-                            },
-                            {
-                                "type": "BoxFigure",
-                                "name": "IVA.MaxObjectSize.Points",
-                                "caption": "IVA [AI] - Maximum object size"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "2 Motion detection settings",
+                "type": "Section",
+                "name": "2.1 Motion detection. Include areas",
                 "items":
                 [
                     {
@@ -424,7 +427,14 @@
                                 "maxValue": 5
                             }
                         ]
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "2.2 Motion detection. Exclude areas",
+                "items":
+                [
                     {
                         "type": "GroupBox",
                         "caption": "Exclude areas",
@@ -491,8 +501,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "3 Tampering detection",
+                "type": "Section",
+                "name": "3 Tampering detection",
                 "items":
                 [
                     {
@@ -535,8 +545,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "4 Defocus detection",
+                "type": "Section",
+                "name": "4 Defocus detection",
                 "items":
                 [
                     {
@@ -572,8 +582,66 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "5.1 Object detection. Objects [AI]",
+                "type": "Section",
+                "name": "5 Fog detection",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": "FogDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "FogDetection.ThresholdLevel",
+                        "caption": "Level of detection",
+                        "defaultValue": 20,
+                        "minValue": 1,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "FogDetection.SensitivityLevel",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 1,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "FogDetection.MinimumDuration",
+                        "caption": "Minimum Duration (s)",
+                        "defaultValue": 30,
+                        "minValue": 1,
+                        "maxValue": 5
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "6 Face detection. General",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": "FaceDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": "FaceDetection.SensitivityLevel",
+                        "caption": "Sensitivity",
+                        "defaultValue": 80,
+                        "minValue": 1,
+                        "maxValue": 100
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "name": "7.1 Object detection [AI]. General",
                 "items":
                 [
                     {
@@ -584,7 +652,7 @@
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Object",
+                        "caption": "Object types",
                         "items":
                         [
                             {
@@ -663,8 +731,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "5.2 Object detection. Exclude areas [AI]",
+                "type": "Section",
+                "name": "7.2 Object detection [AI]. Exclude areas",
                 "items":
                 [
                     {
@@ -726,8 +794,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "6.1 IVA lines [AI]",
+                "type": "Section",
+                "name": "8.1 IVA [AI]. Lines",
                 "items":
                 [
                     {
@@ -1021,8 +1089,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "6.2 IVA include areas [AI]",
+                "type": "Section",
+                "name": "8.2 IVA [AI]. Include areas",
                 "items":
                 [
                     {
@@ -1716,8 +1784,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "6.3 IVA Exclude areas [AI]",
+                "type": "Section",
+                "name": "8.3 IVA [AI]. Exclude areas",
                 "items":
                 [
                     {
@@ -1779,8 +1847,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "7 Audio detection",
+                "type": "Section",
+                "name": "9 Audio detection",
                 "items":
                 [
                     {
@@ -1800,8 +1868,8 @@
                 ]
             },
             {
-                "type": "GroupBox",
-                "caption": "8 Sound classification",
+                "type": "Section",
+                "name": "10 Sound classification",
                 "items":
                 [
                     {

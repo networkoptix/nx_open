@@ -224,7 +224,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     EXPECT_GE(cameraData.size(), 4);
 
     int offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
-    ASSERT_EQ(1, offlineEvents);
+    EXPECT_EQ(0, offlineEvents);
 
     const int kOfflineIterations = 4;
     for (int i = 0; i < kOfflineIterations; ++i)
@@ -236,7 +236,7 @@ TEST_F(MetricsCamerasApi, availabilityGroup)
     systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     cameraData = systemValues["cameras"][cameraId];
     offlineEvents = cameraData["availability"]["offlineEvents"].toInt();
-    ASSERT_EQ(1 + kOfflineIterations, offlineEvents);
+    EXPECT_EQ(kOfflineIterations, offlineEvents);
 
     auto systemAlarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
     EXPECT_EQ(systemAlarms["cameras." + cameraId + ".availability.offlineEvents.0"].level, AlarmLevel::warning);

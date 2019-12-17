@@ -136,7 +136,9 @@ public:
         if (!left.isString() || !right.isString())
             return left == right;
 
-        return left.toString() == right.toString().replace("_", " ");
+        // Currently formula language does not support spaces in values. The "_" can be used
+        // instead to achieve desired effect.
+        return left.toString().replace("_", " ") == right.toString().replace("_", " ");
     }
 
     ValueGenerator getBinaryOperation() const

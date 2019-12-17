@@ -58,7 +58,6 @@ extern "C"
 #include <api/helpers/camera_id_helper.h>
 #include <api/global_settings.h>
 #include <nx/metrics/metrics_storage.h>
-#include <nx/vms/server/put_in_order_data_provider.h>
 
 class QnTcpListener;
 
@@ -961,13 +960,7 @@ void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResou
 QnAbstractStreamDataProviderPtr initLiveProvider(
     QnVideoCameraPtr camera, QnServer::ChunksCatalog quality)
 {
-    QnLiveStreamProviderPtr cameraProvider = camera->getLiveReader(quality);
-    if (cameraProvider)
-    {
-        return PutInOrderDataProviderPtr(
-            new PutInOrderDataProvider(cameraProvider));
-    }
-    return nullptr;
+    return camera->getLiveReader(quality);
 }
 
 void QnRtspConnectionProcessor::createDataProvider()

@@ -488,7 +488,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     m_searchersListMutex.lock();
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
-
+    auto searchType = SearchType::Full;
     for (QnAbstractResourceSearcher *searcher: searchersList)
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
@@ -536,6 +536,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             for( QnResourcePtr& res: lst )
                 resourcesAndSearches.push_back( std::make_pair( std::move(res), searcher ) );
         }
+        else
+        {
+            searchType = SearchType::Partial;
+        }
     }
     const auto& resPool = commonModule()->resourcePool();
     //filtering discovered resources by discovery mode
@@ -552,6 +556,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
             case DiscoveryMode::disabled:
                 //discovery totally disabled, ignoring resource
+                // Don't mark resource as as offline because no search actually was performed.
                 continue;
 
             default:
@@ -617,7 +622,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         }
     }
 
-    if (processDiscoveredResources(resources, SearchType::Full))
+    if (processDiscoveredResources(resources, searchType))
     {
         return resources;
     }

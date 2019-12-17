@@ -24,7 +24,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <limits>
+#include <sstream>
 
 namespace json11 {
 
@@ -320,6 +322,23 @@ bool Json::operator< (const Json &other) const {
 /* * * * * * * * * * * * * * * * * * * *
  * Parsing
  */
+
+/* strtod_dot(str)
+ *
+ * Parse the number according to the JSON grammar, ignoring the current locale assuming that the
+ * string is already validated to comply with the JSON grammar.
+ */
+double strtod_dot(const char* str) {
+    // It is not correct to use ordinary strtod because it uses the locale and in some locales,
+    // for example, in ru_RU.UTF-8, the floating-point delimiter is "," but not "." as in JSON
+    // grammar.
+    const size_t str_length = strspn(str, "0123456789.eE+-");
+    std::istringstream string_stream(std::string(str, str_length));
+    string_stream.imbue(std::locale("C"));
+    double f = NAN;
+    string_stream >> f;
+    return f;
+}
 
 /* esc(c)
  *
@@ -618,7 +637,7 @@ struct JsonParser final {
                 i++;
         }
 
-        return std::strtod(str.c_str() + start_pos, nullptr);
+        return strtod_dot(str.c_str() + start_pos);
     }
 
     /* expect(str, res)

@@ -5,11 +5,15 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/chunked_transfer_encoder.h>
 #include <nx/network/http/http_client.h>
+#include <nx/network/http/http_stream_reader.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 namespace test {
+
+using namespace nx::network::http;
 
 static const QString testPath("/test");
 static const QString testQuery("testQuery");
@@ -411,7 +415,8 @@ TEST_F(Proxy, ModRewrite)
 
 //-------------------------------------------------------------------------------------------------
 
-static const char* kEmptyResourcePath = "/proxy/empty";
+static constexpr char kEmptyResourcePath[] = "/proxy/empty";
+static constexpr char kSaveRequestPath[] = "/proxy/save-request";
 
 class ProxyNewTest:
     public Proxy
@@ -424,15 +429,60 @@ protected:
         fetchResource(kEmptyResourcePath);
     }
 
+    void whenSendRequestSpecifyingSupportedAndUnsupportedEncodings()
+    {
+        fetchResource(
+            kSaveRequestPath,
+            {{"Accept-Encoding", "invalid-encoding, deflate, gzip"}});
+    }
+
+    void whenSendRequestSpecifyingOnlyUnsupportedEncodings()
+    {
+        fetchResource(
+            kSaveRequestPath,
+            {{"Accept-Encoding", "invalid-encoding"}});
+    }
+
     void thenEmptyResponseIsDelivered()
     {
-        ASSERT_EQ(nx::network::http::StatusCode::noContent, m_response->statusLine.statusCode);
+        ASSERT_EQ(StatusCode::noContent, m_response->statusLine.statusCode);
         ASSERT_TRUE(m_msgBody.isEmpty());
     }
 
+    void thenTheRequestIsDeliveredToTheTarget()
+    {
+        m_lastProxiedRequest = m_proxiedRequests.pop();
+    }
+
+    void thenRequestIsFailed()
+    {
+        ASSERT_NE(StatusCode::ok, m_response->statusLine.statusCode);
+    }
+
+    void andOnlySupportedEncodingArePresentInTheProxiedRequest()
+    {
+        header::AcceptEncodingHeader acceptEncoding(
+            getHeaderValue(m_lastProxiedRequest.headers, "Accept-Encoding"));
+
+        for (const auto& [encoding, qValue]: acceptEncoding.allEncodings())
+        {
+            if (qValue > 0.0)
+            {
+                ASSERT_TRUE(HttpStreamReader::isEncodingSupported(encoding));
+            }
+        }
+    }
+
+    void andNoHeaderPresent(const StringType& name)
+    {
+        ASSERT_EQ(0, m_lastProxiedRequest.headers.count(name));
+    }
+
 private:
-    boost::optional<nx::network::http::Response> m_response;
+    boost::optional<Response> m_response;
     nx::Buffer m_msgBody;
+    nx::utils::SyncQueue<Request> m_proxiedRequests;
+    Request m_lastProxiedRequest;
 
     virtual void SetUp() override
     {
@@ -444,21 +494,37 @@ private:
             kEmptyResourcePath,
             std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2));
 
+        testHttpServer()->registerRequestProcessorFunc(
+            kSaveRequestPath,
+            std::bind(&ProxyNewTest::saveRequest, this, _1, _2));
+
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
     void returnEmptyHttpResponse(
-        nx::network::http::RequestContext /*requestContext*/,
-        nx::network::http::RequestProcessedHandler completionHandler)
+        RequestContext /*requestContext*/,
+        RequestProcessedHandler completionHandler)
     {
-        completionHandler(nx::network::http::StatusCode::noContent);
+        completionHandler(StatusCode::noContent);
     }
 
-    void fetchResource(const char* path)
+    void saveRequest(
+        RequestContext requestContext,
+        RequestProcessedHandler completionHandler)
+    {
+        m_proxiedRequests.push(std::move(requestContext.request));
+        completionHandler(StatusCode::ok);
+    }
+
+    void fetchResource(
+        const char* path,
+        std::vector<HttpHeader> headers = {})
     {
         const nx::utils::Url url(QString("http://%1/%2%3").arg(
             endpoint().toString(), testHttpServer()->serverAddress().toString(), path));
-        nx::network::http::HttpClient httpClient;
+        HttpClient httpClient;
+        for (const auto& header: headers)
+            httpClient.addAdditionalHeader(header.first, header.second);
         httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
         ASSERT_TRUE(httpClient.doGet(url));
         ASSERT_NE(nullptr, httpClient.response());
@@ -473,6 +539,22 @@ TEST_F(ProxyNewTest, response_contains_no_content)
 {
     whenRequestEmptyResource();
     thenEmptyResponseIsDelivered();
+}
+
+TEST_F(ProxyNewTest, proxy_server_does_not_forward_unsupported_encodings)
+{
+    whenSendRequestSpecifyingSupportedAndUnsupportedEncodings();
+
+    thenTheRequestIsDeliveredToTheTarget();
+    andOnlySupportedEncodingArePresentInTheProxiedRequest();
+}
+
+TEST_F(ProxyNewTest, accept_encoding_header_is_removed_by_proxy_if_no_supported_encodings_found)
+{
+    whenSendRequestSpecifyingOnlyUnsupportedEncodings();
+
+    thenTheRequestIsDeliveredToTheTarget();
+    andNoHeaderPresent("Accept-Encoding");
 }
 
 } // namespace test

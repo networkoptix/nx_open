@@ -24,7 +24,7 @@ public:
 
     bool isNull() const;
 
-    Data bytes() const;
+    const Data& bytes() const;
     QString toString() const;
 
     bool operator==(const MacAddress& other) const;
@@ -37,7 +37,8 @@ private:
 
 inline uint qHash(const MacAddress& value, uint seed = 0)
 {
-     return qHashRange(value.bytes().cbegin(), value.bytes().cend(), seed);
+    const MacAddress::Data& bytes = value.bytes();
+    return qHashRange(bytes.cbegin(), bytes.cend(), seed);
 }
 
 } // namespace nx::utils

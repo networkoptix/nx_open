@@ -45,8 +45,8 @@ public:
         QnServer::ChunksCatalog catalog,
         bool ensureInitialized = true, bool createIfNotExist = true) = 0;
 
-    QnLiveStreamProviderPtr getPrimaryReader() { return getLiveReader(QnServer::HiQualityCatalog); }
-    QnLiveStreamProviderPtr getSecondaryReader() { return getLiveReader(QnServer::LowQualityCatalog); }
+    QnLiveStreamProviderPtr getPrimaryReader(bool autoStartReader = true);
+    QnLiveStreamProviderPtr getSecondaryReader(bool autoStartReader = true);
 
     virtual int copyLastGop(
         StreamIndex streamIndex,

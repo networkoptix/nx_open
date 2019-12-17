@@ -374,11 +374,11 @@ TEST_P(FileInfoTest, Constructor)
     const auto expected = GetParam();
     QnAbstractStorageResource::FileInfo fileInfo(expected.absolutePath, 42, expected.isDir);
     ASSERT_EQ(expected.isDir, fileInfo.isDir());
-    ASSERT_EQ(QDir::toNativeSeparators(expected.baseName), fileInfo.baseName());
-    ASSERT_EQ(QDir::toNativeSeparators(expected.ext), fileInfo.extension());
-    ASSERT_EQ(QDir::toNativeSeparators(expected.dirPath), fileInfo.absoluteDirPath());
-    ASSERT_EQ(QDir::toNativeSeparators(expected.fileName), fileInfo.fileName());
-    ASSERT_EQ(QDir::toNativeSeparators(expected.absolutePath), fileInfo.absoluteFilePath());
+    ASSERT_EQ(expected.baseName, fileInfo.baseName());
+    ASSERT_EQ(expected.ext, fileInfo.extension());
+    ASSERT_EQ(expected.dirPath, fileInfo.absoluteDirPath());
+    ASSERT_EQ(expected.fileName, fileInfo.fileName());
+    ASSERT_EQ(expected.absolutePath, fileInfo.absoluteFilePath());
 }
 
 INSTANTIATE_TEST_CASE_P(

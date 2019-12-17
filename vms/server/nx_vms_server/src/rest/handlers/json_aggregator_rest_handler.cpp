@@ -19,7 +19,8 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     const QnRequestParams & params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner,
-    QVariantMap& fullData)
+    QVariantMap& fullData,
+    std::chrono::milliseconds timeout)
 {
     int port = owner->owner()->getPort();
     nx::utils::Url url(lit("https://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
@@ -31,25 +32,23 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     auto server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
     if (!server)
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));
+        result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error: No server resource");
         return false;
     }
 
     nx::network::http::HttpClient client;
     client.setUserName(server->getId().toString());
     client.setUserPassword(server->getAuthKey());
-    auto user = owner->resourcePool()->getResourceById<QnUserResource>(owner->accessRights().userId);
-    if (user)
+    client.setSendTimeout(timeout);
+    client.setResponseReadTimeout(timeout);
+    client.setMessageBodyReadTimeout(timeout);
+    if (auto user = owner->resourcePool()->getResourceById<QnUserResource>(owner->accessRights().userId))
         client.addAdditionalHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, user->getName().toUtf8());
-    if (!client.doGet(url))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));
-        return false;
-    }
 
-    if (!client.response())
+    if (!client.doGet(url) || !client.response())
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't exec request '%1'").arg(command));
+        result.setError(QnJsonRestResult::CantProcessRequest, lm("%1 has failed: %2").args(
+            command, SystemError::toString(client.lastSysErrorCode())));
         return false;
     }
 
@@ -57,14 +56,11 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     while (!client.eof())
         msgBody.append(client.fetchMessageBodyBuffer());
 
-    int statusCode = client.response()->statusLine.statusCode;
-    if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
+    const auto status = client.response()->statusLine;
+    if (!nx::network::http::StatusCode::isSuccessCode(status.statusCode))
     {
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            lit("Can't exec request '%1'. HTTP error '%2'").
-            arg(command).
-            arg(QString::fromUtf8(client.response()->statusLine.reasonPhrase)));
+        result.setError(QnJsonRestResult::CantProcessRequest, lm("%1 has failed: %2 %3").args(
+            command, status.statusCode, status.reasonPhrase));
         return false;
     }
 
@@ -72,8 +68,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            lit("Request '%1' has no json content type. Only json result is supported").
-            arg(command));
+            lm("%1 has failed: Response content type is not JSON").args(command));
         return false;
     }
 
@@ -83,12 +78,11 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            lit("Request '%1' parse error: %2").arg(command).arg(error.errorString()));
+            lm("%1 has failed: Response parse error: %2").args(command, error.errorString()));
         return false;
     }
 
     fullData[command] = doc.toVariant();
-
     return true;
 }
 
@@ -106,6 +100,7 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
     QnRequestParams outParams;
     QString cmdToExecute;
     QVariantMap fullData;
+    std::chrono::seconds timeout(10);
 
     for (auto itr = params.begin(); itr != params.end(); ++itr)
     {
@@ -113,11 +108,15 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
         {
             if (!cmdToExecute.isEmpty())
             {
-                if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
+                if (!executeCommad(cmdToExecute, outParams, result, owner, fullData, timeout))
                     return nx::network::http::StatusCode::ok;
             }
             outParams.clear();
             cmdToExecute = itr->second;
+        }
+        else if (itr->first == "exec_timeout")
+        {
+            timeout = std::chrono::seconds(itr->second.toInt());
         }
         else
         {
@@ -126,7 +125,7 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
     }
     if (!cmdToExecute.isEmpty())
     {
-        if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
+        if (!executeCommad(cmdToExecute, outParams, result, owner, fullData, timeout))
             return nx::network::http::StatusCode::ok;
     }
     result.setReply(QJsonValue::fromVariant(fullData));

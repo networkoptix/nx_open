@@ -68,61 +68,42 @@ void ProxyDataProvider::startIfNotRunning()
     m_provider->startIfNotRunning();
 }
 
-void ProxyDataProvider::start(Priority /*priority*/)
-{
-    // This class hasn't own thread.
-    m_provider->addDataProcessor(this);
-}
-
-void ProxyDataProvider::stop()
-{
-    m_provider->removeDataProcessor(this);
-}
-
 QnSharedResourcePointer<QnAbstractVideoCamera> ProxyDataProvider::getOwner() const
 {
     return m_provider->getOwner();
 }
 
-// ------------------- PutInOrderDataProvider -------------------------
+// ------------------- AbstractPutInOrderDataProvider -------------------------
 
-PutInOrderDataProvider::PutInOrderDataProvider(
-    const QnAbstractStreamDataProviderPtr& provider,
+AbstractDataReorderer::AbstractDataReorderer(
     microseconds minQueueDuration,
     microseconds maxQueueDuration,
     microseconds initialQueueDuration,
     BufferingPolicy policy)
     :
-    ProxyDataProvider(provider),
     m_queueDuration(initialQueueDuration),
     m_minQueueDuration(minQueueDuration),
     m_maxQueueDuration(maxQueueDuration),
     m_policy(policy)
 {
-    start();
     m_timer.restart();
 }
 
-PutInOrderDataProvider::~PutInOrderDataProvider()
-{
-    stop();
-}
-
-std::optional<std::chrono::microseconds> PutInOrderDataProvider::flush()
+std::optional<std::chrono::microseconds> AbstractDataReorderer::flush()
 {
     QnMutexLocker lock(& m_mutex);
     std::optional<std::chrono::microseconds> lastFlushTime;
     while (!m_dataQueue.empty())
     {
         auto data = std::move(m_dataQueue.front());
-        QnAbstractStreamDataProvider::putData(data);
+        flushData(data);
         lastFlushTime = microseconds(data->timestamp);
         m_dataQueue.pop_front();
     }
     return lastFlushTime;
 }
 
-void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
+void AbstractDataReorderer::processNewData(const QnAbstractDataPacketPtr& data)
 {
     QnMutexLocker lock(& m_mutex);
 
@@ -144,12 +125,12 @@ void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
     while (!m_dataQueue.empty() && (*m_dataQueue.begin())->timestamp < keepDataToTime)
     {
         auto data = std::move(m_dataQueue.front());
-        QnAbstractStreamDataProvider::putData(data);
+        flushData(data);
         m_dataQueue.pop_front();
     }
 }
 
-void PutInOrderDataProvider::updateBufferSize(const QnAbstractDataPacketPtr& data)
+void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data)
 {
     auto multiply = [](microseconds value, float coeff)
     {
@@ -217,6 +198,59 @@ void PutInOrderDataProvider::updateBufferSize(const QnAbstractDataPacketPtr& dat
             m_queueDuration = newValue;
         }
     }
+}
+
+// ----------------------- PutInOrderDataProvider --------------------------------------
+
+PutInOrderDataProvider::PutInOrderDataProvider(
+    const QnAbstractStreamDataProviderPtr& provider,
+    microseconds minQueueDuration,
+    microseconds maxQueueDuration,
+    microseconds initialQueueDuration,
+    BufferingPolicy policy)
+    :
+    ProxyDataProvider(provider),
+    AbstractDataReorderer(initialQueueDuration, minQueueDuration, maxQueueDuration, policy)
+{
+    start();
+}
+
+PutInOrderDataProvider::~PutInOrderDataProvider()
+{
+    stop();
+}
+
+void PutInOrderDataProvider::start(Priority /*priority*/)
+{
+    // This class hasn't own thread.
+    m_provider->addDataProcessor(this);
+}
+
+void PutInOrderDataProvider::stop()
+{
+    m_provider->removeDataProcessor(this);
+}
+
+void PutInOrderDataProvider::flushData(const QnAbstractDataPacketPtr& data)
+{
+    ProxyDataProvider::putData(data);
+}
+
+void PutInOrderDataProvider::putData(const QnAbstractDataPacketPtr& data)
+{
+    processNewData(data);
+}
+
+// ----------------------- SimpleReorderingProvider --------------------------------------
+
+void SimpleReorderer::flushData(const QnAbstractDataPacketPtr& data)
+{
+    m_queue.push_back(data);
+}
+
+std::deque<QnAbstractDataPacketPtr>& SimpleReorderer::queue() 
+{ 
+    return m_queue; 
 }
 
 } // namespace nx::vms::server

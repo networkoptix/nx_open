@@ -1,7 +1,8 @@
 #pragma once
 #if defined(ENABLE_TEST_CAMERA)
 
-#include <QtCore/QSet>
+#include <set>
+
 #include <QtCore/QString>
 #include <QtCore/QCoreApplication>
 #include <QHostAddress>
@@ -41,26 +42,34 @@ private:
 
     void processDiscoveryResponseMessage(
         const QByteArray& discoveryResponseMessage,
-        const QString& serverAddress,
+        const QString& testcameraAddress,
         QnResourceList* resources,
-        QSet<nx::utils::MacAddress>* processedMacAddresses) const;
+        std::set<nx::utils::MacAddress>* processedMacAddresses) const;
 
-    QnTestCameraResourcePtr createTestCameraResource(
+    QnTestCameraResourcePtr createDiscoveredTestCameraResource(
         const nx::utils::MacAddress& macAddress,
         const QString& videoLayoutString,
         int mediaPort,
-        const QString& serverAddress) const;
+        const QString& testcameraAddress) const;
 
 private:
-    struct DiscoveryInfo
+    struct DiscoverySocket
     {
-        DiscoveryInfo( nx::network::AbstractDatagramSocket* _sock, const QHostAddress& _ifAddr): sock(_sock), ifAddr(_ifAddr) {}
-        ~DiscoveryInfo() { }
-        nx::network::AbstractDatagramSocket* sock;
-        QHostAddress ifAddr;
+        DiscoverySocket(
+            nx::network::AbstractDatagramSocket* socket, const QHostAddress& address)
+            :
+            socket(socket), address(address)
+        {
+        }
+
+        ~DiscoverySocket() {}
+
+        nx::network::AbstractDatagramSocket* const socket;
+        const QHostAddress address;
     };
-    QList<DiscoveryInfo> m_sockList;
-    qint64 m_sockUpdateTime = 0;
+
+    QList<DiscoverySocket> m_discoverySockets;
+    qint64 m_socketUpdateTime = 0;
 };
 
 #endif // defined(ENABLE_TEST_CAMERA)

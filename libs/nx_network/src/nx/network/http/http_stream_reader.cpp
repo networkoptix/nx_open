@@ -252,6 +252,12 @@ void HttpStreamReader::setParseHeadersStrict(bool enabled)
     m_parseHeadersStrict = enabled;
 }
 
+bool HttpStreamReader::isEncodingSupported(const StringType& encoding)
+{
+    return encoding == "gzip"
+        || encoding == "deflate";
+}
+
 bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
 {
     for (;;)
@@ -600,8 +606,14 @@ std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
     HttpStreamReader::createContentDecoder(
         const nx::network::http::StringType& encodingName)
 {
-    if (encodingName == "gzip")
-        return std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
+    bool deflate = false;
+    if (encodingName == "gzip" || (deflate = encodingName == "deflate"))
+    {
+        auto decompressor = std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
+        if (deflate)
+            decompressor->setDeflateDecoding();
+        return decompressor;
+    }
     return nullptr;
 }
 

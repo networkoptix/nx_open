@@ -1302,6 +1302,10 @@ bool AcceptEncodingHeader::encodingIsAllowed(
     return codingIter->second > 0.0;
 }
 
+const std::map<nx::network::http::StringType, double>& AcceptEncodingHeader::allEncodings() const
+{
+    return m_codings;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Range.

@@ -150,12 +150,12 @@
                             {
                                 "level": "warning",
                                 "condition": "equal %logLevel debug",
-                                "text": "Current logging level is %logLevel. Recommended logging level is info."
+                                "text": "current logging level is %logLevel. Recommended logging level is info."
                             },
                             {
                                 "level": "warning",
                                 "condition": "equal %logLevel verbose",
-                                "text": "Current logging level is %logLevel. Recommended logging level is info."
+                                "text": "current logging level is %logLevel. Recommended logging level is info."
                             }
                         ]
                     },
@@ -375,7 +375,7 @@
                         "name": "Events: Camera Offline (1h)",
                         "description": "Events count: Camera Offline (1h)",
                         "display": "table|panel",
-                        "calculate": "countValues %systemStatus 1h Offline",
+                        "calculate": "countValues %offlineFromOnlineStatus 1h Offline",
                         "insert": "streamIssues",
                         "alarms": [
                             {
@@ -485,7 +485,7 @@
                             {
                                 "level": "error",
                                 "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
-                                "text": " Secondary stream Resolution is too high: %resolution. It's not recommended to put Secondary stream Resolution more than %recommendedMaxSecondaryResolution."
+                                "text": " Secondary stream Resolution is too high: %resolution. It's recommended to put Secondary stream Resolution less than %recommendedMaxSecondaryResolution."
                             }
                         ]
                     },

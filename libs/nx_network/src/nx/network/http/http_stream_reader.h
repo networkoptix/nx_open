@@ -112,6 +112,8 @@ public:
     /** If true, then parseBytes skips invalid HTTP headers instead of failing. */
     void setParseHeadersStrict(bool enabled);
 
+    static bool isEncodingSupported(const StringType& encoding);
+
 private:
     enum ChunkStreamParseState
     {

@@ -223,8 +223,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "caption": "CheckBox Parameter",
                                 "name": "testCheckBox",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             }
                         ]
                     }
@@ -254,36 +253,31 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateCarsSetting + R"json(",
                                 "caption": "Generate cars",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateTrucksSetting + R"json(",
                                 "caption": "Generate trucks",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGeneratePedestriansSetting + R"json(",
                                 "caption": "Generate pedestrians",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateHumanFacesSetting + R"json(",
                                 "caption": "Generate human faces",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateBicyclesSetting + R"json(",
                                 "caption": "Generate bicycles",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "SpinBox",
@@ -297,8 +291,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kBlinkingObjectInDedicatedPacketSetting + R"json(",
                                 "caption": "Put BlinkingObject into a dedicated MetadataPacket",
-                                "defaultValue": false,
-                                "value": false
+                                "defaultValue": false
                             },
                             {
                                 "type": "SpinBox",
@@ -320,8 +313,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
                                 "caption": "Generate preview packet",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             },
                             {
                                 "type": "SpinBox",
@@ -345,23 +337,20 @@ std::string Engine::manifestString() const
                         "type": "CheckBox",
                         "name": ")json" + kGenerateEventsSetting + R"json(",
                         "caption": "Generate events",
-                        "defaultValue": true,
-                        "value": true
+                        "defaultValue": true
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json"
                         + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
                         "caption": "Throw plugin events from the DeviceAgent",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json" + kLeakFramesSetting + R"json(",
                         "caption": "Force a memory leak when processing a video frame",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "SpinBox",
@@ -413,7 +402,6 @@ std::string Engine::manifestString() const
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
                         "defaultValue": true,
-                        "value": true
                     }
                 ]
             }
@@ -462,8 +450,7 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "caption": "Device Agent CheckBox",
                                 "name": "testCheckBox2",
-                                "defaultValue": true,
-                                "value": true
+                                "defaultValue": true
                             }
                         ]
                     }

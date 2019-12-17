@@ -17,47 +17,31 @@ set(py_installer_args
     -y
     -F
     --hidden-import json
-    --distpath \"${build_dir}/distrib\"
-    --workpath \"${build_dir}/build\"
-    --specpath \"${build_dir}\"
-    -p \"${CMAKE_CURRENT_SOURCE_DIR}/lib\"
-    -p \"${CMAKE_CURRENT_BINARY_DIR}/release/lib\"
+    --distpath ${build_dir}/distrib
+    --workpath ${build_dir}/build
+    --specpath ${build_dir}
+    -p ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    -p ${CMAKE_CURRENT_BINARY_DIR}/release/lib
     --name vms_benchmark
-    \"${CMAKE_CURRENT_SOURCE_DIR}/bin/main.py\"
+    ${CMAKE_CURRENT_SOURCE_DIR}/bin/main.py
 )
-list(JOIN py_installer_args " " py_installer_args_command_line)
 
-set(python_dir "${vms_benchmark_dev_dir}/python")
+set(python_dir ${vms_benchmark_dev_dir}/python)
 
 if(targetDevice STREQUAL "windows-x64")
     set(exe_extension ".exe")
 
     set(py_installer_with_env_command
-        COMMAND cmd /C
-        " \
-            \" \
-                set PYTHONPATH=\"${python_dir}/lib/python3.7/site-packages\" && \
-                ${python_dir}/python3.exe ${py_installer_args_command_line} \
-            \" \
-        "
+        PYTHONPATH=${python_dir}/lib/python3.7/site-packages
+        ${python_dir}/python3.exe ${py_installer_args}
     )
 else()
     set(exe_extension "")
-
-    # NOTE: add_custom_command() on Linux requires each quote and ampersand to be prepended with
-    # a bashslash.
     
-    string(REPLACE "\"" "\\\""
-        py_installer_args_command_line_escaped_quotes "${py_installer_args_command_line}")
-        
     set(py_installer_with_env_command
-        COMMAND bash -c
-        " \
-            export PATH=\\\"${python_dir}/bin:/usr/bin:/bin\\\" \\&\\& \
-            export LD_LIBRARY_PATH=\\\"${python_dir}/lib\\\" \\&\\& \
-            export PYTHONPATH=\\\"${python_dir}/lib/python3.6/site-packages\\\" \\&\\& \
-            python3 ${py_installer_args_command_line_escaped_quotes} \
-        "
+        LD_LIBRARY_PATH=${python_dir}/lib
+        PYTHONPATH=${python_dir}/lib/python3.6/site-packages
+        ${python_dir}/bin/python3 ${py_installer_args}
     )
 endif()
 
@@ -77,7 +61,7 @@ add_custom_command(
         ${vms_benchmark_dev_dir}/zip/low.ts
         ${CMAKE_CURRENT_BINARY_DIR}/
 
-    ${py_installer_with_env_command}
+    COMMAND ${CMAKE_COMMAND} -E env ${py_installer_with_env_command}
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${build_dir}/distrib/vms_benchmark${exe_extension}
