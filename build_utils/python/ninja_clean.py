@@ -65,6 +65,9 @@ def ignore_file(file):
     if file.endswith('.pdb'):
         return True
 
+    if file.endswith('.cpp_parameters'):
+        return True
+
     exclusions = set([
         "CTestTestfile.cmake",
         "cmake_install.cmake",

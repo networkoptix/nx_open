@@ -88,7 +88,7 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
             if (!childSection)
             {
                 return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
-                    lm("A section must be of type \"Section\""));
+                    "A section must be of type \"Section\"");
             }
 
             sectionsProperty.append(&sectionsProperty, childSection);

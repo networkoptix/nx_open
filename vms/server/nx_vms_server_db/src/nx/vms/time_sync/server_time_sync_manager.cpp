@@ -14,6 +14,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/time.h>
 #include <nx/vms/api/data/misc_data.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace vms {
@@ -152,6 +153,8 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
     m_internetTimeSynchronizer->getTimeAsync(
         [this](const qint64 newValue, SystemError::ErrorCode errorCode, milliseconds rtt)
         {
+            auto guard = nx::utils::makeScopeGuard([&]() { m_internetSyncInProgress = false; });
+
             if (errorCode)
             {
                 NX_WARNING(this, lm("Failed to get time from the internet. %1")
@@ -172,7 +175,6 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
             setSyncTime(milliseconds(newValue), rtt);
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
-            m_internetSyncInProgress = false;
             m_isTimeTakenFromInternet = true;
         });
     return true;

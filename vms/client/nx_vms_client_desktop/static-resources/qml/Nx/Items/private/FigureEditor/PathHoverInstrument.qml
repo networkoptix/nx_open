@@ -10,6 +10,7 @@ Instrument
     property ListModel model: null
     property real hoverDistance: 8
     property real pointRadius: 6
+    property bool closed: false
 
     readonly property alias hoveredEdgeIndex: d.currentEdgeIndex
     readonly property alias hoveredEdgeStart: d.currentEdgeStart
@@ -100,8 +101,8 @@ Instrument
         var closestEdgeP1
         var closestEdgeP2
 
-        var prev = d.getPoint(model.count - 1)
-        for (var i = 0; i < model.count; ++i)
+        var prev = closed ? d.getPoint(model.count - 1) : d.getPoint(0)
+        for (var i = closed ? 0 : 1; i < model.count; ++i)
         {
             const current = d.getPoint(i)
             if (d.closeToPoint(hover.position, current))

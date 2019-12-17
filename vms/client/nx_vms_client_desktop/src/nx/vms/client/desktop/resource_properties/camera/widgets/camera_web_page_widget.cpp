@@ -15,6 +15,9 @@
 #include <QtWebEngineWidgets/QWebEngineScriptCollection>
 #include <QtWebEngineCore/QWebEngineCookieStore>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <common/common_module.h>
 #include <utils/common/event_processors.h>
 
@@ -36,7 +39,6 @@ using namespace std::chrono;
 namespace {
 
 constexpr milliseconds kHttpAuthSmallInterval = 10s;
-constexpr int kHttpAuthAttemptsLimit = 2;
 constexpr int kHttpAuthDialogAttemptsLimit = 3;
 
 /**
@@ -145,7 +147,6 @@ struct CameraWebPageWidget::Private
     bool loadNeeded = false;
 
     QnMutex mutex;
-    AttemptCounter authCounter;
     AttemptCounter authDialodCounter;
     QUrl testPageUrl;
 };
@@ -211,7 +212,6 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
-    authCounter.setLimit(kHttpAuthAttemptsLimit);
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
@@ -219,8 +219,49 @@ void CameraWebPageWidget::Private::createNewPage()
         {
             QnMutexLocker lock(&mutex);
 
-            authenticator->setUser(credentials.login());
-            authenticator->setPassword(credentials.password());
+            // Camera may redirect to another path and ask for credentials,
+            // so check for host match.
+            if (lastRequestUrl.host() == requestUrl.host())
+            {
+                const auto camera = parent->commonModule()
+                                        ->resourcePool()
+                                        ->getResourceById<QnVirtualCameraResource>(
+                                            QnUuid::fromStringSafe(lastCamera.id));
+                if (camera && camera->getStatus() != Qn::Unauthorized)
+                {
+                    authenticator->setUser(credentials.login());
+                    authenticator->setPassword(credentials.password());
+                    return;
+                }
+            }
+
+            authDialodCounter.registerAttempt();
+            if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
+                return;
+
+            PasswordDialog dialog(parent);
+
+            auto url = requestUrl;
+
+            // Hide credentials.
+            url.setUserName(QString());
+            url.setPassword(QString());
+
+            // Replace server address with camera address.
+            const auto serverHost = parent->commonModule()->currentUrl().host();
+            if (serverHost == url.host())
+            {
+                url.setHost(lastCamera.ipAddress);
+                url.setPort(-1); //< Hide server port.
+            }
+
+            dialog.setText(url.toString());
+
+            if (dialog.exec() == QDialog::Accepted)
+            {
+                authenticator->setUser(dialog.username());
+                authenticator->setPassword(dialog.password());
+            }
         });
 
     QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,

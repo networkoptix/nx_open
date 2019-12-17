@@ -1,18 +1,15 @@
 #include "notifications_workbench_panel.h"
+#include "buttons.h"
+
+#include <chrono>
+#include <memory>
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/workbench/workbench_animations.h>
-
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <core/resource/camera_resource.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -27,34 +24,44 @@
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/notifications/notification_tooltip_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_ui_globals.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
-
-#include "buttons.h"
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace ui;
+using namespace std::chrono;
 
 namespace {
 
 static constexpr int kNarrowWidth = 283;
 static constexpr int kWideWidth = 433;
 
-static const QSize kToolTipMaxThumbnailSize(240, 180);
+static const QSize kToolTipMaxThumbnailSize{240, 180};
+static const QSize kToolTipMaxMultiThumbnailSize{240, 540};
+static constexpr int kMaxMultiThumbnailCount = 5;
+static constexpr int kMultiThumbnailSpacing = 1;
 static constexpr int kToolTipShowDelayMs = 250;
 static constexpr int kToolTipHideDelayMs = 250;
 static constexpr qreal kToolTipFadeSpeedFactor = 2.0;
@@ -462,8 +469,9 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     m_lastHoveredTile = tile;
 
+    auto multiImageProvider = this->multiImageProvider(index);
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
-    const auto imageProvider = tile->preview();
+    const auto imageProvider = multiImageProvider ? multiImageProvider.get() : tile->preview();
 
     auto text = tile->toolTip();
     if (text.isEmpty() && imageProvider)
@@ -477,12 +485,16 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     QPointer<QnNotificationToolTipWidget> toolTip(
         new QnNotificationToolTipWidget(parentWidget));
+
     toolTip->setOpacity(0.0);
     toolTip->setEnclosingGeometry(tooltipsEnclosingRect);
-    toolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
+    toolTip->setMaxThumbnailSize(multiImageProvider
+        ? kToolTipMaxMultiThumbnailSize
+        : kToolTipMaxThumbnailSize);
+
     toolTip->setText(text);
     toolTip->setImageProvider(imageProvider);
-    toolTip->setHighlightRect(tile->previewCropRect());
+    toolTip->setHighlightRect(multiImageProvider ? QRectF() : tile->previewCropRect());
     toolTip->setThumbnailVisible(imageProvider != nullptr);
     toolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     toolTip->updateTailPos();
@@ -491,6 +503,12 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->setCropMode(ini().rightPanelHoverPreviewCrop
         ? AsyncImageWidget::CropMode::notHovered
         : AsyncImageWidget::CropMode::never);
+
+    if (multiImageProvider)
+    {
+        multiImageProvider->loadAsync();
+        multiImageProvider.release()->setParent(toolTip);
+    }
 
     // TODO: #vkutin Refactor tooltip clicks, now it looks hackish.
     connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
@@ -533,6 +551,55 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
         });
 
     m_eventPanelHoverProcessor->forceHoverEnter();
+}
+
+std::unique_ptr<MultiImageProvider> NotificationsWorkbenchPanel::multiImageProvider(
+    const QModelIndex& index) const
+{
+    const auto previewTime = index.data(Qn::PreviewTimeRole).value<microseconds>();
+
+    const auto requiredPermission = previewTime > 0ms
+        ? Qn::ViewFootagePermission
+        : Qn::ViewLivePermission;
+
+    const auto cameras = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>(
+            [this, requiredPermission](const QnVirtualCameraResourcePtr& camera)
+            {
+                return accessController()->hasPermissions(camera, requiredPermission);
+            });
+
+    if (cameras.size() < 2)
+        return {};
+
+    const bool precisePreview = index.data(Qn::ForcePrecisePreviewRole).toBool();
+    const auto streamSelectionMode = index.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::CameraImageRequest::StreamSelectionMode>();
+
+    MultiImageProvider::Providers providers;
+
+    nx::api::CameraImageRequest request;
+    request.size = QSize(kToolTipMaxThumbnailSize.width(), 0);
+    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
+    request.streamSelectionMode = streamSelectionMode;
+    request.usecSinceEpoch =
+        previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
+    request.roundMethod = precisePreview
+        ? nx::api::ImageRequest::RoundMethod::precise
+        : nx::api::ImageRequest::RoundMethod::iFrameAfter;
+
+    for (const auto& camera: cameras)
+    {
+        if (providers.size() >= kMaxMultiThumbnailCount)
+            break;
+
+        request.camera = camera;
+        providers.emplace_back(new CameraThumbnailProvider(request));
+    }
+
+    return std::make_unique<MultiImageProvider>(
+        std::move(providers), Qt::Vertical, kMultiThumbnailSpacing);
 }
 
 } //namespace nx::vms::client::desktop

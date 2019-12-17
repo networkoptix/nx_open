@@ -106,14 +106,14 @@ Item
 
             Rectangle
             {
-                readonly property var thisEngineId: modelData.id
-                readonly property bool isActive: enabledAnalyticsEngines.indexOf(thisEngineId) !== -1
-                readonly property bool selectedBlock: currentEngineId === thisEngineId
+                readonly property var engineId: modelData.id
+                readonly property bool isActive: enabledAnalyticsEngines.indexOf(engineId) !== -1
+                readonly property bool isSelected: currentEngineId === engineId
                 readonly property real textAlpha: isActive ? 1.0 : 0.3
 
                 width: parent.width
                 height: column.height
-                color: selectedBlock ? ColorTheme.colors.dark9 : "transparent"
+                color: isSelected ? ColorTheme.colors.dark9 : "transparent"
 
                 Column
                 {
@@ -125,13 +125,13 @@ Item
                         id: menuItem
 
                         height: 28
-                        itemId: thisEngineId.toString()
+                        itemId: engineId.toString()
                         text: modelData.name
                         active: isActive
                         navigationMenu: menu
 
                         color: ColorTheme.transparent(
-                            current || selectedBlock
+                            current || isSelected
                                 ? ColorTheme.colors.light1
                                 : ColorTheme.colors.light10,
                             textAlpha);
@@ -139,7 +139,7 @@ Item
                         onClicked:
                         {
                             currentSection = ""
-                            store.setCurrentAnalyticsEngineId(thisEngineId)
+                            store.setCurrentAnalyticsEngineId(engineId)
                             settingsView.contentItem.sectionsItem.currentIndex = 0
                         }
 
@@ -168,7 +168,7 @@ Item
 
                             onClicked:
                             {
-                                if (currentEngineId === thisEngineId)
+                                if (isSelected)
                                     parent.click()
 
                                 sectionsView.collapsed = !sectionsView.collapsed
@@ -193,7 +193,7 @@ Item
                             MenuItem
                             {
                                 height: 28
-                                itemId: thisEngineId.toString() + modelData.name
+                                itemId: engineId.toString() + modelData.name
                                 text: modelData.name
                                 leftPadding: 24
                                 navigationMenu: menu
@@ -207,7 +207,7 @@ Item
                                 onClicked:
                                 {
                                     currentSection = modelData.name
-                                    store.setCurrentAnalyticsEngineId(thisEngineId)
+                                    store.setCurrentAnalyticsEngineId(engineId)
                                     settingsView.contentItem.sectionsItem.currentIndex = index + 1
                                 }
                             }

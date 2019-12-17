@@ -4,7 +4,7 @@ Figure
 {
     figureType: "polygon"
 
-    property int maxPoints: -1
+    property int maxPoints: 0
 
     figureSettings:
     {

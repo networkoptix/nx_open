@@ -15,8 +15,8 @@ Instrument
     readonly property real endY: count > 0 ? getPoint(count - 1).y : 0
 
     property real snapDistance: 12
+    property int minPoints: 2
     property int maxPoints: 0
-    property bool closed: false
 
     signal pointFinished()
 
@@ -38,7 +38,7 @@ Instrument
 
         function snappedToFirstPoint(point)
         {
-            if (count <= 3 || !closed)
+            if (count <= minPoints)
                 return point
 
             const fp = getPoint(0)
@@ -83,7 +83,7 @@ Instrument
 
         d.processMove(mouse)
 
-        if (closed && count > 3)
+        if (count > minPoints)
         {
             const p1 = pointsModel.get(0)
             const p2 = pointsModel.get(count - 1)

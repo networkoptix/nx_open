@@ -11,18 +11,12 @@ Item
     property bool checked: false
     property alias hovered: mouseArea.containsMouse
 
-    property real x1
-    property real y1
-    property real x2
-    property real y2
-
-    x: (x1 + x2) / 2
-    y: (y1 + y2) / 2
-
     signal toggled()
 
     onCheckedChanged: canvas.requestPaint()
     onColorChanged: canvas.requestPaint()
+
+    transformOrigin: Item.Left
 
     Canvas
     {
@@ -31,9 +25,6 @@ Item
         y: -8
         width: 36 + padding
         height: 16
-
-        transformOrigin: Item.Left
-        rotation: Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180 - 90
 
         onPaint:
         {

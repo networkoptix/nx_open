@@ -18,6 +18,11 @@ function absY(y, item)
     return y * item.height
 }
 
+function toDegrees(alpha)
+{
+    return alpha / Math.PI * 180
+}
+
 function distance(x1, y1, x2, y2)
 {
     return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))

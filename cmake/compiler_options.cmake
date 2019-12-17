@@ -220,6 +220,7 @@ if(MACOSX)
     add_compile_options(
         -msse4.1
         -Wno-unused-local-typedef
+        -mmacosx-version-min=10.14
     )
     set(CMAKE_INSTALL_RPATH @executable_path/../lib)
     set(CMAKE_SKIP_BUILD_RPATH ON)

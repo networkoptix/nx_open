@@ -75,7 +75,7 @@ private:
 class ValueItem: public Item
 {
     Q_OBJECT
-    Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
     Q_PROPERTY(QVariant defaultValue READ defaultValue WRITE setDefaultValue
         NOTIFY defaultValueChanged)
 

@@ -443,24 +443,8 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
         return m_delay.sleep(needToSleep, maxSleepTime);
 }
 
-bool QnCamDisplay::isDataQueueFull() const
-{
-    const auto diff = std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime);
-    if (diff < std::chrono::seconds::zero())
-        return true;
-
-    return diff >= m_forcedVideoBufferLength;
-}
-
 int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
 {
-    if (isForcedBufferingEnabled())
-    {
-        // TODO Add warning when buffer size not enought to fill required duration.
-        constexpr int kMillisecondsPerFrame = 2; //< Should be enough for every camera so far.
-        return (int) forcedVideoBufferLength().count() / kMillisecondsPerFrame;
-    }
-
     if (type == QueueSizeType::slowStream)
         return CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE;
 
@@ -537,8 +521,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         qint64 queueLen = m_lastQueuedVideoTime - m_lastVideoPacketTime;
         //qDebug() << "queueLen" << queueLen/1000 << "ms";
 
-        if (queueLen <= m_forcedVideoBufferLength.count())
+        if (queueLen <= 0)
         {
+            NX_ASSERT(queueLen == 0, "Negative value must never be here. Safety check.");
 		    // This function is used for LIVE mode and archive playback with external synchronization
             // like Hanwha NVR. Don't increase buffer for archive mode to make item synchronization more
             /// precise.
@@ -551,17 +536,17 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_delay.addQuant(m_liveBufferSizeMkSec /2); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
         }
-        else if (queueLen > m_forcedVideoBufferLength.count() + m_liveBufferSizeMkSec)
+        else if (queueLen > m_liveBufferSizeMkSec)
         {
             m_liveMaxLenReached = true;
             if (!m_realTimeHurryUp)
-                NX_VERBOSE(this, lm("Video queue overflow. Turn on no-delay mode"));
+                NX_VERBOSE(this, "Video queue overflow. Turn no-delay mode on");
             m_realTimeHurryUp = true;
         }
         else if (m_realTimeHurryUp
-            && queueLen <= m_forcedVideoBufferLength.count() + m_liveBufferSizeMkSec / 2)
+            && queueLen <= m_liveBufferSizeMkSec / 2)
         {
-            NX_VERBOSE(this, lm("Half video buffer again. Turn of no-delay mode"));
+            NX_VERBOSE(this, "Half video buffer again. Turn no-delay mode off");
             m_realTimeHurryUp = false;
             m_delay.afterdelay();
             m_delay.addQuant(-needToSleep);
@@ -1162,12 +1147,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     {
         m_lastQueuedVideoTime = video->timestamp;
 
-        if (isForcedBufferingEnabled())
-        {
-            if (m_dataQueue.size() == m_dataQueue.maxSize())
-                m_delay.breakSleep();
-        }
-        else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
+        if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
             && m_dataQueue.size() > 0
             && video->timestamp - m_lastVideoPacketTime > m_liveBufferSizeMkSec)
         {
@@ -1606,9 +1586,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                     afterJump(vd);
                 }
             }
-
-            if (m_isRealTimeSource && (isForcedBufferingEnabled() && !isDataQueueFull()))
-                return false;
 
             m_lastVideoPacketTime = vd->timestamp;
 
@@ -2145,22 +2122,6 @@ qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
 {
     return m_lastMediaEvent;
-}
-
-std::chrono::milliseconds QnCamDisplay::forcedVideoBufferLength() const
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(m_forcedVideoBufferLength);
-}
-
-void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
-{
-    m_forcedVideoBufferLength = length;
-    m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::normalStream));
-}
-
-bool QnCamDisplay::isForcedBufferingEnabled() const
-{
-    return m_forcedVideoBufferLength != std::chrono::microseconds::zero();
 }
 
 // -------------------------------- QnFpsStatistics -----------------------
