@@ -7,6 +7,7 @@ namespace nx::vms::server::analytics {
 MotionMetadataPacket::MotionMetadataPacket(QnConstMetaDataV1Ptr motionMetadata):
     m_motionMetadata(motionMetadata)
 {
+    NX_ASSERT(m_motionMetadata);
 }
 
 const uint8_t* MotionMetadataPacket::motionData() const
