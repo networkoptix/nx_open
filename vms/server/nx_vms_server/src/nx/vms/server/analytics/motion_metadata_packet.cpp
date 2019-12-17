@@ -55,7 +55,7 @@ bool MotionMetadataPacket::isMotionAt(int columnIndex, int rowIndex) const
     if (NX_ASSERT(m_motionMetadata))
         return m_motionMetadata->isMotionAt(columnIndex, rowIndex);
 
-    return nullptr;
+    return false;
 }
 
 int64_t MotionMetadataPacket::timestampUs() const

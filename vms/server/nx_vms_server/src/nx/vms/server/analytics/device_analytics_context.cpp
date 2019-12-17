@@ -85,6 +85,10 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     subscribeToRulesChanges();
 }
 
+DeviceAnalyticsContext::~DeviceAnalyticsContext()
+{
+}
+
 bool DeviceAnalyticsContext::isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const
 {
     return m_bindings.find(engineId) != m_bindings.cend();

@@ -43,6 +43,8 @@ public:
         QnMediaServerModule* severModule,
         const QnVirtualCameraResourcePtr& device);
 
+    virtual ~DeviceAnalyticsContext();
+
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
