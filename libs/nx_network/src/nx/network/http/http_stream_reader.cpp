@@ -606,8 +606,8 @@ std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
     HttpStreamReader::createContentDecoder(
         const nx::network::http::StringType& encodingName)
 {
-    bool deflate = false;
-    if (encodingName == "gzip" || (deflate = encodingName == "deflate"))
+    const bool deflate = encodingName == "deflate";
+    if (deflate || encodingName == "gzip")
     {
         auto decompressor = std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
         if (deflate)
