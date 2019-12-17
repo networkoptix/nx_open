@@ -12,7 +12,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 

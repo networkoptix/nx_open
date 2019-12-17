@@ -3,7 +3,7 @@
 #include <set>
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 
 namespace nx::vms::server::analytics {
 

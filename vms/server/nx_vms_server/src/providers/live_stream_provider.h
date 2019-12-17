@@ -15,7 +15,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/resource/resource_fwd.h>

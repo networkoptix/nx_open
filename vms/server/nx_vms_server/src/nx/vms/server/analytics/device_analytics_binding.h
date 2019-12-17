@@ -23,7 +23,7 @@
 
 #include <nx/vms/server/analytics/stream_requirements.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/wrappers/fwd.h>
 
