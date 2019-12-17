@@ -1,25 +1,34 @@
 #pragma once
 
+#include <set>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/analytics/i_stream_data_receptor.h>
 
 namespace nx::vms::server::analytics {
 
-class ProxyStreamDataReceptor: public IStreamDataReceptor
+class ProxyStreamDataReceptor: public StreamDataReceptor
 {
 public:
     ProxyStreamDataReceptor() = default;
-    ProxyStreamDataReceptor(QWeakPointer<IStreamDataReceptor> receptor);
+    ProxyStreamDataReceptor(QWeakPointer<StreamDataReceptor> receptor);
 
-    void setProxiedReceptor(QWeakPointer<IStreamDataReceptor> receptor);
+    void setProxiedReceptor(QWeakPointer<StreamDataReceptor> receptor);
 
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
-    virtual nx::vms::api::analytics::StreamTypes requiredStreamTypes() const override;
+    virtual StreamProviderRequirements providerRequirements(
+        nx::vms::api::StreamIndex streamIndex) const override;
+
+    virtual void registerStream(nx::vms::api::StreamIndex streamIndex) override;
+
+private:
+    void registerStreamsToProxiedReceptorUnsafe();
 
 private:
     mutable QnMutex m_mutex;
-    QWeakPointer<IStreamDataReceptor> m_proxiedReceptor;
+    QWeakPointer<StreamDataReceptor> m_proxiedReceptor;
+    std::set<nx::vms::api::StreamIndex> m_registeredStreams;
 };
 
 using ProxyStreamDataReceptorPtr = QSharedPointer<ProxyStreamDataReceptor>;

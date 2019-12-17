@@ -1,4 +1,4 @@
-#include "device_analytics_context.h"
+﻿#include "device_analytics_context.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
@@ -30,8 +30,10 @@ using namespace nx::vms::server;
 
 using StreamType = nx::vms::api::analytics::StreamType;
 using StreamTypes = nx::vms::api::analytics::StreamTypes;
+using StreamIndex = nx::vms::api::StreamIndex;
 
 static const std::chrono::seconds kMinSkippedFramesReportingInterval(30);
+static const StreamIndex kDefaultPreferredStreamIndex = StreamIndex::primary;
 
 static bool isAliveStatus(Qn::ResourceStatus status)
 {
@@ -129,7 +131,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         }
     }
 
-    updateStreamRequirements();
+    updateStreamProviderRequirements();
 }
 
 void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
@@ -139,7 +141,7 @@ void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourc
         m_bindings.erase(engine->getId());
     }
 
-    updateStreamRequirements();
+    updateStreamProviderRequirements();
 }
 
 void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink)
@@ -437,10 +439,27 @@ void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
     }
 }
 
-StreamTypes DeviceAnalyticsContext::requiredStreamTypes() const
+StreamProviderRequirements DeviceAnalyticsContext::providerRequirements(
+    StreamIndex streamIndex) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_cachedRequiredStreamTypes;
+    if (const auto it = m_cachedStreamProviderRequirements.find(streamIndex);
+        it != m_cachedStreamProviderRequirements.cend())
+    {
+        return it->second;
+    }
+
+    return {};
+}
+
+void DeviceAnalyticsContext::registerStream(nx::vms::api::StreamIndex streamIndex)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_registeredStreams.insert(streamIndex);
+    }
+
+    updateStreamProviderRequirements();
 }
 
 void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
@@ -508,7 +527,7 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
         }
     }
 
-    updateStreamRequirements();
+    updateStreamProviderRequirements();
 }
 
 void DeviceAnalyticsContext::at_devicePropertyChanged(
@@ -590,21 +609,113 @@ bool DeviceAnalyticsContext::isDeviceAlive() const
         && !flags.testFlag(Qn::desktop_camera);
 }
 
-void DeviceAnalyticsContext::updateStreamRequirements()
+void DeviceAnalyticsContext::updateStreamProviderRequirements()
+{
+    StreamProviderRequirementsMap providerRequirementsMap = getTotalProviderRequirements();
+    providerRequirementsMap = setUpMotionAnalysisPolicy(std::move(providerRequirementsMap));
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    providerRequirementsMap = adjustProviderRequirementsByProviderCountUnsafe(
+        std::move(providerRequirementsMap));
+
+    m_cachedStreamProviderRequirements = providerRequirementsMap;
+}
+
+DeviceAnalyticsContext::StreamProviderRequirementsMap
+    DeviceAnalyticsContext::getTotalProviderRequirements() const
 {
     BindingMap bindings = analyticsBindingsSafe();
-    StreamTypes totalRequiredStreamTypes;
+    StreamProviderRequirementsMap providerRequirementsMap;
     for (const auto& [engineId, binding]: bindings)
     {
+        if (!binding->isStreamConsumer())
+            continue;
+
         const std::optional<StreamRequirements> requirements = binding->streamRequirements();
         if (!requirements)
             continue;
 
-        totalRequiredStreamTypes |= requirements->requiredStreamTypes;
+        StreamIndex preferredStreamIndex = requirements->preferredStreamIndex;
+        if (preferredStreamIndex == StreamIndex::undefined)
+            preferredStreamIndex = kDefaultPreferredStreamIndex;
+
+        providerRequirementsMap[preferredStreamIndex].requiredStreamTypes |=
+            requirements->requiredStreamTypes;
     }
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_cachedRequiredStreamTypes = totalRequiredStreamTypes;
+    return providerRequirementsMap;
+}
+
+DeviceAnalyticsContext::StreamProviderRequirementsMap
+    DeviceAnalyticsContext::setUpMotionAnalysisPolicy(
+        StreamProviderRequirementsMap requirements) const
+{
+    const bool needMotion =
+        requirements[StreamIndex::primary].requiredStreamTypes.testFlag(StreamType::motion)
+        || requirements[StreamIndex::secondary].requiredStreamTypes.testFlag(StreamType::motion);
+
+    if (!needMotion)
+    {
+        for (const StreamIndex streamIndex: {StreamIndex::primary, StreamIndex::secondary})
+            requirements[streamIndex].motionAnalysisPolicy = MotionAnalysisPolicy::automatic;
+
+        return requirements;
+    }
+
+    const auto setMotionStream =
+        [](StreamIndex streamIndex, StreamProviderRequirementsMap requirements)
+        {
+            const StreamIndex oppositeStreamIndex = nx::vms::api::oppositeStreamIndex(streamIndex);
+
+            requirements[streamIndex].motionAnalysisPolicy = MotionAnalysisPolicy::forced;
+            requirements[oppositeStreamIndex].motionAnalysisPolicy =
+                MotionAnalysisPolicy::disabled;
+
+            requirements[streamIndex].requiredStreamTypes.setFlag(StreamType::motion, true);
+            requirements[oppositeStreamIndex].requiredStreamTypes.setFlag(
+                StreamType::motion, false);
+
+            return requirements;
+        };
+
+    const bool needUncompressedFramesFromPrimaryStream =
+        requirements[StreamIndex::primary].requiredStreamTypes.testFlag(
+            StreamType::uncompressedVideo);
+
+    const bool needUncompressedFramesFromSecondaryStream =
+        requirements[StreamIndex::secondary].requiredStreamTypes.testFlag(
+            StreamType::uncompressedVideo);
+
+    if (!needUncompressedFramesFromPrimaryStream)
+        requirements = setMotionStream(StreamIndex::secondary, std::move(requirements));
+    else if (!needUncompressedFramesFromSecondaryStream)
+        requirements = setMotionStream(StreamIndex::primary, std::move(requirements));
+
+    return requirements;
+}
+
+DeviceAnalyticsContext::StreamProviderRequirementsMap
+    DeviceAnalyticsContext::adjustProviderRequirementsByProviderCountUnsafe(
+        StreamProviderRequirementsMap requirements) const
+{
+    if (m_registeredStreams.size() != 1)
+        return requirements;
+
+    const StreamIndex registeredStreamIndex = *m_registeredStreams.begin();
+    const StreamIndex oppositeStreamIndex =
+        nx::vms::api::oppositeStreamIndex(registeredStreamIndex);
+
+    requirements[registeredStreamIndex].requiredStreamTypes |=
+        requirements[oppositeStreamIndex].requiredStreamTypes;
+
+    requirements[registeredStreamIndex].motionAnalysisPolicy =
+        requirements[registeredStreamIndex].requiredStreamTypes.testFlag(StreamType::motion)
+            ? MotionAnalysisPolicy::forced
+            : MotionAnalysisPolicy::automatic;
+
+    requirements[oppositeStreamIndex] = StreamProviderRequirements{};
+
+    return requirements;
 }
 
 DeviceAnalyticsContext::BindingMap DeviceAnalyticsContext::analyticsBindingsSafe() const

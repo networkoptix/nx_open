@@ -97,8 +97,12 @@ protected:
 private:
     float getDefaultFps() const;
 
-    bool needAnalyzeMotion();
+    bool doesStreamSuitMotionAnalysisRequirements();
 
+    bool doesFrameSuitMotionAnalysisRequirements(
+        const QnCompressedVideoDataPtr& compressedFrame) const;
+
+    void checkAndUpdatePrimaryStreamResolution(const QnCompressedVideoDataPtr& compressedFrame);
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
@@ -109,9 +113,6 @@ private:
         bool isCameraConfigured);
 
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
-
-    QSharedPointer<nx::vms::server::analytics::IStreamDataReceptor>
-        getStreamDataReceptorForMetadataPluginsIfNeeded();
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
@@ -136,7 +137,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::vms::server::analytics::IStreamDataReceptor> m_streamDataReceptor;
+    QWeakPointer<nx::vms::server::analytics::StreamDataReceptor> m_streamDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

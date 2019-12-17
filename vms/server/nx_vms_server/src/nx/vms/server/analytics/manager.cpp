@@ -383,10 +383,19 @@ void Manager::registerMetadataSink(
         analyticsContext->setMetadataSink(metadataSink);
 }
 
-QWeakPointer<IStreamDataReceptor> Manager::registerMediaSource(const QnUuid& deviceId)
+QWeakPointer<StreamDataReceptor> Manager::registerMediaSource(
+    const QnUuid& deviceId,
+    nx::vms::api::StreamIndex streamIndex)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    auto proxySource = QSharedPointer<ProxyStreamDataReceptor>::create();
+    QSharedPointer<ProxyStreamDataReceptor> proxySource;
+    if (auto it = m_mediaSources.find(deviceId); it != m_mediaSources.cend())
+        proxySource = it->second;
+    else
+        proxySource = QSharedPointer<ProxyStreamDataReceptor>::create();
+
+    proxySource->registerStream(streamIndex);
+
     auto analyticsContext = deviceAnalyticsContextUnsafe(deviceId);
 
     if (analyticsContext)

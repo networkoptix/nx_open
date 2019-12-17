@@ -55,7 +55,9 @@ public:
         const QnResourcePtr& deviceResource,
         QWeakPointer<QnAbstractDataReceptor> metadataSink);
 
-    QWeakPointer<IStreamDataReceptor> registerMediaSource(const QnUuid& deviceId);
+    QWeakPointer<StreamDataReceptor> registerMediaSource(
+        const QnUuid& deviceId,
+        nx::vms::api::StreamIndex streamIndex);
 
     void setSettings(const QString& deviceId,
         const QString& engineId,
