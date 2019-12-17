@@ -1,4 +1,4 @@
-#include "proxy_video_data_receptor.h"
+#include "proxy_stream_data_receptor.h"
 
 namespace nx::vms::server::analytics {
 
