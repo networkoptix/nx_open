@@ -83,7 +83,7 @@ QHash<QString, FigureType> findFigureKeys(const QJsonObject& model)
 void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
 {
     item.color = object.value(QStringLiteral("color")).toString();
-    item.visible = object.value(QStringLiteral("showOnCamera")).toBool();
+    item.visible = object.value(QStringLiteral("showOnCamera")).toBool(true);
 
     item.points.clear();
     for (const auto p: object.value(QStringLiteral("points")).toArray())

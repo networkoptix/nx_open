@@ -74,7 +74,7 @@ LabeledItem
 
                             onThumbnailUpdated:
                             {
-                                if (cameraId.toString() === settingsView.resourceId.toString())
+                                if (cameraId === settingsView.resourceId)
                                     backgroundImage.source = thumbnailUrl
                             }
                         }
@@ -82,20 +82,23 @@ LabeledItem
                         Connections
                         {
                             target: settingsView
-
-                            onResourceIdChanged:
-                            {
-                                backgroundImage.source = ""
-
-                                if (!thumbnailProvider)
-                                    return
-
-                                if (settingsView.resourceId.isNull())
-                                    return
-
-                                thumbnailProvider.refresh(settingsView.resourceId)
-                            }
+                            onResourceIdChanged: backgroundImage.updateThumbnail()
                         }
+
+                        function updateThumbnail()
+                        {
+                            backgroundImage.source = ""
+
+                            if (!thumbnailProvider)
+                                return
+
+                            if (settingsView.resourceId.isNull())
+                                return
+
+                            thumbnailProvider.refresh(settingsView.resourceId)
+                        }
+
+                        Component.onCompleted: updateThumbnail()
                     }
 
                     FigurePreview
@@ -229,16 +232,18 @@ LabeledItem
             return null
 
         // Clone the figure object and fill the rest of fields.
-        var obj = JSON.parse(JSON.stringify(figure))
-        obj.name = figureNameEdit.text
-        obj.showOnCamera = showOnCameraCheckBox.checked
+        var obj = {
+            "figure": JSON.parse(JSON.stringify(figure)),
+            "name": figureNameEdit.text,
+            "showOnCamera": showOnCameraCheckBox.checked
+        }
         return obj
     }
 
     function setValue(value)
     {
         figureNameEdit.text = (value && value.name) || ""
-        showOnCameraCheckBox.checked = value && value.showOnCamera !== false
-        figure = value
+        showOnCameraCheckBox.checked = !value || value.showOnCamera !== false
+        figure = value && value.figure
     }
 }

@@ -16,6 +16,8 @@ TextField
     font.pixelSize: 14
     passwordCharacter: "\u25cf"
 
+    property bool warningState: false
+
     color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
 
     background: TextFieldBackground { control: parent }

@@ -240,6 +240,42 @@ TextField::TextField(QObject* parent):
 {
 }
 
+QString TextField::validationRegex() const
+{
+    return m_validationRegex;
+}
+
+void TextField::setValidationRegex(const QString& regex)
+{
+    if (m_validationRegex == regex)
+        return;
+
+    m_validationRegex = regex;
+    emit validationRegexChanged();
+}
+
+QString TextField::validationRegexFlags() const
+{
+    return m_validationRegexFlags;
+}
+
+void TextField::setValidationRegexFlags(const QString& flags)
+{
+    if (m_validationRegexFlags == flags)
+        return;
+
+    m_validationRegexFlags = flags;
+    emit validationRegexFlagsChanged();
+}
+
+QJsonObject TextField::serialize() const
+{
+    auto result = base_type::serialize();
+    result[QStringLiteral("validationRegex")] = validationRegex();
+    result[QStringLiteral("validationRegexFlags")] = validationRegexFlags();
+    return result;
+}
+
 TextArea::TextArea(QObject* parent):
     ValueItem(QStringLiteral("TextArea"), parent)
 {
