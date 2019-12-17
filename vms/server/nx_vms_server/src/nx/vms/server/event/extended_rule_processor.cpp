@@ -904,13 +904,37 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     aggregatedActionIter->periodicTaskID = 0;
 }
 
+struct PushPayload
+{
+    QString url;
+};
+#define PushPayload_Fields (url)
+QN_FUSION_DECLARE_FUNCTIONS(PushPayload, (json));
+
 struct PushNotification
 {
     QString title;
     QString body;
-    // TODO: payload, options.
+    PushPayload payload;
+    // TODO: options?
+
+    PushNotification() = default;
+    PushNotification(const vms::event::EventParameters& event, const QnGlobalSettings* settings)
+    {
+        // TODO: Work out normal messages for all cases.
+        title = event.caption.isEmpty() ? QnLexical::serialized(event.eventType) : event.caption;
+        body = event.description.isEmpty()
+            ? "Reason: " + QnLexical::serialized(event.reasonCode)
+            : event.description;
+
+        payload.url = lm("%1://%2/client/%3/view/?timestamp=%4").args(
+            nx::branding::nativeUriProtocol(), settings->cloudHost(),
+            settings->cloudSystemId(), event.eventTimestampUsec);
+        if (!event.eventResourceId.isNull())
+            payload.url += "&resources=" + event.eventResourceId.toSimpleString();
+    }
 };
-#define PushNotification_Fields (title)(body)
+#define PushNotification_Fields (title)(body)(payload)
 QN_FUSION_DECLARE_FUNCTIONS(PushNotification, (json));
 
 struct PushNotificationMessage
@@ -922,13 +946,12 @@ struct PushNotificationMessage
 #define PushNotificationMessage_Fields (systemId)(targets)(notification)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PushNotification)(PushNotificationMessage), (json), _Fields);
+    (PushPayload)(PushNotification)(PushNotificationMessage), (json), _Fields);
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
     PushNotificationMessage message;
     const auto settings = serverModule()->commonModule()->globalSettings();
-
     message.systemId = settings->cloudSystemId();
     if (message.systemId.isEmpty())
     {
@@ -943,14 +966,9 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
         return true;
     }
 
-    const auto& event = action->getRuntimeParams();
-    // TODO: Work out normal messages for all cases.
-    message.notification = PushNotification{
-        event.caption.isEmpty() ? QString(QJson::serialized(event.eventType)) : event.caption,
-        event.description.isEmpty() ? QString(QJson::serialized(event.reasonCode)) : event.description
-    };
+    message.notification = PushNotification(action->getRuntimeParams(), settings);
 
-    nx::utils::Url url("https://host/api/notifications/push_notification");
+    nx::utils::Url url("https://CLOUD-HOST/api/notifications/push_notification");
     url.setHost(settings->cloudHost());
 
     nx::network::http::HttpClient client;
