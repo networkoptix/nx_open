@@ -255,7 +255,8 @@ void HttpStreamReader::setParseHeadersStrict(bool enabled)
 bool HttpStreamReader::isEncodingSupported(const StringType& encoding)
 {
     return encoding == "gzip"
-        || encoding == "deflate";
+        || encoding == "deflate"
+        || encoding == "identity";
 }
 
 bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
