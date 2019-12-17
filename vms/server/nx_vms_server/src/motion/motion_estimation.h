@@ -52,12 +52,16 @@ public:
         const QnCompressedVideoDataPtr& frame,
         CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
 
-    // Gets motion preserving internal state. Subsequent calls to getMotion and takeMotion will
-    //     return the same data.
+    /**
+     * Gets motion preserving internal state. Subsequent calls to getMotion and a single call to
+     *     takeMotion will return the same data.
+     */
     QnMetaDataV1Ptr getMotion();
 
-    // Gets motion and resets internal states (i.e subsequent call to getMotion or takeMotion) will
-    //     return nullptr;
+    /**
+     * Gets motion and resets internal state (i.e subsequent call to getMotion or takeMotion) will
+     *     return nullptr.
+     */
     QnMetaDataV1Ptr takeMotion();
 
     bool existsMetadata() const;
