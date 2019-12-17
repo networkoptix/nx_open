@@ -14,6 +14,7 @@ struct StreamRequirements
 {
     nx::vms::api::analytics::StreamTypes requiredStreamTypes;
     AVPixelFormat uncompressedFramePixelFormat = AV_PIX_FMT_NONE;
+    nx::vms::api::StreamIndex preferredStreamIndex = nx::vms::api::StreamIndex::undefined;
 };
 
 } // namespace nx::vms::server::analytics
