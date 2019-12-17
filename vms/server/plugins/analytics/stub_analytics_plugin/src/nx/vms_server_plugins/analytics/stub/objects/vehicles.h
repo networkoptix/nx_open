@@ -18,6 +18,8 @@ class Vehicle: public AbstractObject
 public:
     Vehicle(const std::string& typeId, Attributes attributes);
     virtual void update() override;
+protected:
+    void updateDistanceAttributeIfItExists();
 };
 
 class Car: public Vehicle
