@@ -150,24 +150,6 @@ void OnlineRelaysClusterClient::onRelayLost(nx::cloud::discovery::Node trafficRe
     m_unresolvedRelays.erase(trafficRelayNode);
 }
 
-std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByContinent(
-    nx::geo_ip::Continent continent) const
-{
-    QnMutexLocker lock(&m_mutex);
-    std::vector<nx::utils::Url> relayUrls;
-
-    auto range = m_resolvedRelays.equal_range(continent);
-    for (auto it = range.first; it != range.second; ++it)
-    {
-        if (it->second.node.urls.empty())
-            continue;
-
-        relayUrls.emplace_back(baseUrl(it->second.node.urls.front()));
-    }
-
-    return relayUrls;
-}
-
 std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
     const nx::geo_ip::Geopoint& geopoint) const
 {
