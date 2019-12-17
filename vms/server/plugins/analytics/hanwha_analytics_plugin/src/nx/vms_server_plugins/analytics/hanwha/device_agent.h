@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/network/http/http_client.h>
 
@@ -70,6 +71,9 @@ private:
     void loadFrameSize();
 
     void loadSupportedEventTypes(); // page 9 Application Programmers Guide
+
+public:
+    void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
 
 private:
 

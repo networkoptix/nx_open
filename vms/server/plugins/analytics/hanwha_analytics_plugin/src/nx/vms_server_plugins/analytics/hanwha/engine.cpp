@@ -11,6 +11,7 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log_main.h>
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
@@ -19,7 +20,6 @@
 #include "common.h"
 #include "attributes_parser.h"
 #include "string_helper.h"
-#include <nx/utils/log/log_main.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -128,6 +128,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->readCameraSettings();
+    //deviceAgent->addSettingModel(&deviceAgentManifest);
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
 
     ++sharedRes->deviceAgentCount;
