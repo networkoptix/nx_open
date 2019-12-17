@@ -175,6 +175,7 @@ std::string Engine::manifestString() const
     ],
     "capabilities": ")json" + m_capabilities + R"json(",
     "streamTypeFilter": ")json" + m_streamTypeFilter + R"json(",
+    "preferredStream": ")json" + ini().preferredStream + R"json(",
     "objectActions": [
         {
             "id": "nx.stub.addToList",

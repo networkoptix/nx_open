@@ -36,6 +36,9 @@ struct Ini: public nx::kit::IniConfig
         "active motion grid cell is dispalyed as a separate object), regular object generation\n"
         "is disabled in this case, so the correspondent DeviceAgent settings won't work. Use\n"
         "carefully since this option can affect performance very much");
+
+    NX_INI_STRING("primary", preferredStream,
+        "Preferred stream in the Engine manifest. Possible values: 'primary', 'secondary'");
 };
 
 inline Ini& ini()
