@@ -232,6 +232,36 @@ void CameraWebPageWidget::Private::createNewPage()
                     authenticator->setUser(credentials.login());
                     authenticator->setPassword(credentials.password());
                     return;
+                }
+            }
+
+            authDialodCounter.registerAttempt();
+            if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
+                return;
+
+            PasswordDialog dialog(parent);
+
+            auto url = requestUrl;
+
+            // Hide credentials.
+            url.setUserName(QString());
+            url.setPassword(QString());
+
+            // Replace server address with camera address.
+            const auto serverHost = parent->commonModule()->currentUrl().host();
+            if (serverHost == url.host())
+            {
+                url.setHost(lastCamera.ipAddress);
+                url.setPort(-1); //< Hide server port.
+            }
+
+            dialog.setText(url.toString());
+
+            if (dialog.exec() == QDialog::Accepted)
+            {
+                authenticator->setUser(dialog.username());
+                authenticator->setPassword(dialog.password());
+            }
         });
 
     QObject::connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired,
