@@ -7,14 +7,10 @@
 #include <QtCore/QThread>
 
 #include <utils/common/connective.h>
-#include <decoders/video/ffmpeg_video_decoder.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 #include <nx/vms/api/data/analytics_data.h>
-
-#include <nx/vms/server/analytics/device_analytics_context.h>
-#include <nx/vms/server/analytics/proxy_video_data_receptor.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -23,12 +19,15 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/debugging/abstract_visual_metadata_debugger.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
 
 namespace nx::vms::server::analytics {
+
+class DeviceAnalyticsContext;
+class ProxyStreamDataReceptor;
+class StreamDataReceptor;
 
 class Manager final:
     public Connective<QObject>,

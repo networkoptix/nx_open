@@ -15,6 +15,9 @@
 
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/wrappers/engine.h>
+#include <nx/vms/server/analytics/device_analytics_context.h>
+#include <nx/vms/server/analytics/proxy_video_data_receptor.h>
+
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
