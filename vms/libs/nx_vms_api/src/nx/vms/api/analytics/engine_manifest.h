@@ -74,7 +74,7 @@ struct NX_VMS_API EngineManifest
 
     StreamTypes streamTypeFilter;
 
-    StreamIndex preferredStreamIndex = StreamIndex::undefined;
+    StreamIndex preferredStream = StreamIndex::undefined;
 
     /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
     QList<EventType> eventTypes;
@@ -92,7 +92,7 @@ struct NX_VMS_API EngineManifest
 #define EngineManifest_Fields \
     (capabilities) \
     (streamTypeFilter) \
-    (preferredStreamIndex) \
+    (preferredStream) \
     (eventTypes) \
     (objectTypes) \
     (objectActions) \
