@@ -74,7 +74,7 @@ LabeledItem
 
                             onThumbnailUpdated:
                             {
-                                if (cameraId.toString() === settingsView.resourceId.toString())
+                                if (cameraId === settingsView.resourceId)
                                     backgroundImage.source = thumbnailUrl
                             }
                         }
@@ -82,20 +82,23 @@ LabeledItem
                         Connections
                         {
                             target: settingsView
-
-                            onResourceIdChanged:
-                            {
-                                backgroundImage.source = ""
-
-                                if (!thumbnailProvider)
-                                    return
-
-                                if (settingsView.resourceId.isNull())
-                                    return
-
-                                thumbnailProvider.refresh(settingsView.resourceId)
-                            }
+                            onResourceIdChanged: backgroundImage.updateThumbnail()
                         }
+
+                        function updateThumbnail()
+                        {
+                            backgroundImage.source = ""
+
+                            if (!thumbnailProvider)
+                                return
+
+                            if (settingsView.resourceId.isNull())
+                                return
+
+                            thumbnailProvider.refresh(settingsView.resourceId)
+                        }
+
+                        Component.onCompleted: updateThumbnail()
                     }
 
                     FigurePreview
