@@ -460,6 +460,36 @@ void QnRtspDataConsumer::sendRangeHeaderIfChanged()
     sendMetadata(range);
 };
 
+void QnRtspDataConsumer::flushReorderingBuffer()
+{
+    {
+        QnMutexLocker lock(&m_dataQueueMtx);
+        if (m_reorderingProvider)
+            m_reorderingProvider->flush();
+    }
+    sendReorderedData();
+}
+
+void QnRtspDataConsumer::sendReorderedData()
+{
+    QnMutexLocker lock(&m_dataQueueMtx);
+    while (1)
+    {
+        if (!m_reorderingProvider)
+            return;
+        auto& queue = m_reorderingProvider->queue();
+        if (queue.empty())
+            return;
+
+        auto data = queue.front();
+        queue.pop_front();
+
+        lock.unlock();
+        processMediaData(std::dynamic_pointer_cast<QnAbstractMediaData>(data));
+        lock.relock();
+    }
+}
+
 void QnRtspDataConsumer::setNeedKeyData()
 {
     m_needKeyData.fill(true);
@@ -512,31 +542,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (m_pauseNetwork)
         return false; // does not ready to process data. please wait
 
-    //msleep(500);
-
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
-
-    const auto flushBuffer = nx::utils::makeScopeGuard(
-        [this]()
-        {
-            if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
-            {
-                m_owner->sendBuffer(m_sendBuffer);
-                m_sendBuffer.clear();
-            }
-        });
-
-    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
-    {
-        //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
-            //Introduce safe solution
-        if (!media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
-            (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
-        else
-            NX_DEBUG(this, "Speed parameter was ignored for live mode");
-    }
 
     const bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     const bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
@@ -545,23 +553,24 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (isVideo || isAudio)
     {
+        QnMutexLocker lock(&m_qualityChangeMutex);
+
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
         {
-            QnMutexLocker lock(&m_qualityChangeMutex);
-            if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
+            if (isLowMediaQuality(m_newLiveQuality) && isSecondaryProvider)
             {
-                if (isLowMediaQuality(m_newLiveQuality) && isSecondaryProvider)
-                {
-                    m_liveQuality = m_newLiveQuality;
-                    m_newLiveQuality = MEDIA_Quality_None;
-                    setNeedKeyData();
-                }
-                else if (!isLowMediaQuality(m_newLiveQuality) && !isSecondaryProvider)
-                {
-                    m_liveQuality = m_newLiveQuality;
-                    m_newLiveQuality = MEDIA_Quality_None;
-                    setNeedKeyData();
-                }
+                m_liveQuality = m_newLiveQuality;
+                m_newLiveQuality = MEDIA_Quality_None;
+                flushReorderingBuffer();
+                setNeedKeyData();
+            }
+            else if (!isLowMediaQuality(m_newLiveQuality) && !isSecondaryProvider)
+            {
+                m_liveQuality = m_newLiveQuality;
+                m_newLiveQuality = MEDIA_Quality_None;
+                flushReorderingBuffer();
+                setNeedKeyData();
             }
         }
 
@@ -571,19 +580,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 return true; // data for other live quality stream
             else if (isLowMediaQuality(m_liveQuality) && !isSecondaryProvider)
                 return true; // data for other live quality stream
-
-            if (isVideo)
-            {
-                if (isKeyFrame)
-                {
-                    m_needKeyData[media->channelNumber] = false;
-                }
-                else if (m_needKeyData[media->channelNumber] ||
-                    m_liveQuality == MEDIA_Quality_LowIframesOnly)
-                {
-                    return true; // wait for I frame for this channel
-                }
-            }
         }
 
         StreamIndex index = isSecondaryProvider ? StreamIndex::secondary : StreamIndex::primary;
@@ -597,16 +593,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (logger)
         logger->pushData(media, lm("Queue size %1").args(m_dataQueue.size()));
 
-    int trackNum = media->channelNumber;
-    if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
-        trackNum = 0; // multichannel video is going to be transcoded to a single track
-    RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
-
-    if (trackInfo == nullptr || trackInfo->clientPort == -1)
-        return true; // skip data (for example audio is disabled)
-    AbstractRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
-    if (!codecEncoder)
-        return true; // skip data (for example audio is disabled)
     {
         QnMutexLocker lock( &m_mutex );
         int cseq = media->opaque;
@@ -628,13 +614,78 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_lastMediaTime = media->timestamp;
     }
 
+
     if (m_someDataIsDropped) {
         sendMetadata("drop-report");
         m_someDataIsDropped = false;
     }
 
-    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
+    {
+        QnMutexLocker lock(&m_dataQueueMtx);
+        if (!m_reorderingProvider)
+            m_reorderingProvider = std::make_unique<nx::vms::server::SimpleReorderer>();
+        m_reorderingProvider->processNewData(nonConstData);
+    }
+    sendReorderedData();
+
+    return true;
+}
+
+void QnRtspDataConsumer::processMediaData(const QnAbstractDataPacketPtr& nonConstData)
+{
+    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+
+    const auto flushBuffer = nx::utils::makeScopeGuard(
+        [this]()
+        {
+            if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
+            {
+                m_owner->sendBuffer(m_sendBuffer);
+                m_sendBuffer.clear();
+            }
+        });
+
+    if ((m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1))
+    {
+        //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
+            //Introduce safe solution
+        if (!media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
+            (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
+        else
+            NX_DEBUG(this, "Speed parameter was ignored for live mode");
+    }
+
+    const bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    if (isVideo)
+    {
+        const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        if (isKeyFrame)
+        {
+            m_needKeyData[media->channelNumber] = false;
+        }
+        else if (m_needKeyData[media->channelNumber] ||
+            m_liveQuality == MEDIA_Quality_LowIframesOnly)
+        {
+            return; // wait for I frame for this channel
+        }
+    }
+
+    const bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+
+    if ((m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive))
         doRealtimeDelay(media);
+
+    int trackNum = media->channelNumber;
+    if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
+        trackNum = 0; // multichannel video is going to be transcoded to a single track
+    RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
+
+    if (trackInfo == nullptr || trackInfo->clientPort == -1)
+        return; // skip data (for example audio is disabled)
+
+    AbstractRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
+    if (!codecEncoder)
+        return; // skip data (for example audio is disabled)
 
     QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)
@@ -654,7 +705,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         trackInfo->firstRtpTime = media->timestamp;
     m_owner->notifyMediaRangeUsed(media->timestamp);
 
-    while(!m_needStop)
+    while (!m_needStop)
     {
         int dataStartIndex = m_sendBuffer.size();
         if (m_owner->isTcpMode())
@@ -684,7 +735,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             m_sendBuffer.data()[dataStartIndex] = '$';
             m_sendBuffer.data()[dataStartIndex + 1] = isRtcp ? trackInfo->clientRtcpPort : trackInfo->clientPort;
-            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + dataStartIndex + 2);
+            quint16* lenPtr = (quint16*)(m_sendBuffer.data() + dataStartIndex + 2);
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
             {
@@ -707,9 +758,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
-
-
-    return true;
 }
 
 void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
@@ -788,12 +836,13 @@ void QnRtspDataConsumer::setLiveMarker(int marker)
 
 void QnRtspDataConsumer::clearUnprocessedData()
 {
-    QnMutexLocker lock( &m_dataQueueMtx );
+    QnMutexLocker lock(&m_dataQueueMtx);
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
     m_lastLiveFrameTime[0] = 0;
     m_lastLiveFrameTime[1] = 0;
+    m_reorderingProvider.reset();
 }
 
 void QnRtspDataConsumer::setUseUTCTime(bool value)

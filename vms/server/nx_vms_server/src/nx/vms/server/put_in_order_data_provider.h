@@ -11,35 +11,11 @@
 
 namespace nx::vms::server {
 
-    class ProxyDataProvider:
-        public QnAbstractStreamDataProvider,
-        public QnAbstractMediaDataReceptor
-    {
-    public:
-        ProxyDataProvider(const QnAbstractStreamDataProviderPtr& provider);
-
-        virtual bool dataCanBeAccepted() const override;
-        virtual bool isReverseMode() const override;
-        virtual void disconnectFromResource() override;
-        virtual void setRole(Qn::ConnectionRole role) override;
-        virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
-        virtual bool hasVideo() const override;
-        virtual bool needConfigureProvider() const override;
-        virtual void startIfNotRunning() override;
-        virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
-        virtual void stop() override;
-    protected:
-        virtual void start(Priority priority = InheritPriority) override;
-    protected:
-        QnAbstractStreamDataProviderPtr m_provider = nullptr;
-    };
-
     /*
      * This class allow to reorder input media by their timestamps.
-     * It works as a proxy provider between consumer and source data provider.
      * Required reordering buffer size is calculated automatically.
      */
-    class PutInOrderDataProvider: public ProxyDataProvider
+    class AbstractDataReorderer
     {
     public:
 
@@ -62,18 +38,17 @@ namespace nx::vms::server {
          * @param maxQueueDuration maximum reordering queue length.
          * @param BufferingPolicy auto increase/decrease buffer or increase only.
          */
-        PutInOrderDataProvider(
-            const QnAbstractStreamDataProviderPtr& provider,
+        AbstractDataReorderer(
             std::chrono::microseconds minQueueDuration = kMinQueueDuration,
             std::chrono::microseconds maxQueueDuration = kMaxQueueDuration,
             std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
             BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
-        virtual ~PutInOrderDataProvider();
 
-        virtual void putData(const QnAbstractDataPacketPtr& data) override;
-        virtual bool canAcceptData() const override { return true; }
+        void processNewData(const QnAbstractDataPacketPtr& data);
 
         std::optional<std::chrono::microseconds> flush();
+
+        virtual void flushData(const QnAbstractDataPacketPtr& data) = 0;
     private:
         void updateBufferSize(const QnAbstractDataPacketPtr& data);
     private:
@@ -99,6 +74,59 @@ namespace nx::vms::server {
         BufferingPolicy m_policy = BufferingPolicy::increaseAndDescrease;
         QnMutex m_mutex;
     };
+
+    class ProxyDataProvider: public QnAbstractStreamDataProvider
+    {
+    public:
+        ProxyDataProvider(const QnAbstractStreamDataProviderPtr& provider);
+
+        virtual bool dataCanBeAccepted() const override;
+        virtual bool isReverseMode() const override;
+        virtual void disconnectFromResource() override;
+        virtual void setRole(Qn::ConnectionRole role) override;
+        virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
+        virtual bool hasVideo() const override;
+        virtual bool needConfigureProvider() const override;
+        virtual void startIfNotRunning() override;
+        virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
+    protected:
+        QnAbstractStreamDataProviderPtr m_provider = nullptr;
+    };
+
+    class PutInOrderDataProvider:
+        public ProxyDataProvider,
+        public AbstractDataReorderer,
+        public QnAbstractMediaDataReceptor
+    {
+    public:
+        PutInOrderDataProvider(
+            const QnAbstractStreamDataProviderPtr& provider,
+            std::chrono::microseconds minQueueDuration = kMinQueueDuration,
+            std::chrono::microseconds maxQueueDuration = kMaxQueueDuration,
+            std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
+            BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
+
+        virtual ~PutInOrderDataProvider();
+
+        virtual bool canAcceptData() const override { return true; }
+        virtual void stop() override;
+        virtual void flushData(const QnAbstractDataPacketPtr& data) override;
+        virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    protected:
+        virtual void start(Priority priority = InheritPriority) override;
+    };
+
+    class SimpleReorderer: public AbstractDataReorderer
+    {
+    public:
+        using AbstractDataReorderer::AbstractDataReorderer;
+
+        virtual void flushData(const QnAbstractDataPacketPtr& data) override;
+        std::deque<QnAbstractDataPacketPtr>& queue();
+    private:
+        std::deque<QnAbstractDataPacketPtr> m_queue;
+    };
+
 
     using PutInOrderDataProviderPtr = QSharedPointer<PutInOrderDataProvider>;
 

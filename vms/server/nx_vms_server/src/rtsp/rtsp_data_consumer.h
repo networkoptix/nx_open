@@ -12,6 +12,7 @@
 
 #include <nx/analytics/metadata_logger.h>
 #include <nx/metrics/streams_metric_helper.h>
+#include <nx/vms/server/put_in_order_data_provider.h>
 
 class QnRtspConnectionProcessor;
 
@@ -94,12 +95,13 @@ protected:
     void sendRangeHeaderIfChanged();
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
-
+    void flushReorderingBuffer();
+    void sendReorderedData();
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
     bool needData(const QnAbstractDataPacketPtr& data) const;
     void switchQualityIfNeeded(bool isSecondaryProvider);
-
+    void processMediaData(const QnAbstractDataPacketPtr& nonConstData);
 private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
@@ -152,4 +154,5 @@ private:
     std::unique_ptr<nx::analytics::MetadataLogger> m_primarypPutDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;
     nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
+    std::unique_ptr<nx::vms::server::SimpleReorderer> m_reorderingProvider;
 };
