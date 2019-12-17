@@ -20,7 +20,7 @@ function(nx_force_include target)
         endif()
     endforeach()
 
-    if(CMAKE_GENERATOR MATCHES "Visual Studio" AND enablePrecompiledHeaders)
+    if(CMAKE_GENERATOR MATCHES "Visual Studio")
         target_compile_options(${target} PRIVATE ${flags})
     else()
         # target_compile_options cannot be used! Now source file property is the only right way to

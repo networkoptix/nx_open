@@ -130,11 +130,6 @@ public:
 
     Qn::MediaStreamEvent lastMediaEvent() const;
 
-    std::chrono::milliseconds forcedVideoBufferLength() const;
-    void setForcedVideoBufferLength(std::chrono::milliseconds length);
-
-    bool isForcedBufferingEnabled() const;
-
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -194,8 +189,6 @@ private:
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
-
-    bool isDataQueueFull() const;
 
     enum class QueueSizeType
     {
@@ -293,7 +286,6 @@ protected:
     bool m_fisheyeEnabled;
     int m_channelsCount;
 
-    std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSizeMkSec;
     bool m_liveMaxLenReached;

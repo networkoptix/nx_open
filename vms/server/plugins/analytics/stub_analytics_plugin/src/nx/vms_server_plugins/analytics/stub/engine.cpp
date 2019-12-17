@@ -404,28 +404,6 @@ std::string Engine::manifestString() const
                         "defaultValue": true,
                     }
                 ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "ROI",
-                "collapsed": true,
-                "items": [
-                    {
-                      "type": "PolygonFigure",
-                      "name": "testPolygon",
-                      "caption": "Polygon"
-                    },
-                    {
-                      "type": "BoxFigure",
-                      "name": "testBox",
-                      "caption": "Box"
-                    },
-                    {
-                      "type": "LineFigure",
-                      "name": "testLine",
-                      "caption": "Line"
-                    }
-                ]
             }
         ],
         "sections": [
@@ -484,18 +462,24 @@ std::string Engine::manifestString() const
                 "items": [
                     {
                         "type": "PolygonFigure",
-                        "name": "testPolygon2",
-                        "caption": "Polygon",
+                        "name": "testPolygon",
+                        "caption": "Polygon"
                     },
                     {
                         "type": "BoxFigure",
-                        "name": "testBox2",
+                        "name": "testBox",
                         "caption": "Box"
                     },
                     {
                         "type": "LineFigure",
-                        "name": "testLine2",
+                        "name": "testLine",
                         "caption": "Line"
+                    },
+                    {
+                        "type": "LineFigure",
+                        "name": "testPolyLine",
+                        "caption": "Polyline",
+                        "maxPoints": 8
                     }
                 ]
             }

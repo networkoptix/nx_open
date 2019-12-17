@@ -1,9 +1,11 @@
 #pragma once
 
+#include "abstract_workbench_panel.h"
+
+#include <memory>
+
 #include <QtCore/QScopedPointer>
 #include <QtCore/QRect>
-
-#include "abstract_workbench_panel.h"
 
 class QGraphicsProxyWidget;
 class QnControlBackgroundWidget;
@@ -19,6 +21,7 @@ namespace nx::vms::client::desktop {
 class EventPanel;
 class EventTileToolTip;
 class EventTile;
+class MultiImageProvider;
 
 class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
@@ -59,12 +62,10 @@ public:
 private:
     void enableShowButton(bool used);
     void updateControlsGeometry();
-
-private:
-    void at_showingProcessor_hoverEntered();
-
     void createEventPanel(QGraphicsWidget* parentWidget);
+    std::unique_ptr<MultiImageProvider> multiImageProvider(const QModelIndex& index) const;
 
+    void at_showingProcessor_hoverEntered();
     void at_eventTileHovered(const QModelIndex& index, EventTile* tile);
 
 private:

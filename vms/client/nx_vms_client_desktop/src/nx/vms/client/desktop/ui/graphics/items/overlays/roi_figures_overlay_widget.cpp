@@ -6,6 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 
 #include <core/resource/camera_resource.h>
@@ -157,7 +158,8 @@ public:
     void drawBox(QPainter* painter, const Box& box);
     void drawPolygon(QPainter* painter, const Polygon& polygon);
     void drawPoints(QPainter* painter, const QVector<QPointF>& points, const QColor& color);
-    void drawDirectionMark(QPainter* painter, const QLineF& line, const QColor& color);
+    void drawDirectionMark(
+        QPainter* painter, const QPointF& position, qreal angle, const QColor& color);
 
     void updateFigureKeys(const QnUuid& engineId, const QJsonObject& model);
     void updateFigures();
@@ -197,6 +199,8 @@ void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& l
     setupPainter(painter, line);
 
     const auto& points = mapPoints(line.points);
+    painter->setBrush({});
+
     QPainterPath path;
     path.moveTo(points.first());
     for (auto it = std::next(points.begin()); it != points.end(); ++it)
@@ -204,10 +208,25 @@ void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& l
     painter->drawPath(path);
     drawPoints(painter, points, line.color);
 
+    core::PathUtil pathUtil;
+    pathUtil.setPoints(points);
+
     if (line.direction == Line::Direction::a || line.direction == Line::Direction::none)
-        drawDirectionMark(painter, QLineF(points[0], points[1]), line.color);
+    {
+        drawDirectionMark(
+            painter,
+            pathUtil.midAnchorPoint(),
+            pathUtil.midAnchorPointNormalAngle(),
+            line.color);
+    }
     if (line.direction == Line::Direction::b || line.direction == Line::Direction::none)
-        drawDirectionMark(painter, QLineF(points[1], points[0]), line.color);
+    {
+        drawDirectionMark(
+            painter,
+            pathUtil.midAnchorPoint(),
+            pathUtil.midAnchorPointNormalAngle() + M_PI,
+            line.color);
+    }
 }
 
 void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box)
@@ -246,10 +265,10 @@ void RoiFiguresOverlayWidget::Private::drawPoints(
 }
 
 void RoiFiguresOverlayWidget::Private::drawDirectionMark(
-    QPainter* painter, const QLineF& line, const QColor& color)
+    QPainter* painter, const QPointF& position, qreal angle, const QColor& color)
 {
-    auto transform = QTransform::fromTranslate(-line.center().x(), -line.center().y());
-    transform *= QTransform().rotateRadians(std::atan2(line.dx(), line.dy()));
+    auto transform = QTransform::fromTranslate(-position.x(), -position.y());
+    transform *= QTransform().rotateRadians(-angle);
 
     if (!NX_ASSERT(transform.isInvertible()))
         return;

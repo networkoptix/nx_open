@@ -199,7 +199,6 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_vms_utils
             nx_vms_api
             nx_kit
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_kit.pdb
             udt
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py

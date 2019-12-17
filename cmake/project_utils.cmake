@@ -172,7 +172,14 @@ function(nx_add_target name type)
     endif()
 
     if(has_pch)
-        add_precompiled_header(${name} ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+        target_precompile_headers(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+
+        # Precompile headers are not compatible between languages, turn them off for Objective C.
+        foreach(src ${sources})
+            if(src MATCHES "^.+\\.mm?$")
+                set_source_files_properties("${src}" PROPERTIES SKIP_PRECOMPILE_HEADERS TRUE)
+            endif()
+        endforeach()
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

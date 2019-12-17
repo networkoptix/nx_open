@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import io
 import fnmatch
 import subprocess
 import shutil
@@ -17,7 +18,7 @@ def change_dep_path(binary, xfrom, relative_to):
 
 
 def remove_rpath(binary):
-    output = subprocess.check_output(["otool", "-l", binary])
+    output = subprocess.check_output(["otool", "-l", binary]).decode('utf-8')
 
     # Here we parse paths from otool output which looks like this:
     #     cmd LC_RPATH
@@ -41,6 +42,7 @@ def remove_rpath(binary):
 def binary_deps(binary):
     p = subprocess.Popen(["otool", "-L", binary], stdout=subprocess.PIPE)
     out, err = p.communicate()
+    out = out.decode('utf-8')
     for line in out.splitlines():
         if line.endswith(':') or not line.strip():
             continue
@@ -54,16 +56,16 @@ def binary_deps(binary):
 
 def set_permissions(path):
     if os.path.isdir(path):
-        os.chmod(path, 0755)
+        os.chmod(path, 0o755)
         for root, dirs, files in os.walk(path):
             for xdir in dirs:
-                os.chmod(join(root, xdir), 0755)
+                os.chmod(join(root, xdir), 0o755)
             for xfile in files:
-                os.chmod(join(root, xfile), 0644)
+                os.chmod(join(root, xfile), 0o644)
     else:
-        os.chmod(path, 0644)
+        os.chmod(path, 0o644)
 
-# Since Apple does not allow dots in the folders names in the bundle we have 
+# Since Apple does not allow dots in the folders names in the bundle we have
 # to replace them with underscore and preserve folders tree by symlinks creation
 def fix_qt_folder(root):
     current_directory = os.getcwd()
@@ -79,9 +81,9 @@ def fix_qt_folder(root):
         os.chdir(base_path)
         os.rename(source_name, target_name)
         os.symlink(target_name, source_name)
-    
+
     os.chdir(current_directory)
-        
+
 def prepare(build_dir, binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
@@ -103,9 +105,9 @@ def prepare(build_dir, binary, sbindir, tlibdir):
     shutil.copyfile(join(sbindir, '@applauncher.binary.name@'), applauncher_binary)
     shutil.copyfile(join(build_dir, 'qt.conf'), join(tbindir, 'qt.conf'))
 
-    os.chmod(binary, 0755)
-    os.chmod(applauncher_binary, 0755)
-    os.chmod(applauncher_script, 0755)
+    os.chmod(binary, 0o755)
+    os.chmod(applauncher_binary, 0o755)
+    os.chmod(applauncher_script, 0o755)
 
     yield binary
     yield applauncher_binary
@@ -149,7 +151,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
             tpath = join(tlibdir, name)
             if not os.path.exists(tpath):
                 shutil.copy(fpath, tlibdir)
-                os.chmod(tpath, 0644)
+                os.chmod(tpath, 0o644)
                 fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)
             change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
@@ -178,17 +180,19 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
 
                     # Copy framework binary
                     shutil.copy(fpath, tfolder)
-                    os.chmod(tpath, 0644)
+                    os.chmod(tpath, 0o644)
 
                     resources_dir = join(tfolder, 'Resources')
                     os.mkdir(resources_dir)
 
                     info_plist_path = join(qlibdir, framework_name, 'Resources', 'Info.plist')
-                    info_plist = open(info_plist_path).read().replace('_debug', '')
-                    plist_obj = plistlib.readPlistFromString(info_plist)
-                    plist_obj['CFBundleIdentifier'] = 'org.qt-project.{}'.format(name)
-                    plist_obj['CFBundleVersion'] = qtver
-                    plistlib.writePlist(plist_obj, join(resources_dir, 'Info.plist'))
+                    info_plist = open(info_plist_path, 'rb').read().replace(b'_debug', b'')
+
+                    plist_obj = plistlib.load(io.BytesIO(info_plist))
+                    if plist_obj:
+                        plist_obj['CFBundleIdentifier'] = 'org.qt-project.{}'.format(name)
+                        plist_obj['CFBundleVersion'] = qtver
+                        plistlib.dump(plist_obj, open(join(resources_dir, 'Info.plist'), 'wb'))
 
                     os.symlink(join('Versions/Current', name), join(troot, name))
                     os.symlink('Versions/Current/Resources', join(troot, 'Resources'))
