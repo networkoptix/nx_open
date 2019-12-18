@@ -6,6 +6,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QContextMenuEvent>
+#include <QtWidgets/QAction>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
@@ -211,6 +212,16 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+
+    static const auto kHiddenActions = {
+        QWebEnginePage::DownloadImageToDisk,
+        QWebEnginePage::DownloadLinkToDisk,
+        QWebEnginePage::DownloadMediaToDisk,
+        QWebEnginePage::SavePage
+    };
+
+    for (const auto& action: kHiddenActions)
+        webView->page()->action(action)->setVisible(false);
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
