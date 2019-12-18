@@ -3077,8 +3077,6 @@ void MediaServerProcess::initializeCloudConnect()
 
 static void setFdLimit(RootFileSystem* rootFs, int value)
 {
-    Q_UNUSED(rootFs);
-    Q_UNUSED(value);
     #if defined (Q_OS_LINUX)
         int newValue = rootFs->setFdLimit(getpid(), value);
         if (newValue == -1)
@@ -3100,6 +3098,9 @@ static void setFdLimit(RootFileSystem* rootFs, int value)
         NX_INFO(
             typeid(MediaServerProcess),
             "Successfully set file descriptor limit: %1", newValue);
+    #else
+        (void) rootFs;
+        (void) value;
     #endif // Q_OS_LINUX
 }
 
