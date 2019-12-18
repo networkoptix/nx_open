@@ -44,6 +44,8 @@ namespace nx::vms::server {
             std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
             BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
 
+        virtual ~AbstractDataReorderer() = default;
+
         void processNewData(const QnAbstractDataPacketPtr& data);
 
         std::optional<std::chrono::microseconds> flush();

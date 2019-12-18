@@ -2,10 +2,11 @@
 #if defined(ENABLE_TEST_CAMERA)
 
 #include <set>
+#include <vector>
 
 #include <QtCore/QString>
 #include <QtCore/QCoreApplication>
-#include <QHostAddress>
+#include <QtNetwork/QHostAddress>
 
 #include <core/resource_management/resource_searcher.h>
 #include <nx/network/socket.h>
@@ -68,7 +69,7 @@ private:
         const QHostAddress address;
     };
 
-    QList<DiscoverySocket> m_discoverySockets;
+    std::vector<DiscoverySocket> m_discoverySockets;
     qint64 m_socketUpdateTime = 0;
 };
 
