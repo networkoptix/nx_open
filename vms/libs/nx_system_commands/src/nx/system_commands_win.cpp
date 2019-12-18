@@ -183,4 +183,10 @@ std::string SystemCommands::serializedDmiInfo()
     return "";
 }
 
+int SystemCommands::setFdLimit(int /*pid*/, int /*value*/)
+{
+    assert(false);
+    return -1;
+}
+
 } // namespace nx

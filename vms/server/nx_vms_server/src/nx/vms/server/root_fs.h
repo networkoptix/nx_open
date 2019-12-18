@@ -40,6 +40,7 @@ public:
     qint64 fileSize(const QString& path);
     QString devicePath(const QString& fsPath);
     bool dmiInfo(QString* outPartNumber, QString *outSerialNumber);
+    int setFdLimit(int pid, int value);
 
 private:
     const bool m_ignoreTool;

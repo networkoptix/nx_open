@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include <nx/kit/debug.h>
@@ -250,6 +251,12 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
         "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
         "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
+
+    for (const auto &allowed: {"/etc/nx_ini"})
+    {
+        if (path.find(allowed) == 0)
+            return true;
+    }
 
     for (const auto& forbiddenPath: kForbiddenOwnershipPaths)
     {
@@ -614,6 +621,27 @@ std::string SystemCommands::serializedDmiInfo()
     }
 
     return result;
+}
+
+int SystemCommands::setFdLimit(int pid, int value)
+{
+    rlimit newLimit = {(rlim_t) value, (rlim_t) value};
+    rlimit oldLimit;
+
+    if (getrlimit(RLIMIT_NOFILE, &oldLimit) == -1)
+    {
+        NX_OUTPUT << "getrlimit failed. pid: " << pid << ", value: " << value;
+        return -1;
+    }
+
+    if (prlimit(pid, RLIMIT_NOFILE, &newLimit, nullptr) == -1)
+    {
+        NX_OUTPUT << "prlimit failed. pid: " << pid << " value: " << value;
+        return oldLimit.rlim_cur;
+    }
+
+    NX_OUTPUT << "prlimit succeeded. pid: " << pid << " value: " << value;
+    return newLimit.rlim_cur;
 }
 
 std::string SystemCommands::lastError() const

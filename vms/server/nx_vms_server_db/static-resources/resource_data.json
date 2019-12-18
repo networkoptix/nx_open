@@ -2530,7 +2530,7 @@
 
         },
         {
-            "keys":["neutral|DSC-TVC-0200", "entropix|DSC-TVC-0200"],
+            "keys":["*|DSC-TVC-0200"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -2538,7 +2538,10 @@
                     "1,3",
                     "2,4"
                 ]
-            }
+            },
+            "onvifManufacturerReplacement": "entropix",
+            "onvifVendorSubtype": "entropix"
+
         },
         {
             "keys":["DW|DWC-PB6M4T"],
@@ -3328,8 +3331,7 @@
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
             "cellinx|nbm2-h6",
-            "neutral|DSC-TVC-0200",
-            "entropix|DSC-TVC-0200",
+            "*|DSC-TVC-0200",
             "vivotek|ma9322*"
             ],
             "canShareLicenseGroup": true
@@ -3840,6 +3842,34 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.15, 0.23, 0.44, 0.64 , 0.76 , 1.000],
                         "logical": [1, 3.55, 5.00, 8.56, 11.90, 13.57, 16.37],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapping for firmware: 05.30.0.8-20190911",
+            "keys": [
+                "pelco|P2230L-ESR"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.00, 0.03, 0.13, 0.18, 0.27, 0.50, 0.76, 0.93, 1.00],
+                        "logical": [1.00, 1.59, 4.30, 5.70, 8.19, 11.30, 14.73, 19.49, 22.22],
                         "logicalMultiplier": 32,
                         "space": "35MmEquiv"
                     }
