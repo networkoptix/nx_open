@@ -290,6 +290,9 @@ void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::Abstra
 bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)
 {
     bool result = base_type::executeActionInternal(action);
+
+    // This is a temporary testing solution, until push notifications get their own action type.
+    // TODO: Add server selection for push action type in RuleProcessor::getDestinationServer.
     if (action->actionType() == ActionType::showPopupAction && ini().pushNotifyOnPopup)
         sendPushNotification(action);
 
