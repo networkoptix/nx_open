@@ -3075,11 +3075,39 @@ void MediaServerProcess::initializeCloudConnect()
         });
 }
 
+static void setFdLimit(RootFileSystem* rootFs, int value)
+{
+    Q_UNUSED(rootFs);
+    Q_UNUSED(value);
+    #if defined (Q_OS_LINUX)
+        int newValue = rootFs->setFdLimit(getpid(), value);
+        if (newValue == -1)
+        {
+            qWarning()
+                << "WARNING: Failed to set file descriptor limit and get previous value";
+
+            return;
+        }
+
+        if (newValue != value)
+        {
+            qWarning()
+                << "WARNING: Failed to set file descriptor limit. Current value:" << newValue;
+
+            return;
+        }
+
+        qInfo() << "INFO: Successfully set file descriptor limit:" << newValue;
+    #endif // Q_OS_LINUX
+}
+
 void MediaServerProcess::prepareOsResources()
 {
     auto rootToolPtr = serverModule()->rootFileSystem();
     if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
         qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
+
+    setFdLimit(rootToolPtr, 32000);
 
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
@@ -5001,8 +5029,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 {
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    nx::utils::rlimit::setMaxFileDescriptors(32000);
-
     #if defined(_WIN32)
         win32_exception::installGlobalUnhandledExceptionHandler();
         _tzset();
@@ -5010,6 +5036,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     #if defined(__linux__)
         signal(SIGUSR1, SIGUSR1_handler);
+
     #endif
 
     // Festival should be initialized before QnVideoService has started because of a Festival bug.

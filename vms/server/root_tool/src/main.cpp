@@ -180,6 +180,18 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, (int64_t) result);
             return result >= 0 ? Result::ok : Result::execFailed;
         })
+    .reg({"setFdLimit"}, {"pid", "value"},
+        [systemCommands](const std::string& command, int transportFd)
+        {
+            std::string pid, value;
+            if (!parseCommand(command, &pid, &value))
+                return Result::invalidArg;
+
+            int result = systemCommands->setFdLimit(std::stoi(pid), std::stoi(value));
+            sendInt64(transportFd, (int64_t) result);
+            return result >= 0 ? Result::ok : Result::execFailed;
+        })
+
     .reg({"dmiInfo"}, {},
         [systemCommands](const std::string& /*command*/, int transportFd)
         {
