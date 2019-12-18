@@ -3083,21 +3083,23 @@ static void setFdLimit(RootFileSystem* rootFs, int value)
         int newValue = rootFs->setFdLimit(getpid(), value);
         if (newValue == -1)
         {
-            qWarning()
-                << "WARNING: Failed to set file descriptor limit and get previous value";
-
+            NX_WARNING(
+                typeid(MediaServerProcess),
+                "Failed to set file descriptor limit and get previous value");
             return;
         }
 
         if (newValue != value)
         {
-            qWarning()
-                << "WARNING: Failed to set file descriptor limit. Current value:" << newValue;
-
+            NX_WARNING(
+                typeid(MediaServerProcess),
+                "Failed to set file descriptor limit. Current value: %1", newValue);
             return;
         }
 
-        qInfo() << "INFO: Successfully set file descriptor limit:" << newValue;
+        NX_INFO(
+            typeid(MediaServerProcess),
+            "Successfully set file descriptor limit: %1", newValue);
     #endif // Q_OS_LINUX
 }
 
