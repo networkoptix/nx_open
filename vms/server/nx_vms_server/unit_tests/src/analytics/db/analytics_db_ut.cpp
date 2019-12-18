@@ -144,10 +144,10 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
-    std::vector<ObjectTrack> toObjectTrack(
+    std::vector<ObjectTrackEx> toObjectTrack(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
-        std::vector<ObjectTrack> objectTracks;
+        std::vector<ObjectTrackEx> objectTracks;
 
         convertPacketsToObjectTracks(objectMetadataPackets, &objectTracks);
         groupTracks(&objectTracks);
@@ -156,13 +156,13 @@ protected:
         return objectTracks;
     }
 
-    std::vector<ObjectTrack> filterObjectTracks(
-        std::vector<ObjectTrack> tracks,
+    std::vector<ObjectTrackEx> filterObjectTracks(
+        std::vector<ObjectTrackEx> tracks,
         const Filter& filter)
     {
         for (auto trackIter = tracks.begin(); trackIter != tracks.end();)
         {
-            if (!filter.acceptsTrack(*trackIter))
+            if (!filter.acceptsTrackEx(*trackIter))
                 trackIter = tracks.erase(trackIter);
             else
                 ++trackIter;
@@ -502,12 +502,15 @@ private:
             }
         }
 
-        return objectMetadataPackets;
+        std::vector<nx::analytics::db::ObjectTrack> result;
+        for (const auto& value: objectMetadataPackets)
+            result.push_back(nx::analytics::db::ObjectTrack(value));
+        return result;
     }
 
-    std::vector<nx::analytics::db::ObjectTrack> filterObjectTracksAndApplySortOrder(
+    std::vector<nx::analytics::db::ObjectTrackEx> filterObjectTracksAndApplySortOrder(
         const Filter& filter,
-        std::vector<nx::analytics::db::ObjectTrack> objectTracks)
+        std::vector<nx::analytics::db::ObjectTrackEx> objectTracks)
     {
         // First, sorting tracks in descending order, because we always filtering the most recent
         // tracks and filter.sortOrder is applied AFTER filtering.
@@ -571,13 +574,13 @@ private:
 
     static void convertPacketsToObjectTracks(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& analyticsDataPackets,
-        std::vector<ObjectTrack>* tracks)
+        std::vector<ObjectTrackEx>* tracks)
     {
         for (const auto& packet: analyticsDataPackets)
         {
             for (const auto& objectMetadata: packet->objectMetadataList)
             {
-                ObjectTrack track;
+                ObjectTrackEx track;
                 track.id = objectMetadata.trackId;
                 track.objectTypeId = objectMetadata.typeId;
                 track.attributes = objectMetadata.attributes;
@@ -585,6 +588,14 @@ private:
                 track.firstAppearanceTimeUs = packet->timestampUs;
                 track.lastAppearanceTimeUs = packet->timestampUs;
                 track.objectPosition.add(objectMetadata.boundingBox);
+
+                track.objectPositionSequence.push_back(ObjectPosition());
+                ObjectPosition& objectPosition = track.objectPositionSequence.back();
+                objectPosition.timestampUs = packet->timestampUs;
+                objectPosition.durationUs = packet->durationUs;
+                objectPosition.deviceId = packet->deviceId;
+                objectPosition.boundingBox = objectMetadata.boundingBox;
+                objectPosition.attributes = objectMetadata.attributes;
 
                 if (objectMetadata.bestShot)
                 {
@@ -597,7 +608,7 @@ private:
         }
     }
 
-    static void groupTracks(std::vector<ObjectTrack>* tracks)
+    static void groupTracks(std::vector<ObjectTrackEx>* tracks)
     {
         std::sort(
             tracks->begin(), tracks->end(),
@@ -620,6 +631,9 @@ private:
                 it->lastAppearanceTimeUs =
                     std::max(it->lastAppearanceTimeUs, nextIter->lastAppearanceTimeUs);
                 std::move(
+                    nextIter->objectPositionSequence.begin(), nextIter->objectPositionSequence.end(),
+                    std::back_inserter(it->objectPositionSequence));
+                std::move(
                     nextIter->attributes.begin(), nextIter->attributes.end(),
                     std::back_inserter(it->attributes));
                 it->objectPosition.add(nextIter->objectPosition);
@@ -635,7 +649,7 @@ private:
         }
     }
 
-    static void removeDuplicateAttributes(std::vector<ObjectTrack>* tracks)
+    static void removeDuplicateAttributes(std::vector<ObjectTrackEx>* tracks)
     {
         for (auto& track: *tracks)
         {
