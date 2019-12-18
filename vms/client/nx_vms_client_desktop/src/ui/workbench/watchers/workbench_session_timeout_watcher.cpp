@@ -3,6 +3,7 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <client/client_runtime_settings.h>
 
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 
@@ -44,12 +45,15 @@ WorkbenchSessionTimeoutWatcher::WorkbenchSessionTimeoutWatcher(QnWorkbenchConnec
     const auto handleConnectionStateChanged =
         [this, sessionTimeoutTimer](LogicalState logicalValue, PhysicalState /*physicalValue*/)
         {
+            // Videowall must not disconnect automatically as we may have not option to restart it.
+            // ACS clients display only fixed part of the archive, so they look quite safe.
+            const bool shouldBeDisconnected = qnRuntime->isDesktopMode();
             const bool wasConnected = m_connectedAtMsecSinceEpoch > 0;
             const bool isConnected = logicalValue == LogicalState::connected;
             if (isConnected == wasConnected)
                 return;
 
-            if (isConnected)
+            if (isConnected && shouldBeDisconnected)
             {
                 m_connectedAtMsecSinceEpoch = qnSyncTime->currentMSecsSinceEpoch();
                 sessionTimeoutTimer->start();

@@ -31,38 +31,42 @@ QnTestCameraResourceSearcher::~QnTestCameraResourceSearcher()
 
 void QnTestCameraResourceSearcher::clearSocketList()
 {
-    for(const DiscoveryInfo& info: m_sockList)
-        delete info.sock;
-    m_sockList.clear();
+    for(const DiscoverySocket& info: m_discoverySockets)
+        delete info.socket;
+    m_discoverySockets.clear();
 }
 
 bool QnTestCameraResourceSearcher::updateSocketList()
 {
     const qint64 currentTime = getUsecTimer();
-    if (currentTime - m_sockUpdateTime <= SOCK_UPDATE_INTERVAL)
+    if (currentTime - m_socketUpdateTime <= SOCK_UPDATE_INTERVAL)
         return false;
 
     clearSocketList();
     for (const auto& address: nx::network::allLocalAddresses(nx::network::ipV4))
     {
-        DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(),
+        DiscoverySocket info(nx::network::SocketFactory::createDatagramSocket().release(),
             QHostAddress(address.toString()));
-        if (info.sock->bind(address.toString(), 0))
-            m_sockList << info;
+        if (info.socket->bind(address.toString(), 0))
+            m_discoverySockets << info;
         else
-            delete info.sock;
+            delete info.socket;
     }
-    m_sockUpdateTime = currentTime;
+    m_socketUpdateTime = currentTime;
     return true;
 }
 
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     ini().reload();
+
     const QByteArray testCameraFindMessage = ini().discoveryMessage + QByteArray("\n");
-    for (const DiscoveryInfo& info: m_sockList)
+
+    NX_VERBOSE(this, "Broadcasting discovery messages to %1 sockets.", m_discoverySockets.size());
+
+    for (const DiscoverySocket& info: m_discoverySockets)
     {
-        info.sock->sendTo(
+        info.socket->sendTo(
             testCameraFindMessage.constData(), testCameraFindMessage.size(),
             nx::network::BROADCAST_ADDRESS, ini().discoveryPort);
     }
@@ -70,6 +74,8 @@ void QnTestCameraResourceSearcher::sendBroadcast()
 
 QnResourceList QnTestCameraResourceSearcher::findResources()
 {
+    NX_VERBOSE(this, "Reading discovery responses from %2 sockets.", m_discoverySockets.size());
+
     if (updateSocketList())
     {
         sendBroadcast();
@@ -77,13 +83,15 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
     }
 
     QnResourceList resources;
-    QSet<nx::utils::MacAddress> processedMacAddresses;
+    std::set<nx::utils::MacAddress> processedMacAddresses;
 
-    for (const DiscoveryInfo& info: m_sockList)
+    for (const DiscoverySocket& info: m_discoverySockets)
     {
-        nx::network::AbstractDatagramSocket* const socket = info.sock;
+        nx::network::AbstractDatagramSocket* const socket = info.socket;
         while (socket->hasData())
         {
+            NX_VERBOSE(this, "Reading discovery response from %1.", socket->getForeignHostName());
+ 
             QByteArray discoveryResponseMessage;
             discoveryResponseMessage.resize(
                 nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
@@ -91,14 +99,19 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
             nx::network::SocketAddress remoteEndpoint;
             const int bytesRead = socket->recvFrom(
                 discoveryResponseMessage.data(), discoveryResponseMessage.size(), &remoteEndpoint);
+            const QString testcameraHost = remoteEndpoint.address.toString();
             if (bytesRead < 1)
+            {
+                NX_DEBUG(this, "Unable to read discovery response from testcamera %1: code %2",
+                    testcameraHost, bytesRead);
                 continue;
+            }
 
             discoveryResponseMessage.resize(bytesRead);
 
             processDiscoveryResponseMessage(
                 discoveryResponseMessage,
-                remoteEndpoint.address.toString(),
+                testcameraHost,
                 &resources,
                 &processedMacAddresses);
         }
@@ -106,14 +119,15 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
 
     sendBroadcast();
 
+    NX_VERBOSE(this, "Finished testcamera discovery: created %1 resource(s).", resources.size());
     return resources;
 }
 
 void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
     const QByteArray& discoveryResponseMessage,
-    const QString& serverAddress,
+    const QString& testcameraHost,
     QnResourceList* resources,
-    QSet<nx::utils::MacAddress>* processedMacAddresses) const
+    std::set<nx::utils::MacAddress>* processedMacAddresses) const
 {
     QString errorMessage;
     const nx::vms::testcamera::DiscoveryResponse discoveryResponse(
@@ -121,21 +135,30 @@ void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
     if (!errorMessage.isEmpty())
     {
         NX_DEBUG(this,
-            "Ignoring received testcamera discovery response message %1 from the Server %2: %3",
-            nx::kit::utils::toString(discoveryResponseMessage), serverAddress, errorMessage);
+            "Ignoring received testcamera discovery response %1 from testcamera %2: %3",
+            nx::kit::utils::toString(discoveryResponseMessage), testcameraHost, errorMessage);
         return;
     }
 
+    NX_DEBUG(this, "Received discovery response from testcamera %1 hosting %2 Cameras: %3",
+        testcameraHost,
+        discoveryResponse.cameraDiscoveryResponses().size(),
+        nx::kit::utils::toString(discoveryResponseMessage));
+
     for (const auto& cameraDiscoveryResponse: discoveryResponse.cameraDiscoveryResponses())
     {
-        if (processedMacAddresses->contains(cameraDiscoveryResponse->macAddress()))
+        if (processedMacAddresses->count(cameraDiscoveryResponse->macAddress()) > 0)
+        {
+            NX_DEBUG(this, "Ignoring Camera with already processed MAC %1.",
+                cameraDiscoveryResponse->macAddress());
             continue;
+        }
 
-        if (const auto resource = createTestCameraResource(
+        if (const auto resource = createDiscoveredTestCameraResource(
             cameraDiscoveryResponse->macAddress(),
             cameraDiscoveryResponse->videoLayoutSerialized(),
             discoveryResponse.mediaPort(),
-            serverAddress))
+            testcameraHost))
         {
             processedMacAddresses->insert(cameraDiscoveryResponse->macAddress());
             resources->push_back(resource);
@@ -143,11 +166,11 @@ void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
     }
 }
 
-QnTestCameraResourcePtr QnTestCameraResourceSearcher::createTestCameraResource(
+QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCameraResource(
     const nx::utils::MacAddress& macAddress,
     const QString& videoLayoutString,
     int mediaPort,
-    const QString& serverAddress) const
+    const QString& testcameraHost) const
 {
     const QnTestCameraResourcePtr resource(new QnTestCameraResource(serverModule()));
 
@@ -155,11 +178,15 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createTestCameraResource(
 
     const QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(manufacturer(), model);
     if (resourceTypeId.isNull())
+    {
+        NX_DEBUG(this, "Missing Resource type for manifacturer %1, model %2.",
+            nx::kit::utils::toString(manufacturer()), nx::kit::utils::toString(model));
         return {};
+    }
 
     const nx::utils::Url url = nx::network::url::Builder()
         .setScheme("tcp")
-        .setHost(serverAddress)
+        .setHost(testcameraHost)
         .setPort(mediaPort)
         .setPath(macAddress.toString());
 

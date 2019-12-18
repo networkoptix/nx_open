@@ -30,10 +30,13 @@ Item
         target: store
         onStateChanged:
         {
+            const resourceId = store.resourceId()
+
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
-            settingsView.resourceId = store.resourceId()
+            if (settingsView.resourceId !== resourceId)
+                settingsView.resourceId = resourceId
             mediaResourceHelper.resourceId = store.resourceId().toString()
             var engineId = store.currentAnalyticsEngineId()
 

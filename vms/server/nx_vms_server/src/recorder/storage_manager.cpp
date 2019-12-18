@@ -105,93 +105,68 @@ namespace empty_dirs {
 
 namespace detail {
 
-using FileInfo = QnAbstractStorageResource::FileInfo;
-using FileInfoList = QnAbstractStorageResource::FileInfoList;
-
-static std::pair<FileInfoList, FileInfoList> filesDirsFromList(const FileInfoList& fileInfoList)
+struct DirNode
 {
-    FileInfoList files;
-    FileInfoList dirs;
-    for (const auto& fileInfo : fileInfoList)
-    {
-        if (fileInfo.isDir())
-            dirs.push_back(fileInfo);
-        else
-            files.push_back(fileInfo);
-    }
-    return std::make_pair(files, dirs);
-}
-
-struct FileInfoEx
-{
-    bool visited = false;
-    FileInfoList nodes;
+    const QString url;
     const int depth = 0;
-    FileInfoEx(const FileInfoList& fileInfoList, int depth):
-        nodes(fileInfoList),
-        depth(depth)
-    {}
+    DirNode* parent = nullptr;
+    int childrenCount = 0;
+
+    DirNode(const QString& url, int depth, DirNode* parent, int childrenCount = 0):
+        url(url),
+        depth(depth),
+        parent(parent),
+        childrenCount(childrenCount)
+    {
+    }
 };
 
-static const int kMaxDepth = 10;
+std::stack <std::unique_ptr<DirNode>> buildStack(const QnStorageResourcePtr& storage)
+{
+    std::stack<std::unique_ptr<DirNode>> result;
+    std::queue<std::unique_ptr<DirNode>> queue;
+    queue.emplace(std::make_unique<DirNode>(storage->getUrl(), 0, nullptr, 1));
+    while (!queue.empty())
+    {
+        auto current = std::move(queue.front());
+        queue.pop();
+        if (current->depth > 10)
+            continue;
+
+        const auto children = storage->getFileList(current->url);
+        for (const auto& c: children)
+        {
+            if (c.isDir())
+                queue.emplace(std::make_unique<DirNode>(c.absoluteFilePath(), current->depth + 1, current.get()));
+
+            current->childrenCount++;
+        }
+
+        result.push(std::move(current));
+    }
+
+    return result;
+}
 
 } // namespace detail
 
-static void remove(const QnStorageResourcePtr &storage)
+static void remove(const QnStorageResourcePtr& storage)
 {
     using namespace detail;
-
-    std::stack<FileInfoEx> fileInfoStack;
-    fileInfoStack.push(FileInfoEx({FileInfo(storage->getUrl(), /*size*/0, /*isDir*/true)}, 1));
-
-    while (!fileInfoStack.empty())
+    auto stack = buildStack(storage);
+    while (!stack.empty())
     {
-        auto& currentFileInfo = fileInfoStack.top();
-        if (currentFileInfo.depth > kMaxDepth)
+        const auto node = std::move(stack.top());
+        stack.pop();
+        if (node->childrenCount == 0)
         {
-            NX_WARNING(
-                typeid(QnStorageManager),
-                "Unexpectd file system tree depth detected while removing empty directories. " \
-                "Bailing out");
-            return;
-        }
+            NX_DEBUG(
+                typeid(QnStorageManager), "Removing empty directory %1",
+                nx::utils::url::hidePassword(node->url));
 
-        if (currentFileInfo.visited)
-        {
-            for (const auto& node: currentFileInfo.nodes)
-            {
-                const auto dirContents = storage->getFileList(node.absoluteFilePath());
-                if (dirContents.isEmpty())
-                    storage->removeDir(node.absoluteFilePath());
-            }
-
-            fileInfoStack.pop();
-            continue;
-        }
-
-        currentFileInfo.visited = true;
-        for (auto it = currentFileInfo.nodes.begin(); it != currentFileInfo.nodes.end(); )
-        {
-            const auto dirContents = storage->getFileList(it->absoluteFilePath());
-            const auto [files, dirs] = filesDirsFromList(dirContents);
-
-            if (dirContents.isEmpty())
-            {
-                storage->removeDir(it->absoluteFilePath());
-                it = currentFileInfo.nodes.erase(it);
-                continue;
-            }
-
-            if (!dirs.isEmpty())
-                fileInfoStack.push(FileInfoEx(dirs, currentFileInfo.depth + 1));
-
-            if (!files.isEmpty())
-            {
-                it = currentFileInfo.nodes.erase(it);
-                continue;
-            }
-
-            ++it;
+            storage->removeDir(node->url);
+            if (node->parent)
+                node->parent->childrenCount--;
         }
     }
 }
@@ -1001,7 +976,7 @@ void QnStorageManager::scanMediaCatalog(
         closeDirPath(closeDirPath(storage->getUrl())
         + DeviceFileCatalog::prefixByCatalog(quality));
 
-    const auto cameraPath = QDir(qualityPath).absoluteFilePath(cameraUuid);
+    const auto cameraPath = closeDirPath(qualityPath) + cameraUuid;
     if (!storage->isDirExists(cameraPath))
     {
         DeviceFileCatalogPtr newCatalog(

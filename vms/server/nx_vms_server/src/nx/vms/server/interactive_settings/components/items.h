@@ -277,8 +277,39 @@ public:
 
 class TextField: public ValueItem
 {
+    Q_OBJECT
+    Q_PROPERTY(QString validationRegex READ validationRegex WRITE setValidationRegex
+        NOTIFY validationRegexChanged)
+
+    using base_type = ValueItem;
+
 public:
     TextField(QObject* parent = nullptr);
+
+    /**
+     * Regular expression pattern to check the value.
+     * Check failure does not avoid server from saving wrong values. This regex is just for UI to
+     * notify a user about wrong input.
+     */
+    QString validationRegex() const;
+    void setValidationRegex(const QString& regex);
+
+    /**
+     * Javascript RegExp flags.
+     * See RegExp documentation for details.
+     */
+    QString validationRegexFlags() const;
+    void setValidationRegexFlags(const QString& flags);
+
+    virtual QJsonObject serialize() const override;
+
+signals:
+    void validationRegexChanged();
+    void validationRegexFlagsChanged();
+
+private:
+    QString m_validationRegex;
+    QString m_validationRegexFlags;
 };
 
 class TextArea: public ValueItem

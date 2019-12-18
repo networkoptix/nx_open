@@ -132,16 +132,6 @@ bool BestShot::operator==(const BestShot& right) const
         && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
 }
 
-bool ObjectTrack::operator==(const ObjectTrack& right) const
-{
-    return id == right.id
-        && objectTypeId == right.objectTypeId
-        //&& attributes == right.attributes
-        && firstAppearanceTimeUs == right.firstAppearanceTimeUs
-        && lastAppearanceTimeUs == right.lastAppearanceTimeUs
-        && objectPosition == right.objectPosition
-        && bestShot == right.bestShot;
-}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (BestShot)(ObjectTrack)(ObjectTrackEx)(ObjectRegion)(ObjectPosition),

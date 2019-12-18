@@ -423,10 +423,10 @@ std::string Engine::manifestString() const
                         "items": [
                             {
                                 "type": "TextField",
-                                "name": "testTextField2",
-                                "caption": "Device Agent Text Field",
-                                "description": "A text field",
-                                "defaultValue": "a text"
+                                "name": "testTextFieldWithValidation",
+                                "caption": "Hexadecimal number text field",
+                                "validationRegex": "^[a-f0-9]+$",
+                                "validationRegexFlags": "i"
                             },
                             {
                                 "type": "SpinBox",

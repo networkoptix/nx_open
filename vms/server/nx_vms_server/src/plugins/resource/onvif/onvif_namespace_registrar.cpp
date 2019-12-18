@@ -51,6 +51,14 @@ static const std::map<RequestTypeId, std::vector<Namespace>> kOverridenNamespace
             {"onvifEvents", "http://www.onvif.org/ver10/events/wsdl", nullptr, nullptr},
             { nullptr, nullptr, nullptr, nullptr }
         }
+    },
+    {
+        typeId<_onvifEvents__CreatePullPointSubscription>(),
+        {
+            COMMON_NAMESPACES,
+            {"onvifEvents", "http://www.onvif.org/ver10/events/wsdl", nullptr, nullptr},
+            { nullptr, nullptr, nullptr, nullptr }
+        }
     }
 };
 

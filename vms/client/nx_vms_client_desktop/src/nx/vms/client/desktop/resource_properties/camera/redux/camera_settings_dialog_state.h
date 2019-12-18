@@ -359,6 +359,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     {
         return isSingleCamera()
             && !singleCameraProperties.networkLink
+            && devicesDescription.isWearable == CombinedValue::None
             && (ini().showWebPageForAllCameras ||
                 !singleCameraProperties.settingsUrlPath.isEmpty());
     }

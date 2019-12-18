@@ -37,7 +37,8 @@ private:
 
 inline uint qHash(const MacAddress& value, uint seed = 0)
 {
-     return qHashRange(value.bytes().cbegin(), value.bytes().cend(), seed);
+    const MacAddress::Data& bytes = value.bytes();
+    return qHashRange(bytes.cbegin(), bytes.cend(), seed);
 }
 
 } // namespace nx::utils

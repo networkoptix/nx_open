@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "objectMetadataXmlParser.h"
+#include "settings_model.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -599,6 +600,15 @@ void DeviceAgent::readCameraSettings()
 
     sunapiReply = loadEventSettings("audioanalysis");
     readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
+}
+
+void DeviceAgent::addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest)
+{
+    QString model = deviceAgentSettingsModel();
+
+    QJsonDocument doc = QJsonDocument::fromJson(model.toUtf8());
+    if (doc.isObject())
+        destinastionManifest->deviceAgentSettingsModel = doc.object();
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha
