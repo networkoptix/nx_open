@@ -12,6 +12,8 @@
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
+#include <licensing/license_validator.h>
+
 using namespace nx::vms::server;
 using namespace std::chrono;
 
@@ -95,7 +97,20 @@ void VideoWallLicenseWatcher::at_checkLicenses()
         const qint64 licenseOverflowTime =
             runtimeInfoManager()->localInfo().data.prematureVideoWallLicenseExpirationDate;
         if (licenseOverflowTime)
-            syncLicenseOverflowTime(0);
+        {
+            QnLicenseValidator validator(serverModule()->commonModule());
+            const auto allLicenses = serverModule()->commonModule()->licensePool()->getLicenses();
+            const bool allVideoWallsAreValid = std::all_of(allLicenses.begin(), allLicenses.end(),
+                [&validator](const QnLicensePtr& license)
+                {
+                    if (license->type() != Qn::LC_VideoWall)
+                        return true;
+                    return validator.validate(license) == QnLicenseErrorCode::NoError;
+                });
+
+            if (allVideoWallsAreValid)
+                syncLicenseOverflowTime(0);
+        }
 
         m_tooManyVideoWallsCounter = 0;
     }
