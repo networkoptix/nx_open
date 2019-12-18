@@ -46,7 +46,6 @@ public:
     int cameraCount() const { return (int) m_cameraByMacAddress.size(); }
 
     bool addCameraSet(
-        const FileCache* fileCache,
         bool cameraForEachFile,
         const CameraOptions& cameraOptions,
         int count,

@@ -110,7 +110,6 @@ bool CameraPool::addCamera(
 }
 
 bool CameraPool::addCameraSet(
-    const FileCache* fileCache,
     bool cameraForEachFile,
     const CameraOptions& cameraOptions,
     int count,
