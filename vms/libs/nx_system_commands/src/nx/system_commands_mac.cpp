@@ -107,7 +107,7 @@ std::string SystemCommands::serializedDmiInfo()
     return "";
 }
 
-int SystemCommands::setFdLimit(int pid, int value)
+int SystemCommands::setFdLimit(int /*pid*/, int /*value*/)
 {
     return -1;
 }
