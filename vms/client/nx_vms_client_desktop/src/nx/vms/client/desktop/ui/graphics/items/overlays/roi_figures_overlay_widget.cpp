@@ -82,11 +82,15 @@ QHash<QString, FigureType> findFigureKeys(const QJsonObject& model)
 
 void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
 {
-    item.color = object.value(QStringLiteral("color")).toString();
+    const QJsonObject& figure = object.value(QStringLiteral("figure")).toObject();
+    if (figure.isEmpty())
+        return;
+
     item.visible = object.value(QStringLiteral("showOnCamera")).toBool(true);
+    item.color = figure.value(QStringLiteral("color")).toString();
 
     item.points.clear();
-    for (const auto p: object.value(QStringLiteral("points")).toArray())
+    for (const auto p: figure.value(QStringLiteral("points")).toArray())
     {
         if (!p.isArray())
             continue;
@@ -103,10 +107,14 @@ RoiFiguresOverlayWidget::Line parseLine(const QJsonObject& object)
 {
     using Line = RoiFiguresOverlayWidget::Line;
 
+    const QJsonObject& figure = object.value(QStringLiteral("figure")).toObject();
+    if (figure.isEmpty())
+        return {};
+
     Line line;
     parseItem(line, object);
 
-    const auto& direction = object.value(QStringLiteral("direction")).toString();
+    const auto& direction = figure.value(QStringLiteral("direction")).toString();
     if (direction == QStringLiteral("a"))
         line.direction = Line::Direction::a;
     else if (direction == QStringLiteral("b"))
