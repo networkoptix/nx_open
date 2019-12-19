@@ -19,8 +19,6 @@ public:
     virtual bool processData(const QnByteArrayConstRef& data) override;
     virtual size_t flush() override;
 
-    void setDeflateDecoding();
-
 private:
     class Private;
     std::unique_ptr<Private> d;

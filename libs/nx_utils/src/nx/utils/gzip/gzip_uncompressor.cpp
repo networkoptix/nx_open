@@ -21,7 +21,6 @@ public:
     State state = State::init;
     z_stream zStream;
     QByteArray outputBuffer;
-    bool deflateDecoding = false;
 };
 
 Uncompressor::Uncompressor(const std::shared_ptr<AbstractByteStreamFilter>& nextFilter):
@@ -42,6 +41,7 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
     if (data.isEmpty())
         return true;
 
+    bool isFirstInflateAttempt = true;
     int zFlushMode = Z_NO_FLUSH;
 
     d->zStream.next_in = (Bytef*) data.constData();
@@ -56,11 +56,9 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
         {
             case Private::State::init:
             case Private::State::done: //< To support stream of gzipped files.
-                // Possible compressions are gzip, zlib or deflate, manipulated by windowBits
-                // parameter, see http://www.zlib.net/manual.html#Advanced. Http uses gzip or
-                // deflate.
-                zResult =
-                    inflateInit2(&d->zStream, d->deflateDecoding ? -MAX_WBITS : 16 + MAX_WBITS);
+                // 32 is added for automatic zlib header detection, see
+                // http://www.zlib.net/manual.html#Advanced.
+                zResult = inflateInit2(&d->zStream, 32 + MAX_WBITS);
                 if (zResult != Z_OK)
                 {
                     NX_ASSERT(false);
@@ -165,6 +163,23 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                         d->state = Private::State::failed;
                         break;
 
+                    case Z_DATA_ERROR:
+                        // Some servers seem to not generate zlib headers, try to decompress
+                        // headless. This code is similar to the code in the curl utility.
+                        if (isFirstInflateAttempt)
+                        {
+                            isFirstInflateAttempt = false;
+                            inflateEnd(&d->zStream);
+                            // Using negative windowBits parameter turns off looking for
+                            // header, see http://www.zlib.net/manual.html#Advanced
+                            zResult = inflateInit2(&d->zStream, -MAX_WBITS);
+                            if (zResult == Z_OK)
+                            {
+                                d->zStream.next_in = (Bytef*) data.constData();
+                                d->zStream.avail_in = (uInt) data.size();
+                                continue;
+                            }
+                        }
                     default:
                         d->state = Private::State::failed;
                         break;
@@ -201,11 +216,6 @@ size_t Uncompressor::flush()
         return (uInt) d->outputBuffer.size() - d->zStream.avail_out;
     }
     return 0;
-}
-
-void Uncompressor::setDeflateDecoding()
-{
-    d->deflateDecoding = true;
 }
 
 } // namespace nx::utils::bstream::gzip
