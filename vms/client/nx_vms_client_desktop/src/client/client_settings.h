@@ -122,8 +122,6 @@ public:
         /** Allow blur on video items. */
         GL_BLUR,
 
-        GL_MULTISAMPLING_SAMPLES,
-
         TIMESTAMP_CORNER,
 
         USER_IDLE_TIMEOUT_MSECS,
@@ -244,7 +242,6 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        showInfoByDefault,      setShowInfoByDefault,       SHOW_INFO_BY_DEFAULT,       false);
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
-        QN_DECLARE_RW_PROPERTY(int,                         glMultisamplingSamples, setGlMultisamplingSamples,  GL_MULTISAMPLING_SAMPLES,   8)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportMediaSettings,    setExportMediaSettings,     EXPORT_MEDIA_SETTINGS,      ExportMediaSettings())
         QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())

@@ -67,14 +67,6 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->disableBlurCheckbox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    ui->antiAliasingComboBox->addItem(tr("Disabled"), 0);
-    ui->antiAliasingComboBox->addItem("2x", 2);
-    ui->antiAliasingComboBox->addItem("4x", 4);
-    ui->antiAliasingComboBox->addItem("8x", 8);
-    ui->antiAliasingComboBox->addItem("16x", 16);
-    connect(ui->antiAliasingComboBox, &QComboBox::currentTextChanged, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-
     /* Live buffer lengths slider/spin logic: */
     connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
         [this](int value)
@@ -101,7 +93,6 @@ void QnAdvancedSettingsWidget::applyChanges()
     qnSettings->setGLDoubleBuffer(isDoubleBufferingEnabled());
     qnSettings->setMaximumLiveBufferMs(maximumLiveBufferMs());
     qnSettings->setGlBlurEnabled(isBlurEnabled());
-    qnSettings->setGlMultisamplingSamples(antialiasingLevel());
 }
 
 void QnAdvancedSettingsWidget::loadDataToUi()
@@ -110,7 +101,6 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setDoubleBufferingEnabled(qnSettings->isGlDoubleBuffer());
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMs());
     setBlurEnabled(qnSettings->isGlBlurEnabled());
-    setAntialiasingLevel(qnSettings->glMultisamplingSamples());
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
@@ -118,15 +108,13 @@ bool QnAdvancedSettingsWidget::hasChanges() const
     return qnSettings->isAudioDownmixed() != isAudioDownmixed()
         || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
         || qnSettings->maximumLiveBufferMs() != maximumLiveBufferMs()
-        || qnSettings->isGlBlurEnabled() != isBlurEnabled()
-        || qnSettings->glMultisamplingSamples() != antialiasingLevel();
+        || qnSettings->isGlBlurEnabled() != isBlurEnabled();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const
 {
-    // These changes can be applied only after client restart.
-    return qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled()
-        || qnRuntime->glMultisamplingSamples() != antialiasingLevel();
+    /* These changes can be applied only after client restart. */
+    return qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled();
 }
 
 // -------------------------------------------------------------------------- //
@@ -196,17 +184,6 @@ bool QnAdvancedSettingsWidget::isBlurEnabled() const
 void QnAdvancedSettingsWidget::setBlurEnabled(bool value)
 {
     ui->disableBlurCheckbox->setChecked(!value);
-}
-
-int QnAdvancedSettingsWidget::antialiasingLevel() const
-{
-    return ui->antiAliasingComboBox->currentData().toInt();
-}
-
-void QnAdvancedSettingsWidget::setAntialiasingLevel(int level)
-{
-    const int index = ui->antiAliasingComboBox->findData(level);
-    ui->antiAliasingComboBox->setCurrentIndex(index >= 0 ? index : 0);
 }
 
 int QnAdvancedSettingsWidget::maximumLiveBufferMs() const
