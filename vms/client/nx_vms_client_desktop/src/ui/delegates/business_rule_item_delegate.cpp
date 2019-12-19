@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/event_rules/event_action_subtype.h>
 #include <nx/vms/client/desktop/event_rules/nvr_events_actions_access.h>
 
+#include <ui/delegates/select_servers_delegate_editor_button.h>
 #include <ui/delegates/select_cameras_delegate_editor_button.h>
 #include <ui/delegates/select_users_delegate_editor_button.h>
 
@@ -278,22 +279,41 @@ bool QnBusinessRuleItemDelegate::eventFilter(QObject* object, QEvent* event)
 QWidget* QnBusinessRuleItemDelegate::createSourceEditor(QWidget* parent,
     const QModelIndex& index) const
 {
-    QnSelectCamerasDialogButton* button = new QnSelectCamerasDialogButton(parent);
-    // TODO: #GDM #Business server selection dialog?
-    connect(button, &QnSelectCamerasDialogButton::commit,
-        this, &QnBusinessRuleItemDelegate::emitCommitData);
+    const auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
 
-    vms::api::EventType eventType =
-        index.data(Qn::EventTypeRole).value<vms::api::EventType>();
+    if (nx::vms::event::requiresCameraResource(eventType))
+    {
+        auto button = new QnSelectCamerasDialogButton(parent);
 
-    if (eventType == EventType::cameraMotionEvent)
-        button->setResourcePolicy<QnCameraMotionPolicy>();
-    else if (eventType == EventType::cameraInputEvent)
-        button->setResourcePolicy<QnCameraInputPolicy>();
-    else if (eventType == EventType::analyticsSdkEvent)
-        button->setResourcePolicy<QnCameraAnalyticsPolicy>();
+        connect(button, &QnSelectCamerasDialogButton::commit,
+            this, &QnBusinessRuleItemDelegate::emitCommitData);
 
-    return button;
+        if (eventType == EventType::cameraMotionEvent)
+            button->setResourcePolicy<QnCameraMotionPolicy>();
+        else if (eventType == EventType::cameraInputEvent)
+            button->setResourcePolicy<QnCameraInputPolicy>();
+        else if (eventType == EventType::analyticsSdkEvent)
+            button->setResourcePolicy<QnCameraAnalyticsPolicy>();
+
+        return button;
+    }
+
+    if (nx::vms::event::requiresServerResource(eventType))
+    {
+        auto button = new SelectServersDialogButton(parent);
+
+        connect(button, &SelectServersDialogButton::commit,
+            this, &QnBusinessRuleItemDelegate::emitCommitData);
+
+        if (eventType == EventType::poeOverBudgetEvent)
+            button->setResourcePolicy<QnPoeOverBudgetPolicy>();
+        else if (eventType == EventType::fanErrorEvent)
+            button->setResourcePolicy<QnFanErrorPolicy>();
+
+        return button;
+    }
+
+    return nullptr;
 }
 
 QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
@@ -371,6 +391,12 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         auto camerasButton = new QnSelectCamerasDialogButton(parent);
         camerasButton->setResourcePolicy<QnFullscreenCameraPolicy>();
         editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::buzzerAction)
+    {
+        auto serversButton = new SelectServersDialogButton(parent);
+        serversButton->setResourcePolicy<QnBuzzerPolicy>();
+        editorButton = serversButton;
     }
 
     if (editorButton)
