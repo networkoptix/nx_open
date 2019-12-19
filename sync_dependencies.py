@@ -23,13 +23,8 @@ def determine_package_versions(
     box,
     release_version,
     customization="default",
-    customization_package="",
     debug=False
 ):
-    customization_pack_version = customization
-    if customization_package:
-        customization_pack_version += '_' + customization_package
-
     v = {
         "gcc": "8.1",
         "sdk-gcc": "5.4.0",
@@ -54,7 +49,7 @@ def determine_package_versions(
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
-        "customization_pack": customization_pack_version,
+        "customization_pack": f"{customization}_v2",
     }
 
     # Desktop Linux.
@@ -312,11 +307,6 @@ def main():
         help="Don't sync package if a local copy is found")
     parser.add_argument("--release-version", required=True, help="VMS release version")
     parser.add_argument("--customization", default="default", help="VMS customization")
-    parser.add_argument(
-        "--customization_package",
-        choices=['', 'v2', 'v2_draft'],
-        default='',
-        help="Customization package version")
     parser.add_argument("-o", "--overrides", nargs="*", default=[],
         help="Package version or location overrides (e.g. -o ffmpeg=4.0)")
     parser.add_argument("-O", "--options", nargs="*", default=[], help="Additional options")
@@ -336,7 +326,6 @@ def main():
         box,
         args.release_version,
         customization=args.customization,
-        customization_package=args.customization_package,
         debug=args.debug
     )
     syncher.versions.update(version_overrides)
