@@ -352,6 +352,9 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
     GraphicsWidget(parent),
     d(new Private(this))
 {
+    setAcceptedMouseButtons(Qt::NoButton);
+    setFocusPolicy(Qt::NoFocus);
+
     if (const auto camera = resourceWidget->resource().dynamicCast<QnVirtualCameraResource>())
     {
         d->settingsListener = new AnalyticsSettingsMultiListener(camera, this);
