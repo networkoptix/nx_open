@@ -2,6 +2,7 @@
 
 #include "vehicles.h"
 
+#include <string>
 #include <map>
 
 namespace nx {
@@ -51,14 +52,22 @@ static std::pair<const char*, const char*> randomVehicle(const VehicleMap& map)
     return std::make_pair(it->first, it->second[rand() % it->second.size()]);
 }
 
-static Attributes makeAttributes(const VehicleMap& map)
+/** @param makeDistanceAttribute Make an attribute that will change its value for every frame. */
+static Attributes makeAttributes(
+    const VehicleMap& map, bool makeDistanceAttribute = false)
 {
     const auto vehicle = randomVehicle(map);
-    return {
+    Attributes attributes = {
         makePtr<Attribute>(IAttribute::Type::string, "Brand", vehicle.first),
         makePtr<Attribute>(IAttribute::Type::string, "Model", vehicle.second),
         makePtr<Attribute>(IAttribute::Type::string, "Color", randomColor()),
     };
+    if (makeDistanceAttribute)
+    {
+        attributes.push_back(makePtr<Attribute>(
+            IAttribute::Type::number, "Distance", "UNDEFINED"));
+    }
+    return attributes;
 }
 
 } // namespace
@@ -68,14 +77,28 @@ Vehicle::Vehicle(const std::string& typeId, Attributes attributes):
 {
 }
 
+void Vehicle::updateDistanceAttributeIfItExists()
+{
+    for (const auto& attribute: m_attributes)
+    {
+        if (attribute->name() == std::string("Distance"))
+        {
+            attribute->setValue(std::to_string(m_position.magnitude()));
+            break;
+        }
+    }
+}
+
 void Vehicle::update()
 {
     m_position += m_trajectory * m_speed;
+    updateDistanceAttributeIfItExists();
 }
 
 Car::Car():
-    Vehicle(kCarObjectType, makeAttributes(kCars))
+    Vehicle(kCarObjectType, makeAttributes(kCars, /*makeDistanceAttribute*/ true))
 {
+    updateDistanceAttributeIfItExists();
 }
 
 Truck::Truck():

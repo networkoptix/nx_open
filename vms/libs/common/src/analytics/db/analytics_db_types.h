@@ -27,8 +27,6 @@ struct ObjectPosition
     QRectF boundingBox;
     /** Variable object attributes. E.g., car speed. */
     nx::common::metadata::Attributes attributes;
-
-    bool operator==(const ObjectPosition& right) const;
 };
 
 #define ObjectPosition_analytics_storage_Fields \
@@ -80,8 +78,6 @@ struct ObjectTrack
     qint64 lastAppearanceTimeUs = 0;
     ObjectRegion objectPosition;
     BestShot bestShot;
-
-    bool operator==(const ObjectTrack& right) const;
 };
 
 struct ObjectTrackEx: public ObjectTrack
@@ -152,6 +148,7 @@ struct Filter
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
     bool acceptsTrack(const ObjectTrack& track) const;
+    bool acceptsTrackEx(const ObjectTrackEx& track) const;
 
     /**
      * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
@@ -167,6 +164,9 @@ struct Filter
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
+private:
+    template <typename ObjectTrackType>
+    bool acceptsTrackInternal(const ObjectTrackType& track) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);

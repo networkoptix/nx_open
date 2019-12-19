@@ -7,7 +7,7 @@ function(nx_vcs_changeset dir var)
 
     if(EXISTS ${dir}/.hg/)
         _hg_changeset(${dir} ${var})
-    elseif(EXISTS ${dir}/.git/)
+    elseif(EXISTS ${dir}/.git)
         _git_changeset(${dir} ${var})
     else()
         set(_reason "VCS not detected")
@@ -37,10 +37,10 @@ endfunction()
 function(nx_vcs_branch dir var)
     if(EXISTS ${dir}/.hg/)
         _hg_branch(${dir} ${var})
-    elseif(EXISTS ${dir}/.git/)
+    elseif(EXISTS ${dir}/.git)
         _git_branch(${dir} ${var})
     else()
-        message(WARNING "Can't get current branch: not found any VCS")
+        message(WARNING "Can't get current branch: not found any VCS: ${dir}")
     endif()
     set(${var} ${${var}} PARENT_SCOPE)
 endfunction()
@@ -65,7 +65,7 @@ endfunction()
 
 function(_git_changeset dir var)
     execute_process(
-        COMMAND git -C "${dir}" rev-parse HEAD
+        COMMAND git -C "${dir}" rev-parse --short=12 HEAD
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

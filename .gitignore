@@ -6,6 +6,7 @@
 *~*.TMP
 *.kdev4
 .DS_Store
+._.DS_Store
 *.swp
 *.orig
 CMakeLists.txt.user

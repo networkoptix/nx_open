@@ -17,6 +17,7 @@
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "attribute_dictionary.h"
+#include "utils.h"
 
 namespace nx::analytics::db::test {
 
@@ -143,10 +144,10 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
-    std::vector<ObjectTrack> toObjectMetadataPackets(
+    std::vector<ObjectTrackEx> toObjectTrack(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
-        std::vector<ObjectTrack> objectTracks;
+        std::vector<ObjectTrackEx> objectTracks;
 
         convertPacketsToObjectTracks(objectMetadataPackets, &objectTracks);
         groupTracks(&objectTracks);
@@ -155,13 +156,13 @@ protected:
         return objectTracks;
     }
 
-    std::vector<ObjectTrack> filterObjectTracks(
-        std::vector<ObjectTrack> tracks,
+    std::vector<ObjectTrackEx> filterObjectTracks(
+        std::vector<ObjectTrackEx> tracks,
         const Filter& filter)
     {
         for (auto trackIter = tracks.begin(); trackIter != tracks.end();)
         {
-            if (!filter.acceptsTrack(*trackIter))
+            if (!filter.acceptsTrackEx(*trackIter))
                 trackIter = tracks.erase(trackIter);
             else
                 ++trackIter;
@@ -487,8 +488,9 @@ private:
                 return QRectF();
             };
 
-        auto objectMetadataPackets = toObjectMetadataPackets(packets);
-        objectMetadataPackets = filterObjectTracksAndApplySortOrder(filter, std::move(objectMetadataPackets));
+        auto objectMetadataPackets = toObjectTrack(packets);
+        objectMetadataPackets = filterObjectTracksAndApplySortOrder(
+            filter, std::move(objectMetadataPackets));
         for (auto& packet : objectMetadataPackets)
         {
             packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
@@ -500,12 +502,15 @@ private:
             }
         }
 
-        return objectMetadataPackets;
+        std::vector<nx::analytics::db::ObjectTrack> result;
+        for (const auto& value: objectMetadataPackets)
+            result.push_back(nx::analytics::db::ObjectTrack(value));
+        return result;
     }
 
-    std::vector<nx::analytics::db::ObjectTrack> filterObjectTracksAndApplySortOrder(
+    std::vector<nx::analytics::db::ObjectTrackEx> filterObjectTracksAndApplySortOrder(
         const Filter& filter,
-        std::vector<nx::analytics::db::ObjectTrack> objectTracks)
+        std::vector<nx::analytics::db::ObjectTrackEx> objectTracks)
     {
         // First, sorting tracks in descending order, because we always filtering the most recent
         // tracks and filter.sortOrder is applied AFTER filtering.
@@ -569,13 +574,13 @@ private:
 
     static void convertPacketsToObjectTracks(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& analyticsDataPackets,
-        std::vector<ObjectTrack>* tracks)
+        std::vector<ObjectTrackEx>* tracks)
     {
         for (const auto& packet: analyticsDataPackets)
         {
             for (const auto& objectMetadata: packet->objectMetadataList)
             {
-                ObjectTrack track;
+                ObjectTrackEx track;
                 track.id = objectMetadata.trackId;
                 track.objectTypeId = objectMetadata.typeId;
                 track.attributes = objectMetadata.attributes;
@@ -583,6 +588,14 @@ private:
                 track.firstAppearanceTimeUs = packet->timestampUs;
                 track.lastAppearanceTimeUs = packet->timestampUs;
                 track.objectPosition.add(objectMetadata.boundingBox);
+
+                track.objectPositionSequence.push_back(ObjectPosition());
+                ObjectPosition& objectPosition = track.objectPositionSequence.back();
+                objectPosition.timestampUs = packet->timestampUs;
+                objectPosition.durationUs = packet->durationUs;
+                objectPosition.deviceId = packet->deviceId;
+                objectPosition.boundingBox = objectMetadata.boundingBox;
+                objectPosition.attributes = objectMetadata.attributes;
 
                 if (objectMetadata.bestShot)
                 {
@@ -595,7 +608,7 @@ private:
         }
     }
 
-    static void groupTracks(std::vector<ObjectTrack>* tracks)
+    static void groupTracks(std::vector<ObjectTrackEx>* tracks)
     {
         std::sort(
             tracks->begin(), tracks->end(),
@@ -618,6 +631,9 @@ private:
                 it->lastAppearanceTimeUs =
                     std::max(it->lastAppearanceTimeUs, nextIter->lastAppearanceTimeUs);
                 std::move(
+                    nextIter->objectPositionSequence.begin(), nextIter->objectPositionSequence.end(),
+                    std::back_inserter(it->objectPositionSequence));
+                std::move(
                     nextIter->attributes.begin(), nextIter->attributes.end(),
                     std::back_inserter(it->attributes));
                 it->objectPosition.add(nextIter->objectPosition);
@@ -633,7 +649,7 @@ private:
         }
     }
 
-    static void removeDuplicateAttributes(std::vector<ObjectTrack>* tracks)
+    static void removeDuplicateAttributes(std::vector<ObjectTrackEx>* tracks)
     {
         for (auto& track: *tracks)
         {
@@ -817,7 +833,7 @@ protected:
     void addMaxObjectTracksLimitToFilter()
     {
         const auto filteredObjectCount = (int) filterObjectTracks(
-            toObjectMetadataPackets(analyticsDataPackets()), m_filter).size();
+            toObjectTrack(analyticsDataPackets()), m_filter).size();
 
         if (filteredObjectCount > 0)
         {
@@ -842,6 +858,11 @@ protected:
         }
 
         m_filter.freeText = text.mid(0, text.size() / 2);
+    }
+
+    void addTextToFilter(const QString& text)
+    {
+        m_filter.freeText = text;
     }
 
     void addRandomUnknownText()
@@ -943,39 +964,26 @@ protected:
 
     void givenObjectWithLongTrack()
     {
-        using namespace std::chrono;
+        saveAnalyticsDataPackets(generateObjectWithLongTrackPackets());
+    }
 
-        const auto startTime = system_clock::from_time_t(
-            analyticsDataPackets().back()->timestampUs / 1000000) + hours(1);
-        setAllowedTimeRange(startTime, startTime + hours(24));
+    std::vector<QString> givenObjectWithAttributeChangingInTime()
+    {
+        auto packets = generateObjectWithLongTrackPackets();
 
-        m_specificObjectTrackId = QnUuid::createUuid();
-        const auto deviceId = QnUuid::createUuid();
-        auto analyticsDataPackets = generateEventsByCriteria();
+        const QString attrName = "changeling";
+        std::vector<QString> attrValues;
 
-        qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
-        qint64 objectTrackEndTime = std::numeric_limits<qint64>::min();
-
-        for (auto& packet: analyticsDataPackets)
+        for (std::size_t i = 0; i < packets.size(); ++i)
         {
-            objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUs);
-            objectTrackEndTime =
-                std::max(objectTrackEndTime, packet->timestampUs + packet->durationUs);
-            packet->deviceId = deviceId;
-
-            for (auto& objectMetadata: packet->objectMetadataList)
-            {
-                objectMetadata.trackId = m_specificObjectTrackId;
-                objectMetadata.typeId = m_specificObjectTrackId.toString();
-            }
+            attrValues.push_back(lm("pos_%1").args(i));
+            packets[i]->objectMetadataList.front().attributes.emplace_back(
+                attrName, attrValues.back());
         }
 
-        m_specificObjectTrackTimePeriod.setStartTime(
-            duration_cast<milliseconds>(microseconds(objectTrackStartTime)));
-        m_specificObjectTrackTimePeriod.setDuration(
-            duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
+        saveAnalyticsDataPackets(packets);
 
-        saveAnalyticsDataPackets(analyticsDataPackets);
+        return attrValues;
     }
 
     void setSortOrder(Qt::SortOrder sortOrder)
@@ -1097,6 +1105,43 @@ private:
 
         saveAnalyticsDataPackets(generateEventsByCriteria());
     }
+
+    std::vector<common::metadata::ObjectMetadataPacketPtr> generateObjectWithLongTrackPackets()
+    {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUs / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
+        m_specificObjectTrackId = QnUuid::createUuid();
+        const auto deviceId = QnUuid::createUuid();
+        auto analyticsDataPackets = generateEventsByCriteria();
+
+        qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
+        qint64 objectTrackEndTime = std::numeric_limits<qint64>::min();
+
+        for (auto& packet : analyticsDataPackets)
+        {
+            objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUs);
+            objectTrackEndTime =
+                std::max(objectTrackEndTime, packet->timestampUs + packet->durationUs);
+            packet->deviceId = deviceId;
+
+            for (auto& objectMetadata : packet->objectMetadataList)
+            {
+                objectMetadata.trackId = m_specificObjectTrackId;
+                objectMetadata.typeId = m_specificObjectTrackId.toString();
+            }
+        }
+
+        m_specificObjectTrackTimePeriod.setStartTime(
+            duration_cast<milliseconds>(microseconds(objectTrackStartTime)));
+        m_specificObjectTrackTimePeriod.setDuration(
+            duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
+
+        return analyticsDataPackets;
+    }
 };
 
 TEST_F(AnalyticsDbLookup, empty_filter_matches_all_tracks)
@@ -1172,6 +1217,16 @@ TEST_F(AnalyticsDbLookup, full_text_search)
 TEST_F(AnalyticsDbLookup, full_text_search_by_prefix)
 {
     addRandomTextPrefixFoundInDataToFilter();
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, lookup_historic_attribute_value)
+{
+    const auto historicAttributeValues = givenObjectWithAttributeChangingInTime();
+    addTextToFilter(historicAttributeValues.front());
+
     whenLookupObjectTracks();
 
     thenResultMatchesExpectations();

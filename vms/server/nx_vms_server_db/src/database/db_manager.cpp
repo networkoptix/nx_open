@@ -4846,29 +4846,26 @@ ErrorCode QnDbManager::readFullInfoDataForMobileClient(
         return errorCode;
     }
 
-    const UserData* user = nullptr;
-    if (data->users.size() == 1)
-        user = &data->users[0];
-
-    if (user) // Do not load user roles if there is no current user.
-        DB_LOAD(user->userRoleId, data->userRoles);
+    for (const auto& u: data->users)
+    {
+        if (u.id  == userAccess.userId)
+            DB_LOAD(u.userRoleId, data->userRoles);
+    }
 
     DB_LOAD(QnUuid(), data->layouts);
-    if (user) // Remove layouts belonging to other users.
-    {
-        QSet<QnUuid> serverIds;
-        for (const auto& server: data->servers)
-            serverIds.insert(server.id);
+    // Remove layouts belonging to other users.
+    QSet<QnUuid> serverIds;
+    for (const auto& server: data->servers)
+        serverIds.insert(server.id);
 
-        data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
-            [user, &serverIds](const auto& layout)
-            {
-                return !layout.parentId.isNull()
-                    && layout.parentId != user->id
-                    && !serverIds.contains(layout.parentId);
-            }),
-            data->layouts.end());
-    }
+    data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
+        [userAccess, &serverIds](const auto& layout)
+        {
+            return !layout.parentId.isNull()
+                && layout.parentId != userAccess.userId
+                && !serverIds.contains(layout.parentId);
+        }),
+        data->layouts.end());
 
     // Event rules are required for software triggers.
     DB_LOAD(QnUuid(), data->rules);

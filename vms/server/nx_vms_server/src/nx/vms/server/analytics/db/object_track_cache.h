@@ -106,7 +106,7 @@ private:
         bool insertionReported = false;
         bool modified = false;
 
-        std::map<QString, QString> allAttributes;
+        std::set<std::pair<QString, QString>> allAttributes;
         std::vector<ObjectPosition> allPositionSequence;
     };
 

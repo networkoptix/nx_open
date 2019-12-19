@@ -136,49 +136,50 @@ void FileStreamer::send(
 
 void FileStreamer::obtainUnloopingPeriod(microseconds pts) const
 {
-    if (!NX_ASSERT(m_ptsUnloopingContext))
-        return;
-    PtsUnloopingContext& context = *m_ptsUnloopingContext;
-
-    if (!NX_ASSERT(context.firstFramePts))
+    if (!NX_ASSERT(m_ptsUnloopingContext) || !NX_ASSERT(m_ptsUnloopingContext->firstFramePts))
         return;
 
-    if (!context.prevPrevPts || !context.prevPts)
+    if (!m_ptsUnloopingContext->prevPrevPts || !m_ptsUnloopingContext->prevPts)
     {
         NX_LOGGER_ERROR(m_logger, "Unlooping: The file seems to have less than 3 frames.");
         return;
     }
 
-    if (context.prevPrevPts >= context.prevPts || context.prevPrevPts <= context.firstFramePts)
+    if (m_ptsUnloopingContext->prevPrevPts >= m_ptsUnloopingContext->prevPts
+        || m_ptsUnloopingContext->prevPrevPts <= m_ptsUnloopingContext->firstFramePts)
     {
         NX_LOGGER_ERROR(m_logger, "Unlooping: Bad ptses of file's last 3 frames: %1, %2, %3.",
-            us(context.prevPrevPts), us(context.prevPts), us(pts));
+            us(m_ptsUnloopingContext->prevPrevPts), us(m_ptsUnloopingContext->prevPts), us(pts));
         return;
     }
 
-    if (context.prevPrevPts < 0s
-        || context.prevPts < 0s
-        || context.prevPrevPts >= context.prevPts
-        || context.prevPrevPts <= context.firstFramePts)
+    if (m_ptsUnloopingContext->prevPrevPts < 0s
+        || m_ptsUnloopingContext->prevPts < 0s
+        || m_ptsUnloopingContext->prevPrevPts >= m_ptsUnloopingContext->prevPts
+        || m_ptsUnloopingContext->prevPrevPts <= m_ptsUnloopingContext->firstFramePts)
     {
         NX_LOGGER_ERROR(m_logger, "Unlooping: Bad ptses of file's last 3 frames: %1, %2, %3.",
-            us(context.prevPrevPts), us(context.prevPts), us(pts));
+            us(m_ptsUnloopingContext->prevPrevPts), us(m_ptsUnloopingContext->prevPts), us(pts));
         return;
     }
 
-    const microseconds delayBetweenLoops = *context.prevPts - *context.prevPrevPts;
-    context.unloopingPeriod = *context.prevPts - *context.firstFramePts + delayBetweenLoops;
+    const microseconds delayBetweenLoops =
+        *m_ptsUnloopingContext->prevPts - *m_ptsUnloopingContext->prevPrevPts;
+    m_ptsUnloopingContext->unloopingPeriod =
+        *m_ptsUnloopingContext->prevPts - *m_ptsUnloopingContext->firstFramePts
+        + delayBetweenLoops;
 
-    NX_LOGGER_INFO(m_logger, "Unlooping: File period is %1.", us(context.unloopingPeriod));
+    NX_LOGGER_INFO(m_logger, "Unlooping: File period is %1.",
+        us(m_ptsUnloopingContext->unloopingPeriod));
 }
 
 void FileStreamer::obtainRequestedShift() const
 {
     if (!NX_ASSERT(m_ptsUnloopingContext))
         return;
-    PtsUnloopingContext& context = *m_ptsUnloopingContext;
 
-    context.requestedShift = microseconds(0); //< Makes sure this method will execute only once.
+    // Make sure this method executes only once for the particular PtsUnloopingContext.
+    m_ptsUnloopingContext->requestedShift = microseconds(0);
 
     const std::optional<microseconds> shiftPtsPeriod = (m_streamIndex == StreamIndex::secondary)
         ? m_cameraOptions.shiftPtsSecondaryPeriod
@@ -194,12 +195,12 @@ void FileStreamer::obtainRequestedShift() const
         return;
 
     if (m_cameraOptions.shiftPtsFromNow)
-        context.requestedShift = now + *m_cameraOptions.shiftPtsFromNow;
+        m_ptsUnloopingContext->requestedShift = now + *m_cameraOptions.shiftPtsFromNow;
     else if (shiftPtsPeriod)
-        context.requestedShift = (now / *shiftPtsPeriod - 1) * *shiftPtsPeriod;
+        m_ptsUnloopingContext->requestedShift = (now / *shiftPtsPeriod - 1) * *shiftPtsPeriod;
 
     NX_LOGGER_INFO(m_logger, "Unlooping: Shifting unlooped PTSes by %1.",
-        us(context.requestedShift));
+        us(m_ptsUnloopingContext->requestedShift));
 }
 
 microseconds FileStreamer::processPtsIfNeeded(const microseconds pts) const
@@ -219,11 +220,7 @@ microseconds FileStreamer::processPtsIfNeeded(const microseconds pts) const
 
 microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) const
 {
-    if (!NX_ASSERT(m_ptsUnloopingContext))
-        return pts;
-    PtsUnloopingContext& context = *m_ptsUnloopingContext;
-
-    if (!m_cameraOptions.unloopPts)
+    if (!m_cameraOptions.unloopPts || !NX_ASSERT(m_ptsUnloopingContext))
         return pts;
 
     if (pts < 0s)
@@ -232,24 +229,27 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
         return pts;
     }
 
-    if (pts < context.prevPts) //< The previous frame was the last.
+    if (pts < m_ptsUnloopingContext->prevPts) //< The previous frame was the last.
     {
-        ++context.loopIndex;
+        ++m_ptsUnloopingContext->loopIndex;
 
-        if (context.loopIndex == 1)
+        if (m_ptsUnloopingContext->loopIndex == 1)
             obtainUnloopingPeriod(pts);
 
-        context.unloopingShift += *context.unloopingPeriod;
+        m_ptsUnloopingContext->unloopingShift += *m_ptsUnloopingContext->unloopingPeriod;
 
         NX_LOGGER_DEBUG(m_logger, "Unlooping: Starting new loop with unlooping shift %1.",
-            us(context.unloopingShift));
+            us(m_ptsUnloopingContext->unloopingShift));
     }
-    const microseconds unloopedPts = pts + context.unloopingShift;
+    const microseconds unloopedPts = pts + m_ptsUnloopingContext->unloopingShift;
 
-    if (!context.requestedShift) //< The very first frame of this file streaming session.
+    if (!m_ptsUnloopingContext->requestedShift)
+    {
+        // The very first frame of this file streaming session.
         obtainRequestedShift();
+    }
 
-    return unloopedPts + *context.requestedShift;
+    return unloopedPts + *m_ptsUnloopingContext->requestedShift;
 }
 
 /** @throws SocketError */
@@ -290,7 +290,7 @@ void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
     packet::Flags flags;
     if (frame->flags & AV_PKT_FLAG_KEY)
         flags |= packet::Flag::keyFrame;
-    if (m_cameraOptions.includePts && NX_ASSERT(m_ptsUnloopingContext))
+    if (m_cameraOptions.includePts)
         flags |= packet::Flag::ptsIncluded;
     if (m_channelCount > 1)
         flags |= packet::Flag::channelNumberIncluded;

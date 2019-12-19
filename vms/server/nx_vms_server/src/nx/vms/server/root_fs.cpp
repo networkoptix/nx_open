@@ -370,6 +370,18 @@ qint64 RootFileSystem::fileSize(const QString& path)
     return execViaRootTool("size " + enquote(path), &receiveInt64Action);
 }
 
+int RootFileSystem::setFdLimit(int pid, int value)
+{
+    if (m_ignoreTool)
+        return SystemCommands().setFdLimit(pid, value);
+
+    QString command;
+    QTextStream stream(&command);
+    stream << "setFdLimit " << pid << " " << value;
+
+    return execViaRootTool(command, &receiveInt64Action);
+}
+
 QString RootFileSystem::devicePath(const QString& fsPath)
 {
     if (m_ignoreTool)

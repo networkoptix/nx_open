@@ -82,7 +82,7 @@ import threading
 
 conf_definition = {
     "boxHostnameOrIp": {"type": "str"},
-    "boxLogin": {"type": "str"},
+    "boxLogin": {"type": "str", "default": ""},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
     "boxSshKey": {"type": "str", "default": ""},
@@ -90,11 +90,6 @@ conf_definition = {
     "vmsPassword": {"type": "str"},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
 }
-
-# On Windows plink tool is used and this tool doesn't support the fallback to default for the SSH login.
-if platform.system() != "Windows":
-    conf_definition["boxLogin"]["default"] = ""
-
 
 ini_definition = {
     "virtualCameraCount": {"type": "intList", "range": [1, 999], "default": [4]},
@@ -992,7 +987,10 @@ def _connect_to_box(conf, conf_file):
         box.sh('true', exc=True)
     except exceptions.BoxCommandError as e:
         raise exceptions.SshConnectionError(
-            "Can't connect to the box via SSH: check SSH configuration settings (host, login, password and so on).",
+            (
+                "Can't connect to the box via SSH: " +
+                "check SSH configuration settings (host, login, password and so on)."
+            ),
             original_exception=e
         )
 
@@ -1011,13 +1009,26 @@ def _connect_to_box(conf, conf_file):
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
-    '--config', '-c', 'conf_file', default='vms_benchmark.conf', metavar='<filename>', show_default=True,
+    '--config',
+    '-c',
+    'conf_file',
+    default='vms_benchmark.conf',
+    metavar='<filename>',
+    show_default=True,
     help='Configuration file.')
 @click.option(
-    '--ini-config', '-i', 'ini_file', default='vms_benchmark.ini', metavar='<filename>', show_default=True,
+    '--ini-config',
+    '-i',
+    'ini_file',
+    default='vms_benchmark.ini',
+    metavar='<filename>',
+    show_default=True,
     help='Internal configuration file for experimenting and debugging.')
 @click.option(
-    '--log', '-l', 'log_file', default='vms_benchmark.log', metavar='<filename>', show_default=True,
+    '--log', '-l', 'log_file',
+    default='vms_benchmark.log',
+    metavar='<filename>',
+    show_default=True,
     help='Detailed log of all actions; intended to be studied by the support team.')
 def main(conf_file, ini_file, log_file):
     global log_file_ref
@@ -1037,11 +1048,21 @@ def main(conf_file, ini_file, log_file):
 
     conf, ini = load_configs(conf_file, ini_file)
 
-    if ini['liveStreamsPerCameraRatio'] + ini['archiveStreamsPerCameraRatio'] == 0:
+    if ini['liveStreamsPerCameraRatio'] == 0 and ini['archiveStreamsPerCameraRatio'] == 0:
         raise exceptions.ConfigOptionsRestrictionError(
-            'Config settings liveStreamsPerCameraRatio and archiveStreamsPerCameraRatio should not be zero ' +
-            'simultaneously.'
+            'Config settings liveStreamsPerCameraRatio and archiveStreamsPerCameraRatio should ' +
+            'not be zero simultaneously.'
         )
+
+    print(platform.system(), conf["boxLogin"], not conf["boxLogin"])
+    # On Windows plink tool is used and this tool doesn't support the fallback to default for the
+    # SSH login.
+    if platform.system() == "Linux" and not conf["boxLogin"]:
+        class InvalidBoxLoginConfigOptionValue(exceptions.VmsBenchmarkError):
+            pass
+
+        raise InvalidBoxLoginConfigOptionValue(
+            f"Config option boxLogin should be set and not empty on Windows.")
 
     box = _connect_to_box(conf, conf_file)
     linux_distribution = LinuxDistributionDetector.detect(box)

@@ -49,7 +49,6 @@ public:
      * @param videoLayout Can be empty if not specified.
      */
     bool addCameraSet(
-        const FileCache* fileCache,
         const std::optional<VideoLayout>& videoLayout,
         bool cameraForEachFile,
         const CameraOptions& cameraOptions,

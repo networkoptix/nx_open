@@ -59,7 +59,7 @@ void Session::run(const QString& url, const Config& config, bool live)
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)
     {
-        report(lm("Failed to open rtsp stream: %1").args(nullptr));
+        report(lm("Failed to open rtsp stream: %1, error: %2").args(url, result.toString(nullptr)));
         failed = true;
         ++failedCount;
         return;

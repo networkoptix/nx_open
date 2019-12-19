@@ -89,6 +89,7 @@ public:
     std::string devicePath(const std::string& path);
 
     std::string serializedDmiInfo();
+    int setFdLimit(int pid, int value);
 
     std::string lastError() const;
 
