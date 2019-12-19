@@ -6,7 +6,9 @@
             "name": "text",
             "caption": "Text Field",
             "description": "A text field",
-            "defaultValue": "a text"
+            "defaultValue": "a text",
+            "validationRegex": "",
+            "validationRegexFlags": ""
         },
         {
             "type": "TextArea",
