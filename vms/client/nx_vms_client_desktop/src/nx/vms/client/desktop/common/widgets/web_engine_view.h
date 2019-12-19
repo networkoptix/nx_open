@@ -14,10 +14,12 @@ namespace nx::vms::client::desktop {
  */
 class WebEngineView: public QWebEngineView
 {
+    Q_OBJECT
     using base_type = QWebEngineView;
 
 public:
-    WebEngineView(QWidget* parent = nullptr);
+    WebEngineView(QWidget* parent = nullptr, WebEngineView* deriveFrom = nullptr);
+    virtual ~WebEngineView();
 
     // Replicates setContextMenuPolicy(Qt::ActionsContextMenu) behavior for link context menu.
     void setUseActionsForLinks(bool enabled);
@@ -40,8 +42,14 @@ public:
     void insertStyleSheet(const QString& name, const QString& source, bool immediately = true);
     void removeStyleSheet(const QString& name, bool immediately = true);
 
+    void setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions);
+
+signals:
+    void profileChanged();
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
+    QWebEngineView* createWindow(QWebEnginePage::WebWindowType type) override;
 
 private:
     struct Private;

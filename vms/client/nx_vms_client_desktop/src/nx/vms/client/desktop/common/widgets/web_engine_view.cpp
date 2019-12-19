@@ -4,7 +4,10 @@
 #include <QtCore/QEventLoop>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QContextMenuEvent>
+#include <QtGui/QWindow>
+#include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
+#include <QtNetwork/QAuthenticator>
 #include <QtWebEngineWidgets/QWebEngineView>
 #include <QtWebEngineWidgets/QWebEngineContextMenuData>
 #include <QtWebEngineWidgets/QWebEngineScript>
@@ -17,7 +20,8 @@ struct WebEngineView::Private
     bool m_useActionsForLinks = false;
     bool m_ignoreSslErrors = true;
     bool m_redirectLinksToDesktop = false;
-    QScopedPointer<QWebEngineProfile> m_webEngineProfile;
+    QSharedPointer<QWebEngineProfile> m_webEngineProfile;
+    std::vector<QWebEnginePage::WebAction> m_hiddenActions;
 };
 
 namespace {
@@ -77,11 +81,41 @@ private:
 
 } // namespace
 
-WebEngineView::WebEngineView(QWidget* parent):
+WebEngineView::WebEngineView(QWidget* parent, WebEngineView* deriveFrom):
     base_type(parent),
     d(new Private())
 {
-    setPage(new WebEnginePage(this, *this));
+    if (deriveFrom)
+    {
+        // Copy settings.
+        *d = *deriveFrom->d;
+        addActions(deriveFrom->actions());
+    }
+
+    // Make the page use derived profile.
+    if (d->m_webEngineProfile)
+        setPage(new WebEnginePage(d->m_webEngineProfile.data(), d->m_webEngineProfile.data(), *this));
+    else
+        setPage(new WebEnginePage(this, *this));
+
+    if (deriveFrom)
+        setHiddenActions(deriveFrom->d->m_hiddenActions);
+}
+
+WebEngineView::~WebEngineView()
+{
+    delete page();
+}
+
+void WebEngineView::setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions)
+{
+    for (const auto& action: d->m_hiddenActions)
+        page()->action(action)->setVisible(true);
+
+    d->m_hiddenActions = actions;
+
+    for (const auto& action: d->m_hiddenActions)
+        page()->action(action)->setVisible(false);
 }
 
 void WebEngineView::setUseActionsForLinks(bool enabled)
@@ -125,6 +159,7 @@ void WebEngineView::createPageWithUserAgent(const QString& userAgent)
     setPage(new WebEnginePage(profile, profile, *this));
 
     d->m_webEngineProfile.reset(profile);
+    emit profileChanged();
 }
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent* event)
@@ -193,4 +228,56 @@ void WebEngineView::removeStyleSheet(const QString& name, bool immediately)
 
     QWebEngineScript script = page()->scripts().findScript(name);
     page()->scripts().remove(script);
+}
+
+QWebEngineView* WebEngineView::createWindow(QWebEnginePage::WebWindowType type)
+{
+    Qt::WindowFlags flags = type == QWebEnginePage::WebDialog ? Qt::Dialog : Qt::Window;
+    flags |= Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint
+        | Qt::WindowMaximizeButtonHint | Qt::WindowStaysOnTopHint;
+
+    auto window = new QMainWindow(nullptr, flags);
+    auto webView = new WebEngineView(window, this);
+
+    // Profile change means that our parent page is no longer used.
+    // But it is going to stay in memory because its parent is the shared profile which is used
+    // by all derived pages.
+    // Closing the window dereferences the profile pointer so that all pages will be freed.
+    connect(this, &WebEngineView::profileChanged, window, &QMainWindow::close);
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    connect(page(), &QObject::destroyed, window, &QMainWindow::close);
+
+    connect(webView->page(), &QWebEnginePage::authenticationRequired, page(),
+        &QWebEnginePage::authenticationRequired);
+    connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired, page(),
+        &QWebEnginePage::proxyAuthenticationRequired);
+
+    // setGeometry() expects a size excluding the window decoration, while geom includes it.
+    const auto changeGeometry =
+        [window](const QRect& geom)
+        {
+            window->setGeometry(geom.marginsRemoved(window->windowHandle()->frameMargins()));
+        };
+
+    switch (type)
+    {
+        case QWebEnginePage::WebBrowserWindow:
+        case QWebEnginePage::WebDialog:
+            // Allow JavaScript to change geomerty only for windows and dialogs.
+            connect(webView->page(), &QWebEnginePage::geometryChangeRequested, changeGeometry);
+            break;
+        case QWebEnginePage::WebBrowserTab:
+        case QWebEnginePage::WebBrowserBackgroundTab:
+            window->setGeometry(this->window()->geometry());
+            break;
+        default:
+            break;
+    }
+
+    connect(webView->page(), &QWebEnginePage::windowCloseRequested,  window, &QMainWindow::close);
+
+    window->setCentralWidget(webView);
+    window->show();
+
+    return webView;
 }

@@ -220,8 +220,7 @@ void CameraWebPageWidget::Private::createNewPage()
         QWebEnginePage::SavePage
     };
 
-    for (const auto& action: kHiddenActions)
-        webView->page()->action(action)->setVisible(false);
+    webView->setHiddenActions(kHiddenActions);
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
