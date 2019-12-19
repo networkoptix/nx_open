@@ -10,18 +10,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct AgentId
-{
-    QnUuid device;
-    QnUuid engine;
-
-    bool operator==(const AgentId& other) const
-    {
-        return device == other.device && engine == other.engine;
-    }
-};
-
-uint qHash(const AgentId& key)
+uint qHash(const DeviceAgentId& key)
 {
     return qHash(key.device) + qHash(key.engine);
 }
@@ -30,22 +19,20 @@ uint qHash(const AgentId& key)
 
 QJsonObject AnalyticsSettingsListener::model() const
 {
-    return m_cache->model(deviceId, engineId);
+    return m_manager->model(agentId);
 }
 
 QJsonObject AnalyticsSettingsListener::values() const
 {
-    return m_cache->values(deviceId, engineId);
+    return m_manager->values(agentId);
 }
 
 AnalyticsSettingsListener::AnalyticsSettingsListener(
-    const QnUuid& deviceId,
-    const QnUuid& engineId,
-    AnalyticsSettingsManager* cache)
+    const DeviceAgentId& agentId,
+    AnalyticsSettingsManager* manager)
     :
-    deviceId(deviceId),
-    engineId(engineId),
-    m_cache(cache)
+    agentId(agentId),
+    m_manager(manager)
 {
 }
 
@@ -56,15 +43,17 @@ class AnalyticsSettingsManager::Private: public QObject, public QnConnectionCont
 public:
     Private();
 
-    void refreshSettings(const AgentId& agentId, QJsonObject newRawValues);
-    void handleListenerDeleted(const AgentId& id);
+    void refreshSettings(const DeviceAgentId& agentId, QJsonObject newRawValues);
+    void handleListenerDeleted(const DeviceAgentId& id);
 
-private:
-    void addDevice(const QnResourcePtr& resource);
-    void removeDevice(const QnResourcePtr& resource);
+    bool hasSubscription(const DeviceAgentId& id) const;
+
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleResourceRemoved(const QnResourcePtr& resource);
     void handleDevicePropertyChanged(const QnResourcePtr& resource, const QString& key);
+    void handleEnginePropertyChanged(const QnResourcePtr& resource, const QString& key);
 
-    void setSettings(const AgentId& id, const QJsonObject& model, const QJsonObject& values);
+    void setSettings(const DeviceAgentId& id, const QJsonObject& model, const QJsonObject& values);
 
 public:
     struct SettingsData
@@ -81,31 +70,37 @@ public:
     };
     QHash<QnUuid, Subscription> subscriptionByDeviceId;
 
-    SettingsData& dataByAgentIdRef(const AgentId& id)
+    SettingsData& dataByAgentIdRef(const DeviceAgentId& id)
     {
         return subscriptionByDeviceId[id.device].settingsByEngineId[id.engine];
     }
-    SettingsData dataByAgentId(const AgentId& id) const
+    SettingsData dataByAgentId(const DeviceAgentId& id) const
     {
         return subscriptionByDeviceId[id.device].settingsByEngineId[id.engine];
     }
 
-private:
-    QList<rest::Handle> m_pendingRefreshRequests;
+    QList<rest::Handle> pendingRefreshRequests;
+    QList<rest::Handle> pendingApplyRequests;
 };
 
 AnalyticsSettingsManager::Private::Private()
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &Private::addDevice);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &Private::handleResourceAdded);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &Private::removeDevice);
+        &Private::handleResourceRemoved);
+
+    for (const common::AnalyticsEngineResourcePtr& engine:
+        resourcePool()->getResources<common::AnalyticsEngineResource>())
+    {
+        handleResourceAdded(engine);
+    }
 
     for (const QnVirtualCameraResourcePtr& camera: resourcePool()->getAllCameras())
-        addDevice(camera);
+        handleResourceAdded(camera);
 }
 
 void AnalyticsSettingsManager::Private::refreshSettings(
-    const AgentId& agentId, QJsonObject newRawValues)
+    const DeviceAgentId& agentId, QJsonObject newRawValues)
 {
     const auto& camera =
         resourcePool()->getResourceById<QnVirtualCameraResource>(agentId.device);
@@ -131,7 +126,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(
                     rest::Handle requestId,
                     const nx::vms::api::analytics::SettingsResponse &result)
             {
-                if (!m_pendingRefreshRequests.removeOne(requestId))
+                if (!pendingRefreshRequests.removeOne(requestId))
                     return;
 
                 if (!success)
@@ -143,26 +138,29 @@ void AnalyticsSettingsManager::Private::refreshSettings(
         thread());
 
     if (handle > 0)
-        m_pendingRefreshRequests.append(handle);
+        pendingRefreshRequests.append(handle);
 }
 
-void AnalyticsSettingsManager::Private::addDevice(const QnResourcePtr& resource)
+void AnalyticsSettingsManager::Private::handleResourceAdded(const QnResourcePtr& resource)
 {
-    const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return;
-
-    connect(camera.data(), &QnResource::propertyChanged, this,
-        &Private::handleDevicePropertyChanged);
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        connect(camera.data(), &QnResource::propertyChanged, this,
+            &Private::handleDevicePropertyChanged);
+    }
+    else if (const auto& engine = resource.dynamicCast<common::AnalyticsEngineResource>())
+    {
+        connect(engine.data(), &QnResource::propertyChanged, this,
+            &Private::handleEnginePropertyChanged);
+    }
 }
 
-void AnalyticsSettingsManager::Private::removeDevice(const QnResourcePtr& resource)
+void AnalyticsSettingsManager::Private::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return;
-
-    camera->disconnect(this);
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+        camera->disconnect(this);
+    else if (const auto& engine = resource.dynamicCast<common::AnalyticsEngineResource>())
+        engine->disconnect(this);
 }
 
 void AnalyticsSettingsManager::Private::handleDevicePropertyChanged(
@@ -174,12 +172,13 @@ void AnalyticsSettingsManager::Private::handleDevicePropertyChanged(
 
     const QnUuid& deviceId = camera->getId();
 
-    if (key == QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty)
+    if (key == QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty
+        || key == QnVirtualCameraResource::kDeviceAgentManifestsProperty)
     {
         const QHash<QnUuid, QJsonObject>& valuesByEngine = camera->deviceAgentSettingsValues();
         for (auto it = valuesByEngine.begin(); it != valuesByEngine.end(); ++it)
         {
-            AgentId agentId{deviceId, it.key()};
+            DeviceAgentId agentId{deviceId, it.key()};
             const auto& data = dataByAgentId(agentId);
             if (!data.listener.expired() && data.rawValues != it.value())
                 refreshSettings(agentId, it.value());
@@ -187,7 +186,26 @@ void AnalyticsSettingsManager::Private::handleDevicePropertyChanged(
     }
 }
 
-void AnalyticsSettingsManager::Private::handleListenerDeleted(const AgentId& id)
+void AnalyticsSettingsManager::Private::handleEnginePropertyChanged(
+    const QnResourcePtr& resource, const QString& key)
+{
+    const auto& engine = resource.dynamicCast<common::AnalyticsEngineResource>();
+    if (!NX_ASSERT(engine))
+        return;
+
+    const QnUuid& engineId = engine->getId();
+
+    if (key == common::AnalyticsEngineResource::kEngineManifestProperty)
+    {
+        for (auto it = subscriptionByDeviceId.begin(); it != subscriptionByDeviceId.end(); ++it)
+        {
+            if (it->settingsByEngineId.contains(engineId))
+                refreshSettings({it.key(), engineId}, {});
+        }
+    }
+}
+
+void AnalyticsSettingsManager::Private::handleListenerDeleted(const DeviceAgentId& id)
 {
     auto subscriptionIt = subscriptionByDeviceId.find(id.device);
     if (subscriptionIt != subscriptionByDeviceId.end())
@@ -198,8 +216,17 @@ void AnalyticsSettingsManager::Private::handleListenerDeleted(const AgentId& id)
     }
 }
 
+bool AnalyticsSettingsManager::Private::hasSubscription(const DeviceAgentId& id) const
+{
+    const auto it = subscriptionByDeviceId.find(id.device);
+    if (it == subscriptionByDeviceId.end())
+        return false;
+
+    return it->settingsByEngineId.contains(id.engine);
+}
+
 void AnalyticsSettingsManager::Private::setSettings(
-    const AgentId& id, const QJsonObject& model, const QJsonObject& values)
+    const DeviceAgentId& id, const QJsonObject& model, const QJsonObject& values)
 {
     auto& data = dataByAgentIdRef(id);
 
@@ -232,15 +259,13 @@ AnalyticsSettingsManager::~AnalyticsSettingsManager()
 {
 }
 
-AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(
-    const QnUuid& deviceId, const QnUuid& engineId)
+AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceAgentId& agentId)
 {
-    const AgentId agentId{deviceId, engineId};
     auto& data = d->dataByAgentIdRef(agentId);
     if (const auto& listener = data.listener.lock())
         return listener;
 
-    AnalyticsSettingsListenerPtr listener(new AnalyticsSettingsListener(deviceId, engineId, this));
+    AnalyticsSettingsListenerPtr listener(new AnalyticsSettingsListener(agentId, this));
     data.listener = listener;
     connect(listener.get(), &QObject::destroyed, d.data(),
         [this, agentId]() { d->handleListenerDeleted(agentId); });
@@ -249,14 +274,72 @@ AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(
     return listener;
 }
 
-QJsonObject AnalyticsSettingsManager::values(const QnUuid& deviceId, const QnUuid& engineId) const
+QJsonObject AnalyticsSettingsManager::values(const DeviceAgentId& agentId) const
 {
-    return d->dataByAgentId({deviceId, engineId}).values;
+    return d->dataByAgentId(agentId).values;
 }
 
-QJsonObject AnalyticsSettingsManager::model(const QnUuid& deviceId, const QnUuid& engineId) const
+QJsonObject AnalyticsSettingsManager::model(const DeviceAgentId& agentId) const
 {
-    return d->dataByAgentId({deviceId, engineId}).model;
+    return d->dataByAgentId(agentId).model;
+}
+
+AnalyticsSettingsManager::Error AnalyticsSettingsManager::setValues(
+    const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId)
+{
+    if (isApplyingChanges())
+        return Error::busy;
+
+    for (auto it = valuesByAgentId.begin(); it != valuesByAgentId.end(); ++it)
+    {
+        const auto engine =
+            d->resourcePool()->getResourceById<common::AnalyticsEngineResource>(it.key().engine);
+        if (!NX_ASSERT(engine))
+            continue;
+
+        const auto device =
+            d->resourcePool()->getResourceById<QnVirtualCameraResource>(it.key().device);
+        if (!NX_ASSERT(device))
+            continue;
+
+        const auto server = device->getParentServer();
+        if (!NX_ASSERT(server))
+            continue;
+
+        const auto handle = server->restConnection()->setDeviceAnalyticsSettings(
+            device,
+            engine,
+            *it,
+            nx::utils::guarded(this,
+                [this, agentId = it.key()](
+                    bool success,
+                    rest::Handle requestId,
+                    const nx::vms::api::analytics::SettingsResponse& result)
+                {
+                    if (!d->pendingApplyRequests.removeOne(requestId))
+                        return;
+
+                    if (success)
+                    {
+                        if (d->hasSubscription(agentId))
+                            d->setSettings(agentId, result.model, result.values);
+                    }
+
+                    if (!isApplyingChanges())
+                        emit appliedChanges();
+                }),
+            thread());
+
+        if (handle >= 0)
+            d->pendingApplyRequests.append(handle);
+    }
+
+    return Error::noError;
+}
+
+bool AnalyticsSettingsManager::isApplyingChanges() const
+{
+    return !d->pendingApplyRequests.isEmpty();
 }
 
 } // namespace nx::vms::client::desktop

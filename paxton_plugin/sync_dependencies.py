@@ -12,21 +12,12 @@ def main():
     parser.add_argument("--customization", default="default", help="VMS customization")
     parser.add_argument("--cmake-include-file", default="dependencies.cmake",
                         help="CMake include file name")
-    parser.add_argument(
-        "--customization_package",
-        choices=['', 'v2', 'v2_draft'],
-        default='',
-        help="Customization package version")
     args = parser.parse_args()
-
-    customization_pack_version = args.customization
-    if args.customization_package:
-        customization_pack_version += '_' + args.customization_package
 
     syncher = RdepSyncher(args.packages_dir)
     syncher.versions = {
         "paxton_plugin_references": args.dot_net_framework,
-        "customization_pack": customization_pack_version,
+        "customization_pack": f"{args.customization}_v2",
     }
 
     def sync(package, **kwargs):

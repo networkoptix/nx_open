@@ -579,12 +579,6 @@ void QnWorkbenchDisplay::initSceneView()
             }, 1, this);
 
         const auto viewport = new QOpenGLWidget(m_view);
-
-        QSurfaceFormat format = viewport->format();
-        format.setSamples(qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling)
-            ? 0 : qnSettings->glMultisamplingSamples());
-        viewport->setFormat(format);
-
         viewport->makeCurrent();
         m_view->setViewport(viewport);
 

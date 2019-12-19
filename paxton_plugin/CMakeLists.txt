@@ -9,9 +9,6 @@ set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowe
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "One of [Debug Release RelWithDebInfo MinSizeRel].")
 set(buildNumber "0" CACHE STRING "Build number")
 option(codeSigning "Enable code signing" OFF)
-set(customizationPackageVersion "" CACHE STRING
-    "Version of the customization package. Supported values are: (empty), v2, v2_draft")
-
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(repositoryRootDir ${PROJECT_SOURCE_DIR}/..)
@@ -43,7 +40,6 @@ execute_process(
         --packages-dir=${PACKAGES_DIR}
         --cmake-include-file=${depenencies_cmake_file}
         --customization=${customization}
-        --customization_package=${customizationPackageVersion}
         --dot-net-framework=${dotNetFramework}
     RESULT_VARIABLE sync_result
 )

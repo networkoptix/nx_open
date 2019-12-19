@@ -220,8 +220,7 @@ void CameraWebPageWidget::Private::createNewPage()
         QWebEnginePage::SavePage
     };
 
-    for (const auto& action: kHiddenActions)
-        webView->page()->action(action)->setVisible(false);
+    webView->setHiddenActions(kHiddenActions);
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
@@ -259,8 +258,7 @@ void CameraWebPageWidget::Private::createNewPage()
             url.setPassword(QString());
 
             // Replace server address with camera address.
-            const auto serverHost = parent->commonModule()->currentUrl().host();
-            if (serverHost == url.host())
+            if (url.host() == lastRequestUrl.host())
             {
                 url.setHost(lastCamera.ipAddress);
                 url.setPort(-1); //< Hide server port.

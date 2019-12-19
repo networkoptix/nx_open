@@ -66,6 +66,8 @@ public:
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
     static State setAnalyticsSettingsLoading(State state, bool value);
     static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
+    static std::pair<bool, State> setDeviceAgentSettingsModel(
+        State state, const QnUuid& engineId, const QJsonObject& value);
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state, const QnUuid& engineId, const QJsonObject& values);
     static std::pair<bool, State> resetDeviceAgentSettingsValues(

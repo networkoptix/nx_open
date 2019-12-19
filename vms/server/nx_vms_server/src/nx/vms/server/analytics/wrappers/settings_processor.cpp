@@ -9,7 +9,11 @@ sdk::Ptr<const sdk::IStringMap> SettingsProcessor::prepareSettings(
 {
     const auto sdkSettings = sdk::makePtr<sdk::StringMap>();
     for (auto it = settings.begin(); it != settings.end(); ++it)
-        sdkSettings->setItem(it.key().toStdString(), QJson::serialize(it.value()).toStdString());
+    {
+        sdkSettings->setItem(
+            it.key().toStdString(),
+            (it->isString() ? it->toString() : QJson::serialize(it.value())).toStdString());
+    }
 
     if (!m_debugSettings.outputPath.isEmpty())
     {
