@@ -365,7 +365,6 @@ std::string Engine::manifestString() const
             {
                 "type": "GroupBox",
                 "caption": "Example Stub DeviceAgent settings",
-                "collapsible": false,
                 "items": [
                     {
                         "type": "TextField",
@@ -414,7 +413,6 @@ std::string Engine::manifestString() const
                     {
                         "type": "GroupBox",
                         "caption": "Example Stub DeviceAgent settings",
-                        "collapsible": false,
                         "items": [
                             {
                                 "type": "TextField",

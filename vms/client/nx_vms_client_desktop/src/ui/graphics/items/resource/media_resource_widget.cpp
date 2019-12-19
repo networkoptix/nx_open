@@ -15,7 +15,9 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+#include <api/runtime_info_manager.h>
 
+#include <iterator>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/rule_manager.h>
@@ -43,6 +45,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -107,6 +110,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
+#include <ui/workbench/handlers/workbench_videowall_handler.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -285,17 +289,27 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
 
-        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged,
-            this,
-            [this]
+        auto updateStatus = [this]
             {
                 const bool animate = animationAllowed();
                 updateIoModuleVisibility(animate);
                 updateStatusOverlay(animate);
                 updateOverlayButton();
+            };
 
+        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged,
+            this,
+            [this, updateStatus]
+            {
+                updateStatus();
                 emit licenseStatusChanged();
             });
+
+        if (qnRuntime->isVideoWallMode())
+        {
+            auto handler = context->instance<QnWorkbenchVideoWallHandler>();
+            connect(handler, &QnWorkbenchVideoWallHandler::onlineScreensChanged, this, updateStatus);
+        }
 
         auto ptzPool = qnClientCoreModule->ptzControllerPool();
         connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
@@ -2170,16 +2184,47 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     return result;
 }
 
+bool QnMediaResourceWidget::isVideoWallLicenseValid() const
+{
+    license::VideoWallLicenseValidator validator(commonModule());
+    QnVideoWallLicenseUsageHelper helper(commonModule());
+    helper.setCustomValidator(&validator);
+
+    if (helper.isValid())
+        return true;
+
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
+    QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
+
+    // Gather all online screen ids.
+    // The order of screens should be the same across all client instances.
+    const auto onlineScreens = context()->instance<QnWorkbenchVideoWallHandler>()->onlineScreens();
+
+    const int allowedLiceses = helper.totalLicenses(Qn::LC_VideoWall);
+
+    // Calculate the number of screens that should show invalid license overlay.
+    using Helper = QnVideoWallLicenseUsageHelper;
+    size_t sceensToDisable = 0;
+    while (sceensToDisable < onlineScreens.size()
+        && Helper::licensesForScreens(onlineScreens.size() - sceensToDisable) > allowedLiceses)
+        ++sceensToDisable;
+
+    if (sceensToDisable > 0)
+    {
+        // If current screen falls into the range - report invalid license.
+        const size_t i = std::distance(onlineScreens.begin(), onlineScreens.find(currentScreenId));
+        if (i < sceensToDisable)
+            return false;
+    }
+
+    return true;
+}
+
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
-    if (qnRuntime->isVideoWallMode())
-    {
-        license::VideoWallLicenseValidator validator(commonModule());
-        QnVideoWallLicenseUsageHelper helper(commonModule());
-        helper.setCustomValidator(&validator);
-        if (!helper.isValid())
-            return Qn::VideowallWithoutLicenseOverlay;
-    }
+    if (qnRuntime->isVideoWallMode() && !isVideoWallLicenseValid())
+        return Qn::VideowallWithoutLicenseOverlay;
 
     // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF

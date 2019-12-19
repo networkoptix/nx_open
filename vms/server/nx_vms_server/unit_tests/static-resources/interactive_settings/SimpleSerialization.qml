@@ -12,6 +12,8 @@ Settings
                 "caption": "Text Field",
                 "description": "A text field",
                 "defaultValue": "a text",
+                "validationRegex": "",
+                "validationRegexFlags": ""
             },
             {
                 "type": "TextArea",

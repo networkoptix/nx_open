@@ -135,12 +135,11 @@ Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
     switch (m_webEngineView->status())
     {
-    case kPageLoadFailed:
-        return Qn::OfflineOverlay;
     case kPageInitialLoadInProgress:
         return Qn::LoadingOverlay;
     //case kPageLoading:
     //case kPageLoaded:
+    //case kPageLoadFailed:
     default:
         return Qn::EmptyOverlay;
     }

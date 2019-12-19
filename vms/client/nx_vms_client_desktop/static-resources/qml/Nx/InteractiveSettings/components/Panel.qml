@@ -12,7 +12,7 @@ Panel
     property string name: ""
     property alias caption: control.title
     property string description: ""
-    property bool collapsible: true
+    property bool collapsible: false
     property bool collapsed: false
 
     property alias childrenItem: control.contentItem

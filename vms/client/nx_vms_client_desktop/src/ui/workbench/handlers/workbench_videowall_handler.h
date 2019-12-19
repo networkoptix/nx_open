@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
@@ -41,6 +43,11 @@ public:
     bool saveReviewLayout(
         QnWorkbenchLayout* layout,
         std::function<void(int, ec2::ErrorCode)> callback);
+
+    std::set<QnUuid> onlineScreens() const;
+
+signals:
+    void onlineScreensChanged();
 
 private:
     enum class ItemAction
@@ -255,4 +262,5 @@ private:
 
     class GeometrySetter;
     QScopedPointer<GeometrySetter> m_geometrySetter;
+    std::set<QnUuid> m_onlineScreens;
 };

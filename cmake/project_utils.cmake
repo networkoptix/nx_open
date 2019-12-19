@@ -1,3 +1,6 @@
+option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
+mark_as_advanced(enablePrecompiledHeaders)
+
 set(nx_enable_werror OFF)
 set(nx_werror_condition CMAKE_COMPILER_IS_GNUCXX)
 
@@ -171,7 +174,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    if(has_pch)
+    if(has_pch AND enablePrecompiledHeaders)
         target_precompile_headers(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
 
         # Precompile headers are not compatible between languages, turn them off for Objective C.
