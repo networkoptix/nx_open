@@ -59,10 +59,7 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                 // 32 is added for automatic zlib header detection, see
                 // http://www.zlib.net/manual.html#Advanced.
                 zResult = inflateInit2(&d->zStream, 32 + MAX_WBITS);
-                if (zResult != Z_OK)
-                {
-                    NX_ASSERT(false);
-                }
+                NX_ASSERT(zResult == Z_OK);
                 d->state = Private::State::inProgress;
                 continue;
 
@@ -72,6 +69,25 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                 // available.
                 const uInt availInBak = d->zStream.avail_in;
                 zResult = inflate(&d->zStream, zFlushMode);
+
+                if (isFirstInflateAttempt)
+                {
+                    isFirstInflateAttempt = false;
+                    // Some servers seem to not generate zlib headers, try to decompress
+                    // headless. This code is similar to the code in the curl utility.
+                    if (zResult == Z_DATA_ERROR)
+                    {
+                        inflateEnd(&d->zStream);
+                        d->zStream.next_in = (Bytef*) data.constData();
+                        d->zStream.avail_in = (uInt) data.size();
+                        // Using negative windowBits parameter turns off looking for
+                        // header, see http://www.zlib.net/manual.html#Advanced
+                        zResult = inflateInit2(&d->zStream, -MAX_WBITS);
+                        NX_ASSERT(zResult == Z_OK);
+                        continue;
+                    }
+                }
+
                 const uInt inBytesConsumed = availInBak - d->zStream.avail_in;
 
                 switch (zResult)
@@ -162,25 +178,6 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                         }
                         d->state = Private::State::failed;
                         break;
-
-                    case Z_DATA_ERROR:
-                        // Some servers seem to not generate zlib headers, try to decompress
-                        // headless. This code is similar to the code in the curl utility.
-                        if (isFirstInflateAttempt)
-                        {
-                            isFirstInflateAttempt = false;
-                            inflateEnd(&d->zStream);
-                            // Using negative windowBits parameter turns off looking for
-                            // header, see http://www.zlib.net/manual.html#Advanced
-                            zResult = inflateInit2(&d->zStream, -MAX_WBITS);
-                            if (zResult == Z_OK)
-                            {
-                                d->zStream.next_in = (Bytef*) data.constData();
-                                d->zStream.avail_in = (uInt) data.size();
-                                continue;
-                            }
-                        }
-                        [[fallthrough]];
 
                     default:
                         d->state = Private::State::failed;
