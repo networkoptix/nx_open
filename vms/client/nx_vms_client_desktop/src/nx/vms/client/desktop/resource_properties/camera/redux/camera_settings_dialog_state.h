@@ -273,6 +273,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditable<QSet<QnUuid>> enabledEngines;
 
         QHash<QnUuid, UserEditable<QJsonObject>> settingsValuesByEngineId;
+        QHash<QnUuid, QJsonObject> settingsModelByEngineId;
         bool loading = false;
         QnUuid currentEngineId;
     };

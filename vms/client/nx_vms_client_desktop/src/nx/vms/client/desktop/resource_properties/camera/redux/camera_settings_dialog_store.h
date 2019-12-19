@@ -94,6 +94,8 @@ public:
     Q_INVOKABLE bool analyticsSettingsLoading() const;
     void setAnalyticsSettingsLoading(bool value);
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
+    Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const QnUuid& engineId) const;
+    void setDeviceAgentSettingsModel(const QnUuid& engineId, const QJsonObject& value);
     Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
         const QnUuid& engineId, const QJsonObject& values);

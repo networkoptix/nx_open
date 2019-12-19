@@ -19,7 +19,6 @@ public:
 
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void refreshSettings(const QnUuid& engineId, bool forceRefresh = false);
     void applySettings();
 
 private:

@@ -424,6 +424,21 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& v
     setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
 }
 
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsModel(const QnUuid& engineId) const
+{
+    return d->state.analytics.settingsModelByEngineId.value(engineId);
+}
+
+void CameraSettingsDialogStore::setDeviceAgentSettingsModel(
+    const QnUuid& engineId, const QJsonObject& value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setDeviceAgentSettingsModel(std::move(state), engineId, value);
+        });
+}
+
 QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
 {
     return d->state.analytics.settingsValuesByEngineId.value(engineId).get();
