@@ -145,7 +145,7 @@ void AbstractEngine::applyValues(const QJsonObject& values) const
             if (it == values.end())
                 return true;
 
-            item->setValue(*it);
+            item->setValue(it->toVariant());
             return true;
         });
 
