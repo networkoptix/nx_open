@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/utils/geometry.h>
@@ -11,6 +12,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workaround/gl_native_painting.h>
 
 namespace nx::vms::client::desktop {
 
@@ -146,7 +148,7 @@ class RoiFiguresOverlayWidget::Private: public QObject
 public:
     qreal lineWidth = 2;
     qreal pointRadius = 1.5;
-    qreal regionTransparency = 0.15;
+    qreal regionOpacity = 0.15;
 
     QMap<QString, Line> lines;
     QMap<QString, Box> boxes;
@@ -162,6 +164,8 @@ public:
     QVector<QPointF> mapPoints(const QVector<QPointF>& points) const;
 
     void setupPainter(QPainter* painter, const Item& item);
+    void strokePolyline(
+        QPainter* painter, const QVector<QPointF>& points, const QColor& color, bool closed);
     void drawLine(QPainter* painter, const Line& line);
     void drawBox(QPainter* painter, const Box& box);
     void drawPolygon(QPainter* painter, const Polygon& polygon);
@@ -195,8 +199,37 @@ void RoiFiguresOverlayWidget::Private::setupPainter(QPainter* painter, const Ite
 {
     painter->setPen(QPen(item.color, lineWidth));
     QColor brushColor = item.color;
-    brushColor.setAlphaF(regionTransparency);
+    brushColor.setAlphaF(regionOpacity);
     painter->setBrush(brushColor);
+}
+
+void RoiFiguresOverlayWidget::Private::strokePolyline(
+    QPainter* painter, const QVector<QPointF>& points, const QColor& color, bool closed)
+{
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
+    QnGlNativePainting::begin(glWidget, painter);
+
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(false);
+    glLineWidth(2); //< TODO: HiDPI does not work yet.
+    glColor3d(color.redF(), color.greenF(), color.blueF());
+
+    glBegin(GL_LINE_STRIP);
+
+    for (const auto& point: points)
+        glVertex2d(point.x(), point.y());
+    if (closed)
+        glVertex2d(points.first().x(), points.first().y());
+
+    glEnd();
+
+    glDepthMask(true);
+    glDisable(GL_BLEND);
+    glDisable(GL_LINE_SMOOTH);
+
+    QnGlNativePainting::end(painter);
 }
 
 void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& line)
@@ -204,18 +237,13 @@ void RoiFiguresOverlayWidget::Private::drawLine(QPainter* painter, const Line& l
     if (line.points.size() < 2 || !line.visible)
         return;
 
-    setupPainter(painter, line);
-
     const auto& points = mapPoints(line.points);
-    painter->setBrush({});
 
-    QPainterPath path;
-    path.moveTo(points.first());
-    for (auto it = std::next(points.begin()); it != points.end(); ++it)
-        path.lineTo(*it);
-    painter->drawPath(path);
+    strokePolyline(painter, points, line.color, false);
+
     drawPoints(painter, points, line.color);
 
+    // TODO: Reimplement via QPixmap to make the arrows anti-aliased.
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
@@ -246,8 +274,10 @@ void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box
     QVector<QPointF> points{
         rect.topLeft(), rect.topRight(), rect.bottomRight(), rect.bottomLeft()};
 
-    setupPainter(painter, box);
-    painter->drawRect(rect);
+    QColor fillColor = box.color;
+    fillColor.setAlphaF(regionOpacity);
+    painter->fillRect(rect, fillColor);
+    strokePolyline(painter, points, box.color, true);
     drawPoints(painter, points, box.color);
 }
 
@@ -256,10 +286,16 @@ void RoiFiguresOverlayWidget::Private::drawPolygon(QPainter* painter, const Poly
     if (polygon.points.empty() || !polygon.visible)
         return;
 
-    setupPainter(painter, polygon);
-
     const auto& points = mapPoints(polygon.points);
-    painter->drawPolygon(QPolygonF(points));
+
+    QPainterPath path;
+    path.addPolygon(points);
+    QColor fillColor = polygon.color;
+    fillColor.setAlphaF(regionOpacity);
+    painter->fillPath(path, fillColor);
+
+    strokePolyline(painter, points, polygon.color, true);
+
     drawPoints(painter, points, polygon.color);
 }
 
