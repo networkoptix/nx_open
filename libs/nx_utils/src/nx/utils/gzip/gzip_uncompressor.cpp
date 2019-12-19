@@ -180,6 +180,8 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                                 continue;
                             }
                         }
+                        [[fallthrough]];
+
                     default:
                         d->state = Private::State::failed;
                         break;
