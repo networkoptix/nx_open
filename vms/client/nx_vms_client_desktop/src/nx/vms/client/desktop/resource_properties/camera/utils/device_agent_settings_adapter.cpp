@@ -1,6 +1,7 @@
 #include "device_agent_settings_adapter.h"
 
 #include <nx/utils/log/assert.h>
+#include <utils/common/delayed.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <core/resource/camera_resource.h>
@@ -78,7 +79,7 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
                 return;
 
             d->currentEngineId = id;
-            d->refreshSettings(id);
+            executeDelayedParented([this, id]() { d->refreshSettings(id); }, this);
         });
 }
 
