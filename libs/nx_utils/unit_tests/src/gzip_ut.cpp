@@ -31,7 +31,7 @@ TEST(Gzip, DecompressZip)
 {
     const QByteArray origin = "test";
     const std::array<char, 12> compressed = {
-        0x78, 0x9c, 0x2b, 0x49, 0x2d, 0x2e, 0x01, 0x00, 0x04, 0x5d, 0x01, 0xc1};
+        0x78, '\x9c', 0x2b, 0x49, 0x2d, 0x2e, 0x01, 0x00, 0x04, 0x5d, 0x01, '\xc1'};
     ASSERT_TRUE(isZipCompressed(compressed));
     ASSERT_EQ(
         Compressor::uncompressData(QByteArray(compressed.data(), compressed.size())), origin);
