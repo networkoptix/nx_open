@@ -210,9 +210,11 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     QPainter* painter, const QVector<QPointF>& points, const QColor& color, bool closed)
 {
     const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
-    const auto functions = glWidget->context()->versionFunctions<QOpenGLFunctions_1_5>();
 
     QnGlNativePainting::begin(glWidget, painter);
+
+    const auto functions =
+        QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
     functions->glEnable(GL_LINE_SMOOTH);
     functions->glEnable(GL_BLEND);
