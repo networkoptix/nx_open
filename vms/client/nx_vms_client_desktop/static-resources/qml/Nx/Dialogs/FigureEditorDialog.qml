@@ -7,6 +7,7 @@ import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Core.Items 1.0
 import Nx.Instruments 1.0
+import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 import nx.client.desktop 1.0
 
@@ -34,6 +35,12 @@ Window
         resourceId: dialog.resourceId ? dialog.resourceId.toString() : ""
     }
 
+    TextureSizeHelper
+    {
+        id: textureSizeHelper
+        window: dialog
+    }
+
     MediaPlayer
     {
         id: player
@@ -45,6 +52,7 @@ Window
 
         onResourceIdChanged: video.videoOutput.clear()
         onSourceChanged: updatePlayingState()
+        maxTextureSize: textureSizeHelper.maxTextureSize
     }
 
     CursorManager
