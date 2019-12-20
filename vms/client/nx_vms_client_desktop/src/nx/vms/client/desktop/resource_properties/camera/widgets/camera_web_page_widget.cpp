@@ -213,14 +213,11 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
 
-    static const auto kHiddenActions = {
+    webView->setHiddenActions({
         QWebEnginePage::DownloadImageToDisk,
         QWebEnginePage::DownloadLinkToDisk,
         QWebEnginePage::DownloadMediaToDisk,
-        QWebEnginePage::SavePage
-    };
-
-    webView->setHiddenActions(kHiddenActions);
+        QWebEnginePage::SavePage});
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
