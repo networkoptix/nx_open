@@ -1819,6 +1819,14 @@
         <source>Fan Error</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>PoE over budget at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fan error at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
