@@ -25,8 +25,23 @@
 
 namespace
 {
-    const QString kFastRequestKey("fast");
+
+const QString kFastRequestKey("fast");
+
+static QString determineStorageType(const QnMediaServerModule* serverModule, const QString& url)
+{
+    const auto partitions = serverModule->platform()->monitor()->totalPartitionSpaceInfo();
+    const auto partitionIt = std::find_if(
+        partitions.begin(), partitions.end(),
+        [&url](const auto& partition) { return url.startsWith(partition.path); });
+
+    const auto storageType =
+        (partitionIt != partitions.end()) ? partitionIt->type : QnPlatformMonitor::NetworkPartition;
+
+    return QnLexical::serialized(storageType);
 }
+
+} // namespace
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -179,6 +194,11 @@ QnStorageResourceList QnStorageSpaceRestHandler::storageListFrom(
                 return QnStorageResourcePtr();
             }
 
+            storage->setUrl(url);
+            if (storage->getStorageType().isNull())
+                storage->setStorageType(determineStorageType(serverModule(), url));
+
+            NX_VERBOSE(this, "Starting initOrUpdate for storage %1", storage->getUrl());
             if (storage->initOrUpdate() != Qn::StorageInit_Ok)
             {
                 NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
@@ -188,7 +208,6 @@ QnStorageResourceList QnStorageSpaceRestHandler::storageListFrom(
             storage->setIdUnsafe(QnUuid::createUuid());
             storage->setStatus(Qn::Online);
             storage->setSpaceLimit(storage->calcInitialSpaceLimit());
-            storage->setUrl(url);
             if (!wouldBeWritableInPool(storage))
             {
                 NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
@@ -212,7 +231,12 @@ static QList<QnStorageSpaceData> spaceDataListFrom(const QnStorageResourceList& 
     QList<QnStorageSpaceData> result;
     std::transform(
         storages.cbegin(), storages.cend(), std::back_inserter(result),
-        [](const auto& storage) { return QnStorageSpaceData(storage, /*fastCreate*/ false); });
+        [](const auto& storage)
+        {
+            auto s = QnStorageSpaceData(storage, /*fastCreate*/ false);
+            s.storageId = QnUuid(); // This is needed for client to correctly treat this storage as a new one.
+            return s;
+        });
     return result;
 }
 

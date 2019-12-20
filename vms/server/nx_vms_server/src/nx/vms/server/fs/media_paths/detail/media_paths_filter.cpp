@@ -15,13 +15,19 @@ void filterOut(
     QList<QnPlatformMonitor::PartitionSpace>* list,
     QnPlatformMonitor::PartitionType partitionType)
 {
-    list->erase(
-        std::remove_if(
-            list->begin(), list->end(),
-            [partitionType](const QnPlatformMonitor::PartitionSpace& partition)
+    const auto newEndIt = std::remove_if(
+        list->begin(), list->end(),
+        [partitionType](const QnPlatformMonitor::PartitionSpace& partition)
+        { return partition.type == partitionType; });
+
+    using namespace nx::utils::log;
+    if (nx::utils::log::isToBeLogged(Level::verbose))
     {
-        return partition.type == partitionType;
-    }), list->end());
+        for (auto it = newEndIt; it != list->cend(); ++it)
+            NX_VERBOSE(typeid(Filter), "Filtering out partition: '%1' of type '%2'", it->path, it->type);
+    }
+
+    list->erase(newEndIt, list->end());
 }
 
 class PathAmender
@@ -108,6 +114,7 @@ Filter::Filter(FilterConfig filterConfig) :
 QStringList Filter::get() const
 {
     QStringList result;
+    NX_VERBOSE(this, "Candidates: %1", containerString(m_filterConfig.partitions));
     for (const auto& partition : filteredPartitions())
         result.push_back(amendPath(partition.path));
 
