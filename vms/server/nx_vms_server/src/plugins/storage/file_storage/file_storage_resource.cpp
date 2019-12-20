@@ -305,7 +305,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 
     if (url.isEmpty())
     {
-        NX_VERBOSE(this, "[initOrUpdate] storage url is empty");
+        NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
 
@@ -325,7 +325,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
         else
         {
-            NX_VERBOSE(this, "[initOrUpdate] storage dir doesn't exist or mkdir failed");
+            NX_WARNING(this, "[initOrUpdate] storage dir doesn't exist or mkdir failed");
             result = Qn::StorageInit_WrongPath;
         }
     }
