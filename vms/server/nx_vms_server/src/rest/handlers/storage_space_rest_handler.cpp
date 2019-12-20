@@ -226,15 +226,18 @@ QnStorageResourceList QnStorageSpaceRestHandler::storageListFrom(
     return result;
 }
 
-static QList<QnStorageSpaceData> spaceDataListFrom(const QnStorageResourceList& storages)
+static QList<QnStorageSpaceData> spaceDataListFrom(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourceList& storages)
 {
     QList<QnStorageSpaceData> result;
     std::transform(
         storages.cbegin(), storages.cend(), std::back_inserter(result),
-        [](const auto& storage)
+        [serverModule](const auto& storage)
         {
             auto s = QnStorageSpaceData(storage, /*fastCreate*/ false);
             s.storageId = QnUuid(); // This is needed for client to correctly treat this storage as a new one.
+            s.storageStatus = QnStorageManager::storageStatus(serverModule, storage);
             return s;
         });
     return result;
@@ -251,5 +254,5 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
 {
     const auto partitions = getSuitablePartitions();
     const auto storages = storageListFrom(partitions);
-    return spaceDataListFrom(storages);
+    return spaceDataListFrom(serverModule(), storages);
 }
