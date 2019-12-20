@@ -56,7 +56,7 @@ void ClientConnectionTunnelingServer::authorize(
                 api::ResultCode resultCode,
                 controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc) mutable
         {
-            auto lock = m_operationGuard->lock();
+            auto lock = guard->lock();
             if (!lock)
                 return;
 
