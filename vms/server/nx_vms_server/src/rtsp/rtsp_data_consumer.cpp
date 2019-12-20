@@ -620,13 +620,22 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_someDataIsDropped = false;
     }
 
+    if (isLive)
     {
-        QnMutexLocker lock(&m_dataQueueMtx);
-        if (!m_reorderingProvider)
-            m_reorderingProvider = std::make_unique<nx::vms::server::SimpleReorderer>();
-        m_reorderingProvider->processNewData(nonConstData);
+        {
+            QnMutexLocker lock(&m_dataQueueMtx);
+            if (!m_reorderingProvider)
+                m_reorderingProvider = std::make_unique<nx::vms::server::SimpleReorderer>();
+            m_reorderingProvider->processNewData(nonConstData);
+        }
+        sendReorderedData();
     }
-    sendReorderedData();
+    else
+    {
+        processMediaData(nonConstData);
+        QnMutexLocker lock(&m_dataQueueMtx);
+        m_reorderingProvider.reset();
+    }
 
     return true;
 }

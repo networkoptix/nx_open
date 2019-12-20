@@ -122,7 +122,7 @@ void AbstractDataReorderer::processNewData(const QnAbstractDataPacketPtr& data)
     m_dataQueue.insert(itr, media);
 
     const auto keepDataToTime = (*m_dataQueue.rbegin())->timestamp - m_queueDuration.count();
-    while (!m_dataQueue.empty() && (*m_dataQueue.begin())->timestamp < keepDataToTime)
+    while (!m_dataQueue.empty() && (*m_dataQueue.begin())->timestamp <= keepDataToTime)
     {
         auto data = std::move(m_dataQueue.front());
         flushData(data);
