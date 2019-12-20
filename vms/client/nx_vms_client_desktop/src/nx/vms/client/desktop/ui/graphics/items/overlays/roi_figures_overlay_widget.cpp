@@ -2,6 +2,9 @@
 
 #include <cmath>
 
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLFunctions_1_5>
 #include <QtGui/QPainter>
 #include <QtWidgets/QOpenGLWidget>
 
@@ -207,27 +210,29 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     QPainter* painter, const QVector<QPointF>& points, const QColor& color, bool closed)
 {
     const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
+    const auto functions = glWidget->context()->versionFunctions<QOpenGLFunctions_1_5>();
+
     QnGlNativePainting::begin(glWidget, painter);
 
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(false);
-    glLineWidth(2); //< TODO: HiDPI does not work yet.
-    glColor3d(color.redF(), color.greenF(), color.blueF());
+    functions->glEnable(GL_LINE_SMOOTH);
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    functions->glDepthMask(false);
+    functions->glLineWidth(2); //< TODO: HiDPI does not work yet.
+    functions->glColor3d(color.redF(), color.greenF(), color.blueF());
 
-    glBegin(GL_LINE_STRIP);
+    functions->glBegin(GL_LINE_STRIP);
 
     for (const auto& point: points)
-        glVertex2d(point.x(), point.y());
+        functions->glVertex2d(point.x(), point.y());
     if (closed)
-        glVertex2d(points.first().x(), points.first().y());
+        functions->glVertex2d(points.first().x(), points.first().y());
 
-    glEnd();
+    functions->glEnd();
 
-    glDepthMask(true);
-    glDisable(GL_BLEND);
-    glDisable(GL_LINE_SMOOTH);
+    functions->glDepthMask(true);
+    functions->glDisable(GL_BLEND);
+    functions->glDisable(GL_LINE_SMOOTH);
 
     QnGlNativePainting::end(painter);
 }
