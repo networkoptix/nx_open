@@ -910,8 +910,9 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
 struct PushPayload
 {
     QString url;
+    QString image;
 };
-#define PushPayload_Fields (url)
+#define PushPayload_Fields (url)(image)
 QN_FUSION_DECLARE_FUNCTIONS(PushPayload, (json));
 
 struct PushNotification
@@ -924,17 +925,37 @@ struct PushNotification
     PushNotification() = default;
     PushNotification(const vms::event::EventParameters& event, const QnGlobalSettings* settings)
     {
+        static const auto enumString =
+            [](const auto& value)
+            {
+                QString text = QnLexical::serialized(value);
+                text[0] = text[0].toUpper();
+                text.replace(QRegularExpression("(.)([A-Z][a-z]+)"), "\\1 \\2");
+                text.replace(QRegularExpression("([a-z0-9])([A-Z])"), "\\1 \\2");
+                return text;
+            };
+
         // TODO: Work out normal messages for all cases.
-        title = event.caption.isEmpty() ? QnLexical::serialized(event.eventType) : event.caption;
-        body = event.description.isEmpty()
-            ? "Reason: " + QnLexical::serialized(event.reasonCode)
-            : event.description;
+        title = event.caption.isEmpty() ? enumString(event.eventType) : event.caption;
+        if (const auto resource = settings->resourcePool()->getResourceById(event.eventResourceId))
+            body += resource->getName() + "\n";
+        if (event.reasonCode != vms::event::EventReason::none)
+            body += "Reason: " + enumString(event.reasonCode) + "\n";
+        if (!event.description.isEmpty())
+            body += event.description + "\n";
 
         payload.url = lm("%1://%2/client/%3/view/?timestamp=%4").args(
             nx::branding::nativeUriProtocol(), settings->cloudHost(),
             settings->cloudSystemId(), event.eventTimestampUsec);
         if (!event.eventResourceId.isNull())
+        {
             payload.url += "&resources=" + event.eventResourceId.toSimpleString();
+            payload.image = lm("https://%1.%2/ec2/cameraThumbnail?cameraId=%3&time=%4&height=64").args(
+                settings->cloudSystemId(),
+                "relay.vmsproxy.hdw.mx", //< TODO: Set actual proxy host.
+                event.eventResourceId.toSimpleString(),
+                event.eventTimestampUsec / 1000); //< TODO: Add temporary auth key.
+        }
     }
 };
 #define PushNotification_Fields (title)(body)(payload)
