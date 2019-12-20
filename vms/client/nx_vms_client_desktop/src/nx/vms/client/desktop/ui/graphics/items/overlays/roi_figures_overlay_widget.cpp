@@ -344,8 +344,6 @@ void RoiFiguresOverlayWidget::Private::drawDirectionMark(
     path.addPolygon(inverted.map(kDirectionMark));
     path.closeSubpath();
     painter->fillPath(path, color);
-
-    strokePolyline(painter, widget, )
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
