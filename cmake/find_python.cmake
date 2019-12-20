@@ -1,7 +1,7 @@
 if(WIN32)
     find_program(PYTHON_EXECUTABLE python.exe)
 else()
-    find_program(PYTHON_EXECUTABLE python)
+    find_program(PYTHON_EXECUTABLE python3)
 endif()
 
 if(PYTHON_EXECUTABLE)
