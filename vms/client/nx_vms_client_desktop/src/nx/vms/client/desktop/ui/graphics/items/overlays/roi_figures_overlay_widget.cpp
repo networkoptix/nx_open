@@ -25,13 +25,12 @@ namespace {
 
 static constexpr qreal kDirectionMarkWidth = 16;
 static constexpr qreal kDirectionMarkHeight = 8;
-static constexpr qreal kDirectionMarkOffset = 2;
+static constexpr qreal kDirectionMarkOffset = 3;
 
 static const QVector<QPointF> kDirectionMark{
     {kDirectionMarkOffset, -kDirectionMarkWidth / 2},
     {kDirectionMarkOffset + kDirectionMarkHeight, 0},
-    {kDirectionMarkOffset, kDirectionMarkWidth / 2},
-    {kDirectionMarkOffset, -kDirectionMarkWidth / 2}
+    {kDirectionMarkOffset, kDirectionMarkWidth / 2}
 };
 
 enum class FigureType
@@ -171,7 +170,9 @@ public:
         QWidget* widget,
         const QVector<QPointF>& points,
         const QColor& color,
-        bool closed);
+        bool closed,
+        qreal lineWidth,
+        bool beginNativePainting = true);
     void drawLine(QPainter* painter, const Line& line, QWidget* widget);
     void drawBox(QPainter* painter, const Box& box, QWidget* widget);
     void drawPolygon(QPainter* painter, const Polygon& polygon, QWidget* widget);
@@ -182,6 +183,8 @@ public:
         qreal angle,
         const QColor& color,
         QWidget* widget);
+
+    qreal realLineWidth(QWidget* widget) const;
 
     void updateFigureKeys(const QnUuid& engineId, const QJsonObject& model);
     void updateFigures();
@@ -218,10 +221,15 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     QWidget* widget,
     const QVector<QPointF>& points,
     const QColor& color,
-    bool closed)
+    bool closed,
+    qreal lineWidth,
+    bool beginNativePainting)
 {
-    const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
-    QnGlNativePainting::begin(glWidget, painter);
+    if (beginNativePainting)
+    {
+        const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+        QnGlNativePainting::begin(glWidget, painter);
+    }
 
     const auto functions =
         QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
@@ -230,7 +238,7 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     functions->glEnable(GL_BLEND);
     functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     functions->glDepthMask(false);
-    functions->glLineWidth((GLfloat) (2 * widget->devicePixelRatioF()));
+    functions->glLineWidth((GLfloat) lineWidth);
     functions->glColor3d(color.redF(), color.greenF(), color.blueF());
 
     functions->glBegin(GL_LINE_STRIP);
@@ -246,7 +254,8 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     functions->glDisable(GL_BLEND);
     functions->glDisable(GL_LINE_SMOOTH);
 
-    QnGlNativePainting::end(painter);
+    if (beginNativePainting)
+        QnGlNativePainting::end(painter);
 }
 
 void RoiFiguresOverlayWidget::Private::drawLine(
@@ -257,7 +266,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
 
     const auto& points = mapPoints(line.points);
 
-    strokePolyline(painter, widget, points, line.color, false);
+    strokePolyline(painter, widget, points, line.color, false, realLineWidth(widget));
 
     drawPoints(painter, points, line.color, widget);
 
@@ -297,7 +306,7 @@ void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box
     QColor fillColor = box.color;
     fillColor.setAlphaF(regionOpacity);
     painter->fillRect(rect, fillColor);
-    strokePolyline(painter, widget, points, box.color, true);
+    strokePolyline(painter, widget, points, box.color, true, realLineWidth(widget));
     drawPoints(painter, points, box.color, widget);
 }
 
@@ -315,7 +324,7 @@ void RoiFiguresOverlayWidget::Private::drawPolygon(
     fillColor.setAlphaF(regionOpacity);
     painter->fillPath(path, fillColor);
 
-    strokePolyline(painter, widget, points, polygon.color, true);
+    strokePolyline(painter, widget, points, polygon.color, true, realLineWidth(widget));
 
     drawPoints(painter, points, polygon.color, widget);
 }
@@ -332,18 +341,33 @@ void RoiFiguresOverlayWidget::Private::drawPoints(
 void RoiFiguresOverlayWidget::Private::drawDirectionMark(
     QPainter* painter, const QPointF& position, qreal angle, const QColor& color, QWidget* widget)
 {
-    auto transform = QTransform::fromTranslate(-position.x(), -position.y());
-    transform *= QTransform().rotateRadians(-angle);
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
+    QnGlNativePainting::begin(glWidget, painter);
 
-    if (!NX_ASSERT(transform.isInvertible()))
-        return;
+    const auto functions =
+        QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
-    const QTransform inverted = transform.inverted();
+    functions->glPushMatrix();
+    functions->glTranslated(position.x(), position.y(), 0);
+    functions->glRotated(angle / M_PI * 180, 0, 0, 1);
 
-    QPainterPath path;
-    path.addPolygon(inverted.map(kDirectionMark));
-    path.closeSubpath();
-    painter->fillPath(path, color);
+    functions->glColor3d(color.redF(), color.greenF(), color.blueF());
+
+    functions->glBegin(GL_TRIANGLES);
+    for (const auto& point: kDirectionMark)
+        functions->glVertex2d(point.x(), point.y());
+    functions->glEnd();
+
+    strokePolyline(painter, widget, kDirectionMark, color, true, 1, false);
+
+    functions->glPopMatrix();
+
+    QnGlNativePainting::end(painter);
+}
+
+qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
+{
+    return lineWidth * widget->devicePixelRatioF();
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
