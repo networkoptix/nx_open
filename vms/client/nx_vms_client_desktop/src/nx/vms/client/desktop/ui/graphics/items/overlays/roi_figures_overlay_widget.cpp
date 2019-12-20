@@ -27,13 +27,12 @@ static constexpr qreal kDirectionMarkWidth = 16;
 static constexpr qreal kDirectionMarkHeight = 8;
 static constexpr qreal kDirectionMarkOffset = 2;
 
-static const QPolygonF kMark(
-    {
-        {kDirectionMarkOffset, -kDirectionMarkWidth / 2},
-        {kDirectionMarkOffset + kDirectionMarkHeight, 0},
-        {kDirectionMarkOffset, kDirectionMarkWidth / 2},
-        {kDirectionMarkOffset, -kDirectionMarkWidth / 2}
-    });
+static const QVector<QPointF> kDirectionMark{
+    {kDirectionMarkOffset, -kDirectionMarkWidth / 2},
+    {kDirectionMarkOffset + kDirectionMarkHeight, 0},
+    {kDirectionMarkOffset, kDirectionMarkWidth / 2},
+    {kDirectionMarkOffset, -kDirectionMarkWidth / 2}
+};
 
 enum class FigureType
 {
