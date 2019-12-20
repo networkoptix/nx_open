@@ -27,6 +27,9 @@ public:
 public slots:
     void cleanup();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent* event) override;
+
 private:
     void loadState(const CameraSettingsDialogState& state);
 

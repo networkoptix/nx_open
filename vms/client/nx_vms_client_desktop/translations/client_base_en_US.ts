@@ -990,6 +990,10 @@ to view more bookmarks</source>
         <source>Connect to this Server</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1366,7 +1370,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All</source>
-        <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
@@ -3933,12 +3936,8 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation></translation>
+        <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6587,6 +6586,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Video Wall is removed on the server and will be closed.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Failed to connect to the selected server</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -9094,6 +9097,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Power</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&lt; Unknown device &gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
@@ -9603,13 +9610,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-        <source>Failed to load page</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
         <source>%n bookmarks</source>
@@ -9846,10 +9846,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-        <source>Please fill up information about yourself and reason for license deactivation</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Next</source>
         <translation></translation>
     </message>
@@ -9888,6 +9884,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Other Reason</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Please enter your contact information and the reason for deactivating your license</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
