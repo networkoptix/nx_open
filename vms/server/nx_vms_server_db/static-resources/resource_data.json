@@ -2523,7 +2523,8 @@
 
         },
         {
-            "keys":["*|DSC-TVC-0200"],
+            "__comment__": "entropix issues resolution",
+            "keys":["*|DSC-TVC-0200*","DSC-TVC-0200*|*"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -3324,7 +3325,8 @@
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
             "cellinx|nbm2-h6",
-            "*|DSC-TVC-0200",
+            "*|DSC-TVC-0200*",
+            "DSC-TVC-0200*|ipcam",
             "vivotek|ma9322*"
             ],
             "canShareLicenseGroup": true
