@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.184",
+    "version": "1.0.1.185",
     "data": [
         {
             "keys": [
@@ -2532,9 +2532,7 @@
                     "1,3",
                     "2,4"
                 ]
-            },
-            "onvifManufacturerReplacement": "entropix",
-            "onvifVendorSubtype": "entropix"
+            }
 
         },
         {
