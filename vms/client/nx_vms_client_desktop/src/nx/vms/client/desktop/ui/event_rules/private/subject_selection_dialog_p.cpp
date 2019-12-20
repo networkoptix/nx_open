@@ -27,11 +27,12 @@ int countEnabledUsers(const QList<QnResourceAccessSubject>& subjects)
 
 namespace nx::vms::client::desktop {
 namespace ui {
+namespace subject_selection_dialog_private {
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::RoleListModel
+// subject_selection_dialog_private::RoleListModel
 
-SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
+RoleListModel::RoleListModel(QObject* parent):
     base_type(parent, StandardRoleFlag | UserRoleFlag),
     QnCommonModuleAware(parent)
 {
@@ -39,14 +40,14 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     setPredefinedRoleIdsEnabled(true);
 }
 
-void SubjectSelectionDialog::RoleListModel::setRoleValidator(RoleValidator roleValidator)
+void RoleListModel::setRoleValidator(RoleValidator roleValidator)
 {
     m_roleValidator = roleValidator;
     m_validationStates.clear();
     emitDataChanged();
 }
 
-void SubjectSelectionDialog::RoleListModel::setUserValidator(UserValidator userValidator)
+void RoleListModel::setUserValidator(UserValidator userValidator)
 {
     m_userValidator = userValidator;
     if (!m_roleValidator)
@@ -56,7 +57,7 @@ void SubjectSelectionDialog::RoleListModel::setUserValidator(UserValidator userV
     }
 }
 
-void SubjectSelectionDialog::RoleListModel::emitDataChanged()
+void RoleListModel::emitDataChanged()
 {
     const int lastRow = rowCount() - 1;
     if (lastRow >= 0)
@@ -67,7 +68,7 @@ void SubjectSelectionDialog::RoleListModel::emitDataChanged()
     }
 }
 
-QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, int role) const
+QVariant RoleListModel::data(const QModelIndex& index, int role) const
 {
     if (m_allUsers && role == Qt::CheckStateRole && index.column() == CheckColumn)
         return qVariantFromValue<int>(Qt::Checked);
@@ -92,7 +93,7 @@ QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, i
     return qVariantFromValue(state);
 }
 
-QValidator::State SubjectSelectionDialog::RoleListModel::validateRole(const QnUuid& roleId) const
+QValidator::State RoleListModel::validateRole(const QnUuid& roleId) const
 {
     if (m_roleValidator)
         return m_roleValidator(roleId);
@@ -102,7 +103,7 @@ QValidator::State SubjectSelectionDialog::RoleListModel::validateRole(const QnUu
         : QValidator::Acceptable;
 }
 
-QValidator::State SubjectSelectionDialog::RoleListModel::validateUsers(
+QValidator::State RoleListModel::validateUsers(
     const QList<QnResourceAccessSubject>& subjects) const
 {
     if (!m_userValidator)
@@ -141,7 +142,7 @@ QValidator::State SubjectSelectionDialog::RoleListModel::validateUsers(
     }
 }
 
-QSet<QnUuid> SubjectSelectionDialog::RoleListModel::checkedUsers() const
+QSet<QnUuid> RoleListModel::checkedUsers() const
 {
     QSet<QnUuid> checkedUsers;
     for (const auto& roleId: checkedRoles())
@@ -157,12 +158,12 @@ QSet<QnUuid> SubjectSelectionDialog::RoleListModel::checkedUsers() const
     return checkedUsers;
 }
 
-bool SubjectSelectionDialog::RoleListModel::allUsers() const
+bool RoleListModel::allUsers() const
 {
     return m_allUsers;
 }
 
-void SubjectSelectionDialog::RoleListModel::setAllUsers(bool value)
+void RoleListModel::setAllUsers(bool value)
 {
     if (m_allUsers == value)
         return;
@@ -172,9 +173,9 @@ void SubjectSelectionDialog::RoleListModel::setAllUsers(bool value)
 }
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::UserListModel
+// subject_selection_dialog_private::UserListModel
 
-SubjectSelectionDialog::UserListModel::UserListModel(
+UserListModel::UserListModel(
     RoleListModel* rolesModel, QObject* parent)
     :
     base_type(parent),
@@ -223,22 +224,22 @@ SubjectSelectionDialog::UserListModel::UserListModel(
     setFilterKeyColumn(NameColumn);
 }
 
-QSet<QnUuid> SubjectSelectionDialog::UserListModel::checkedUsers() const
+QSet<QnUuid> UserListModel::checkedUsers() const
 {
     return m_usersModel->checkedResources();
 }
 
-void SubjectSelectionDialog::UserListModel::setCheckedUsers(const QSet<QnUuid>& ids)
+void UserListModel::setCheckedUsers(const QSet<QnUuid>& ids)
 {
     m_usersModel->setCheckedResources(ids);
 }
 
-bool SubjectSelectionDialog::UserListModel::customUsersOnly() const
+bool UserListModel::customUsersOnly() const
 {
     return m_customUsersOnly;
 }
 
-void SubjectSelectionDialog::UserListModel::setCustomUsersOnly(bool value)
+void UserListModel::setCustomUsersOnly(bool value)
 {
     if (m_customUsersOnly == value)
         return;
@@ -247,20 +248,20 @@ void SubjectSelectionDialog::UserListModel::setCustomUsersOnly(bool value)
     invalidateFilter();
 }
 
-bool SubjectSelectionDialog::UserListModel::systemHasCustomUsers() const
+bool UserListModel::systemHasCustomUsers() const
 {
     const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::customPermissions);
     return countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(id)) > 0;
 }
 
-Qt::ItemFlags SubjectSelectionDialog::UserListModel::flags(const QModelIndex& index) const
+Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 {
     return index.column() == IndicatorColumn
         ? base_type::flags(index.sibling(index.row(), NameColumn))
         : base_type::flags(index);
 }
 
-QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, int role) const
+QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
     switch (role)
     {
@@ -287,7 +288,7 @@ QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, i
     }
 }
 
-bool SubjectSelectionDialog::UserListModel::filterAcceptsRow(int sourceRow,
+bool UserListModel::filterAcceptsRow(int sourceRow,
     const QModelIndex& sourceParent) const
 {
     const auto user = getUser(sourceModel()->index(sourceRow, 0, sourceParent));
@@ -300,19 +301,19 @@ bool SubjectSelectionDialog::UserListModel::filterAcceptsRow(int sourceRow,
     return base_type::filterAcceptsRow(sourceRow, sourceParent);
 }
 
-bool SubjectSelectionDialog::UserListModel::isValid(const QModelIndex& index) const
+bool UserListModel::isValid(const QModelIndex& index) const
 {
     const auto user = getUser(index);
     return user && (!m_userValidator || m_userValidator(user));
 }
 
-bool SubjectSelectionDialog::UserListModel::isChecked(const QModelIndex& index) const
+bool UserListModel::isChecked(const QModelIndex& index) const
 {
     const auto checkIndex = index.sibling(index.row(), UserListModel::CheckColumn);
     return checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
 }
 
-bool SubjectSelectionDialog::UserListModel::isIndirectlyChecked(const QModelIndex& index) const
+bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
 {
     const auto user = getUser(index);
     if (!user)
@@ -326,24 +327,24 @@ bool SubjectSelectionDialog::UserListModel::isIndirectlyChecked(const QModelInde
     return m_rolesModel->checkedRoles().contains(roleId);
 }
 
-QnUserResourcePtr SubjectSelectionDialog::UserListModel::getUser(const QModelIndex& index)
+QnUserResourcePtr UserListModel::getUser(const QModelIndex& index)
 {
     return index.sibling(index.row(), NameColumn)
         .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 }
 
-void SubjectSelectionDialog::UserListModel::setUserValidator(UserValidator userValidator)
+void UserListModel::setUserValidator(UserValidator userValidator)
 {
     m_userValidator = userValidator;
     columnsChanged(0, columnCount() - 1);
 }
 
-bool SubjectSelectionDialog::UserListModel::allUsers() const
+bool UserListModel::allUsers() const
 {
     return m_allUsers;
 }
 
-void SubjectSelectionDialog::UserListModel::setAllUsers(bool value)
+void UserListModel::setAllUsers(bool value)
 {
     if (m_allUsers == value)
         return;
@@ -352,7 +353,7 @@ void SubjectSelectionDialog::UserListModel::setAllUsers(bool value)
     columnsChanged(0, ColumnCount - 1);
 }
 
-void SubjectSelectionDialog::UserListModel::columnsChanged(int firstColumn, int lastColumn,
+void UserListModel::columnsChanged(int firstColumn, int lastColumn,
     const QVector<int> roles)
 {
     const int lastRow = rowCount() - 1;
@@ -360,15 +361,15 @@ void SubjectSelectionDialog::UserListModel::columnsChanged(int firstColumn, int 
         emit dataChanged(index(0, firstColumn), index(lastRow, lastColumn), roles);
 }
 
-void SubjectSelectionDialog::UserListModel::updateIndicators()
+void UserListModel::updateIndicators()
 {
     columnsChanged(IndicatorColumn, IndicatorColumn, { Qt::DecorationRole });
 };
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::RoleListDelegate
+// subject_selection_dialog_private::RoleListDelegate
 
-SubjectSelectionDialog::RoleListDelegate::RoleListDelegate(QObject* parent):
+RoleListDelegate::RoleListDelegate(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
 {
@@ -376,11 +377,11 @@ SubjectSelectionDialog::RoleListDelegate::RoleListDelegate(QObject* parent):
     setCheckBoxColumn(RoleListModel::CheckColumn);
 }
 
-SubjectSelectionDialog::RoleListDelegate::~RoleListDelegate()
+RoleListDelegate::~RoleListDelegate()
 {
 }
 
-void SubjectSelectionDialog::RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
+void RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
@@ -396,7 +397,7 @@ void SubjectSelectionDialog::RoleListDelegate::initStyleOption(QStyleOptionViewI
     }
 }
 
-void SubjectSelectionDialog::RoleListDelegate::getDisplayInfo(const QModelIndex& index,
+void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
@@ -407,16 +408,16 @@ void SubjectSelectionDialog::RoleListDelegate::getDisplayInfo(const QModelIndex&
 }
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::UserListDelegate
+// subject_selection_dialog_private::UserListDelegate
 
-SubjectSelectionDialog::UserListDelegate::UserListDelegate(QObject* parent):
+UserListDelegate::UserListDelegate(QObject* parent):
     base_type(parent)
 {
     setOptions(HighlightChecked | ValidateOnlyChecked);
     setCheckBoxColumn(UserListModel::CheckColumn);
 }
 
-void SubjectSelectionDialog::UserListDelegate::initStyleOption(
+void UserListDelegate::initStyleOption(
     QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
@@ -425,10 +426,9 @@ void SubjectSelectionDialog::UserListDelegate::initStyleOption(
         option->icon = qnSkin->icon(lit("tree/user_alert.png"));
 }
 
-QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::itemState(
-    const QModelIndex& index) const
+QnResourceItemDelegate::ItemState UserListDelegate::itemState(const QModelIndex& index) const
 {
-    auto model = qobject_cast<const SubjectSelectionDialog::UserListModel*>(index.model());
+    auto model = qobject_cast<const UserListModel*>(index.model());
     NX_ASSERT(model);
 
     if (model->isIndirectlyChecked(index))
@@ -439,5 +439,6 @@ QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::item
 
 //-------------------------------------------------------------------------------------------------
 
+} // namespace subject_selection_dialog_private
 } // namespace ui
 } // namespace nx::vms::client::desktop

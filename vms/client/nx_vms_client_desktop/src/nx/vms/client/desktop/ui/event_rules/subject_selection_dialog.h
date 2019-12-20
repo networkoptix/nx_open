@@ -19,6 +19,15 @@ class SubjectSelectionDialog;
 namespace nx::vms::client::desktop {
 namespace ui {
 
+namespace subject_selection_dialog_private {
+
+class UserListModel;
+class RoleListModel;
+class UserListDelegate;
+class RoleListDelegate;
+
+} //namespace subject_selection_dialog_private
+
 class SubjectSelectionDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
@@ -61,17 +70,15 @@ private:
     void validateAllUsers();
 
 private:
-    class UserListModel;
-    class RoleListModel;
-    class UserListDelegate;
-    class RoleListDelegate;
 
 private:
     QScopedPointer<Ui::SubjectSelectionDialog> ui;
-    RoleListModel* m_roles = nullptr;
-    UserListModel* m_users = nullptr;
-    RoleListDelegate* m_roleListDelegate = nullptr;
-    UserListDelegate* m_userListDelegate = nullptr;
+
+    subject_selection_dialog_private::RoleListModel* m_roles = nullptr;
+    subject_selection_dialog_private::UserListModel* m_users = nullptr;
+    subject_selection_dialog_private::RoleListDelegate* m_roleListDelegate = nullptr;
+    subject_selection_dialog_private::UserListDelegate* m_userListDelegate = nullptr;
+
     bool m_allUsersSelectorEnabled = true;
 };
 
