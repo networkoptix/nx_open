@@ -529,7 +529,7 @@ struct RemoveResourceAccess
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        bool result = result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
+        bool result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
 
         if (!result)
             NX_INFO(this, "Remove resource access returned false. User resource: %1. Target resource: %2",
