@@ -401,217 +401,130 @@ QnWindowsMonitor::~QnWindowsMonitor() {
 
 namespace {
 
-class WindowsDrivesInfoFetcher
+// It took a lot of time and effort to make those functions work correctly, so while they are not
+// used now, we may decide to use them in future. That's why they are still here.
+#if 0
+    static HANDLE getDriveHandle(const QString& driveName)
+    {
+        QString driveSysString = lit("\\\\.\\%1:").arg(driveName[0]);
+        return CreateFile(
+            reinterpret_cast<LPCWSTR>(driveSysString.data()),
+            FILE_READ_ATTRIBUTES,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING, 0, NULL);
+    }
+
+    bool isInserted(HANDLE handle)
+    {
+        DWORD bytesReturned;
+        return DeviceIoControl(
+            handle, IOCTL_STORAGE_CHECK_VERIFY2,
+            NULL, 0, NULL, 0, &bytesReturned, NULL);
+    }
+
+    bool isWritable(HANDLE handle)
+    {
+        DWORD bytesReturned;
+        return DeviceIoControl(
+            handle, IOCTL_DISK_IS_WRITABLE,
+            NULL, 0, NULL, 0, &bytesReturned, NULL);
+    }
+
+#endif // if 0
+
+static std::tuple<std::array<WCHAR, 512>, const WCHAR*> prepareDriveNameBuffer()
 {
-public:
-    QList<QnPlatformMonitor::PartitionSpace> getInfoList()
+    std::array<WCHAR, 512> b;
+    std::fill(b.begin(), b.end(), L'\0');
+    if (!GetLogicalDriveStringsW(static_cast<DWORD>(b.size()), b.data()))
     {
-        if (!fillDriveNamesBuf())
-            return m_infoList;
-
-        QString driveString;
-        while (getNextDriveString(&driveString))
-            processDrive(driveString);
-
-        return m_infoList;
+        NX_ERROR(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW failed");
+        std::fill(b.begin(), b.end(), L'\0');
     }
 
-private:
-    class DriveInfo
+    return std::make_tuple(std::move(b), b.data());
+}
+
+static QStringList getDriveNames()
+{
+    auto [b, pb] = prepareDriveNameBuffer();
+    QStringList result;
+    while (*pb)
     {
-    public:
-        explicit DriveInfo(const QString& driveName): m_drivePath(driveName)
-        {
-            if (!openHandle())
-            {
-                NX_WARNING(this, lm("Failed to open handle for drive %1").arg(driveName));
-                return;
-            }
-
-            m_partition.devName = m_drivePath;
-            m_partition.path = m_drivePath;
-            if (!retrivePartitionType())
-            {
-                NX_WARNING(
-                    this,
-                    lm("Failed to retrive partition type for drive %1").arg(driveName));
-                return;
-            }
-
-            if (isRemovable() && !isMediaOk())
-            {
-                NX_VERBOSE(
-                    this,
-                    lm("Media is not inserted or is not writable for removable drive %1")
-                        .arg(driveName));
-            }
-
-            if (!retriveSpaceInfo())
-            {
-                NX_VERBOSE(
-                    this,
-                    lm("Failed to retrieve partition space information for drive %1")
-                        .arg(driveName));
-                return;
-            }
-
-            m_ok = true;
-        }
-
-        ~DriveInfo()
-        {
-            CloseHandle(m_driveHandle);
-        }
-
-        bool ok() const { return m_ok; }
-        QnPlatformMonitor::PartitionSpace partition() const { return m_partition; }
-    private:
-        QString m_drivePath;
-        HANDLE m_driveHandle = INVALID_HANDLE_VALUE;
-        bool m_ok = false;
-        QnPlatformMonitor::PartitionSpace m_partition;
-
-        bool openHandle()
-        {
-            QString driveSysString = lit("\\\\.\\%1:").arg(m_drivePath[0]);
-            m_driveHandle = CreateFile(
-                reinterpret_cast<LPCWSTR>(driveSysString.data()),
-                FILE_READ_ATTRIBUTES,
-                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                NULL,
-                OPEN_EXISTING,
-                0,
-                NULL);
-            return m_driveHandle != INVALID_HANDLE_VALUE;
-        }
-
-        bool retrivePartitionType()
-        {
-            const UINT systemDriveType =
-                GetDriveType(reinterpret_cast<LPCWSTR>(m_partition.path.data()));
-            switch (systemDriveType)
-            {
-                case DRIVE_NO_ROOT_DIR:
-                    return false;
-                case DRIVE_REMOVABLE:
-                    m_partition.type = QnPlatformMonitor::RemovableDiskPartition;
-                    break;
-                case DRIVE_FIXED:
-                    m_partition.type = QnPlatformMonitor::LocalDiskPartition;
-                    break;
-                case DRIVE_REMOTE:
-                    m_partition.type = QnPlatformMonitor::NetworkPartition;
-                    break;
-                case DRIVE_CDROM:
-                    m_partition.type = QnPlatformMonitor::OpticalDiskPartition;
-                    break;
-                case DRIVE_RAMDISK:
-                    m_partition.type = QnPlatformMonitor::RamDiskPartition;
-                    break;
-                case DRIVE_UNKNOWN:
-                default:
-                    m_partition.type = QnPlatformMonitor::UnknownPartition;
-                    break;
-            }
-            return true;
-        }
-
-        bool isRemovable() const
-        {
-            return m_partition.type == QnPlatformMonitor::RemovableDiskPartition;
-        }
-
-        bool isMediaOk() const
-        {
-            return isInserted() && isWritable();
-        }
-
-        bool isInserted() const
-        {
-            DWORD bytesReturned;
-            return DeviceIoControl(
-                m_driveHandle,
-                IOCTL_STORAGE_CHECK_VERIFY2,
-                NULL, 0,
-                NULL, 0,
-                &bytesReturned,
-                NULL);
-        }
-
-        bool isWritable() const
-        {
-            DWORD bytesReturned;
-            return DeviceIoControl(
-                m_driveHandle,
-                IOCTL_DISK_IS_WRITABLE,
-                NULL, 0,
-                NULL, 0,
-                &bytesReturned,
-                NULL);
-        }
-
-        bool retriveSpaceInfo()
-        {
-            quint64 freeBytesAvailableToCaller = -1;
-            quint64 totalNumberOfBytes = -1;
-            quint64 totalNumberOfFreeBytes = -1;
-            if (!GetDiskFreeSpaceEx(
-                reinterpret_cast<LPCWSTR>(m_drivePath.constData()),
-                reinterpret_cast<PULARGE_INTEGER>(&freeBytesAvailableToCaller),
-                reinterpret_cast<PULARGE_INTEGER>(&totalNumberOfBytes),
-                reinterpret_cast<PULARGE_INTEGER>(&totalNumberOfFreeBytes)))
-            {
-                return false;
-            }
-            m_partition.sizeBytes = totalNumberOfBytes;
-            m_partition.freeBytes = totalNumberOfFreeBytes;
-            return true;
-        }
-    };
-
-    QList<QnPlatformMonitor::PartitionSpace> m_infoList;
-    std::array<WCHAR, 512> m_driveNamesBuf;
-    const WCHAR* m_bufPtr = nullptr;
-
-    bool fillDriveNamesBuf()
-    {
-        if (!GetLogicalDriveStringsW(
-                static_cast<DWORD>(m_driveNamesBuf.size()),
-                m_driveNamesBuf.data()))
-        {
-            NX_ERROR(this, "GetLogicalDriveStringsW failed");
-            return false;
-        }
-
-        m_bufPtr = m_driveNamesBuf.data();
-        return true;
+        const auto driveName = QString::fromWCharArray(pb);
+        result.append(driveName);
+        pb += (size_t) driveName.size() + 1;
     }
 
-    bool getNextDriveString(QString* driveString)
+    return result;
+}
+
+static QnPlatformMonitor::PartitionType getPartitionType(const QString& driveName)
+{
+    switch (GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData())))
     {
-        if (*m_bufPtr == L'\0')
-            return false;
-
-        *driveString = QString::fromUtf16(reinterpret_cast<const ushort*>(m_bufPtr));
-        m_bufPtr += driveString->length() + 1;
-
-        return true;
+        case DRIVE_NO_ROOT_DIR: throw std::runtime_error("Failed to determine drive type");
+        case DRIVE_REMOVABLE: return QnPlatformMonitor::RemovableDiskPartition;
+        case DRIVE_FIXED: return QnPlatformMonitor::LocalDiskPartition;
+        case DRIVE_REMOTE: return QnPlatformMonitor::NetworkPartition;
+        case DRIVE_CDROM: return QnPlatformMonitor::OpticalDiskPartition;
+        case DRIVE_RAMDISK: return QnPlatformMonitor::RamDiskPartition;
+        case DRIVE_UNKNOWN:
+        default: return QnPlatformMonitor::UnknownPartition;
     }
 
-    void processDrive(const QString& driveName)
+    return QnPlatformMonitor::UnknownPartition;
+}
+
+static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
+{
+    ULARGE_INTEGER bytesAvailable;
+    ULARGE_INTEGER bytesTotal;
+    ULARGE_INTEGER bytesFree;
+    if (!GetDiskFreeSpaceEx(
+        (LPCWSTR) driveName.constData(), &bytesAvailable, &bytesTotal, &bytesFree))
     {
-        DriveInfo driveInfo(driveName);
-        if (!driveInfo.ok())
-            return;
-        m_infoList.append(driveInfo.partition());
+        throw std::runtime_error("Failed to get space information");
     }
-};
+
+    return std::make_tuple(bytesTotal.QuadPart, bytesFree.QuadPart);
+}
+
+static std::optional<QnPlatformMonitor::PartitionSpace> getPartitionInfo(const QString& driveName)
+{
+    try
+    {
+        QnPlatformMonitor::PartitionSpace result;
+        result.path = driveName;
+        result.devName = driveName;
+        result.type = getPartitionType(driveName);
+        std::tie(result.sizeBytes, result.freeBytes) = getSpaceInfo(driveName);
+
+        return result;
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(
+            typeid(QnWindowsMonitor),
+            "Error '%1' while fetching volume information for '%2'",
+            e.what(), driveName);
+
+        return std::nullopt;
+    }
+}
 
 } // <anonymous>
 
 QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
 {
-    return WindowsDrivesInfoFetcher().getInfoList();
+    QList<QnPlatformMonitor::PartitionSpace> result;
+    for (const auto& n: getDriveNames())
+    {
+        if (const auto partition = getPartitionInfo(n))
+            result.append(*partition);
+    }
+
+    return result;
 }
 
 QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
