@@ -34,7 +34,10 @@ Connection::Connection(QnCommonModule* commonModule,
     nx::network::http::HttpHeaders headers;
     const auto serializedPeer = localPeer.dataFormat == Qn::UbjsonFormat
         ? QnUbjson::serialized(localPeer) : QJson::serialized(localPeer);
-    headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
+    // Server v4.0 has bug in function 'readFullInfoDataForMobileClient'. Suppress this header
+    // as an temporary solution in order to switch server to function 'readFullInfoDataComplete'.
+    // This hack is for Mobile Clients only! Don't merge it to other branches.
+    //headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
     headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
 
     addAdditionalRequestHeaders(std::move(headers));
