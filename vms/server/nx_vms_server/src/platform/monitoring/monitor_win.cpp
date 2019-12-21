@@ -404,6 +404,8 @@ QnWindowsMonitor::~QnWindowsMonitor() {
 
 namespace {
 
+    using namespace nx::vms::server;
+
 // It took a lot of time and effort to make those functions work correctly, so while they are not
 // used now, we may decide to use them in future. That's why they are still here.
 #if 0
@@ -462,21 +464,21 @@ static QStringList getDriveNames()
     return result;
 }
 
-static QnPlatformMonitor::PartitionType getPartitionType(const QString& driveName)
+static PlatformMonitor::PartitionType getPartitionType(const QString& driveName)
 {
     switch (GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData())))
     {
         case DRIVE_NO_ROOT_DIR: throw std::runtime_error("Failed to determine drive type");
-        case DRIVE_REMOVABLE: return QnPlatformMonitor::RemovableDiskPartition;
-        case DRIVE_FIXED: return QnPlatformMonitor::LocalDiskPartition;
-        case DRIVE_REMOTE: return QnPlatformMonitor::NetworkPartition;
-        case DRIVE_CDROM: return QnPlatformMonitor::OpticalDiskPartition;
-        case DRIVE_RAMDISK: return QnPlatformMonitor::RamDiskPartition;
+        case DRIVE_REMOVABLE: return PlatformMonitor::RemovableDiskPartition;
+        case DRIVE_FIXED: return PlatformMonitor::LocalDiskPartition;
+        case DRIVE_REMOTE: return PlatformMonitor::NetworkPartition;
+        case DRIVE_CDROM: return PlatformMonitor::OpticalDiskPartition;
+        case DRIVE_RAMDISK: return PlatformMonitor::RamDiskPartition;
         case DRIVE_UNKNOWN:
-        default: return QnPlatformMonitor::UnknownPartition;
+        default: return PlatformMonitor::UnknownPartition;
     }
 
-    return QnPlatformMonitor::UnknownPartition;
+    return PlatformMonitor::UnknownPartition;
 }
 
 static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
@@ -493,11 +495,11 @@ static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
     return std::make_tuple(bytesTotal.QuadPart, bytesFree.QuadPart);
 }
 
-static std::optional<QnPlatformMonitor::PartitionSpace> getPartitionInfo(const QString& driveName)
+static std::optional<PlatformMonitor::PartitionSpace> getPartitionInfo(const QString& driveName)
 {
     try
     {
-        QnPlatformMonitor::PartitionSpace result;
+        PlatformMonitor::PartitionSpace result;
         result.path = driveName;
         result.devName = driveName;
         result.type = getPartitionType(driveName);
@@ -520,7 +522,7 @@ static std::optional<QnPlatformMonitor::PartitionSpace> getPartitionInfo(const Q
 
 QList<nx::vms::server::PlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
 {
-    QList<QnPlatformMonitor::PartitionSpace> result;
+    QList<PlatformMonitor::PartitionSpace> result;
     for (const auto& n: getDriveNames())
     {
         if (const auto partition = getPartitionInfo(n))
