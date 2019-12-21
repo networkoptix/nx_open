@@ -946,7 +946,7 @@ struct PushNotification
 
         payload.url = lm("%1://%2/client/%3/view/?timestamp=%4").args(
             nx::branding::nativeUriProtocol(), settings->cloudHost(),
-            settings->cloudSystemId(), event.eventTimestampUsec);
+            settings->cloudSystemId(), event.eventTimestampUsec / 1000);
         if (!event.eventResourceId.isNull())
         {
             payload.url += "&resources=" + event.eventResourceId.toSimpleString();
