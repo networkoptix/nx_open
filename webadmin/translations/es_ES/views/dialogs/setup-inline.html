@@ -12,7 +12,7 @@
         Autorización incorrecta.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
@@ -181,7 +181,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Mantener sesión activa
+                Mantener la sesión activa
             </labe>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
@@ -455,7 +455,7 @@
     <p class="master-description">Algo ha fallado. <br> Descripción del error: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
@@ -468,7 +468,7 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Mediante navegador web</b></div>
-            <div class="col-xs-4 text-right"> Dirección </div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Dirección</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>Usando {{Config.productName}} aplicación</b></div>

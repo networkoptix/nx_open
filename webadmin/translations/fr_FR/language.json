@@ -28,7 +28,7 @@
         "confirmRestoreDefault": "Effacer la base de données et paramètres? Ce processus prendra du temps et le serveur sera redémarré après.",
         "confirmRestoreDefaultTitle": "Restaurer les paramètres par défaut",
         "unexpectedError": "Échec : une erreur inattendue survenue",
-        "connnetionError": "Erreur de connexion",
+        "connnetionError": "Erreur de Connexion",
         "wrongPassword": "Mot de passe incorrect.",
         "error": "Erreur: ",
         "restartNeeded": "Changements enregistrées. Redémarrer le serveur pour appliquer?",

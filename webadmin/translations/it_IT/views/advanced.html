@@ -1,6 +1,6 @@
 <div class="container">
     <h1><a href="#/metrics/">Novità: report sullo stato del sistema</a></h1>
-    <h1><a href="#/developers/serverDocumentation">New: Server Settings Documentation</a></h1>
+    <h1><a href="#/developers/serverDocumentation">Nuovo: Documentazione Impostazioni Server</a></h1>
 </div>
 <div class="container">
     <h1>Impostazioni avanzate del server</h1>
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inacessibile
+                                Inaccessibile
                             </div>
                         </div>
                     </td>
@@ -121,7 +121,7 @@
     <h2>Impostazioni registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} livello di registro</label>
+            <label class="col-sm-4">{{name}} livello del registro</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Nessuno: log disabilitato.</option>
@@ -187,7 +187,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Attenzione!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Attenzione!</b> Attenzione! Alcune modifiche richiedono il riavvio <b> tutti </b> i server nel sistema.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Riavvia il server corrente</button>
         </div>

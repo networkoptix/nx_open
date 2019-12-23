@@ -12,7 +12,7 @@
         Помилка авторизації.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Спробуйте ще раз</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Спробуйте ще раз</button>
     </p>
 </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-click="retry()">Спробуйте ще раз</button>
     </p>
 </div>
 
@@ -453,7 +453,7 @@
         Опис помилки: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-click="retry()">Спробуйте ще раз</button>
     </p>
 </div>
 

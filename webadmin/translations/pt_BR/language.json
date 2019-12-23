@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Login ou senha incorrectos",
-        "authLockout": "Demasiadas tentativas. Tente novamente mais tarde."
+        "authLockout": "Demasiadas tentativas. Tente novamente dentro de um minuto."
     },
     "navigaion": {
         "cannotGetUser": "Falha do servidor: não é possível obter os dados do utilizador actual"

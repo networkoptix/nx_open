@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Strona...</translation>
     </message>
   </context>
   <context>
@@ -3026,7 +3026,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Nie można wykryć rozdzielczości przechwytywania</translation>
     </message>
   </context>
   <context>
@@ -5873,31 +5873,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>local</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optical</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>network</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>unknown</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6602,7 +6602,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>POBIERANIE&lt;br&gt;ROZPOCZĘTE</translation>
     </message>
   </context>
   <context>
@@ -6749,7 +6749,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Nie można potwierdzić zdarzenia na usuniętej kamerze.</translation>
     </message>
   </context>
   <context>
@@ -10317,7 +10317,7 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Zapisz plik jako...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10325,15 +10325,15 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Nie udało się zapisać pliku</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>Folder %1 jest zablokowany do zapisu.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Pobieranie pliku...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10341,15 +10341,15 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Zatrzymać pobieranie pliku?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Plik pobrany</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Pobieranie pliku nie powiodło się</translation>
     </message>
   </context>
 </TS>

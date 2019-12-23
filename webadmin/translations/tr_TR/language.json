@@ -28,7 +28,7 @@
         "confirmRestoreDefault": "Database ve ayarlar temizlensin mi? Bu işlem biraz zaman alabilir ve tamamlandığında sunucu yeniden başlatılacak.",
         "confirmRestoreDefaultTitle": "Fabrika ayarlarına geri yükle",
         "unexpectedError": "Hata: beklenmedik bir hata oluştu",
-        "connnetionError": "Bağlantı hatası",
+        "connnetionError": "Bağlantı Hatası",
         "wrongPassword": "Hatalı parola.",
         "error": "Hata: ",
         "restartNeeded": "Değişiklikler kaydedildi. Yeni ayarlarda uygulama yeniden başlatılsın mı?",

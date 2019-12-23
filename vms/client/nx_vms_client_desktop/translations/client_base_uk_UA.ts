@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Сторінка...</translation>
     </message>
   </context>
   <context>
@@ -3030,7 +3030,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Не вдалося виявити роздільну здатність запису</translation>
     </message>
   </context>
   <context>
@@ -5878,31 +5878,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>локальний</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ОЗП</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>оптичний</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>поміняти</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>мережа</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>невідомо</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6607,7 +6607,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>ЗАВАНТАЖЕННЯ&lt;br&gt;ПОЧАТОК</translation>
     </message>
   </context>
   <context>
@@ -6754,7 +6754,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Неможливо підтвердити подію на видаленій камері.</translation>
     </message>
   </context>
   <context>
@@ -10322,7 +10322,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Зберегти файл як...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10330,15 +10330,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Помилка збереження файлу</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 папка заблокована для запису.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Завантаження файлу...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10346,15 +10346,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Припинити завантаження?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Файл завантажено</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Не вдалося завантажити файл</translation>
     </message>
   </context>
 </TS>

@@ -10,7 +10,7 @@
             <tr><td>Versión</td><td><b>{{settings.version}}</b></td></tr>
             <tr><td>Plataforma</td><td><b>{{settings.osInfo.platform}}</b></td></tr>
             <tr ng-if="user.isAdmin" class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr ng-if="user.isAdmin"><td>Todos los servidores</td><td>
+            <tr ng-if="user.isAdmin"><td>All servers</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">
                     <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
                     <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank"><b>{{server.name}}</b> {{server.apiUrlFormatted}}</a>

@@ -28,7 +28,7 @@
         "confirmRestoreDefault": "Smazat databázi a nastavení? Tento proces bude trvat nějakou dobu a poté bude server restartován.",
         "confirmRestoreDefaultTitle": "Obnovit výchozí nastavení",
         "unexpectedError": "Porucha: Došlo k neočekávané chybě",
-        "connnetionError": "Chyba připojení",
+        "connnetionError": "Chyba spojení",
         "wrongPassword": "Chybne heslo.",
         "error": "Chyba: ",
         "restartNeeded": "Změny byly uloženy. Restartujte server, chcete-li použít nová nastavení.",

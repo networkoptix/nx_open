@@ -12,7 +12,7 @@
         A autorização falhou.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente novamente</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente novamente</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -233,7 +233,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Guardar senha
+                Guardar password
             </labe>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tente novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -456,7 +456,7 @@
         Descrição do erro:{{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tente novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -474,7 +474,7 @@
         <div class="col-xs-6">
             <div class="text-center"><b>Usando a aplicação {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Porta</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Porto</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">Entrar</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Senha</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>

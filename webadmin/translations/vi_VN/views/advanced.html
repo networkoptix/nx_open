@@ -17,7 +17,7 @@
             <thead>
                 <tr>
                     <th >
-                        Đường dẫn
+                        Nơi
                     </th>
                     <th width="200">
                         Dung lượng trống
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Không thể truy cập
+                                Không thể tiếp cận
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">Gb</div>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">Gb</div>
+                            <div class="input-group-addon">GB</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">

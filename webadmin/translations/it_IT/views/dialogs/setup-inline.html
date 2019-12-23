@@ -12,7 +12,7 @@
         Autorizzazione fallita.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Riprova</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Riprovare</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Riprova</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Riprovare</button>
     </p>
 </div>
 
@@ -357,7 +357,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Riprova</button>
+        <button class="btn btn-default" ng-click="retry()">Riprovare</button>
     </p>
 </div>
 
@@ -447,7 +447,7 @@
     <p class="master-description">Qualcosa è andato completamente storto. <br> Descrizione errore: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Riprova</button>
+        <button class="btn btn-default" ng-click="retry()">Riprovare</button>
     </p>
 </div>
 
@@ -459,7 +459,7 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Utilizzando il browser web</b></div>
-            <div class="col-xs-4 text-right">Indirizzo</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Indirizzo</div><div class="col-xs-8 text-left"><b>https: //{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>Utilizzando {{Config.productName}} applicazione</b></div>

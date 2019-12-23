@@ -135,7 +135,7 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>خطأ داخلي %1. يرجى الاتصال بفريق الدعم.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
