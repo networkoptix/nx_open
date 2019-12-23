@@ -203,7 +203,7 @@ void CameraWebPageWidget::Private::createNewPage()
         script.setSourceCode(s);
         script.setInjectionPoint(QWebEngineScript::DocumentCreation);
         script.setRunsOnSubFrames(true);
-        script.setWorldId(QWebEngineScript::ApplicationWorld);
+        script.setWorldId(QWebEngineScript::MainWorld);
         webView->page()->profile()->scripts()->insert(script);
     }
 
