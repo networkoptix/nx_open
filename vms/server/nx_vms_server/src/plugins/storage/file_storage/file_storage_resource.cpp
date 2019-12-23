@@ -926,6 +926,7 @@ void QnFileStorageResource::setMounted(bool value)
 {
     QnMutexLocker lock(&m_mutex);
     m_isMounted = value;
+    m_valid = false;
 }
 
 bool QnFileStorageResource::isMounted() const
