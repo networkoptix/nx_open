@@ -97,7 +97,7 @@ private:
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
     nx::vms::server::RootFileSystem* rootTool() const;
-    QIODevice* QnFileStorageResource::openInternal(
+    QIODevice* openInternal(
         const QString& fileName,
         QIODevice::OpenMode openMode);
 
