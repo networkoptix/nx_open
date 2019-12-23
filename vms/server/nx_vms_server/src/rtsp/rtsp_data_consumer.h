@@ -95,13 +95,13 @@ protected:
     void sendRangeHeaderIfChanged();
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
-    void flushReorderingBuffer();
     void sendReorderedData();
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
     bool needData(const QnAbstractDataPacketPtr& data) const;
     void switchQualityIfNeeded(bool isSecondaryProvider);
-    void processMediaData(const QnAbstractDataPacketPtr& nonConstData);
+    void processMediaData(const QnAbstractMediaDataPtr& nonConstData);
+    void flushReorderingBuffer();
 private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;

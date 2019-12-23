@@ -147,7 +147,7 @@ void QnRtspDataConsumer::setLastSendTime(qint64 time)
  */
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 {
-    QnMutexLocker lock( &m_mutex );
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_waitSCeq = sceq;
     m_lastMediaTime = m_lastSendTime = newTime;
 }
@@ -304,7 +304,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     if (!needData(nonConstData))
         return;
 
-    QnMutexLocker lock(&m_dataQueueMtx);
+    NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
 
     // quality control
@@ -377,7 +377,7 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
-    QnMutexLocker lock(&m_qualityChangeMutex);
+    NX_MUTEX_LOCKER lock(&m_qualityChangeMutex);
     if (m_liveQuality != liveQuality && m_newLiveQuality != liveQuality)
     {
         NX_DEBUG(this, "Schedule to change quality from %1, to %2", m_liveQuality, liveQuality);
@@ -463,7 +463,7 @@ void QnRtspDataConsumer::sendRangeHeaderIfChanged()
 void QnRtspDataConsumer::flushReorderingBuffer()
 {
     {
-        QnMutexLocker lock(&m_dataQueueMtx);
+        NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
         if (m_reorderingProvider)
             m_reorderingProvider->flush();
     }
@@ -472,7 +472,7 @@ void QnRtspDataConsumer::flushReorderingBuffer()
 
 void QnRtspDataConsumer::sendReorderedData()
 {
-    QnMutexLocker lock(&m_dataQueueMtx);
+    NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
     while (1)
     {
         if (!m_reorderingProvider)
@@ -553,7 +553,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (isVideo || isAudio)
     {
-        QnMutexLocker lock(&m_qualityChangeMutex);
+        NX_MUTEX_LOCKER lock(&m_qualityChangeMutex);
 
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -594,7 +594,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         logger->pushData(media, lm("Queue size %1").args(m_dataQueue.size()));
 
     {
-        QnMutexLocker lock( &m_mutex );
+        NX_MUTEX_LOCKER lock( &m_mutex );
         int cseq = media->opaque;
         if (m_waitSCeq != -1) {
             if (cseq != m_waitSCeq)
@@ -623,7 +623,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (isLive)
     {
         {
-            QnMutexLocker lock(&m_dataQueueMtx);
+            NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
             if (!m_reorderingProvider)
                 m_reorderingProvider = std::make_unique<nx::vms::server::SimpleReorderer>();
             m_reorderingProvider->processNewData(nonConstData);
@@ -632,18 +632,16 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
     else
     {
-        processMediaData(nonConstData);
-        QnMutexLocker lock(&m_dataQueueMtx);
+        processMediaData(std::const_pointer_cast<QnAbstractMediaData>(media));
+        NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
         m_reorderingProvider.reset();
     }
 
     return true;
 }
 
-void QnRtspDataConsumer::processMediaData(const QnAbstractDataPacketPtr& nonConstData)
+void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
 {
-    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
-
     const auto flushBuffer = nx::utils::makeScopeGuard(
         [this]()
         {
@@ -659,7 +657,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractDataPacketPtr& nonCons
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
         if (!media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
-            (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
+            (media.get())->timestamp /= m_streamingSpeed;
         else
             NX_DEBUG(this, "Speed parameter was ignored for live mode");
     }
@@ -778,7 +776,7 @@ void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtc
         bytesRead = rtcpSocket->recv(buffer, sizeof(buffer));
         if (bytesRead > 0)
         {
-            QnMutexLocker lock(&m_mutex);
+            NX_MUTEX_LOCKER lock(&m_mutex);
             m_keepAliveTimer.restart();
         }
     } while(bytesRead > 0 && !m_needStop);
@@ -786,7 +784,7 @@ void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtc
 
 std::chrono::milliseconds QnRtspDataConsumer::timeFromLastReceiverReport()
 {
-    QnMutexLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_keepAliveTimer.elapsed();
 }
 
@@ -845,7 +843,7 @@ void QnRtspDataConsumer::setLiveMarker(int marker)
 
 void QnRtspDataConsumer::clearUnprocessedData()
 {
-    QnMutexLocker lock(&m_dataQueueMtx);
+    NX_MUTEX_LOCKER lock(&m_dataQueueMtx);
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);

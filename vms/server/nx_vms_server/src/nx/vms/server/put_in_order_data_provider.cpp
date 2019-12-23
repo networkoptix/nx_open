@@ -54,7 +54,7 @@ bool ProxyDataProvider::hasVideo() const
 
 bool ProxyDataProvider::needConfigureProvider() const
 {
-    QnMutexLocker mutex(&m_mutex);
+    NX_MUTEX_LOCKER mutex(&m_mutex);
     for (auto processor: m_dataprocessors)
     {
         if (processor->needConfigureProvider())
@@ -75,23 +75,16 @@ QnSharedResourcePointer<QnAbstractVideoCamera> ProxyDataProvider::getOwner() con
 
 // ------------------- AbstractPutInOrderDataProvider -------------------------
 
-AbstractDataReorderer::AbstractDataReorderer(
-    microseconds minQueueDuration,
-    microseconds maxQueueDuration,
-    microseconds initialQueueDuration,
-    BufferingPolicy policy)
-    :
-    m_queueDuration(initialQueueDuration),
-    m_minQueueDuration(minQueueDuration),
-    m_maxQueueDuration(maxQueueDuration),
-    m_policy(policy)
+AbstractDataReorderer::AbstractDataReorderer(const Settings& settings):
+    m_queueDuration(settings.initialQueueDuration),
+    m_settings(settings)
 {
     m_timer.restart();
 }
 
 std::optional<std::chrono::microseconds> AbstractDataReorderer::flush()
 {
-    QnMutexLocker lock(& m_mutex);
+    NX_MUTEX_LOCKER lock(& m_mutex);
     std::optional<std::chrono::microseconds> lastFlushTime;
     while (!m_dataQueue.empty())
     {
@@ -105,7 +98,7 @@ std::optional<std::chrono::microseconds> AbstractDataReorderer::flush()
 
 void AbstractDataReorderer::processNewData(const QnAbstractDataPacketPtr& data)
 {
-    QnMutexLocker lock(& m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
@@ -176,7 +169,7 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
     if (data->timestamp < keepDataToTime)
     {
         // Increase queue size if need
-        auto newValue = std::min(multiply(jitter, kExtraBufferSizeCoeff), m_maxQueueDuration);
+        auto newValue = std::min(multiply(jitter, kExtraBufferSizeCoeff), m_settings.maxQueueDuration);
         if (m_queueDuration != newValue)
         {
             NX_DEBUG(this, "Increase queue duration from %1 to %2", toMs(m_queueDuration), toMs(newValue));
@@ -186,10 +179,10 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
 
     const auto testJitter = multiply(maxJitter, kExtraBufferSizeCoeff);
     if (isJitterQueueFull
-        && m_policy == BufferingPolicy::increaseAndDescrease
+        && m_settings.policy == BufferingPolicy::increaseAndDescrease
         && testJitter < m_queueDuration)
     {
-        auto newValue = std::max(testJitter, m_minQueueDuration);
+        auto newValue = std::max(testJitter, m_settings.minQueueDuration);
         if (m_queueDuration != newValue)
         {
             NX_DEBUG(this, "decrease queue duration from %1 to %2. History size %3",
@@ -203,14 +196,10 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
 // ----------------------- PutInOrderDataProvider --------------------------------------
 
 PutInOrderDataProvider::PutInOrderDataProvider(
-    const QnAbstractStreamDataProviderPtr& provider,
-    microseconds minQueueDuration,
-    microseconds maxQueueDuration,
-    microseconds initialQueueDuration,
-    BufferingPolicy policy)
+    const QnAbstractStreamDataProviderPtr& provider, const Settings& settings)
     :
     ProxyDataProvider(provider),
-    AbstractDataReorderer(initialQueueDuration, minQueueDuration, maxQueueDuration, policy)
+    AbstractDataReorderer(settings)
 {
     start();
 }
