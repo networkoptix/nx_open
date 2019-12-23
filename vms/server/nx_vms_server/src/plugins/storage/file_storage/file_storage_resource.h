@@ -101,7 +101,7 @@ private:
         const QString& fileName,
         QIODevice::OpenMode openMode);
 
-    QIODevice* QnFileStorageResource::openInternal(
+    QIODevice* openInternal(
         const QString& url,
         QIODevice::OpenMode openMode,
         int bufferSize);
