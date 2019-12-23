@@ -700,24 +700,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-
-        using namespace nx::vms::server::fs::media_paths;
-        using namespace nx::mserver_aux;
-        auto pathConfig = FilterConfig::createDefault(
-            serverModule()->platform(), /*includeNonHdd*/ true, &serverModule()->settings());
-
         for (const auto& s: m_mediaServer->getStorages())
-        {
-            if (auto fileStorage = s.dynamicCast<QnFileStorageResource>(); s && !s->isExternal())
-            {
-                const bool isMounted = isPathMounted(fileStorage->getUrl(), getMediaPaths(pathConfig));
-                NX_DEBUG(
-                    this, "Setting initial mounted status '%1' for local file storage '%2'",
-                    isMounted, fileStorage->getUrl());
-
-                fileStorage->setMounted(isMounted);
-            }
-        }
+            nx::mserver_aux::updateMountedStatus(s, serverModule());
 
         QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
         for (auto it = smallStorages.begin(); it != smallStorages.end(); )

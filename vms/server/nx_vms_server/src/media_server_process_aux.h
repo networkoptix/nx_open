@@ -16,7 +16,7 @@ void saveStoragesInfoToBeforeRestoreData(
     BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages);
 
-bool isPathMounted(const QString& path, const QStringList& mediaPaths);
+void updateMountedStatus(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule);
 
 class SystemNameProxy
 {
