@@ -89,7 +89,8 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
     m_ready(false),
     m_state(InitialSearch),
     m_discoveryUpdateIdx(0),
-    m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs)
+    m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs),
+    m_manualCameraListChanged(false)
 {
     m_threadPool.setMaxThreadCount(kThreadCount);
 }
@@ -425,12 +426,15 @@ nx::vms::common::AnalyticsEngineResourcePtr
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
     decltype(m_manualCameraByUniqueId) manualCameraByUniqueId;
+    bool manualCameraListChanged = false;
     {
         QnMutexLocker lock(&m_searchersListMutex);
         if (m_manualCameraByUniqueId.empty())
             return;
 
         manualCameraByUniqueId = m_manualCameraByUniqueId;
+        manualCameraListChanged = m_manualCameraListChanged;
+        m_manualCameraListChanged = false;
     }
 
     std::vector<QFuture<QnResourceList>> searchFutures;
@@ -451,7 +455,8 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
         // TODO: Refactor so samera is not pinged on manual addition. The resource from manual
         // search handler should be used instead!
         if (!manualCamera.searcher || (
-            camera && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled))
+            camera && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled) 
+            && !manualCameraListChanged)
         {
             NX_VERBOSE(this, lm("Skip disabled searcher for camera %1 on %2").args(
                 manualCamera.uniqueId, manualCamera.url));
@@ -735,6 +740,7 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vecto
             const auto iterator = m_manualCameraByUniqueId.insert(camera.uniqueId, camera);
             iterator.value().searcher = searcher;
             registeredUniqueIds << camera.uniqueId;
+            m_manualCameraListChanged = true;
             break;
         }
     }
