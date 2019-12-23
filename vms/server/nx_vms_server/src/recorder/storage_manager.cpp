@@ -57,6 +57,8 @@
 #include <media_server_process_aux.h>
 #include <nx/sql/database.h>
 #include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -1391,10 +1393,16 @@ void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
 {
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
     {
-        fileStorage->setMounted(nx::mserver_aux::isStorageMounted(
-            serverModule()->platform(),
-            fileStorage,
-            &serverModule()->settings()));
+        using namespace nx::vms::server::fs::media_paths;
+        auto pathConfig = FilterConfig::createDefault(
+            serverModule()->platform(), /*includeNonHdd*/ false, &serverModule()->settings());
+
+        const bool isMounted = nx::mserver_aux::isPathMounted(fileStorage->getUrl(), getMediaPaths(pathConfig));
+        if (isMounted != fileStorage->isMounted())
+        {
+            NX_DEBUG(this, "Changing 'IsMounted' for storage '%1' to '%2'", fileStorage->getUrl(), isMounted);
+            fileStorage->setMounted(isMounted);
+        }
     }
 }
 

@@ -13,11 +13,7 @@ namespace media_paths {
 
 struct FilterConfig
 {
-    FilterConfig(FilterConfig&&) = default;
-    FilterConfig& operator=(FilterConfig&&) = default;
-    FilterConfig() = default;
-
-    QList<nx::vms::server::PlatformMonitor::PartitionSpace> partitions;
+    QList<QnPlatformMonitor::PartitionSpace> partitions;
     bool isMultipleInstancesAllowed = false;
     bool isNetworkDrivesAllowed = false;
     bool isRemovableDrivesAllowed = false;

@@ -18,85 +18,11 @@
 namespace nx {
 namespace mserver_aux {
 
-UnmountedLocalStoragesFilter::UnmountedLocalStoragesFilter(const QString& mediaFolderName):
-    m_mediaFolderName(mediaFolderName)
-{}
-
-QString UnmountedLocalStoragesFilter::stripMediaFolderFromPath(const QString& path)
+bool isPathMounted(const QString& path, const QStringList& mediaPaths)
 {
-    if (!path.endsWith(m_mediaFolderName))
-        return path;
-
-    int indexBeforeMediaFolderName = path.indexOf(m_mediaFolderName) - 1;
-    NX_ASSERT(indexBeforeMediaFolderName > 0);
-    if (indexBeforeMediaFolderName <= 0)
-        return path;
-
-    return path.mid(0, indexBeforeMediaFolderName);
-}
-
-QStringList UnmountedLocalStoragesFilter::stripMediaFolderFromPaths(const QStringList& paths)
-{
-    QStringList result;
-    std::transform(
-          paths.cbegin(),
-          paths.cend(),
-          std::back_inserter(result),
-          [this](const QString& path)
-          {
-            return stripMediaFolderFromPath(path);
-          });
-
-    return result;
-}
-
-QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
-        const QnStorageResourceList& allStorages,
-        const QStringList& paths)
-{
-    QStringList strippedPaths = stripMediaFolderFromPaths(paths);
-    QnStorageResourceList result;
-
-    for (const auto& storage: allStorages)
-    {
-        if (!strippedPaths.contains(stripMediaFolderFromPath(storage->getUrl())))
-            result.append(storage);
-    }
-
-    return result;
-}
-
-bool isStorageMounted(
-    QnPlatformAbstraction* platform,
-    const QnStorageResourcePtr& storage,
-    const nx::vms::server::Settings* settings)
-{
-    const auto unmountedStorages = getUnmountedStorages(platform, {storage}, settings);
-    return !unmountedStorages.contains(storage);
-}
-
-QnStorageResourceList getUnmountedStorages(
-    QnPlatformAbstraction* platform,
-    const QnStorageResourceList& allServerStorages,
-    const nx::vms::server::Settings* settings)
-{
-    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
-
-    using namespace nx::vms::server::fs::media_paths;
-
-    auto mediaPathList = get(FilterConfig::createDefault(platform, /*includeNonHdd*/ true, settings));
-    NX_VERBOSE(
-        typeid(UnmountedLocalStoragesFilter),
-        lm("Record folders: %1").container(mediaPathList));
-
-    QnStorageResourceList filteredStorages;
-    for (const auto& storage: allServerStorages)
-    {
-        if (!storage->isExternal())
-            filteredStorages.push_back(storage);
-    }
-
-    return unmountedLocalStoragesFilter.getUnmountedStorages(filteredStorages, mediaPathList);
+    return std::any_of(
+        mediaPaths.cbegin(), mediaPaths.cend(),
+        [&path](const auto& p) { return p.startsWith(path); });
 }
 
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
