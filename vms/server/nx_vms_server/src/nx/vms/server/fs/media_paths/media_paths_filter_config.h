@@ -13,7 +13,7 @@ namespace media_paths {
 
 struct FilterConfig
 {
-    QList<QnPlatformMonitor::PartitionSpace> partitions;
+    QList<PlatformMonitor::PartitionSpace> partitions;
     bool isMultipleInstancesAllowed = false;
     bool isNetworkDrivesAllowed = false;
     bool isRemovableDrivesAllowed = false;

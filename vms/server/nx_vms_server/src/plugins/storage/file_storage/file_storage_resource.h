@@ -97,6 +97,14 @@ private:
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
     nx::vms::server::RootFileSystem* rootTool() const;
+    QIODevice* QnFileStorageResource::openInternal(
+        const QString& fileName,
+        QIODevice::OpenMode openMode);
+
+    QIODevice* QnFileStorageResource::openInternal(
+        const QString& url,
+        QIODevice::OpenMode openMode,
+        int bufferSize);
 
 public:
     // Try to remove old temporary dirs if any.

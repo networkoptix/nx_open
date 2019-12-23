@@ -552,7 +552,7 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
     using namespace nx::vms::server::fs::media_paths;
 
     auto mediaPathList = getMediaPaths(FilterConfig::createDefault(
-        m_platform.get(), includeNonHdd, &serverModule()->settings()));
+        serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
