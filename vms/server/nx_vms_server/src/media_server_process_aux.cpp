@@ -37,9 +37,11 @@ void updateMountedStatus(const QnStorageResourcePtr& storage, QnMediaServerModul
     if (!fileStorage)
         return;
 
-    if (fileStorage->isExternal() && !fileStorage->isMounted())
+    if (fileStorage->isExternal())
     {
-        fileStorage->setMounted(true);
+        if (!fileStorage->isMounted())
+            fileStorage->setMounted(true);
+
         return;
     }
 
