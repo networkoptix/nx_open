@@ -210,12 +210,12 @@ Qn::ConnectionRole fromStreamIndex(nx::vms::api::StreamIndex streamIndex)
     using namespace nx::vms::api;
     switch (streamIndex)
     {
-    case StreamIndex::primary:
-        return ConnectionRole::CR_LiveVideo;
-    case StreamIndex::secondary:
-        return ConnectionRole::CR_SecondaryLiveVideo;
-    default:
-        return ConnectionRole::CR_Default;
+        case StreamIndex::primary:
+            return ConnectionRole::CR_LiveVideo;
+        case StreamIndex::secondary:
+            return ConnectionRole::CR_SecondaryLiveVideo;
+        default:
+            return ConnectionRole::CR_Default;
     }
 }
 

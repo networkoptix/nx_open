@@ -460,7 +460,7 @@ void DeviceAnalyticsContext::registerStream(nx::vms::api::StreamIndex streamInde
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_registeredStreams.insert(streamIndex);
+        m_registeredStreamIndexes.insert(streamIndex);
     }
 
     updateStreamProviderRequirements();
@@ -702,10 +702,10 @@ DeviceAnalyticsContext::StreamProviderRequirementsMap
     DeviceAnalyticsContext::adjustProviderRequirementsByProviderCountUnsafe(
         StreamProviderRequirementsMap requirements) const
 {
-    if (m_registeredStreams.size() != 1)
+    if (m_registeredStreamIndexes.size() != 1)
         return requirements;
 
-    const StreamIndex registeredStreamIndex = *m_registeredStreams.begin();
+    const StreamIndex registeredStreamIndex = *m_registeredStreamIndexes.begin();
     const StreamIndex oppositeStreamIndex =
         nx::vms::api::oppositeStreamIndex(registeredStreamIndex);
 

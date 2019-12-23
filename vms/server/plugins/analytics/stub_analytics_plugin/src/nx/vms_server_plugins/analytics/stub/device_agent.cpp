@@ -267,7 +267,7 @@ void DeviceAgent::processCustomMetadataPacket(
     const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket,
     const char* func)
 {
-    NX_OUTPUT << func << "(): timestamp " << customMetadataPacket->timestampUs() << " us;";
+    NX_OUTPUT << func << "(): timestamp " << customMetadataPacket->timestampUs() << " us.";
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
@@ -319,11 +319,11 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
     if (!metadataPacketList)
         return;
 
-    const int numberOfMetadataPackets = metadataPacketList->count();
-    if (numberOfMetadataPackets == 0)
+    const int metadataPacketCount = metadataPacketList->count();
+    if (metadataPacketCount == 0)
         return;
 
-    for (int i = 0; i < numberOfMetadataPackets; ++i)
+    for (int i = 0; i < metadataPacketCount; ++i)
     {
         const auto metadataPacket = metadataPacketList->at(i);
         if (!NX_KIT_ASSERT(metadataPacket))
@@ -348,7 +348,7 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
 
                 const auto objectMetadata = makePtr<ObjectMetadata>();
                 objectMetadata->setBoundingBox(Rect(
-                    column / (float)columnCount,
+                    column / (float) columnCount,
                     row / (float) rowCount,
                     1.0F / columnCount,
                     1.0F / rowCount));

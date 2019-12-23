@@ -13,8 +13,10 @@ class StreamConverter
 public:
     StreamConverter();
 
-    // @return true if it is possible to retrieve some data with `getData()` call after current
-    //     `pushData()`
+    /**
+     * @return true if it is possible to retrieve some data with `getData()` call after current
+     *     pushData().
+     */
     bool pushData(QnAbstractDataPacketPtr dataPacket);
 
     QnAbstractDataPacketPtr getData(const StreamRequirements& requirements) const;

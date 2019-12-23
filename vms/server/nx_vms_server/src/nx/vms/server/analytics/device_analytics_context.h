@@ -119,7 +119,7 @@ private:
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
     std::map<QnUuid, int> m_skippedPacketCountByEngine;
     std::unique_ptr<StreamConverter> m_streamConverter;
-    std::set<nx::vms::api::StreamIndex> m_registeredStreams;
+    std::set<nx::vms::api::StreamIndex> m_registeredStreamIndexes;
 };
 
 } // namespace nx::vms::server::analytics

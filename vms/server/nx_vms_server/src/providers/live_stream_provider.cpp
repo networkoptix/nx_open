@@ -314,17 +314,7 @@ bool QnLiveStreamProvider::doesStreamSuitMotionAnalysisRequirements()
         return false;
 
     const auto motionStreamIndex = m_cameraRes->motionStreamIndex().index;
-    switch (getRole())
-    {
-        case Qn::CR_LiveVideo:
-            return motionStreamIndex == nx::vms::api::StreamIndex::primary;
-        case Qn::CR_SecondaryLiveVideo:
-            return motionStreamIndex == nx::vms::api::StreamIndex::secondary;
-        default:
-            break;
-    }
-
-    return false;
+    return motionStreamIndex == toStreamIndex(getRole());
 }
 
 bool QnLiveStreamProvider::isMaxFps() const

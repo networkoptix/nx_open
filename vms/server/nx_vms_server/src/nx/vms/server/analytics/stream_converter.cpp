@@ -23,7 +23,7 @@ bool StreamConverter::pushData(QnAbstractDataPacketPtr dataPacket)
         m_lastStreamData.reset();
         m_motionMetadataExpirationTimer.restart();
         m_lastMotionMetadata = motionMetadata;
-        return false;
+        return false; //< No SDK packet can be created at this point.
     }
 
     NX_VERBOSE(this,

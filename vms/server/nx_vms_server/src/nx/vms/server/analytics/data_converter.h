@@ -16,13 +16,7 @@ namespace nx::vms::server::analytics {
 class DataConverter
 {
 public:
-    DataConverter(int rotationAngle);
-
-    DataConverter(DataConverter&& other) = default;
-    DataConverter(const DataConverter& other) = default;
-
-    DataConverter& operator=(DataConverter&& other) = default;
-    DataConverter& operator=(const DataConverter& other) = default;
+    explicit DataConverter(int rotationAngle);
 
     QnAbstractDataPacketPtr convert(
         const QnAbstractDataPacketPtr& dataPacket,

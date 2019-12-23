@@ -35,7 +35,7 @@ StreamProviderRequirements ProxyStreamDataReceptor::providerRequirements(
 void ProxyStreamDataReceptor::registerStream(nx::vms::api::StreamIndex streamIndex)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_registeredStreams.insert(streamIndex);
+    m_registeredStreamIndexes.insert(streamIndex);
 
     registerStreamsToProxiedReceptorUnsafe();
 }
@@ -44,7 +44,7 @@ void ProxyStreamDataReceptor::registerStreamsToProxiedReceptorUnsafe()
 {
     if (const auto proxiedReceptor = m_proxiedReceptor.toStrongRef())
     {
-        for (nx::vms::api::StreamIndex streamIndex: m_registeredStreams)
+        for (nx::vms::api::StreamIndex streamIndex: m_registeredStreamIndexes)
             proxiedReceptor->registerStream(streamIndex);
     }
 }

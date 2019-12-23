@@ -28,7 +28,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     QWeakPointer<StreamDataReceptor> m_proxiedReceptor;
-    std::set<nx::vms::api::StreamIndex> m_registeredStreams;
+    std::set<nx::vms::api::StreamIndex> m_registeredStreamIndexes;
 };
 
 using ProxyStreamDataReceptorPtr = QSharedPointer<ProxyStreamDataReceptor>;
