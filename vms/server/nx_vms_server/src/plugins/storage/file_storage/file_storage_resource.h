@@ -67,7 +67,7 @@ public:
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);
-    bool isMounted() const;
+    virtual bool isMounted() const;
 
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
