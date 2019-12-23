@@ -1242,19 +1242,7 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 
 void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
 {
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
-    {
-        using namespace nx::vms::server::fs::media_paths;
-        auto pathConfig = FilterConfig::createDefault(
-            serverModule()->platform(), /*includeNonHdd*/ true, &serverModule()->settings());
-
-        const bool isMounted = nx::mserver_aux::isPathMounted(fileStorage->getUrl(), getMediaPaths(pathConfig));
-        if (isMounted != fileStorage->isMounted())
-        {
-            NX_DEBUG(this, "Changing 'IsMounted' for storage '%1' to '%2'", fileStorage->getUrl(), isMounted);
-            fileStorage->setMounted(isMounted);
-        }
-    }
+    nx::mserver_aux::updateMountedStatus(storage, serverModule());
 }
 
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
