@@ -18,6 +18,8 @@ void saveStoragesInfoToBeforeRestoreData(
 
 void updateMountedStatus(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule);
 
+bool isStoragePathMounted(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule);
+
 class SystemNameProxy
 {
 public:

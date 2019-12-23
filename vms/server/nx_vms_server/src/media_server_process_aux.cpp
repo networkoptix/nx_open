@@ -19,7 +19,7 @@
 namespace nx {
 namespace mserver_aux {
 
-static bool isStoragePathMounted(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule)
+bool isStoragePathMounted(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule)
 {
     using namespace nx::vms::server::fs::media_paths;
     auto pathConfig = FilterConfig::createDefault(
