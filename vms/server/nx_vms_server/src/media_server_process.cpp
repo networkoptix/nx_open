@@ -704,7 +704,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         using namespace nx::vms::server::fs::media_paths;
         using namespace nx::mserver_aux;
         auto pathConfig = FilterConfig::createDefault(
-            serverModule()->platform(), /*includeNonHdd*/ false, &serverModule()->settings());
+            serverModule()->platform(), /*includeNonHdd*/ true, &serverModule()->settings());
 
         for (const auto& s: m_mediaServer->getStorages())
         {
