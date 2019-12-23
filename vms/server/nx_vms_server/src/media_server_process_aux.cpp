@@ -34,16 +34,8 @@ bool isStoragePathMounted(const QnStorageResourcePtr& storage, QnMediaServerModu
 void updateMountedStatus(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule)
 {
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-    if (!fileStorage)
+    if (!fileStorage || fileStorage->isExternal())
         return;
-
-    if (fileStorage->isExternal())
-    {
-        if (!fileStorage->isMounted())
-            fileStorage->setMounted(true);
-
-        return;
-    }
 
     const bool isPathMounted = isStoragePathMounted(storage, serverModule);
     if (isPathMounted != fileStorage->isMounted())
