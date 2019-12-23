@@ -227,7 +227,13 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 return tr("network");
             if (storageData.storageType == "usb")
                 return tr("usb");
-            return tr("unknown");
+
+            // Note: Plugins can register own out-of-enum storage types (e.g. 'smb'). It should not
+            // be translated in general case, though we can make a hardcode for popular plugins.
+            if (storageData.storageType == "smb")
+                return tr("smb");
+
+            return storageData.storageType;
         }
 
         case TotalSpaceColumn:
