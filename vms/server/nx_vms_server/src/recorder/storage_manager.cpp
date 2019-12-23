@@ -1246,7 +1246,7 @@ void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
     {
         using namespace nx::vms::server::fs::media_paths;
         auto pathConfig = FilterConfig::createDefault(
-            serverModule()->platform(), /*includeNonHdd*/ false, &serverModule()->settings());
+            serverModule()->platform(), /*includeNonHdd*/ true, &serverModule()->settings());
 
         const bool isMounted = nx::mserver_aux::isPathMounted(fileStorage->getUrl(), getMediaPaths(pathConfig));
         if (isMounted != fileStorage->isMounted())
