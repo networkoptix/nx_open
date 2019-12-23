@@ -67,6 +67,7 @@ public:
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);
+    bool isMounted() const;
 
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
@@ -95,7 +96,6 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
-    bool isMounted() const;
     nx::vms::server::RootFileSystem* rootTool() const;
 
 public:
@@ -109,13 +109,13 @@ private:
     mutable boost::optional<bool> m_dbReady;
 
 private:
-    mutable QnMutex     m_mutexCheckStorage;
-    mutable int         m_capabilities;
-    QString     m_localPath;
+    mutable QnMutex m_mutexCheckStorage;
+    mutable int m_capabilities;
+    QString m_localPath;
 
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
-    mutable QnMutex      m_writeTestMutex;
+    mutable QnMutex m_writeTestMutex;
     bool m_isSystem;
     bool m_isMounted = true;
     QnMediaServerModule* m_serverModule = nullptr;

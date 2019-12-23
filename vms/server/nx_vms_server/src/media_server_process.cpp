@@ -542,7 +542,7 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
 {
     using namespace nx::vms::server::fs::media_paths;
 
-    auto mediaPathList = get(FilterConfig::createDefault(
+    auto mediaPathList = getMediaPaths(FilterConfig::createDefault(
         m_platform.get(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
@@ -691,55 +691,52 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-        const auto unmountedStorages =
-            nx::mserver_aux::getUnmountedStorages(
-                m_platform.get(),
-                m_mediaServer->getStorages(),
-                &serverModule()->settings());
-        for (const auto& storageResource: unmountedStorages)
+
+        using namespace nx::vms::server::fs::media_paths;
+        using namespace nx::mserver_aux;
+        auto pathConfig = FilterConfig::createDefault(
+            serverModule()->platform(), /*includeNonHdd*/ false, &serverModule()->settings());
+
+        for (const auto& s: m_mediaServer->getStorages())
         {
-            auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
-            if (fileStorageResource)
-                fileStorageResource->setMounted(false);
+            if (auto fileStorage = s.dynamicCast<QnFileStorageResource>(); s && !s->isExternal())
+            {
+                const bool isMounted = isPathMounted(fileStorage->getUrl(), getMediaPaths(pathConfig));
+                NX_DEBUG(
+                    this, "Setting initial mounted status '%1' for local file storage '%2'",
+                    isMounted, fileStorage->getUrl());
+
+                fileStorage->setMounted(isMounted);
+            }
         }
 
         QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
-        QnStorageResourceList storagesToRemove;
-        // We won't remove automatically storages which might have been unmounted because of their
-        // small size. This small size might be the result of the unmounting itself (just the size
-        // of the local drive where mount folder is located). User will be able to remove such
-        // storages by themselves.
-        for (const auto& smallStorage: smallStorages)
+        for (auto it = smallStorages.begin(); it != smallStorages.end(); )
         {
-            bool isSmallStorageAmongstUnmounted = false;
-            for (const auto& unmountedStorage: unmountedStorages)
+            if (const auto fileStorage = (*it).dynamicCast<QnFileStorageResource>();
+                fileStorage && !fileStorage->isMounted())
             {
-                if (unmountedStorage == smallStorage)
-                {
-                    isSmallStorageAmongstUnmounted = true;
-                    break;
-                }
+                NX_DEBUG(
+                    this, "Small storage '%1' won't be removed because it's not mounted",
+                    fileStorage->getUrl());
+
+                it = smallStorages.erase(it);
             }
-
-            if (!isSmallStorageAmongstUnmounted)
-                storagesToRemove.append(smallStorage);
+            else
+            {
+                NX_DEBUG(this, "Small storage '%1' will be removed", fileStorage->getUrl());
+                ++it;
+            }
         }
 
-        NX_DEBUG(this, lm("[Storages init] Found %1 storages to remove").arg(storagesToRemove.size()));
-        for (const auto& storage: storagesToRemove)
-        {
-            NX_DEBUG(this, lm("[Storages init] Storage to remove: %2, id: %3").args(
-                storage->getUrl(), storage->getId()));
-        }
-
-        if (!storagesToRemove.isEmpty())
+        if (!smallStorages.isEmpty())
         {
             nx::vms::api::IdDataList idList;
-            for (const auto& value: storagesToRemove)
+            for (const auto& value: smallStorages)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
                 qWarning() << "[Storages init] Failed to remove deprecated storage on startup. Postpone removing to the next start...";
-            commonModule()->resourcePool()->removeResources(storagesToRemove);
+            commonModule()->resourcePool()->removeResources(smallStorages);
         }
 
         QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
