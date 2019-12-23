@@ -66,11 +66,6 @@ protected:
     virtual void TearDown() override
     {
     }
-    enum class PathFound
-    {
-        yes,
-        no
-    };
 
     enum class MediaFolderSuffix
     {
@@ -86,21 +81,21 @@ protected:
 
     UnmountedLocalStoragesFilterTest():
         mediaFolderName(lit("HD Witness Media")),
-        unmountedFilter(mediaFolderName),
         spaceLimit(10 * 1024 * 1024 * 1024ll)
     {
     }
 
-    void when(PathFound isPathFound, MediaFolderSuffix isSuffix)
+    void when(MediaFolderSuffix isSuffix)
     {
         QString url = basePath;
         if (isSuffix == MediaFolderSuffix::yes)
             url += "/" + mediaFolderName;
 
-        unmountedStorages = unmountedFilter.getUnmountedStorages(
-              QnStorageResourceList() << nx::ut::utils::FileStorageTestHelper::createStorage(
-                  &serverModule(), url, spaceLimit),
-              isPathFound == PathFound::yes ? QStringList() << url : QStringList());
+        auto storage = nx::ut::utils::FileStorageTestHelper::createStorage(&serverModule(), url, spaceLimit);
+        nx::mserver_aux::updateMountedStatus(storage, &serverModule());
+        unmountedStorages.clear();
+        if (!nx::mserver_aux::isStoragePathMounted(storage, &serverModule()))
+            unmountedStorages.push_back(storage);
     }
 
     void then(StorageUnmounted isUnmounted)
@@ -113,22 +108,15 @@ protected:
 
     QString basePath = "/some/path";
     QString mediaFolderName;
-    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedFilter;
     qint64 spaceLimit;
     QnStorageResourceList unmountedStorages;
 };
 
 TEST_F(UnmountedLocalStoragesFilterTest, main)
 {
-    when(PathFound::yes, MediaFolderSuffix::yes);
-    then(StorageUnmounted::no);
-
-    when(PathFound::yes, MediaFolderSuffix::no);
-    then(StorageUnmounted::no);
-
-    when(PathFound::no, MediaFolderSuffix::yes);
+    when(MediaFolderSuffix::yes);
     then(StorageUnmounted::yes);
 
-    when(PathFound::no, MediaFolderSuffix::no);
+    when(MediaFolderSuffix::no);
     then(StorageUnmounted::yes);
 }
