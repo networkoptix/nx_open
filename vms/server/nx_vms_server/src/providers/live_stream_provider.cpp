@@ -348,11 +348,10 @@ bool QnLiveStreamProvider::needMetadata()
         {
             for (int i = 0; i < m_videoChannels; ++i)
             {
-                bool rez = m_motionEstimation[i]->existsMetadata();
-                if (rez)
+                if (m_lastMotionMetadata)
                 {
                     m_softMotionLastChannel = i;
-                    return rez;
+                    return true;
                 }
             }
         }
@@ -440,6 +439,9 @@ void QnLiveStreamProvider::processMetadata(
                     ? &uncompressedFrame
                     : nullptr))
         {
+            if (motionEstimation->tryToCreateMotionMetadata())
+                m_lastMotionMetadata = motionEstimation->getMotion();
+
             updateStreamResolution(channel, motionEstimation->videoResolution());
         }
     }
@@ -458,14 +460,12 @@ void QnLiveStreamProvider::processMetadata(
 
     if (streamDataReceptor)
     {
-        if (motionEstimation->existsMetadata()
-            && requirements.requiredStreamTypes.testFlag(StreamType::motion))
+        if (m_lastMotionMetadata && requirements.requiredStreamTypes.testFlag(StreamType::motion))
         {
-            const QnMetaDataV1Ptr motionMetadata = motionEstimation->getMotion();
             NX_VERBOSE(this, "Pushing motion metadata to receptor, timestamp: %1 us",
-                motionMetadata->timestamp);
+                m_lastMotionMetadata->timestamp);
 
-            streamDataReceptor->putData(motionMetadata);
+            streamDataReceptor->putData(m_lastMotionMetadata);
         }
 
         if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
@@ -571,8 +571,12 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         return metadata;
     }
 
-    if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-        return m_motionEstimation[m_softMotionLastChannel]->takeMotion();
+    if (m_lastMotionMetadata && m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
+    {
+        QnMetaDataV1Ptr motionMetadata = std::move(m_lastMotionMetadata);
+        m_lastMotionMetadata.reset();
+        return motionMetadata;
+    }
     else
         return getCameraMetadata();
 }

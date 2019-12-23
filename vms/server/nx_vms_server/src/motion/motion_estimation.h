@@ -53,18 +53,14 @@ public:
         CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
 
     /**
-     * Gets motion preserving internal state. Subsequent calls to getMotion and a single call to
-     *     takeMotion will return the same data.
+     * @return last created via a tryToCreateMotionMetadata() call motion metadata.
      */
     QnMetaDataV1Ptr getMotion();
 
     /**
-     * Gets motion and resets internal state (i.e subsequent call to getMotion or takeMotion) will
-     *     return nullptr.
+     * @return True if metadata has been successfully created.
      */
-    QnMetaDataV1Ptr takeMotion();
-
-    bool existsMetadata() const;
+    bool tryToCreateMotionMetadata();
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analyzeFrame call)
     QSize videoResolution() const;
@@ -115,6 +111,5 @@ private:
     int m_channelNum;
     nx::metrics::Storage* m_metrics = nullptr;
 
-    bool m_motionHasBeenTaken = true;
     QnMetaDataV1Ptr m_lastMotionData;
 };

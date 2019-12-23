@@ -145,6 +145,7 @@ private:
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
     std::atomic_bool m_canStartThread{true};
+    QnMetaDataV1Ptr m_lastMotionMetadata;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

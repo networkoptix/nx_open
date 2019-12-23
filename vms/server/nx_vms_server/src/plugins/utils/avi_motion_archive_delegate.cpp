@@ -60,8 +60,8 @@ QnMetaDataV1Ptr AviMotionArchiveDelegate::analyzeMotion(const QnAbstractMediaDat
     if (!result)
         return nullptr;
 
-    if (m_motionEstimation.existsMetadata())
-        return m_motionEstimation.takeMotion();
+    if (m_motionEstimation.tryToCreateMotionMetadata())
+        return m_motionEstimation.getMotion();
 
     return nullptr;
 }

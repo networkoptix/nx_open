@@ -1213,7 +1213,6 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     if (m_totalFrames == 0)
         m_totalFrames++;
 
-    m_motionHasBeenTaken = false;
     return true;
 }
 
@@ -1251,22 +1250,7 @@ void QnMotionEstimation::postFiltering()
 
 QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 {
-    if (m_motionHasBeenTaken)
-        return QnMetaDataV1Ptr();
-
-    if (!m_lastMotionData)
-        m_lastMotionData = makeMotion();
-
     return m_lastMotionData;
-}
-
-QnMetaDataV1Ptr QnMotionEstimation::takeMotion()
-{
-    QnMetaDataV1Ptr result = getMotion();
-    m_motionHasBeenTaken = true;
-    m_lastMotionData.reset();
-
-    return result;
 }
 
 QnMetaDataV1Ptr QnMotionEstimation::makeMotion()
@@ -1311,10 +1295,20 @@ QnMetaDataV1Ptr QnMotionEstimation::makeMotion()
     return rez;
 }
 
-bool QnMotionEstimation::existsMetadata() const
+bool QnMotionEstimation::tryToCreateMotionMetadata()
 {
-    return !m_motionHasBeenTaken
-        && m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
+    const bool enoughFramesAreAggregated =
+        m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD;
+
+    if (!enoughFramesAreAggregated)
+        return false;
+
+    QnMetaDataV1Ptr motion = makeMotion();
+    if (!motion)
+        return false;
+
+    m_lastMotionData = std::move(motion);
+    return true;
 }
 
 QSize QnMotionEstimation::videoResolution() const
