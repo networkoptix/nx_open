@@ -5751,7 +5751,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Reserverad</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5783,7 +5783,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7239,15 +7239,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>In selected area</source>
-      <translation>I markerat område</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Vald kamera</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Vald enhet</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7256,7 +7256,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -8788,7 +8788,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Var vänlig kontakta support.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10063,7 +10063,7 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Misslyckades med att skriva över filen</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10079,7 +10079,7 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Öppna Innehållande mapp</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

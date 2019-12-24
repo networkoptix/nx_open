@@ -1998,7 +1998,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation>Stáhnout a nainstalovat</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <location/>
@@ -2044,7 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation>Nová virtuální kamera...</translation>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3192,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation>Čas VMS</translation>
+      <translation type="unfinished">VMS Time</translation>
     </message>
     <message>
       <location/>

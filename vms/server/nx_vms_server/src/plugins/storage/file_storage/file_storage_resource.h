@@ -12,6 +12,9 @@
 #include <optional>
 #include <atomic>
 
+#include <optional>
+#include <atomic>
+
 /*
 * QnFileStorageResource uses custom implemented IO access
 */

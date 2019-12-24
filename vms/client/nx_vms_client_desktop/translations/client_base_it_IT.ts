@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Pagina...</translation>
     </message>
   </context>
   <context>
@@ -2969,7 +2969,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Impossibile rilevare la risoluzione di acquisizione</translation>
     </message>
   </context>
   <context>
@@ -5747,39 +5747,39 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Riservato</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>locale</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>ottico</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>rete</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>sconosciuto</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -6476,7 +6476,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>DOWNLOAD&lt;br&gt;INIZIATO</translation>
     </message>
   </context>
   <context>
@@ -6621,7 +6621,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Impossibile riconoscere l'evento sulla telecamera rimossa.</translation>
     </message>
   </context>
   <context>
@@ -7235,15 +7235,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation>Nell'area selezionata</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Telecamera selezionata</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Dispositivi selezionati</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7252,7 +7252,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>nessuno</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -8784,7 +8784,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Si prega di contattare l'assistenza clienti.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10056,39 +10056,39 @@ L'impostazione della posizione iniziale dei dati di analisi e' all'interno della
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Salva file come...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Impossibile sovrascrivere il file</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Impossibile salvare il file</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>La cartella %1 è bloccata per la scrittura.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Download file in corso...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Apri la cartella contenente</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Interrompere il download del file?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>File scaricato</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Download del file non riuscito</translation>
     </message>
   </context>
 </TS>

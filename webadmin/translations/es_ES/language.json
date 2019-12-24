@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Servidor",
-            "system": "Sistema",
-            "device": "Dispositivo"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "¿Reiniciar el servidor?",
         "couldntCheckInternet": "No se pudo comprobar conexión de nube",
         "confirmRestoreDefault": "¿Borrar configuración y base de datos? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
         "confirmRestoreDefaultTitle": "Restaurar valores predeterminados de fábrica",
         "unexpectedError": "Error: error inesperado ha ocurrido",
-        "connnetionError": "Error de conexión",
+        "connnetionError": "Connection error",
         "wrongPassword": "Contraseña incorrecta.",
         "error": "Error: ",
         "restartNeeded": "Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
         "confirmDisconnectFromCloud": "Desconectar el sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Desconectar",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
         "disconnectedFromCloudError": "No se puede desconectar el Sistema",
         "confirmDisconnectFromSystem": "Separar servidor del sistema actual",
@@ -111,18 +111,18 @@
         "SystemName": "Nombre del sistema",
         "takeCameraOwnershipWithoutLock": "Apropiarse de las cámaras sin bloquear",
         "timeSynchronizationEnabled": "Sincronización de tiempo habilitada",
-        "primaryTimeServer": "Primary time synchronization server",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
-        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+        "primaryTimeServer": "Servidor primario de sincronización horaria",
+        "osTimeChangeCheckPeriodMs": "Período de verificación de cambio de hora del SO",
+        "syncTimeExchangePeriod": "Período de intercambio de tiempo de sincronización",
+        "maxWearableArchiveSynchronizationThreads": "Máx hilos de sincronización de archivo de cámara portátil",
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
         "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
         "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos",
-        "trafficEncryptionForced": "Force traffic encryption",
-        "videoTrafficEncryptionForced": "Force video traffic encryption",
-        "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings",
+        "trafficEncryptionForced": "Forzar Encriptación de Trafico",
+        "videoTrafficEncryptionForced": "Forzar Encriptación de Trafico de Video",
+        "updateStatus": "Estado de actualización",
+        "watermarkSettings": "Configuraciones de marca de agua",
         "maxWebMTranscoders": "Cantidad máxima de conexiones WEBM para el servidor. Chrome abre 2 conexiones a la vez, luego cierra la primera. Por lo tanto, se recomienda establecer valor >=2 a este parámetro.",
         "maxEventLogRecords": "Máximo registro de eventos para mantener en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20% mayor que el valor especificado.",
         "forceLiveCacheForPrimaryStream": "Si almacenar en caché algunos marcos para la secuencia principal. Valores: \"sí\": siempre habilitado (puede usar una gran cantidad de RAM), \"no\" - siempre deshabilitado, excepto cuando lo requiera la reproducción (por ejemplo, HLS), \"automático\" - similar a \"no\", pero se activa cuando mejora la experiencia del usuario (por ejemplo, cuando algún plugin de analíticas está funcionando en la cámara)."
@@ -149,7 +149,7 @@
         "licenceError": "¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
         "duplicateServersError": "No se pueden combinar los sistemas porque tienen al menos 1 servidor con la misma ID. Por favor, quite este servidor y vuelva a intentarlo.",
         "connectionFailed": "Error de conexión: ",
-        "unknownError": "Error desconocido",
+        "unknownError": "Unknown error",
         "mergeFailed": "Error en la combinación",
         "mergeSucceed": "Unión fue exitosa.",
         "newSystemDisplayName": "Nuevo Sistema",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Nombre de usuario o contraseña es incorrecta",
-        "authLockout": "Demasiados intentos. Inténtalo de nuevo en un minuto."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Falla en el servidor: no se puede recuperar datos de usuario actual"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "servidor está empezando",
         "serverRestarting": "el servidor se está reiniciando",
-        "serverOffline": "servidor está desconectado"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Actualización se inició correctamente. Tardará varios minutos",
@@ -182,7 +182,7 @@
         "selectFiles": "Seleccionar archivos"
     },
     "advanced": {
-        "free": "Gratis",
+        "free": "Free",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

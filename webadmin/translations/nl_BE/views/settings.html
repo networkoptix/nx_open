@@ -21,10 +21,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Poort</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Poort" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -40,22 +40,22 @@
                         <h3>Reset server</h3>
                         <p>Met deze actie wordt deze server teruggezet naar de standaardinstellingen (de database en de configuratie worden gewist).
                             De server zal worden losgekoppeld van het huidige systeem. Videoarchief zal intact blijven.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Koppel de server los van het huidige systeem</h3>
                         <p>Met deze actie wordt de server losgekoppeld van de systeemdatabase met behoud van lokale gebruikers en configuratie.
-                            Videoarchief zal intact blijven. <b>Alle cloud gebruikers zullen worden verwijderd.</b></p>
+                            Het videoarchief zal intact blijven. <b>Alle cloud gebruikers zullen worden verwijderd.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Loskoppelen van het systeem</button></p>
                     </div>
                     <div>
-                        <h3>Herstarten</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Herstart server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Wijzig admin wachtwoord</h3>
+                            <h3>Change admin password</h3>
                             <p>Als het systeem niet is aangesloten op de cloud dan zal het wachtwoord voor de  gebruiker "admin" and het herstel (root) wachtwoord gewijzigd worden op de servers.<br>
 Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
                             <div class="col-sm-6">
@@ -64,7 +64,7 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Wachtwoord wijzigen</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -72,7 +72,7 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Naam</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -86,8 +86,8 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Systemen Samenvoegen</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Systemen Samenvoegen</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -136,7 +136,7 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
                                     Forceer Video Dataverkeer Encryptie
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Opslaan</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -154,8 +154,8 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Tijdzone</label></td>
-                                        <td><label for="date">Datum</label></td>
-                                        <td><label for="time">Tijd</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

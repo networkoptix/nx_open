@@ -1,6 +1,6 @@
 <div class="container">
     <h1><a href="#/metrics/">Новий: Звіт про стан системи</a></h1>
-    <h1><a href="#/developers/serverDocumentation">New: Server Settings Documentation</a></h1>
+    <h1><a href="#/developers/serverDocumentation">Нове: Документація щодо налаштувань сервера</a></h1>
 </div>
 <div class="container">
     <h1>Додаткові параметри сервера</h1>
@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Сховище</h2>
+    <h2>Storage</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Недоступно
+                                Inaccessible
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Зарезервоване місце"/>
-                            <div class="input-group-addon">ГБ</div>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Зарезервоване місце"/>
-                            <div class="input-group-addon">ГБ</div>
+ placeholder="Reserved space"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Для збереження необхідно виправити всі зазначені налаштування</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Зберегти</button>
-        <button class="btn btn-warning" ng-click="cancel()">Відмінити</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </form>
 
     <h2>Налаштування журналу</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Зберегти</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
     <h1>Розширені налаштування системи</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Увага!</b> Будь-які зміни на цій сторінці можуть призвести до неправильного функціонування сервера.
+        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Зберегти</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
 
     </form>

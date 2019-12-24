@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "שרת",
-            "system": "מערכת",
-            "device": "מכשיר"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "להפעיל מחדש את השרת?",
         "couldntCheckInternet": "לא ניתן לבדוק את החיבור לענן",
         "confirmRestoreDefault": "נקה את מסד נתונים והגדרות? תהליך זה ייקח זמן מה, השרת יופעל מחדש לאחר מכן.",
         "confirmRestoreDefaultTitle": "שחזר להגדרות ברירת מחדל",
         "unexpectedError": "כשלון: שגיאה בלתי צפויה התרחשה",
-        "connnetionError": "שגיאת חיבור",
+        "connnetionError": "Connection error",
         "wrongPassword": "סיסמא שגויה.",
         "error": "שגיאה: ",
         "restartNeeded": "שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
         "confirmDisconnectFromCloud": "נתק את המערכת מ- {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-        "confirmDisconnectFromCloudAction": "נתק",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "לא ניתן לנתק את המערכת",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
@@ -149,7 +149,7 @@
         "licenceError": "אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
         "duplicateServersError": "לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.",
         "connectionFailed": "החיבור נכשל: ",
-        "unknownError": "שגיאה לא מוכרת",
+        "unknownError": "Unknown error",
         "mergeFailed": "המיזוג נכשל",
         "mergeSucceed": "המיזוג להצליח.",
         "newSystemDisplayName": "מערכת חדשה",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "שם או הסיסמה שגויים",
-        "authLockout": "יותר מדי ניסיונות. נסה שוב בעוד דקה."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "השרת עולה",
         "serverRestarting": "השרת מאתחל",
-        "serverOffline": "השרת אינו זמין"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "עדכון התחיל בהצלחה. פעולה זו תימשך כמה דקות",
@@ -182,7 +182,7 @@
         "selectFiles": "בחר קבצים"
     },
     "advanced": {
-        "free": "פנוי",
+        "free": "Free",
         "total": "סה\"כ",
         "occupied": "תפוס",
         "reserved": "שמור"

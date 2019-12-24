@@ -21,14 +21,14 @@
         "tabs": {
             "server": "Server",
             "system": "System",
-            "device": "Enhet"
+            "device": "Device"
         },
         "confirmRestart": "Starta om servern?",
         "couldntCheckInternet": "Det gick inte att kontrollera molnanslutningen",
         "confirmRestoreDefault": "Rensa databas och inställningar? Denna process tar lite tid och servern kommer att startas om efteråt.",
         "confirmRestoreDefaultTitle": "Återställ fabriksinställningar",
         "unexpectedError": "Misslyckades: oväntat fel har hänt",
-        "connnetionError": "Anslutningsfel",
+        "connnetionError": "Connection error",
         "wrongPassword": "Fel lösenord.",
         "error": "Fel: ",
         "restartNeeded": "Ändringar sparade. Starta om servern för att tillämpa nya inställningar?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Det är inte säkert att använda portnummer mindre än 1025. Servern kan bli otillgänglig. Fortsätt ändå?",
         "confirmDisconnectFromCloud": "Koppla från systemet från {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alla molnanvändare kommer att raderas.</span><br><br>Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.",
-        "confirmDisconnectFromCloudAction": "Koppla från",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "Systemet kopplades från {{CLOUD_NAME}} framgångsrikt",
         "disconnectedFromCloudError": "Kan inte koppla från systemet",
         "confirmDisconnectFromSystem": "Ta bort servern från nuvarande system",
@@ -149,7 +149,7 @@
         "licenceError": "Varning! Du håller på att slå samman system med startlicenser. Endast en startlicens är tillåten per system, så den andra licensen kommer att inaktiveras. Sammanfoga ändå?",
         "duplicateServersError": "Kan inte slå samman system eftersom de har minst en server med samma ID. Ta bort den här servern och försök igen.",
         "connectionFailed": "Anslutningen misslyckades: ",
-        "unknownError": "Okänt fel",
+        "unknownError": "Unknown error",
         "mergeFailed": "Sammanslagning misslyckades",
         "mergeSucceed": "Sammanfogan lyckades.",
         "newSystemDisplayName": "Nytt system",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Inloggning eller lösenord är felaktigt",
-        "authLockout": "Alltför många försök. Försök igen om någon minut."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Serverfel: går inte att hämta aktuell användardata"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "servern startas",
         "serverRestarting": "servern startar om",
-        "serverOffline": "servern är offline"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Uppdatering startad framgångsrikt. Det tar flera minuter",
@@ -182,7 +182,7 @@
         "selectFiles": "Välj filer"
     },
     "advanced": {
-        "free": "Gratis",
+        "free": "Free",
         "total": "Totalt",
         "occupied": "Upptagen",
         "reserved": "Reserverad"

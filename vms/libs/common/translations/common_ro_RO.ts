@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Telespectator</translation>
+      <translation type="unfinished">Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>

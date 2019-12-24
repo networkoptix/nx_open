@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Сервер",
-            "system": "Система",
-            "device": "Устройство"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "Перезагрузить сервер сейчас?",
         "couldntCheckInternet": "Не удалось проверить подключение к облаку",
         "confirmRestoreDefault": "Вы хотите очистить базу данных и настройки? Этот процесс займет некоторое время, после чего сервер будет перезапущен.",
         "confirmRestoreDefaultTitle": "Восстановить значения по умолчанию",
         "unexpectedError": "Не удаётся выполнить действие: произошла непредвиденная ошибка",
-        "connnetionError": "Ошибка подключения",
+        "connnetionError": "Connection error",
         "wrongPassword": "Неправильный пароль.",
         "error": "Ошибка: ",
         "restartNeeded": "Все изменения сохранены. Новые настройки будут применены после перезагрузки. Перезагрузить сервер сейчас?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Номер порта менее 1025 использовать небезопасно. Сервер может быть недоступен. Продолжить?",
         "confirmDisconnectFromCloud": "Отключить систему от {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Все облачные пользователи будут удалены.</span> <br><br>Система будет доступна через локальную сеть с учётной записью локального администратора.",
-        "confirmDisconnectFromCloudAction": "Отключить",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "Система успешно отключена от {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "Не удается отключить систему",
         "confirmDisconnectFromSystem": "Отсоединить сервер от текущей системы",
@@ -149,7 +149,7 @@
         "licenceError": "Внимание! Будут объедины системы с лицензиями Starter.\nВ системе разрешается использовать только одну Starter лицензию, поэтому вторая лицензия будет деактивирована.\nОбъединить?",
         "duplicateServersError": "Невозможно объединить системы, поскольку они имеют как минимум 1 сервер с одинаковым идентификатором. Пожалуйста, удалите этот сервер и попробуйте снова.",
         "connectionFailed": "Ошибка подключения: ",
-        "unknownError": "Неизвестная ошибка",
+        "unknownError": "Unknown error",
         "mergeFailed": "Слияние не удалось",
         "mergeSucceed": "Слияние прошло успешно.",
         "newSystemDisplayName": "Новая система",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Неверный логин или пароль",
-        "authLockout": "Слишком много попыток. Повторите позже."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Ошибка сервера: не удаётся получить данные текущего пользователя"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "запуск запускается",
         "serverRestarting": "запуск перезапускается",
-        "serverOffline": "сервер не в сети"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Обновление успешно запущено. Это займет несколько минут",
@@ -182,7 +182,7 @@
         "selectFiles": "Выберите файлы"
     },
     "advanced": {
-        "free": "Свободно",
+        "free": "Free",
         "total": "Всего",
         "occupied": "Занято",
         "reserved": "Зарезервировано"

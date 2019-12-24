@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Bahasa Indonesia</translation>
+      <translation type="unfinished">Language Name</translation>
     </message>
   </context>
   <context>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Unknown error.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -64,12 +64,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation type="unfinished">New System</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation>The discovered System %1 is incompatible with the current System.</translation>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -113,11 +113,11 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>Server has been stopped.</translation>
+      <translation type="unfinished">Server has been stopped.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(unknown)</translation>
+      <translation type="unfinished">(unknown)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -309,15 +309,15 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialize audio encoder.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Could not initialize video encoder.</translation>
+      <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
   </context>
   <context>
@@ -433,15 +433,15 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Video Wall</translation>
+      <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation type="unfinished">Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Invalid</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -493,7 +493,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>Time</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -707,7 +707,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>License is expired</translation>
+      <translation type="unfinished">License is expired</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Unknown error</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -738,42 +738,42 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation>New Server</translation>
+      <translation type="unfinished">New Server</translation>
     </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation>Cameras</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>cameras</translation>
+      <translation type="unfinished">cameras</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation>camera</translation>
+      <translation type="unfinished">camera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Devices</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation>devices</translation>
+      <translation type="unfinished">devices</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Device</translation>
+      <translation type="unfinished">Device</translation>
     </message>
     <message>
       <source>device</source>
-      <translation>device</translation>
+      <translation type="unfinished">device</translation>
     </message>
     <message>
       <source>I/O Modules</source>
@@ -785,7 +785,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -832,7 +832,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -924,11 +924,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>Owner</translation>
+      <translation type="unfinished">Owner</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>Administrator</translation>
+      <translation type="unfinished">Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -999,7 +999,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Unknown error.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1025,7 +1025,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1397,11 +1397,11 @@
     </message>
     <message>
       <source>start</source>
-      <translation>start</translation>
+      <translation type="unfinished">start</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation>stop</translation>
+      <translation type="unfinished">stop</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -1417,11 +1417,11 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>Role</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -1437,7 +1437,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1461,7 +1461,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Acknowledge</translation>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
     <message>
       <source>Analytics Event</source>
@@ -1470,7 +1470,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 at %2</translation>
+      <translation type="unfinished">%1 at %2</translation>
     </message>
     <message>
       <source>Storage Issue</source>

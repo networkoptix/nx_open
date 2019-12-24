@@ -5751,7 +5751,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Reservado</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5783,7 +5783,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -5872,7 +5872,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Plugins</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7239,15 +7239,15 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>In selected area</source>
-      <translation>Na área selecionada</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Câmara selecionada</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Dispositivo selecionado</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7256,7 +7256,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>nenhum</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -7512,7 +7512,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>câmera removida</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
   </context>
   <context>
@@ -7714,9 +7714,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation>
-        <numerusform>%n câmeras</numerusform>
-        <numerusform>%n câmeras</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -7809,7 +7809,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Plugins</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8509,7 +8509,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>câmera removida</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8580,7 +8580,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation>Arquivo de atualização não encontrado</translation>
+      <translation type="unfinished">Update file is not found</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8732,7 +8732,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Download e instalação</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -8788,7 +8788,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Por favor entre em contato com o Suporte ao Cliente.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -8861,7 +8861,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Evento de Diagnóstico de Plugin Desconhecido</translation>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -8926,7 +8926,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Installed</source>
-      <translation>Instalado</translation>
+      <translation type="unfinished">Installed</translation>
     </message>
     <message>
       <source>Failed to download update</source>
@@ -10063,7 +10063,7 @@ Você pode selecionar outro local de armazenamento na guia &quot;gestão de arma
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Falha ao sobrescrever arquivo</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10079,7 +10079,7 @@ Você pode selecionar outro local de armazenamento na guia &quot;gestão de arma
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Abrir Pasta</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

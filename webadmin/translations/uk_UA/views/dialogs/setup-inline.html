@@ -12,7 +12,7 @@
         Помилка авторизації.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -54,7 +54,7 @@
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
-                   placeholder="Назва системи" required auto-focus>
+                   placeholder="System name" required auto-focus>
         </div>
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
@@ -106,7 +106,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>Локальний</h3>
+                <h3>Local</h3>
                 <p>
                     Працює тільки в  локальній мережі
  <br>не вимагає підключення до Інтернету
@@ -175,13 +175,13 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Пароль" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Запам'ятати мене
+                Stay logged in
             </labe>
         </div>
 
@@ -228,12 +228,12 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Повторіть пароль" required>
+                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Зберегти пароль
+                Save password
             </labe>
         </div>
 
@@ -265,7 +265,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                Потрібно заповнити всі поля
+                All fields are required
             </div>
         </div>
 
@@ -273,7 +273,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Паролі не співпадають
+                Passwords do not match
             </div>
         </div>
     </form>
@@ -304,20 +304,20 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Логін" required>
+                   placeholder="Login" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Пароль" required>
+                   placeholder="Password" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Потрібно заповнити всі поля
+                All fields are required
             </div>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -375,7 +375,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Система готова до використання</h2>
-    <p>Логін</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Налаштування розділеного доступу і облікового запису</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="відкрити {{Config.cloud.productName}}"
@@ -384,7 +384,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Система готова до використання</h2>
+    <h2>System is ready for use</h2>
     <p>Адреса сервера</p>
     <h4>{{serverAddress}}</h4>
     <p>Логін адміністратора</p>
@@ -406,7 +406,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Зберегти налаштування і перезавантажити пристрій</button>
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
     </p>
 </div>
 
@@ -437,7 +437,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Не вдається підключитися до {{Config.cloud.productName}}</h2>
+    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -448,12 +448,12 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Не вдається налаштувати систему</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">Щось пішло не так. <br>
         Опис помилки: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -465,14 +465,14 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>За допомогою web-браузера</b></div>
-            <div class="col-xs-4 text-right">Адреса</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>За допомогою програми {{Config.productName}}</b></div>
-            <div class="col-xs-6 text-right">Вузол</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Порт</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Логін</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Пароль</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>

@@ -6,119 +6,119 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
+      <translation type="unfinished">
+        <numerusform>Bytes</numerusform>
+        <numerusform>Bytes</numerusform>
+        <numerusform>Bytes</numerusform>
+        <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation>B</translation>
+      <translation type="unfinished">B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>קילובייט</numerusform>
-        <numerusform>שני קילובייטים</numerusform>
-        <numerusform>קילובייטים</numerusform>
-        <numerusform>קילובייט</numerusform>
+      <translation type="unfinished">
+        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation>ק"ב</translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
+      <translation type="unfinished">
+        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation>מ"ב</translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
+      <translation type="unfinished">
+        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>ג"ב</translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>טרה-בייט</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
+      <translation type="unfinished">
+        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>פטאבייט</numerusform>
-        <numerusform>פטאבייטים</numerusform>
-        <numerusform>פטאבייטים</numerusform>
-        <numerusform>פטאבייטים</numerusform>
+      <translation type="unfinished">
+        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>PB</translation>
+      <translation type="unfinished">PB</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation>הצליח.</translation>
+      <translation type="unfinished">Successful.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>שם וסיסמא לא תואמים.</translation>
+      <translation type="unfinished">Invalid login or password.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation>הפעולה המבוקשת אסורה עם הנתונים שסופקו.</translation>
+      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>חשבון זה אינו מופעל. אנא בדוק את האימייל שלך.</translation>
+      <translation type="unfinished">This account is not activated. Please check your email.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation>פרטי הכניסה אינם תקפים עוד.</translation>
+      <translation type="unfinished">Credentials are no longer valid.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation>כניסה לא חוקית.</translation>
+      <translation type="unfinished">Invalid login.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -144,42 +144,42 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>בעלים: %1</translation>
+      <translation type="unfinished">Owner: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>המערכת שלך</translation>
+      <translation type="unfinished">Your System</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>לא היתה אפשרות למצוא מקודד אודיו &quot;%1&quot;.</translation>
+      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>פורמט הדגימה של ההתקן %1 אינו נתמך.</translation>
+      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>התקן האודיו הראשוני לא נבחר.</translation>
+      <translation type="unfinished">Primary audio device is not selected.</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>מערכת</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation>מערכת (%1)</translation>
+      <translation type="unfinished">System (%1)</translation>
     </message>
   </context>
   <context>
@@ -187,11 +187,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>בעלים: %1</translation>
+      <translation type="unfinished">Owner: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>המערכת שלך</translation>
+      <translation type="unfinished">Your System</translation>
     </message>
   </context>
   <context>
@@ -199,161 +199,161 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
+      <translation type="unfinished">ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
+      <translation type="unfinished">m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
+      <translation type="unfinished">h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
+      <translation type="unfinished">d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
+      <translation type="unfinished">w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation type="unfinished">M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
+      <translation type="unfinished">y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
+      <translation type="unfinished">msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>שניות</translation>
+      <translation type="unfinished">sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>דקות</translation>
+      <translation type="unfinished">min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>שעות</translation>
+      <translation type="unfinished">hrs</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>ימים</translation>
+      <translation type="unfinished">days</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
+      <translation type="unfinished">wks</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
+      <translation type="unfinished">mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>yrs</translation>
+      <translation type="unfinished">yrs</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
+      <translation type="unfinished">
+        <numerusform>milliseconds</numerusform>
+        <numerusform>milliseconds</numerusform>
+        <numerusform>milliseconds</numerusform>
+        <numerusform>milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
+      <translation type="unfinished">
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
+      <translation type="unfinished">
+        <numerusform>minutes</numerusform>
+        <numerusform>minutes</numerusform>
+        <numerusform>minutes</numerusform>
+        <numerusform>minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
+      <translation type="unfinished">
+        <numerusform>hours</numerusform>
+        <numerusform>hours</numerusform>
+        <numerusform>hours</numerusform>
+        <numerusform>hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
+      <translation type="unfinished">
+        <numerusform>days</numerusform>
+        <numerusform>days</numerusform>
+        <numerusform>days</numerusform>
+        <numerusform>days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
+      <translation type="unfinished">
+        <numerusform>weeks</numerusform>
+        <numerusform>weeks</numerusform>
+        <numerusform>weeks</numerusform>
+        <numerusform>weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
+      <translation type="unfinished">
+        <numerusform>months</numerusform>
+        <numerusform>months</numerusform>
+        <numerusform>months</numerusform>
+        <numerusform>months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
+      <translation type="unfinished">
+        <numerusform>years</numerusform>
+        <numerusform>years</numerusform>
+        <numerusform>years</numerusform>
+        <numerusform>years</numerusform>
       </translation>
     </message>
   </context>

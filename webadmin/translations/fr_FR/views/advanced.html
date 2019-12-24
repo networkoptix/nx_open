@@ -1,6 +1,6 @@
 <div class="container">
     <h1><a href="#/metrics/">Nouveau : Rapport de santé système</a></h1>
-    <h1><a href="#/developers/serverDocumentation">New: Server Settings Documentation</a></h1>
+    <h1><a href="#/developers/serverDocumentation">Nouveau: Documentation des paramètres du serveur</a></h1>
 </div>
 <div class="container">
     <h1>Paramètres serveur avancés</h1>
@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Stockage</h2>
+    <h2>Storage</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Espace réservé"/>
-                            <div class="input-group-addon">Go</div>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Espace réservé"/>
-                            <div class="input-group-addon">Go</div>
+ placeholder="Reserved space"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Corrigez tous les paramètres en surbrillance pour l’enregistrer</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Enregistrer</button>
-        <button class="btn btn-warning" ng-click="cancel()">Annuler</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </form>
 
     <h2>Paramètres journal</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Enregistrer</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
     <h1>Paramètres système avancés</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Attention!</b> Toutes modifications sur cette page peut provoquer un mauvais fonctionnement du serveur.
+        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Enregistrer</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
 
     </form>

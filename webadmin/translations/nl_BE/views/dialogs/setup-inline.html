@@ -12,7 +12,7 @@
         Autorisatie is mislukt.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Nogmaals proberen</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Nogmaals proberen</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -54,7 +54,7 @@
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
-                   placeholder="Systeemnaam" required auto-focus>
+                   placeholder="System name" required auto-focus>
         </div>
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
@@ -106,7 +106,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>Lokaal</h3>
+                <h3>Local</h3>
                 <p>
                     Werkt alleen in een lokaal netwerk <br>geen internetverbinding vereist
                 </p>
@@ -166,7 +166,7 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="E-mailadres" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
@@ -176,7 +176,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Blijf ingelogd
+                Stay logged in
             </labe>
         </div>
 
@@ -223,12 +223,12 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Herhaal wachtwoord" required>
+                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Wachtwoord opslaan
+                Save password
             </labe>
         </div>
 
@@ -260,7 +260,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                Alle velden zijn verplicht
+                All fields are required
             </div>
         </div>
 
@@ -268,7 +268,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                De wachtwoorden komen niet overeen
+                Passwords do not match
             </div>
         </div>
     </form>
@@ -299,7 +299,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Gebruikersnaam" required>
+                   placeholder="Login" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -312,7 +312,7 @@
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Alle velden zijn verplicht
+                All fields are required
             </div>
         </div>
 
@@ -356,7 +356,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Nogmaals proberen</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -369,7 +369,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Systeem is klaar voor gebruik</h2>
-    <p>Gebruikersnaam</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Delen en account instellingen</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
@@ -378,7 +378,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Systeem is klaar voor gebruik</h2>
+    <h2>System is ready for use</h2>
     <p>Serveradres</p>
     <h4>{{serverAddress}}</h4>
     <p>Inloggen (voor beheerders)</p>
@@ -400,7 +400,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Instellingen opslaan en herstart de server</button>
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
     </p>
 </div>
 
@@ -431,7 +431,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Kan geen verbinding maken met {{Config.cloud.productName}}</h2>
+    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -442,11 +442,11 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Kan het systeem niet aanmaken</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">Er ging iets helemaal mis. <br> Foutomschrijving: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Nogmaals proberen</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -458,13 +458,13 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Met behulp van webbrowser</b></div>
-            <div class="col-xs-4 text-right">Adres</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>Gebruik {{Config.productName}} applicatie</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Poort</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Gebruikersnaam</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
