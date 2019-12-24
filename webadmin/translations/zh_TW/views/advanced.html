@@ -10,14 +10,14 @@
     </div>
 
 
-    <h2>儲存裝置</h2>
+    <h2>Storage</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
             <thead>
                 <tr>
                     <th >
-                        網址
+                        URL
                     </th>
                     <th width="200">
                         剩餘空間
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                無法存取
+                                Inaccessible
                             </div>
                         </div>
                     </td>
@@ -78,7 +78,7 @@
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="保留空間"/>
+ placeholder="Reserved space"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">修正所有標記的設定並儲存</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >儲存</button>
-        <button class="btn btn-warning" ng-click="cancel()">取消</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </form>
 
     <h2>日誌設定</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >儲存</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
     <h1>進階系統設定</h1>
     <div class="alert alert-danger" role="alert">
-        <b>警告 ！</b>此頁面上的任何變更可能會導致伺服器無法正常工作.
+        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >儲存</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
 
     </form>

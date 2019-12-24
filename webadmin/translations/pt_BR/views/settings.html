@@ -22,10 +22,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Porto</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Porto" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -41,22 +41,22 @@
                         <h3>Reiniciar o servidor</h3>
                         <p>Esta acção irá reverter este servidor para as definições padrão (limpar a base de dados e redefinir a configuração).
                             O servidor será desligado do sistema atual. O arquivo de vídeo permanecerá intacto.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurar Definições de Fábrica</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Desanexar servidor do sistema</h3>
                         <p>Esta ação irá separar o servidor do sistema mantendo o banco de dados, usuários locais e configuração.
-                            O arquivo de vídeo permanecerá intacto. <b>Os Utilizadores da "Cloud" serão apagados.</b></p>
+                            Video archive will remain intact. <b>Os Utilizadores da "Cloud" serão apagados.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Desanexar do sistema</button></p>
                     </div>
                     <div>
-                        <h3>Reiniciar</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Reiniciar o Servidor</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Alterar senha do administrador</h3>
+                            <h3>Change admin password</h3>
                             <p>Se o sistema for local (não conectado à "Cloud"), isso alterará a senha do utilizador "admin" e a senha de recuperação (root) em alguns servidores.<br>
                                 Caso contrário, isso somente alterará a senha de recuperação.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Mudar senha</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Nome</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>"Merge" dos Sistemas</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">"Merge" dos Sistemas</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     Forçar a Encriptação de Tráfego de Vídeo
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Gravar</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Fuso horário</label></td>
-                                        <td><label for="date">Data</label></td>
-                                        <td><label for="time">Hora</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

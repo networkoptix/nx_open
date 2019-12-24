@@ -5874,7 +5874,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Зарезервовано</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5906,7 +5906,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ТБ</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7434,15 +7434,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation>У обраній ділянці</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Обрана камера</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Обраний пристрій</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7451,7 +7451,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>жоден</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -10326,7 +10326,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Не вдалося перезаписати файл</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10342,7 +10342,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Відкрити Відповідну Папку</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

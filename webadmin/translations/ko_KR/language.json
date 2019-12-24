@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "서버",
-            "system": "시스템",
-            "device": "장치"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "서버를 다시 시작?",
         "couldntCheckInternet": "클라우드 연결을 확인 할 수 없습니다.",
         "confirmRestoreDefault": "데이터베이스와 셋팅을 클리어 하시겠습니까? 이 절차후 상단한 시간이 소요되면 시스템 재부팅이 요구됩니다.",
         "confirmRestoreDefaultTitle": "공장 기본값 복원",
         "unexpectedError": "실패: 예기치 않은 오류가 발생 했습니다.",
-        "connnetionError": "접속 에러",
+        "connnetionError": "Connection error",
         "wrongPassword": "비밀번호가 틀립니다.",
         "error": "오류: ",
         "restartNeeded": "변경 저장 됩니다. 새로운 설정을 적용 하려면 서버를 다시 시작?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "1025 이하의 포트를 사용 하는 것은 안전 하지 않습니다. 서버를 액세스하지 못할 수 있습니다. 그래도 진행 하시겠습니까?",
         "confirmDisconnectFromCloud": "{{CLOUD_NAME}} 에서 시스템 연결을 끊으시겠습니까",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 모든 클라우드 사용자 삭제 됩니다.</span> <br><br>로컬 네트워크에서 관리자 계정을 통해 액세스할 수 있을 것입니다.",
-        "confirmDisconnectFromCloudAction": "연결 해제",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "시스템은 성공적으로 {{CLOUD_NAME}} 에서 분리되었습니다.",
         "disconnectedFromCloudError": "시스템을 분리 할 수 없습니다",
         "confirmDisconnectFromSystem": "현재 시스템에서 서버 분리",
@@ -149,7 +149,7 @@
         "licenceError": "경고! Starter 라이센스르 이용하여 병합하려 하고 있습니다. 시스템당 1개의 starter license만 사용가능합니다. 2번째 starter license는 비활성화 됩니다. 그래도 병합 하시겠습니까?",
         "duplicateServersError": "동일한 ID를 가진 서버가 하나 이상 있기 때문에 시스템을 머지 할 수 없습니다. 이 서버를 제거하고 다시 시도하십시오.",
         "connectionFailed": "연결 실패: ",
-        "unknownError": "알 수 없는 오류",
+        "unknownError": "Unknown error",
         "mergeFailed": "병합에 실패했습니다",
         "mergeSucceed": "병합 성공.",
         "newSystemDisplayName": "새로운 시스템",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "사용자 이름 또는 비밀번호가 잘못되었습니다.",
-        "authLockout": "시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "서버 오류: 현재 사용자 데이터를 검색할 수 없습니다"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "서버 시작",
         "serverRestarting": "서버 다시 시작!",
-        "serverOffline": "서버 오프라인"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "업데이트는 성공적으로 시작 했다. 그것은 몇 분 정도 걸릴 것입니다.",
@@ -182,7 +182,7 @@
         "selectFiles": "파일 선택"
     },
     "advanced": {
-        "free": "무료",
+        "free": "Free",
         "total": "전체",
         "occupied": "사용중",
         "reserved": "예약됨"

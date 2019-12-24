@@ -5,735 +5,742 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation>Tabblad sluiten</translation>
+      <translation type="unfinished">Close Tab</translation>
     </message>
   </context>
   <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
       <source>Services</source>
-      <translation>Services</translation>
+      <translation type="unfinished">Services</translation>
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>Verberg %1</translation>
+      <translation type="unfinished">Hide %1</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Anderen verbergen</translation>
+      <translation type="unfinished">Hide Others</translation>
     </message>
     <message>
       <source>Show All</source>
-      <translation>Toon alles</translation>
+      <translation type="unfinished">Show All</translation>
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Voorkeuren...</translation>
+      <translation type="unfinished">Preferences...</translation>
     </message>
     <message>
       <source>Quit %1</source>
-      <translation>Beëindig %1</translation>
+      <translation type="unfinished">Quit %1</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation>Over %1</translation>
+      <translation type="unfinished">About %1</translation>
     </message>
   </context>
   <context>
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Alles selecteren</translation>
+      <translation type="unfinished">&amp;Select All</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation>Stap omhoog</translation>
+      <translation type="unfinished">&amp;Step up</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation>Stap omlaag</translation>
+      <translation type="unfinished">Step &amp;down</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation>Druk</translation>
+      <translation type="unfinished">Press</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation>Verhoog</translation>
+      <translation type="unfinished">Increase</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation>Verlaag</translation>
+      <translation type="unfinished">Decrease</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation>Toon Menu</translation>
+      <translation type="unfinished">ShowMenu</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation>Focus instellen</translation>
+      <translation type="unfinished">SetFocus</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Schakel</translation>
+      <translation type="unfinished">Toggle</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Naar links scrollen</translation>
+      <translation type="unfinished">Scroll Left</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Naar rechts scrollen</translation>
+      <translation type="unfinished">Scroll Right</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Naar boven scrollen</translation>
+      <translation type="unfinished">Scroll Up</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Naar beneden scrollen</translation>
+      <translation type="unfinished">Scroll Down</translation>
     </message>
     <message>
       <source>Previous Page</source>
-      <translation>Vorige pagina</translation>
+      <translation type="unfinished">Previous Page</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation>Volgende pagina</translation>
+      <translation type="unfinished">Next Page</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Activeert de actie</translation>
+      <translation type="unfinished">Triggers the action</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation>Verhoog de waarde</translation>
+      <translation type="unfinished">Increase the value</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation>Verlaag de waarde</translation>
+      <translation type="unfinished">Decrease the value</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>Toont het menu</translation>
+      <translation type="unfinished">Shows the menu</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>Stelt de focus in</translation>
+      <translation type="unfinished">Sets the focus</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>Schakelt de status</translation>
+      <translation type="unfinished">Toggles the state</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation>Scrollt naar links</translation>
+      <translation type="unfinished">Scrolls to the left</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation>Scrollt naar rechts</translation>
+      <translation type="unfinished">Scrolls to the right</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation>Scrollt omhoog</translation>
+      <translation type="unfinished">Scrolls up</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation>Scrollt omlaag</translation>
+      <translation type="unfinished">Scrolls down</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>Gaat een pagina terug</translation>
+      <translation type="unfinished">Goes back a page</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation>Gaat een pagina vooruit</translation>
+      <translation type="unfinished">Goes to the next page</translation>
     </message>
   </context>
   <context>
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation>Ja</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>Ja op alles</translation>
+      <translation type="unfinished">Yes to All</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nee</translation>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation>Nee op alles</translation>
+      <translation type="unfinished">No to All</translation>
     </message>
   </context>
   <context>
     <name>QCocoaMenuItem</name>
     <message>
       <source>About Qt</source>
-      <translation>Over Qt</translation>
+      <translation type="unfinished">About Qt</translation>
     </message>
     <message>
       <source>About</source>
-      <translation>Over</translation>
+      <translation type="unfinished">About</translation>
     </message>
     <message>
       <source>Config</source>
-      <translation>Config</translation>
+      <translation type="unfinished">Config</translation>
     </message>
     <message>
       <source>Preference</source>
-      <translation>Voorkeur</translation>
+      <translation type="unfinished">Preference</translation>
     </message>
     <message>
       <source>Options</source>
-      <translation>Opties</translation>
+      <translation type="unfinished">Options</translation>
     </message>
     <message>
       <source>Setting</source>
-      <translation>Instelling</translation>
+      <translation type="unfinished">Setting</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation>Configuratie</translation>
+      <translation type="unfinished">Setup</translation>
     </message>
     <message>
       <source>Quit</source>
-      <translation>Afsluiten</translation>
+      <translation type="unfinished">Quit</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Afsluiten</translation>
+      <translation type="unfinished">Exit</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation>Knippen</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopiëren</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Plakken</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Alles selecteren</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation>Niet opslaan</translation>
+      <translation type="unfinished">Don&apos;t Save</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation>Tint:</translation>
+      <translation type="unfinished">Hu&amp;e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation>Verzadiging:</translation>
+      <translation type="unfinished">&amp;Sat:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation>Waarde:</translation>
+      <translation type="unfinished">&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation>Rood:</translation>
+      <translation type="unfinished">&amp;Red:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation>Groen:</translation>
+      <translation type="unfinished">&amp;Green:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation>Blauw:</translation>
+      <translation type="unfinished">Bl&amp;ue:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>Alpha kanaal:</translation>
+      <translation type="unfinished">A&amp;lpha channel:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation>&amp;HTML:</translation>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation>Cursor op %1, %2 Druk op ESC om te annuleren</translation>
+      <translation type="unfinished">Cursor at %1, %2
+Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation>Schermkleur kiezen</translation>
+      <translation type="unfinished">&amp;Pick Screen Color</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation>Selecteer Kleur</translation>
+      <translation type="unfinished">Select Color</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation>&amp;Basiskleuren</translation>
+      <translation type="unfinished">&amp;Basic colors</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation>&amp;Aangepaste kleuren</translation>
+      <translation type="unfinished">&amp;Custom colors</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation>&amp;Voeg toe aan aangepaste kleuren</translation>
+      <translation type="unfinished">&amp;Add to Custom Colors</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>Fout</translation>
+      <translation type="unfinished">False</translation>
     </message>
     <message>
       <source>True</source>
-      <translation>Goed</translation>
+      <translation type="unfinished">True</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>Open de combo box selectie popup</translation>
+      <translation type="unfinished">Open the combo box selection popup</translation>
     </message>
   </context>
   <context>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation>AM</translation>
+      <translation type="unfinished">AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation>am</translation>
+      <translation type="unfinished">am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation>PM</translation>
+      <translation type="unfinished">PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation>pm</translation>
+      <translation type="unfinished">pm</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Wat is dit?</translation>
+      <translation type="unfinished">What&apos;s This?</translation>
     </message>
   </context>
   <context>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>Oké</translation>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation>Naam</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Grootte</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation>Soort</translation>
+      <translation type="unfinished">Kind</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Datum gewijzigd</translation>
+      <translation type="unfinished">Date Modified</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>Bestemmingsbestand is hetzelfde bestand.</translation>
+      <translation type="unfinished">Destination file is the same file.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation>Bronbestand bestaat niet.</translation>
+      <translation type="unfinished">Source file does not exist.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>Bestemmingsbestand bestaat al</translation>
+      <translation type="unfinished">Destination file exists</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation>Fout bij het hernoemen.</translation>
+      <translation type="unfinished">Error while renaming.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation>Kan niet herstellen van %1: %2</translation>
+      <translation type="unfinished">Unable to restore from %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation>Zal het sequentiële bestand niet hernoemen met blokkopie</translation>
+      <translation type="unfinished">Will not rename sequential file using block copy</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation>Kan bronbestand niet verwijderen</translation>
+      <translation type="unfinished">Cannot remove source file</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation>Kan %1 niet openen voor input</translation>
+      <translation type="unfinished">Cannot open %1 for input</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation>Kan niet openen voor ingang</translation>
+      <translation type="unfinished">Cannot open for output</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>Kon block niet schrijven</translation>
+      <translation type="unfinished">Failure to write block</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>Kan geen %1 maken voor output</translation>
+      <translation type="unfinished">Cannot create %1 for output</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation>Kijk in:</translation>
+      <translation type="unfinished">Look in:</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation>Terug</translation>
+      <translation type="unfinished">Back</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation>Ga terug</translation>
+      <translation type="unfinished">Go back</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Vooruit</translation>
+      <translation type="unfinished">Forward</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation>Ga vooruit</translation>
+      <translation type="unfinished">Go forward</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation>Hoofdmap</translation>
+      <translation type="unfinished">Parent Directory</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation>Ga naar de hoofdmap</translation>
+      <translation type="unfinished">Go to the parent directory</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation>Maak een nieuwe map aan</translation>
+      <translation type="unfinished">Create New Folder</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>Maak een nieuwe map</translation>
+      <translation type="unfinished">Create a New Folder</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation>Lijstweergave</translation>
+      <translation type="unfinished">List View</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation>Wijzig naar de lijstweergave modus</translation>
+      <translation type="unfinished">Change to list view mode</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation>Detailweergave</translation>
+      <translation type="unfinished">Detail View</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation>Wijzigen naar de detailweergave modus</translation>
+      <translation type="unfinished">Change to detail view mode</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation>Bestanden van het type:</translation>
+      <translation type="unfinished">Files of type:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation>Vind map</translation>
+      <translation type="unfinished">Find Directory</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation>Opslaan als</translation>
+      <translation type="unfinished">Save As</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation>Map:</translation>
+      <translation type="unfinished">Directory:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation>Bestandsnaam:</translation>
+      <translation type="unfinished">File &amp;name:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation>&amp;Open</translation>
+      <translation type="unfinished">&amp;Open</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation>&amp;Kies</translation>
+      <translation type="unfinished">&amp;Choose</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Save</translation>
+      <translation type="unfinished">&amp;Save</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation>Alle bestanden (*)</translation>
+      <translation type="unfinished">All Files (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation>Toon </translation>
+      <translation type="unfinished">Show </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>&amp;Naam wijzigen</translation>
+      <translation type="unfinished">&amp;Rename</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Verwijder</translation>
+      <translation type="unfinished">&amp;Delete</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Verborgen bestanden tonen</translation>
+      <translation type="unfinished">Show &amp;hidden files</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>&amp;Nieuwe map</translation>
+      <translation type="unfinished">&amp;New Folder</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Alle bestanden (*)</translation>
+      <translation type="unfinished">All files (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation>Mappen</translation>
+      <translation type="unfinished">Directories</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation>%1 Map niet gevonden. Controleer of de juiste mapnaam is opgegeven.</translation>
+      <translation type="unfinished">%1
+Directory not found.
+Please verify the correct directory name was given.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 bestaat al. Wil je het vervangen?</translation>
+      <translation type="unfinished">%1 already exists.
+Do you want to replace it?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-      <translation>%1 Bestand niet gevonden. Controleer of de juiste bestandsnaam is opgegeven.</translation>
+      <translation type="unfinished">%1
+File not found.
+Please verify the correct file name was given.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation>Nieuwe map</translation>
+      <translation type="unfinished">New Folder</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijder</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; is beveiligd tegen schrijven. Wil je het toch verwijderen?</translation>
+      <translation type="unfinished">&apos;%1&apos; is write protected.
+Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>Weet u zeker dat u &apos;%1&apos; wilt verwijderen;?</translation>
+      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation>Kan de map niet verwijderen.</translation>
+      <translation type="unfinished">Could not delete directory.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation>Recente plaatsen</translation>
+      <translation type="unfinished">Recent Places</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Mijn computer</translation>
+      <translation type="unfinished">My Computer</translation>
     </message>
     <message>
       <source>Drive</source>
-      <translation>Schijf</translation>
+      <translation type="unfinished">Drive</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation>%1 Bestand</translation>
+      <translation type="unfinished">%1 File</translation>
     </message>
     <message>
       <source>File</source>
-      <translation>Bestand</translation>
+      <translation type="unfinished">File</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation>Bestandsmap</translation>
+      <translation type="unfinished">File Folder</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>Map</translation>
+      <translation type="unfinished">Folder</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Alias</translation>
+      <translation type="unfinished">Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation>Snelkoppeling</translation>
+      <translation type="unfinished">Shortcut</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation>Zijbalk</translation>
+      <translation type="unfinished">Sidebar</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>Lijst met plaatsen en bladwijzers</translation>
+      <translation type="unfinished">List of places and bookmarks</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation>Bestanden</translation>
+      <translation type="unfinished">Files</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt + pijl links</translation>
+      <translation type="unfinished">Alt+Left</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt + pijl rechts</translation>
+      <translation type="unfinished">Alt+Right</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt + pijl omhoog</translation>
+      <translation type="unfinished">Alt+Up</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation>%1 MB</translation>
+      <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation>%1 KB</translation>
+      <translation type="unfinished">%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation>%1 bytes</translation>
+      <translation type="unfinished">%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation>Ongeldige bestandsnaam</translation>
+      <translation type="unfinished">Invalid filename</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt;De naam &quot;%1&quot; kan niet worden gebruikt.&lt;/b&gt;&lt;p&gt;Probeer een andere naam te gebruiken, met minder tekens of geen leestekens.</translation>
+      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Naam</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Grootte</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation>Soort</translation>
+      <translation type="unfinished">Kind</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Datum gewijzigd</translation>
+      <translation type="unfinished">Date Modified</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Mijn computer</translation>
+      <translation type="unfinished">My Computer</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation>Computer</translation>
+      <translation type="unfinished">Computer</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation>%1 byte (s)</translation>
+      <translation type="unfinished">%1 byte(s)</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;Oké</translation>
+      <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Save</translation>
+      <translation type="unfinished">&amp;Save</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Annuleren</translation>
+      <translation type="unfinished">&amp;Cancel</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;Afsluiten</translation>
+      <translation type="unfinished">&amp;Close</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation>Afluiten zonder opslaan</translation>
+      <translation type="unfinished">Close without Saving</translation>
     </message>
   </context>
   <context>
@@ -741,432 +748,432 @@ Do you want to delete it anyway?</source>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation>LTR</translation>
+      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation>Geen toestemming</translation>
+      <translation type="unfinished">Permission denied</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation>Te veel open bestanden</translation>
+      <translation type="unfinished">Too many open files</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation>Bestand of map bestaat niet</translation>
+      <translation type="unfinished">No such file or directory</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>Geen ruimte over op het apparaat</translation>
+      <translation type="unfinished">No space left on device</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Onbekende fout</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>bestand om te openen is een map</translation>
+      <translation type="unfinished">file to open is a directory</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation>Ongeldig apparaat</translation>
+      <translation type="unfinished">Invalid device</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation>Bestand niet gevonden</translation>
+      <translation type="unfinished">File not found</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>Niet-ondersteund beeldformaat</translation>
+      <translation type="unfinished">Unsupported image format</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation>Kan geen beeldgegevens lezen</translation>
+      <translation type="unfinished">Unable to read image data</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Onbekende fout</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation>Onbekende fout</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>Apparaat is niet ingesteld</translation>
+      <translation type="unfinished">Device is not set</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation>Apparaat niet beschrijfbaar</translation>
+      <translation type="unfinished">Device not writable</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>Niet-ondersteund beeldformaat</translation>
+      <translation type="unfinished">Unsupported image format</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>Voer een waarde in:</translation>
+      <translation type="unfinished">Enter a value:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation>Druk op de snelkoppeling</translation>
+      <translation type="unfinished">Press shortcut</translation>
     </message>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation>%1, ...</translation>
+      <translation type="unfinished">%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;Ongedaan maken</translation>
+      <translation type="unfinished">&amp;Undo</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>&amp;Opnieuw</translation>
+      <translation type="unfinished">&amp;Redo</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Knippen</translation>
+      <translation type="unfinished">Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Kopiëren</translation>
+      <translation type="unfinished">&amp;Copy</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Plakken</translation>
+      <translation type="unfinished">&amp;Paste</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijder</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Alles selecteren</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation>Toon details...</translation>
+      <translation type="unfinished">Show Details...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>Details verbergen...</translation>
+      <translation type="unfinished">Hide Details...</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>Oké</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Help</translation>
+      <translation type="unfinished">Help</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>Oké</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation>Opslaan</translation>
+      <translation type="unfinished">Save</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation>Alles opslaan</translation>
+      <translation type="unfinished">Save All</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation>&amp;Ja</translation>
+      <translation type="unfinished">&amp;Yes</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>Ja op alles</translation>
+      <translation type="unfinished">Yes to &amp;All</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation>&amp;Nee</translation>
+      <translation type="unfinished">&amp;No</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>Nee op alles</translation>
+      <translation type="unfinished">N&amp;o to All</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Afbreken</translation>
+      <translation type="unfinished">Abort</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Opnieuw proberen</translation>
+      <translation type="unfinished">Retry</translation>
     </message>
     <message>
       <source>Ignore</source>
-      <translation>Negeren</translation>
+      <translation type="unfinished">Ignore</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Afsluiten</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuleren</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation>Weggooien</translation>
+      <translation type="unfinished">Discard</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Help</translation>
+      <translation type="unfinished">Help</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation>Toepassen</translation>
+      <translation type="unfinished">Apply</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Reset</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Herstel standaardwaarden</translation>
+      <translation type="unfinished">Restore Defaults</translation>
     </message>
   </context>
   <context>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Annuleren</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>Alle bestanden (*.*)</translation>
+      <translation type="unfinished">All files (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>Bestaand bestand %1 is niet overschrijfbaar</translation>
+      <translation type="unfinished">Existing file %1 is not writable</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>Bestandsnaam verwijst naar een map</translation>
+      <translation type="unfinished">Filename refers to a directory</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>Schrijven geannuleerd door toepassing</translation>
+      <translation type="unfinished">Writing canceled by application</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation>Scroll hier</translation>
+      <translation type="unfinished">Scroll here</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation>Linkerrand</translation>
+      <translation type="unfinished">Left edge</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation>Bovenkant</translation>
+      <translation type="unfinished">Top</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation>Rechterrand</translation>
+      <translation type="unfinished">Right edge</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Onderkant</translation>
+      <translation type="unfinished">Bottom</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation>Pagina links</translation>
+      <translation type="unfinished">Page left</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation>Pagina omhoog</translation>
+      <translation type="unfinished">Page up</translation>
     </message>
     <message>
       <source>Page right</source>
-      <translation>Pagina rechts</translation>
+      <translation type="unfinished">Page right</translation>
     </message>
     <message>
       <source>Page down</source>
-      <translation>Pagina omlaag</translation>
+      <translation type="unfinished">Page down</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>Naar links scrollen</translation>
+      <translation type="unfinished">Scroll left</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation>Scroll omhoog</translation>
+      <translation type="unfinished">Scroll up</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation>Scroll rechts</translation>
+      <translation type="unfinished">Scroll right</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation>Scroll omlaag</translation>
+      <translation type="unfinished">Scroll down</translation>
     </message>
   </context>
   <context>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation>Desktop</translation>
+      <translation type="unfinished">Desktop</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation>Documenten</translation>
+      <translation type="unfinished">Documents</translation>
     </message>
     <message>
       <source>Fonts</source>
-      <translation>Lettertypen</translation>
+      <translation type="unfinished">Fonts</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation>Toepassingen</translation>
+      <translation type="unfinished">Applications</translation>
     </message>
     <message>
       <source>Music</source>
-      <translation>Muziek</translation>
+      <translation type="unfinished">Music</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation>Films</translation>
+      <translation type="unfinished">Movies</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation>Afbeeldingen</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation>Tijdelijke map</translation>
+      <translation type="unfinished">Temporary Directory</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Home</translation>
+      <translation type="unfinished">Home</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation>Applicatie Data</translation>
+      <translation type="unfinished">Application Data</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation>Applicatie configuratie</translation>
+      <translation type="unfinished">Application Configuration</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation>Cache</translation>
+      <translation type="unfinished">Cache</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Gedeelde Data</translation>
+      <translation type="unfinished">Shared Data</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Runtime</translation>
+      <translation type="unfinished">Runtime</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation>Configuratie</translation>
+      <translation type="unfinished">Configuration</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Gedeelde configuratie</translation>
+      <translation type="unfinished">Shared Configuration</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Gedeelde cache</translation>
+      <translation type="unfinished">Shared Cache</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Download</translation>
+      <translation type="unfinished">Download</translation>
     </message>
   </context>
   <context>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Naar links scrollen</translation>
+      <translation type="unfinished">Scroll Left</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Naar rechts scrollen</translation>
+      <translation type="unfinished">Scroll Right</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Wat is dit?</translation>
+      <translation type="unfinished">What&apos;s This?</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;Ongedaan maken</translation>
+      <translation type="unfinished">&amp;Undo</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>&amp;Opnieuw</translation>
+      <translation type="unfinished">&amp;Redo</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Knippen</translation>
+      <translation type="unfinished">Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Kopiëren</translation>
+      <translation type="unfinished">&amp;Copy</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation>Kopieer linklocatie</translation>
+      <translation type="unfinished">Copy &amp;Link Location</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Plakken</translation>
+      <translation type="unfinished">&amp;Paste</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijder</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Alles selecteren</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
   </context>
 </TS>

@@ -958,11 +958,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>Собственик</translation>
+      <translation type="unfinished">Owner</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>Администратор</translation>
+      <translation type="unfinished">Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>

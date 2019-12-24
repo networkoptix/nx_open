@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Edit</source>
-      <translation>Redigere</translation>
+      <translation type="unfinished">Edit</translation>
     </message>
     <message>
       <source>Hide</source>

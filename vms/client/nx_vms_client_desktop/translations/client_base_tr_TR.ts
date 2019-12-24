@@ -5745,7 +5745,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Rezerve</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5777,7 +5777,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7233,15 +7233,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>In selected area</source>
-      <translation>Seçilen alanda</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Seçilen kamera</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Seçilen cihazlar</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7250,7 +7250,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>hiçbiri</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -8782,7 +8782,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10058,7 +10058,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Dosyanın üzerine yazmak başarısız oldu</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10074,7 +10074,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>İçeren Klasörü Aç</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

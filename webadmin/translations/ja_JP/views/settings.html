@@ -19,10 +19,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>ポート</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="ポート" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -38,22 +38,22 @@
                         <h3>サーバーをリセット</h3>
                         <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)。
                             サーバーは現在のシステムから切り離されます。 ビデオのアーカイブはそのまま残ります。</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">工場出荷時の状態に戻します</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>システムからサーバーを切離す</h3>
                         <p>このアクションは、データベース、ローカルユーザーおよび設定を保持しているシステムからサーバーを切り離します。
-                            ビデオのアーカイブはそのまま残ります。 <b>クラウドユーザーは削除されます。 </b></p>
+                            Video archive will remain intact. <b>クラウドユーザーは削除されます。 </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
                     <div>
-                        <h3>再始動</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>                            
 <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>管理者パスワードを変更する</h3>
+                            <h3>Change admin password</h3>
                             <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます。<br>　　
 それ以外は回復パスワードのみを変更します。</p>
                             <div class="col-sm-6">
@@ -62,7 +62,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">パスワードを変更</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -70,7 +70,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>名前</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -84,8 +84,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>システム統合</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">システム統合</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -135,7 +135,7 @@
                                     ビデオトラフィック暗号化
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -153,8 +153,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">タイムゾーン</label></td>
-                                        <td><label for="date">日付</label></td>
-                                        <td><label for="time">時間</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

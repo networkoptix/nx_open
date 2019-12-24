@@ -19,10 +19,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>พอร์ท</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="พอร์ท" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -38,21 +38,21 @@
                         <h3>รีเซ็ตเซิร์ฟเวอร์</h3>
                         <p>การดำเนินการนี้จะเปลี่ยนเซิร์ฟเวอร์นี้เป็นค่าเริ่มต้น (ล้างฐานข้อมูลและตั้งค่าใหม่)
                             เซิร์ฟเวอร์ที่จะแยกออกจากระบบปัจจุบัน ที่เก็บวิดีโอจะยังคงเดิม</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">เรียกคืนค่าเริ่มต้นจากโรงงาน</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>แยกออกจากระบบเซิร์ฟเวอร์</h3>
                         <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า
-                            ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
+                            Video archive will remain intact. <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">แยกออกจากระบบ</button></p>
                     </div>
                     <div>
-                        <h3>รีสตาร์ท</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()"> รีสตาร์ทเซิร์ฟเวอร์ </button> <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> Reboot </button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>เปลี่ยนรหัสผ่านผู้ดูแลระบบ</h3>
+                            <h3>Change admin password</h3>
                             <p>ถ้าระบบอยู่ในระบบ (ไม่ได้เชื่อมต่อกับระบบคลาวด์) ระบบจะเปลี่ยนรหัสผ่านสำหรับผู้ใช้ "admin" และรหัสผ่านการกู้คืน (root) บนเซิร์ฟเวอร์บางเครื่อง <br> มิฉะนั้นจะเป็นการเปลี่ยนรหัสผ่านการกู้คืนเท่านั้น</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
@@ -60,7 +60,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">เปลี่ยนรหัสผ่าน</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -68,7 +68,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>ชื่อ</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -82,8 +82,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>รวมระบบ</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">รวมระบบ</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -130,7 +130,7 @@
                                     บังคับใช้ Encription การเข้าชมวิดีโอ
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">บันทึก</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -148,8 +148,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">โซนเวลา</label></td>
-                                        <td><label for="date">วันที่</label></td>
-                                        <td><label for="time">เวลา</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

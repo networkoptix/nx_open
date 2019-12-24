@@ -38,12 +38,12 @@
                         <h3>Przywróć serwer</h3>
                         <p>Ta czynność spowoduje przywrócenie serwera do ustawień domyślnych (usunięcie bazy danych i zresetowanie konfiguracji).
                             Serwer zostanie odłączony od bieżącego systemu. Archiwum wideo pozostanie nienaruszone.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Przywróć ustawienia fabryczne</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Odłącz serwer od systemu</h3>
                         <p>Ta czynność spowoduje odłączenie serwera od systemu przechowującego bazę danych, lokalnych użytkowników i konfigurację.
-                            Archiwum wideo pozostanie nienaruszone. Wszyscy użytkownicy chmury zostaną usunięci.</p>
+                            Video archive will remain intact. Wszyscy użytkownicy chmury zostaną usunięci.</p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odłącz od systemu</button></p>
                     </div>
                     <div>
@@ -52,7 +52,7 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Zmień hasło administratora</h3>
+                            <h3>Change admin password</h3>
                             <p>Jeśli system nie jest podłączony do chmury spowoduje to zmianę hasła dla lokalnego użytkownika "admin" i hasła ratunkowego (root) na niektórych serwerach. <br> Natomiast jeśli system jest podłączony do chmury, spowoduje to tylko zmianę hasła ratunkowego.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
@@ -60,7 +60,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Zmień hasło</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -68,7 +68,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Nazwa</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -82,8 +82,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Złącz systemy</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Złącz systemy</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -130,7 +130,7 @@
                                     Wymuszaj szyfrowanie transmisji wideo
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Zachowaj</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -148,8 +148,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Strefa czasowa</label></td>
-                                        <td><label for="date">Data</label></td>
-                                        <td><label for="time">Czas</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

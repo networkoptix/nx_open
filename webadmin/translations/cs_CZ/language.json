@@ -20,15 +20,15 @@
     "settings": {
         "tabs": {
             "server": "Server",
-            "system": "Systém",
-            "device": "Zařízení"
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "Restartovat server?",
         "couldntCheckInternet": "Nelze zkontrolovat připojení ke cloudu",
         "confirmRestoreDefault": "Smazat databázi a nastavení? Tento proces bude trvat nějakou dobu a poté bude server restartován.",
         "confirmRestoreDefaultTitle": "Obnovit výchozí nastavení",
         "unexpectedError": "Porucha: Došlo k neočekávané chybě",
-        "connnetionError": "Chyba spojení",
+        "connnetionError": "Connection error",
         "wrongPassword": "Chybne heslo.",
         "error": "Chyba: ",
         "restartNeeded": "Změny byly uloženy. Restartujte server, chcete-li použít nová nastavení.",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Není bezpečné použít číslo portu menší než 1025. Server nemusí být dostupný. Přejete si přesto pokračovat?",
         "confirmDisconnectFromCloud": "Odpojit systém od {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Všichni uživatelé cloudu budou smazáni.</span><br><br>Systém bude přístupný prostřednictvím lokální sítě s účtem místního správce.",
-        "confirmDisconnectFromCloudAction": "Odpojit",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "Systém byl úspěšně odpojen od {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "Systém nelze odpojit",
         "confirmDisconnectFromSystem": "Odpojit server od současného systému",
@@ -149,7 +149,7 @@
         "licenceError": "Upozornění! Chystáte se sloučit systémy s licencí Starter. Pro každý systém je povolena pouze jedna licence Starter, takže druhá licence bude deaktivovaná. Přejete si přesto systémy sloučit?",
         "duplicateServersError": "Nelze sloučit systémy, protože mají alespoň jeden server se stejným ID. Odstraňte tento server a zkuste to znovu.",
         "connectionFailed": "Připojení se nezdařilo: ",
-        "unknownError": "Neznámá chyba",
+        "unknownError": "Unknown error",
         "mergeFailed": "Sloučení se nezdařilo",
         "mergeSucceed": "Sloučení bylo úspěšné.",
         "newSystemDisplayName": "Nový systém",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Přihlašovací jméno nebo heslo je nesprávné",
-        "authLockout": "Příliš mnoho pokusů. Zkuste to znovu za chvíli."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Chyba serveru: Nelze načíst aktuální data uživatelů"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "server se spouští",
         "serverRestarting": "server se restartuje",
-        "serverOffline": "server je offline"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Aktualizace byla úspěšně spuštěna. Proces bude trvat několik minut",
@@ -182,7 +182,7 @@
         "selectFiles": "Vybrat soubory"
     },
     "advanced": {
-        "free": "Zdarma",
+        "free": "Free",
         "total": "Celkem",
         "occupied": "Obsazený",
         "reserved": "Vyhrazený"

@@ -12,7 +12,7 @@
         인증 실패
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">재시도</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">재시도</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -54,7 +54,7 @@
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
-                   placeholder="시스템 이름" required auto-focus>
+                   placeholder="System name" required auto-focus>
         </div>
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">고급 시스템 설정</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>고급 시스템 설정</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -106,7 +106,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>내부</h3>
+                <h3>Local</h3>
                 <p>
                     로컬 네트워크에서만 사용합니다.<br>
                     인터넷 연결이 필요 없습니다.
@@ -169,17 +169,17 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="이메일" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="패스워드" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                로그인 상태 유지
+                Stay logged in
             </labe>
         </div>
 
@@ -231,7 +231,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                비밀번호 저장
+                Save password
             </labe>
         </div>
 
@@ -263,7 +263,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                모든 항목을 입력하십시오
+                All fields are required
             </div>
         </div>
 
@@ -271,7 +271,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                패스워드가 일치하지 않습니다.
+                Passwords do not match
             </div>
         </div>
     </form>
@@ -308,14 +308,14 @@
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="패스워드" required>
+                   placeholder="Password" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                모든 항목을 입력하십시오
+                All fields are required
             </div>
         </div>
 
@@ -360,7 +360,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">재시도</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -382,7 +382,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>시스템 사용할 준비가 되었습니다.</h2>
+    <h2>System is ready for use</h2>
     <p>서버주소</p>
     <h4>{{serverAddress}}</h4>
     <p>관리자 로그인</p>
@@ -404,7 +404,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">설정을 저장하고 장치 재 부 팅</button>
+        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
     </p>
 </div>
 
@@ -437,7 +437,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>{{Config.cloud.productName}}에 연결할 수 없습니다.</h2>
+    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -449,12 +449,12 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>시스템을 설정 할수 없습니다.</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">무엇인가 잘못된 방향으로 진행되었습니다. <br>
         오류 내용: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">재시도</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -466,14 +466,14 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>웹 브라우저를 사용 하 여</b></div>
-            <div class="col-xs-4 text-right">주소</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>{{Config.productName}} 응용 프로그램을 사용 하 여</b></div>
-            <div class="col-xs-6 text-right">호스트</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">포트:</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">패스워드</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>

@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Szerver",
-            "system": "Rendszer",
-            "device": "Eszköz"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "Szerver újraindítása?",
         "couldntCheckInternet": "Felhő-kapcsolat nem ellenőrizhető",
         "confirmRestoreDefault": "Törli az adatbázist és beállításokat? Ez a folyamat eltart egy ideig, és utána a szerver újraindul.",
         "confirmRestoreDefaultTitle": "Gyári beállítások visszaállítása",
         "unexpectedError": "Nem sikerült: váratlan hiba történt",
-        "connnetionError": "Kapcsoltai hiba",
+        "connnetionError": "Connection error",
         "wrongPassword": "Hibás jelszó.",
         "error": "Hiba: ",
         "restartNeeded": "Módosítások elmentve. Újraindítja a szervert az új beállítások érvényesítéséhez?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "A nem biztonságos a 1025 alatti portszám használata. A szerver lehet, hogy nem lesz hozzáférhető. Ennek ellenére folytatja?",
         "confirmDisconnectFromCloud": "Lekapcsolódik innen: {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Minden felhasználó törölve lesz.</span><br><br>A rendszer a helyi hálózatból a helyi adminisztrátor fiókkal lesz elérhető.",
-        "confirmDisconnectFromCloudAction": "Szétkapcsolás",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "A {{CLOUD_NAME}} rendszer sikeresen lekapcsolódott",
         "disconnectedFromCloudError": "A rendszerről való lecsatlakozás nem lehetséges",
         "confirmDisconnectFromSystem": "Szerver leválasztása a jelenlegi rendszerről",
@@ -149,7 +149,7 @@
         "licenceError": "Figyelem! Starter licenccet használó rendszerek összevonására készül. Rendszerenként egy Starter licenc engedélyezett, így a második licenc deaktiválva lesz. Folytatja?",
         "duplicateServersError": "Nem lehet egyesíteni a rendszereket, mert legalább egy azonos azonosítójú szerverrel rendelkeznek. Kérjük, távolítsa el ezt a szervert, és próbálja újra.",
         "connectionFailed": "Csatlakozás sikertelen: ",
-        "unknownError": "Ismeretlen hiba",
+        "unknownError": "Unknown error",
         "mergeFailed": "Egyesítés nem sikerült",
         "mergeSucceed": "Sikeres egyesítés.",
         "newSystemDisplayName": "Új rendszer",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Felhasználónév vagy a jelszó hibás",
-        "authLockout": "Túl sok próbálkozás. Próbálja újra később."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Szerver hiba: nem olvashatók az aktuális felhasználó adatok"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "a szerver indul",
         "serverRestarting": "a szerver újraindul",
-        "serverOffline": "a szerver offine"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "A frissítés sikeresen elindult. Ez néhány percig tarthat",
@@ -182,7 +182,7 @@
         "selectFiles": "Fájlok kiválasztása"
     },
     "advanced": {
-        "free": "Szabad",
+        "free": "Free",
         "total": "Teljes",
         "occupied": "Elfoglalt",
         "reserved": "Fenntartott"

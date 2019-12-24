@@ -5751,7 +5751,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Réservés</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5783,7 +5783,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 To</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7239,15 +7239,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>In selected area</source>
-      <translation>Dans la zone sélectionnée</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Caméra sélectionnée</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Périphérique sélectionné</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7256,7 +7256,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>aucun</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -8788,7 +8788,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Veuillez contacter le Support Client.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10063,7 +10063,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Échec du remplacement de fichier</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10079,7 +10079,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Ouvrir le dossier contenant</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

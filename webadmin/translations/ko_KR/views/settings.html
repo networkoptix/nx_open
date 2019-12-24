@@ -20,10 +20,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>포트:</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="포트:" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -39,21 +39,21 @@
                         <h3>서버를 리셋</h3>
                         <p>이 작업은이 서버를 기본값으로 되돌립니다 (데이터베이스를 지우고 구성을 다시 설정).
                             서버가 현재 시스템에서 분리될 것입니다. 저장된 비디오는 그대로 유지됩니다.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">공장 기본값 복원</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>시스템에서 서버 분리</h3>
                         <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다.
-                            저장된 비디오는 그대로 유지됩니다. <b>클라우드 사용자가 삭제됩니다.</b></p>
+                            Video archive will remain intact. <b>클라우드 사용자가 삭제됩니다.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">시스템에서 분리</button></p>
                     </div>
                     <div>
-                        <h3>재시작</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()"> 서버 다시 시작</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> 재 부 팅</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>관리자 패스워드 변경</h3>
+                            <h3>Change admin password</h3>
                             <p>시스템이 로컬인 경우(클라우드에 연결되지 않음) 일부 서버의 경우 "admin"사용자 및 복구 (루트) 암호의 암호가 변경됩니다. <br> 그렇지 않으면 복구 암호 만 변경됩니다.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
@@ -61,7 +61,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">암호 변경</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -69,7 +69,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>이름</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -83,8 +83,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>병합 시스템</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">병합 시스템</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -128,7 +128,7 @@
                                     강제 영상전송 암호화
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">저장</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -146,8 +146,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">표준시간대</label></td>
-                                        <td><label for="date">날짜</label></td>
-                                        <td><label for="time">시간</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

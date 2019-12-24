@@ -21,14 +21,14 @@
         "tabs": {
             "server": "Server",
             "system": "System",
-            "device": "Gerät"
+            "device": "Device"
         },
         "confirmRestart": "Server neu starten?",
         "couldntCheckInternet": "Cloudverbindung konnte nicht überprüft werden",
         "confirmRestoreDefault": "Datenbank und Einstellungen löschen? Dieser Vorgang dauert einige Zeit und der Server wird anschließend neu gestartet.",
         "confirmRestoreDefaultTitle": "Werkseinstellungen wiederherstellen",
         "unexpectedError": "Fehler: unerwarteter Fehler ist aufgetreten",
-        "connnetionError": "Verbindungsfehler",
+        "connnetionError": "Connection error",
         "wrongPassword": "Falsches Passwort.",
         "error": "Fehler: ",
         "restartNeeded": "Änderungen gespeichert. Starten Sie den Server neu um die Einstellungen zu übernehmen?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Es ist nicht sicher Portnummern unter 1025 zu verwenden. Der Server ist dann möglicherweise nicht mehr erreichbar. Trotzdem fortfahren?",
         "confirmDisconnectFromCloud": "System von {{CLOUD_NAME}} trennen",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle Cloudnutzer werden gelöscht.</span><br><br>Das System wird über das lokale Netzwerk mit dem lokalen Administratoraccount erreichbar sein.",
-        "confirmDisconnectFromCloudAction": "Trennen",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "System wurde von {{CLOUD_NAME}} erfolgreich getrennt",
         "disconnectedFromCloudError": "Die Verbindung zum System kann nicht getrennt werden",
         "confirmDisconnectFromSystem": "Server aus dem aktuellen System trennen",
@@ -149,7 +149,7 @@
         "licenceError": "Warnung! Sie haben vor Systeme mit Starter-Lizenzen zusammenzuführen. Nur eine Starter-Lizenz pro System ist erlaubt, weshalb die zweite Lizenz deaktiviert wird. Trotzdem zusammenführen?",
         "duplicateServersError": "Systeme können nicht zusammengeführt werden, da sie mindestens einen Server mit derselben ID haben. Bitte entfernen Sie diesen Server und versuchen Sie es erneut.",
         "connectionFailed": "Verbindung fehlgeschlagen: ",
-        "unknownError": "Unbekannter Fehler",
+        "unknownError": "Unknown error",
         "mergeFailed": "Fehler beim Zusammenführen",
         "mergeSucceed": "Zusammenführung erfolgreich abgeschlossen.",
         "newSystemDisplayName": "Neues System",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Login oder Passwort falsch",
-        "authLockout": "Zu viele Versuche. Versuchen Sie es später erneut."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "server wird gestartet",
         "serverRestarting": "server startet neu",
-        "serverOffline": "server ist offline"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Update wurde erfolgreich gestartet. Es kann einige Minuten dauern",
@@ -182,7 +182,7 @@
         "selectFiles": "Dateien auswählen"
     },
     "advanced": {
-        "free": "Kostenlos",
+        "free": "Free",
         "total": "Insgesamt",
         "occupied": "Belegt",
         "reserved": "Reserviert"
