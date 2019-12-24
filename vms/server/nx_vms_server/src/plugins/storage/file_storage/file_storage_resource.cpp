@@ -253,8 +253,8 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
     const bool isSystem = !sysPath.isNull() && getDevicePath(m_serverModule, getUrl()).startsWith(sysPath);
     NX_DEBUG(
         this,
-        "Setting isSystem flag for storage '%1'. System drive path: '%2'. This url: '%3'. Result: %4",
-        sysPath, nx::utils::url::hidePassword(getUrl()), isSystem);
+        "Setting isSystem flag for storage '%1'. System drive path: '%2'. Result: %3",
+        nx::utils::url::hidePassword(getUrl()), sysPath, isSystem);
 
     *m_isSystem.lock() = isSystem;
 }
