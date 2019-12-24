@@ -238,7 +238,6 @@ QList<ActionType> userAvailableActions()
         ActionType::showOnAlarmLayoutAction,
         ActionType::execHttpRequestAction,
         ActionType::openLayoutAction,
-        ActionType::execHttpRequestAction,
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction,
         ActionType::buzzerAction,

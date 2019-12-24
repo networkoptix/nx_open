@@ -642,23 +642,28 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             break;
     }
 
-    QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
+    auto resourceIcon =
+        [this](QnResourceIconCache::Key defaultKey)
+        {
+            const QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
+            if (resources.empty())
+                return qnSkin->icon("tree/buggy.png");
 
-    if (resources.size() == 1)
-        return qnResIconCache->icon(resources.first());
+            if (resources.size() == 1)
+                return qnResIconCache->icon(resources.first());
 
-    if (resources.isEmpty())
-        return qnSkin->icon(lit("tree/buggy.png"));
+            return qnResIconCache->icon(defaultKey);
+        };
 
     if (vms::event::requiresCameraResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Camera);
+        return resourceIcon(QnResourceIconCache::Camera);
     if (vms::event::requiresServerResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Server);
+        return resourceIcon(QnResourceIconCache::Server);
     if (vms::event::requiresUserResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::User);
+        return resourceIcon(QnResourceIconCache::User);
 
-    NX_ASSERT(false);
-    return qnResIconCache->icon(QnResourceIconCache::Unknown);
+    // Icon for the <System> actions.
+    return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
 }
 
 QSet<QnUuid> QnBusinessRuleViewModel::eventResources() const
@@ -1358,6 +1363,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
     }
+
     if (vms::event::requiresServerResource(m_actionType))
     {
         QnMediaServerResourceList targetServers =
@@ -1371,13 +1377,13 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
     }
+
     if (vms::event::requiresUserResource(m_actionType))
     {
         return braced(tr("User"));
     }
 
-    NX_ASSERT(false);
-    return QString();
+    return braced(tr("System"));
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const
