@@ -10,43 +10,13 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/server/fs/media_paths/media_paths.h>
-#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
+#include <nx/utils/url.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/app_info.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 namespace nx {
 namespace mserver_aux {
-
-bool isStoragePathMounted(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule)
-{
-    using namespace nx::vms::server::fs::media_paths;
-    auto pathConfig = FilterConfig::createDefault(
-        serverModule->platform(), /*includeNonHdd*/ true, &serverModule->settings());
-
-    const auto mediaPaths = getMediaPaths(pathConfig);
-    return std::any_of(
-        mediaPaths.cbegin(), mediaPaths.cend(),
-        [&storage](const auto& p) { return p.startsWith(storage->getUrl()); });
-}
-
-void updateMountedStatus(const QnStorageResourcePtr& storage, QnMediaServerModule* serverModule)
-{
-    auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-    if (!fileStorage || fileStorage->isExternal())
-        return;
-
-    const bool isPathMounted = isStoragePathMounted(storage, serverModule);
-    if (isPathMounted != fileStorage->isMounted())
-    {
-        NX_DEBUG(
-            typeid(QnFileStorageResource),
-            "Changing 'IsMounted' for storage '%1' to '%2'", fileStorage->getUrl(), isPathMounted);
-
-        fileStorage->setMounted(isPathMounted);
-    }
-}
 
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,

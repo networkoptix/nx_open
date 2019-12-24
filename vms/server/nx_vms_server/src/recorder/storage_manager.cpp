@@ -512,9 +512,6 @@ public:
     virtual void run() override
     {
         NX_DEBUG(this, "Starting to test storages");
-        for (const auto& storage: storagesToTest())
-            m_owner->updateMountedStatus(storage);
-
         for (const auto& storage : storagesToTest())
         {
             NX_DEBUG(this, "Testing storage %1", nx::utils::url::hidePassword(storage->getUrl()));
@@ -1240,17 +1237,11 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
     return true;
 }
 
-void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
-{
-    nx::mserver_aux::updateMountedStatus(storage, serverModule());
-}
-
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
-        updateMountedStatus(storage);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }

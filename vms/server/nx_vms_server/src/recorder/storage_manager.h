@@ -291,7 +291,6 @@ private:
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
-    void updateMountedStatus(const QnStorageResourcePtr& storage);
 
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
