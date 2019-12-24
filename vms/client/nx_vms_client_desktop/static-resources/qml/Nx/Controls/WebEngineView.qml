@@ -33,7 +33,16 @@ WebEngineView
     userScripts: enableInjections ? injectScripts : []
 
     signal loadingStatusChanged(int status)
-    onLoadingChanged: loadingStatusChanged(loadRequest.status)
+    onLoadingChanged: function(loadRequest)
+    {
+        if (loadRequest.status == WebEngineLoadRequest.LoadFailedStatus
+            && loadRequest.errorDomain == WebEngineView.InternalErrorDomain)
+        {
+            // Content cannot be interpreted by Qt WebEngine, avoid continuous reloading.
+            stop()
+        }
+        loadingStatusChanged(loadRequest.status)
+    }
     onJavaScriptDialogRequested: workbench.requestJavaScriptDialog(request)
     onAuthenticationDialogRequested: workbench.requestAuthenticationDialog(request)
     onFileDialogRequested: workbench.requestFileDialog(request)
