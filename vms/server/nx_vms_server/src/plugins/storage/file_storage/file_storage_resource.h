@@ -1,13 +1,16 @@
 #pragma once
 
-#include <atomic>
 #include "core/resource/storage_resource.h"
 #include <platform/platform_abstraction.h>
 #include <nx/vms/server/resource/storage_resource.h>
+#include <nx/utils/lockable.h>
 
 #if defined(Q_OS_WIN)
 #include <wtypes.h>
 #endif
+
+#include <optional>
+#include <atomic>
 
 /*
 * QnFileStorageResource uses custom implemented IO access
@@ -55,10 +58,9 @@ public:
 
     virtual QString getPath() const override;
 
-    qint64 calculateAndSetTotalSpaceWithoutInit();
-
     // true if storage is located on local disks
     bool isLocal();
+    bool isMounted() const;
 
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(
@@ -66,8 +68,6 @@ public:
         nx::vms::server::PlatformMonitor::PartitionType ptype);
 
     qint64 calcInitialSpaceLimit();
-    void setMounted(bool value);
-    virtual bool isMounted() const;
 
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
@@ -75,7 +75,6 @@ private:
     Qn::StorageInitResult initOrUpdateInternal();
     Qn::StorageInitResult updatePermissions(const QString& url) const;
     bool checkWriteCap() const;
-    bool isStorageDirMounted() const;
     bool checkDBCap() const;
 #if defined(Q_OS_WIN)
     Qn::StorageInitResult updatePermissionsHelper(
@@ -106,6 +105,15 @@ private:
         QIODevice::OpenMode openMode,
         int bufferSize);
 
+    void setIsSystemFlagIfNeeded();
+    Qn::StorageInitResult initStorageDirectory(const QString& url);
+    Qn::StorageInitResult initRemoteStorage(const QString& url);
+    Qn::StorageInitResult checkMountedStatus() const;
+    Qn::StorageInitResult testWrite() const;
+    bool isValid() const;
+    QString getFsPath() const;
+    bool isLocalPathMounted(const QString& path) const;
+
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -113,18 +121,15 @@ public:
     static void removeOldDirs(QnMediaServerModule *serverModule);
 
 private:
-    mutable std::atomic<bool> m_valid;
+    mutable std::atomic<Qn::StorageInitResult> m_state = Qn::StorageInit_CreateFailed;
     mutable boost::optional<bool> m_dbReady;
 
 private:
     mutable QnMutex m_mutexCheckStorage;
     mutable int m_capabilities;
     QString m_localPath;
-
-    mutable qint64 m_cachedTotalSpace;
-    mutable boost::optional<bool> m_writeCapCached;
-    mutable QnMutex m_writeTestMutex;
-    bool m_isSystem;
-    bool m_isMounted = true;
+    mutable std::atomic<int64_t> m_cachedTotalSpace{-1};
+    nx::utils::Lockable<std::optional<bool>> m_isSystem;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;

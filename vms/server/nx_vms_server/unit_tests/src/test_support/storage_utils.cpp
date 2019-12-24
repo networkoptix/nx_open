@@ -60,9 +60,6 @@ public:
 
         return storage;
     }
-
-private:
-    virtual bool isMounted() const override { return true; }
 };
 
 static bool storagePresent(MediaServerLauncher* server, const QString& storagePath)

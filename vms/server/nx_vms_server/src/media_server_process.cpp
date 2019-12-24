@@ -476,23 +476,19 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     QnStorageResourceList result;
     for (const auto& storage: storages)
     {
-        qint64 totalSpace = -1;
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage)
-            totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        else
-        {
-            storage->initOrUpdate();
-            totalSpace = storage->getTotalSpace();
-        }
+        if (fileStorage && !fileStorage->isMounted())
+            continue;
+
+        const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
 
-        NX_VERBOSE(kLogTag,
-            lm("Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete").args(
-                storage->getUrl(), static_cast<bool>(fileStorage), totalSpace,
-                storage->getSpaceLimit()));
+        NX_VERBOSE(
+            kLogTag, "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
+            storage->getUrl(), static_cast<bool>(fileStorage), totalSpace, storage->getSpaceLimit());
     }
+
     return result;
 }
 
@@ -516,26 +512,25 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
         : nx::vms::server::PlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+    auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
     {
-        const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
-
-        if (totalSpace < fileStorage->getSpaceLimit())
-        {
-            NX_DEBUG(kLogTag, lm(
-                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
-                "Total space: %2, Space limit: %3").args(path, totalSpace, storage->getSpaceLimit()));
-            return QnStorageResourcePtr();
-        }
-    }
-    else
-    {
-        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
+        NX_WARNING(this, "Failed to initialize new storage '%1', path");
         return QnStorageResourcePtr();
     }
 
-    storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+    calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
+    if (fileStorage->getTotalSpace() < fileStorage->getSpaceLimit())
+    {
+        NX_DEBUG(
+            kLogTag, "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
+            "Total space: %2, Space limit: %3",
+            path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
+
+        return QnStorageResourcePtr();
+    }
+
+    storage->setUsedForWriting(storage->isWritable());
     NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -701,27 +696,15 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         }
 
         for (const auto& s: m_mediaServer->getStorages())
-            nx::mserver_aux::updateMountedStatus(s, serverModule());
-
-        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
-        for (auto it = smallStorages.begin(); it != smallStorages.end(); )
         {
-            if (const auto fileStorage = (*it).dynamicCast<QnFileStorageResource>();
-                fileStorage && !fileStorage->isMounted())
-            {
-                NX_DEBUG(
-                    this, "Small storage '%1' won't be removed because it's not mounted",
-                    fileStorage->getUrl());
-
-                it = smallStorages.erase(it);
-            }
+            const auto result = s->initOrUpdate();
+            if (result == Qn::StorageInit_Ok)
+                NX_DEBUG(this, "[Storages init] Existing storage '%1' is successfully initialized", nx::utils::url::hidePassword(s->getUrl()));
             else
-            {
-                NX_DEBUG(this, "Small storage '%1' will be removed", fileStorage->getUrl());
-                ++it;
-            }
+                NX_WARNING(this, "[Storages init] Failed to initialize existing storage '%1'",  nx::utils::url::hidePassword(s->getUrl()));
         }
 
+        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
         if (!smallStorages.isEmpty())
         {
             nx::vms::api::IdDataList idList;

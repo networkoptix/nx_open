@@ -33,13 +33,13 @@ public:
     }
 
     ValueLocker& operator=(const ValueLocker& other) = delete;
-    inline Value* operator->() { return m_value; }
-    inline const Value* operator->() const { return m_value; }
-    inline Value& operator*() { return *m_value; }
-    inline const Value& operator*() const { return *m_value; }
+    Value* operator->() { return m_value; }
+    const Value* operator->() const { return m_value; }
+    Value& operator*() { return *m_value; }
+    const Value& operator*() const { return *m_value; }
 
 private:
-    mutable QnMutex* m_mutex;
+    QnMutex* m_mutex;
     Value* m_value;
 };
 
@@ -51,9 +51,14 @@ struct Lockable
         return ValueLocker<Value>(&m_mutex, &m_value);
     };
 
+    const ValueLocker<Value> lock() const
+    {
+        return ValueLocker<Value>(&m_mutex, &m_value);
+    };
+
 private:
-    QnMutex m_mutex;
-    Value m_value;
+    mutable QnMutex m_mutex;
+    mutable Value m_value;
 };
 
 

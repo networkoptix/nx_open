@@ -115,7 +115,6 @@ TEST_F(MetricsStoragesApi, state)
     ASSERT_FALSE(storages.isEmpty());
     auto storage = storages[0];
     auto storage2 = storages[1];
-    storage.dynamicCast<QnFileStorageResource>()->setMounted(true);
     storage->setStatus(Qn::Offline);
 
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
