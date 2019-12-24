@@ -28,6 +28,14 @@ MediatorConnector::MediatorConnector(const std::string& cloudHost):
         m_mediatorEndpointProvider.get());
 
     bindToAioThread(getAioThread());
+
+    fetchAddress(
+        [](auto resultCode, auto address)
+        {
+            NX_VERBOSE(NX_SCOPE_TAG,
+                "fetchAddress complete, resultCode %1, mediator address %2",
+                resultCode, address);
+        });
 }
 
 MediatorConnector::~MediatorConnector()

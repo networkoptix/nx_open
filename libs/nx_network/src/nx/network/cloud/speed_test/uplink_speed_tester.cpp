@@ -52,11 +52,13 @@ void UplinkSpeedTester::start(const nx::utils::Url& speedTestUrl, CompletionHand
 
 void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 {
+	NX_VERBOSE(this, "Starting bandwidth test...");
 	m_bandwidthTester =
 		std::make_unique<UplinkBandwidthTester>(m_url, kTestDuration, pingTime);
 	m_bandwidthTester->doBandwidthTest(
 		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
 		{
+			NX_VERBOSE(NX_SCOPE_TAG, "Bandwidth test done");
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);
 
@@ -87,7 +89,7 @@ void UplinkSpeedTester::setupPingTest()
 			// a connection, increasing the ping time on first request.
             if (++m_testContext.totalPings == 1)
             {
-                NX_VERBOSE(this, "Initial ping: %1", pingTime);
+                NX_VERBOSE(this, "Started ping test, initial ping: %1", pingTime);
                 return sendPing();
             }
 
@@ -105,7 +107,6 @@ void UplinkSpeedTester::setupPingTest()
             else
             {
 				startBandwidthTest(averagePingTime);
-
 				m_httpClient.reset();
             }
         });

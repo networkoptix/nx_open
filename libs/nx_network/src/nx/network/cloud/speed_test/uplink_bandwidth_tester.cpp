@@ -14,7 +14,8 @@ using namespace std::chrono;
 namespace {
 
 static constexpr char kSpeedTest[] = "SPEEDTEST";
-static constexpr int kPayloadSizeBytes = 1000 * 1000;
+// static constexpr int kPayloadSizeBytes = 1000000; //< 1MB
+static constexpr int kPayloadSizeBytes = 2000;
 static constexpr float kSimilarityThreshold = 0.97F;
 static constexpr int kMinRunningAverages = 4;
 static constexpr auto kMinTestDuration = milliseconds(1);
@@ -79,6 +80,9 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 				[this](SystemError::ErrorCode errorCode) {
 					using namespace std::placeholders;
 
+					NX_VERBOSE(this, "connectAsync to %1 complete, reporting system error %2", 
+						m_url, SystemError::toString(errorCode));
+
                     if (errorCode != SystemError::noError)
 						return testFailed(errorCode);
 
@@ -117,7 +121,7 @@ std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
 
 	request.requestLine.method = Method::post;
 	request.requestLine.url.setPath(http::kApiPath);
-	request.requestLine.version = http_1_1;
+	request.requestLine.version = http_1_0;
 
 	// Adding payload to the request before serializing results in a double copy of the payload:
 	// Once to the request, and again into the buffer.
@@ -232,6 +236,8 @@ void UplinkBandwidthTester::sendRequest()
 	auto [sequence, buffer] = makeRequest();
 	m_testContext.totalBytesSent += buffer.size();
 	m_testContext.runningValues[sequence].totalBytesSent = m_testContext.totalBytesSent;
+
+	NX_VERBOSE(this, "Sending request %1, buffer size: %2", sequence, buffer.size());
 
     m_pipeline->sendData(
 		std::move(buffer),
