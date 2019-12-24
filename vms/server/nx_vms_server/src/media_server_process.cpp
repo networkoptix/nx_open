@@ -508,13 +508,26 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
-    const auto it = std::find_if(partitions.begin(), partitions.end(),
-        [&](const nx::vms::server::PlatformMonitor::PartitionSpace& part)
-    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
-    const auto storageType = (it != partitions.end())
-        ? it->type
-        : nx::vms::server::PlatformMonitor::NetworkPartition;
+    // Find the closest mount point. "/" matches everything on Linux.
+    auto storageType = nx::vms::server::PlatformMonitor::NetworkPartition;
+    QString closestMountPoint = "";
+    for (const auto& partition: partitions)
+    {
+        auto partitionPath = QnStorageResource::toNativeDirPath(partition.path);
+        if (!storagePath.startsWith(partitionPath))
+            continue;
+        if (!closestMountPoint.isEmpty())
+            if (closestMountPoint.length() > partitionPath.length())
+                continue;
+        closestMountPoint = partitionPath;
+        storageType = partition.type;
+    }
+    if (!closestMountPoint.isEmpty())
+    {
+        NX_VERBOSE(this, "Corresponding partition: %1 %2",
+            closestMountPoint, QnLexical::serialized(storageType));
+    }
     storage->setStorageType(QnLexical::serialized(storageType));
 
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
