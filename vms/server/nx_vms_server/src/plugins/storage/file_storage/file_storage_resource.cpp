@@ -581,11 +581,8 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
 
 Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
 {
-    setLocalPathSafe(
-        "\\\\" +
-        storageUrl.host() +
-        storageUrl.path().replace("/", "\\"));
-
+    nx::utils::Url u(url);
+    setLocalPathSafe("\\\\" + u.host() + u.path().replace("/", "\\"));
     return updatePermissions(url);
 }
 #endif
