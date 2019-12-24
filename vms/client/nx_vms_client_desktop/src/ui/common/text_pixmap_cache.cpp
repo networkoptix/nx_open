@@ -63,10 +63,7 @@ int calculateTextPixmapCost(const QnTextPixmap& textPixmap)
 
     int result = pixmap.height() * pixmap.width() * (pixmap.depth() / kBitsPerByte);
     result += textPixmap.renderedText.capacity() * sizeof(QChar);
-
-    result += sizeof(textPixmap.origin)
-        + sizeof(textPixmap.elideMode)
-        + sizeof(textPixmap.elidedForWidth);
+    result += sizeof(QnTextPixmap);
 
     return result;
 }
