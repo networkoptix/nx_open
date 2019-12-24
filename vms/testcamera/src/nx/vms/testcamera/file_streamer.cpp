@@ -46,7 +46,6 @@ FileStreamer::FileStreamer(
     const CameraOptions& cameraOptions,
     nx::network::AbstractStreamSocket* socket,
     StreamIndex streamIndex,
-    QString filename,
     PtsUnloopingContext* ptsUnloopingContext)
     :
     m_logger(logger),
@@ -54,7 +53,6 @@ FileStreamer::FileStreamer(
     m_cameraOptions(cameraOptions),
     m_socket(socket),
     m_streamIndex(streamIndex),
-    m_filename(std::move(filename)),
     m_ptsUnloopingContext(ptsUnloopingContext)
 {
 }
