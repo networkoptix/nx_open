@@ -16,7 +16,7 @@
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0">
    <item>
     <widget class="nx::vms::client::desktop::Panel" name="widget" native="true">
-     <layout class="QHBoxLayout" name="panelLayout">
+     <layout class="QHBoxLayout" name="panelLayout" stretch="0,0,0,0,1,0,0">
       <item>
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
       </item>
@@ -54,27 +54,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Description:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="textFilter"/>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
+       <widget class="nx::vms::client::desktop::SearchLineEdit" name="textSearchLineEdit" native="true">
+        <property name="minimumSize">
          <size>
-          <width>20</width>
-          <height>20</height>
+          <width>200</width>
+          <height>0</height>
          </size>
         </property>
-       </spacer>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="clearFilterButton">
@@ -288,6 +275,12 @@
    <class>QnTreeComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">ui/widgets/common/tree_combo_box.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::SearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/search_line_edit.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

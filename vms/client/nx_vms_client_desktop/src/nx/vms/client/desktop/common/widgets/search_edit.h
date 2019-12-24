@@ -13,6 +13,10 @@ namespace nx::vms::client::desktop {
 class SelectableTextButton;
 class CheckableMenu;
 
+/**
+ * This control is used in the resources tree only and is considered to be deprecated.
+ * Use SearchLineEdit instead.
+ */
 class SearchEdit: public QWidget
 {
     Q_OBJECT
