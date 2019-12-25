@@ -75,6 +75,9 @@ NX_KIT_API bool fromString(const std::string& s, int* value);
 NX_KIT_API bool fromString(const std::string& s, double* value);
 NX_KIT_API bool fromString(const std::string& s, float* value);
 
+void NX_KIT_API stringReplaceAllChars(std::string* s, char sample, char replacement);
+void NX_KIT_API stringInsertAfterEach(std::string* s, char sample, const char* insertion);
+
 //-------------------------------------------------------------------------------------------------
 // OS support.
 
