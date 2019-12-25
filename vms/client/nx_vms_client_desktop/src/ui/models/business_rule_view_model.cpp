@@ -1373,9 +1373,8 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
             return tr("Select server");
 
         const auto server = targetServers.first();
-        const auto camerasCount = resourcePool()->getAllCameras(server, true).size();
 
-        return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
+        return server->getName();
     }
 
     if (vms::event::requiresUserResource(m_actionType))
