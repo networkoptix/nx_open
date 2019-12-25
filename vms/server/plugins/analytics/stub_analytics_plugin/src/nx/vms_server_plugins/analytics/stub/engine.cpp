@@ -419,7 +419,8 @@ std::string Engine::manifestString() const
                                 "name": "testTextFieldWithValidation",
                                 "caption": "Hexadecimal number text field",
                                 "validationRegex": "^[a-f0-9]+$",
-                                "validationRegexFlags": "i"
+                                "validationRegexFlags": "i",
+                                "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd."
                             },
                             {
                                 "type": "SpinBox",
