@@ -4,7 +4,6 @@
 
 #include "utils.h"
 
-#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -25,12 +24,6 @@ namespace {
 
 #if !defined(NX_INI_CONFIG_DEFAULT_INI_FILES_DIR)
     #define NX_INI_CONFIG_DEFAULT_INI_FILES_DIR nullptr
-#endif
-
-#if !defined(NX_INI_CONFIG_PRINT_DESCRIPTION)
-    static constexpr bool kDoPrintDescription = false;
-#else
-    static constexpr bool kDoPrintDescription = true;
 #endif
 
 //-------------------------------------------------------------------------------------------------
@@ -59,21 +52,6 @@ std::string defaultValueToString(const T& value)
     std::ostringstream os;
     os << value;
     return os.str();
-}
-
-static void stringReplaceAllChars(std::string* s, char sample, char replacement)
-{
-    std::transform(s->cbegin(), s->cend(), s->begin(),
-        [=](char c) { return c == sample ? replacement : c; });
-}
-
-static void stringInsertAfterAll(std::string* s, char sample, const char* const insertion)
-{
-    for (int i = (int) s->size() - 1; i >= 0; --i)
-    {
-        if ((*s)[i] == sample)
-            s->insert((size_t) (i + 1), insertion);
-    }
 }
 
 /**
@@ -212,14 +190,7 @@ struct AbstractParam
         {
             std::stringstream s;
             s << ((error[0] != '\0') ? "  ! " : (eqDefault ? "    " : "  * "));
-            s << value << valueNameSeparator << name << error;
-            if (kDoPrintDescription && !description.empty())
-            {
-                std::string descriptionStr = " # " + description;
-                stringReplaceAllChars(&descriptionStr, '\n', ' ');
-                s << descriptionStr;
-            }
-            s << "\n";
+            s << value << valueNameSeparator << name << error << "\n";
             *output << s.str(); //< Output in one piece to minimize multi-threaded races.
         }
     }
@@ -536,7 +507,7 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
         if (!description.empty())
         {
             description += " ";
-            stringInsertAfterAll(&description, '\n', "# ");
+            nx::kit::utils::stringInsertAfterEach(&description, '\n', "# ");
         }
 
         file << "# " << description << "Default: " << param->defaultValueStr() << "\n";
