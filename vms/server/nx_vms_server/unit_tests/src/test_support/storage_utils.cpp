@@ -23,6 +23,8 @@ extern "C"
 #include <decoders/video/ffmpeg_video_decoder.h>
 }
 
+#include <nx/vms/server/root_fs.h>
+
 namespace nx::vms::server::test::test_support {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +61,24 @@ public:
             storage->setTypeId(resType->getId());
 
         return storage;
+    }
+
+    virtual Qn::StorageInitResult initOrUpdate() override
+    {
+        const auto url = getUrl();
+        NX_CRITICAL(!url.isNull());
+        const auto onExit = nx::utils::makeScopeGuard(
+            [this]()
+            {
+                updateCapabilities();
+                m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());
+            });
+
+        if (QDir(url).exists())
+            return m_state = Qn::StorageInit_Ok;
+
+        m_state = QDir().mkpath(url) ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
+        return m_state;
     }
 };
 

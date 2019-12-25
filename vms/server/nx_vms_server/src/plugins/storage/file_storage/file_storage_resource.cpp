@@ -330,7 +330,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
-    
+
     Qn::StorageInitResult result = isValid()
         ? checkMountedStatus()
         : (url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url));
@@ -626,8 +626,6 @@ void QnFileStorageResource::setUrl(const QString& url)
 
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
-    m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::kUnknownSize),
     m_serverModule(serverModule)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
