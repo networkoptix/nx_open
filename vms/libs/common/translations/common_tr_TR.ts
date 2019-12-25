@@ -6,70 +6,70 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Turkish</translation>
     </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>Parola veya kullanıcı adı yanlış.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>İstenilen işlem için bu kullanıcının yetkisi yok.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>Veritabanı yedeklemesi yapılamadı.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>Sistem adı henüz yapılandırılmadı.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Bilinmeyen hata.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
+      <translation>Starter lisans ile sistemleri birleştirmek üzeresiniz.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Sistem başına sadece 1 starter lisans atanabilir. ikinci starter lisans devre dışı kalacaktır.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Yine de birleştirilsin mi?</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation type="unfinished">System was not found.</translation>
+      <translation>Sistem bulunamadı.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>%1 sistemi %2 sistemi ile uyumsuzdur.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
+      <translation>%1 güvenli modda çalışıyor.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">Could not configure the remote System %1.</translation>
+      <translation>%1 sistemi yapılandırılamadı.</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Yeni sistem</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -106,222 +106,222 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Sistem Olayı</translation>
     </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>TAMAM</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation type="unfinished">Server has been stopped.</translation>
+      <translation>Sunucu Durduruldu.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
+      <translation>Medya Akışı Açık Fakat Medya Verisi Alınamıyor.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation type="unfinished">Unknown error. Please contact support.</translation>
+      <translation>Bilinmeyen Hata. Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation type="unfinished">(unknown)</translation>
+      <translation>(bilinmeyen)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation type="unfinished">Server %1 is not available.</translation>
+      <translation>%1 Sunucu Müsait Değil.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation type="unfinished">Check that Server is up and running.</translation>
+      <translation>Sunucunun Aktif ve Çalışabilir Olduğunu Kontrol Edin.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>%1 sunucusundan geçersiz cevap:&quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
+      <translation>Sunucunun Çalışır Durumda Olduğunu ve Uygun Versiyona Sahip Olduğunu Kontrol Edin.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation type="unfinished">Cannot connect to http port %1.</translation>
+      <translation>%1 Http Port'una Bağlanılamıyor.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
+      <translation>Son Olarak, Aygıt Yazılımını Güncellemeyi Deneyin. Sorun Devam Ederse, Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation type="unfinished">Failed to configure parameter %1.</translation>
+      <translation>%1 Parametresini Yetkilendirme Başarısız Oldu.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation type="unfinished">Please contact support.</translation>
+      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Bir giriş / çıkış hatası oluştu. OS mesajı: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
-      <translation type="unfinished">Parameters:</translation>
+      <translation>Parametreler:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
+      <translation>Lütfen Aygıtı Yeniden Başlatmayı Deneyin, Sonrasında Web Sayfasındaki Fabrika Ayarlarına Geri Dönün.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
+      <translation>Lütfen Kamerayı Yeniden Başlatmayı Deneyin, Sonrasında Web Sayfasındaki Fabrika Ayarlarına Geri Dönün.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
+      <translation>Aygıtın Ağa Bağlı Olduğundan Emin Olun. Aygıtı Yeniden Başlatmayı Deneyin.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
+      <translation>Kameranın Ağa Bağlı Olduğundan Emin Olun. Kamerayı Yeniden Başlatmayı Deneyin.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Cihaz isteği &quot;%1&quot;, hata &quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Kamera isteği &quot;%1&quot;, hata &quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation type="unfinished">Unknown device issue.</translation>
+      <translation>Bilinmeyen Aygıt Sorunu.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation type="unfinished">Unknown camera issue.</translation>
+      <translation>Bilinmeyen Kamera Sorunu.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation type="unfinished">Invalid data was received from the device %1.</translation>
+      <translation>%1 Aygıtından Geçersiz Veri Alındı.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation type="unfinished">Invalid data was received from the camera %1.</translation>
+      <translation>%1 Kamerasından Geçersiz Veri Alındı.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
+      <translation>Birden Fazla Medya Hatası. Daha Fazla Detay İçin Lütfen Aygıt Sorun Penceresini Açın.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
+      <translation>Birden Fazla Medya Hatası. Daha Fazla Detay İçin Lütfen Kamera Sorun Penceresini Açın.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
+      <translation>Lütfen I/O Modülünü Yeniden Başlatmayı Deneyin, Sonrasında Web Sayfasındaki Fabrika Ayarlarına Geri Dönün.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
+      <translation>I/O Modülünün Ağa Bağlı Olduğundan Emin Olun. I/O Modülünü Yeniden Başlatmayı Deneyin.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I/O modülisteği &quot;%1&quot;&quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation type="unfinished">Unknown I/O module issue.</translation>
+      <translation>Bilinmeyen I/O Mödülü Sorunu.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
+      <translation>%1 I/O Mödülünden Geçersiz Veri Alındı.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>Birden Fazla Medya Hatası. Daha Fazla Detay İçin Lütfen I/O Modülü Sorun Penceresini Açın.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>Aygıt Başlatma İşlemi Yürütülüyor.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>Kamera Başlatma İşlemi Yürütülüyor.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>I/O Modülü Başlatma İşlemi Yürütülüyor.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>Port %1 in erişilebilir olduğuna emin olun (e.g. forwarded).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>Eğer sorun çözülmez ise, Cihaz web sayfasından fabrika ayarlarına dönün.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>Eğer sorun çözülmez ise, Kamera web sayfasından fabrika ayarlarına dönün.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>Eğer sorun çözülmez ise, I/O modülü web sayfasından fabrika ayarlarına dönün.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>%1 için URL açılamadı. %2 Portuna bağlanırken hata oluştu.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>%1 için URL açılamadı. %2 Portu beklenmedik bir şekilde kapatıldı.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>Cihazdan gelen bilgi okunamadı.%1 URL, istek %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>Kameradan gelen bilgi okunamadı.%1 URL, istek %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>I/O modülünden gelen bilgi okunamadı.%1 URL, istek %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>%1 URL de desteklenen media izi yok.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>URL %1 için yetki sağlanamadı.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>%1 deki media açılamıyor.%2 media tipi desteklenmiyor.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Kamera arşivden geri yüklendi. Canlı video izlemek için kamerayı silin ve tekrar ekleyin.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve cihazın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve kameranın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Lütfen firmware güncelleyiniz. Desteklenen minimum versiyon %1'dir. Şu anki versiyon %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -340,35 +340,35 @@
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation type="unfinished">Audio context was not specified.</translation>
+      <translation>Ses İçeriği Belirlenemedi.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>%1 Kodek'i İçin Kodlayıcı Bulunamadı.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Ses Kodlayıcısı Başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation type="unfinished">Could not initialize audio decoder.</translation>
+      <translation>Ses Kod Çözüsüsü Başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation type="unfinished">Could not find decoder for codec %1.</translation>
+      <translation>%1 için kodlayıcı bulunamadı.</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
+      <translation>Encodera ses gönderilemedi. Hata kodu:%1.</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
+      <translation>Encoder dan ses alınamadı, Hata kodu: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+      <translation>Decoder dan ses alınamadı, Hata kodu: %1.</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
@@ -379,133 +379,133 @@
     <name>QnFfmpegTranscoder</name>
     <message>
       <source>Container %1 was not found in FFMPEG library.</source>
-      <translation type="unfinished">Container %1 was not found in FFMPEG library.</translation>
+      <translation>%1 Taşıyıcısı FFMPEG Kütüphanesinde Bulunamadı.</translation>
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation type="unfinished">Could not create output context for format %1.</translation>
+      <translation>%1 Formatı İçin Çıkış İçeriği Oluşturulamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation type="unfinished">Could not perform direct stream copy because frame size is undefined.</translation>
+      <translation>Sayfa Boyutu Belirlenemediğinden Doğrudan Akış Kopyası Gerçekleştirilemedi.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation type="unfinished">Could not find codec %1.</translation>
+      <translation>%1 Kodek'i Bulunamadı.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with container %1.</translation>
+      <translation>Ses veya Video Kodek'i %1 Taşıyıcısıyla Uyumsuz.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>%1 Kodek'i İçin Kodlayıcı Bulunamadı.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Video Kodlayıcısı Başlatılamadı.</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Analog</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Profesyonel</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Uç</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Multi Monitör</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O Modülü</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Başla</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Analog Kodlayıcı</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>Analog Lisanları</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>Profesyonel Lisanslar</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>Edge Lisansları</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation type="unfinished">Vmax Licenses</translation>
+      <translation>Vmax Lisansları</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation type="unfinished">Analog Encoder Licenses</translation>
+      <translation>Analog Kodlayıcı Lisanları</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation type="unfinished">Video Wall Licenses</translation>
+      <translation>Multi Monitör Lisansları</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation type="unfinished">I/O Module Licenses</translation>
+      <translation>I/O Modül Lisansları</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation type="unfinished">Start Licenses</translation>
+      <translation>Başlangıç Lisansları</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Geçersiz</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation type="unfinished">Invalid Licenses</translation>
+      <translation>Geçersiz Lisanslar</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>Ücretsiz</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Zaman</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Deneme Lisansları</translation>
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Köprü</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Bridge Lisansları</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
@@ -696,30 +696,30 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+      <translation>
+        <numerusform>%1 Arasından %2 %n Kullanıldı.</numerusform>
+        <numerusform>%1 Arasından %2 %n Kullanıldı.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+      <translation>
+        <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
+        <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>%n lisans etkinleşti %1 daha gerekli.</numerusform>
+        <numerusform>%n lisans etkinleşti %1 daha gerekli.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>
+        <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>
       </translation>
     </message>
   </context>
@@ -727,27 +727,27 @@
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
+      <translation>Geçersiz imza</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation type="unfinished">Invalid customization</translation>
+      <translation>Geçersiz özelleştirme</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Lisans süresi doldu</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
+      <translation>Geçersiz tür</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>Bu lisans türü daha yüksek yazılım sürümü gerektirir</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -766,58 +766,58 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Yeni Sunucu</translation>
     </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameralar</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>kameralar</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation type="unfinished">camera</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Aygıtlar</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>aygıtlar</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Aygıt</translation>
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>aygıt</translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation type="unfinished">I/O Modules</translation>
+      <translation>I/O Modülleri</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation type="unfinished">I/O modules</translation>
+      <translation>I/O modülleri</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O Modül</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>I/O modül</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -866,23 +866,23 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Bilinmeyen</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation type="unfinished">FREE License</translation>
+      <translation>ÜCRETSİZ Lisans</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>Lisans sahibi: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>Watermark: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Deneme Lisansı</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -893,124 +893,124 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>FFMPEG Kütüphanesindeki Karşılık Gelen Taşıyıcı Bulunamadı.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Video Kaydı İçin Çıkış Dosyası Oluşturulamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Kayıt İçin Akış Çıkışı Ayrılamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Ses Akış Çıkışı Ayrılamadı.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Geçersiz Ses Kodek Bilgisi.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Data aktarma için geçersiz kaynak tipi.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Dışa aktarılan veri yok.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>İsimlendirilmemiş Sistem</translation>
     </message>
   </context>
   <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation type="unfinished">OpenCL transcoding is not implemented.</translation>
+      <translation>OpenCL Kod Çözme Uygulanamadı.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation type="unfinished">Unknown transcoding method.</translation>
+      <translation>Bilinmeyen Kod Çözme Yöntemi.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation type="unfinished">OpenCLTranscode is not implemented.</translation>
+      <translation>OpenCL Yeniden Kodlama Uygulanamadı.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation type="unfinished">Unknown transcode method</translation>
+      <translation>Bilinmeyen Yeniden Kodlama Yöntemi</translation>
     </message>
   </context>
   <context>
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Sahip</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Yönetici</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Gelişmiş Görüntüleyici</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>İzleyiciler</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Canlı İzleyici</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation type="unfinished">Custom Role</translation>
+      <translation>Özel roller</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Özel Ayarlar</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
+      <translation>Tüm kameraları ve yer imlerini yönetebilirsiniz.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation type="unfinished">Can view all cameras and export video.</translation>
+      <translation>Bütün kameralar görüntüleyebilir ve Video dışa aktarabilir.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>Tüm kameraların canlı görüntülerini izleyebilir.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>Özel Kullanıcı yetkisi.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>Özel izinler.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir. Ve kullanıcıları yönetebilir.</translation>
     </message>
   </context>
   <context>
@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Bilinmeyen hata.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1059,264 +1059,264 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Yer İmi</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Panik Kaydı</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation type="unfinished">Write to log</translation>
+      <translation>Günlüğe Yaz</translation>
     </message>
     <message>
       <source>Show notification</source>
-      <translation type="unfinished">Show notification</translation>
+      <translation>Bildirimi Göster</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation type="unfinished">Repeat sound</translation>
+      <translation>Sesi Tekrarla</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation type="unfinished">Play sound</translation>
+      <translation>Sesi Oynat</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Konuş</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation type="unfinished">Execute PTZ preset</translation>
+      <translation>PTZ Ön Ayarını Uygula</translation>
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Metin Şablonunu Göster</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Alarm Düzenini Göster</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
-      <translation type="unfinished">Do HTTP request</translation>
+      <translation>HTTP isteği</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation type="unfinished">Device output</translation>
+      <translation>Aygıt Çıkışı</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation type="unfinished">Camera output</translation>
+      <translation>Kamera Çıkışı</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation type="unfinished">Device recording</translation>
+      <translation>Aygıt Kaydı</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation type="unfinished">Camera recording</translation>
+      <translation>Kamera Kaydı</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Genel olay</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>Haraket olan kamera</numerusform>
+        <numerusform>Haraket olan kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Ağ Sorunu</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Sunucu Hatası</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Sunucu Uyuşmazlığı</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Sunucu Başlatıldı</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Lisans Sorunu</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
-      <translation type="unfinished">Archive backup finished</translation>
+      <translation>Arşiv Yedeklemesi Bitti</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation type="unfinished">Any Server Issue</translation>
+      <translation>Herhangi Bir Sunucu Sorunu</translation>
     </message>
     <message>
       <source>Any Event</source>
-      <translation type="unfinished">Any Event</translation>
+      <translation>Herhangi Bir Durum</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
-        <numerusform>Input Signal on Devices</numerusform>
+      <translation>
+        <numerusform>Cihazlarda giriş sinyali</numerusform>
+        <numerusform>Cihazlarda giriş sinyali</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
-        <numerusform>Input Signal on Cameras</numerusform>
+      <translation>
+        <numerusform>Kameralarda giriş sinyali</numerusform>
+        <numerusform>Kameralarda giriş sinyali</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
-        <numerusform>Devices Disconnected</numerusform>
+      <translation>
+        <numerusform>Aygıt bağlantısı kesildi</numerusform>
+        <numerusform>Aygıt bağlantısı kesildi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
-        <numerusform>Cameras Disconnected</numerusform>
+      <translation>
+        <numerusform>Kameraların bağlantısı kesildi</numerusform>
+        <numerusform>Kameraların bağlantısı kesildi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
-        <numerusform>Devices IP Conflict</numerusform>
+      <translation>
+        <numerusform>Cihazlarda IP çakışması</numerusform>
+        <numerusform>Cihazlarda IP çakışması</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
-        <numerusform>Cameras IP Conflict</numerusform>
+      <translation>
+        <numerusform>Kameralarda IP çakışması</numerusform>
+        <numerusform>Kameralarda IP çakışması</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation type="unfinished">Any Device Issue</translation>
+      <translation>Herhangi Bir Aygıt Sorunu</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation type="unfinished">Any Camera Issue</translation>
+      <translation>Herhangi Bir Kamera Sorunu</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation type="unfinished">Undefined event has occurred on %1</translation>
+      <translation>%1 Üzerinde Tanımlanamayan Bir Durum Oluştu</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>%1 Aygıt Bağlantısı Kesildi</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>%1 Kamera Bağlantısı Kesildi</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>%1 I/O Modül Bağlantısı Kesildi</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>%1 Giriş Üzerinde</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>%1 Hareket Üzerinde</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>%1 Ağ Sorunu</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Sunucu &quot;%1&quot; Hata</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>%1 Aygıt IP Uyuşmazlığı</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>%1 Kamera IP Uyuşmazlığı</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Sunucu &quot;%1&quot; Çakışması</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Sunucu &quot;%1&quot; Başladı</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Sunucu &quot;%1&quot; bir lisans sorunu yaşıyor</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Sunucu &quot;%1&quot; bir arşiv yedekleme işlemini tamamladı</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>%1 Genel Durum</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation type="unfinished">An unknown event has occurred</translation>
+      <translation>Bilinmeyen Bir Durum Oluştu</translation>
     </message>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Durum: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Kaynak: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Başlık: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Port Girişi: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Gerekçe: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Çakışan Adres: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Conflicting Server#%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Çakışan Sunucu: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Tetikleyici: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1326,197 +1326,197 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Zaman: %2 üzerinde %1</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
+        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
+        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Aygıtla Bağlantı Beklenmedik Bir Şekilde Kapandı.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Kamerayla Bağlantı (birincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP Veri Kaybı Algılandı.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Aygıt ağ isteklerine yanıt vermiyor.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Sunucuyla Bağlantı Kayboldu.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Sunucu beklenmedik biçimde durdu.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>%1 Üzerinde I/O Hatası Meydana Geldi.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>%1 'i Kaydetmek İçin Yeterli HDD/SSD Hızı Yok.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD / SSD disk &quot;%1&quot; dolu. Disk, VMS tarafından yönetilmeyen çok fazla veri içeriyor.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Sistem diski &quot;%1&quot; neredeyse doluydu.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation type="unfinished">Archive backup failed: No available backup storages with sufficient free space</translation>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Yeterli Boş Alan ile Yedekleme Depolama Alanı Bulunmuyor</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation type="unfinished">Archive backup failed: Target storage failure</translation>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Depolama Alanı Hatası</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation type="unfinished">Archive backup failed: Source file open/read error</translation>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Kaynak Dosya Açma/Okuma Hatası</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation type="unfinished">Archive backup failed: Target file create/write error</translation>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Dosya Oluşturma/Yazma Hatası</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation type="unfinished">Archive backup failed: File catalog error</translation>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Dosya Liste Hatası</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>Arşiv yedeği tamamlandı. Fakat süre bittiğinden tam bitirilemedi. Data %1 e yedeklendi</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation type="unfinished">Archive backup is successfully completed</translation>
+      <translation>Arşiv Yedeklemesi Başarıyla Tamamlandı</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup is canceled by user. Data is backed up to %1</translation>
+      <translation>Arşiv Yedeklemesi Kullanıcı Tarafından İptal Edildi. Veri %1'e kadar Yedeklendi</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki kameralar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki I/O cihazları için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>start</source>
-      <translation type="unfinished">start</translation>
+      <translation>başlat</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation type="unfinished">stop</translation>
+      <translation>durdur</translation>
     </message>
     <message>
       <source>While %1</source>
-      <translation type="unfinished">While %1</translation>
+      <translation>%1 Sürdürülüyor</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation type="unfinished">On %1 %2</translation>
+      <translation>%1 Üzerinde %2</translation>
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Tetikleyici Adı</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Yetki</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n kullanıcı</numerusform>
+        <numerusform>%n kullanıcı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n Rolleri</numerusform>
+        <numerusform>%n Rolleri</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Yöneticiler</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Tüm Kullanıcılar</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>En az bir kullanıcı seçin</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Yazılımsal Tetikleyici</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>%2'de Yazılımsal Tetikleme %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Yazılımsal Tetikleyici %1 birden çok kez etkinleştirildi</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>E-posta gönder</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Kabul edilen</translation>
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analiz Etkinliği</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%2 de %1</translation>
     </message>
     <message>
       <source>Storage Issue</source>
@@ -1536,7 +1536,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>Ekranı Aç</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
@@ -1583,7 +1583,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Kaldırılmış Kamera</translation>
     </message>
   </context>
 </TS>
