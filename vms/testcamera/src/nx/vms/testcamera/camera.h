@@ -20,6 +20,7 @@ class FrameLogger;
 class FileCache;
 class Logger; //< private
 class FileStreamer; //< private
+class FrameScheduler; //< private
 
 /**
  * Streams the files loaded into FileCache in an infinite loop. Exits only on error.
@@ -51,7 +52,7 @@ public:
 private:
     bool performStreamingFile(
         const std::vector<std::shared_ptr<const QnCompressedVideoData>>& frames,
-        int fps,
+        FrameScheduler* frameScheduler,
         FileStreamer* fileStreamer,
         Logger* logger);
 
