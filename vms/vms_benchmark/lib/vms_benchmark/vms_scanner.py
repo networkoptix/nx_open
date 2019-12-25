@@ -168,7 +168,7 @@ class VmsScanner:
             if res:
                 vms['dir'] = vms_dir
             else:
-                raise BoxStateError(f'VMS Server dir at the box does not exist: {repr(vms_dir)}.')
+                raise BoxStateError(f'VMS Server dir at the box does not exist: {vms_dir!r}.')
 
             server_config_path = f"{vms['dir']}/etc/mediaserver.conf"
             server_config = device.eval(f"cat {server_config_path}")
@@ -190,9 +190,9 @@ class VmsScanner:
                 try:
                     vms['port'] = int(ConfigParser(tmp_file_path).options.get('port', 7001))
                 except ValueError:
-                    raise BoxStateError(f'Unable to get box Server port from {repr(server_config_path)}.')
+                    raise BoxStateError(f'Unable to get box Server port from {server_config_path!r}.')
             else:
-                raise BoxStateError(f"VMS Server at {repr(vms['dir'])} has none or empty \"mediaserver.conf\".")
+                raise BoxStateError(f"VMS Server at {vms['dir']!r} has none or empty \"mediaserver.conf\".")
 
             vms['host'] = device.host
 
