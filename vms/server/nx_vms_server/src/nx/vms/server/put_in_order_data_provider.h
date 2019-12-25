@@ -116,7 +116,6 @@ namespace nx::vms::server {
         virtual void stop() override;
         virtual void flushData(const QnAbstractDataPacketPtr& data) override;
         virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    protected:
         virtual void start(Priority priority = InheritPriority) override;
     };
 
