@@ -3808,7 +3808,7 @@
             ],
             "useOnvifPtz": true
         },
-		        {
+        {
             "_comment1": "Mapping for firmware: V102_2019_03_15",
             "keys": [
                 "GeoVision_2|GV-SD2722-IR"
