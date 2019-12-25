@@ -14,6 +14,11 @@
 #include <string>
 #include <unordered_set>
 
+namespace nx {
+namespace kit {
+
+namespace {
+
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
 #endif
@@ -22,10 +27,11 @@
     #define NX_INI_CONFIG_DEFAULT_INI_FILES_DIR nullptr
 #endif
 
-namespace nx {
-namespace kit {
-
-namespace {
+#if !defined(NX_INI_CONFIG_PRINT_DESCRIPTION)
+    static constexpr bool kDoPrintDescription = false;
+#else
+    static constexpr bool kDoPrintDescription = true;
+#endif
 
 //-------------------------------------------------------------------------------------------------
 // Utils
@@ -204,15 +210,17 @@ struct AbstractParam
     {
         if (output)
         {
-            const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
-            std::string descriptionStr;
-            if (!description.empty())
+            std::stringstream s;
+            s << ((error[0] != '\0') ? "  ! " : (eqDefault ? "    " : "  * "));
+            s << value << valueNameSeparator << name << error;
+            if (kDoPrintDescription && !description.empty())
             {
-                descriptionStr = " # " + description;
+                std::string descriptionStr = " # " + description;
                 stringReplaceAllChars(&descriptionStr, '\n', ' ');
+                s << descriptionStr;
             }
-            *output << prefix << value << valueNameSeparator << name << error << descriptionStr
-                << std::endl;
+            s << "\n";
+            *output << s.str(); //< Output in one piece to minimize multi-threaded races.
         }
     }
 };
@@ -555,7 +563,7 @@ void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) c
     for (const auto& entry: m_iniMap)
     {
         if (m_paramNames.count(entry.first) == 0 && output)
-            *output << "!!! " << entry.first << " [unexpected param in file]" << std::endl;
+            *output << "  ! " << entry.first << " [unexpected param in file]" << std::endl;
     }
 }
 
