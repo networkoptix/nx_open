@@ -34,10 +34,10 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
  offline=0..100
      Optional. Frequency of the Camera going offline. Default: 0 - never go offline.
  video-layout=<channelNumber>[,<channelNumber>]...[/<channelNumber>[,<channelNumber>]...]...
-     Optional. Defines the layout of channels in multi-channel video files, row-by-row, rows are
-     separated with `/`, items in a row are separated with `,`. Each channel may occur in the
-     matrix only once. If omitted and multi-channel files exist, a default video layout is assumed:
-     channels are laid out horizontally, increasing their numbers.
+     Optional. Defines the layout of channels in multi-channel video files as a matrix of
+     zero-based channel numbers, row-by-row, rows separated with `/`, items in a row separated with
+     `,`. Each channel may occur only once. If omitted and multi-channel files exist, a default
+     video layout is assumed: channels are laid out horizontally, left-to-right.
 
 <option> is one of the following:
  -h, --help

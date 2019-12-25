@@ -74,7 +74,7 @@ void VideoLayout::parseSlashCommaString(const QString& slashCommaString, QString
         m_sensors.push_back(rowData);
 
         if (rowData.size() != m_sensors.at(0).size())
-            return error("The matrix has rows of different length.");
+            return error("The matrix has rows of different lengths.");
     }
 
     if (m_sensors.empty())
