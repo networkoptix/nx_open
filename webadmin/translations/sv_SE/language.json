@@ -21,14 +21,14 @@
         "tabs": {
             "server": "Server",
             "system": "System",
-            "device": "Device"
+            "device": "Enhet"
         },
         "confirmRestart": "Starta om servern?",
         "couldntCheckInternet": "Det gick inte att kontrollera molnanslutningen",
         "confirmRestoreDefault": "Rensa databas och inställningar? Denna process tar lite tid och servern kommer att startas om efteråt.",
         "confirmRestoreDefaultTitle": "Återställ fabriksinställningar",
         "unexpectedError": "Misslyckades: oväntat fel har hänt",
-        "connnetionError": "Connection error",
+        "connnetionError": "Anslutningsfel",
         "wrongPassword": "Fel lösenord.",
         "error": "Fel: ",
         "restartNeeded": "Ändringar sparade. Starta om servern för att tillämpa nya inställningar?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Det är inte säkert att använda portnummer mindre än 1025. Servern kan bli otillgänglig. Fortsätt ändå?",
         "confirmDisconnectFromCloud": "Koppla från systemet från {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alla molnanvändare kommer att raderas.</span><br><br>Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Koppla från",
         "disconnectedFromCloudSuccess": "Systemet kopplades från {{CLOUD_NAME}} framgångsrikt",
         "disconnectedFromCloudError": "Kan inte koppla från systemet",
         "confirmDisconnectFromSystem": "Ta bort servern från nuvarande system",
@@ -111,18 +111,18 @@
         "SystemName": "Systemets namn",
         "takeCameraOwnershipWithoutLock": "Ta kamerans ägande utan lås",
         "timeSynchronizationEnabled": "Tidssynkronisering aktiverad",
-        "primaryTimeServer": "Primary time synchronization server",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
-        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+        "primaryTimeServer": "Primär tidssynkroniseringsserver",
+        "osTimeChangeCheckPeriodMs": "Kontrolltid för OS-tidändring",
+        "syncTimeExchangePeriod": "Synkronisera tidsväxlingsperiod",
+        "maxWearableArchiveSynchronizationThreads": "Max synkroniseringstrådar för kroppsburen kameraarkiv",
         "updateNotificationsEnabled": "Uppdateringsnotifikationer aktiverade",
         "upnpPortMappingEnabled": "UPNP-portmappning aktiverad",
         "useTextEmailFormat": "Skicka oformaterad text i email",
         "useWindowsEmailLineFeed": "Använd Windows radmatning i e-postmeddelanden",
-        "trafficEncryptionForced": "Force traffic encryption",
-        "videoTrafficEncryptionForced": "Force video traffic encryption",
-        "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings",
+        "trafficEncryptionForced": "Kräv trafikkryptering",
+        "videoTrafficEncryptionForced": "Tvinga videotrafikkryptering",
+        "updateStatus": "Uppdatera status",
+        "watermarkSettings": "Vattenmärkesinställningar",
         "maxWebMTranscoders": "Max antal WEBM-anslutningar för servern. Chrome öppnar 2 anslutningar samtidigt och stänger sedan den första. Så det rekommenderas att ange värdet> = 2 till denna parameter.",
         "maxEventLogRecords": "Maximal händelselogg poster för att hålla i databasen. Verklig mängd återlästa poster kan vara upp till 20% högre än det angivna värdet.",
         "forceLiveCacheForPrimaryStream": "Om du vill cache några ramar för primärströmmen. Värden: \"ja\" - alltid aktiverat (kan använda mycket RAM), \"nej\" - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), \"auto\" - liknande \"nej\" men tänds när det förbättras användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran)."
@@ -149,7 +149,7 @@
         "licenceError": "Varning! Du håller på att slå samman system med startlicenser. Endast en startlicens är tillåten per system, så den andra licensen kommer att inaktiveras. Sammanfoga ändå?",
         "duplicateServersError": "Kan inte slå samman system eftersom de har minst en server med samma ID. Ta bort den här servern och försök igen.",
         "connectionFailed": "Anslutningen misslyckades: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Okänt Fel",
         "mergeFailed": "Sammanslagning misslyckades",
         "mergeSucceed": "Sammanfogan lyckades.",
         "newSystemDisplayName": "Nytt system",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Inloggning eller lösenord är felaktigt",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Alltför många försök. Försök igen om någon minut."
     },
     "navigaion": {
         "cannotGetUser": "Serverfel: går inte att hämta aktuell användardata"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "servern startas",
         "serverRestarting": "servern startar om",
-        "serverOffline": "server is offline"
+        "serverOffline": "servern är offline"
     },
     "fileUpload": {
         "started": "Uppdatering startad framgångsrikt. Det tar flera minuter",
@@ -182,7 +182,7 @@
         "selectFiles": "Välj filer"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Ledigt",
         "total": "Totalt",
         "occupied": "Upptagen",
         "reserved": "Reserverad"
