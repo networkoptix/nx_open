@@ -400,7 +400,7 @@ std::string Engine::manifestString() const
                         "type": "CheckBox",
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
-                        "defaultValue": true,
+                        "defaultValue": true
                     }
                 ]
             }
@@ -418,6 +418,7 @@ std::string Engine::manifestString() const
                                 "type": "TextField",
                                 "name": "testTextFieldWithValidation",
                                 "caption": "Hexadecimal number text field",
+                                "defaultValue": "12ab34cd",
                                 "validationRegex": "^[a-f0-9]+$",
                                 "validationRegexFlags": "i",
                                 "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd."
