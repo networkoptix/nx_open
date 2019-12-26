@@ -923,7 +923,7 @@ bool QnBusinessRuleViewModel::actionCanUseSourceServer() const
 
 bool QnBusinessRuleViewModel::actionIsUsingSourceServer() const
 {
-    return m_actionParams.useSource && actionCanUseSourceServer();
+    return m_actionParams.useSource && vms::event::requiresServerResource(m_actionType);
 }
 
 void QnBusinessRuleViewModel::toggleActionUseSourceServer()
