@@ -109,8 +109,13 @@ public:
     bool disabled() const;
     void setDisabled(bool value);
 
-    bool canUseSourceCamera() const;
-    bool isUsingSourceCamera() const;
+    bool actionCanUseSourceCamera() const;
+    bool isActionUsingSourceCamera() const;
+
+    bool actionCanUseSourceServer() const;
+    bool actionIsUsingSourceServer() const;
+
+    void toggleActionUseSourceServer();
 
     QIcon iconForAction() const;
 
@@ -149,8 +154,6 @@ signals:
 private:
     void updateActionTypesModel();
     void updateEventStateModel();
-
-
 
     QString getAggregationText() const;
 

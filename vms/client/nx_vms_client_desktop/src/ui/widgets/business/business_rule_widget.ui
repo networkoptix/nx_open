@@ -285,6 +285,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="useEventSourceServerCheckBox">
+          <property name="text">
+           <string>Use event source server</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="nx::vms::client::desktop::AggregationWidget" name="aggregationWidget" native="true"/>
         </item>
         <item>

@@ -59,12 +59,12 @@ void QnFullscreenCameraActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        ui->useSourceCheckBox->setEnabled(model()->canUseSourceCamera());
+        ui->useSourceCheckBox->setEnabled(model()->actionCanUseSourceCamera());
     }
 
     if (fields.testFlag(Field::actionParams))
     {
-        ui->useSourceCheckBox->setChecked(model()->isUsingSourceCamera());
+        ui->useSourceCheckBox->setChecked(model()->isActionUsingSourceCamera());
     }
 
     if (fields & (Field::eventType | Field::actionResources | Field::actionParams))
