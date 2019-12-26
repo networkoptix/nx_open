@@ -98,7 +98,6 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
-    nx::vms::server::RootFileSystem* rootTool() const;
     QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode);
     QIODevice* openInternal(const QString& url, QIODevice::OpenMode openMode, int bufferSize);
 
@@ -120,7 +119,6 @@ protected:
     mutable std::atomic<Qn::StorageInitResult> m_state = Qn::StorageInit_CreateFailed;
     mutable std::atomic<int64_t> m_cachedTotalSpace{ -1 };
 
-    void updateCapabilities();
     nx::vms::server::RootFileSystem* rootTool() const;
     QString getFsPath() const;
 

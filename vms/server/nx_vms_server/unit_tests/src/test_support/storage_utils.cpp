@@ -68,11 +68,7 @@ public:
         const auto url = getUrl();
         NX_CRITICAL(!url.isNull());
         const auto onExit = nx::utils::makeScopeGuard(
-            [this]()
-            {
-                updateCapabilities();
-                m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());
-            });
+            [this]() { m_cachedTotalSpace = rootTool()->totalSpace(getFsPath()); });
 
         if (QDir(url).exists())
             return m_state = Qn::StorageInit_Ok;
