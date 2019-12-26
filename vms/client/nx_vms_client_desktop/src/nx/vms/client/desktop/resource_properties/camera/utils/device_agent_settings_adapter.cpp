@@ -81,6 +81,9 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
             d->currentEngineId = id;
             executeDelayedParented([this, id]() { d->refreshSettings(id); }, this);
         });
+
+    connect(d->settingsManager, &AnalyticsSettingsManager::appliedChanges, this,
+        [this]() { d->updateLoadingState(); });
 }
 
 DeviceAgentSettingsAdapter::~DeviceAgentSettingsAdapter()
