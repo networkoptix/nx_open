@@ -4,13 +4,15 @@
 
 #include <nx/sdk/interface.h>
 
+#include <nx/sdk/i_list.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
 #include <nx/sdk/analytics/i_uncompressed_media_frame.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedMediaFrame>
+class IUncompressedVideoFrame0: public Interface<IUncompressedVideoFrame0, IUncompressedMediaFrame>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame"); }
@@ -34,7 +36,7 @@ public:
     };
 
     /**
-     * @return width of decoded frame in pixels.
+     * @return width of the decoded frame in pixels.
      */
     virtual int width() const = 0;
 
@@ -61,6 +63,21 @@ public:
      * @return Number of bytes in each pixel line of the plane, or 0 if the data is not accessible.
      */
     virtual int lineSize(int plane) const = 0;
+};
+
+/**
+ * Represents a single uncompressed video frame.
+ */
+class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedVideoFrame0>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame0"); }
+
+    protected: virtual IList<IMetadataPacket>* getMetadataList() const = 0;
+    public: Ptr<IList<IMetadataPacket>> metadataList() const
+    {
+        return toPtr(getMetadataList());
+    }
 };
 
 } // namespace analytics

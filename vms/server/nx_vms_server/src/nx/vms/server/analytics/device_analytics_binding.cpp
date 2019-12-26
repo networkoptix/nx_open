@@ -339,7 +339,7 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequire
         requiredStreamTypes |= StreamType::compressedVideo;
     }
 
-   return StreamRequirements{requiredStreamTypes, avPixelFormat};
+   return StreamRequirements{requiredStreamTypes, avPixelFormat, manifest.preferredStream};
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)

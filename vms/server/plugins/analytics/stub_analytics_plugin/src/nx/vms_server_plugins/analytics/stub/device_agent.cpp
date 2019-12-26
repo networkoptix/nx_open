@@ -14,6 +14,8 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/analytics/i_motion_metadata_packet.h>
+
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
@@ -265,7 +267,7 @@ void DeviceAgent::processCustomMetadataPacket(
     const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket,
     const char* func)
 {
-    NX_OUTPUT << func << "(): timestamp " << customMetadataPacket->timestampUs() << " us;";
+    NX_OUTPUT << func << "(): timestamp " << customMetadataPacket->timestampUs() << " us.";
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
@@ -277,6 +279,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     }
 
     processVideoFrame(videoFrame, __func__);
+    processFrameMotion(videoFrame->metadataList());
     return true;
 }
 
@@ -289,6 +292,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     }
 
     processVideoFrame(videoFrame, __func__);
+    processFrameMotion(videoFrame->metadataList());
     return checkVideoFrame(videoFrame);
 }
 
@@ -305,21 +309,76 @@ bool DeviceAgent::pushCustomMetadataPacket(
     return true;
 }
 
+void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketList)
+{
+    if (!ini().visualizeMotion)
+        return;
+
+    cleanUpTimestampQueue();
+
+    if (!metadataPacketList)
+        return;
+
+    const int metadataPacketCount = metadataPacketList->count();
+    if (metadataPacketCount == 0)
+        return;
+
+    for (int i = 0; i < metadataPacketCount; ++i)
+    {
+        const auto metadataPacket = metadataPacketList->at(i);
+        if (!NX_KIT_ASSERT(metadataPacket))
+            continue;
+
+        const auto motionPacket = metadataPacket->queryInterface<IMotionMetadataPacket>();
+        if (!motionPacket)
+            continue;
+
+        auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+        objectMetadataPacket->setTimestampUs(motionPacket->timestampUs());
+
+        const int columnCount = motionPacket->columnCount();
+        const int rowCount = motionPacket->rowCount();
+
+        for (int column = 0; column < columnCount; ++column)
+        {
+            for (int row = 0; row < rowCount; ++row)
+            {
+                if (!motionPacket->isMotionAt(column, row))
+                    continue;
+
+                const auto objectMetadata = makePtr<ObjectMetadata>();
+                objectMetadata->setBoundingBox(Rect(
+                    column / (float) columnCount,
+                    row / (float) rowCount,
+                    1.0F / columnCount,
+                    1.0F / rowCount));
+
+                objectMetadata->setTypeId(kMotionVisualizationObjectType);
+                objectMetadata->setTrackId(UuidHelper::randomUuid());
+                objectMetadata->setConfidence(1.0F);
+                objectMetadataPacket->addItem(objectMetadata.get());
+            }
+        }
+
+        pushMetadataPacket(objectMetadataPacket.releasePtr());
+    }
+}
+
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    std::string logMessage = "No need to generate metadata packets";
-    if (m_deviceAgentSettings.needToGenerateObjects())
+    if (!m_deviceAgentSettings.needToGenerateObjects())
     {
-        *metadataPackets = cookSomeObjects();
-        logMessage =
-            nx::kit::utils::format("Generated %d metadata packet(s)", metadataPackets->size());
+        NX_OUTPUT << __func__ << "() END -> true: no need to generate object metadata packets";
+        return true;
     }
 
+    *metadataPackets = cookSomeObjects();
     m_lastVideoFrameTimestampUs = 0;
 
-    NX_OUTPUT << __func__ << "() END -> true: " << logMessage;
+    NX_OUTPUT << __func__ << "() END -> true: " <<
+        nx::kit::utils::format("generated %d metadata packet(s)", metadataPackets->size());
     return true;
 }
 

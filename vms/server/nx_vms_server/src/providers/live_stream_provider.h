@@ -15,7 +15,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -97,8 +97,12 @@ protected:
 private:
     float getDefaultFps() const;
 
-    bool needAnalyzeMotion();
+    bool doesStreamSuitMotionAnalysisRequirements();
 
+    bool doesFrameSuitMotionAnalysisRequirements(
+        const QnCompressedVideoDataPtr& compressedFrame) const;
+
+    void checkAndUpdatePrimaryStreamResolution(const QnCompressedVideoDataPtr& compressedFrame);
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
@@ -109,9 +113,6 @@ private:
         bool isCameraConfigured);
 
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
-
-    QSharedPointer<nx::vms::server::analytics::IStreamDataReceptor>
-        getStreamDataReceptorForMetadataPluginsIfNeeded();
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
@@ -136,7 +137,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::vms::server::analytics::IStreamDataReceptor> m_streamDataReceptor;
+    QWeakPointer<nx::vms::server::analytics::StreamDataReceptor> m_streamDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;
@@ -144,6 +145,7 @@ private:
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
     std::atomic_bool m_canStartThread{true};
+    QnMetaDataV1Ptr m_lastMotionMetadata;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

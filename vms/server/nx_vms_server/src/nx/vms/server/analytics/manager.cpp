@@ -15,6 +15,9 @@
 
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/analytics/wrappers/engine.h>
+#include <nx/vms/server/analytics/device_analytics_context.h>
+#include <nx/vms/server/analytics/proxy_stream_data_receptor.h>
+
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
@@ -38,9 +41,7 @@ using namespace nx::vms::server::metrics;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    m_thread(new QThread(this)),
-    m_visualMetadataDebugger(
-        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
+    m_thread(new QThread(this))
 {
     m_thread->setObjectName(toString(this));
     moveToThread(m_thread);
@@ -106,7 +107,8 @@ void Manager::initExistingResources()
     }
 }
 
-QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
+QSharedPointer<DeviceAnalyticsContext> Manager::deviceAnalyticsContextUnsafe(
+    const QnUuid& deviceId) const
 {
     auto contextItr = m_deviceAnalyticsContexts.find(deviceId);
     if (contextItr == m_deviceAnalyticsContexts.cend())
@@ -115,10 +117,10 @@ QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) 
     return contextItr->second;
 }
 
-QSharedPointer<DeviceAnalyticsContext> Manager::context(
+QSharedPointer<DeviceAnalyticsContext> Manager::deviceAnalyticsContextUnsafe(
     const QnVirtualCameraResourcePtr& device) const
 {
-    return context(device->getId());
+    return deviceAnalyticsContextUnsafe(device->getId());
 }
 
 void Manager::at_resourceAdded(const QnResourcePtr& resource)
@@ -269,16 +271,18 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
         device->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
-    context->setMetadataSink(metadataSink(device));
+    context->setMetadataSink(metadataSinkUnsafe(device->getId()));
 
-    if (auto source = mediaSource(device).toStrongRef())
+    if (auto source = mediaSourceUnsafe(device->getId()).toStrongRef())
         source->setProxiedReceptor(context);
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_deviceAnalyticsContexts.emplace(device->getId(), context);
 }
 
 void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_deviceAnalyticsContexts.erase(device->getId());
 }
 
@@ -371,16 +375,31 @@ void Manager::registerMetadataSink(
         return;
     }
 
-    m_metadataSinks[deviceResource->getId()] = metadataSink;
-    auto analyticsContext = context(device);
+    QSharedPointer<DeviceAnalyticsContext> analyticsContext;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_metadataSinks[deviceResource->getId()] = metadataSink;
+        analyticsContext = deviceAnalyticsContextUnsafe(device);
+    }
+
     if (analyticsContext)
         analyticsContext->setMetadataSink(metadataSink);
 }
 
-QWeakPointer<IStreamDataReceptor> Manager::registerMediaSource(const QnUuid& deviceId)
+QWeakPointer<StreamDataReceptor> Manager::registerMediaSource(
+    const QnUuid& deviceId,
+    nx::vms::api::StreamIndex streamIndex)
 {
-    auto proxySource = QSharedPointer<ProxyStreamDataReceptor>::create();
-    auto analyticsContext = context(deviceId);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    QSharedPointer<ProxyStreamDataReceptor> proxySource;
+    if (auto it = m_mediaSources.find(deviceId); it != m_mediaSources.cend())
+        proxySource = it->second;
+    else
+        proxySource = QSharedPointer<ProxyStreamDataReceptor>::create();
+
+    proxySource->registerStream(streamIndex);
+
+    auto analyticsContext = deviceAnalyticsContextUnsafe(deviceId);
 
     if (analyticsContext)
         proxySource->setProxiedReceptor(analyticsContext);
@@ -396,8 +415,8 @@ void Manager::setSettings(
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
-        QnMutexLocker lock(&m_contextMutex);
-        analyticsContext = context(QnUuid(deviceId));
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        analyticsContext = deviceAnalyticsContextUnsafe(QnUuid(deviceId));
     }
 
     if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
@@ -410,8 +429,8 @@ QJsonObject Manager::getSettings(const QString& deviceId, const QString& engineI
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
-        QnMutexLocker lock(&m_contextMutex);
-        analyticsContext = context(QnUuid(deviceId));
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        analyticsContext = deviceAnalyticsContextUnsafe(QnUuid(deviceId));
     }
 
     if (!analyticsContext)
@@ -442,13 +461,7 @@ QJsonObject Manager::getSettings(const QString& engineId) const
     return engine->settingsValues();
 }
 
-QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
-    const QnVirtualCameraResourcePtr& device) const
-{
-    return metadataSink(device->getId());
-}
-
-QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceId) const
+QWeakPointer<QnAbstractDataReceptor> Manager::metadataSinkUnsafe(const QnUuid& deviceId) const
 {
     auto it = m_metadataSinks.find(deviceId);
     if (it == m_metadataSinks.cend())
@@ -457,13 +470,7 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceI
     return it->second;
 }
 
-QWeakPointer<ProxyStreamDataReceptor> Manager::mediaSource(
-    const QnVirtualCameraResourcePtr& device) const
-{
-    return mediaSource(device->getId());
-}
-
-QWeakPointer<ProxyStreamDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
+QWeakPointer<ProxyStreamDataReceptor> Manager::mediaSourceUnsafe(const QnUuid& deviceId) const
 {
     auto it = m_mediaSources.find(deviceId);
     if (it == m_mediaSources.cend())
@@ -546,7 +553,12 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
 
 void Manager::updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device)
 {
-    auto analyticsContext = context(device);
+    QSharedPointer<DeviceAnalyticsContext> analyticsContext;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        analyticsContext = deviceAnalyticsContextUnsafe(device);
+    }
+
     if (!analyticsContext)
     {
         NX_DEBUG(this, "Can't find a DeviceAnalyticsContext for the Device %1 (%2)",

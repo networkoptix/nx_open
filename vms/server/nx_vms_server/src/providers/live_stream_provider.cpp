@@ -156,17 +156,16 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     QnAbstractMediaStreamDataProvider::setRole(role);
     updateSoftwareMotion();
 
-    const auto roleForAnalytics = ini().analyzeSecondaryStream
-        ? Qn::ConnectionRole::CR_SecondaryLiveVideo
-        : Qn::ConnectionRole::CR_LiveVideo;
-
-    if (role == roleForAnalytics && serverModule())
+    if (NX_ASSERT(serverModule()))
     {
         m_streamDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
-            m_cameraRes->getId());
+            m_cameraRes->getId(), Qn::toStreamIndex(getRole()));
 
-        serverModule()->analyticsManager()->registerMetadataSink(
-            getResource(), m_dataReceptorMultiplexer.toWeakRef());
+        if (getRole() == Qn::ConnectionRole::CR_LiveVideo)
+        {
+            serverModule()->analyticsManager()->registerMetadataSink(
+                getResource(), m_dataReceptorMultiplexer.toWeakRef());
+        }
     }
 
     if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
@@ -309,23 +308,13 @@ float QnLiveStreamProvider::getDefaultFps() const
         QnLiveStreamParams::kMinSecondStreamFps, newSecondaryStreamFps, m_cameraRes->getMaxFps());
 }
 
-bool QnLiveStreamProvider::needAnalyzeMotion()
+bool QnLiveStreamProvider::doesStreamSuitMotionAnalysisRequirements()
 {
     if (m_cameraRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
         return false;
 
     const auto motionStreamIndex = m_cameraRes->motionStreamIndex().index;
-    switch (getRole())
-    {
-        case Qn::CR_LiveVideo:
-            return motionStreamIndex == nx::vms::api::StreamIndex::primary;
-        case Qn::CR_SecondaryLiveVideo:
-            return motionStreamIndex == nx::vms::api::StreamIndex::secondary;
-        default:
-            break;
-    }
-
-    return false;
+    return motionStreamIndex == toStreamIndex(getRole());
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
@@ -349,15 +338,20 @@ bool QnLiveStreamProvider::needMetadata()
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
-        if (needAnalyzeMotion())
+        StreamProviderRequirements requirements;
+        if (const auto streamReceptor = m_streamDataReceptor.toStrongRef())
+            requirements = streamReceptor->providerRequirements(Qn::toStreamIndex(getRole()));
+
+        if ((doesStreamSuitMotionAnalysisRequirements()
+            && requirements.motionAnalysisPolicy == MotionAnalysisPolicy::automatic)
+            || (requirements.motionAnalysisPolicy == MotionAnalysisPolicy::forced))
         {
             for (int i = 0; i < m_videoChannels; ++i)
             {
-                bool rez = m_motionEstimation[i]->existsMetadata();
-                if (rez)
+                if (m_lastMotionMetadata)
                 {
                     m_softMotionLastChannel = i;
-                    return rez;
+                    return true;
                 }
             }
         }
@@ -386,29 +380,6 @@ void QnLiveStreamProvider::onStreamReopen()
     m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES;
 }
 
-/**
- * @param outNeedUncompressedFrame Set to true if a non-null IStreamDataReceptor is returned and
- *     the uncompressed frame has to be passed to the returned IStreamDataReceptor.
- * @return Stored m_streamDataReceptor, if it exists and sending the frame to metadata plugins is
- *     needed; null otherwise.
- */
-QSharedPointer<IStreamDataReceptor>
-    QnLiveStreamProvider::getStreamDataReceptorForMetadataPluginsIfNeeded()
-{
-    QSharedPointer<IStreamDataReceptor> streamDataReceptor;
-
-    const auto roleForAnalytics = ini().analyzeSecondaryStream
-        ? Qn::ConnectionRole::CR_SecondaryLiveVideo
-        : Qn::ConnectionRole::CR_LiveVideo;
-
-    const bool needToAnalyzeStream = roleForAnalytics == getRole();
-
-    if (needToAnalyzeStream)
-        streamDataReceptor = m_streamDataReceptor.toStrongRef();
-
-    return streamDataReceptor;
-}
-
 void QnLiveStreamProvider::onGotVideoFrame(
     const QnCompressedVideoDataPtr& compressedFrame,
     const QnLiveStreamParams& currentLiveParams,
@@ -430,39 +401,27 @@ void QnLiveStreamProvider::onGotVideoFrame(
 void QnLiveStreamProvider::processMetadata(
     const QnCompressedVideoDataPtr& compressedFrame)
 {
-
     NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
 
     bool needToAnalyzeMotion = false;
-    if (needAnalyzeMotion())
-    {
-        static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
-            * SECONDARY_STREAM_MAX_RESOLUTION.height();
-        needToAnalyzeMotion = compressedFrame->width * compressedFrame->height <= maxSquare
-            || m_cameraRes->motionStreamIndex().isForced;
-    }
+    if (doesStreamSuitMotionAnalysisRequirements())
+        needToAnalyzeMotion = doesFrameSuitMotionAnalysisRequirements(compressedFrame);
     else
-    {
-        const bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming()
-            && getRole() == Qn::CR_LiveVideo
-            && (!m_resolutionCheckTimer.isValid()
-                || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
-        if (updateResolutionFromPrimaryStream)
-        {
-            QSize newResolution = nx::media::getFrameSize(compressedFrame);
-            if (newResolution.isValid())
-            {
-                updateStreamResolution(compressedFrame->channelNumber, newResolution);
-                m_resolutionCheckTimer.restart();
-            }
-        }
-    }
+        checkAndUpdatePrimaryStreamResolution(compressedFrame);
 
-    const auto streamDataReceptor = getStreamDataReceptorForMetadataPluginsIfNeeded();
-
-    StreamTypes neededStreamTypes;
+    const auto streamDataReceptor = m_streamDataReceptor.toStrongRef();
+    StreamProviderRequirements requirements;
     if (streamDataReceptor)
-        neededStreamTypes = streamDataReceptor->requiredStreamTypes();
+        requirements = streamDataReceptor->providerRequirements(Qn::toStreamIndex(getRole()));
+
+    NX_ASSERT((requirements.motionAnalysisPolicy == MotionAnalysisPolicy::forced
+        && requirements.requiredStreamTypes.testFlag(StreamType::motion))
+        || (requirements.motionAnalysisPolicy == MotionAnalysisPolicy::disabled
+        && !requirements.requiredStreamTypes.testFlag(StreamType::motion))
+        || requirements.motionAnalysisPolicy == MotionAnalysisPolicy::automatic);
+
+    if (requirements.motionAnalysisPolicy != MotionAnalysisPolicy::automatic)
+        needToAnalyzeMotion = requirements.motionAnalysisPolicy == MotionAnalysisPolicy::forced;
 
     const int channel = compressedFrame->channelNumber;
     auto& motionEstimation = m_motionEstimation[channel];
@@ -471,18 +430,22 @@ void QnLiveStreamProvider::processMetadata(
     if (needToAnalyzeMotion)
     {
         NX_VERBOSE(this, "Analyzing motion (Role: [%1]); needUncompressedFrame: %2",
-            getRole(), neededStreamTypes.testFlag(StreamType::uncompressedVideo));
+            getRole(),
+            requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo));
 
         if (motionEstimation->analyzeFrame(
                 compressedFrame,
-                neededStreamTypes.testFlag(StreamType::uncompressedVideo)
+                requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
                     ? &uncompressedFrame
                     : nullptr))
         {
+            if (motionEstimation->tryToCreateMotionMetadata())
+                m_lastMotionMetadata = motionEstimation->getMotion();
+
             updateStreamResolution(channel, motionEstimation->videoResolution());
         }
     }
-    else if (neededStreamTypes.testFlag(StreamType::uncompressedVideo))
+    else if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo))
     {
         NX_VERBOSE(this) << lm("Decoding frame for metadata plugins");
         uncompressedFrame = motionEstimation->decodeFrame(compressedFrame);
@@ -497,18 +460,27 @@ void QnLiveStreamProvider::processMetadata(
 
     if (streamDataReceptor)
     {
-        if (neededStreamTypes.testFlag(StreamType::uncompressedVideo) && uncompressedFrame)
+        if (m_lastMotionMetadata && requirements.requiredStreamTypes.testFlag(StreamType::motion))
         {
-            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1",
+            NX_VERBOSE(this, "Pushing motion metadata to receptor, timestamp: %1 us",
+                m_lastMotionMetadata->timestamp);
+
+            streamDataReceptor->putData(m_lastMotionMetadata);
+        }
+
+        if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
+            && uncompressedFrame)
+        {
+            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1 us",
                 compressedFrame->timestamp);
 
             streamDataReceptor->putData(
                 std::make_shared<nx::streaming::UncompressedVideoPacket>(uncompressedFrame));
         }
 
-        if (neededStreamTypes.testFlag(StreamType::compressedVideo))
+        if (requirements.requiredStreamTypes.testFlag(StreamType::compressedVideo))
         {
-            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1",
+            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1 us",
                 compressedFrame->timestamp);
             streamDataReceptor->putData(compressedFrame);
         }
@@ -543,7 +515,10 @@ void QnLiveStreamProvider::onGotInStreamMetadata(
 {
     if (auto streamDataReceptor = m_streamDataReceptor.toStrongRef())
     {
-        if (streamDataReceptor->requiredStreamTypes().testFlag(StreamType::metadata))
+        const StreamProviderRequirements requirements =
+            streamDataReceptor->providerRequirements(Qn::toStreamIndex(getRole()));
+
+        if (requirements.requiredStreamTypes.testFlag(StreamType::metadata))
         {
             NX_VERBOSE(this, "Pushing in-stream metadata to the plugins");
             streamDataReceptor->putData(metadata);
@@ -596,8 +571,12 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         return metadata;
     }
 
-    if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-        return m_motionEstimation[m_softMotionLastChannel]->getMotion();
+    if (m_lastMotionMetadata && m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
+    {
+        QnMetaDataV1Ptr motionMetadata = std::move(m_lastMotionMetadata);
+        m_lastMotionMetadata.reset();
+        return motionMetadata;
+    }
     else
         return getCameraMetadata();
 }
@@ -662,6 +641,37 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
+}
+
+bool QnLiveStreamProvider::doesFrameSuitMotionAnalysisRequirements(
+    const QnCompressedVideoDataPtr& compressedFrame) const
+{
+    static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
+        * SECONDARY_STREAM_MAX_RESOLUTION.height();
+
+    return compressedFrame->width * compressedFrame->height <= maxSquare
+        || m_cameraRes->motionStreamIndex().isForced;
+}
+
+void QnLiveStreamProvider::checkAndUpdatePrimaryStreamResolution(
+    const QnCompressedVideoDataPtr& compressedFrame)
+{
+    const bool resolutionCheckTimeoutIsExpired = !m_resolutionCheckTimer.isValid()
+        || (m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
+
+    const bool updatePrimaryStreamResolution = getRole() == Qn::CR_LiveVideo
+        && !m_cameraRes->hasDualStreaming()
+        && resolutionCheckTimeoutIsExpired;
+
+    if (updatePrimaryStreamResolution)
+    {
+        const QSize newResolution = nx::media::getFrameSize(compressedFrame);
+        if (newResolution.isValid())
+        {
+            updateStreamResolution(compressedFrame->channelNumber, newResolution);
+            m_resolutionCheckTimer.restart();
+        }
+    }
 }
 
 void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize& newResolution)

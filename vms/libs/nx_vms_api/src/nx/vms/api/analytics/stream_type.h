@@ -7,9 +7,10 @@ namespace nx::vms::api::analytics {
 enum class StreamType
 {
     none = 0,
-    compressedVideo = 1 << 0,
-    uncompressedVideo = 1 << 1,
-    metadata = 1 << 2,
+    compressedVideo = 1 << 0, //< Compressed video packets.
+    uncompressedVideo = 1 << 1, //< Uncompressed video frames.
+    metadata = 1 << 2, //< Metadata that comes in the RTSP stream.
+    motion = 1 << 3, //< Motion metadata retrieved by the Server.
 };
 
 Q_DECLARE_FLAGS(StreamTypes, StreamType);

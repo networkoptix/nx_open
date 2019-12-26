@@ -1250,58 +1250,36 @@ void QnMotionEstimation::postFiltering()
 
 QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 {
+    return m_lastMotionData;
+}
+
+QnMetaDataV1Ptr QnMotionEstimation::makeMotion()
+{
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
-    //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
-    //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
+    rez->timestamp = (m_lastFrameTime == (qint64)AV_NOPTS_VALUE)
+        ? qnSyncTime->currentMSecsSinceEpoch() * 1000
+        : m_lastFrameTime;
+
     rez->channelNumber = m_channelNum;
-    rez->m_duration = 1000*1000*1000; // 1000 sec ;
+    rez->m_duration = 1000 * 1000 * 1000; // 1000 sec ;
     if (m_decoder == 0)
         return rez;
 
-#if 0
-    // unit test
-    for (int x = 0; x < Qn::kMotionGridWidth; ++x)
-    {
-        for (int y = 0; y < Qn::kMotionGridHeight; ++y)
-        {
-            bool val = false;
-            switch (m_totalFrames/8 % 4)
-            {
-                case 0:
-                    val = x < Qn::kMotionGridWidth/2 && y < Qn::kMotionGridHeight/2;
-                    break;
-                case 1:
-                    val = x > Qn::kMotionGridWidth/2 && y < Qn::kMotionGridHeight/2;
-                    break;
-                case 2:
-                    val = x < Qn::kMotionGridWidth/2 && y > Qn::kMotionGridHeight/2;
-                    break;
-                case 3:
-                    val = x > Qn::kMotionGridWidth/2 && y > Qn::kMotionGridHeight/2;
-                    break;
-            }
-            if (val)
-                rez->setMotionAt(x,y);
-        }
-    }
-#else
-    // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
-    int lineStep = (m_scaledWidth*65536) / Qn::kMotionGridWidth;
+    // Scale the result motion data (height is already valid, scale width only).
+    // Data rotates, so actually we duplicate or remove some lines
+    int lineStep = (m_scaledWidth * 65536) / Qn::kMotionGridWidth;
     int scaledLineNum = 0;
     int prevILineNum = -1;
-    quint32* dst = (quint32*) rez->data();
-
-    //postFiltering();
+    quint32* dst = (quint32*)rez->data();
 
     for (int y = 0; y < Qn::kMotionGridWidth; ++y)
     {
-        int iLineNum = (scaledLineNum+32768) >> 16;
+        int iLineNum = (scaledLineNum + 32768) >> 16;
         if (iLineNum > prevILineNum)
         {
             dst[y] = m_resultMotion[iLineNum];
             for (int i = 1; i < iLineNum - prevILineNum; ++i)
-                dst[y] |= m_resultMotion[iLineNum+i];
+                dst[y] |= m_resultMotion[iLineNum + i];
         }
         else {
             dst[y] |= m_resultMotion[iLineNum];
@@ -1309,7 +1287,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
-#endif
+
     memset(m_resultMotion, 0, Qn::kMotionGridHeight * m_scaledWidth);
     m_firstFrameTime = m_lastFrameTime;
     m_totalFrames++;
@@ -1317,10 +1295,20 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     return rez;
 }
 
-
-bool QnMotionEstimation::existsMetadata() const
+bool QnMotionEstimation::tryToCreateMotionMetadata()
 {
-    return m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
+    const bool enoughFramesAreAggregated =
+        m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD;
+
+    if (!enoughFramesAreAggregated)
+        return false;
+
+    QnMetaDataV1Ptr motion = makeMotion();
+    if (!motion)
+        return false;
+
+    m_lastMotionData = std::move(motion);
+    return true;
 }
 
 QSize QnMotionEstimation::videoResolution() const
