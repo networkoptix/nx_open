@@ -23,7 +23,7 @@ public:
     virtual void registerStream(nx::vms::api::StreamIndex streamIndex) override;
 
 private:
-    void registerStreamsToProxiedReceptorUnsafe();
+    void registerStreamsToProxiedReceptorThreadUnsafe();
 
 private:
     mutable QnMutex m_mutex;

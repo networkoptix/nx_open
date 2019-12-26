@@ -12,7 +12,7 @@ void ProxyStreamDataReceptor::setProxiedReceptor(QWeakPointer<StreamDataReceptor
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_proxiedReceptor = std::move(receptor);
 
-    registerStreamsToProxiedReceptorUnsafe();
+    registerStreamsToProxiedReceptorThreadUnsafe();
 }
 
 void ProxyStreamDataReceptor::putData(const QnAbstractDataPacketPtr& data)
@@ -37,10 +37,10 @@ void ProxyStreamDataReceptor::registerStream(nx::vms::api::StreamIndex streamInd
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_registeredStreamIndexes.insert(streamIndex);
 
-    registerStreamsToProxiedReceptorUnsafe();
+    registerStreamsToProxiedReceptorThreadUnsafe();
 }
 
-void ProxyStreamDataReceptor::registerStreamsToProxiedReceptorUnsafe()
+void ProxyStreamDataReceptor::registerStreamsToProxiedReceptorThreadUnsafe()
 {
     if (const auto proxiedReceptor = m_proxiedReceptor.toStrongRef())
     {

@@ -36,7 +36,7 @@ public:
     };
 
     /**
-     * @return width of decoded frame in pixels.
+     * @return width of the decoded frame in pixels.
      */
     virtual int width() const = 0;
 
@@ -65,6 +65,9 @@ public:
     virtual int lineSize(int plane) const = 0;
 };
 
+/**
+ * Represents a single uncompressed video frame.
+ */
 class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedVideoFrame0>
 {
 public:

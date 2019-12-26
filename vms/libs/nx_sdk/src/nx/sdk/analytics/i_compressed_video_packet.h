@@ -12,25 +12,26 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-/**
- * Represents a single video frame.
- */
 class ICompressedVideoPacket0: public Interface<ICompressedVideoPacket0, ICompressedMediaPacket>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedVideoPacket"); }
 
     /**
-     * @return Width of video frame in pixels.
+     * @return Width of the video frame in pixels.
      */
     virtual int width() const = 0;
 
     /**
-     * @return Height of video frame in pixels.
+     * @return Height of the video frame in pixels.
      */
     virtual int height() const = 0;
 };
 
+
+/**
+ * Represents a single video frame.
+ */
 class ICompressedVideoPacket: public Interface<ICompressedVideoPacket, ICompressedVideoPacket0>
 {
 public:
