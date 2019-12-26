@@ -146,7 +146,7 @@ public:
         auto alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
-            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::error);
+            EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::warning);
 
             liveParams.resolution = QSize(640, 480);
             dataProvider->setPrimaryStreamParams(liveParams);
