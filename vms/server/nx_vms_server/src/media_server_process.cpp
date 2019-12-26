@@ -1671,7 +1671,9 @@ void MediaServerProcess::registerRestHandlers(
      *     %value ActivatePresetPtzCommand Go to PTZ preset. Parameter presetId defines internal
      *         preset name. Parameter speed defines move speed in range [0..1.0.]
      *     %value GetPresetsPtzCommand Read PTZ presets list.
-     *     %value GetPresetsPtzCommand Read PTZ presets list.
+     *     %value GetToursPtzCommand Read PTZ tours list.
+     *     %value ActivateTourPtzCommand Activate PTZ tour. Parameter tourId defines defines internal
+     *         tour name. Parameter tourName defines display preset name.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/ptz", new QnPtzRestHandler(serverModule()));
