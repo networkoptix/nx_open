@@ -28,8 +28,7 @@ class RemoteConnectionFactory:
 public:
     RemoteConnectionFactory(
         QnCommonModule* commonModule,
-        nx::vms::api::PeerType peerType,
-        bool isP2pMode);
+        nx::vms::api::PeerType peerType);
     virtual ~RemoteConnectionFactory() override;
 
     virtual void pleaseStop() override;
