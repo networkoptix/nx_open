@@ -813,6 +813,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
+    if (ini().forceJsonClientConnection)
+        runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = ini().developerMode ? QString() : AppInfo::brand();
     runtimeData.customization = ini().developerMode ? QString() : AppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
