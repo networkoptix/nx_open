@@ -205,27 +205,27 @@
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation type="unfinished">Invalid data was received from the device %1.</translation>
+      <translation>تم استلام بيانات غير صالحة من الجهاز %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation type="unfinished">Invalid data was received from the camera %1.</translation>
+      <translation>تم استلام بيانات غير صالحة من الكاميرا %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
+      <translation>الكثير من أخطاء الوسائط. يرجى فتح مربع حوار مشاكل الجهاز لمزيد من التفاصيل.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
+      <translation>الكثير من أخطاء الوسائط. يرجى فتح مربع حوار مشاكل الكاميرا لمزيد من التفاصيل.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
+      <translation>يرجى محاولة إعادة تشغيل وحدة الإدخال / الإخراج ، ثم استعادة إعدادات المصنع الافتراضية على صفحة الويب.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
+      <translation>تأكد من توصيل وحدة الإدخال / الإخراج بالشبكة. حاول إعادة تشغيل وحدة الإدخال / الإخراج.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -233,39 +233,39 @@
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation type="unfinished">Unknown I/O module issue.</translation>
+      <translation>مشكلة وحدة ادخال/إخراج غير معروفة.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
+      <translation>تم استلام بيانات غير صالحة من الجهاز %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>الكثير من أخطاء الوسائط. يرجى فتح مربع حوار مشاكل الجهاز لمزيد من التفاصيل.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>عملية تهيئة الجهاز قيد العمل.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>عملية تهيئة الكاميرا قيد العمل.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>عملية تهيئة وحده ادخال/اخراج قيد العمل.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>تأكد من إمكانية الوصول إلى المنفذ %1 (مثل إعادة التوجيه).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>إذا لم ينجح ذلك ، فاستعد إعدادات المصنع الافتراضية على صفحة الويب الخاصة بالجهاز.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>إذا لم ينجح ذلك ، فاستعد إعدادات المصنع الافتراضية على صفحة الويب الخاصة بالكاميرا.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
