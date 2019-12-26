@@ -312,8 +312,7 @@ bool QnFileStorageResource::isValid() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 {
-    if (isValid())
-        return Qn::StorageInit_Ok;
+    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
 
     QString url = getUrl();
     if (!NX_ASSERT(!url.isEmpty()))
@@ -321,8 +320,14 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
+    
+    Qn::StorageInitResult result = isValid()
+        ? checkMountedStatus()
+        : (url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url));
+    if (result != Qn::StorageInit_Ok)
+        return result;
 
-    return url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url);
+    return testWrite();
 }
 
 bool QnFileStorageResource::isSystem() const
@@ -818,13 +823,15 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
         {
             auto result = s;
             result.replace('\\', '/');
+            while (result.endsWith('/'))
+                result.chop(1);
             return result;
         };
 
     const auto mediaPaths = getMediaPaths(pathConfig);
     return std::any_of(
         mediaPaths.cbegin(), mediaPaths.cend(),
-        [path = normalize(path)](const auto& p) { return normalize(p).startsWith(path); });
+        [path = normalize(path)](const auto& p) { return normalize(p) == path; });
 }
 
 Qn::StorageInitResult QnFileStorageResource::testWrite() const
@@ -834,15 +841,8 @@ Qn::StorageInitResult QnFileStorageResource::testWrite() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
-    if (m_state == Qn::StorageInit_Ok //< Checking mounted status only if storage has already been initialized
-        && (m_state = checkMountedStatus()) != Qn::StorageInit_Ok)
-        return m_state;
-
-    if (m_state = initOrUpdateInternal(); m_state != Qn::StorageInit_Ok)
-        return m_state;
-
-    if (m_state = testWrite(); m_state != Qn::StorageInit_Ok)
+    m_state = initOrUpdateInternal();
+    if (m_state != Qn::StorageInit_Ok)
         return m_state;
 
     m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());
