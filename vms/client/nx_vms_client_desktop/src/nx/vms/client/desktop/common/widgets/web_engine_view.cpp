@@ -155,7 +155,8 @@ void WebEngineView::createPageWithUserAgent(const QString& userAgent)
 
     // Make new profile a parent of the web page because it should outlive the page.
     auto profile = new QWebEngineProfile(this);
-    profile->setHttpUserAgent(userAgent);
+    if (!userAgent.isEmpty())
+        profile->setHttpUserAgent(userAgent);
     setPage(new WebEnginePage(profile, profile, *this));
 
     d->m_webEngineProfile.reset(profile);

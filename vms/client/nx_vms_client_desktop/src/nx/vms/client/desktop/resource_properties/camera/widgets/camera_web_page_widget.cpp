@@ -181,7 +181,9 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
 void CameraWebPageWidget::Private::createNewPage()
 {
     auto webView = webWidget->webEngineView();
-    webView->createPageWithUserAgent(kUserAgentForCameraPage);
+    webView->createPageWithUserAgent(lastCamera.overrideHttpUserAgent.isNull()
+            ? kUserAgentForCameraPage
+            : lastCamera.overrideHttpUserAgent);
     webView->page()->profile()->clearHttpCache();
 
     if (lastCamera.overrideXmlHttpRequestTimeout > 0)

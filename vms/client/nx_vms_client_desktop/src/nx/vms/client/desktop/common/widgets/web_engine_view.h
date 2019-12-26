@@ -29,8 +29,8 @@ public:
     void setIgnoreSslErrors(bool ignore);
     bool hasIgnoreSslErrors() const;
 
-    // Creates new web page with specified user agent and switches it to off-the-records profile.
-    void createPageWithUserAgent(const QString& userAgent);
+    // Creates new web page with specified user agent (if not empty) and off-the-records profile.
+    void createPageWithUserAgent(const QString& userAgent = QString());
 
     // Enables redirecting all link navigation to desktop browser.
     void setRedirectLinksToDesktop(bool enabled);
