@@ -320,7 +320,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
-    
+
     Qn::StorageInitResult result = isValid()
         ? checkMountedStatus()
         : (url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url));
