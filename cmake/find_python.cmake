@@ -1,5 +1,4 @@
 set(Python3_FIND_STRATEGY LOCATION)
-set(Python3_FIND_REGISTRY NEVER)
 set(Python3_FIND_FRAMEWORK NEVER)
 find_package(Python3 COMPONENTS Interpreter)
 
