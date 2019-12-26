@@ -166,18 +166,29 @@ bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 {
+    NX_VERBOSE(this, "Getting next data %1 (%2)", m_resource->getName(), m_resource->getId());
+
     if (!isStreamOpened())
+    {
+        NX_VERBOSE(this, "Getting next data, stream is not opened, exiting, device: %1 (%2)",
+            m_resource->getName(), m_resource->getId());
+
         return QnAbstractMediaDataPtr(0);
+    }
 
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
     if (position != AV_NOPTS_VALUE)
     {
+        NX_VERBOSE(this, "Getting next data, seeking to position %1 us, device %2 (%3)",
+            position, m_resource->getName(), m_resource->getId());
+
         m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, m_RtpSession.getScale());
         createTrackParsers();
     }
 
     QnAbstractMediaDataPtr result;
-    do {
+    do
+    {
         if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
             result = getNextDataTCP();
         else
@@ -185,13 +196,21 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     } while(result && !gotKeyData(result));
 
-    if (result) {
+    if (result)
+    {
+        NX_VERBOSE(this, "Got some stream data, device %1 (%2)",
+            m_resource->getName(), m_resource->getId());
+
         m_gotSomeFrame = true;
         return result;
     }
 
     if (!m_gotSomeFrame)
+    {
+        NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2)",
+            m_resource->getName(), m_resource->getId());
         return result; // if no frame received yet do not report network issue error
+    }
 
     bool isRtpFail = !m_RtpSession.isOpened() && m_rtpStarted;
     int elapsed = m_dataTimer.elapsed();
@@ -220,6 +239,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     }
 
+    NX_VERBOSE(this, "Getting stream data, got data: %1", !!result);
     return result;
 }
 
