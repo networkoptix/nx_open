@@ -13,7 +13,8 @@ Settings
                 "description": "A text field",
                 "defaultValue": "a text",
                 "validationRegex": "",
-                "validationRegexFlags": ""
+                "validationRegexFlags": "",
+                "validationErrorMessage": ""
             },
             {
                 "type": "TextArea",
