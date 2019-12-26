@@ -22,12 +22,14 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
 {
     const QFontMetrics metrics(font);
 
-    const QString renderText = width > 0
+    QString renderText = width > 0
         ? metrics.elidedText(text, elideMode, width)
         : text;
 
     if (renderText.isEmpty())
         return QnTextPixmap();
+
+    renderText.squeeze(); //< Do not bloat cache with excessive allocated data.
 
     const QSize size = metrics.size(0, renderText);
 
@@ -52,6 +54,18 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
 
     const int elidedForWidth = (width > 0 && renderText != text) ? width : 0;
     return QnTextPixmap(pixmap, origin, renderText, elideMode, elidedForWidth);
+}
+
+int calculateTextPixmapCost(const QnTextPixmap& textPixmap)
+{
+    static constexpr int kBitsPerByte = 8;
+    const QPixmap& pixmap = textPixmap.pixmap;
+
+    int result = pixmap.height() * pixmap.width() * (pixmap.depth() / kBitsPerByte);
+    result += textPixmap.renderedText.capacity() * sizeof(QChar);
+    result += sizeof(QnTextPixmap);
+
+    return result;
 }
 
 } // namespace
@@ -108,13 +122,20 @@ QnTextPixmapCache::~QnTextPixmapCache()
 {
 }
 
-const QPixmap& QnTextPixmapCache::pixmap(const QString& text, const QFont& font, const QColor& color)
+const QPixmap& QnTextPixmapCache::pixmap(
+    const QString& text,
+    const QFont& font,
+    const QColor& color)
 {
     return pixmap(text, font, color, 0, Qt::ElideNone).pixmap;
 }
 
-const QnTextPixmap& QnTextPixmapCache::pixmap(const QString& text, const QFont& font, const QColor& color,
-    int width, Qt::TextElideMode elideMode)
+const QnTextPixmap& QnTextPixmapCache::pixmap(
+    const QString& text,
+    const QFont& font,
+    const QColor& color,
+    int width,
+    Qt::TextElideMode elideMode)
 {
     QColor localColor = color.toRgb();
     if (!localColor.isValid())
@@ -146,20 +167,15 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(const QString& text, const QFont& 
         d->pixmapByKey.remove(key);
     }
 
-    const auto r = renderText(
-        text,
-        QPen(localColor, 0),
-        font,
-        width,
-        elideMode);
+    const auto textPixmapStruct = renderText(text, QPen(localColor, 0), font, width, elideMode);
 
     static const QnTextPixmap kEmptyTextPixmap;
 
-    if (r.pixmap.isNull())
+    if (textPixmapStruct.pixmap.isNull())
         return kEmptyTextPixmap;
 
-    const auto cost = r.pixmap.height() * r.pixmap.width() * r.pixmap.depth() / 8;
-    if (d->pixmapByKey.insert(key, result = new QnTextPixmap(r), cost))
+    const auto cost = calculateTextPixmapCost(textPixmapStruct);
+    if (d->pixmapByKey.insert(key, result = new QnTextPixmap(std::move(textPixmapStruct)), cost))
         return *result;
 
     NX_ASSERT(false, "Too huge text pixmap");
