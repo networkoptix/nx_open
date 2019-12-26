@@ -113,7 +113,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Tamam</translation>
+      <translation>TAMAM</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modülü</translation>
+      <translation>I/O Modül</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
+      <translation>Kayıt İçin Akış Çıkışı Ayrılamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

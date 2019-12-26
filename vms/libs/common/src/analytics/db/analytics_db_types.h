@@ -148,6 +148,7 @@ struct Filter
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
     bool acceptsTrack(const ObjectTrack& track) const;
+    bool acceptsTrackEx(const ObjectTrackEx& track) const;
 
     /**
      * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
@@ -163,6 +164,9 @@ struct Filter
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
+private:
+    template <typename ObjectTrackType>
+    bool acceptsTrackInternal(const ObjectTrackType& track) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);

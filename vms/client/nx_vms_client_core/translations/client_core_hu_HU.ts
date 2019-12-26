@@ -147,7 +147,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Audió enkóder nem inicializálható.</translation>
+      <translation>Audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

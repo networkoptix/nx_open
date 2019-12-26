@@ -10,14 +10,14 @@
     </div>
 
 
-    <h2>Lưu trữ</h2>
+    <h2>Storage</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
             <thead>
                 <tr>
                     <th >
-                        Đường dẫn
+                        URL
                     </th>
                     <th width="200">
                         Dung lượng trống
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Không thể truy cập
+                                Inaccessible
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">Gb</div>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">Gb</div>
+ placeholder="Reserved space"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Sửa chữa tất cả các cài đặt được đánh dấu để lưu nó</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Tiết kiệm</button>
-        <button class="btn btn-warning" ng-click="cancel()">Hủy bỏ</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </form>
 
     <h2>Cài đặt nhật ký</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
     <h1>Thiết lập hệ thống nâng cao</h1>
     <div class="alert alert-danger" role="alert">
-        <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
+        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
 
     </form>

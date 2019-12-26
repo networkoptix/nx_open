@@ -476,23 +476,19 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     QnStorageResourceList result;
     for (const auto& storage: storages)
     {
-        qint64 totalSpace = -1;
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage)
-            totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        else
-        {
-            storage->initOrUpdate();
-            totalSpace = storage->getTotalSpace();
-        }
+        if (fileStorage && !fileStorage->isMounted())
+            continue;
+
+        const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
 
-        NX_VERBOSE(kLogTag,
-            lm("Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete").args(
-                storage->getUrl(), static_cast<bool>(fileStorage), totalSpace,
-                storage->getSpaceLimit()));
+        NX_VERBOSE(
+            kLogTag, "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
+            storage->getUrl(), static_cast<bool>(fileStorage), totalSpace, storage->getSpaceLimit());
     }
+
     return result;
 }
 
@@ -516,26 +512,25 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
         : nx::vms::server::PlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+    auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
     {
-        const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
-
-        if (totalSpace < fileStorage->getSpaceLimit())
-        {
-            NX_DEBUG(kLogTag, lm(
-                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
-                "Total space: %2, Space limit: %3").args(path, totalSpace, storage->getSpaceLimit()));
-            return QnStorageResourcePtr();
-        }
-    }
-    else
-    {
-        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
+        NX_WARNING(this, "Failed to initialize new storage '%1', path");
         return QnStorageResourcePtr();
     }
 
-    storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+    calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
+    if (fileStorage->getTotalSpace() < fileStorage->getSpaceLimit())
+    {
+        NX_DEBUG(
+            kLogTag, "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
+            "Total space: %2, Space limit: %3",
+            path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
+
+        return QnStorageResourcePtr();
+    }
+
+    storage->setUsedForWriting(storage->isWritable());
     NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -551,7 +546,7 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
 {
     using namespace nx::vms::server::fs::media_paths;
 
-    auto mediaPathList = get(FilterConfig::createDefault(
+    auto mediaPathList = getMediaPaths(FilterConfig::createDefault(
         serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
@@ -700,55 +695,24 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-        const auto unmountedStorages =
-            nx::mserver_aux::getUnmountedStorages(
-                serverModule()->platform(),
-                m_mediaServer->getStorages(),
-                &serverModule()->settings());
-        for (const auto& storageResource: unmountedStorages)
+        for (const auto& s: m_mediaServer->getStorages())
         {
-            auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
-            if (fileStorageResource)
-                fileStorageResource->setMounted(false);
+            const auto result = s->initOrUpdate();
+            if (result == Qn::StorageInit_Ok)
+                NX_DEBUG(this, "[Storages init] Existing storage '%1' is successfully initialized", nx::utils::url::hidePassword(s->getUrl()));
+            else
+                NX_WARNING(this, "[Storages init] Failed to initialize existing storage '%1'",  nx::utils::url::hidePassword(s->getUrl()));
         }
 
         QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
-        QnStorageResourceList storagesToRemove;
-        // We won't remove automatically storages which might have been unmounted because of their
-        // small size. This small size might be the result of the unmounting itself (just the size
-        // of the local drive where mount folder is located). User will be able to remove such
-        // storages by themselves.
-        for (const auto& smallStorage: smallStorages)
-        {
-            bool isSmallStorageAmongstUnmounted = false;
-            for (const auto& unmountedStorage: unmountedStorages)
-            {
-                if (unmountedStorage == smallStorage)
-                {
-                    isSmallStorageAmongstUnmounted = true;
-                    break;
-                }
-            }
-
-            if (!isSmallStorageAmongstUnmounted)
-                storagesToRemove.append(smallStorage);
-        }
-
-        NX_DEBUG(this, lm("[Storages init] Found %1 storages to remove").arg(storagesToRemove.size()));
-        for (const auto& storage: storagesToRemove)
-        {
-            NX_DEBUG(this, lm("[Storages init] Storage to remove: %2, id: %3").args(
-                storage->getUrl(), storage->getId()));
-        }
-
-        if (!storagesToRemove.isEmpty())
+        if (!smallStorages.isEmpty())
         {
             nx::vms::api::IdDataList idList;
-            for (const auto& value: storagesToRemove)
+            for (const auto& value: smallStorages)
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
                 qWarning() << "[Storages init] Failed to remove deprecated storage on startup. Postpone removing to the next start...";
-            commonModule()->resourcePool()->removeResources(storagesToRemove);
+            commonModule()->resourcePool()->removeResources(smallStorages);
         }
 
         QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -3120,11 +3084,42 @@ void MediaServerProcess::initializeCloudConnect()
         });
 }
 
+static void setFdLimit(RootFileSystem* rootFs, int value)
+{
+    #if defined (Q_OS_LINUX)
+        int newValue = rootFs->setFdLimit(getpid(), value);
+        if (newValue == -1)
+        {
+            NX_WARNING(
+                typeid(MediaServerProcess),
+                "Failed to set file descriptor limit and get previous value");
+            return;
+        }
+
+        if (newValue != value)
+        {
+            NX_WARNING(
+                typeid(MediaServerProcess),
+                "Failed to set file descriptor limit. Current value: %1", newValue);
+            return;
+        }
+
+        NX_INFO(
+            typeid(MediaServerProcess),
+            "Successfully set file descriptor limit: %1", newValue);
+    #else
+        (void) rootFs;
+        (void) value;
+    #endif // Q_OS_LINUX
+}
+
 void MediaServerProcess::prepareOsResources()
 {
     auto rootToolPtr = serverModule()->rootFileSystem();
     if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
         qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
+
+    setFdLimit(rootToolPtr, 32000);
 
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
@@ -5158,14 +5153,6 @@ int MediaServerProcess::main(int argc, char* argv[])
     std::locale::global(std::locale("C"));
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    static const int kMaxDescriptors = 32000;
-    int descriptorsCount = nx::utils::rlimit::setMaxFileDescriptors(kMaxDescriptors);
-    if (descriptorsCount == 0)
-    {
-        NX_WARNING(nx::utils::log::Tag(QString("MediaServerProcess")),
-            "failure to setup process descriptors count to %1", kMaxDescriptors);
-    }
-
     #if defined(_WIN32)
         win32_exception::installGlobalUnhandledExceptionHandler();
         _tzset();
@@ -5173,6 +5160,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     #if defined(__linux__)
         signal(SIGUSR1, SIGUSR1_handler);
+
     #endif
 
     // Festival should be initialized before QnVideoService has started because of a Festival bug.

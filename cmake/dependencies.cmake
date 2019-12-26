@@ -6,9 +6,6 @@ set(customWebAdminPackageDirectory "" CACHE STRING
     "Custom location of server-external package")
 mark_as_advanced(customWebAdminPackageDirectory)
 
-set(customizationPackageVersion "" CACHE STRING
-    "Version of the customization package. Supported values are: (empty), v2, v2_draft")
-
 set(cmake_include_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 
 set(sync_target ${targetDevice})
@@ -21,7 +18,6 @@ set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --target=${rdep_target}
     --release-version=${releaseVersion}
     --customization=${customization}
-    --customization_package=${customizationPackageVersion}
     --cmake-include-file=${cmake_include_file}
 )
 

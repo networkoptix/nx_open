@@ -16,30 +16,6 @@ void saveStoragesInfoToBeforeRestoreData(
     BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages);
 
-class UnmountedLocalStoragesFilter
-{
-public:
-    UnmountedLocalStoragesFilter(const QString& mediaFolderName);
-    QnStorageResourceList getUnmountedStorages(
-        const QnStorageResourceList& allStorages, const QStringList& paths);
-
-private:
-    QString stripMediaFolderFromPath(const QString& path);
-    QStringList stripMediaFolderFromPaths(const QStringList& paths);
-
-    QString m_mediaFolderName;
-};
-
-QnStorageResourceList getUnmountedStorages(
-    QnPlatformAbstraction* platform,
-    const QnStorageResourceList& allServerStorages,
-    const nx::vms::server::Settings* settings);
-
-bool isStorageMounted(
-    QnPlatformAbstraction* platform,
-    const QnStorageResourcePtr& storage,
-    const nx::vms::server::Settings* settings);
-
 class SystemNameProxy
 {
 public:

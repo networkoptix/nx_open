@@ -6,6 +6,7 @@
                 "values": {
                     "name": {
                         "name": "Name",
+                        "format": "longText",
                         "display": "panel"
                     },
                     "recommendedMaxServers": {
@@ -44,6 +45,7 @@
                     },
                     "version": {
                         "name": "System version",
+                        "format": "text",
                         "display": "panel"
                     }
                 }
@@ -56,6 +58,7 @@
             "_": {
                 "values": {
                     "name": {
+                        "format": "longText",
                         "display": "table|panel"
                     }
                 }
@@ -64,18 +67,22 @@
                 "values": {
                     "publicIp": {
                         "name": "Public IP",
+                        "format": "text",
                         "display": "table|panel"
                     },
                     "os": {
                         "name": "OS",
+                        "format": "text",
                         "display": "panel"
                     },
                     "osTime": {
                         "name": "OS Time",
+                        "format": "longText",
                         "display": "table|panel"
                     },
                     "vmsTime": {
                         "name": "VMS Time",
+                        "format": "longText",
                         "display": "panel"
                     },
                     "vmsTimeChanged24h": {
@@ -95,6 +102,7 @@
                     "cpu": {
                         "name": "CPU",
                         "description": "CPU Name",
+                        "format": "longText",
                         "display": "panel"
                     },
                     "cpuCores": {
@@ -111,6 +119,7 @@
             "availability": {
                 "values": {
                     "status": {
+                        "format": "shortText",
                         "display": "table|panel",
                         "alarms": [
                             {
@@ -145,6 +154,7 @@
                 "values": {
                     "logLevel": {
                         "name": "Logging level",
+                        "format": "shortText",
                         "display": "panel",
                         "alarms": [
                             {
@@ -242,15 +252,15 @@
                     },
                     "decodingSpeed3s": {
                         "name": "Decoding speed",
-                        "display": "panel",
                         "format": "MPix/s",
+                        "display": "panel",
                         "calculate": "counterToAvg %decodedPixels 3s",
                         "insert": "decodedPixels"
                     },
                     "encodingSpeed3s": {
                         "name": "Encoding speed",
-                        "display": "panel",
                         "format": "MPix/s",
+                        "display": "panel",
                         "calculate": "counterToAvg %encodedPixels 3s",
                         "insert": "encodedPixels"
                     },
@@ -270,8 +280,8 @@
                         "name": "Transactions/s",
                         "description": "Transactions per second",
                         "isOptional": true,
-                        "display": "panel",
                         "format": "Tr/s",
+                        "display": "panel",
                         "calculate": "counterToAvg %transactionsPerSecond 1m",
                         "insert": "transactionsPerSecond"
                     },
@@ -299,6 +309,7 @@
                     "activePlugins": {
                         "name": "Active plugins list",
                         "isOptional": true,
+                        "format": "longText",
                         "display": "panel"
                     }
                 }
@@ -311,6 +322,7 @@
             "_": {
                 "values": {
                     "name": {
+                        "format": "longText",
                         "display": "table|panel"
                     },
                     "thumbnail": {
@@ -323,27 +335,33 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel",
-                        "format": "resource"
+                        "format": "resource",
+                        "display": "table|panel"
                     },
                     "type": {
+                        "format": "longText",
                         "display": "table|panel"
                     },
                     "ip": {
                         "name": "IP",
+                        "format": "text",
                         "display": "table|panel"
                     },
                     "vendor": {
+                        "format": "shortText",
                         "display": "panel"
                     },
                     "model": {
+                        "format": "shortText",
                         "display": "panel"
                     },
                     "firmware": {
+                        "format": "shortText",
                         "display": "panel"
                     },
                     "recording": {
                         "name": "Recording",
+                        "format": "text",
                         "display": "table|panel"
                     }
                 }
@@ -352,6 +370,7 @@
                 "values": {
                     "status": {
                         "name": "Status",
+                        "format": "shortText",
                         "display": "table|panel",
                         "alarms": [
                             {
@@ -431,6 +450,7 @@
                     "resolution": {
                         "name": "Resolution",
                         "isOptional": true,
+                        "format": "shortText",
                         "display": "table|panel"
                     },
                     "targetFps": {
@@ -469,8 +489,8 @@
                     "actualBitrateBps": {
                         "name": "Bitrate",
                         "isOptional": true,
-                        "display": "panel",
-                        "format": "Mbit/s"
+                        "format": "Mbit/s",
+                        "display": "panel"
                     }
                 }
             },
@@ -480,10 +500,11 @@
                     "resolution": {
                         "name": "Resolution",
                         "isOptional": true,
+                        "format": "shortText",
                         "display": "table|panel",
                         "alarms": [
                             {
-                                "level": "error",
+                                "level": "warning",
                                 "condition": "resolutionGreaterOrEqualThan %resolution %recommendedMaxSecondaryResolution",
                                 "text": " Secondary stream Resolution is too high: %resolution. It's recommended to put Secondary stream Resolution less than %recommendedMaxSecondaryResolution."
                             }
@@ -516,8 +537,8 @@
                     "actualBitrateBps": {
                         "name": "Bitrate",
                         "isOptional": true,
-                        "display": "panel",
-                        "format": "Mbit/s"
+                        "format": "Mbit/s",
+                        "display": "panel"
                     }
                 }
             },
@@ -528,8 +549,8 @@
                         "name": "Archive",
                         "description": "Current Archive length",
                         "isOptional": true,
-                        "display": "table|panel",
                         "format": "durationDh",
+                        "display": "table|panel",
                         "alarms": [
                             {
                                 "level": "error",
@@ -541,8 +562,8 @@
                     "recordingBitrateBps": {
                         "name": "Recording Bitrate (5min)",
                         "isOptional": true,
-                        "display": "table|panel",
-                        "format": "Mbit/s"
+                        "format": "Mbit/s",
+                        "display": "table|panel"
                     },
                     "isArchiveTooSmall": {
                         "isOptional": true,
@@ -552,8 +573,8 @@
                         "name": "Min Archive length",
                         "description": "Minimum Archive length",
                         "isOptional": true,
-                        "display": "panel",
-                        "format": "durationDh"
+                        "format": "durationDh",
+                        "display": "panel"
                     }
                 }
             }
@@ -566,6 +587,7 @@
             "_": {
                 "values": {
                     "name": {
+                        "format": "longText",
                         "display": "table|panel"
                     }
                 }
@@ -577,9 +599,11 @@
                         "format": "resource"
                     },
                     "pool": {
+                        "format": "shortText",
                         "display": "table|panel"
                     },
                     "type": {
+                        "format": "shortText",
                         "display": "table|panel"
                     }
                 }
@@ -587,6 +611,7 @@
             "state": {
                 "values": {
                     "status": {
+                        "format": "shortText",
                         "display": "table|panel",
                         "alarms": [
                             {
@@ -626,15 +651,15 @@
                 "values": {
                     "readRateBps1m": {
                         "name": "Read Rate",
-                        "display": "table|panel",
                         "format": "KB/s",
+                        "display": "table|panel",
                         "calculate": "counterToAvg %readRateBps 1m",
                         "insert": "readRateBps"
                     },
                     "writeRateBps1m": {
                         "name": "Write Rate",
-                        "display": "table|panel",
                         "format": "KB/s",
+                        "display": "table|panel",
                         "calculate": "counterToAvg %writeRateBps 1m",
                         "insert": "writeRateBps"
                     },
@@ -642,8 +667,8 @@
                         "name": "Transactions/s",
                         "description": "Analytics DB transactions per second",
                         "isOptional": true,
-                        "display": "panel",
-                        "format": "Tr/s"
+                        "format": "Tr/s",
+                        "display": "panel"
                     }
                 }
             },
@@ -652,15 +677,15 @@
                     "totalSpaceB": {
                         "name": "Total",
                         "description": "Total Space",
-                        "display": "table|panel",
                         "format": "GB",
+                        "display": "table|panel",
                         "isOptional": true
                     },
                     "mediaSpaceP": {
                         "name": "VMS Media(%)",
                         "description": "Space Used by VMS media (%)",
-                        "display": "table|panel",
                         "format": "%",
+                        "display": "table|panel",
                         "calculate": "divide %mediaSpaceB %totalSpaceB",
                         "insert": "mediaSpaceB",
                         "isOptional": true
@@ -668,8 +693,8 @@
                     "mediaSpaceB": {
                         "name": "VMS Media",
                         "description": "Space Used by VMS media",
-                        "display": "panel",
                         "format": "GB",
+                        "display": "panel",
                         "isOptional": true
                     }
                 }
@@ -683,6 +708,7 @@
             "_": {
                 "values": {
                     "name": {
+                        "format": "longText",
                         "display": "table|panel"
                     }
                 }
@@ -690,20 +716,23 @@
             "info": {
                 "values": {
                     "server": {
-                        "display": "table|panel",
-                        "format": "resource"
+                        "format": "resource",
+                        "display": "table|panel"
                     },
                     "state": {
+                        "format": "shortText",
                         "display": "table|panel"
                     },
                     "displayAddress": {
                         "name": "IP",
                         "isOptional": true,
+                        "format": "text",
                         "display": "table|panel"
                     },
                     "otherAddresses": {
                         "name": "Other IP addresses",
                         "isOptional": true,
+                        "format": "text",
                         "display": "panel"
                     }
                 }

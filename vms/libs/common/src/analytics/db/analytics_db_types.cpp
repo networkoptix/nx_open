@@ -185,6 +185,17 @@ bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingB
 
 bool Filter::acceptsTrack(const ObjectTrack& track) const
 {
+    return acceptsTrackInternal(track);
+}
+
+bool Filter::acceptsTrackEx(const ObjectTrackEx& track) const
+{
+    return acceptsTrackInternal(track);
+}
+
+template <typename ObjectTrackType>
+bool Filter::acceptsTrackInternal(const ObjectTrackType& track) const
+{
      using namespace std::chrono;
 
     if (!objectTrackId.isNull() && track.id != objectTrackId)
@@ -213,7 +224,26 @@ bool Filter::acceptsTrack(const ObjectTrack& track) const
     }
 
     if (!acceptsAttributes(track.attributes))
-        return false;
+    {
+        if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
+        {
+            // Checking the track attributes.
+            if (!std::any_of(
+                track.objectPositionSequence.cbegin(),
+                track.objectPositionSequence.cend(),
+                [this](const ObjectPosition& position)
+            {
+                return acceptsAttributes(position.attributes);
+            }))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     // Checking the track.
     if (boundingBox && !track.objectPosition.intersect(*boundingBox))

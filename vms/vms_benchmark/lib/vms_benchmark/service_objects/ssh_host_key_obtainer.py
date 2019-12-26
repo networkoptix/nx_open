@@ -40,8 +40,8 @@ class SshHostKeyObtainer:
             if not res or res.return_code != 0:
                 logging.error('Connecting via ssh failed: ssh reported:\n%r', error_messages)
                 raise BoxCommandError(
-                    f'Unable to connect to the box via ssh; ' +
-                        'check box credentials in {repr(self.conf_file)}.'
+                    'Unable to connect to the box via ssh; ' +
+                        f'check box credentials in {self.conf_file!r}'
                 )
 
             return host_key

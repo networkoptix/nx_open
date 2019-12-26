@@ -22,6 +22,8 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
+using namespace subject_selection_dialog_private;
+
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     ui(new Ui::SubjectSelectionDialog()),

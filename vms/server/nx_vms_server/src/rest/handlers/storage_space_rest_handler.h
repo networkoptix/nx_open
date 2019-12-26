@@ -13,8 +13,6 @@ class QnStorageSpaceRestHandler: public QnJsonRestHandler, public /*mixin*/ nx::
 {
     Q_OBJECT
 public:
-    static const QString kOwndedOnlyKey;
-
     QnStorageSpaceRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(

@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -832,7 +832,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>不明</translation>
+      <translation>未知の値</translation>
     </message>
     <message>
       <source>FREE License</source>

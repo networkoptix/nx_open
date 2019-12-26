@@ -236,6 +236,21 @@ bool fromString(const std::string& s, float* value)
     return true;
 }
 
+void stringReplaceAllChars(std::string* s, char sample, char replacement)
+{
+    std::transform(s->cbegin(), s->cend(), s->begin(),
+        [=](char c) { return c == sample ? replacement : c; });
+}
+
+void stringInsertAfterEach(std::string* s, char sample, const char* const insertion)
+{
+    for (int i = (int) s->size() - 1; i >= 0; --i)
+    {
+        if ((*s)[i] == sample)
+            s->insert((size_t) (i + 1), insertion);
+    }
+}
+
 } // namespace utils
 } // namespace kit
 } // namespace nx

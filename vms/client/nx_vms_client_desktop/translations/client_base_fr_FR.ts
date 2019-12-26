@@ -985,7 +985,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Page...</translation>
     </message>
   </context>
   <context>
@@ -1830,15 +1830,15 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Règle d'événement modifiée</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Règle d'événement supprimée</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Règles d'évènement réinitialisées par défaut</translation>
     </message>
   </context>
   <context>
@@ -2973,7 +2973,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Impossible de détecter la résolution de capture</translation>
     </message>
   </context>
   <context>
@@ -5751,35 +5751,35 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Réservés</translation>
+      <translation>Réservé</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>local</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optique</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>réseau</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>inconnu</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6480,7 +6480,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>TÉLÉCHARGEMENT&lt;br&gt;COMMENCÉ</translation>
     </message>
   </context>
   <context>
@@ -6625,7 +6625,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Impossible de reconnaître l'événement sur la caméra retirée.</translation>
     </message>
   </context>
   <context>
@@ -7256,7 +7256,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>aucun</translation>
+      <translation>aucune</translation>
     </message>
   </context>
   <context>
@@ -10059,7 +10059,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Enregistrer le fichier sous ...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10067,15 +10067,15 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Échec d'enregistrement du fichier</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>Dossier %1 bloqué en écriture.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Téléchargement du fichier...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10083,15 +10083,15 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Arrêter le téléchargement du fichier ?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Fichier téléchargé</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Échec de téléchargement du fichier</translation>
     </message>
   </context>
 </TS>

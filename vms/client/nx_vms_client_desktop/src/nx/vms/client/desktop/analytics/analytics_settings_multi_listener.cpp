@@ -92,7 +92,7 @@ void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
 
 void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId)
 {
-    auto listener = settingsManager->getListener(camera->getId(), engineId);
+    auto listener = settingsManager->getListener(DeviceAgentId{camera->getId(), engineId});
     listeners.insert(engineId, listener);
 
     connect(listener.get(), &AnalyticsSettingsListener::valuesChanged, this,

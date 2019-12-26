@@ -5038,7 +5038,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Камеры и устройства</translation>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
     <message>
       <source>Videowalls</source>
@@ -5875,7 +5875,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Зарезервировано</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
@@ -5907,7 +5907,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Тб</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
   </context>
   <context>
@@ -5996,7 +5996,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Плагины</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7435,15 +7435,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation>В выбранной области</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Выбранное устройство</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7452,7 +7452,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>нет</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -7712,7 +7712,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>удаленная камера</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
   </context>
   <context>
@@ -7920,11 +7920,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation>
-        <numerusform>%n камера</numerusform>
-        <numerusform>%n камеры</numerusform>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -8023,7 +8023,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Плагины</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8741,7 +8741,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>удаленная камера</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8812,7 +8812,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation>Файл обновления не найден</translation>
+      <translation type="unfinished">Update file is not found</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -9022,7 +9022,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Пожалуйста, свяжитесь со службой технической поддержки.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -9097,7 +9097,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Неизвестное событие диагностики плагинов</translation>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -9162,7 +9162,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation>Установлен</translation>
+      <translation type="unfinished">Installed</translation>
     </message>
     <message>
       <source>Failed to download update</source>
@@ -9517,7 +9517,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>Добавить в закладки...</translation>
+      <translation type="unfinished">Bookmark it...</translation>
     </message>
   </context>
   <context>
@@ -10327,7 +10327,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Не удалось перезаписать файл</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10343,7 +10343,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Открыть в каталоге</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

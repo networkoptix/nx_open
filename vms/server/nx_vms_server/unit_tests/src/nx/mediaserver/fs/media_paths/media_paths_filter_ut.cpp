@@ -80,7 +80,7 @@ protected:
 
     void whenPathsRequested()
     {
-        m_mediaPaths = media_paths::get(std::move(m_filterConfig));
+        m_mediaPaths = media_paths::getMediaPaths(std::move(m_filterConfig));
     }
 
     void thenNumberOfStoragesReturnedShouldBeEqualTo(int expected) const

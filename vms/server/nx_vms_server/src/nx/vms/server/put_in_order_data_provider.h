@@ -30,6 +30,14 @@ namespace nx::vms::server {
             increaseOnly
         };
 
+        struct Settings
+        {
+            std::chrono::microseconds minQueueDuration = kMinQueueDuration;
+            std::chrono::microseconds maxQueueDuration = kMaxQueueDuration;
+            std::chrono::microseconds initialQueueDuration = kMinQueueDuration;
+            BufferingPolicy policy = BufferingPolicy::increaseAndDescrease;
+        };
+
         /*
          * This class allow to reorder input media by their timestamps.
          * @param provider source data provider.
@@ -38,16 +46,18 @@ namespace nx::vms::server {
          * @param maxQueueDuration maximum reordering queue length.
          * @param BufferingPolicy auto increase/decrease buffer or increase only.
          */
-        AbstractDataReorderer(
-            std::chrono::microseconds minQueueDuration = kMinQueueDuration,
-            std::chrono::microseconds maxQueueDuration = kMaxQueueDuration,
-            std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
-            BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
+        AbstractDataReorderer(const Settings& settings);
+
+        virtual ~AbstractDataReorderer() = default;
 
         void processNewData(const QnAbstractDataPacketPtr& data);
 
+        /*
+         * Flush Unprocessed (buffered) data. For each media packet
+         * virtual function 'flushData' is called.
+         */
         std::optional<std::chrono::microseconds> flush();
-
+    protected:
         virtual void flushData(const QnAbstractDataPacketPtr& data) = 0;
     private:
         void updateBufferSize(const QnAbstractDataPacketPtr& data);
@@ -68,10 +78,8 @@ namespace nx::vms::server {
 
         nx::utils::ElapsedTimer m_timer;
 
-        std::chrono::microseconds m_minQueueDuration{};
-        std::chrono::microseconds m_maxQueueDuration{};
+        const Settings m_settings;
         nx::utils::QueueWithMax<JitterInfo> m_lastJitter;
-        BufferingPolicy m_policy = BufferingPolicy::increaseAndDescrease;
         QnMutex m_mutex;
     };
 
@@ -100,11 +108,7 @@ namespace nx::vms::server {
     {
     public:
         PutInOrderDataProvider(
-            const QnAbstractStreamDataProviderPtr& provider,
-            std::chrono::microseconds minQueueDuration = kMinQueueDuration,
-            std::chrono::microseconds maxQueueDuration = kMaxQueueDuration,
-            std::chrono::microseconds initialQueueDuration = kMinQueueDuration,
-            BufferingPolicy policy = BufferingPolicy::increaseAndDescrease);
+            const QnAbstractStreamDataProviderPtr& provider, const Settings& settings);
 
         virtual ~PutInOrderDataProvider();
 
@@ -112,14 +116,13 @@ namespace nx::vms::server {
         virtual void stop() override;
         virtual void flushData(const QnAbstractDataPacketPtr& data) override;
         virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    protected:
         virtual void start(Priority priority = InheritPriority) override;
     };
 
     class SimpleReorderer: public AbstractDataReorderer
     {
     public:
-        using AbstractDataReorderer::AbstractDataReorderer;
+        SimpleReorderer(): AbstractDataReorderer(Settings()) {}
 
         virtual void flushData(const QnAbstractDataPacketPtr& data) override;
         std::deque<QnAbstractDataPacketPtr>& queue();

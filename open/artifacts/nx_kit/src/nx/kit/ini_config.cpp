@@ -4,7 +4,6 @@
 
 #include "utils.h"
 
-#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -14,6 +13,11 @@
 #include <string>
 #include <unordered_set>
 
+namespace nx {
+namespace kit {
+
+namespace {
+
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
 #endif
@@ -21,11 +25,6 @@
 #if !defined(NX_INI_CONFIG_DEFAULT_INI_FILES_DIR)
     #define NX_INI_CONFIG_DEFAULT_INI_FILES_DIR nullptr
 #endif
-
-namespace nx {
-namespace kit {
-
-namespace {
 
 //-------------------------------------------------------------------------------------------------
 // Utils
@@ -53,21 +52,6 @@ std::string defaultValueToString(const T& value)
     std::ostringstream os;
     os << value;
     return os.str();
-}
-
-static void stringReplaceAllChars(std::string* s, char sample, char replacement)
-{
-    std::transform(s->cbegin(), s->cend(), s->begin(),
-        [=](char c) { return c == sample ? replacement : c; });
-}
-
-static void stringInsertAfterAll(std::string* s, char sample, const char* const insertion)
-{
-    for (int i = (int) s->size() - 1; i >= 0; --i)
-    {
-        if ((*s)[i] == sample)
-            s->insert((size_t) (i + 1), insertion);
-    }
 }
 
 /**
@@ -204,15 +188,10 @@ struct AbstractParam
     {
         if (output)
         {
-            const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
-            std::string descriptionStr;
-            if (!description.empty())
-            {
-                descriptionStr = " # " + description;
-                stringReplaceAllChars(&descriptionStr, '\n', ' ');
-            }
-            *output << prefix << value << valueNameSeparator << name << error << descriptionStr
-                << std::endl;
+            std::stringstream s;
+            s << ((error[0] != '\0') ? "  ! " : (eqDefault ? "    " : "  * "));
+            s << value << valueNameSeparator << name << error << "\n";
+            *output << s.str(); //< Output in one piece to minimize multi-threaded races.
         }
     }
 };
@@ -528,7 +507,7 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
         if (!description.empty())
         {
             description += " ";
-            stringInsertAfterAll(&description, '\n', "# ");
+            nx::kit::utils::stringInsertAfterEach(&description, '\n', "# ");
         }
 
         file << "# " << description << "Default: " << param->defaultValueStr() << "\n";
@@ -555,7 +534,7 @@ void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) c
     for (const auto& entry: m_iniMap)
     {
         if (m_paramNames.count(entry.first) == 0 && output)
-            *output << "!!! " << entry.first << " [unexpected param in file]" << std::endl;
+            *output << "  ! " << entry.first << " [unexpected param in file]" << std::endl;
     }
 }
 

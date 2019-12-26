@@ -12,7 +12,7 @@
 
 /norestart   - suppress any attempts to restart. By default UI will prompt before restart.
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
-  <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
+  <String Id="ConfirmCancelMessage">هل أنت متأكد من الإلغاء؟</String>
   <String Id="ClientAndServer">Client and Server</String>
   <String Id="ClientOnly">Client only</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
@@ -21,18 +21,18 @@
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Close</String>
   <String Id="InstallOptionsButton">Options</String>
-  <String Id="InstallInstallButton">Accept and Install</String>
+  <String Id="InstallInstallButton">تثبيت</String>
   <String Id="InstallCloseButton">Close</String>
-  <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
+  <String Id="InstallAcceptCheckbox">أوافق على</String>
   <String Id="InstallLicenseLinkText">End User License Agreement</String>
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
   <String Id="OptionsBrowseButton">Browse</String>
   <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">Cancel</String>
-  <String Id="ProgressHeader">Setup Progress</String>
+  <String Id="ProgressHeader">جاري الإعداد</String>
   <String Id="ProgressLabel">Processing...</String>
-  <String Id="OverallProgressPackageText">Initializing...</String>
+  <String Id="OverallProgressPackageText">تجري الآن عملية التهيئة...</String>
   <String Id="ProgressCancelButton">Cancel</String>
   <String Id="ModifyHeader">Modify Setup</String>
   <String Id="ModifyRepairButton">Repair</String>
@@ -68,5 +68,5 @@
   <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
   <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
   <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="Product_ArchMismatch_x64">تم تصميم هذه الحزمة لنظام التشغيل 64 بت. سيتم الآن ألغاء التثبيت.</String>
 </WixLocalization>

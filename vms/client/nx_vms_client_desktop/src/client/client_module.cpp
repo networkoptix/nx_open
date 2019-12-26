@@ -330,6 +330,8 @@ void QnClientModule::initSurfaceFormat()
 {
     QSurfaceFormat format;
 
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling))
+        format.setSamples(2);
     format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
@@ -354,7 +356,6 @@ void QnClientModule::initSingletons()
     // Runtime settings are standalone, but some actual values are taken from persistent settings.
     auto clientRuntimeSettings = std::make_unique<QnClientRuntimeSettings>(m_startupParameters);
     clientRuntimeSettings->setGLDoubleBuffer(clientSettings->isGlDoubleBuffer());
-    clientRuntimeSettings->setGlMultisamplingSamples(clientSettings->glMultisamplingSamples());
     clientRuntimeSettings->setLocale(clientSettings->locale());
 
     // Depends on QnClientSettings.

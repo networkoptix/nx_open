@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "เซิร์ฟเวอร์",
-            "system": "ระบบ",
-            "device": "อุุปกรณ์"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "รีสตาร์ทเซิร์ฟเวอร์หรือไม่?",
         "couldntCheckInternet": "ไม่สามารถตรวจสอบการเชื่อมต่อกับระบบคลาวด์ได้",
         "confirmRestoreDefault": "ล้างฐานข้อมูลและการตั้งค่า? ขั้นตอนนี้จะใช้เวลาสักพักและเซิร์ฟเวอร์จะเริ่มต้นใหม่หลังจากนั้น",
         "confirmRestoreDefaultTitle": "เรียกคืนค่าเริ่มต้นจากโรงงาน",
         "unexpectedError": "ล้มเหลว: มีข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น",
-        "connnetionError": "การเชื่อมต่อผิดพลาด",
+        "connnetionError": "Connection error",
         "wrongPassword": "รหัสผ่านผิด.",
         "error": "ข้อผิดพลาด: ",
         "restartNeeded": "บันทึกการเปลี่ยนแปลงแล้ว รีสตาร์ทเซิร์ฟเวอร์เพื่อใช้การตั้งค่าใหม่หรือไม่?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "ไม่ปลอดภัยที่จะใช้หมายเลขพอร์ตน้อยกว่า 1025 เซิร์ฟเวอร์อาจไม่สามารถเข้าถึงได้ ดำเนินการต่อ?",
         "confirmDisconnectFromCloud": "ตัดการเชื่อมต่อระบบจาก {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบออก</span><br><br>ระบบสามารถเข้าถึงได้ผ่านเครือข่ายท้องถิ่นโดยใช้บัญชีผู้ดูแลระบบภายใน",
-        "confirmDisconnectFromCloudAction": "ตัดการเชื่อมต่อ",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "ระบบถูกตัดการเชื่อมต่อจาก {{CLOUD_NAME}} เรียบร้อยแล้ว",
         "disconnectedFromCloudError": "ไม่สามารถเชื่อมต่อกับระบบ",
         "confirmDisconnectFromSystem": "แยกเซิร์ฟเวอร์ออกจากระบบปัจจุบัน",
@@ -149,7 +149,7 @@
         "licenceError": "คำเตือน! คุณกำลังจะผสานรวมสิทธิ์การใช้งานระบบกับ Starter อนุญาตได้หนึ่งใบต่อระบบดังนั้นใบอนุญาตที่สองจะถูกยกเลิกการใช้งาน รวมหรือไม่?",
         "duplicateServersError": "ไม่สามารถรวมระบบได้เนื่องจากมีเซิร์ฟเวอร์อย่างน้อย 1 เครื่องที่มี ID เดียวกัน โปรดลบเซิร์ฟเวอร์นี้แล้วลองอีกครั้ง",
         "connectionFailed": "การเชื่อมต่อล้มเหลว: ",
-        "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก",
+        "unknownError": "Unknown error",
         "mergeFailed": "ผสานล้มเหลว",
         "mergeSucceed": "ผสานสำเร็จ",
         "newSystemDisplayName": "ระบบใหม่",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "เข้าสู่ระบบหรือรหัสผ่านไม่ถูกต้อง",
-        "authLockout": "คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่"
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "ล้มเหลวของเซิร์ฟเวอร์: ไม่สามารถเรียกข้อมูลผู้ใช้ปัจจุบัน"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "เซิร์ฟเวอร์กำลังเริ่มต้น",
         "serverRestarting": "เซิร์ฟเวอร์กำลังรีสตาร์ท",
-        "serverOffline": "เซิร์ฟเวอร์ออฟไลน์"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "ปรับปรุงเริ่มต้นเรียบร้อยแล้ว จะใช้เวลาหลายนาที",
@@ -182,7 +182,7 @@
         "selectFiles": "เลือกไฟล์"
     },
     "advanced": {
-        "free": "ฟรี",
+        "free": "Free",
         "total": "ทั้งหมด",
         "occupied": "ครอบครอง",
         "reserved": "สงวนไว้แล้ว"

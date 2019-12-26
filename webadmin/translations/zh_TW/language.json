@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "伺服器",
-            "system": "系統",
-            "device": "裝置"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "是否重啟伺服器?",
         "couldntCheckInternet": "無法檢查雲端連線",
         "confirmRestoreDefault": "清除資料庫和設定? 此過程將花費一些時間. 之後會重新啟動伺服器.",
         "confirmRestoreDefaultTitle": "恢復出廠預設值",
         "unexpectedError": "失敗: 發生未知錯誤",
-        "connnetionError": "連線錯誤",
+        "connnetionError": "Connection error",
         "wrongPassword": "密碼不正確.",
         "error": "錯誤: ",
         "restartNeeded": "變更已儲存. 是否重新啟動伺服器以套用新設定?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "使用小於1025的埠號不安全. 伺服器將可能無法被存取. 是否仍繼續?",
         "confirmDisconnectFromCloud": "從 {{CLOUD_NAME}} 斷開系統嗎",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 所有雲帳號都將被刪除.</span><br><br>系統將可被本機管理者帳號存取.",
-        "confirmDisconnectFromCloudAction": "斷線",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "系統已成功從 {{CLOUD_NAME}} 斷開連接",
         "disconnectedFromCloudError": "無法連接到系統",
         "confirmDisconnectFromSystem": "將伺服器從系統中脫離",
@@ -149,7 +149,7 @@
         "licenceError": "警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
         "duplicateServersError": "至少有一個具有相同ID的伺服器, 所以無法合併系統。請刪除此伺服器, 然後重試。",
         "connectionFailed": "連接失敗: ",
-        "unknownError": "未知的錯誤",
+        "unknownError": "Unknown error",
         "mergeFailed": "合併失敗",
         "mergeSucceed": "合併成功.",
         "newSystemDisplayName": "新系統",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "帳號或密碼不正確",
-        "authLockout": "嘗試次數過多，請稍後再試。"
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "伺服器故障: 無法取得此使用者資料"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "伺服器正在啟動中",
         "serverRestarting": "伺服器正在重新啟動!",
-        "serverOffline": "伺服器已離線"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "更新成功地開始. 這將需要幾分鐘時間",
@@ -182,7 +182,7 @@
         "selectFiles": "選擇檔案"
     },
     "advanced": {
-        "free": "可用",
+        "free": "Free",
         "total": "合計",
         "occupied": "被佔用",
         "reserved": "保留"

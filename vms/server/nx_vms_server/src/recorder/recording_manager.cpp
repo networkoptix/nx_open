@@ -155,12 +155,13 @@ std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
     if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
         recorder->updateCamera(camRes);
 
-    auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(
-            reader,
-            std::chrono::milliseconds(0) /*minSize*/,
-            std::chrono::seconds(5) /*maxSize*/,
-            std::chrono::seconds(0)  /*initialSize*/,
-            PutInOrderDataProvider::BufferingPolicy::increaseOnly);
+    PutInOrderDataProvider::Settings settings {
+        std::chrono::milliseconds(0) /*minSize*/,
+        std::chrono::seconds(5) /*maxSize*/,
+        std::chrono::seconds(0)  /*initialSize*/,
+        PutInOrderDataProvider::BufferingPolicy::increaseOnly
+    };
+    auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(reader, settings);
     reorderingDataProvider->addDataProcessor(recorder.get());
 
     return std::make_unique<RecorderData>(std::move(recorder), std::move(reorderingDataProvider));
@@ -288,6 +289,7 @@ void QnRecordingManager::startRecording(
         recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, AV_NOPTS_VALUE);
         camera->inUse(recorder->recorder.get());
         recorder->recorder->start();
+        recorder->reorderingProvider->start();
         provider->startIfNotRunning();
     }
 }
@@ -299,11 +301,11 @@ bool QnRecordingManager::stopRecording(
 {
     if (!recorder)
         return false;
-
     const auto id = camera->resource()->getUniqueId();
     // Recording thread can be stopped outside, not by RecordingManager
     // So, remove cameraUse anyway
     camera->notInUse(recorder->recorder.get());
+    recorder->reorderingProvider->stop();
     if (recorder->recorder->isRunning())
     {
         NX_INFO(this, "Recording is stopped for camera %1", id);

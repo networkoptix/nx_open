@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "服务器",
-            "system": "系统",
-            "device": "设备"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "重新启动服务器吗？",
         "couldntCheckInternet": "不能检查云连接",
         "confirmRestoreDefault": "清除数据库和设置？此过程将花费一些时间和会之后重新启动服务器。",
         "confirmRestoreDefaultTitle": "恢复出厂默认值",
         "unexpectedError": "失败︰ 发生了意外的错误",
-        "connnetionError": "连接错误",
+        "connnetionError": "Connection error",
         "wrongPassword": "错误的密码。",
         "error": "错误: ",
         "restartNeeded": "保存的更改。重新启动服务器以应用新设置吗？",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "端口号小于 1025 是不安全的。服务器可能不可访问。是否继续？",
         "confirmDisconnectFromCloud": "从 {{CLOUD_NAME}} 断开系统",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 云的所有用户将被都删除。</span><br><br>系统将可通过本地网络的本地管理员帐户。",
-        "confirmDisconnectFromCloudAction": "断开连接",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "系统已成功从{{CLOUD_NAME}} 断开连接",
         "disconnectedFromCloudError": "无法连接到系统",
         "confirmDisconnectFromSystem": "从当前系统分离服务器",
@@ -149,7 +149,7 @@
         "licenceError": "警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
         "duplicateServersError": "至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试",
         "connectionFailed": "连接失败︰ ",
-        "unknownError": "未知的错误",
+        "unknownError": "Unknown error",
         "mergeFailed": "合并失败",
         "mergeSucceed": "合并成功。",
         "newSystemDisplayName": "新系统",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "登录名或密码不正确",
-        "authLockout": "尝试次数过多，请稍后重试。"
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "服务器故障︰ 无法检索当前用户数据"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "启动服务器",
         "serverRestarting": "服务器正在重新启动 ！",
-        "serverOffline": "服务器离线"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "成功更新。它将需要几分钟时间",
@@ -182,7 +182,7 @@
         "selectFiles": "选择文件"
     },
     "advanced": {
-        "free": "可用",
+        "free": "Free",
         "total": "总共",
         "occupied": "正忙",
         "reserved": "保留"

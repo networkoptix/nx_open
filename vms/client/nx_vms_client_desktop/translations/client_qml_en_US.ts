@@ -55,6 +55,22 @@
         <source>click to add</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display on camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Figure</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FigureEditorDialog</name>
@@ -80,6 +96,17 @@
     <message>
         <source>Click arrows to toggle the desired directions.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Line is not valid. Remove self-intersections to proceed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Maximum points count is reached (%n points).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -124,15 +151,14 @@
     </message>
 </context>
 <context>
-    <name>Polygon</name>
+    <name>PolyFigure</name>
     <message>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Maximum points count is reached.</source>
-        <translation type="unfinished"></translation>
-    </message>
+</context>
+<context>
+    <name>Polygon</name>
     <message>
         <source>Click on video to start polygon.</source>
         <translation type="unfinished"></translation>
@@ -140,6 +166,13 @@
     <message>
         <source>Polygon is not valid. Remove self-intersections to proceed.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Maximum points count is reached (%n points).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

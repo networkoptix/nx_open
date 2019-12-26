@@ -724,7 +724,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Salvare</translation>
+      <translation>&amp;Salva</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
@@ -901,7 +901,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Open</source>
-      <translation>Apri</translation>
+      <translation>Aperto</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -1123,7 +1123,7 @@ Do you want to delete it anyway?</source>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Scorrere verso sinistra</translation>
+      <translation>Scorri a sinistra</translation>
     </message>
     <message>
       <source>Scroll Right</source>

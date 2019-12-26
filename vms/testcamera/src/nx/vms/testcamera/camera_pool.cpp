@@ -163,7 +163,6 @@ bool CameraPool::addCamera(
 }
 
 bool CameraPool::addCameraSet(
-    const FileCache* fileCache,
     const std::optional<VideoLayout>& videoLayout,
     bool cameraForEachFile,
     const CameraOptions& cameraOptions,

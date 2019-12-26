@@ -66,33 +66,6 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0">
-     <item>
-      <widget class="QLabel" name="antialiasingLabel">
-       <property name="text">
-        <string>Anti-aliasing</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="antiAliasingComboBox"/>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="maximumLiveBufferLengthLabelLayout" stretch="0,1,0">
      <property name="spacing">
       <number>4</number>

@@ -40,9 +40,6 @@ private:
     bool isBlurEnabled() const;
     void setBlurEnabled(bool value);
 
-    int antialiasingLevel() const;
-    void setAntialiasingLevel(int level);
-
     int  maximumLiveBufferMs() const;
     void setMaximumLiveBufferMs(int value);
 

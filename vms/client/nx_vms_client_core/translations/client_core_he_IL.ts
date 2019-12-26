@@ -159,7 +159,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
+      <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

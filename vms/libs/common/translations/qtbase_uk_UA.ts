@@ -867,7 +867,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати Все</translation>
+      <translation>Вибрати все</translation>
     </message>
   </context>
   <context>
@@ -968,7 +968,7 @@ Do you want to delete it anyway?</source>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Відмінити</translation>
+      <translation>Відміна</translation>
     </message>
   </context>
   <context>
@@ -1127,11 +1127,11 @@ Do you want to delete it anyway?</source>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Прокрутити Ліворуч</translation>
+      <translation>Прокрутити ліворуч</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Прокрутити Праворуч</translation>
+      <translation>Прокрутити праворуч</translation>
     </message>
   </context>
   <context>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати Все</translation>
+      <translation>Вибрати все</translation>
     </message>
   </context>
 </TS>

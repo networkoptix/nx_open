@@ -159,7 +159,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Nelze inicializovat zvukový enkodér.</translation>
+      <translation>Nelze inicializovat audio enkodér.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

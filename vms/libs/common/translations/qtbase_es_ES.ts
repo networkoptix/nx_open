@@ -881,7 +881,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>Aceptar</translation>
     </message>
     <message>
       <source>Help</source>
@@ -892,7 +892,7 @@ Do you want to delete it anyway?</source>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>Aceptar</translation>
     </message>
     <message>
       <source>Save</source>

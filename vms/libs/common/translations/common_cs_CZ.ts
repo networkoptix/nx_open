@@ -406,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nelze najít kodér pro kodek %1.</translation>
+      <translation>Nelze najít enkodér pro kodek %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>

@@ -406,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kon geen encoder vinden voor codec %1.</translation>
+      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -866,7 +866,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de output stream niet toewijzen voor opname.</translation>
+      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

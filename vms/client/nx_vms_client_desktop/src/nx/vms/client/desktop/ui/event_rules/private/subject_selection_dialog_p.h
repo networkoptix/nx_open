@@ -20,11 +20,12 @@ class QnUuid;
 
 namespace nx::vms::client::desktop {
 namespace ui {
+namespace subject_selection_dialog_private {
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::RoleListModel
+// subject_selection_dialog_private::RoleListModel
 
-class SubjectSelectionDialog::RoleListModel:
+class RoleListModel:
     public QnUserRolesModel,
     public QnCommonModuleAware
 {
@@ -59,9 +60,9 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::UserListModel
+// subject_selection_dialog_private::UserListModel
 
-class SubjectSelectionDialog::UserListModel:
+class UserListModel:
     public NaturalStringSortProxyModel,
     public QnCommonModuleAware
 {
@@ -118,9 +119,9 @@ private:
 };
 
 //------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::RoleListDelegate
+// subject_selection_dialog_private::RoleListDelegate
 
-class SubjectSelectionDialog::RoleListDelegate:
+class RoleListDelegate:
     public QnResourceItemDelegate,
     public QnCommonModuleAware
 {
@@ -140,9 +141,9 @@ protected:
 };
 
 //-------------------------------------------------------------------------------------------------
-// SubjectSelectionDialog::UserListDelegate
+// subject_selection_dialog_private::UserListDelegate
 
-class SubjectSelectionDialog::UserListDelegate:
+class UserListDelegate:
     public QnResourceItemDelegate
 {
     Q_OBJECT
@@ -160,5 +161,6 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 
+} // namespace subject_selection_dialog_private
 } // namespace ui
 } // namespace nx::vms::client::desktop

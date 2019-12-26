@@ -196,7 +196,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
-    connect(ui->textFilter, &QLineEdit::textChanged,
+    // Pending is implemented on the dialog side, so no additional delay is needed.
+    ui->textSearchLineEdit->setTextChangedSignalFilterMs(0);
+    ui->textSearchLineEdit->lineEdit()->setPlaceholderText(tr("Description"));
+    connect(ui->textSearchLineEdit, &SearchLineEdit::textChanged,
         this, &QnEventLogDialog::updateDataDelayed);
     m_delayUpdateTimer.setSingleShot(true);
     m_delayUpdateTimer.setInterval(kUpdateDelayMs);
@@ -470,7 +473,7 @@ void QnEventLogDialog::updateData()
         eventType,
         analyticsEventTypeId,
         actionType,
-        ui->textFilter->text());
+        ui->textSearchLineEdit->text());
 
     // update UI
 
@@ -687,7 +690,7 @@ void QnEventLogDialog::setActionType(ActionType value)
 
 void QnEventLogDialog::setText(const QString& text)
 {
-    ui->textFilter->setText(text);
+    ui->textSearchLineEdit->lineEdit()->setText(text);
 }
 
 void QnEventLogDialog::at_filterAction_triggered()

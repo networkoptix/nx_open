@@ -1467,6 +1467,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
         return {false, std::move(state)};
 
     state.analytics.currentEngineId = value;
+    state.analytics.loading = true;
+
     return {true, std::move(state)};
 }
 
@@ -1490,6 +1492,13 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     state.analytics.enabledEngines.setUser(actualValue);
     state.hasChanges = true;
     return state;
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsModel(
+    State state, const QnUuid& engineId, const QJsonObject& value)
+{
+    state.analytics.settingsModelByEngineId[engineId] = value;
+    return {true, std::move(state)};
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(

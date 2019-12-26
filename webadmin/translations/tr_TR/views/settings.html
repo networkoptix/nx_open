@@ -40,22 +40,22 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                         <h3>Sunucuyu sıfırla</h3>
                         <p>Bu eylem, bu sunucuyu varsayılanlara geri döndürür (veritabanını temizler ve yapılandırmayı sıfırlar).
                             Sistem şu anda bağlı olduğu sistemden ayrılacaktır. Video arşivi bozulmadan kalacaktır.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Sunucuyu sistemden ayır</h3>
                         <p>Bu aksiyon sistemin databaseini, yerel kullanıcılarını ve konfigürasyonunu koruyarak sistemden ayıracaktır.
-                            Video arşivi bozulmadan kalacaktır. <b>Tüm bulut kullanıcıları silindi.</b></p>
+                            Video archive will remain intact. <b>Tüm bulut kullanıcıları silindi.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Sistemden ayır</button></p>
                     </div>
                     <div>
-                        <h3>Yeniden Başlat</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Sunucuyu Yeniden Başlatın</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Yeniden Başlat</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Yönetici parolasını değiştir</h3>
+                            <h3>Change admin password</h3>
                             <p>Eğer sistem yerel ise ( buluta bağlı değil ise) parola "admin" olarak değişecektir.<br>
                                 Aksi halde sadece kurtarma (root) parolası değişecektir.</p>
                             <div class="col-sm-6">
@@ -64,7 +64,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Şifre değiştir</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -72,7 +72,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>İsim</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -86,8 +86,8 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Sistemleri Birleştir</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Sistemleri Birleştir</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -136,7 +136,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                     Video trafiğini şifrelemeyi zorla
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Kaydet</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -154,8 +154,8 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Zaman Dilimi</label></td>
-                                        <td><label for="date">Tarih</label></td>
-                                        <td><label for="time">Zaman</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

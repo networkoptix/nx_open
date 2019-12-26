@@ -406,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder a %1 codec-hez.</translation>
+      <translation>Nem található enkóder %1 kodekhez.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

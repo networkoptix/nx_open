@@ -6,6 +6,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QContextMenuEvent>
+#include <QtWidgets/QAction>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
@@ -202,7 +203,7 @@ void CameraWebPageWidget::Private::createNewPage()
         script.setSourceCode(s);
         script.setInjectionPoint(QWebEngineScript::DocumentCreation);
         script.setRunsOnSubFrames(true);
-        script.setWorldId(QWebEngineScript::ApplicationWorld);
+        script.setWorldId(QWebEngineScript::MainWorld);
         webView->page()->profile()->scripts()->insert(script);
     }
 
@@ -211,6 +212,12 @@ void CameraWebPageWidget::Private::createNewPage()
         webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
         webView->pageAction(QWebEnginePage::Copy),
         webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+
+    webView->setHiddenActions({
+        QWebEnginePage::DownloadImageToDisk,
+        QWebEnginePage::DownloadLinkToDisk,
+        QWebEnginePage::DownloadMediaToDisk,
+        QWebEnginePage::SavePage});
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 
@@ -248,8 +255,7 @@ void CameraWebPageWidget::Private::createNewPage()
             url.setPassword(QString());
 
             // Replace server address with camera address.
-            const auto serverHost = parent->commonModule()->currentUrl().host();
-            if (serverHost == url.host())
+            if (url.host() == lastRequestUrl.host())
             {
                 url.setHost(lastCamera.ipAddress);
                 url.setPort(-1); //< Hide server port.
@@ -286,6 +292,28 @@ CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidg
 CameraWebPageWidget::~CameraWebPageWidget()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+void CameraWebPageWidget::keyPressEvent(QKeyEvent* event)
+{
+    base_type::keyPressEvent(event);
+
+    // Web page JavaScript code observes and reacts on key presses, but may not accept the actual
+    // event. In regular web browser pressing those keys does nothing, but in camera settings web
+    // page dialog they will close the dialog and the user won't be able interact with the web
+    // page any further.
+    // So just accept them anyway in order to provide the same user experience as in regular
+    // web browser.
+    switch (event->key())
+    {
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+        case Qt::Key_Escape:
+            event->setAccepted(true);
+            break;
+        default:
+            break;
+    }
 }
 
 void CameraWebPageWidget::cleanup()

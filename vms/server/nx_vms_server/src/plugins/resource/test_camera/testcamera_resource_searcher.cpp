@@ -31,7 +31,7 @@ QnTestCameraResourceSearcher::~QnTestCameraResourceSearcher()
 
 void QnTestCameraResourceSearcher::clearSocketList()
 {
-    for(const DiscoverySocket& info: m_discoverySockets)
+    for (const DiscoverySocket& info: m_discoverySockets)
         delete info.socket;
     m_discoverySockets.clear();
 }
@@ -48,7 +48,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         DiscoverySocket info(nx::network::SocketFactory::createDatagramSocket().release(),
             QHostAddress(address.toString()));
         if (info.socket->bind(address.toString(), 0))
-            m_discoverySockets << info;
+            m_discoverySockets.push_back(info);
         else
             delete info.socket;
     }
