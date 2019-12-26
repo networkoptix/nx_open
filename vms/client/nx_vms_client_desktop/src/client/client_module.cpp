@@ -813,7 +813,7 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    if (ini().forceJsonClientConnection)
+    if (ini().forceJsonConnection)
         runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = ini().developerMode ? QString() : AppInfo::brand();
     runtimeData.customization = ini().developerMode ? QString() : AppInfo::customizationName();

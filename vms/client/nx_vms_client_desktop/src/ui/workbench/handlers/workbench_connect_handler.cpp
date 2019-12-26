@@ -1132,7 +1132,7 @@ void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
         return;
 
     m_connecting.url = url;
-    if (ini().forceJsonClientConnection)
+    if (ini().forceJsonConnection)
     {
         QUrlQuery query(m_connecting.url.toQUrl());
         query.removeQueryItem("format");

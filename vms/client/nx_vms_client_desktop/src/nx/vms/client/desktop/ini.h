@@ -195,7 +195,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", updateFeedUrl,
         "Overrides URL update server. Leave empty value to use built-in path.");
 
-    NX_INI_FLAG(0, forceJsonClientConnection,
+    NX_INI_FLAG(0, forceJsonConnection,
         "Force desktop client use json data encoding");
 };
 
