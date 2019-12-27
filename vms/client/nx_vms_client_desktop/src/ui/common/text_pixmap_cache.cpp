@@ -61,7 +61,10 @@ int calculateTextPixmapCost(const QnTextPixmap& textPixmap)
     static constexpr int kBitsPerByte = 8;
     const QPixmap& pixmap = textPixmap.pixmap;
 
-    int result = pixmap.height() * pixmap.width() * (pixmap.depth() / kBitsPerByte);
+    int result = std::pow(pixmap.devicePixelRatio(), 2)
+        * pixmap.height() * pixmap.width()
+        * (pixmap.depth() / kBitsPerByte);
+
     result += textPixmap.renderedText.capacity() * sizeof(QChar);
     result += sizeof(QnTextPixmap);
 
