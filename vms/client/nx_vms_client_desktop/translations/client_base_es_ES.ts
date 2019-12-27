@@ -5748,7 +5748,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Reservado</translation>
     </message>
     <message>
       <source>local</source>
@@ -5780,7 +5780,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7236,15 +7236,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>En area seleccionada</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Cámara seleccionada</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo seleccionado</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7253,7 +7253,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ninguno</translation>
     </message>
   </context>
   <context>
@@ -8785,7 +8785,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Póngase en contacto con el servicio técnico.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10060,7 +10060,7 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Error al sobrescribir el archivo</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10076,7 +10076,7 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Abrir carpeta contenedora</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
