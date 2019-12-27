@@ -886,9 +886,6 @@ QString QnFileStorageResource::getFsPath() const
 
 bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
 {
-    if (path.startsWith(nx::utils::TestOptions::temporaryDirectoryPath()))
-        return true;
-
     using namespace nx::vms::server::fs::media_paths;
     auto pathConfig = FilterConfig::createDefault(
         m_serverModule->platform(), /*includeNonHdd*/ true, &m_serverModule->settings());
@@ -900,6 +897,10 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
             result.replace('\\', '/');
             return result;
         };
+
+    const auto tempDir = normalize(nx::utils::TestOptions::temporaryDirectoryPath());
+    if (normalize(path).startsWith(tempDir))
+        return true;
 
     const auto mediaPaths = getMediaPaths(pathConfig);
     return std::any_of(
