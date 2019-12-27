@@ -235,9 +235,13 @@ QWebEngineView* WebEngineView::createWindow(QWebEnginePage::WebWindowType type)
 {
     Qt::WindowFlags flags = type == QWebEnginePage::WebDialog ? Qt::Dialog : Qt::Window;
     flags |= Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint
-        | Qt::WindowMaximizeButtonHint | Qt::WindowStaysOnTopHint;
+        | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint;
 
     auto window = new QMainWindow(nullptr, flags);
+
+    static constexpr QSize kMinumumWindowSize(120, 0); //< Leave some space for window controls.
+    window->setMinimumSize(kMinumumWindowSize);
+
     auto webView = new WebEngineView(window, this);
 
     // Profile change means that our parent page is no longer used.
