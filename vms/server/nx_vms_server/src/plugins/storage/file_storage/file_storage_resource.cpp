@@ -273,7 +273,10 @@ Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString&
 {
     if (checkMountedStatus() != Qn::StorageInit_Ok)
     {
-        NX_WARNING(this, "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed");
+        NX_WARNING(
+            this,
+            "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed"
+            " for storage '%1'", url);
         return Qn::StorageInit_WrongPath;
     }
 
