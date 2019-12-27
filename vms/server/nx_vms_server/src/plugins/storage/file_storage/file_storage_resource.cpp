@@ -272,15 +272,6 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
 
 Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString& url)
 {
-    if (checkMountedStatus() != Qn::StorageInit_Ok)
-    {
-        NX_WARNING(
-            this,
-            "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed"
-            " for storage '%1'", url);
-        return Qn::StorageInit_WrongPath;
-    }
-
     if (rootTool()->isPathExists(url))
     {
         NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", url);
@@ -901,6 +892,7 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
     const auto tempDir = normalize(nx::utils::TestOptions::temporaryDirectoryPath());
     if (!tempDir.isEmpty() && normalize(path).startsWith(tempDir))
         return true;
+    NX_VERBOSE(this, "check isMounted for patch %1, tempDir %2", normalize(path), tempDir);
 
     const auto mediaPaths = getMediaPaths(pathConfig);
     return std::any_of(
