@@ -117,3 +117,29 @@ All tests are successfully finished.
 If an ISSUE (assessment failure) or en ERROR (OS or similar failure) occurs, a message is printed
 starting with one of these capitalized words, indicating what has happened. The message may also
 include an advice to look in the log file for additional details.
+
+---------------------------------------------------------------------------------------------------
+## How it works
+
+Here are the approximate steps the tool performs (with some details omitted here for clarity).
+
+1. Connect to the box via ssh.
+2. Collect box system information like Linux version, CPU properties, RAM size, and file systems.
+3. Check the time at the box - must be the same as the time at the host.
+4. Check that the VMS Server is up and running at the box.
+5. Connect to the VMS Server via HTTP API.
+6. Clear all VMS Server storages (video archives), restarting the Server.
+7. Evaluate whether there is enough free RAM at the box.
+8. Evaluate whether there is enough free space at the box for the video archive for the test.
+9. Run the load tests:
+9.1. Start the required number of virtual cameras on the host.
+9.2. Wait until the Server discovers all virtual cameras.
+9.3. Enable recording of all virtual cameras by the Server.
+9.4. Run the streaming test: for the certain time period, pull some live and recorded video streams
+    from the Server, periodically doing the following:
+9.4.1. Report a brief status every minute.
+9.4.2. Check whether the pulled streams arrive uninterrupted.
+9.4.3. Check whether the pulled streams have any frame drops or lags.
+9.4.4. Check that the box CPU usage is not higher than 50%.
+9.4.5. Check that there are no storage failure reports from the Server.
+9.4.6. Check whether there are any network errors at the box.

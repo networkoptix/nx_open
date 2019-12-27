@@ -272,6 +272,15 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
 
 Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString& url)
 {
+    if (checkMountedStatus() != Qn::StorageInit_Ok)
+    {
+        NX_WARNING(
+            this,
+            "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed"
+            " for storage '%1'", url);
+        return Qn::StorageInit_WrongPath;
+    }
+
     if (rootTool()->isPathExists(url))
     {
         NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", url);
