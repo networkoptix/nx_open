@@ -14,7 +14,7 @@ using namespace std::chrono;
 namespace {
 
 static constexpr char kSpeedTest[] = "SPEEDTEST";
-static constexpr int kPayloadSizeBytes = 1000 * 1000;
+static constexpr int kPayloadSizeBytes = 1000 * 1000 ; //< 1 Megabyte
 static constexpr float kSimilarityThreshold = 0.97F;
 static constexpr int kMinRunningAverages = 4;
 static constexpr auto kMinTestDuration = milliseconds(1);
@@ -78,6 +78,9 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 				network::url::getEndpoint(m_url),
 				[this](SystemError::ErrorCode errorCode) {
 					using namespace std::placeholders;
+
+					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2", 
+						m_url, SystemError::toString(errorCode));
 
                     if (errorCode != SystemError::noError)
 						return testFailed(errorCode);
@@ -178,9 +181,14 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 {
+	if (!m_handler) //< If handler is nullptr, test is already completed and handler invoked
+		return;
+
 	auto sequence = parseSequence(message);
 	if (!sequence)
 		return testFailed(SystemError::invalidData);
+
+	NX_VERBOSE(this, "Received response %1", *sequence);
 
     auto messageSentTime = nx::utils::utcTime() - m_pingTime;
 
@@ -232,6 +240,8 @@ void UplinkBandwidthTester::sendRequest()
 	auto [sequence, buffer] = makeRequest();
 	m_testContext.totalBytesSent += buffer.size();
 	m_testContext.runningValues[sequence].totalBytesSent = m_testContext.totalBytesSent;
+
+	NX_VERBOSE(this, "Sending request %1, buffer size: %2", sequence, buffer.size());
 
     m_pipeline->sendData(
 		std::move(buffer),

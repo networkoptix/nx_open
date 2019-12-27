@@ -52,11 +52,16 @@ void UplinkSpeedTester::start(const nx::utils::Url& speedTestUrl, CompletionHand
 
 void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 {
+	NX_VERBOSE(this, "Starting bandwidth test...");
 	m_bandwidthTester =
 		std::make_unique<UplinkBandwidthTester>(m_url, kTestDuration, pingTime);
+	m_bandwidthTester->bindToAioThread(getAioThread());
 	m_bandwidthTester->doBandwidthTest(
 		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
 		{
+			NX_VERBOSE(this,
+				"Bandwidth test complete, SystemError = %1", 
+				SystemError::toString(errorCode));
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);
 
