@@ -823,15 +823,14 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
         {
             auto result = s;
             result.replace('\\', '/');
-            while (result.endsWith('/'))
-                result.chop(1);
             return result;
         };
 
     const auto mediaPaths = getMediaPaths(pathConfig);
+    NX_WARNING(this, "media paths: %1, localPath: %2", containerString(mediaPaths), path);
     return std::any_of(
         mediaPaths.cbegin(), mediaPaths.cend(),
-        [path = normalize(path)](const auto& p) { return normalize(p) == path; });
+        [path = normalize(path)](const auto& p) { return normalize(p).startsWith(path); });
 }
 
 Qn::StorageInitResult QnFileStorageResource::testWrite() const
