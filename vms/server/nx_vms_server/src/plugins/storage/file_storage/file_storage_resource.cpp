@@ -899,7 +899,7 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
         };
 
     const auto tempDir = normalize(nx::utils::TestOptions::temporaryDirectoryPath());
-    if (normalize(path).startsWith(tempDir))
+    if (!tempDir.isEmpty() && normalize(path).startsWith(tempDir))
         return true;
 
     const auto mediaPaths = getMediaPaths(pathConfig);
