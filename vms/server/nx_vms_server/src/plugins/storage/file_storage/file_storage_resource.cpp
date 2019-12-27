@@ -47,6 +47,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <nx/utils/test_support/test_options.h>
 
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
@@ -271,15 +272,6 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
 
 Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString& url)
 {
-    if (checkMountedStatus() != Qn::StorageInit_Ok)
-    {
-        NX_WARNING(
-            this,
-            "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed"
-            " for storage '%1'", url);
-        return Qn::StorageInit_WrongPath;
-    }
-
     if (rootTool()->isPathExists(url))
     {
         NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", url);
@@ -339,14 +331,48 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
+    
+    const bool isRemote = url.contains("://");
+    if (isRemote && !isValid())
+    {
+        // Initialize once because it is long operation.
+        if (auto result = initRemoteStorage(url); result != Qn::StorageInit_Ok)
+        {
+            NX_WARNING(
+                this,
+                "[initOrUpdate] initRemoteStorage check failed for storage '%1'", url);
+            return result;
+        }
+    }
 
-    Qn::StorageInitResult result = isValid()
-        ? checkMountedStatus()
-        : (url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url));
-    if (result != Qn::StorageInit_Ok)
+    if (auto result = checkMountedStatus(); result != Qn::StorageInit_Ok)
+    {
+        NX_WARNING(
+            this,
+            "[initOrUpdate] 'IsMounted' check failed for storage '%1'", url);
         return result;
+    }
 
-    return testWrite();
+    if (!isRemote)
+    {
+        if (auto result = initStorageDirectory(url); result != Qn::StorageInit_Ok)
+        {
+            NX_WARNING(
+                this,
+                "[initOrUpdate] initStorageDirectory check failed for storage '%1'", url);
+            return result;
+        }
+    }
+
+    if (auto result = testWrite(); result != Qn::StorageInit_Ok)
+    {
+        NX_WARNING(
+            this,
+            "[initOrUpdate] testWrite failed for storage '%1'", url);
+        return result;
+    }
+
+    return Qn::StorageInitResult::StorageInit_Ok;
 }
 
 bool QnFileStorageResource::isSystem() const
@@ -851,6 +877,9 @@ QString QnFileStorageResource::getFsPath() const
 
 bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
 {
+    if (path.startsWith(nx::utils::TestOptions::temporaryDirectoryPath()))
+        return true;
+
     using namespace nx::vms::server::fs::media_paths;
     auto pathConfig = FilterConfig::createDefault(
         m_serverModule->platform(), /*includeNonHdd*/ true, &m_serverModule->settings());

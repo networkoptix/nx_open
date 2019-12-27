@@ -5,6 +5,7 @@
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
 #include <iostream>
+#include <nx/utils/test_support/test_options.h>
 
 namespace {
 
@@ -21,7 +22,7 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
     if (parser->isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser->value("tmp")))
         nx::ut::cfg::configInstance().tmpDir = parser->value("tmp");
     else
-        nx::ut::cfg::configInstance().tmpDir = QDir(QDir::tempPath()).absoluteFilePath("nx_ut");
+        nx::ut::cfg::configInstance().tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
 
     if (parser->isSet("ftp-storage-url"))
         nx::ut::cfg::configInstance().ftpUrl = parser->value("ftp-storage-url");
