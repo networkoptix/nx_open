@@ -4,6 +4,7 @@
 #include <api/test_api_requests.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx::vms::server::test {
 
@@ -43,7 +44,7 @@ QnStorageResourcePtr ServerForTests::addStorage(const QString& storageName)
     storage.parentId = commonModule()->moduleGUID();
     storage.spaceLimit = 1000000;
     storage.storageType = "local";
-    storage.url = dataDir() + L'/' + storageName;
+    storage.url = nx::utils::TestOptions::temporaryDirectoryPath() + L'/' + storageName;
     [&](){ NX_TEST_API_POST(this, lit("/ec2/saveStorage"), storage); }();
 
     auto storageRes = commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
