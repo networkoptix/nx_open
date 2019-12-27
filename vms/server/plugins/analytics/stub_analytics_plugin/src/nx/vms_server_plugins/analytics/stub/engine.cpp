@@ -454,6 +454,49 @@ std::string Engine::manifestString() const
                             }
                         ]
                     }
+                ],
+                "sections": [
+                    {
+                        "type": "Section",
+                        "name": "Nested section",
+                        "items": [
+                            {
+                                "type": "GroupBox",
+                                "caption": "Nested Section Example",
+                                "items": [
+                                    {
+                                        "type": "SpinBox",
+                                        "caption": "SpinBox Parameter",
+                                        "name": "testSpinBox3",
+                                        "defaultValue": 42,
+                                        "minValue": 0,
+                                        "maxValue": 100
+                                    },
+                                    {
+                                        "type": "DoubleSpinBox",
+                                        "caption": "DoubleSpinBox Parameter",
+                                        "name": "testDoubleSpinBox3",
+                                        "defaultValue": 3.1415,
+                                        "minValue": 0.0,
+                                        "maxValue": 100.0
+                                    },
+                                    {
+                                        "type": "ComboBox",
+                                        "name": "testComboBox3",
+                                        "caption": "ComboBox Parameter",
+                                        "defaultValue": "value2",
+                                        "range": ["value1", "value2", "value3"]
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "caption": "CheckBox Parameter",
+                                        "name": "testCheckBox3",
+                                        "defaultValue": true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             },
             {

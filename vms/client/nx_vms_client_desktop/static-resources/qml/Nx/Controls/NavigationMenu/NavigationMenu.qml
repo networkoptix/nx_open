@@ -9,6 +9,8 @@ Scrollable
     property var currentItemId: null
     default property alias data: column.data
 
+    signal itemClicked(Item item)
+
     scrollView.topPadding: 16
     scrollView.bottomPadding: 16
 
