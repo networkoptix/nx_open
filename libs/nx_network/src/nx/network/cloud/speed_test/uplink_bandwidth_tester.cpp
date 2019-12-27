@@ -115,7 +115,8 @@ std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
     request.headers.emplace("User-Agent", userAgentString());
     request.headers.emplace("Host", url::getEndpoint(m_url).toString().toUtf8());
     request.headers.emplace("Content-Type", "text/plain");
-    request.headers.emplace("Content-Length", std::to_string(m_testContext.payload.size()).c_str());
+	request.headers.emplace("Connection", "keep-alive");
+	request.headers.emplace("Content-Length", std::to_string(m_testContext.payload.size()).c_str());
 	request.headers.emplace("X-Test-Sequence", std::to_string(m_testContext.sequence).c_str());
 
 	request.requestLine.method = Method::post;
