@@ -4,12 +4,12 @@
 
 namespace nx::vms::server::test_support {
 
-QnStorageResourcePtr TestFileStorage::create(
+StorageResourcePtr TestFileStorage::create(
     QnMediaServerModule* serverModule,
     const QString& path,
     bool isBackup)
 {
-    QnStorageResourcePtr storage(new TestFileStorage(serverModule));
+    StorageResourcePtr storage(new TestFileStorage(serverModule));
 
     storage->setName("Test storage");
     storage->setParentId(serverModule->commonModule()->moduleGUID());

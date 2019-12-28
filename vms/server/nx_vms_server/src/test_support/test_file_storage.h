@@ -10,7 +10,7 @@ class TestFileStorage: public QnFileStorageResource
 public:
     using QnFileStorageResource::QnFileStorageResource;
 
-    static QnStorageResourcePtr create(
+    static StorageResourcePtr create(
         QnMediaServerModule* serverModule,
         const QString& path,
         bool isBackup = false);
