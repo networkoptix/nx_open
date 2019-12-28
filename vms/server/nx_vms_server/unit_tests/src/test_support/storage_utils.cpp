@@ -23,7 +23,7 @@ extern "C"
 #include <decoders/video/ffmpeg_video_decoder.h>
 }
 
-#include <nx/vms/server/root_fs.h>
+#include <test_support/test_file_storage.h>
 
 namespace nx::vms::server::test::test_support {
 
@@ -31,52 +31,6 @@ namespace nx::vms::server::test::test_support {
 // Test storage
 
 namespace {
-
-class TestFileStorage: public QnFileStorageResource
-{
-public:
-    using QnFileStorageResource::QnFileStorageResource;
-
-    static QnStorageResourcePtr create(
-        MediaServerLauncher* server,
-        const QString& path,
-        bool isBackup = false)
-    {
-        QnStorageResourcePtr storage(new TestFileStorage(server->serverModule()));
-
-        storage->setName("Test storage");
-        storage->setParentId(server->commonModule()->moduleGUID());
-        storage->setUrl(path);
-        storage->setSpaceLimit(0);
-        storage->setStorageType("local");
-        storage->setUsedForWriting(
-            storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
-        storage->setIdUnsafe(QnUuid::createUuid());
-        storage->setBackup(isBackup);
-
-        NX_ASSERT(storage->isUsedForWriting());
-
-        QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
-        if (resType)
-            storage->setTypeId(resType->getId());
-
-        return storage;
-    }
-
-    virtual Qn::StorageInitResult initOrUpdate() override
-    {
-        const auto url = getUrl();
-        NX_CRITICAL(!url.isNull());
-        const auto onExit = nx::utils::makeScopeGuard(
-            [this]() { m_cachedTotalSpace = rootTool()->totalSpace(getFsPath()); });
-
-        if (QDir(url).exists())
-            return m_state = Qn::StorageInit_Ok;
-
-        m_state = QDir().mkpath(url) ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
-        return m_state;
-    }
-};
 
 static bool storagePresent(MediaServerLauncher* server, const QString& storagePath)
 {
@@ -106,7 +60,7 @@ QnStorageResourcePtr addStorage(
     if (storagePresent(server, path))
     {
         NX_DEBUG(
-            typeid(TestFileStorage),
+            typeid(nx::vms::server::test_support::TestFileStorage),
             "Storage %1 is already present. Won't be added second time",
             path);
     }
@@ -114,11 +68,11 @@ QnStorageResourcePtr addStorage(
     const auto storageManager = storageRole == QnServer::StoragePool::Normal
         ? server->serverModule()->normalStorageManager()
         : server->serverModule()->backupStorageManager();
-    auto storage = TestFileStorage::create(
-        server, path, storageRole == QnServer::StoragePool::Backup);
+    auto storage = nx::vms::server::test_support::TestFileStorage::create(
+        server->serverModule(), path, storageRole == QnServer::StoragePool::Backup);
 
     NX_DEBUG(
-        typeid(TestFileStorage),
+        typeid(nx::vms::server::test_support::TestFileStorage),
         "Adding TestStorage '%1', pool: '%2' to the '%3' StorageManager storage pool"
         " and to the Mediaserver resource pool",
         path, storageRole, storageManager->getRole());
@@ -148,7 +102,7 @@ QnStorageResourcePtr addStorage(
         });
 
     NX_DEBUG(
-        typeid(TestFileStorage),
+        typeid(nx::vms::server::test_support::TestFileStorage),
         "TestStorage '%1', pool: '%2' successfully added to the '%3' StorageManager storage pool",
         path, storageRole, storageManager->getRole());
 

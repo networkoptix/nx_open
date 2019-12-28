@@ -331,48 +331,16 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         NX_WARNING(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
-    
-    const bool isRemote = url.contains("://");
-    if (isRemote && !isValid())
-    {
-        // Initialize once because it is long operation.
-        if (auto result = initRemoteStorage(url); result != Qn::StorageInit_Ok)
-        {
-            NX_WARNING(
-                this,
-                "[initOrUpdate] initRemoteStorage check failed for storage '%1'", url);
-            return result;
-        }
-    }
 
-    if (auto result = checkMountedStatus(); result != Qn::StorageInit_Ok)
-    {
-        NX_WARNING(
-            this,
-            "[initOrUpdate] 'IsMounted' check failed for storage '%1'", url);
+    const auto isSmb = url.contains("://");
+    auto result = Qn::StorageInit_Ok;
+    if ((isValid() || !isSmb) && (result = checkMountedStatus()) != Qn::StorageInit_Ok)
         return result;
-    }
 
-    if (!isRemote)
-    {
-        if (auto result = initStorageDirectory(url); result != Qn::StorageInit_Ok)
-        {
-            NX_WARNING(
-                this,
-                "[initOrUpdate] initStorageDirectory check failed for storage '%1'", url);
-            return result;
-        }
-    }
-
-    if (auto result = testWrite(); result != Qn::StorageInit_Ok)
-    {
-        NX_WARNING(
-            this,
-            "[initOrUpdate] testWrite failed for storage '%1'", url);
+    if (!isValid() && (result = isSmb ? initRemoteStorage(url) : initStorageDirectory(url)) != Qn::StorageInit_Ok)
         return result;
-    }
 
-    return Qn::StorageInitResult::StorageInit_Ok;
+    return testWrite();
 }
 
 bool QnFileStorageResource::isSystem() const
@@ -888,11 +856,6 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
             result.replace('\\', '/');
             return result;
         };
-
-    const auto tempDir = normalize(nx::utils::TestOptions::temporaryDirectoryPath());
-    if (!tempDir.isEmpty() && normalize(path).startsWith(tempDir))
-        return true;
-    NX_VERBOSE(this, "check isMounted for patch %1, tempDir %2", normalize(path), tempDir);
 
     const auto mediaPaths = getMediaPaths(pathConfig);
     return std::any_of(

@@ -116,17 +116,14 @@ public:
     static void removeOldDirs(QnMediaServerModule *serverModule);
 
 protected:
-    mutable std::atomic<Qn::StorageInitResult> m_state = Qn::StorageInit_CreateFailed;
     mutable std::atomic<int64_t> m_cachedTotalSpace{ -1 };
+    mutable std::atomic<Qn::StorageInitResult> m_state = Qn::StorageInit_CreateFailed;
 
     nx::vms::server::RootFileSystem* rootTool() const;
     QString getFsPath() const;
 
 private:
     mutable boost::optional<bool> m_dbReady;
-
-private:
-    mutable QnMutex m_mutexCheckStorage;
     mutable int m_capabilities = 0;
     QString m_localPath;
     nx::utils::Lockable<std::optional<bool>> m_isSystem;
