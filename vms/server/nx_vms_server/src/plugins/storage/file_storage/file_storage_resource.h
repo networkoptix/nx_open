@@ -95,14 +95,12 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
-    nx::vms::server::RootFileSystem* rootTool() const;
     void setIsSystemFlagIfNeeded();
     Qn::StorageInitResult initStorageDirectory(const QString& url);
     Qn::StorageInitResult initRemoteStorage(const QString& url);
     Qn::StorageInitResult checkMountedStatus() const;
     Qn::StorageInitResult testWrite() const;
     bool isValid() const;
-    QString getFsPath() const;
     bool isLocalPathMounted(const QString& path) const;
 
 public:
@@ -111,16 +109,19 @@ public:
     // was not called.
     static void removeOldDirs(QnMediaServerModule *serverModule);
 
-private:
+protected:
+    mutable std::atomic<int64_t> m_cachedTotalSpace{ -1 };
     mutable std::atomic<Qn::StorageInitResult> m_state = Qn::StorageInit_CreateFailed;
-    mutable boost::optional<bool> m_dbReady;
+
+    nx::vms::server::RootFileSystem* rootTool() const;
+    QString getFsPath() const;
 
 private:
+    mutable boost::optional<bool> m_dbReady;
     mutable QnMutex m_mutexCheckStorage;
-    mutable int m_capabilities;
+    mutable int m_capabilities = 0;
     QString m_localPath;
 
-    mutable std::atomic<int64_t> m_cachedTotalSpace{-1};
     nx::utils::Lockable<std::optional<bool>> m_isSystem;
     QnMediaServerModule* m_serverModule = nullptr;
 };

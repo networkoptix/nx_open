@@ -261,15 +261,6 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
 
 Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString& url)
 {
-    if (checkMountedStatus() != Qn::StorageInit_Ok)
-    {
-        NX_WARNING(
-            this,
-            "[initOrUpdate] 'IsMounted' check before initializing local storage directory failed"
-            " for storage '%1'", url);
-        return Qn::StorageInit_WrongPath;
-    }
-
     if (rootTool()->isPathExists(url))
     {
         NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", url);
@@ -330,10 +321,12 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         return Qn::StorageInit_WrongPath;
     }
 
-    Qn::StorageInitResult result = isValid()
-        ? checkMountedStatus()
-        : (url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url));
-    if (result != Qn::StorageInit_Ok)
+    const auto isSmb = url.contains("://");
+    auto result = Qn::StorageInit_Ok;
+    if ((isValid() || !isSmb) && (result = checkMountedStatus()) != Qn::StorageInit_Ok)
+        return result;
+
+    if (!isValid() && (result = isSmb ? initRemoteStorage(url) : initStorageDirectory(url)) != Qn::StorageInit_Ok)
         return result;
 
     return testWrite();
@@ -609,8 +602,6 @@ void QnFileStorageResource::setUrl(const QString& url)
 
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
     base_type(serverModule->commonModule()),
-    m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::kUnknownSize),
     m_serverModule(serverModule)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
