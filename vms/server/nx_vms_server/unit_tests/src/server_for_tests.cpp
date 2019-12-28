@@ -5,6 +5,8 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
 #include <nx/utils/test_support/test_options.h>
+#include <test_support/test_file_storage.h>
+#include <test_support/storage_utils.h>
 
 namespace nx::vms::server::test {
 
@@ -36,23 +38,9 @@ QnSharedResourcePointer<resource::test::CameraMock> ServerForTests::addCamera(st
 
 QnStorageResourcePtr ServerForTests::addStorage(const QString& storageName)
 {
-    vms::api::StorageDataList storages;
-    vms::api::StorageData storage;
-
-    storage.id = QnUuid::createUuid();
-    storage.name = storageName;
-    storage.parentId = commonModule()->moduleGUID();
-    storage.spaceLimit = 1000000;
-    storage.storageType = "local";
-    storage.url = nx::utils::TestOptions::temporaryDirectoryPath() + L'/' + storageName;
-    [&](){ NX_TEST_API_POST(this, lit("/ec2/saveStorage"), storage); }();
-
-    auto storageRes = commonModule()->resourcePool()->getResourceById<QnStorageResource>(storage.id);
-    while (!serverModule()->normalStorageManager()->hasStorage(storageRes))
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-    storageRes->initOrUpdate();
-    return storageRes;
+     return test_support::addStorage(
+        this, nx::utils::TestOptions::temporaryDirectoryPath() + L'/' + storageName,
+        QnServer::StoragePool::Normal);
 }
 
 } // namespace nx::vms::server::test
