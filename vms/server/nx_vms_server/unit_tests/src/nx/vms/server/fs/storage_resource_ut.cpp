@@ -7,6 +7,7 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include "media_server_module_fixture.h"
 #include <test_support/utils.h>
+#include <test_support/test_file_storage.h>
 
 namespace nx::vms::server::test
 {
@@ -22,15 +23,9 @@ public:
     virtual void SetUp() override
     {
         MediaServerModuleFixture::SetUp();
-
         workDirResource = std::make_unique<nx::ut::utils::WorkDirResource>();
-        ASSERT_TRUE((bool)workDirResource->getDirName());
-
-        storage.reset(new QnFileStorageResource(&serverModule()));
         const QString workDirPath = *workDirResource->getDirName();
-        storage->setUrl(workDirPath);
-        auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
-        ASSERT_TRUE(result);
+        storage = nx::vms::server::test_support::TestFileStorage::create(&serverModule(), workDirPath);
     }
 
     std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
