@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "server": "服务器",
+            "system": "系统",
+            "device": "设备"
         },
         "confirmRestart": "重新启动服务器吗？",
         "couldntCheckInternet": "不能检查云连接",
         "confirmRestoreDefault": "清除数据库和设置？此过程将花费一些时间和会之后重新启动服务器。",
         "confirmRestoreDefaultTitle": "恢复出厂默认值",
         "unexpectedError": "失败︰ 发生了意外的错误",
-        "connnetionError": "Connection error",
+        "connnetionError": "连接错误",
         "wrongPassword": "错误的密码。",
         "error": "错误: ",
         "restartNeeded": "保存的更改。重新启动服务器以应用新设置吗？",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "端口号小于 1025 是不安全的。服务器可能不可访问。是否继续？",
         "confirmDisconnectFromCloud": "从 {{CLOUD_NAME}} 断开系统",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 云的所有用户将被都删除。</span><br><br>系统将可通过本地网络的本地管理员帐户。",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "断开连接",
         "disconnectedFromCloudSuccess": "系统已成功从{{CLOUD_NAME}} 断开连接",
         "disconnectedFromCloudError": "无法连接到系统",
         "confirmDisconnectFromSystem": "从当前系统分离服务器",
@@ -111,7 +111,7 @@
         "SystemName": "系统名称",
         "takeCameraOwnershipWithoutLock": "取得摄影机所有权而不锁定",
         "timeSynchronizationEnabled": "启用时间同步",
-        "primaryTimeServer": "Primary time synchronization server",
+        "primaryTimeServer": "將主時間同步校時服務器",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
         "syncTimeExchangePeriod": "Sync time exchange period",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
