@@ -71,6 +71,8 @@ public:
 
     void close();
 
+    QUrl lastRequestUrl() const;
+
     QHash<QByteArray, QByteArray> header() const
     {
         return m_header;
@@ -131,6 +133,8 @@ private:
     QMap<QByteArray,QByteArray> m_additionHeaders;
     QString m_localAddress;
     unsigned short m_localPort;
+
+    QUrl m_lastRequestUrl;
 };
 
 /*!
