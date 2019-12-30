@@ -44,9 +44,6 @@ public:
 
     void setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions);
 
-signals:
-    void profileChanged();
-
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
     QWebEngineView* createWindow(QWebEnginePage::WebWindowType type) override;
