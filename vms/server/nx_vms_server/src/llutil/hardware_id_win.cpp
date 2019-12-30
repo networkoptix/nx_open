@@ -176,7 +176,7 @@ static void findMacAddresses(IWbemServices* pSvc, QnPathToMacAndDeviceClassMap& 
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os << "Query for operating system name failed. Error code = 0x"
+        os << "Query to obtain mac address failed. Error code = 0x"
            << " " << std::ios_base::hex << hres;
         throw LLUtil::HardwareIdError(os.str());
     }
@@ -277,8 +277,7 @@ static QString execQueryForHWID1(IWbemServices* pSvc, const BSTR fieldName, cons
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os << "Query for operating system name failed. Error code = 0x"
-           << " " << std::ios_base::hex << hres;
+        os << "Query " << reqStr << " failed. Error code = 0x" << std::ios_base::hex << hres;
         throw LLUtil::HardwareIdError(os.str());
     }
 
@@ -329,8 +328,7 @@ static QString execQuery2(IWbemServices* pSvc, const BSTR fieldName, const BSTR 
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os << "Query for operating system name failed. Error code = 0x"
-           << " " << std::ios_base::hex << hres;
+        os << "Query " << reqStr << " failed. Error code = 0x" << std::ios_base::hex << hres;
         throw LLUtil::HardwareIdError(os.str());
     }
 

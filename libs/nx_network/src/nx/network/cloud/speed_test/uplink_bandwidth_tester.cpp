@@ -14,8 +14,7 @@ using namespace std::chrono;
 namespace {
 
 static constexpr char kSpeedTest[] = "SPEEDTEST";
-// static constexpr int kPayloadSizeBytes = 1000000; //< 1MB
-static constexpr int kPayloadSizeBytes = 2000;
+static constexpr int kPayloadSizeBytes = 1000 * 1000 ; //< 1 Megabyte
 static constexpr float kSimilarityThreshold = 0.97F;
 static constexpr int kMinRunningAverages = 4;
 static constexpr auto kMinTestDuration = milliseconds(1);
@@ -80,7 +79,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 				[this](SystemError::ErrorCode errorCode) {
 					using namespace std::placeholders;
 
-					NX_VERBOSE(this, "connectAsync to %1 complete, reporting system error %2", 
+					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2", 
 						m_url, SystemError::toString(errorCode));
 
                     if (errorCode != SystemError::noError)
@@ -116,12 +115,13 @@ std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
     request.headers.emplace("User-Agent", userAgentString());
     request.headers.emplace("Host", url::getEndpoint(m_url).toString().toUtf8());
     request.headers.emplace("Content-Type", "text/plain");
-    request.headers.emplace("Content-Length", std::to_string(m_testContext.payload.size()).c_str());
+	request.headers.emplace("Connection", "keep-alive");
+	request.headers.emplace("Content-Length", std::to_string(m_testContext.payload.size()).c_str());
 	request.headers.emplace("X-Test-Sequence", std::to_string(m_testContext.sequence).c_str());
 
 	request.requestLine.method = Method::post;
 	request.requestLine.url.setPath(http::kApiPath);
-	request.requestLine.version = http_1_0;
+	request.requestLine.version = http_1_1;
 
 	// Adding payload to the request before serializing results in a double copy of the payload:
 	// Once to the request, and again into the buffer.
@@ -182,9 +182,14 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 {
+	if (!m_handler) //< If handler is nullptr, test is already completed and handler invoked
+		return;
+
 	auto sequence = parseSequence(message);
 	if (!sequence)
 		return testFailed(SystemError::invalidData);
+
+	NX_VERBOSE(this, "Received response %1", *sequence);
 
     auto messageSentTime = nx::utils::utcTime() - m_pingTime;
 

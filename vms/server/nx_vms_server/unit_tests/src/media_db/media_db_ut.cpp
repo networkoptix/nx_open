@@ -36,8 +36,12 @@
 
 #include "../media_server_module_fixture.h"
 #include <nx/utils/std/thread.h>
+#include <test_support/test_file_storage.h>
 
 namespace nx::media_db::test {
+
+using namespace nx::vms::server;
+
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
     for (size_t i = 0; i < n; i++)
@@ -427,18 +431,12 @@ public:
         MediaServerModuleFixture::SetUp();
 
         workDirResource = std::make_unique<nx::ut::utils::WorkDirResource>();
-        ASSERT_TRUE((bool)workDirResource->getDirName());
-
-        const QString workDirPath = *workDirResource->getDirName();
-
-        storage.reset(new QnFileStorageResource(&serverModule()));
-        storage->setUrl(workDirPath);
-        auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
-        ASSERT_TRUE(result);
+        storage = test_support::TestFileStorage::create(
+            &serverModule(), *workDirResource->getDirName());
     }
 
     std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
-    QnFileStorageResourcePtr storage;
+    QnStorageResourcePtr storage;
 };
 
 TEST(MediaFileOperations, BitsTwiddling)

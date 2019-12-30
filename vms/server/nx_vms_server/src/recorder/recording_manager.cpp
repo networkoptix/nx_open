@@ -289,6 +289,7 @@ void QnRecordingManager::startRecording(
         recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, AV_NOPTS_VALUE);
         camera->inUse(recorder->recorder.get());
         recorder->recorder->start();
+        recorder->reorderingProvider->start();
         provider->startIfNotRunning();
     }
 }
@@ -300,11 +301,11 @@ bool QnRecordingManager::stopRecording(
 {
     if (!recorder)
         return false;
-
     const auto id = camera->resource()->getUniqueId();
     // Recording thread can be stopped outside, not by RecordingManager
     // So, remove cameraUse anyway
     camera->notInUse(recorder->recorder.get());
+    recorder->reorderingProvider->stop();
     if (recorder->recorder->isRunning())
     {
         NX_INFO(this, "Recording is stopped for camera %1", id);

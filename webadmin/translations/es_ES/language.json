@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "server": "Servidor",
+            "system": "Sistema",
+            "device": "Dispositivo"
         },
         "confirmRestart": "¿Reiniciar el servidor?",
         "couldntCheckInternet": "No se pudo comprobar conexión de nube",
         "confirmRestoreDefault": "¿Borrar configuración y base de datos? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
         "confirmRestoreDefaultTitle": "Restaurar valores predeterminados de fábrica",
         "unexpectedError": "Error: error inesperado ha ocurrido",
-        "connnetionError": "Connection error",
+        "connnetionError": "Error de conexión",
         "wrongPassword": "Contraseña incorrecta.",
         "error": "Error: ",
         "restartNeeded": "Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
         "confirmDisconnectFromCloud": "Desconectar el sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
         "disconnectedFromCloudError": "No se puede desconectar el Sistema",
         "confirmDisconnectFromSystem": "Separar servidor del sistema actual",
@@ -149,7 +149,7 @@
         "licenceError": "¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
         "duplicateServersError": "No se pueden combinar los sistemas porque tienen al menos 1 servidor con la misma ID. Por favor, quite este servidor y vuelva a intentarlo.",
         "connectionFailed": "Error de conexión: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Error desconocido",
         "mergeFailed": "Error en la combinación",
         "mergeSucceed": "Unión fue exitosa.",
         "newSystemDisplayName": "Nuevo Sistema",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Nombre de usuario o contraseña es incorrecta",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Demasiados intentos. Inténtalo de nuevo en un minuto."
     },
     "navigaion": {
         "cannotGetUser": "Falla en el servidor: no se puede recuperar datos de usuario actual"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "servidor está empezando",
         "serverRestarting": "el servidor se está reiniciando",
-        "serverOffline": "server is offline"
+        "serverOffline": "servidor está desconectado"
     },
     "fileUpload": {
         "started": "Actualización se inició correctamente. Tardará varios minutos",
@@ -182,7 +182,7 @@
         "selectFiles": "Seleccionar archivos"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Gratis",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

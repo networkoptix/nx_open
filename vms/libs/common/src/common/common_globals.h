@@ -183,6 +183,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
 
+    Qn::ConnectionRole fromStreamIndex(nx::vms::api::StreamIndex streamIndex);
+
     // TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag
     {

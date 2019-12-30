@@ -12,7 +12,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/analytics/i_stream_data_receptor.h>
+#include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
@@ -24,21 +24,26 @@ class QnAbstractDataReceptor;
 namespace nx::vms::server::analytics {
 
 class DeviceAnalyticsBinding;
+class StreamConverter;
 
 class DeviceAnalyticsContext:
     public Connective<QObject>,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
-    public IStreamDataReceptor
+    public StreamDataReceptor
 {
     Q_OBJECT
 
     using base_type = nx::vms::server::ServerModuleAware;
     using BindingMap = std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>>;
+    using StreamProviderRequirementsMap =
+        std::map<nx::vms::api::StreamIndex, StreamProviderRequirements>;
 
 public:
     DeviceAnalyticsContext(
         QnMediaServerModule* severModule,
         const QnVirtualCameraResourcePtr& device);
+
+    virtual ~DeviceAnalyticsContext();
 
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
@@ -52,7 +57,10 @@ public:
     std::map<QnUuid, bool> bindingStatuses() const;
 
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    virtual nx::vms::api::analytics::StreamTypes requiredStreamTypes() const override;
+    virtual StreamProviderRequirements providerRequirements(
+        nx::vms::api::StreamIndex streamIndex) const override;
+
+    virtual void registerStream(nx::vms::api::StreamIndex streamIndex) override;
 
 signals:
     void pluginDiagnosticEventTriggered(const nx::vms::event::PluginDiagnosticEventPtr&) const;
@@ -68,7 +76,20 @@ private:
     void subscribeToRulesChanges();
 
     bool isDeviceAlive() const;
-    void updateStreamRequirements();
+    void updateStreamProviderRequirements();
+
+    // Collects and merges stream requirements from all the plugins.
+    StreamProviderRequirementsMap getTotalProviderRequirements() const;
+
+    // Calculates and sets motion analysis policy according to the binding requirements.
+    StreamProviderRequirementsMap setUpMotionAnalysisPolicy(
+        StreamProviderRequirementsMap requirements) const;
+
+    // Adjusts stream provider requirements according to the registered stream count. E.g. if some
+    // bindings prefer secondary stream data, but there is only the primary stream from the device,
+    // all their requirements will still be served by the existing (primary) provider.
+    StreamProviderRequirementsMap adjustProviderRequirementsByProviderCountUnsafe(
+        StreamProviderRequirementsMap requirements) const;
 
     BindingMap analyticsBindingsSafe() const;
     std::shared_ptr<DeviceAnalyticsBinding> analyticsBindingUnsafe(const QnUuid& engineId) const;
@@ -92,11 +113,13 @@ private:
     BindingMap m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
 
-    nx::vms::api::analytics::StreamTypes m_cachedRequiredStreamTypes;
+    StreamProviderRequirementsMap m_cachedStreamProviderRequirements;
 
     std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
     std::map<QnUuid, int> m_skippedPacketCountByEngine;
+    std::unique_ptr<StreamConverter> m_streamConverter;
+    std::set<nx::vms::api::StreamIndex> m_registeredStreamIndexes;
 };
 
 } // namespace nx::vms::server::analytics

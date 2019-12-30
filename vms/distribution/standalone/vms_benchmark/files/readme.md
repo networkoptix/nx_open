@@ -57,18 +57,20 @@ All configuration options for the tool are supplied via a configuration file - a
 file called `vms_benchmark.conf` which should reside next to the tool's executable. Each option has
 a detailed comment in this file.
 
+The tool has a few command-line options which do not influence the test procedure but allow to
+override some administrative options like where to find the .conf file or where to save the logs.
+Run with `--help` for details.
+
 Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
 - If `ssh <boxHostnameOrIp>` on the Host machine requires to enter credentials, specify them in 
-    `boxLogin` and `boxPassword` fields.
-- Set the desired number of cameras in `virtualCamerasCount` field.
+    `boxLogin` and `boxPassword` fields, or specify `boxSshKey` field instead.
 
 Then simply run the command `vms_benchmark` without arguments, and watch or capture its output.
-
-Currently, the tool has no command-line options besides `--help` which shows a trivial help.
+In case of a nominal run, the duration of the test is about 4 hours.
 
 If the tool encounters an error which prevents further testing (like some of the prerequisites is
-not fulfilled, or the connection to the Box cannot be established, or some command at the Box gives
+not fulfilled, or the connection to the Box cannot be established, or some command at the Box gives 
 unexpected result), an ERROR is reported and the tool aborts execution. In this case it is
 recommended to investigate and fix the error cause, and run the tool again.
 
@@ -87,7 +89,7 @@ The Box and Server state after running the tool:
 
 * The tool is not intended to be run on a Server working in customer's production installation,
     unless the whole VMS System is considered experimental and thus its operational status,
-    configuration and data is considered not valuable.
+    configuration and data are considered not valuable.
 * ATTENTION: The tool clears all video archives on the Server, thus, never run the tool on a Server
     with valuable data.
 * After a successful run, the tool leaves the Server in a state which is good for re-running the
@@ -97,36 +99,47 @@ The Box and Server state after running the tool:
     it is recommended to re-initialize the Box file system.
 
 ---------------------------------------------------------------------------------------------------
-## Example of successful report
+## Report details
 
-Currently, on successful run the tool produces a report similar to this:
+The tool produces the so-called Report on stdout, and additionally writes the log to the log file.
+The Report is intended for the operator who runs the test, and the log is intended for the support
+team though may contain some information useful for the operator in case of a failure.
+
+The Report starts with the general information collected by the tool from the box.
+
+Every minute of the test a progress line is printed with a brief status information.
+
+On a successful assessment, the tool produces a report that ends with the line:
 ```
-VMS Benchmark started.
-Box IP: 192.168.0.100
-Arch: armv7l
-Number of CPUs: 12
-CPU features: NEON
-RAM: 783978496 (140042240 free)
-Volumes:
-    ext4 on /: free 9392750592 of 30450716672
-    vfat on /boot: free 22053376 of 45281280
-Detected VMS installations:
-    networkoptix in /opt/networkoptix/mediaserver (port 7001, PID 22033)
-Restarting server...
-Server restarted successfully.
-Free space of RAM: 211M of 748M
-API test is OK.
-Try to serve 1 cameras.
-
-    Spawned 1 test cameras.
-    Waiting for test cameras discovering... (timeout is 120 seconds)
-    All test cameras had been discovered successfully.
-    Recording on camera e3e9a385-7fe0-3ba5-5482-a86cde7faf48 enabled.
-    RTSP stream opened. Test duration: 300 seconds.
-    Serving 1 cameras is OK.
-    Frame drops: 0
-    CPU usage: 1.50
-    Free RAM usage: 389M
-
 All tests are successfully finished.
 ```
+
+If an ISSUE (assessment failure) or en ERROR (OS or similar failure) occurs, a message is printed
+starting with one of these capitalized words, indicating what has happened. The message may also
+include an advice to look in the log file for additional details.
+
+---------------------------------------------------------------------------------------------------
+## How it works
+
+Here are the approximate steps the tool performs (with some details omitted here for clarity).
+
+1. Connect to the box via ssh.
+2. Collect box system information like Linux version, CPU properties, RAM size, and file systems.
+3. Check the time at the box - must be the same as the time at the host.
+4. Check that the VMS Server is up and running at the box.
+5. Connect to the VMS Server via HTTP API.
+6. Clear all VMS Server storages (video archives), restarting the Server.
+7. Evaluate whether there is enough free RAM at the box.
+8. Evaluate whether there is enough free space at the box for the video archive for the test.
+9. Run the load tests:
+9.1. Start the required number of virtual cameras on the host.
+9.2. Wait until the Server discovers all virtual cameras.
+9.3. Enable recording of all virtual cameras by the Server.
+9.4. Run the streaming test: for the certain time period, pull some live and recorded video streams
+    from the Server, periodically doing the following:
+9.4.1. Report a brief status every minute.
+9.4.2. Check whether the pulled streams arrive uninterrupted.
+9.4.3. Check whether the pulled streams have any frame drops or lags.
+9.4.4. Check that the box CPU usage is not higher than 50%.
+9.4.5. Check that there are no storage failure reports from the Server.
+9.4.6. Check whether there are any network errors at the box.

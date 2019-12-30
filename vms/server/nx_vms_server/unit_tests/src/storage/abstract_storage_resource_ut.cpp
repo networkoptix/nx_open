@@ -33,6 +33,7 @@
 #include <test_support/utils.h>
 
 #include "media_server_module_fixture.h"
+#include <test_support/test_file_storage.h>
 
 namespace {
 
@@ -54,14 +55,10 @@ protected:
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         const QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
-            serverModule().storagePluginFactory()->createStorage(
-                serverModule().commonModule(),
-                fileStorageUrl));
-        fileStorage->setUrl(fileStorageUrl);
-        ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
-        serverModule().normalStorageManager()->addStorage(fileStorage);
+        QnStorageResourcePtr fileStorage = nx::vms::server::test_support::TestFileStorage::create(
+            &serverModule(), fileStorageUrl);
 
+        serverModule().normalStorageManager()->addStorage(fileStorage);
         if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
             const QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(

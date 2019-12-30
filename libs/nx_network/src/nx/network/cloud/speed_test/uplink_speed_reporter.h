@@ -57,7 +57,10 @@ private:
 
     void onSpeedTestComplete(
         SystemError::ErrorCode errorCode,
-        std::optional<hpm::api::ConnectionSpeed> connectionSpeed,
+        std::optional<hpm::api::ConnectionSpeed> connectionSpeed);
+
+    void onFetchMediatorAddressComplete(
+        http::StatusCode::Value statusCode,
         hpm::api::MediatorAddress mediatorAddress);
 
     void stopTest();
@@ -72,6 +75,7 @@ private:
     std::unique_ptr<hpm::api::Client> m_mediatorApiClient;
     std::unique_ptr<CloudModuleUrlFetcher> m_cloudModuleUrlFetcher;
     std::atomic_bool m_testInProgress = false;
+    std::optional<hpm::api::PeerConnectionSpeed> m_peerConnectionSpeed;
 
     QnMutex m_mutex;
     std::optional<nx::utils::Url> m_speedTestUrlMockup;

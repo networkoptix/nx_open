@@ -35,6 +35,28 @@ static nx::utils::MacAddress makeMacAddress(int cameraNumber)
     return macAddress;
 }
 
+class FrameScheduler
+{
+public:
+    FrameScheduler(int fps): m_fps(fps)
+    {
+        m_frameIntervalTimer.restart();
+    }
+
+    void sleepAfterFrame()
+    {
+        m_streamingTimeMs += 1000.0 / m_fps;
+        const int waitingTimeMs = (int) m_streamingTimeMs - m_frameIntervalTimer.elapsed();
+        if (waitingTimeMs > 0)
+            QnSleep::msleep(waitingTimeMs);
+    }
+
+private:
+    const int m_fps;
+    double m_streamingTimeMs = 0;
+    QTime m_frameIntervalTimer;
+};
+
 Camera::Camera(
     const FrameLogger* frameLogger,
     const FileCache* fileCache,
@@ -61,14 +83,10 @@ Camera::~Camera()
 
 bool Camera::performStreamingFile(
     const std::vector<std::shared_ptr<const QnCompressedVideoData>>& frames,
-    int fps,
+    FrameScheduler* frameScheduler,
     FileStreamer* fileStreamer,
     Logger* logger)
 {
-    double streamingTimeMs = 0;
-    QTime frameIntervalTimer;
-    frameIntervalTimer.restart();
-
     for (int i = 0; i < (int) frames.size(); ++i)
     {
         const auto frameLoggerContext = logger->pushContext(
@@ -93,10 +111,7 @@ bool Camera::performStreamingFile(
             }
         }
 
-        streamingTimeMs += 1000.0 / fps;
-        const int waitingTime = (int) streamingTimeMs - frameIntervalTimer.elapsed();
-        if (waitingTime > 0)
-            QnSleep::msleep(waitingTime);
+        frameScheduler->sleepAfterFrame();
     }
     return true;
 }
@@ -122,6 +137,8 @@ void Camera::performStreaming(
     const std::unique_ptr<FileStreamer::PtsUnloopingContext> ptsUnloopingContext{
         m_cameraOptions.unloopPts ? new FileStreamer::PtsUnloopingContext : nullptr};
 
+    FrameScheduler frameScheduler(fps);
+
     for (;;) //< Stream all files in the list infinitely, unless an error occurs.
     {
         for (const QString filename: filenames)
@@ -131,7 +148,7 @@ void Camera::performStreaming(
             const auto fileLoggerContext = logger->pushContext(lm("file #%1%2").args(file.index,
                 ptsUnloopingContext ? lm(", loop #%1").args(ptsUnloopingContext->loopIndex) : ""));
 
-            const auto fileStreamer = std::make_unique<FileStreamer>(
+            FileStreamer fileStreamer(
                 logger.get(),
                 m_frameLogger,
                 m_cameraOptions,
@@ -140,7 +157,7 @@ void Camera::performStreaming(
                 file.channelCount,
                 ptsUnloopingContext.get());
 
-            if (!performStreamingFile(file.frames, fps, fileStreamer.get(), logger.get()))
+            if (!performStreamingFile(file.frames, &frameScheduler, &fileStreamer, logger.get()))
                 return;
         }
     }

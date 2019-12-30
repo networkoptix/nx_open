@@ -52,13 +52,22 @@ public:
         const QnCompressedVideoDataPtr& frame,
         CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
 
+    /**
+     * @return last created via a tryToCreateMotionMetadata() call motion metadata.
+     */
     QnMetaDataV1Ptr getMotion();
-    bool existsMetadata() const;
+
+    /**
+     * @return True if metadata has been successfully created.
+     */
+    bool tryToCreateMotionMetadata();
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analyzeFrame call)
     QSize videoResolution() const;
     void stop();
 private:
+    QnMetaDataV1Ptr makeMotion();
+
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);
     void postFiltering();
@@ -101,4 +110,6 @@ private:
     int m_scaleYStep;
     int m_channelNum;
     nx::metrics::Storage* m_metrics = nullptr;
+
+    QnMetaDataV1Ptr m_lastMotionData;
 };

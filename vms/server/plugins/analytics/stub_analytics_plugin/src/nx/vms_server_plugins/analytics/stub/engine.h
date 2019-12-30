@@ -72,6 +72,8 @@ private:
 };
 
 const std::string kGenerateEventsSetting{"generateEvents"};
+const std::string kMotionVisualizationObjectType{"nx.stub.motionVisualization"};
+
 const std::string kGenerateCarsSetting{"generateCars"};
 const std::string kGenerateTrucksSetting{"generateTrucks"};
 const std::string kGeneratePedestriansSetting{"generatePedestrians"};

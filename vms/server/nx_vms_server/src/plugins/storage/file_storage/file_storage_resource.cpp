@@ -47,6 +47,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <nx/utils/test_support/test_options.h>
 
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
@@ -322,8 +323,7 @@ bool QnFileStorageResource::isValid() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 {
-    if (isValid())
-        return Qn::StorageInit_Ok;
+    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
 
     QString url = getUrl();
     if (!NX_ASSERT(!url.isEmpty()))
@@ -332,7 +332,15 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         return Qn::StorageInit_WrongPath;
     }
 
-    return url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url);
+    const auto isSmb = url.contains("://");
+    auto result = Qn::StorageInit_Ok;
+    if ((isValid() || !isSmb) && (result = checkMountedStatus()) != Qn::StorageInit_Ok)
+        return result;
+
+    if (!isValid() && (result = isSmb ? initRemoteStorage(url) : initStorageDirectory(url)) != Qn::StorageInit_Ok)
+        return result;
+
+    return testWrite();
 }
 
 bool QnFileStorageResource::isSystem() const
@@ -621,8 +629,6 @@ void QnFileStorageResource::setUrl(const QString& url)
 
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
-    m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::kUnknownSize),
     m_serverModule(serverModule)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
@@ -864,15 +870,8 @@ Qn::StorageInitResult QnFileStorageResource::testWrite() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
-    if (m_state == Qn::StorageInit_Ok //< Checking mounted status only if storage has already been initialized
-        && (m_state = checkMountedStatus()) != Qn::StorageInit_Ok)
-        return m_state;
-
-    if (m_state = initOrUpdateInternal(); m_state != Qn::StorageInit_Ok)
-        return m_state;
-
-    if (m_state = testWrite(); m_state != Qn::StorageInit_Ok)
+    m_state = initOrUpdateInternal();
+    if (m_state != Qn::StorageInit_Ok)
         return m_state;
 
     m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());

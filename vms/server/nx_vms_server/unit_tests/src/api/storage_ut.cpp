@@ -336,7 +336,6 @@ TEST_P(Storage, Migration)
         Storage,
         ::testing::Values(
             Param("/some/local/path"),
-            Param(""),
             Param("test://user:password@host/some/path"),
             Param("test://:password@host/some/path"),
             Param("test://user:@host/some/path"),
@@ -350,7 +349,6 @@ TEST_P(Storage, Migration)
         Storage,
         ::testing::Values(
             Param("C:\\some\\local\\path"),
-            Param(""),
             Param("test://user:password@host/some/path"),
             Param("test://:password@host/some/path"),
             Param("test://user:@host/some/path"),
