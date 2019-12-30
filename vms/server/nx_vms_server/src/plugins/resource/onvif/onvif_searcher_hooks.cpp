@@ -213,6 +213,26 @@ void swapVendorAndModel(
         std::swap(outInfo->manufacturer, outInfo->name);
 }
 
+void vivotekHook(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo)
+{
+    static const QString kVivotekVendor("VIVOTEK");
+    const QString normalizedModel = outInfo->name.toUpper();
+    const QString normalizedVendor = outInfo->manufacturer.toUpper();
+
+    const QStringList vendorAndModel = normalizedModel.split(' ');
+    if (vendorAndModel.size() != 2)
+        return;
+
+    if (vendorAndModel[0] != kVivotekVendor)
+        return;
+
+    if (vendorAndModel[1] != normalizedVendor)
+        return;
+
+    outInfo->name = normalizedVendor;
+    outInfo->manufacturer = vendorAndModel[0];
+}
+
 } // namespace searcher_hooks
 } // namespace onvif
 } // namespace plugins
