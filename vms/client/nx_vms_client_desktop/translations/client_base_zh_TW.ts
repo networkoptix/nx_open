@@ -5689,7 +5689,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>保留</translation>
     </message>
     <message>
       <source>local</source>
@@ -5721,7 +5721,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7141,15 +7141,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>在選定區域</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>被選定之攝影機</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>被選定之裝置</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7158,7 +7158,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>無</translation>
     </message>
   </context>
   <context>
@@ -8671,7 +8671,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>請連絡客服</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -9931,7 +9931,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>覆寫檔案失敗</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -9947,7 +9947,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>開啟檔案所在目錄</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

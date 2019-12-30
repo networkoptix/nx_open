@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "server": "伺服器",
+            "system": "系統",
+            "device": "裝置"
         },
         "confirmRestart": "是否重啟伺服器?",
         "couldntCheckInternet": "無法檢查雲端連線",
         "confirmRestoreDefault": "清除資料庫和設定? 此過程將花費一些時間. 之後會重新啟動伺服器.",
         "confirmRestoreDefaultTitle": "恢復出廠預設值",
         "unexpectedError": "失敗: 發生未知錯誤",
-        "connnetionError": "Connection error",
+        "connnetionError": "連線錯誤",
         "wrongPassword": "密碼不正確.",
         "error": "錯誤: ",
         "restartNeeded": "變更已儲存. 是否重新啟動伺服器以套用新設定?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "使用小於1025的埠號不安全. 伺服器將可能無法被存取. 是否仍繼續?",
         "confirmDisconnectFromCloud": "從 {{CLOUD_NAME}} 斷開系統嗎",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 所有雲帳號都將被刪除.</span><br><br>系統將可被本機管理者帳號存取.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "斷線",
         "disconnectedFromCloudSuccess": "系統已成功從 {{CLOUD_NAME}} 斷開連接",
         "disconnectedFromCloudError": "無法連接到系統",
         "confirmDisconnectFromSystem": "將伺服器從系統中脫離",
@@ -111,7 +111,7 @@
         "SystemName": "系統名稱",
         "takeCameraOwnershipWithoutLock": "取得攝影機所有權而不鎖定",
         "timeSynchronizationEnabled": "時間同步啟用",
-        "primaryTimeServer": "Primary time synchronization server",
+        "primaryTimeServer": "將主時間同步校時伺服器",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
         "syncTimeExchangePeriod": "Sync time exchange period",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",

@@ -13,19 +13,19 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>كلمة المرور أو اسم المستخدم غير صالح.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>هذا المستخدم ليس لديه أذونات للعملية المطلوبة.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>لا يمكن إنشاء نسخة احتياطية لقاعدة البيانات.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>لم يتم تكوين اسم النظام بعد.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
