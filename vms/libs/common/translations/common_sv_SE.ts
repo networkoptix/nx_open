@@ -13,63 +13,63 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>Lösenordet eller användarnamnet är ogiltigt.</translation>
+      <translation type="unfinished">The password or user name is invalid.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>Den här användaren har inte behörigheter för den begärda operationen.</translation>
+      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation>Det går inte att skapa databasbackup.</translation>
+      <translation type="unfinished">Cannot create database backup.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>Systemnamnet är inte konfigurerat än.</translation>
+      <translation type="unfinished">System name is not configured yet.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Okänt fel.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Du håller på att slå samman system med startlicenser.</translation>
+      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Endast en startlicens är tillåten per system, så den andra licensen kommer att inaktiveras.</translation>
+      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>Sammanfoga ändå?</translation>
+      <translation type="unfinished">Merge anyway?</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>Systemet kunde inte hittas.</translation>
+      <translation type="unfinished">System was not found.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Det upptäckta Systemet %1 har en inkompatibel version %2.</translation>
+      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>Den upptäckta systemet %1 är i felsäkert läge.</translation>
+      <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>Det gick inte att konfigurera fjärrsystemet %1.</translation>
+      <translation type="unfinished">Could not configure the remote System %1.</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation>Nytt system</translation>
+      <translation type="unfinished">New System</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation>Det upptäckta systemet %1 är oförenligt med det nuvarande systemet.</translation>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -106,222 +106,222 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Systemhändelse</translation>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>Servern har stoppats.</translation>
+      <translation type="unfinished">Server has been stopped.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>Mediaströmmen har öppnats men inga mediedata mottogs.</translation>
+      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>Okänt fel. Vänligen kontakta support.</translation>
+      <translation type="unfinished">Unknown error. Please contact support.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(okänd)</translation>
+      <translation type="unfinished">(unknown)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>Server %1 är inte tillgänglig.</translation>
+      <translation type="unfinished">Server %1 is not available.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>Kontrollera att servern är igång.</translation>
+      <translation type="unfinished">Check that Server is up and running.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>Mottagit dåligt svar från Server %1: &quot;%2&quot;.</translation>
+      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>Kontrollera om servern är igång och har rätt version.</translation>
+      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>Kan inte ansluta till httpport %1.</translation>
+      <translation type="unfinished">Cannot connect to http port %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Slutligen försök att uppdatera firmware. Om problemet kvarstår kontaktar du support.</translation>
+      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation>Misslyckades med att konfigurera parameter %1.</translation>
+      <translation type="unfinished">Failed to configure parameter %1.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>Var vänlig kontakta support.</translation>
+      <translation type="unfinished">Please contact support.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>Ett inmatnings- / utmatningsfel har inträffat. OS-meddelande: &quot;%1&quot;.</translation>
+      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
-      <translation>Parametrar:</translation>
+      <translation type="unfinished">Parameters:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>Försök att starta om enheten och återställ fabriksinställningarna på webbsidan.</translation>
+      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>Försök att starta om enheten och återställ fabriksinställningarna på webbsidan.</translation>
+      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>Kontrollera att enheten är ansluten till nätverket. Försök att starta om enheten.</translation>
+      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>Kontrollera att kameran är ansluten till nätverket. Försök att starta om kameran igen.</translation>
+      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Enhetsbegäran &quot;%1&quot; misslyckades med fel &quot;%2&quot;.</translation>
+      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Kameraförfrågan &quot;%1&quot; misslyckades med fel &quot;%2&quot;.</translation>
+      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>Okänt enhetsproblem.</translation>
+      <translation type="unfinished">Unknown device issue.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>Okänt kameraproblem.</translation>
+      <translation type="unfinished">Unknown camera issue.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>Felaktiga data har tagits emot från enheten %1.</translation>
+      <translation type="unfinished">Invalid data was received from the device %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>Felaktiga data har tagits emot från kameran %1.</translation>
+      <translation type="unfinished">Invalid data was received from the camera %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>För många mediafel. Vänligen öppna dialogrutan Enhetsproblem för mer information.</translation>
+      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>För många mediafel. Vänligen öppna dialogrutan för kamera för mer information.</translation>
+      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Försök att starta om I/O-modulen och återställ fabriksinställningarna på webbsidan.</translation>
+      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>Kontrollera att I/O-modulen är ansluten till nätverket. Försök att starta om I/O-modulen.</translation>
+      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I/O-modulbegäran &quot;%1&quot; misslyckades med fel &quot;%2&quot;.</translation>
+      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Okänd I/O-modulproblem.</translation>
+      <translation type="unfinished">Unknown I/O module issue.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ogiltiga data mottogs från I/O-modulen %1.</translation>
+      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>För många mediafel. Vänligen öppna dialogrutan I/O-modul för mer information.</translation>
+      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>Enhetsinitiering pågår.</translation>
+      <translation type="unfinished">Device initialization process is in progress.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>Kamerainitialisering pågår.</translation>
+      <translation type="unfinished">Camera initialization process is in progress.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I / O-modulens initialisering pågår.</translation>
+      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>Se till att port %1 är tillgänglig (t.ex. portmappad).</translation>
+      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>Om det inte hjälper, återställ till fabriksinställningar på enhetens webbsida.</translation>
+      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>Om det inte hjälper, återställ till fabriksinställningarna på kamerans webbsida.</translation>
+      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>Om det inte hjälper, återställ fabriksinställningarna på I/O-modulens webbsida.</translation>
+      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>Kan inte öppna media URL %1. Misslyckades med att ansluta till media port %2.</translation>
+      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>Kan inte öppna media URL %1. Anslutning till port %2 stängdes oväntat.</translation>
+      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>Det gick inte att analysera enhetens svar. URL %1, begäran namn %2.</translation>
+      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>Det gick inte att analysera kamerans svar. URL %1, begärans namn %2.</translation>
+      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>Det gick inte att analysera I / O-modulens svar. URL %1, begärans namn %2.</translation>
+      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>Inga mediafiler stöds på URL %1.</translation>
+      <translation type="unfinished">No supported media tracks at URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>Inte behörig. URL %1.</translation>
+      <translation type="unfinished">Not authorized. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>Kan inte öppna media URL %1. Har inte stöd för medieprotokoll %2.</translation>
+      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>Kameran återställdes från arkivet. Ta bort kameran och lägg till den igen för att visa Live video.</translation>
+      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Först försök att aktivera inspelningen (om den är av) och minska fps i enhetens inställningar (fel &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Försök först att aktivera inspelning (om den är avstängd) och minska fps i kameran inställningar (fel &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Försök först aktivera inspelning (om den är avstängd) och minska fps i I/O modulinställningar (fel &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Uppdatera firmware. Minimal version som stöds är %1. Nuvarande version är %2</translation>
+      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -340,35 +340,35 @@
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation>Ljudsammanhanget var inte angivet.</translation>
+      <translation type="unfinished">Audio context was not specified.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kunde inte hitta kodare för codec %1.</translation>
+      <translation type="unfinished">Could not find encoder for codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Kunde inte initiera ljudkodek.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>Kunde inte initiera ljudavkodaren.</translation>
+      <translation type="unfinished">Could not initialize audio decoder.</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>Det gick inte att hitta dekoder för codec %1.</translation>
+      <translation type="unfinished">Could not find decoder for codec %1.</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Kunde inte skicka ljud till kodek, Felkod: %1.</translation>
+      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Kunde inte ta emot ljudpaket från kodek, Felkod: %1.</translation>
+      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Kunde inte ta emot ljud från avkodare, Felkod: %1.</translation>
+      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
@@ -379,133 +379,133 @@
     <name>QnFfmpegTranscoder</name>
     <message>
       <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Container %1 hittades inte i FFMPEG-biblioteket.</translation>
+      <translation type="unfinished">Container %1 was not found in FFMPEG library.</translation>
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation>Det gick inte att skapa utgångskontext för format %1.</translation>
+      <translation type="unfinished">Could not create output context for format %1.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
+      <translation type="unfinished">Could not allocate output stream for recording.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Kunde inte utföra direkt stream-kopia eftersom ramstorleken är odefinierad.</translation>
+      <translation type="unfinished">Could not perform direct stream copy because frame size is undefined.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation>Det gick inte att hitta kodek %1.</translation>
+      <translation type="unfinished">Could not find codec %1.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video eller ljudkodek är inkompatibel med behållare %1.</translation>
+      <translation type="unfinished">Video or audio codec is incompatible with container %1.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kunde inte hitta kodare för codec %1.</translation>
+      <translation type="unfinished">Could not find encoder for codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Kunde inte initiera videokodaren.</translation>
+      <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation>Analog</translation>
+      <translation type="unfinished">Analog</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation>Professionell</translation>
+      <translation type="unfinished">Professional</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation>Edge</translation>
+      <translation type="unfinished">Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation>Vmax</translation>
+      <translation type="unfinished">Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Videovägg</translation>
+      <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modul</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation>Starta</translation>
+      <translation type="unfinished">Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation>Analog enkoder</translation>
+      <translation type="unfinished">Analog Encoder</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>Analoga licenser</translation>
+      <translation type="unfinished">Analog Licenses</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Professionella tjänster</translation>
+      <translation type="unfinished">Professional Licenses</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge licenser</translation>
+      <translation type="unfinished">Edge Licenses</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation>Vmax Licenser</translation>
+      <translation type="unfinished">Vmax Licenses</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>Analoga Encoder licenser</translation>
+      <translation type="unfinished">Analog Encoder Licenses</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>Videovägg licenser</translation>
+      <translation type="unfinished">Video Wall Licenses</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>I/o-modul licenser</translation>
+      <translation type="unfinished">I/O Module Licenses</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Vmax Licenser</translation>
+      <translation type="unfinished">Start Licenses</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Ogiltig</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>Ogiltig licens</translation>
+      <translation type="unfinished">Invalid Licenses</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation>Gratis</translation>
+      <translation type="unfinished">Free</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>Tid</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Tidslicens</translation>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
     <message>
       <source>Bridge</source>
-      <translation>Brygga</translation>
+      <translation type="unfinished">Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Bridge-licenser</translation>
+      <translation type="unfinished">Bridge Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
@@ -696,30 +696,30 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation>
-        <numerusform>%n %2 används av %1.</numerusform>
-        <numerusform>%n %2 används av %1.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n %2 are used out of %1.</numerusform>
+        <numerusform>%n %2 are used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation>
-        <numerusform>%n %2 kommer att användas av %1.</numerusform>
-        <numerusform>%n %2 kommer att användas av %1.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n %2 will be used out of %1.</numerusform>
+        <numerusform>%n %2 will be used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation>
-        <numerusform>Aktivera %n mer %1.</numerusform>
-        <numerusform>Aktivera %n mer %1.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Activate %n more %1.</numerusform>
+        <numerusform>Activate %n more %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation>
-        <numerusform>%n mer %1 kommer att användas.</numerusform>
-        <numerusform>%n mer %1 kommer att användas.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more %1 will be used.</numerusform>
+        <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
   </context>
@@ -727,27 +727,27 @@
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
-      <translation>Ogiltig signatur</translation>
+      <translation type="unfinished">Invalid signature</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation>Ogiltig anpassning</translation>
+      <translation type="unfinished">Invalid customization</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Licensen har upphört att gälla</translation>
+      <translation type="unfinished">License is expired</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation>Ogiltig typ</translation>
+      <translation type="unfinished">Invalid type</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation>Denna licenstyp kräver högre programvaruversion</translation>
+      <translation type="unfinished">This license type requires higher software version</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Okänt fel</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -766,58 +766,58 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation>Ny server</translation>
+      <translation type="unfinished">New Server</translation>
     </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation>Kameror</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>kameror</translation>
+      <translation type="unfinished">cameras</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Kamera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation>kamera</translation>
+      <translation type="unfinished">camera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Enheter</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation>enheter</translation>
+      <translation type="unfinished">devices</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Enhet</translation>
+      <translation type="unfinished">Device</translation>
     </message>
     <message>
       <source>device</source>
-      <translation>enhet</translation>
+      <translation type="unfinished">device</translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/O-moduler</translation>
+      <translation type="unfinished">I/O Modules</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/O-moduler</translation>
+      <translation type="unfinished">I/O modules</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modul</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/O modul</translation>
+      <translation type="unfinished">I/O module</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -866,23 +866,23 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Okänd</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>Gratis licens</translation>
+      <translation type="unfinished">FREE License</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>Licensierad till: %1</translation>
+      <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Vattenmärkt: %1</translation>
+      <translation type="unfinished">Watermark: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation>Tidslicens</translation>
+      <translation type="unfinished">Time License</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -893,124 +893,124 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Motsvarande behållare i FFMPEG-biblioteket kunde inte hittas.</translation>
+      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>Det gick inte att skapa en utdatafil för videoinspelning.</translation>
+      <translation type="unfinished">Could not create output file for video recording.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
+      <translation type="unfinished">Could not allocate output stream for recording.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>Det gick inte att allokera utgång för ljudström.</translation>
+      <translation type="unfinished">Could not allocate output audio stream.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation>Ogiltig ljudkodekinformation.</translation>
+      <translation type="unfinished">Invalid audio codec information.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video eller ljudkodek är inkompatibel med behållare %1.</translation>
+      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
+      <translation type="unfinished">File write error. Not enough free space.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation>Ogiltig resurstyp för dataexport.</translation>
+      <translation type="unfinished">Invalid resource type for data export.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Ingen data exporterad.</translation>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation>Namnlöst system</translation>
+      <translation type="unfinished">Unnamed System</translation>
     </message>
   </context>
   <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL-kodning är inte implementerad.</translation>
+      <translation type="unfinished">OpenCL transcoding is not implemented.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation>Okänd transkodningsmetod.</translation>
+      <translation type="unfinished">Unknown transcoding method.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL-kodning är inte implementerad.</translation>
+      <translation type="unfinished">OpenCLTranscode is not implemented.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>Okänd transkodningsmetod</translation>
+      <translation type="unfinished">Unknown transcode method</translation>
     </message>
   </context>
   <context>
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>Ägare</translation>
+      <translation type="unfinished">Owner</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>Administratör</translation>
+      <translation type="unfinished">Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Avancerad användare</translation>
+      <translation type="unfinished">Advanced Viewer</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Användare</translation>
+      <translation type="unfinished">Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Begränsad användare</translation>
+      <translation type="unfinished">Live Viewer</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>Anpassad roll</translation>
+      <translation type="unfinished">Custom Role</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation>Anpassad</translation>
+      <translation type="unfinished">Custom</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation>Kan hantera alla kameror och bokmärken.</translation>
+      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation>Kan visa alla kameror och exportera video.</translation>
+      <translation type="unfinished">Can view all cameras and export video.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>Kan visa livevideo från alla kameror.</translation>
+      <translation type="unfinished">Can view live video from all cameras.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Anpassad användarroll.</translation>
+      <translation type="unfinished">Custom user role.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation>Anpassade behörigheter.</translation>
+      <translation type="unfinished">Custom permissions.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation>Har tillgång till hela systemet och kan göra allt.</translation>
+      <translation type="unfinished">Has access to whole System and can do everything.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Har tillgång till hela systemet och kan hantera det. Kan skapa användare.</translation>
+      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
     </message>
   </context>
   <context>
@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Okänt fel.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1059,264 +1059,264 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bokmärke</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation>Panikinspelning</translation>
+      <translation type="unfinished">Panic recording</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Skriv till logg</translation>
+      <translation type="unfinished">Write to log</translation>
     </message>
     <message>
       <source>Show notification</source>
-      <translation>Visa avisering</translation>
+      <translation type="unfinished">Show notification</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation>Upprepa ljudet</translation>
+      <translation type="unfinished">Repeat sound</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation>Spela upp ljud</translation>
+      <translation type="unfinished">Play sound</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation>Tala</translation>
+      <translation type="unfinished">Speak</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>Kör PTZ förinställning</translation>
+      <translation type="unfinished">Execute PTZ preset</translation>
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation>Visa textöverlagring</translation>
+      <translation type="unfinished">Show text overlay</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Visa på Alarm Layout</translation>
+      <translation type="unfinished">Show on Alarm Layout</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
-      <translation>Gör HTTP-förfrågan</translation>
+      <translation type="unfinished">Do HTTP request</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation>Enhetsutgång</translation>
+      <translation type="unfinished">Device output</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>Kamerautgång</translation>
+      <translation type="unfinished">Camera output</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation>Enhetsinspelning</translation>
+      <translation type="unfinished">Device recording</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation>Kamerainspelning</translation>
+      <translation type="unfinished">Camera recording</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>Generisk händelse</translation>
+      <translation type="unfinished">Generic Event</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Rörelse i kameror</numerusform>
-        <numerusform>Rörelse i kameror</numerusform>
+      <translation type="unfinished">
+        <numerusform>Motion on Cameras</numerusform>
+        <numerusform>Motion on Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>Nätverksproblem</translation>
+      <translation type="unfinished">Network Issue</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>Serverfel</translation>
+      <translation type="unfinished">Server Failure</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>Serverkonflikt</translation>
+      <translation type="unfinished">Server Conflict</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation>Server startad</translation>
+      <translation type="unfinished">Server Started</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation>Licensproblem</translation>
+      <translation type="unfinished">License Issue</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
-      <translation>Säkerhetskopiering slutförd</translation>
+      <translation type="unfinished">Archive backup finished</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation>Serverproblem</translation>
+      <translation type="unfinished">Any Server Issue</translation>
     </message>
     <message>
       <source>Any Event</source>
-      <translation>Någon händelse</translation>
+      <translation type="unfinished">Any Event</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Insignal på enheter</numerusform>
-        <numerusform>Insignal på enheter</numerusform>
+      <translation type="unfinished">
+        <numerusform>Input Signal on Devices</numerusform>
+        <numerusform>Input Signal on Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Ingångssignal på kameror</numerusform>
-        <numerusform>Ingångssignal på kameror</numerusform>
+      <translation type="unfinished">
+        <numerusform>Input Signal on Cameras</numerusform>
+        <numerusform>Input Signal on Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Enheter frånkopplade</numerusform>
-        <numerusform>Enheter frånkopplade</numerusform>
+      <translation type="unfinished">
+        <numerusform>Devices Disconnected</numerusform>
+        <numerusform>Devices Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kameror frånkopplade</numerusform>
-        <numerusform>Kameror frånkopplade</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cameras Disconnected</numerusform>
+        <numerusform>Cameras Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Enheter IP konflikt</numerusform>
-        <numerusform>Enheter IP konflikt</numerusform>
+      <translation type="unfinished">
+        <numerusform>Devices IP Conflict</numerusform>
+        <numerusform>Devices IP Conflict</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Kameror IP konflikt</numerusform>
-        <numerusform>Kameror IP konflikt</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cameras IP Conflict</numerusform>
+        <numerusform>Cameras IP Conflict</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation>Någon enhet har problem</translation>
+      <translation type="unfinished">Any Device Issue</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation>Någon kamera har problem</translation>
+      <translation type="unfinished">Any Camera Issue</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>Odefinierad händelse har inträffat på %1</translation>
+      <translation type="unfinished">Undefined event has occurred on %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>Enhet %1 kopplades bort</translation>
+      <translation type="unfinished">Device %1 was disconnected</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>Kamera %1 kopplades bort</translation>
+      <translation type="unfinished">Camera %1 was disconnected</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I/O-modul %1 kopplades bort</translation>
+      <translation type="unfinished">I/O Module %1 was disconnected</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>Ingång på %1</translation>
+      <translation type="unfinished">Input on %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>Rörelse på %1</translation>
+      <translation type="unfinished">Motion on %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation>Nätverksproblem vid %1</translation>
+      <translation type="unfinished">Network Issue at %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation>Server &quot;%1&quot; Fel</translation>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Enhets-IP-konflikt vid %1</translation>
+      <translation type="unfinished">Device IP Conflict at %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Kamera IP-konflikt vid %1</translation>
+      <translation type="unfinished">Camera IP Conflict at %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Server &quot;%1&quot; Konflikt</translation>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation>Server &quot;%1&quot; Startad</translation>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Server &quot;%1&quot; har ett licensproblem</translation>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Server &quot;%1&quot; har slutfört en säkerhetskopiering av arkivet</translation>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>Generisk händelse vid %1</translation>
+      <translation type="unfinished">Generic Event at %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation>Ett okänt fel har uppstått</translation>
+      <translation type="unfinished">An unknown event has occurred</translation>
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>Händelse: %1</translation>
+      <translation type="unfinished">Event: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>Källa: %1</translation>
+      <translation type="unfinished">Source: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation>Titel: %1</translation>
+      <translation type="unfinished">Caption: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation>Ingångsport: %1</translation>
+      <translation type="unfinished">Input Port: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation>Anledning: %1</translation>
+      <translation type="unfinished">Reason: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>Motstridig adress: %1</translation>
+      <translation type="unfinished">Conflicting Address: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <translation type="unfinished">MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Motstridig Server #%1: %2</translation>
+      <translation type="unfinished">Conflicting Server #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>Motstridig Server: %1</translation>
+      <translation type="unfinished">Conflicting Server: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation>Utlösare: %1</translation>
+      <translation type="unfinished">Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1326,197 +1326,197 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>Tid: %1 på %2</translation>
+      <translation type="unfinished">Time: %1 on %2</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
-        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
+      <translation type="unfinished">
+        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Inga data mottagna under de senaste %n sekunderna.</numerusform>
-        <numerusform>Inga data mottagna under de senaste %n sekunderna.</numerusform>
+      <translation type="unfinished">
+        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>Anslutningen till enheten stängdes oväntat.</translation>
+      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Anslutning till kamera (primärström) stängdes oväntat.</translation>
+      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Anslutning till kamera (sekundärström) stängdes oväntat.</translation>
+      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTP-paketförlust upptäcks.</translation>
+      <translation type="unfinished">RTP packet loss detected.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>Enheten svarar inte på nätverksförfrågningar.</translation>
+      <translation type="unfinished">Device does not respond to network requests.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>Anslutning till Server förlorad.</translation>
+      <translation type="unfinished">Connection to server is lost.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>Servern stoppade oväntat.</translation>
+      <translation type="unfinished">Server stopped unexpectedly.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>I/O-fel har uppstått vid %1.</translation>
+      <translation type="unfinished">I/O error has occurred at %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Inte tillräckligt med HDD/SSD-hastighet för inspelning till %1.</translation>
+      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSD &quot;%1&quot; är full. Disken innehåller för mycket data som inte hanteras av VMS.</translation>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Systemdisken &quot;%1&quot; är nästan full.</translation>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>Arkivering av säkerhetskopiering misslyckades: Inga tillgängliga backupplatser med tillräcklig ledigt utrymme</translation>
+      <translation type="unfinished">Archive backup failed: No available backup storages with sufficient free space</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation>Säkerhetskopiering misslyckades: Fel på lagringsenhet</translation>
+      <translation type="unfinished">Archive backup failed: Target storage failure</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation>Arkivering av säkerhetskopiering misslyckades: Källfil öppen / läsfel</translation>
+      <translation type="unfinished">Archive backup failed: Source file open/read error</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation>Säkerhetskopiering misslyckades: Källfil öppen / läsfel</translation>
+      <translation type="unfinished">Archive backup failed: Target file create/write error</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>Säkerhetskopiering misslyckades: Filkatalogfel</translation>
+      <translation type="unfinished">Archive backup failed: File catalog error</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>Säkerhetskopieringen är klar, men är inte fullständigt slutförd eftersom backuptiden är över. Data säkerhetskopieras till %1</translation>
+      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation>Säkerhetskopieringen är klar</translation>
+      <translation type="unfinished">Archive backup is successfully completed</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>Säkerhetskopieringen avbryts av användaren. Data säkerhetskopieras till %1</translation>
+      <translation type="unfinished">Archive backup is canceled by user. Data is backed up to %1</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande I / O-moduler:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
     </message>
     <message>
       <source>start</source>
-      <translation>starta</translation>
+      <translation type="unfinished">start</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation>stoppa</translation>
+      <translation type="unfinished">stop</translation>
     </message>
     <message>
       <source>While %1</source>
-      <translation>Medan %1</translation>
+      <translation type="unfinished">While %1</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation>På %1 %2</translation>
+      <translation type="unfinished">On %1 %2</translation>
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation>Utlösarens namn</translation>
+      <translation type="unfinished">Trigger Name</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Roll</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n användare</numerusform>
-        <numerusform>%n användare</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Roller</numerusform>
-        <numerusform>%n Roller</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation>Alla administratörer</translation>
+      <translation type="unfinished">All Administrators</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Alla användare</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>Välj minst en användare</translation>
+      <translation type="unfinished">Select at least one user</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation>Utlösare</translation>
+      <translation type="unfinished">Soft Trigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation>Utlösare %1 vid %2</translation>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Utösare %1 har aktiverats flera gånger</translation>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation>Skicka epost</translation>
+      <translation type="unfinished">Send email</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Bekräfta</translation>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation>Analyshändelse</translation>
+      <translation type="unfinished">Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 vid %2</translation>
+      <translation type="unfinished">%1 at %2</translation>
     </message>
     <message>
       <source>Storage Issue</source>
@@ -1536,7 +1536,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation>Öppna layout</translation>
+      <translation type="unfinished">Open layout</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
@@ -1583,7 +1583,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation>Borttagen kamera</translation>
+      <translation type="unfinished">Removed camera</translation>
     </message>
   </context>
 </TS>

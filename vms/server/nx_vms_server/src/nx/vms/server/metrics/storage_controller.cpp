@@ -73,7 +73,7 @@ static auto infoGroupProvider()
                 "pool",
                 [](const auto& r)
                 {
-                    if (!r->isUsedForWriting())
+                    if (!r->isWritable())
                         return "Reserved";
                     return r->isBackup() ? "Backup" : "Main";
                 }
@@ -102,7 +102,7 @@ static auto stateGroupProvider()
                     if (isServerOffline(r))
                         return Value("Server Offline");
                     auto status = r->getStatus();
-                    if (status == Qn::Online && r->isUsedForWriting())
+                    if (status == Qn::Online && r->isWritable())
                         status = Qn::Recording;
                     return Value(QnLexical::serialized(status));
                 }

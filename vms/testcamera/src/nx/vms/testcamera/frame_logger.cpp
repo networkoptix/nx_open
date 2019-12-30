@@ -52,6 +52,8 @@ void FrameLogger::logFrameIfNeeded(const QString& message, const Logger* logger)
     const QString line = currentDateTime() + " " + logger->tag() + ": "
         + message + logger->context() + "\n";
 
+    NX_LOGGER_VERBOSE(logger, message);
+
     if (m_logFramesFile->write(line.toUtf8()) <= 0)
     {
         NX_LOGGER_ERROR(logger, "Unable to log frame to file: %1",

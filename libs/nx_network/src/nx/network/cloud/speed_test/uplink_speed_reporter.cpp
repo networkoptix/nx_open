@@ -1,5 +1,6 @@
 #include "uplink_speed_reporter.h"
 
+#include <nx/network/app_info.h>
 #include <nx/network/aio/scheduler.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
@@ -104,6 +105,8 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
                     m_aboutToRunSpeedTestHandler(!m_testInProgress.load());
             }
 
+            NX_VERBOSE(this, "Fetching speedtest url from cloud_modules.xml...");
+
             if (m_testInProgress)
             {
                 NX_VERBOSE(this, "Speed test already in progress, skipping.");
@@ -113,6 +116,10 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
 
             m_cloudModuleUrlFetcher =
                 std::make_unique<CloudModuleUrlFetcher>(network::cloud::kSpeedTestModuleName);
+            
+            const auto cloudModulesUrl = AppInfo::defaultCloudModulesXmlUrl(AppInfo::defaultCloudHostName());
+            NX_VERBOSE(this, "Fetching speed test url from cloud_modules.xml at %1", cloudModulesUrl);
+            m_cloudModuleUrlFetcher->setModulesXmlUrl(std::move(cloudModulesUrl));
 
             {
                 QnMutexLocker lock(&m_mutex);
@@ -127,9 +134,11 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
 
 void UplinkSpeedReporter::onSystemCredentialsSet(
     std::optional<hpm::api::SystemCredentials> credentials)
-{
+{   
     if (!credentials)
         return disable(__func__);
+
+    NX_VERBOSE(this, "Cloud System credentials have been set.");
 
     if (m_cloudModuleUrlFetcher)
         return;
@@ -153,6 +162,8 @@ void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
         return stopTest();
     }
 
+    NX_VERBOSE(this, "Fetched speedtest url: %1", speedTestUrl);
+
     if (!m_uplinkSpeedTester)
         m_uplinkSpeedTester = UplinkSpeedTesterFactory::instance().create();
 
@@ -162,6 +173,8 @@ void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
         NX_VERBOSE(this, "Mediator address is missing, speed test will not be performed.");
         return stopTest();
     }
+
+    NX_VERBOSE(this, "Starting speed test...");
 
     m_uplinkSpeedTester->start(
         speedTestUrl,
@@ -173,6 +186,8 @@ void UplinkSpeedReporter::UplinkSpeedReporter::onSpeedTestComplete(
     std::optional<hpm::api::ConnectionSpeed> connectionSpeed,
     hpm::api::MediatorAddress mediatorAddress)
 {
+    NX_VERBOSE(this, "Speed test complete: SystemError = %1", SystemError::toString(errorCode));
+
     if (errorCode != SystemError::noError)
     {
         NX_VERBOSE(this, "Speed test failed: %1", SystemError::toString(errorCode));
@@ -192,12 +207,18 @@ void UplinkSpeedReporter::UplinkSpeedReporter::onSpeedTestComplete(
         return disable(__func__);
     }
 
+    nx::hpm::api::PeerConnectionSpeed peerConnectionSpeed{
+        systemCredentials->serverId.toStdString(),
+        systemCredentials->systemId.toStdString(),
+        std::move(*connectionSpeed)
+    };
+
+    NX_VERBOSE(this,
+        "Reporting PeerConnectionSpeed %1 to Connection Mediator at %2...",
+        peerConnectionSpeed, mediatorAddress.tcpUrl);
+
     m_mediatorApiClient->reportUplinkSpeed(
-        hpm::api::PeerConnectionSpeed{
-            systemCredentials->serverId.toStdString(),
-            systemCredentials->systemId.toStdString(),
-            std::move(*connectionSpeed)
-        },
+        std::move(peerConnectionSpeed),
         [this](hpm::api::ResultCode resultCode)
         {
             NX_VERBOSE(this, "reportUplinkSpeed() finished with resultCode: %1", resultCode);

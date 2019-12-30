@@ -57,6 +57,8 @@
 #include <media_server_process_aux.h>
 #include <nx/sql/database.h>
 #include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -642,9 +644,6 @@ public:
     virtual void run() override
     {
         NX_DEBUG(this, "Starting to test storages");
-        for (const auto& storage: storagesToTest())
-            m_owner->updateMountedStatus(storage);
-
         for (const auto& storage : storagesToTest())
         {
             NX_DEBUG(this, "Testing storage %1", nx::utils::url::hidePassword(storage->getUrl()));
@@ -1385,17 +1384,6 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
         return false;
     }
     return true;
-}
-
-void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
-{
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
-    {
-        fileStorage->setMounted(nx::mserver_aux::isStorageMounted(
-            serverModule()->platform(),
-            fileStorage,
-            &serverModule()->settings()));
-    }
 }
 
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)

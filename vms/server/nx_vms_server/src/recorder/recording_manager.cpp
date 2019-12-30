@@ -155,12 +155,13 @@ std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
     if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
         recorder->updateCamera(camRes);
 
-    auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(
-            reader,
-            std::chrono::milliseconds(0) /*minSize*/,
-            std::chrono::seconds(5) /*maxSize*/,
-            std::chrono::seconds(0)  /*initialSize*/,
-            PutInOrderDataProvider::BufferingPolicy::increaseOnly);
+    PutInOrderDataProvider::Settings settings {
+        std::chrono::milliseconds(0) /*minSize*/,
+        std::chrono::seconds(5) /*maxSize*/,
+        std::chrono::seconds(0)  /*initialSize*/,
+        PutInOrderDataProvider::BufferingPolicy::increaseOnly
+    };
+    auto reorderingDataProvider = std::make_unique<PutInOrderDataProvider>(reader, settings);
     reorderingDataProvider->addDataProcessor(recorder.get());
 
     return std::make_unique<RecorderData>(std::move(recorder), std::move(reorderingDataProvider));

@@ -137,7 +137,6 @@ void Camera::performStreaming(
                 m_cameraOptions,
                 socket,
                 streamIndex,
-                filename,
                 file.channelCount,
                 ptsUnloopingContext.get());
 

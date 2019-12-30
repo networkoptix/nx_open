@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "サーバー",
-            "system": "システム",
-            "device": "デバイス"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "サーバーを再起動しますか？",
         "couldntCheckInternet": "クラウド接続を確認できませんでした",
         "confirmRestoreDefault": "データベースと設定を消去しますか？このプロセスにはしばらく時間がかかり、その後サーバーは再起動されます。",
         "confirmRestoreDefaultTitle": "工場出荷時の状態に戻します",
         "unexpectedError": "失敗: 予期しないエラーが発生しました",
-        "connnetionError": "接続エラー",
+        "connnetionError": "Connection error",
         "wrongPassword": "間違ったパスワード",
         "error": "エラー: ",
         "restartNeeded": "変更が保存されました。サーバーを再起動して新しい設定を適用しますか？",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "1025未満のポート番号を使用するのは安全ではありません。サーバーにアクセスできない可能性があります。続行しますか？",
         "confirmDisconnectFromCloud": "{{CLOUD_NAME}} からシステムを切断しますか？",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>すべてのクラウドユーザーが削除されます。</span><br><br>システムはローカル管理者アカウントでローカルネットワークを介してアクセス可能になります。",
-        "confirmDisconnectFromCloudAction": "切断",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "システムが{{CLOUD_NAME}} から正常に切断されました",
         "disconnectedFromCloudError": "システムを切断できません",
         "confirmDisconnectFromSystem": "現在のシステムからサーバーを切離す",
@@ -149,7 +149,7 @@
         "licenceError": "警告！システムとスターターライセンスを統合しようとしています。システムごとに許可されるスターターライセンスは1つのみで、2番目のライセンスは無効になります。統合しますか？",
         "duplicateServersError": "同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません。このサーバーを削除してやり直してください。",
         "connectionFailed": "接続失敗: ",
-        "unknownError": "未知のエラー",
+        "unknownError": "Unknown error",
         "mergeFailed": "統合に失敗",
         "mergeSucceed": "統合成功",
         "newSystemDisplayName": "新規システム",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "ログインまたはパスワードが正しくありません",
-        "authLockout": "試行回数が多すぎます。暫くしてからもう一度お試しください。"
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "サーバー エラー: 現在のユーザーデータを取得できません"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "サーバーを起動しています",
         "serverRestarting": "サーバーを再起動しています",
-        "serverOffline": "サーバーはオフラインです"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "更新プログラムが正常に開始されました　数分かかります",
@@ -182,7 +182,7 @@
         "selectFiles": "ファイルを選択"
     },
     "advanced": {
-        "free": "無料",
+        "free": "Free",
         "total": "合計",
         "occupied": "使用中",
         "reserved": "予約済み"

@@ -115,7 +115,6 @@ TEST_F(MetricsStoragesApi, state)
     ASSERT_FALSE(storages.isEmpty());
     auto storage = storages[0];
     auto storage2 = storages[1];
-    storage.dynamicCast<QnFileStorageResource>()->setMounted(true);
     storage->setStatus(Qn::Offline);
 
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
@@ -139,7 +138,7 @@ TEST_F(MetricsStoragesApi, state)
         storageData = systemValues["storages"][storage->getId().toSimpleString()];
         stateData = storageData["state"];
     } while (kIssues != stateData["issues24h"].toInt());
-    ASSERT_EQ("Online", stateData["status"].toString());
+    ASSERT_EQ("Recording", stateData["status"].toString());
     ASSERT_EQ(kIssues, stateData["issues24h"].toInt());
 
     auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];

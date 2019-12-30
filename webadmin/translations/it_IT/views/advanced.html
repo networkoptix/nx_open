@@ -1,6 +1,6 @@
 <div class="container">
     <h1><a href="#/metrics/">Novità: report sullo stato del sistema</a></h1>
-    <h1><a href="#/developers/serverDocumentation">New: Server Settings Documentation</a></h1>
+    <h1><a href="#/developers/serverDocumentation">Nuovo: Documentazione Impostazioni Server</a></h1>
 </div>
 <div class="container">
     <h1>Impostazioni avanzate del server</h1>
@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Archiviazione</h2>
+    <h2>Storage</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inacessibile
+                                Inaccessible
                             </div>
                         </div>
                     </td>
@@ -78,7 +78,7 @@
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Spazio riservato"/>
+ placeholder="Reserved space"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -114,14 +114,14 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Correggere tutte le impostazioni evidenziate per salvarlo</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Salvare</button>
-        <button class="btn btn-warning" ng-click="cancel()">Annulla</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </form>
 
     <h2>Impostazioni registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} livello di registro</label>
+            <label class="col-sm-4">{{name}} livello del registro</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Nessuno: log disabilitato.</option>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Salvare</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
     <h1>Impostazioni avanzate di sistema</h1>
     <div class="alert alert-danger" role="alert">
-        <b> Attenzione! </b> Qualsiasi modifica in questa pagina può causare il funzionamento non corretto del server.
+        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,13 +181,13 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Salvare</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Attenzione!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Attenzione!</b> Attenzione! Alcune modifiche richiedono il riavvio <b> tutti </b> i server nel sistema.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Riavvia il server corrente</button>
         </div>

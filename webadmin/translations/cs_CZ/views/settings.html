@@ -41,22 +41,22 @@
                         <h3>Obnovení serveru</h3>
                         <p>Tato akce vrátí tento server do výchozího nastavení (smaže databázi a obnoví konfiguraci).
                             Server bude odpojen od stávajícího systému. Videoarchiv zůstane neporušený.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Obnovit výchozí nastavení</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Odpojení serveru ze systému</h3>
                         <p>Tato akce odpojí server ze systému, který uchovává databázi, místní uživatele a nastavení.
-                            Videoarchiv zůstane neporušený. <b>Uživatelé cloudu budou smazáni.</b></p>
+                            Video archive will remain intact. <b>Uživatelé cloudu budou smazáni.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odpojit od systému</button></p>
                     </div>
                     <div>
-                        <h3>Restartování</h3>
+                        <h3>Restart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restartovat server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Restartovat</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Změnit heslo administrátora</h3>
+                            <h3>Change admin password</h3>
                             <p>Pokud je systém lokální (není připojen ke cloudu), změní se heslo pro uživatele "admin" a heslo pro obnovení (root) na některých serverech.<br>
                                 V opačném případě se změní pouze heslo pro obnovení.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Změnit heslo</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Název</h3>
+                        <h3>Name</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Sloučení systémů</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Sloučení systémů</button></p>
+                            <h3>Merge Systems</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     Vynutit šifrovaný video přenos
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Uložit</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Časové pásmo</label></td>
-                                        <td><label for="date">Datum</label></td>
-                                        <td><label for="time">Čas</label></td>
+                                        <td><label for="date">Date</label></td>
+                                        <td><label for="time">Time</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

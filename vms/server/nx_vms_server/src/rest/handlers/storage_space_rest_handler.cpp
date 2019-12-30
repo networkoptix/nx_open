@@ -26,11 +26,20 @@
 
 namespace {
 
-static const QString kFastRequestKey("fast");
+static QString determineStorageType(const QnMediaServerModule* serverModule, const QString& url)
+{
+    const auto partitions = serverModule->platform()->monitor()->totalPartitionSpaceInfo();
+    const auto partitionIt = std::find_if(
+        partitions.begin(), partitions.end(),
+        [&url](const auto& partition) { return url.startsWith(partition.path); });
+
+    const auto storageType =
+        (partitionIt != partitions.end()) ? partitionIt->type : PlatformMonitor::NetworkPartition;
+
+    return QnLexical::serialized(storageType);
+}
 
 } // namespace
-
-const QString QnStorageSpaceRestHandler::kOwndedOnlyKey("ownedOnly");
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -43,12 +52,12 @@ int QnStorageSpaceRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
-    const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
+    const bool fastRequest = QnLexical::deserialized(params["fast"], false);
 
     QnStorageSpaceReply reply;
     reply.storages = nx::rest::helpers::availableStorages(serverModule());
 
-    if (!fastRequest && !params.contains(kOwndedOnlyKey))
+    if (!fastRequest && !params.contains("ownedOnly"))
     {
         for (const QnStorageSpaceData& optionalStorage: getOptionalStorages())
             reply.storages.push_back(optionalStorage);
@@ -157,6 +166,11 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
                 return QnSharedResourcePointer<nx::vms::server::StorageResource>();
             }
 
+            storage->setUrl(url);
+            if (storage->getStorageType().isNull())
+                storage->setStorageType(determineStorageType(serverModule(), url));
+
+            NX_VERBOSE(this, "Starting initOrUpdate for storage %1", storage->getUrl());
             if (storage->initOrUpdate() != Qn::StorageInit_Ok)
             {
                 NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
@@ -166,7 +180,6 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
             storage->setIdUnsafe(QnUuid::createUuid());
             storage->setStatus(Qn::Online);
             storage->setSpaceLimit(storage->calcInitialSpaceLimit());
-            storage->setUrl(url);
             if (!wouldBeWritableInPool(storage))
             {
                 NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
@@ -185,12 +198,20 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
     return result;
 }
 
-static QList<QnStorageSpaceData> spaceDataListFrom(const QnStorageResourceList& storages)
+static QList<QnStorageSpaceData> spaceDataListFrom(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourceList& storages)
 {
     QList<QnStorageSpaceData> result;
     std::transform(
         storages.cbegin(), storages.cend(), std::back_inserter(result),
-        [](const auto& storage) { return QnStorageSpaceData(storage, /*fastCreate*/ false); });
+        [serverModule](const auto& storage)
+        {
+            auto s = QnStorageSpaceData(storage, /*fastCreate*/ false);
+            s.storageId = QnUuid(); // This is needed for client to correctly treat this storage as a new one.
+            s.storageStatus = QnStorageManager::storageStatus(serverModule, storage);
+            return s;
+        });
     return result;
 }
 
@@ -206,5 +227,5 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
 {
     const auto partitions = getSuitablePartitions();
     const auto storages = storageListFrom(partitions);
-    return spaceDataListFrom(storages);
+    return spaceDataListFrom(serverModule(), storages);
 }

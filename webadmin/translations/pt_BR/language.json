@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Servidor",
-            "system": "Sistema",
-            "device": "Dispositivo"
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
         },
         "confirmRestart": "Reiniciar o servidor?",
         "couldntCheckInternet": "Não foi possível verificar a conexão à nuvem",
         "confirmRestoreDefault": "Limpar base de dados e definições? Este processo levará algum tempo e o servidor será depois reiniciado.",
         "confirmRestoreDefaultTitle": "Restaurar Definições de Fábrica",
         "unexpectedError": "Falha: ocorreu um erro inesperado",
-        "connnetionError": "Erro de ligação",
+        "connnetionError": "Connection error",
         "wrongPassword": "Senha incorrecta.",
         "error": "Erro: ",
         "restartNeeded": "Alterações guardadas. Reiniciar o servidor para aplicar as novas definições?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Não é seguro usar uma porta inferior a 1025. O servidor pode não estar acessível. Continuar mesmo assim?",
         "confirmDisconnectFromCloud": "Desconectar o sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Todos os utilizadores da Cloud serão apagados.</span><br><br>O Sistema estará acessível através da rede local com conta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Desconectar",
+        "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "O Sistema foi desconectado de {{CLOUD_NAME}} com sucesso",
         "disconnectedFromCloudError": "Não é possível desconectar o sistema",
         "confirmDisconnectFromSystem": "Desconectar servidor do sistema atual",
@@ -149,7 +149,7 @@
         "licenceError": "Aviso! Você está prestes a efectuar o \"Merge\" de Sistemas com licenças Starter. Apenas é permitida uma licença Starter por sistema, e por isso a segunda licença será desactivada. Efectuar o \"Merge\" mesmo assim?",
         "duplicateServersError": "Não é possível mesclar os Sistemas, porque eles têm pelo menos 1 servidor com o mesmo ID. Por favor, remova este servidor e tente novamente.",
         "connectionFailed": "A ligação falhou: ",
-        "unknownError": "Erro desconhecido",
+        "unknownError": "Unknown error",
         "mergeFailed": "Falha ao mesclar",
         "mergeSucceed": "\"Merge\" feito com sucesso.",
         "newSystemDisplayName": "Novo Sistema",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Login ou senha incorrectos",
-        "authLockout": "Demasiadas tentativas. Tente novamente mais tarde."
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Falha do servidor: não é possível obter os dados do utilizador actual"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "o servidor está a ser iniciado",
         "serverRestarting": "o servidor está a ser reiniciado",
-        "serverOffline": "servidor offline"
+        "serverOffline": "server is offline"
     },
     "fileUpload": {
         "started": "Actualização iniciada com sucesso. Levará vários minutos",
@@ -182,7 +182,7 @@
         "selectFiles": "Selecione os ficheiros"
     },
     "advanced": {
-        "free": "Livre",
+        "free": "Free",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

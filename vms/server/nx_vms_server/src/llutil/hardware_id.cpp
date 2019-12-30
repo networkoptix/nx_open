@@ -144,10 +144,13 @@ namespace LLUtil {
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
-            if (macs.isEmpty())
-            {
-                NX_ERROR(QnLog::HWID_LOG, "No network cards detected.");
-            }
+
+            // But some reason ARMs HWID calculation is completely different for other platforms, so
+            // we newer explicitly detect NICS and this message is shown at all times.
+            #if !(defined(__arm__) || defined(__aarch64__))
+                if (macs.isEmpty())
+                    NX_ERROR(QnLog::HWID_LOG, "No network cards detected.");
+            #endif
 
             g_storedMac = saveMac(macs, settings);
             if (!g_storedMac.isEmpty())

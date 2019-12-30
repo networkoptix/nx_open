@@ -6,8 +6,8 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>ไบต์</numerusform>
+      <translation type="unfinished">
+        <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message>
@@ -18,55 +18,55 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>กิโลไบต์</numerusform>
+      <translation type="unfinished">
+        <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation>KB</translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>เมกะไบต์</numerusform>
+      <translation type="unfinished">
+        <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation>MB</translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>กิกะไบต์</numerusform>
+      <translation type="unfinished">
+        <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>กิกะไบต์</translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>เทราไบต์</numerusform>
+      <translation type="unfinished">
+        <numerusform>Terabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>เทราไบต์</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
@@ -80,27 +80,27 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation>สำเร็จแล้ว</translation>
+      <translation type="unfinished">Successful.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <translation type="unfinished">Invalid login or password.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation>ไม่อนุญาตการดำเนินการที่ร้องขอโดยใช้ข้อมูลประจำตัวที่ได้รับ</translation>
+      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>บัญชีนี้ไม่ได้เปิดใช้งาน โปรดตรวจสอบอีเมลของคุณ</translation>
+      <translation type="unfinished">This account is not activated. Please check your email.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation>ข้อมูลรับรองไม่สามารถใช้งานได้อีกต่อไป</translation>
+      <translation type="unfinished">Credentials are no longer valid.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation>เข้าสู่ระบบไม่ถูกต้อง</translation>
+      <translation type="unfinished">Invalid login.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -126,42 +126,42 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>เจ้าของ: %1</translation>
+      <translation type="unfinished">Owner: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>ระบบของคุณ</translation>
+      <translation type="unfinished">Your System</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>ไม่พบตัวเข้ารหัสเสียง &quot;%1&quot;</translation>
+      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>รูปแบบตัวอย่างของอุปกรณ์ป้อนข้อมูล%1 ไม่สนับสนุน.</translation>
+      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>ไม่ได้เลือกอุปกรณ์เสียงหลัก</translation>
+      <translation type="unfinished">Primary audio device is not selected.</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>ระบบ</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation>ระบบ (%1)</translation>
+      <translation type="unfinished">System (%1)</translation>
     </message>
   </context>
   <context>
@@ -169,11 +169,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>เจ้าของ: %1</translation>
+      <translation type="unfinished">Owner: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>ระบบของคุณ</translation>
+      <translation type="unfinished">Your System</translation>
     </message>
   </context>
   <context>
@@ -181,137 +181,137 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>มิลลิวินาที</translation>
+      <translation type="unfinished">ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>น.</translation>
+      <translation type="unfinished">m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
+      <translation type="unfinished">h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
+      <translation type="unfinished">d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
+      <translation type="unfinished">w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation type="unfinished">M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
+      <translation type="unfinished">y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>มิลลิวินาที</translation>
+      <translation type="unfinished">msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>วินาที</translation>
+      <translation type="unfinished">sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>นาที</translation>
+      <translation type="unfinished">min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>ชั่วโมง</translation>
+      <translation type="unfinished">hrs</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>วัน</translation>
+      <translation type="unfinished">days</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>สัปดาห์</translation>
+      <translation type="unfinished">wks</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
+      <translation type="unfinished">mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>ปี</translation>
+      <translation type="unfinished">yrs</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>มิลลิวินาที</numerusform>
+      <translation type="unfinished">
+        <numerusform>milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>วินาที</numerusform>
+      <translation type="unfinished">
+        <numerusform>seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>นาที</numerusform>
+      <translation type="unfinished">
+        <numerusform>minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>ชั่วโมง</numerusform>
+      <translation type="unfinished">
+        <numerusform>hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>วัน</numerusform>
+      <translation type="unfinished">
+        <numerusform>days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>สัปดาห์</numerusform>
+      <translation type="unfinished">
+        <numerusform>weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>เดือน</numerusform>
+      <translation type="unfinished">
+        <numerusform>months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>ปี</numerusform>
+      <translation type="unfinished">
+        <numerusform>years</numerusform>
       </translation>
     </message>
   </context>

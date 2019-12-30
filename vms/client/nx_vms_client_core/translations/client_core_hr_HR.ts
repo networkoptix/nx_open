@@ -57,7 +57,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>GB</translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -71,7 +71,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -149,26 +149,26 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialize audio encoder.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>Sample format of input device %1 is not supported.</translation>
+      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>Primary audio device is not selected.</translation>
+      <translation type="unfinished">Primary audio device is not selected.</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -198,7 +198,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <source>m</source>
@@ -282,7 +282,7 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
@@ -291,7 +291,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>

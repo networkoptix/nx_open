@@ -878,9 +878,9 @@ QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
 
     QnLiveStreamProviderPtr reader;
     if (streamIndex == nx::vms::api::StreamIndex::primary)
-        reader = camera->getPrimaryReader(false /* Don't run*/);
+        reader = camera->getPrimaryReader(/*autoStartReader*/ false);
     else if (streamIndex == nx::vms::api::StreamIndex::secondary)
-        reader = camera->getSecondaryReader(false /* Don't run*/);
+        reader = camera->getSecondaryReader(/*autoStartReader*/ false);
     return reader;
 }
 

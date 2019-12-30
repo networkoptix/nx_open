@@ -923,8 +923,12 @@ void QnVideoCamera::inUse(void* user)
 void QnVideoCamera::notInUse(void* user)
 {
     QnMutexLocker lock( &m_getReaderMutex );
-    m_cameraUsers.remove(user);
-    m_lastActivityTimer.restart();
+    const auto itr = m_cameraUsers.find(user);
+    if (itr != m_cameraUsers.end())
+    {
+        m_cameraUsers.erase(itr);
+        m_lastActivityTimer.restart();
+    }
 }
 
 bool QnVideoCamera::isSomeActivity() const

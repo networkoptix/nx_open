@@ -49,7 +49,6 @@ public:
         const CameraOptions& cameraOptions,
         nx::network::AbstractStreamSocket* socket,
         StreamIndex streamIndex,
-        QString filename,
         int channelCount,
         PtsUnloopingContext* ptsUnloopingContext);
 
@@ -77,7 +76,6 @@ private:
     const CameraOptions m_cameraOptions;
     nx::network::AbstractStreamSocket* const m_socket;
     const StreamIndex m_streamIndex;
-    const QString m_filename;
     const int m_channelCount;
     PtsUnloopingContext* const m_ptsUnloopingContext;
     mutable std::set<const QnCompressedVideoData*> m_framesWithDifferentPtsAndTimestamp;
