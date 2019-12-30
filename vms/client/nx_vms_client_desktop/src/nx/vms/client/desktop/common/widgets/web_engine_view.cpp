@@ -148,15 +148,14 @@ bool WebEngineView::isRedirectLinksToDesktop() const
     return d->m_redirectLinksToDesktop;
 }
 
-void WebEngineView::createPageWithUserAgent(const QString& userAgent)
+void WebEngineView::createPageWithNewProfile()
 {
     // Since we are changine user agent here, create the off-the-record profile
     // to avoid mess in persistent storage.
 
     // Make new profile a parent of the web page because it should outlive the page.
     auto profile = new QWebEngineProfile(this);
-    if (!userAgent.isEmpty())
-        profile->setHttpUserAgent(userAgent);
+
     setPage(new WebEnginePage(profile, profile, *this));
 
     d->m_webEngineProfile.reset(profile);

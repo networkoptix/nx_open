@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.186",
+    "version": "1.0.2.186",
     "data": [
         {
             "keys": [
@@ -1013,6 +1013,7 @@
             ],
             "showUrl": true,
             "urlLocalePath": "basic/basic.php",
+            "overrideHttpUserAgent": "Mozilla/5.0 (Windows; U; Windows NT based; en-US) AppleWebKit/534.34 (KHTML, like Gecko)  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net",
             "renewOnvifPullPointSubscriptionRequired": false
         },
         {
@@ -3821,12 +3822,6 @@
                 "Hanwha Techwin|*"
             ],
             "overrideXmlHttpRequestTimeout": 30000
-        },
-        {
-            "keys": [
-                "VIVOTEK|*"
-            ],
-            "overrideHttpUserAgent": ""
         },
         {
             "_comment1": "Mapping for firmware: V102_2019_03_15",
