@@ -79,11 +79,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlag,
     (nx::vms::api::SF_NewSystem, "SF_NewSystem")
     (nx::vms::api::SF_SupportsTranscoding, "SF_SupportsTranscoding")
     (nx::vms::api::SF_HasLiteClient, "SF_HasLiteClient")
-    (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone"))
+    (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone")
+    (nx::vms::api::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability")
+    (nx::vms::api::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability")
+    (nx::vms::api::SF_HasBuzzer, "SF_HasBuzzer"))
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlag, (numeric)(debug))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlags,
-(nx::vms::api::SF_None, "SF_None")
+    (nx::vms::api::SF_None, "SF_None")
     (nx::vms::api::SF_Edge, "SF_Edge")
     (nx::vms::api::SF_RemoteEC, "SF_RemoteEC")
     (nx::vms::api::SF_HasPublicIP, "SF_HasPublicIP")
@@ -94,7 +97,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlags,
     (nx::vms::api::SF_NewSystem, "SF_NewSystem")
     (nx::vms::api::SF_SupportsTranscoding, "SF_SupportsTranscoding")
     (nx::vms::api::SF_HasLiteClient, "SF_HasLiteClient")
-    (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone"))
+    (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone")
+    (nx::vms::api::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability")
+    (nx::vms::api::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability")
+    (nx::vms::api::SF_HasBuzzer, "SF_HasBuzzer"))
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlags, (numeric)(debug))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, BackupType,

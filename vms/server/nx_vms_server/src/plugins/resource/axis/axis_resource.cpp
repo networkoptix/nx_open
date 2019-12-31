@@ -547,12 +547,19 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
+        CLSimpleHTTPClient http(
+            getHostAddress(),
+            QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
+            getNetworkTimeout(),
+            auth);
 
         QString firmware;
         auto status = readAxisParameter(&http, AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
         if (status == CL_HTTP_SUCCESS)
             setFirmware(firmware);
+
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl().toString());
     }
 
     if (commonModule()->isNeedToStop())
@@ -565,11 +572,12 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
-        if (status != CL_HTTP_SUCCESS) {
-            if (status == CL_HTTP_AUTH_REQUIRED)
-                setStatus(Qn::Unauthorized);
+
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl().toString());
+
+        if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::UnknownErrorResult();
-        }
     }
     else
     {

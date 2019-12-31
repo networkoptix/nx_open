@@ -143,6 +143,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         request.append("POST ");
         if( !requestStr.startsWith('/') )
             request.append('/');
+
+        m_lastRequestUrl = QUrl(requestStr);
+
         QByteArray encodedRequest = QUrl(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         request.append(encodedRequest);
         request.append(" HTTP/1.1\r\n");
@@ -310,6 +313,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
     if( !requestStr.startsWith('/') )
         requestStr.insert(0, '/');
 
+    m_lastRequestUrl = QUrl(requestStr);
 
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
@@ -564,6 +568,11 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
 QString CLSimpleHTTPClient::digestAccess(const QString& method, const QString& url) const
 {
     return digestAccess(m_auth, mRealm, mNonce, method, url);
+}
+
+QUrl CLSimpleHTTPClient::lastRequestUrl() const
+{
+    return m_lastRequestUrl;
 }
 
 void CLSimpleHTTPClient::addExtraHeaders(QByteArray& request)

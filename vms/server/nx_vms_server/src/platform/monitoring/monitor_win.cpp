@@ -437,7 +437,7 @@ namespace {
 
 #endif // if 0
 
-static std::tuple<std::array<WCHAR, 512>, const WCHAR*> prepareDriveNameBuffer()
+static std::array<WCHAR, 512> prepareDriveNameBuffer()
 {
     std::array<WCHAR, 512> b;
     std::fill(b.begin(), b.end(), L'\0');
@@ -447,12 +447,20 @@ static std::tuple<std::array<WCHAR, 512>, const WCHAR*> prepareDriveNameBuffer()
         std::fill(b.begin(), b.end(), L'\0');
     }
 
-    return std::make_tuple(std::move(b), b.data());
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
+    {
+        auto out = QString::fromWCharArray(b.data(), (int) b.size());
+        out.replace(L'\0', L' ');
+        NX_VERBOSE(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW returned '%1'", out);
+    }
+
+    return b;
 }
 
 static QStringList getDriveNames()
 {
-    auto [b, pb] = prepareDriveNameBuffer();
+    const auto b = prepareDriveNameBuffer();
+    const auto* pb = b.data();
     QStringList result;
     while (*pb)
     {

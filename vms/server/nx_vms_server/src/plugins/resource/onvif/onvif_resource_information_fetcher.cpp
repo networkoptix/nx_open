@@ -116,6 +116,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnMediaServerMo
     m_hookChain.registerHook(searcher_hooks::forcedAdditionalManufacturer);
     m_hookChain.registerHook(searcher_hooks::additionalManufacturerNormalization);
     m_hookChain.registerHook(searcher_hooks::swapVendorAndModel);
+    m_hookChain.registerHook(searcher_hooks::vivotekHook);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
