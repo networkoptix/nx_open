@@ -228,6 +228,36 @@ TEST(utils, fromString_float)
     ASSERT_FALSE(fromString("", &value));
 }
 
+static void testStringReplaceAllChars(
+    const std::string& expected, const std::string& source, char sample, char replacement)
+{
+    std::string s = source;
+    stringReplaceAllChars(&s, sample, replacement);
+    ASSERT_EQ(expected, s);
+}
+
+TEST(utils, stringReplaceAllChars)
+{
+    testStringReplaceAllChars("", "", 'a', 'b');
+    testStringReplaceAllChars("1b2", "1a2", 'a', 'b'); //< 'Replace each 'a' with 'b'.
+    testStringReplaceAllChars("$", "\n", '\n', '$'); //< Replace each '\n' with '$'.
+}
+
+static void testStringInsertAfterEach(
+    const std::string& expected, const std::string& source, char sample, const char* insertion)
+{
+    std::string s = source;
+    stringInsertAfterEach(&s, sample, insertion);
+    ASSERT_EQ(expected, s);
+}
+
+TEST(utils, stringInsertAfterEach)
+{
+    testStringInsertAfterEach("", "", 'a', "123");
+    testStringInsertAfterEach("a123ba123", "aba", 'a', "123"); //< Insert '123' after each 'a'.
+    testStringInsertAfterEach("a\n$", "a\n", '\n', "$"); //< Insert '$' after each '\n'.
+}
+
 } // namespace test
 } // namespace utils
 } // namespace kit
