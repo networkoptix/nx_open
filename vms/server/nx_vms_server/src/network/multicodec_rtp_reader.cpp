@@ -189,6 +189,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     QnAbstractMediaDataPtr result;
     do
     {
+        m_dataTimer.restart();
         if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
             result = getNextDataTCP();
         else
@@ -214,32 +215,31 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     bool isRtpFail = !m_RtpSession.isOpened() && m_rtpStarted;
     int elapsed = m_dataTimer.elapsed();
-    if (isRtpFail || elapsed > m_rtpFrameTimeoutMs)
+    QString reasonParamsEncoded;
+    vms::api::EventReason reason;
+
+    if (!isRtpFail)
     {
-        QString reasonParamsEncoded;
-        vms::api::EventReason reason;
-        if (elapsed > m_rtpFrameTimeoutMs) {
-            reason = vms::api::EventReason::networkNoFrame;
-            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-            NX_WARNING(this, "RTP read timeout for camera %1. Reopen stream", getResource());
-        }
-        else {
-            reason = vms::api::EventReason::networkConnectionClosed;
-            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-            NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource());
-        }
-
-        emit networkIssue(getResource(),
-            qnSyncTime->currentUSecsSinceEpoch(),
-            reason,
-            reasonParamsEncoded);
-        QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(getResource().data());
-        if (cam)
-            cam->issueOccured();
-
+        reason = vms::api::EventReason::networkNoFrame;
+        reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
+        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms", getResource(), elapsed);
+    }
+    else
+    {
+        reason = vms::api::EventReason::networkConnectionClosed;
+        reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
+        NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource());
     }
 
-    NX_VERBOSE(this, "Getting stream data, got data: %1", !!result);
+    emit networkIssue(getResource(),
+        qnSyncTime->currentUSecsSinceEpoch(),
+        reason,
+        reasonParamsEncoded);
+    QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(getResource().data());
+    if (cam)
+        cam->issueOccured();
+
+    NX_VERBOSE(this, "No video frame for camera %1", m_resource->getUrl());
     return result;
 }
 
@@ -332,8 +332,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     // int readed;
     int errorRetryCnt = 0;
     int rtpChannelNum = -1;
-
-    m_dataTimer.restart();
 
     const auto tcpTimeout = m_RtpSession.getTCPTimeout();
     if (m_callbackTimeout.count() > 0)
@@ -442,8 +440,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
     pollfd mediaSockPollArray[MAX_MEDIA_SOCKET_COUNT];
     memset( mediaSockPollArray, 0, sizeof(mediaSockPollArray) );
-
-    m_dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
     {
