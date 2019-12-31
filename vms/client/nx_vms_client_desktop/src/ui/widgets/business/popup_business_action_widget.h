@@ -3,15 +3,10 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/widgets/business/subject_target_action_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui {
-class PopupBusinessActionWidget;
-} // namespace Ui
+namespace Ui { class PopupBusinessActionWidget; }
 
-class QnPopupBusinessActionWidget:
-    public QnSubjectTargetActionWidget,
-    public QnWorkbenchContextAware
+class QnPopupBusinessActionWidget: public QnSubjectTargetActionWidget
 {
     Q_OBJECT
     using base_type = QnSubjectTargetActionWidget;
@@ -24,9 +19,6 @@ public:
 
 protected slots:
     virtual void at_model_dataChanged(Fields fields) override;
-
-private slots:
-    void at_settingsButton_clicked();
 
 private:
     void parametersChanged();

@@ -20,7 +20,7 @@ struct WebEngineView::Private
     bool m_useActionsForLinks = false;
     bool m_ignoreSslErrors = true;
     bool m_redirectLinksToDesktop = false;
-    QSharedPointer<QWebEngineProfile> m_webEngineProfile;
+    QWebEnginePage* m_masterPage = nullptr;
     std::vector<QWebEnginePage::WebAction> m_hiddenActions;
 };
 
@@ -93,8 +93,8 @@ WebEngineView::WebEngineView(QWidget* parent, WebEngineView* deriveFrom):
     }
 
     // Make the page use derived profile.
-    if (d->m_webEngineProfile)
-        setPage(new WebEnginePage(d->m_webEngineProfile.data(), d->m_webEngineProfile.data(), *this));
+    if (d->m_masterPage)
+        setPage(new WebEnginePage(d->m_masterPage->profile(), this, *this));
     else
         setPage(new WebEnginePage(this, *this));
 
@@ -104,7 +104,6 @@ WebEngineView::WebEngineView(QWidget* parent, WebEngineView* deriveFrom):
 
 WebEngineView::~WebEngineView()
 {
-    delete page();
 }
 
 void WebEngineView::setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions)
@@ -148,18 +147,22 @@ bool WebEngineView::isRedirectLinksToDesktop() const
     return d->m_redirectLinksToDesktop;
 }
 
-void WebEngineView::createPageWithUserAgent(const QString& userAgent)
+void WebEngineView::createPageWithNewProfile()
 {
     // Since we are changine user agent here, create the off-the-record profile
     // to avoid mess in persistent storage.
 
+    QWebEngineProfile* oldProfile = page()->profile();
+
     // Make new profile a parent of the web page because it should outlive the page.
     auto profile = new QWebEngineProfile(this);
-    profile->setHttpUserAgent(userAgent);
     setPage(new WebEnginePage(profile, profile, *this));
+    d->m_masterPage = page();
 
-    d->m_webEngineProfile.reset(profile);
-    emit profileChanged();
+    // Delete the old profile because it should no longer be used.
+    // This wiil close all derived windows.
+    if (oldProfile->parent() == this)
+        delete oldProfile;
 }
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent* event)
@@ -234,23 +237,26 @@ QWebEngineView* WebEngineView::createWindow(QWebEnginePage::WebWindowType type)
 {
     Qt::WindowFlags flags = type == QWebEnginePage::WebDialog ? Qt::Dialog : Qt::Window;
     flags |= Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint
-        | Qt::WindowMaximizeButtonHint | Qt::WindowStaysOnTopHint;
+        | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint;
 
     auto window = new QMainWindow(nullptr, flags);
+
+    static constexpr QSize kMinumumWindowSize(120, 0); //< Leave some space for window controls.
+    window->setMinimumSize(kMinumumWindowSize);
+
     auto webView = new WebEngineView(window, this);
 
-    // Profile change means that our parent page is no longer used.
-    // But it is going to stay in memory because its parent is the shared profile which is used
-    // by all derived pages.
-    // Closing the window dereferences the profile pointer so that all pages will be freed.
-    connect(this, &WebEngineView::profileChanged, window, &QMainWindow::close);
     window->setAttribute(Qt::WA_DeleteOnClose);
-    connect(page(), &QObject::destroyed, window, &QMainWindow::close);
 
-    connect(webView->page(), &QWebEnginePage::authenticationRequired, page(),
-        &QWebEnginePage::authenticationRequired);
-    connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired, page(),
-        &QWebEnginePage::proxyAuthenticationRequired);
+    if (d->m_masterPage)
+    {
+        connect(d->m_masterPage, &QObject::destroyed, window, &QMainWindow::close);
+
+        connect(webView->page(), &QWebEnginePage::authenticationRequired, d->m_masterPage,
+            &QWebEnginePage::authenticationRequired);
+        connect(webView->page(), &QWebEnginePage::proxyAuthenticationRequired, d->m_masterPage,
+            &QWebEnginePage::proxyAuthenticationRequired);
+    }
 
     // setGeometry() expects a size excluding the window decoration, while geom includes it.
     const auto changeGeometry =

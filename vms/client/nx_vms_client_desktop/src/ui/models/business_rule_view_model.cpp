@@ -546,6 +546,12 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 
     fields |= updateEventClassRelatedParams();
 
+    if (actionIsUsingSourceServer() && !actionCanUseSourceServer())
+    {
+        m_actionParams.useSource = false;
+        fields |= Field::actionParams;
+    }
+
     emit dataChanged(fields);
     // TODO: #GDM #Business check others, params and resources should be merged
 }
@@ -623,7 +629,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
         case vms::event::ActionType::showTextOverlayAction:
         case vms::event::ActionType::showOnAlarmLayoutAction:
         {
-            if (isUsingSourceCamera())
+            if (isActionUsingSourceCamera())
                 return qnResIconCache->icon(QnResourceIconCache::Camera);
             break;
         }
@@ -638,27 +644,38 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             return ExitFullscreenActionHelper::tableCellIcon(this);
         }
 
+        case vms::event::ActionType::buzzerAction:
+        {
+            if (actionIsUsingSourceServer())
+                return getIcon(Column::source);
+        }
+
         default:
             break;
     }
 
-    QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
+    auto resourceIcon =
+        [this](QnResourceIconCache::Key defaultKey)
+        {
+            const QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
+            if (resources.empty())
+                return qnSkin->icon("tree/buggy.png");
 
-    if (resources.size() == 1)
-        return qnResIconCache->icon(resources.first());
+            if (resources.size() == 1)
+                return qnResIconCache->icon(resources.first());
 
-    if (resources.isEmpty())
-        return qnSkin->icon(lit("tree/buggy.png"));
+            return qnResIconCache->icon(defaultKey);
+        };
 
     if (vms::event::requiresCameraResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Camera);
+        return resourceIcon(QnResourceIconCache::Camera);
     if (vms::event::requiresServerResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::Server);
+        return resourceIcon(QnResourceIconCache::Server);
     if (vms::event::requiresUserResource(m_actionType))
-        return qnResIconCache->icon(QnResourceIconCache::User);
+        return resourceIcon(QnResourceIconCache::User);
 
-    NX_ASSERT(false);
-    return qnResIconCache->icon(QnResourceIconCache::Unknown);
+    // Icon for the <System> actions.
+    return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
 }
 
 QSet<QnUuid> QnBusinessRuleViewModel::eventResources() const
@@ -887,15 +904,37 @@ void QnBusinessRuleViewModel::setDisabled(bool value)
     emit dataChanged(Field::all); // all fields should be redrawn
 }
 
-bool QnBusinessRuleViewModel::canUseSourceCamera() const
+bool QnBusinessRuleViewModel::actionCanUseSourceCamera() const
 {
     return m_eventType >= vms::api::userDefinedEvent
         || vms::event::requiresCameraResource(m_eventType);
 }
 
-bool QnBusinessRuleViewModel::isUsingSourceCamera() const
+bool QnBusinessRuleViewModel::isActionUsingSourceCamera() const
 {
-    return m_actionParams.useSource && canUseSourceCamera();
+    return m_actionParams.useSource && actionCanUseSourceCamera();
+}
+
+bool QnBusinessRuleViewModel::actionCanUseSourceServer() const
+{
+    return vms::event::requiresServerResource(m_actionType)
+        && vms::event::requiresServerResource(m_eventType);
+}
+
+bool QnBusinessRuleViewModel::actionIsUsingSourceServer() const
+{
+    return m_actionParams.useSource && vms::event::requiresServerResource(m_actionType);
+}
+
+void QnBusinessRuleViewModel::toggleActionUseSourceServer()
+{
+    if (!NX_ASSERT(actionCanUseSourceServer()))
+        return;
+
+    m_actionParams.useSource = !m_actionParams.useSource;
+    m_modified = true;
+
+    emit dataChanged(Field::actionParams | Field::modified);
 }
 
 QString QnBusinessRuleViewModel::comments() const
@@ -1173,7 +1212,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case vms::api::showTextOverlayAction:
                 case vms::api::showOnAlarmLayoutAction:
                 {
-                    if (isUsingSourceCamera())
+                    if (isActionUsingSourceCamera())
                         return true;
                     break;
                 }
@@ -1184,6 +1223,10 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         && !url.isEmpty()
                         && (url.scheme().isEmpty() || nx::network::http::isUrlSheme(url.scheme()))
                         && !url.host().isEmpty();
+                }
+                case ActionType::buzzerAction:
+                {
+                    return !filtered.isEmpty() || m_actionParams.useSource;
                 }
                 default:
                     break;
@@ -1312,9 +1355,10 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         case ActionType::showTextOverlayAction:
         case ActionType::showOnAlarmLayoutAction:
         {
-            if (isUsingSourceCamera())
+            if (isActionUsingSourceCamera())
             {
-                QnVirtualCameraResourceList targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
+                QnVirtualCameraResourceList targetCameras =
+                    resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
                     return tr("Source camera");
@@ -1358,26 +1402,30 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
     }
+
     if (vms::event::requiresServerResource(m_actionType))
     {
+        if (actionIsUsingSourceServer())
+            return getSourceText(detailed);
+
         QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
         if (targetServers.isEmpty())
             return tr("Select server");
 
-        const auto server = targetServers.first();
-        const auto camerasCount = resourcePool()->getAllCameras(server, true).size();
+        if (targetServers.count() > 1)
+            return tr("%1 Servers").arg(targetServers.count());
 
-        return QString("%1 - %2").arg(server->getName(), tr("%n cameras", nullptr, camerasCount));
+        return targetServers.first()->getName();
     }
+
     if (vms::event::requiresUserResource(m_actionType))
     {
         return braced(tr("User"));
     }
 
-    NX_ASSERT(false);
-    return QString();
+    return braced(tr("System"));
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const

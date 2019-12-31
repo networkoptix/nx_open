@@ -6,10 +6,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/workbench/workbench_context.h>
-
 #include <business/business_resource_validation.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -20,7 +17,6 @@ using namespace nx::vms::client::desktop::ui;
 
 QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::PopupBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -30,8 +26,6 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
     ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it "
         "creates bookmark with event description"));
 
-    connect(ui->settingsButton, &QPushButton::clicked,
-        this, &QnPopupBusinessActionWidget::at_settingsButton_clicked);
     connect(ui->forceAcknoledgementCheckBox, &QCheckBox::toggled,
         this, &QnPopupBusinessActionWidget::parametersChanged);
 
@@ -67,14 +61,8 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
 void QnPopupBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->selectUsersButton);
-    setTabOrder(ui->selectUsersButton, ui->settingsButton);
-    setTabOrder(ui->settingsButton, ui->forceAcknoledgementCheckBox);
+    setTabOrder(ui->selectUsersButton, ui->forceAcknoledgementCheckBox);
     setTabOrder(ui->forceAcknoledgementCheckBox, after);
-}
-
-void QnPopupBusinessActionWidget::at_settingsButton_clicked()
-{
-    menu()->trigger(action::PreferencesNotificationTabAction);
 }
 
 void QnPopupBusinessActionWidget::parametersChanged()

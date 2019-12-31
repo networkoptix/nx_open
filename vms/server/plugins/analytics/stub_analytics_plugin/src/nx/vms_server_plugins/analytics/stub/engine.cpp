@@ -405,7 +405,7 @@ std::string Engine::manifestString() const
                         "type": "CheckBox",
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
-                        "defaultValue": true,
+                        "defaultValue": true
                     }
                 ]
             }
@@ -423,8 +423,10 @@ std::string Engine::manifestString() const
                                 "type": "TextField",
                                 "name": "testTextFieldWithValidation",
                                 "caption": "Hexadecimal number text field",
+                                "defaultValue": "12ab34cd",
                                 "validationRegex": "^[a-f0-9]+$",
-                                "validationRegexFlags": "i"
+                                "validationRegexFlags": "i",
+                                "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd."
                             },
                             {
                                 "type": "SpinBox",
@@ -454,6 +456,49 @@ std::string Engine::manifestString() const
                                 "caption": "Device Agent CheckBox",
                                 "name": "testCheckBox2",
                                 "defaultValue": true
+                            }
+                        ]
+                    }
+                ],
+                "sections": [
+                    {
+                        "type": "Section",
+                        "name": "Nested section",
+                        "items": [
+                            {
+                                "type": "GroupBox",
+                                "caption": "Nested Section Example",
+                                "items": [
+                                    {
+                                        "type": "SpinBox",
+                                        "caption": "SpinBox Parameter",
+                                        "name": "testSpinBox3",
+                                        "defaultValue": 42,
+                                        "minValue": 0,
+                                        "maxValue": 100
+                                    },
+                                    {
+                                        "type": "DoubleSpinBox",
+                                        "caption": "DoubleSpinBox Parameter",
+                                        "name": "testDoubleSpinBox3",
+                                        "defaultValue": 3.1415,
+                                        "minValue": 0.0,
+                                        "maxValue": 100.0
+                                    },
+                                    {
+                                        "type": "ComboBox",
+                                        "name": "testComboBox3",
+                                        "caption": "ComboBox Parameter",
+                                        "defaultValue": "value2",
+                                        "range": ["value1", "value2", "value3"]
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "caption": "CheckBox Parameter",
+                                        "name": "testCheckBox3",
+                                        "defaultValue": true
+                                    }
+                                ]
                             }
                         ]
                     }

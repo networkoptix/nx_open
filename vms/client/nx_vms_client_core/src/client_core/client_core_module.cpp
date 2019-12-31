@@ -46,8 +46,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
         m_commonModule,
-        qnStaticCommon->localPeerType(),
-        false));
+        qnStaticCommon->localPeerType()));
 
     m_commonModule->instance<QnResourcesChangesManager>();
     m_commonModule->instance<QnClientPtzControllerPool>();

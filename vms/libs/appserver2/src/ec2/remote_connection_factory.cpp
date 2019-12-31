@@ -30,8 +30,7 @@ namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
     QnCommonModule* commonModule,
-    api::PeerType peerType,
-    bool /*isP2pMode*/)
+    api::PeerType peerType)
 :
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),

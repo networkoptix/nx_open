@@ -336,8 +336,15 @@ void QnClientModule::initSurfaceFormat()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
     format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
-    format.setDepthBufferSize(16);
-    format.setStencilBufferSize(8);
+
+    // TODO: Review after upgrade to Qt 5.12
+    // Without depth and stencil buffer sizes Qt prints the following warnings:
+    //   QSGContext::initialize: depth buffer support missing, expect rendering errors
+    //   QSGContext::initialize: stencil buffer support missing, expect rendering errors
+    // However, setting any of those sizes breaks canvas rendering in WebEngine during certains
+    // scenarios.
+    // format.setDepthBufferSize(16);
+    // format.setStencilBufferSize(8);
 
     QSurfaceFormat::setDefaultFormat(format);
 }
@@ -806,6 +813,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
+    if (ini().forceJsonConnection)
+        runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = ini().developerMode ? QString() : AppInfo::brand();
     runtimeData.customization = ini().developerMode ? QString() : AppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;

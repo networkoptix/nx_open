@@ -10,6 +10,7 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
+#include <QtWidgets/QCheckBox>
 
 // TODO: #vkutin Think of a proper location and namespace.
 #include <business/business_resource_validation.h>
@@ -68,15 +69,25 @@ QIcon iconHelper(QIcon base)
         QIcon::Selected, QIcon::Off, false));
 }
 
+void setActionResourcesHolderDisplayFromModel(
+    QPushButton* resourcesHolder,
+    const QnBusinessRuleViewModel* model)
+{
+    using Column = QnBusinessRuleViewModel::Column;
+    resourcesHolder->setText(model->data(Column::target, Qn::ShortTextRole).toString());
+    resourcesHolder->setIcon(
+        iconHelper(model->data(Column::target, Qt::DecorationRole).value<QIcon>()));
+}
+
 } // namespace
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
+QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRuleWidget),
     m_model(),
-    m_eventParameters(NULL),
-    m_actionParameters(NULL),
+    m_eventParameters(nullptr),
+    m_actionParameters(nullptr),
     m_updating(false),
     m_eventAligner(new Aligner(this)),
     m_actionAligner(new Aligner(this))
@@ -102,6 +113,11 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     connect(ui->aggregationWidget, SIGNAL(valueChanged()), this, SLOT(updateModelAggregationPeriod()));
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+
+    // Checkbox notifies model about click, model holds action for it and value for it. Should
+    // be replaced with some kind of read-only check box eventually.
+    connect(ui->useEventSourceServerCheckBox, &QCheckBox::clicked, this,
+        [this](bool checked) { m_model->toggleActionUseSourceServer(); });
 
     m_eventAligner->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
     m_actionAligner->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
@@ -182,6 +198,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
+
+        if (m_model->actionIsUsingSourceServer())
+            setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
+
+        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
     }
 
     if (fields & Field::eventState)
@@ -196,6 +217,9 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventResourcesHolder->setText(m_model->data(Column::source).toString());
         ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(Column::source,
             Qt::DecorationRole).value<QIcon>()));
+
+        if (m_model->actionIsUsingSourceServer())
+            setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
     }
 
     if (fields & Field::actionType)
@@ -233,7 +257,19 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
         ui->aggregationWidget->setVisible(vms::event::allowsAggregation(m_model->actionType()));
 
+        ui->useEventSourceServerCheckBox->setVisible(
+            vms::event::requiresServerResource(m_model->actionType()));
+
         initActionParameters();
+    }
+
+    if (fields & Field::actionParams)
+    {
+        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
+        ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
+        ui->actionResourcesHolder->setEnabled(!m_model->actionIsUsingSourceServer());
+        if (!ui->useEventSourceServerCheckBox->isEnabled())
+            ui->useEventSourceServerCheckBox->setChecked(false);
     }
 
     if (fields & (Field::eventType | Field::actionType | Field::actionParams))
@@ -252,9 +288,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
     if (fields & (Field::actionResources | Field::actionType | Field::actionParams))
     {
-        ui->actionResourcesHolder->setText(m_model->data(Column::target, Qn::ShortTextRole).toString());
-        ui->actionResourcesHolder->setIcon(iconHelper(m_model->data(Column::target,
-            Qt::DecorationRole).value<QIcon>()));
+        setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
     }
 
     if (fields & Field::aggregation)

@@ -102,12 +102,6 @@ private:
     size_t m_count = 0;
 };
 
-// This User-Agent is required for vista camera to use html/js page, not java applet.
-const QString kUserAgentForCameraPage(
-    "Mozilla/5.0 (Windows; U; Windows NT based; en-US)"
-    " AppleWebKit/534.34 (KHTML, like Gecko)"
-    "  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
-
 // QWebEngine does not want to connect to localhost server through localhost proxy,
 // so let's try to find another address in that case.
 QString getNonLocalAddress(const QString& host)
@@ -181,7 +175,11 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
 void CameraWebPageWidget::Private::createNewPage()
 {
     auto webView = webWidget->webEngineView();
-    webView->createPageWithUserAgent(kUserAgentForCameraPage);
+    webView->createPageWithNewProfile();
+
+    if (!lastCamera.overrideHttpUserAgent.isNull())
+        webView->page()->profile()->setHttpUserAgent(lastCamera.overrideHttpUserAgent);
+
     webView->page()->profile()->clearHttpCache();
 
     if (lastCamera.overrideXmlHttpRequestTimeout > 0)

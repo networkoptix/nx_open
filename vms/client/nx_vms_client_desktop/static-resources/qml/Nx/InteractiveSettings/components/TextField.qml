@@ -10,14 +10,18 @@ LabeledItem
     property string defaultValue: ""
     property string validationRegex: ""
     property string validationRegexFlags: ""
+    property string validationErrorMessage: ""
 
-    contentItem: TextField
+    contentItem: TextFieldWithWarning
     {
         readonly property var validationRegex:
             new RegExp(control.validationRegex, control.validationRegexFlags)
 
         id: textField
         text: defaultValue
-        warningState: control.validationRegex && !validationRegex.test(text)
+        warningText: validationErrorMessage
+
+        textField.onEditingFinished:
+            warningState = validationRegex && !validationRegex.test(text)
     }
 }

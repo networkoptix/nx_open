@@ -23,7 +23,7 @@ QIcon invalidIcon()
 
 QnVirtualCameraResourcePtr getCameraInternal(const QnBusinessRuleViewModel* model)
 {
-    if (model->isUsingSourceCamera())
+    if (model->isActionUsingSourceCamera())
         return QnVirtualCameraResourcePtr();
 
     const auto resourceIds = model->actionResourcesRaw();
@@ -53,7 +53,7 @@ namespace nx::vms::client::desktop {
 
 bool FullscreenActionHelper::isCameraValid(const QnBusinessRuleViewModel* model)
 {
-    if (model->isUsingSourceCamera())
+    if (model->isActionUsingSourceCamera())
         return true;
 
     return !getCameraInternal(model).isNull();
@@ -61,7 +61,7 @@ bool FullscreenActionHelper::isCameraValid(const QnBusinessRuleViewModel* model)
 
 QString FullscreenActionHelper::cameraText(const QnBusinessRuleViewModel* model)
 {
-    if (model->isUsingSourceCamera())
+    if (model->isActionUsingSourceCamera())
         return tr("Source camera");
 
     const auto camera = getCameraInternal(model);
@@ -76,7 +76,7 @@ QString FullscreenActionHelper::cameraText(const QnBusinessRuleViewModel* model)
 
 QIcon FullscreenActionHelper::cameraIcon(const QnBusinessRuleViewModel* model)
 {
-    if (model->isUsingSourceCamera())
+    if (model->isActionUsingSourceCamera())
         return selectedIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
 
     const auto camera = getCameraInternal(model);

@@ -1131,11 +1131,20 @@ void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
     if (!validState)
         return;
 
-    setPhysicalState(PhysicalState::testing);
-    NX_VERBOSE(this, "Executing connect to the %1", url);
-    m_connecting.handle = qnClientCoreModule->connectionFactory()->connect(
-        url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
     m_connecting.url = url;
+    if (ini().forceJsonConnection)
+    {
+        QUrlQuery query(m_connecting.url.toQUrl());
+        query.removeQueryItem("format");
+        query.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+        m_connecting.url.setQuery(query);
+    }
+
+    setPhysicalState(PhysicalState::testing);
+    NX_VERBOSE(this, "Executing connect to the %1", m_connecting.url);
+    m_connecting.handle = qnClientCoreModule->connectionFactory()->connect(
+        m_connecting.url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
+
 }
 
 void QnWorkbenchConnectHandler::connectToServerForUpdate(const nx::utils::Url &url)

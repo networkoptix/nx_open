@@ -297,8 +297,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 updateOverlayButton();
             };
 
-        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged,
-            this,
+        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged, this,
             [this, updateStatus]
             {
                 updateStatus();
@@ -2193,7 +2192,7 @@ bool QnMediaResourceWidget::isVideoWallLicenseValid() const
     if (helper.isValid())
         return true;
 
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    const QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
     QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
 
@@ -2208,7 +2207,9 @@ bool QnMediaResourceWidget::isVideoWallLicenseValid() const
     size_t sceensToDisable = 0;
     while (sceensToDisable < onlineScreens.size()
         && Helper::licensesForScreens(onlineScreens.size() - sceensToDisable) > allowedLiceses)
+    {
         ++sceensToDisable;
+    }
 
     if (sceensToDisable > 0)
     {

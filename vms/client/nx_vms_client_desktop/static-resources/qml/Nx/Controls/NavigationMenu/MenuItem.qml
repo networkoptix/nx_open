@@ -23,7 +23,11 @@ Text
     function click()
     {
         if (navigationMenu)
+        {
             navigationMenu.currentItemId = itemId
+            navigationMenu.itemClicked(menuItem)
+        }
+
         clicked()
     }
 

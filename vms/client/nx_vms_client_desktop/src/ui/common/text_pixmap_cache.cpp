@@ -1,6 +1,7 @@
 #include "text_pixmap_cache.h"
 
 #include <limits>
+#include <cmath>
 
 #include <QtCore/QCache>
 

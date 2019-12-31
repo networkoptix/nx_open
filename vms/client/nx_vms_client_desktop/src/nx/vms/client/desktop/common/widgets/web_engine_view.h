@@ -29,8 +29,8 @@ public:
     void setIgnoreSslErrors(bool ignore);
     bool hasIgnoreSslErrors() const;
 
-    // Creates new web page with specified user agent and switches it to off-the-records profile.
-    void createPageWithUserAgent(const QString& userAgent);
+    // Creates web page with new off-the-records profile.
+    void createPageWithNewProfile();
 
     // Enables redirecting all link navigation to desktop browser.
     void setRedirectLinksToDesktop(bool enabled);
@@ -43,9 +43,6 @@ public:
     void removeStyleSheet(const QString& name, bool immediately = true);
 
     void setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions);
-
-signals:
-    void profileChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* event) override;

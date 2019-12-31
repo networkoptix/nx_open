@@ -268,11 +268,26 @@ void TextField::setValidationRegexFlags(const QString& flags)
     emit validationRegexFlagsChanged();
 }
 
+QString TextField::validationErrorMessage() const
+{
+    return m_validationErrorMessage;
+}
+
+void TextField::setValidationErrorMessage(const QString& message)
+{
+    if (m_validationErrorMessage == message)
+        return;
+
+    m_validationErrorMessage = message;
+    emit validationErrorMessageChanged();
+}
+
 QJsonObject TextField::serialize() const
 {
     auto result = base_type::serialize();
     result[QStringLiteral("validationRegex")] = validationRegex();
     result[QStringLiteral("validationRegexFlags")] = validationRegexFlags();
+    result[QStringLiteral("validationErrorMessage")] = validationErrorMessage();
     return result;
 }
 

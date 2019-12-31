@@ -1,12 +1,16 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.11
+
 import Nx 1.0
 import Nx.Utils 1.0
 import Nx.Controls 1.0
 import Nx.Controls.NavigationMenu 1.0
 import Nx.InteractiveSettings 1.0
-import nx.vms.client.core 1.0
 import Nx.Core 1.0
+
+import nx.vms.client.core 1.0
+
+import "private"
 
 Item
 {
@@ -19,11 +23,14 @@ Item
 
     property var currentEngineId
     property var currentEngineInfo
-    property var currentSection
+    property var currentSectionPath: []
     property bool loading: false
 
     readonly property bool isDeviceDependent: currentEngineInfo !== undefined
         && currentEngineInfo.isDeviceDependent
+
+    readonly property bool isDefaultSection: currentEngineId !== undefined
+        && currentSectionPath.length == 0
 
     Connections
     {
@@ -66,7 +73,10 @@ Item
 
                 currentEngineId = engineId
                 currentEngineInfo = engineInfo
-                menu.currentItemId = engineId.toString() + currentSection
+
+                navigationMenu.currentItemId =
+                    [engineId.toString()].concat(currentSectionPath).join("\n")
+
                 settingsView.loadModel(
                     engineInfo.settingsModel,
                     store.deviceAgentSettingsValues(engineInfo.id))
@@ -75,8 +85,8 @@ Item
             {
                 currentEngineId = undefined
                 currentEngineInfo = undefined
-                currentSection = ""
-                menu.currentItemId = undefined
+                currentSectionPath = []
+                navigationMenu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
 
@@ -98,10 +108,26 @@ Item
 
     NavigationMenu
     {
-        id: menu
+        id: navigationMenu
 
         width: 240
         height: parent.height - banner.height
+
+        onItemClicked:
+        {
+            currentSectionPath = item.sections
+            store.setCurrentAnalyticsEngineId(item.engineId)
+
+            var container = settingsView.contentItem.sectionsItem
+            for (var i = 0; i < currentSectionPath.length; ++i)
+            {
+                container.currentIndex = currentSectionPath[i] + 1
+                container = container.children[container.currentIndex].sectionsItem;
+            }
+
+            if (container)
+                container.currentIndex = 0
+        }
 
         Repeater
         {
@@ -109,112 +135,34 @@ Item
 
             Rectangle
             {
-                readonly property var engineId: modelData.id
-                readonly property bool isActive: enabledAnalyticsEngines.indexOf(engineId) !== -1
-                readonly property bool isSelected: currentEngineId === engineId
-                readonly property real textAlpha: isActive ? 1.0 : 0.3
+                id: container
 
                 width: parent.width
                 height: column.height
                 color: isSelected ? ColorTheme.colors.dark9 : "transparent"
+
+                readonly property var engineId: modelData.id
+                readonly property var isSelected: currentEngineId === engineId
 
                 Column
                 {
                     id: column
                     width: parent.width
 
-                    MenuItem
+                    Loader
                     {
-                        id: menuItem
-
-                        height: 28
-                        itemId: engineId.toString()
-                        text: modelData.name
-                        active: isActive
-                        navigationMenu: menu
-
-                        color: ColorTheme.transparent(
-                            current || isSelected
-                                ? ColorTheme.colors.light1
-                                : ColorTheme.colors.light10,
-                            textAlpha);
-
-                        onClicked:
-                        {
-                            currentSection = ""
-                            store.setCurrentAnalyticsEngineId(engineId)
-                            settingsView.contentItem.sectionsItem.currentIndex = 0
-                        }
-
-                        readonly property bool collapsible:
-                            !!modelData.settingsModel.sections && modelData.settingsModel.sections.length > 0
-
-                        MouseArea
-                        {
-                            id: expandCollapseButton
-
-                            width: 20
-                            height: parent.height
-                            anchors.right: parent.right
-                            acceptedButtons: Qt.LeftButton
-                            visible: parent.collapsible
-                            hoverEnabled: true
-
-                            ArrowIcon
-                            {
-                                anchors.centerIn: parent
-                                rotation: sectionsView.collapsed ? 0 : 180
-                                color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
-                                    ? ColorTheme.lighter(menuItem.color, 2)
-                                    : menuItem.color
-                            }
-
-                            onClicked:
-                            {
-                                if (isSelected)
-                                    parent.click()
-
-                                sectionsView.collapsed = !sectionsView.collapsed
-                            }
-                        }
-                    }
-
-                    // Only 1 level of submenu items is supported at the moment.
-                    Column
-                    {
-                        id: sectionsView
                         width: parent.width
-                        clip: true
+                        sourceComponent: AnalyticsMenuItem {}
 
-                        property bool collapsed: false
-                        height: collapsed ? 0 : implicitHeight
-
-                        Repeater
-                        {
-                            model: modelData.settingsModel.sections
-
-                            MenuItem
-                            {
-                                height: 28
-                                itemId: engineId.toString() + modelData.name
-                                text: modelData.name
-                                leftPadding: 24
-                                navigationMenu: menu
-                                font.pixelSize: 12
-                                active: isActive
-
-                                color: ColorTheme.transparent(
-                                    current ? ColorTheme.colors.light1 : ColorTheme.colors.light10,
-                                    textAlpha);
-
-                                onClicked:
-                                {
-                                    currentSection = modelData.name
-                                    store.setCurrentAnalyticsEngineId(engineId)
-                                    settingsView.contentItem.sectionsItem.currentIndex = index + 1
-                                }
-                            }
-                        }
+                        // Context properties:
+                        property var ctx_navigationMenu: navigationMenu
+                        property var ctx_modelData: modelData
+                        property var ctx_engineId: engineId
+                        property var ctx_sections: []
+                        property int ctx_level: 0
+                        property bool ctx_selected: container.isSelected
+                        property bool ctx_active: enabledAnalyticsEngines.indexOf(engineId) !== -1
+                            || analyticsEngines[index].isDeviceDependent
                     }
 
                     Rectangle
@@ -241,7 +189,7 @@ Item
 
     ColumnLayout
     {
-        x: menu.width + 16
+        x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 16
         height: parent.height - 16 - banner.height
@@ -251,8 +199,8 @@ Item
 
         RowLayout
         {
-            visible: currentEngineId !== undefined && isDeviceDependent
             spacing: 16
+            visible: isDefaultSection && isDeviceDependent
 
             Image
             {
@@ -274,7 +222,7 @@ Item
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: currentEngineId !== undefined && !isDeviceDependent && currentSection == ""
+            visible: isDefaultSection && !isDeviceDependent
 
             Binding
             {
@@ -308,7 +256,8 @@ Item
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            onValuesEdited: { store.setDeviceAgentSettingsValues(currentEngineId, getValues()) }
+            onValuesEdited:
+                store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
             contentEnabled: enableSwitch.checked
             scrollBarParent: scrollBarsParent

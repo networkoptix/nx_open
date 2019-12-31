@@ -426,29 +426,41 @@ void MessageBus::doPeriodicTasks()
 
 vms::api::PeerData MessageBus::localPeer() const
 {
-    return vms::api::PeerData(
+    const auto localPeerData = commonModule()->runtimeInfoManager()->localInfo().data.peer;
+
+    const auto result = vms::api::PeerData(
         commonModule()->moduleGUID(),
         commonModule()->runningInstanceGUID(),
         commonModule()->dbId(),
-        m_localPeerType);
+        m_localPeerType,
+        localPeerData.dataFormat);
+
+    // TODO: Simplify logic, use localPeerData directly, remove m_localPeerType.
+    NX_ASSERT(localPeerData == result);
+    return result;
 }
 
 vms::api::PeerDataEx MessageBus::localPeerEx() const
 {
+    const auto localPeerData = commonModule()->runtimeInfoManager()->localInfo().data.peer;
+
     using namespace vms::api;
     PeerDataEx result;
     result.id = commonModule()->moduleGUID();
     result.persistentId = commonModule()->dbId();
     result.instanceId = commonModule()->runningInstanceGUID();
-    result.systemId = commonModule()->globalSettings()->localSystemId();
     result.peerType = m_localPeerType;
+    result.dataFormat = localPeerData.dataFormat;
+
+    // TODO: Simplify logic, use localPeerData directly, remove m_localPeerType.
+    NX_ASSERT(static_cast<PeerData>(result) == localPeerData);
+
+    result.systemId = commonModule()->globalSettings()->localSystemId();
     result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx::vms::api::protocolVersion();
-    result.dataFormat =
-        m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;
 }
 

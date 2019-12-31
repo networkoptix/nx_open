@@ -13,14 +13,10 @@ from itertools import chain
 from os.path import join
 
 
-def change_dep_path(binary, xfrom, relative_to):
-    subprocess.call(['install_name_tool', '-change', xfrom, '@executable_path/../Frameworks/' + relative_to, binary])
-
-
-def remove_rpath(binary):
+def fix_rpath(binary):
     output = subprocess.check_output(["otool", "-l", binary]).decode('utf-8')
 
-    # Here we parse paths from otool output which looks like this:
+    # Here we parse paths from otool -l output which look like this:
     #     cmd LC_RPATH
     # cmdsize 40
     #    path @executable_path/Frameworks (offset 12)
@@ -36,6 +32,9 @@ def remove_rpath(binary):
 
     command.append(binary)
 
+    subprocess.call(command)
+
+    command = ['install_name_tool', '-add_rpath', '@executable_path/../Frameworks', binary]
     subprocess.call(command)
 
 
@@ -132,7 +131,7 @@ def prepare(build_dir, binary, sbindir, tlibdir):
                 yield join(root, xfile)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
-    remove_rpath(binary)
+    fix_rpath(binary)
 
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
     qframeworks = fnmatch.filter(os.listdir(qlibdir), '*.framework')
@@ -153,7 +152,6 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
                 shutil.copy(fpath, tlibdir)
                 os.chmod(tpath, 0o644)
                 fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)
-            change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
             # name: QtCore
             #
@@ -199,7 +197,6 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
                     os.symlink('5', join(troot, 'Versions/Current'))
 
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)
-                change_dep_path(binary, full_name, join(folder, name))
 
 
 def main(build_dir, app_path, bindir, libdir, helpdir, qtdir, qtver):
