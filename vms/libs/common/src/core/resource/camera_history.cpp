@@ -116,7 +116,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(resource->getId().toString())
                 .arg(resource->getName())
-                .arg(resource->getUrl()));
+                .arg(nx::utils::url::hidePassword(resource->getUrl())));
 
         QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
         if (cam)

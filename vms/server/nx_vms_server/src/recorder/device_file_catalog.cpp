@@ -349,21 +349,21 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
             QString baseName = QnFile::baseName(fileName);
             int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
 
-            if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
+            if (startTimeMs < 1 || endTimeMs - startTimeMs < 1)
+            {
                 delete avi;
                 return chunk;
             }
+
             chunk = Chunk(
-                startTimeMs,
-                storageDbPool()->getStorageIndex(storage),
-                fileIndex,
-                endTimeMs - startTimeMs,
-                detectTimeZone(startTimeMs, localFileName)
-            );
+                startTimeMs, storageDbPool()->getStorageIndex(storage),
+                fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, localFileName));
         }
-        else {
-            qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
+        else
+        {
+            NX_WARNING(this, "Can't open media file '%1'", nx::utils::url::hidePassword(fileName));
         }
+
         delete avi;
         return chunk;
     }
@@ -519,47 +519,52 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             break;
         }
 
-        nx::utils::concurrent::run( &tp, [&]()
-        {
-            //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
-            QString fileName = fi.absoluteFilePath();
-            qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
-
-            if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
-                return;
-
-            Chunk chunk = chunkFromFile(storage, fileName);
-            chunk.setFileSize(fi.size());
-            if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+        nx::utils::concurrent::run(
+            &tp,
+            [&]()
             {
-                return;
-            }
+                //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
+                QString fileName = fi.absoluteFilePath();
+                qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
 
-            QnMutexLocker lock(&scanFilesMutex);
-            if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
-                QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
-                if (itr != allChunks.begin())
+                if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
+                    return;
+
+                Chunk chunk = chunkFromFile(storage, fileName);
+                chunk.setFileSize(fi.size());
+                if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
                 {
-                    Chunk& prevChunk = *(itr-1);
-                    qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION_MS && !fi.baseName().contains("_") /*Old version file*/)
-                        prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                    return;
                 }
 
-                if (allChunks.size() % 1000 == 0)
-                    qWarning() << allChunks.size() << "media files processed...";
+                QnMutexLocker lock(&scanFilesMutex);
+                if (chunk.durationMs > 0 && chunk.startTimeMs > 0)
+                {
+                    QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
+                    if (itr != allChunks.begin())
+                    {
+                        Chunk& prevChunk = *(itr-1);
+                        qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
+                        if (delta < MAX_FRAME_DURATION_MS
+                            && !fi.baseName().contains("_")) //< Old version file.
+                        {
+                            prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
+                        }
+                    }
 
-            }
-            else if (fi.fileName().indexOf(".txt") == -1) {
-                qDebug() << "remove file" << fi.absoluteFilePath() << "because of empty chunk. duration=" << chunk.durationMs << "startTime=" << chunk.startTimeMs;
-                emptyFileList
-                    << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
-                           chunk.startTimeMs,
-                           fi.absoluteFilePath()
-                       );
-            }
-        }
-        );
+                    if (allChunks.size() % 1000 == 0)
+                        NX_INFO(this, "%1 media files have been processed...", allChunks.size());
+
+                }
+                else if (fi.fileName().indexOf(".txt") == -1)
+                {
+                    NX_DEBUG(
+                        this, "Removing file '%1' because corresponding chunk is empty",
+                        nx::utils::url::hidePassword(fi.absoluteFilePath()));
+
+                    emptyFileList << EmptyFileInfo(chunk.startTimeMs, fi.absoluteFilePath());
+                }
+            });
     }
     tp.waitForDone();
 

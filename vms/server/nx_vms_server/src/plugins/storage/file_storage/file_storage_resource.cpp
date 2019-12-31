@@ -65,6 +65,8 @@ static const auto MS_NOEXEC = MNT_NOEXEC;
 
 namespace {
 
+using nx::utils::url::hidePassword;
+
 const qint64 kMaxNasStorageSpaceLimit = 100ll * 1024 * 1024 * 1024; // 100 Gb
 const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
@@ -186,7 +188,7 @@ QIODevice* QnFileStorageResource::open(
 
         if (fd < 0)
         {
-            NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
+            NX_ERROR(this, "[open] failed to open file %1", hidePassword(fileName));
             return nullptr;
         }
     }
@@ -263,17 +265,23 @@ Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString&
 {
     if (rootTool()->isPathExists(url))
     {
-        NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", url);
+        NX_DEBUG(this, "[initOrUpdate] Storage directory '%1' exists", hidePassword(url));
         return Qn::StorageInit_Ok;
     }
 
     if (!rootTool()->makeDirectory(url))
     {
-        NX_WARNING(this, "[initOrUpdate] storage directory '%1' doesn't exist and mkdir failed", url);
+        NX_WARNING(
+            this, "[initOrUpdate] storage directory '%1' doesn't exist and mkdir failed",
+            hidePassword(url));
+
         return Qn::StorageInit_WrongPath;
     }
 
-    NX_DEBUG(this, "[initOrUpdate] storage directory '%1' was successfully created", url);
+    NX_DEBUG(
+        this, "[initOrUpdate] storage directory '%1' was successfully created", 
+        hidePassword(url));
+
     return Qn::StorageInit_Ok;
 }
 
@@ -653,7 +661,7 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
     if (rootTool()->rename(oldPath, newPath))
         return true;
 
-    NX_ERROR(this, lm("Rename %1 to %2 failed").args(oldName, newName));
+    NX_ERROR(this, "Rename '%1' to '%2' failed", hidePassword(oldName), hidePassword(newName));
     return false;
 }
 
@@ -666,7 +674,7 @@ bool QnFileStorageResource::removeDir(const QString& url)
     if (rootTool()->removePath(path))
         return true;
 
-    NX_ERROR(this, lm("removeDir failed for %1").args(path));
+    NX_ERROR(this, "removeDir failed for '%1'", hidePassword(path));
     return false;
 }
 
@@ -770,7 +778,8 @@ bool QnFileStorageResource::testWriteCapInternal() const
 #endif
 
     NX_ERROR(
-        this, lm("[initOrUpdate, WriteTest] Open file %1 for writing failed").args(fileName));
+        this, "[initOrUpdate, WriteTest] Open file '%1' for writing failed", 
+        hidePassword(fileName));
 
     return false;
 }

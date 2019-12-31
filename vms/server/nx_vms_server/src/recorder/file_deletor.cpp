@@ -13,6 +13,8 @@
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
 
+using nx::utils::url::hidePassword;
+
 QnFileDeletor::QnFileDeletor(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
@@ -69,12 +71,15 @@ void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
 {
     if (!internalDeleteFile(fileName))
     {
-        NX_DEBUG(this, lm("[Cleanup, FileStorage]. Postponing file %1").arg(fileName));
+        NX_DEBUG(
+            this, "[Cleanup, FileStorage]. Postponing file '%1'", hidePassword(fileName));
         postponeFile(fileName, storageId);
         return;
     }
 
-    NX_VERBOSE(this, lm("[Cleanup, FileStorage]. File %1 removed successfully").arg(fileName));
+    NX_VERBOSE(
+        this,
+        "[Cleanup, FileStorage]. File '%1' removed successfully", hidePassword(fileName));
 }
 
 void QnFileDeletor::postponeFile(const QString& fileName, const QnUuid &storageId)
@@ -139,7 +144,7 @@ void QnFileDeletor::processPostponedFiles()
     {
         if (std::chrono::steady_clock::now() - start > kMaxProcessPostponedDuration)
         {
-            NX_VERBOSE(this, lit("[Cleanup] process postponed files duration exceeded. Breaking."));
+            NX_VERBOSE(this, "[Cleanup] process postponed files duration exceeded. Breaking.");
             for (; itr != m_postponedFiles.end(); ++itr)
                 newList.insert(*itr);
             break;
@@ -154,23 +159,24 @@ void QnFileDeletor::processPostponedFiles()
 
             if (!storage)
             {
-                NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
-                        .arg(itr->storageId.toString())
-                        .arg(itr->fileName));
+                NX_VERBOSE(
+                    this, "[Cleanup] storage with id '%1' not found in pool. Postponing file '%2'",
+                    itr->storageId.toString(), hidePassword(itr->fileName));
             }
             else if (storage->getStatus() == Qn::ResourceStatus::Offline)
             {
-                NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
-                        .arg(storage->getUrl())
-                        .arg(itr->fileName));
+                NX_VERBOSE(
+                    this, "[Cleanup] storage %1 is offline. Postponing file %2",
+                    hidePassword(storage->getUrl()), hidePassword(itr->fileName));
             }
 
             if (needToPostpone || !internalDeleteFile(itr->fileName))
             {
                 newList.insert(*itr);
-                NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
-                    .arg(itr->fileName)
-                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
+                NX_VERBOSE(
+                    this, "[Cleanup] Postponing file %1. Reason: %2",
+                    hidePassword(itr->fileName),
+                    needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed");
             }
         }
     }
