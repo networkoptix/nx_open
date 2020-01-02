@@ -620,7 +620,7 @@ private:
     {
         m_silentServer->acceptAsync(
             [this](
-                SystemError::ErrorCode result,
+                SystemError::ErrorCode /*result*/,
                 std::unique_ptr<AbstractStreamSocket> connection)
             {
                 m_acceptedConnections.push_back(std::move(connection));
