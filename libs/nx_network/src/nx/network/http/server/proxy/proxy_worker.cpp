@@ -152,8 +152,7 @@ void ProxyWorker::onMessageFromTargetHost(nx::network::http::Message message)
             contentType.isEmpty() ? nx::String("none") : contentType));
 
     if (nx::network::http::isMessageBodyPresent(*message.response) &&
-        !messageBodyNeedsConvertion(*message.response) &&
-        message.response->headers.find("Content-Length") != message.response->headers.end())
+        !messageBodyNeedsConvertion(*message.response))
     {
         return startMessageBodyStreaming(std::move(message));
     }
