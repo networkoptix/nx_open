@@ -149,7 +149,7 @@
         "licenceError": "警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
         "duplicateServersError": "至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试",
         "connectionFailed": "连接失败︰ ",
-        "unknownError": "Unknown error",
+        "unknownError": "未知的错误",
         "mergeFailed": "合并失败",
         "mergeSucceed": "合并成功。",
         "newSystemDisplayName": "新系统",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "登录名或密码不正确",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "尝试次数过多，请稍后重试。"
     },
     "navigaion": {
         "cannotGetUser": "服务器故障︰ 无法检索当前用户数据"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "启动服务器",
         "serverRestarting": "服务器正在重新启动 ！",
-        "serverOffline": "server is offline"
+        "serverOffline": "服务器离线"
     },
     "fileUpload": {
         "started": "成功更新。它将需要几分钟时间",
@@ -182,7 +182,7 @@
         "selectFiles": "选择文件"
     },
     "advanced": {
-        "free": "Free",
+        "free": "可用",
         "total": "总共",
         "occupied": "正忙",
         "reserved": "保留"

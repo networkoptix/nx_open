@@ -22,10 +22,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>端口</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="端口" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -41,12 +41,12 @@
                         <h3>重置服务器</h3>
                         <p>此操作将将此服务器恢复为默认值 (清除数据库并重置配置)。
                             服务器将与当前系统分离。 视频存档将保持不变。</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢复出厂默认值</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>从系统中分离服务器</h3>
                         <p>此操作将从系统中分离服务器但保持数据库，本地用户和配置。
-                            Video archive will remain intact. <b>云用户将被删除。</b></p>
+                            影像资料将保持完好 <b>云用户将被删除。</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
                     </div>
                     <div>

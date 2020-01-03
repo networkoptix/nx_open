@@ -149,7 +149,7 @@
         "licenceError": "警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
         "duplicateServersError": "至少有一個具有相同ID的伺服器, 所以無法合併系統。請刪除此伺服器, 然後重試。",
         "connectionFailed": "連接失敗: ",
-        "unknownError": "Unknown error",
+        "unknownError": "未知的錯誤",
         "mergeFailed": "合併失敗",
         "mergeSucceed": "合併成功.",
         "newSystemDisplayName": "新系統",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "帳號或密碼不正確",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "嘗試次數過多，請稍後再試。"
     },
     "navigaion": {
         "cannotGetUser": "伺服器故障: 無法取得此使用者資料"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "伺服器正在啟動中",
         "serverRestarting": "伺服器正在重新啟動!",
-        "serverOffline": "server is offline"
+        "serverOffline": "伺服器已離線"
     },
     "fileUpload": {
         "started": "更新成功地開始. 這將需要幾分鐘時間",
@@ -182,7 +182,7 @@
         "selectFiles": "選擇檔案"
     },
     "advanced": {
-        "free": "Free",
+        "free": "可用",
         "total": "合計",
         "occupied": "被佔用",
         "reserved": "保留"

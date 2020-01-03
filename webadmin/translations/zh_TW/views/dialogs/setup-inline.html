@@ -12,7 +12,7 @@
         身份驗証失敗.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">請重試</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">請重試</button>
     </p>
 </div>
 
@@ -55,7 +55,7 @@
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
-                   placeholder="System name" required auto-focus>
+                   placeholder="系統名稱" required auto-focus>
         </div>
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
@@ -107,7 +107,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>Local</h3>
+                <h3>本機</h3>
                 <p>
                     只運作於內部網路<br>
                     不需網路連線
@@ -175,13 +175,13 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="密碼" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Stay logged in
+                保持登入
             </labe>
         </div>
 
@@ -228,12 +228,12 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
+                   type="password" autocomplete="new-password" placeholder="請重複輸入密碼" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Save password
+                儲存密碼
             </labe>
         </div>
 
@@ -265,7 +265,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                All fields are required
+                所有欄位皆為必填
             </div>
         </div>
 
@@ -273,7 +273,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Passwords do not match
+                密碼輸入不一致
             </div>
         </div>
     </form>
@@ -304,20 +304,20 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="登入" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Password" required>
+                   placeholder="密碼" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                All fields are required
+                所有欄位皆為必填
             </div>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="retry()">請重試</button>
     </p>
 </div>
 
@@ -375,7 +375,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>系統已可使用</h2>
-    <p>Login</p>
+    <p>登入</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>共享與帳號設定</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="開啟 {{Config.cloud.productName}}"
