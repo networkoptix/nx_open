@@ -456,6 +456,15 @@ class SslSocketSpecific:
     using base_type = network::test::StreamSocketAcceptance<
         network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>;
 
+public:
+    ~SslSocketSpecific()
+    {
+        if (m_silentServer)
+            m_silentServer->pleaseStopSync();
+
+        m_acceptedConnections.clear();
+    }
+
 protected:
     void givenSocketTimedOutOnSendAsync()
     {
@@ -500,6 +509,46 @@ protected:
         ASSERT_EQ(
             testData.size(),
             m_notEncryptedConnection->send(testData.constData(), testData.size()));
+    }
+
+    void givenSilentServer()
+    {
+        m_silentServer = std::make_unique<TCPServerSocket>(AF_INET);
+
+        ASSERT_TRUE(m_silentServer->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_silentServer->listen());
+        ASSERT_TRUE(m_silentServer->setNonBlockingMode(true));
+
+        startAccepting();
+    }
+
+    void whenConnectSyncWithTimeout(std::chrono::milliseconds timeout)
+    {
+        m_prevConnectResult = connection()->connect(m_silentServer->getLocalAddress(), timeout)
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode();
+    }
+
+    void whenConnectAsyncWithTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(true));
+        ASSERT_TRUE(connection()->setSendTimeout(timeout.count()));
+
+        std::promise<void> done;
+        connection()->connectAsync(
+            m_silentServer->getLocalAddress(),
+            [this, &done](SystemError::ErrorCode errorCode)
+            {
+                m_prevConnectResult = errorCode;
+                done.set_value();
+            });
+
+        done.get_future().wait();
+    }
+
+    void thenConnectFailed(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_prevConnectResult);
     }
 
     void assertServerReceivedAllDataSent()
@@ -561,8 +610,23 @@ protected:
     }
 
 private:
+    std::unique_ptr<TCPServerSocket> m_silentServer;
     std::unique_ptr<TCPSocket> m_notEncryptedConnection;
     QByteArray m_dataSent;
+    std::optional<SystemError::ErrorCode> m_prevConnectResult;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
+
+    void startAccepting()
+    {
+        m_silentServer->acceptAsync(
+            [this](
+                SystemError::ErrorCode /*result*/,
+                std::unique_ptr<AbstractStreamSocket> connection)
+            {
+                m_acceptedConnections.push_back(std::move(connection));
+                startAccepting();
+            });
+    }
 };
 
 TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
@@ -617,6 +681,26 @@ TEST_F(SslSocketSpecific, servername_tls_extension_is_passed)
     givenConnectedSocket();
 
     assertServerNameHasBeenPassedByTheClientConnection();
+}
+
+TEST_F(SslSocketSpecific, sync_connect_timeout_is_followed)
+{
+    givenSilentServer();
+    givenClientSocket();
+
+    whenConnectSyncWithTimeout(std::chrono::milliseconds(1));
+
+    thenConnectFailed(SystemError::timedOut);
+}
+
+TEST_F(SslSocketSpecific, async_connect_timeout_is_followed)
+{
+    givenSilentServer();
+    givenClientSocket();
+
+    whenConnectAsyncWithTimeout(std::chrono::milliseconds(1));
+
+    thenConnectFailed(SystemError::timedOut);
 }
 
 //-------------------------------------------------------------------------------------------------

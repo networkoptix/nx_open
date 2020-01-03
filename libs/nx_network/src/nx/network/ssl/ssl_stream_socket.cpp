@@ -154,7 +154,45 @@ bool StreamSocket::connect(
 
     switchToSyncModeIfNeeded();
     m_sslPipeline->setServerName(endpoint.address.toStdString());
-    return m_sslPipeline->performHandshake();
+
+    if (timeout != kNoTimeout)
+    {
+        // NOTE: SSL handshake includes recv and send calls. So, setting the timeout for both.
+        if (!saveTimeouts())
+            return false;
+
+        if (!setRecvTimeout(timeout.count()) || !setSendTimeout(timeout.count()))
+            return false;
+    }
+
+    const auto result = m_sslPipeline->performHandshake();
+    std::optional<SystemError::ErrorCode> errorCodeBak;
+    if (!result)
+        errorCodeBak = SystemError::getLastOSErrorCode();
+
+    if (timeout != kNoTimeout)
+    {
+        if (!restoreTimeouts())
+            return false;
+    }
+
+    if (errorCodeBak)
+        SystemError::setLastErrorCode(*errorCodeBak);
+
+    return result;
+}
+
+bool StreamSocket::saveTimeouts()
+{
+    m_recvTimeoutBak = 0;
+    m_sendTimeoutBak = 0;
+
+    return getRecvTimeout(&*m_recvTimeoutBak) && getSendTimeout(&*m_sendTimeoutBak);
+}
+
+bool StreamSocket::restoreTimeouts()
+{
+    return setRecvTimeout(*m_recvTimeoutBak) && setSendTimeout(*m_sendTimeoutBak);
 }
 
 void StreamSocket::connectAsync(

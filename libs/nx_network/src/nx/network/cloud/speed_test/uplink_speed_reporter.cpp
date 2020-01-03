@@ -208,7 +208,7 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         http::StatusCode::Value statusCode,
         hpm::api::MediatorAddress mediatorAddress)
 {
-    NX_VERBOSE(this, 
+    NX_VERBOSE(this,
         "Fetched Mediator adress, http status code = %1, mediator address = {%2}",
         http::StatusCode::toString(statusCode), mediatorAddress);
 

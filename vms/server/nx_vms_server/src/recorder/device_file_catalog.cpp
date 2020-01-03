@@ -331,21 +331,21 @@ nx::vms::server::Chunk DeviceFileCatalog::chunkFromFile(
             QString baseName = QnFile::baseName(fileName);
             int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
 
-            if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
+            if (startTimeMs < 1 || endTimeMs - startTimeMs < 1)
+            {
                 delete avi;
                 return chunk;
             }
+
             chunk = Chunk(
-                startTimeMs,
-                storageDbPool()->getStorageIndex(storage),
-                fileIndex,
-                endTimeMs - startTimeMs,
-                detectTimeZone(startTimeMs, localFileName)
-            );
+                startTimeMs, storageDbPool()->getStorageIndex(storage),
+                fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, localFileName));
         }
-        else {
-            qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
+        else
+        {
+            NX_WARNING(this, "Can't open media file '%1'", nx::utils::url::hidePassword(fileName));
         }
+
         delete avi;
         return chunk;
     }
@@ -535,15 +535,13 @@ void DeviceFileCatalog::scanMediaFiles(
                     }
 
                     if (allChunks.size() % 1000 == 0)
-                        qWarning() << allChunks.size() << "media files processed...";
-
+                        NX_INFO(this, "%1 media files have been processed...", allChunks.size());
                 }
                 else if (fi.fileName().indexOf(".txt") == -1)
                 {
-                    qDebug()
-                        << "remove file" << fi.absoluteFilePath()
-                        << "because of empty chunk. duration=" << chunk.durationMs
-                        << "startTime=" << chunk.startTimeMs;
+                    NX_DEBUG(
+                        this, "Removing file '%1' because corresponding chunk is empty",
+                        nx::utils::url::hidePassword(fi.absoluteFilePath()));
                     emptyFileList << EmptyFileInfo(chunk.startTimeMs, fi.absoluteFilePath());
                 }
             });

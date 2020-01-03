@@ -6,6 +6,7 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/url.h>
 
 #include "file_deletor.h"
 
@@ -152,23 +153,25 @@ void QnFileDeletor::processPostponedFiles()
 
         if (!storage)
         {
-            NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
-                    .arg(itr->storageId.toString())
-                    .arg(itr->fileName));
+            NX_VERBOSE(
+                this, "[Cleanup] storage with id '%1' not found in pool. Postponing file '%2'",
+                itr->storageId.toString(), nx::utils::url::hidePassword(itr->fileName));
         }
         else if (storage->getStatus() == Qn::ResourceStatus::Offline)
         {
-            NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
-                    .arg(storage->getUrl())
-                    .arg(itr->fileName));
+            NX_VERBOSE(
+                this, "[Cleanup] storage %1 is offline. Postponing file %2",
+                nx::utils::url::hidePassword(storage->getUrl()),
+                nx::utils::url::hidePassword(itr->fileName));
         }
 
         if (needToPostpone || !storage->removeFile(itr->fileName))
         {
             newList.insert(*itr);
-            NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
-                .arg(itr->fileName)
-                .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
+            NX_VERBOSE(
+                this, "[Cleanup] Postponing file %1. Reason: %2",
+                nx::utils::url::hidePassword(itr->fileName),
+                needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed");
         }
     }
     if (newList.empty())

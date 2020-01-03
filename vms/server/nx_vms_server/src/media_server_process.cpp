@@ -482,11 +482,16 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
-            result << storage; // if storage size isn't known do not delete it
-
-        NX_VERBOSE(
-            kLogTag, "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
-            storage->getUrl(), static_cast<bool>(fileStorage), totalSpace, storage->getSpaceLimit());
+        {
+            result << storage;
+            NX_VERBOSE(
+                kLogTag,
+                "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
+                nx::utils::url::hidePassword(storage->getUrl()),
+                static_cast<bool>(fileStorage),
+                totalSpace,
+                storage->getSpaceLimit());
+        }
     }
 
     return result;
@@ -690,8 +695,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_DEBUG(this, lm("[Storages init] Existing storage: %1, spaceLimit = %2")
-                .args(storage.url, storage.spaceLimit));
+            NX_DEBUG(
+                this, "[Storages init] Existing storage: '%1', spaceLimit = %2",
+                nx::utils::url::hidePassword(storage.url), storage.spaceLimit);
+
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 

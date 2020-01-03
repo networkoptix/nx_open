@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>存储设备</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -59,7 +59,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                不可访问
                             </div>
                         </div>
                     </td>
@@ -79,7 +79,7 @@
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="保留空间"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -115,8 +115,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">修正所有标记的设定并储存</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >保存</button>
+        <button class="btn btn-warning" ng-click="cancel()">取消</button>
     </form>
 
     <h2>日志设置</h2>
@@ -136,13 +136,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >保存</button>
         </div>
     </form>
 
     <h1>进阶系統设置</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b>警告 ！</b>此页上的任何更改可能会导致服务器无法正常工作。
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -182,13 +182,13 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >保存</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>警告!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>警告!</b> 某些更改需要重启<b> 所有</b>系统中的服务器。<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >重新启动当前服务器</button>
         </div>

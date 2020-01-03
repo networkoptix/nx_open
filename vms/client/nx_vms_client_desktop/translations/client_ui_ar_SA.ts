@@ -36,7 +36,7 @@
     <message>
       <location/>
       <source>Customer Support</source>
-      <translation>Customer Support</translation>
+      <translation>دعم العملاء</translation>
     </message>
   </context>
   <context>
@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>نوع الحدث:</translation>
     </message>
   </context>
   <context>
@@ -174,22 +174,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation type="unfinished">Fixed Archive Length</translation>
+      <translation>طول الأرشيف ثابت</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>آلي</translation>
     </message>
     <message>
       <location/>
       <source>Max. days</source>
-      <translation type="unfinished">Max. days</translation>
+      <translation>حد اعلى الأيام</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation type="unfinished">Min. days</translation>
+      <translation>حد ادنى الأيام</translation>
     </message>
   </context>
   <context>
@@ -315,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>في اليوم التالي</translation>
     </message>
   </context>
   <context>
@@ -389,7 +389,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>معلومات المرجعية</translation>
     </message>
     <message>
       <location/>
@@ -399,17 +399,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>عرض المنطقة</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>حجم الخط</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>تشمل وصف</translation>
     </message>
   </context>
   <context>
@@ -547,7 +547,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>بيانات اعتماد المصادقة</translation>
     </message>
   </context>
   <context>
@@ -575,42 +575,42 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>لا تقم بتغيير هذه الإعدادات إلا إذا كنت متأكدًا تمامًا من تأثيرها المحتمل على أداء نظامك.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation>Camera Settings</translation>
+      <translation>إعدادات الكاميرا</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>الحفاظ على دفق الكاميرا وإعدادات الملف الشخصي</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>ستصبح إعدادات الجودة ومعدل الإطارات (FPS) في جدول التسجيل غير مهمة.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>حساب معدل البت لكل GOP بدلا من معدل البت لكل ثانية</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>سوف تزيد معدل البت للكاميرا.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation>الدفق الثانوي</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>تعطيل الدفق الثانوي</translation>
     </message>
     <message>
       <location/>
@@ -620,12 +620,12 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>أرشيف</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>تدفق الوسائط</translation>
     </message>
     <message>
       <location/>
@@ -635,7 +635,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>انشاء</translation>
     </message>
     <message>
       <location/>
@@ -645,7 +645,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>معرف منطقي ID</translation>
     </message>
     <message>
       <location/>
@@ -660,17 +660,17 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>منفذ وسائط مخصص</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>إعتمد الطابع الزمني للكاميرا</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>نوع PTZ المفضل:</translation>
     </message>
     <message>
       <location/>
@@ -685,22 +685,22 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>لن تكون إعدادات الاتجاه المسبقة للكاميرا متاحة.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>تدعم هذه الكاميرا الحركه والإمالة</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>هذه الكاميرا تدعم التكبير</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>كشف الحركة أثناء استيراد الأرشيف</translation>
     </message>
   </context>
   <context>
@@ -733,7 +733,7 @@
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>معرف الكاميرا ID</translation>
     </message>
     <message>
       <location/>
@@ -758,7 +758,7 @@
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>إظهار على التصميم</translation>
     </message>
     <message>
       <location/>
@@ -768,12 +768,12 @@
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>قواعد الكاميرا</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>معرف منطقي ID</translation>
     </message>
   </context>
   <context>
@@ -781,7 +781,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>معرف الإدخال</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>معرف الإخراج:</translation>
     </message>
   </context>
   <context>
@@ -861,7 +861,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>نسخ الجدول الزمني إلى...</translation>
     </message>
   </context>
   <context>
@@ -887,7 +887,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>تحرير بيانات الاعتماد</translation>
     </message>
     <message>
       <location/>
@@ -897,12 +897,12 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>تمكين الصوت</translation>
     </message>
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>تحرير التدفقات...</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>عناوين التدفقات</translation>
     </message>
   </context>
   <context>
@@ -985,7 +985,7 @@
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>حذف التسجيل</translation>
     </message>
   </context>
   <context>
@@ -1014,17 +1014,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation>to</translation>
+      <translation>إلى</translation>
     </message>
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>حدد الخادم</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>عنوان معروف</translation>
     </message>
     <message>
       <location/>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>تلميح</translation>
     </message>
     <message>
       <location/>
@@ -1079,17 +1079,17 @@
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>إضافة جميع الأجهزة</translation>
     </message>
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>إضافة الأجهزة</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>القياسي</translation>
     </message>
   </context>
   <context>
@@ -1097,17 +1097,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
       <source>Copy to Clipboard</source>
-      <translation>Copy to Clipboard</translation>
+      <translation>نسخ إلى الحافظة</translation>
     </message>
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>انا لا اوافق</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>أنا موافق</translation>
     </message>
   </context>
   <context>
@@ -1178,12 +1178,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>نوع المصادقة</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>نوع الطلب</translation>
     </message>
   </context>
   <context>
@@ -1199,7 +1199,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>على التصميم</translation>
     </message>
   </context>
   <context>
@@ -1287,7 +1287,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation>Nothing matches your search</translation>
+      <translation>لا شيء يطابق بحثك</translation>
     </message>
   </context>
   <context>
@@ -1353,12 +1353,12 @@
     <message>
       <location/>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation>كاميرا</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>Source camera</translation>
+      <translation>كاميرا المصدر</translation>
     </message>
   </context>
   <context>
@@ -1434,7 +1434,7 @@
     <message>
       <location/>
       <source>Security</source>
-      <translation>Security</translation>
+      <translation>الأمن</translation>
     </message>
     <message>
       <location/>
@@ -1480,7 +1480,7 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation>Opacity</translation>
+      <translation>غموض</translation>
     </message>
     <message>
       <location/>
@@ -1582,12 +1582,12 @@
     <message>
       <location/>
       <source>Width</source>
-      <translation>Width</translation>
+      <translation>عرض</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation>Height</translation>
+      <translation>ارتفاع</translation>
     </message>
     <message>
       <location/>
@@ -1988,12 +1988,12 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation>Download</translation>
+      <translation>تنزيل</translation>
     </message>
     <message>
       <location/>
       <source>Browse</source>
-      <translation>Browse</translation>
+      <translation>تصفح</translation>
     </message>
     <message>
       <location/>
@@ -2093,22 +2093,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>Source:</translation>
+      <translation>مصدر:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Caption contains:</translation>
+      <translation>يحتوي التعليق على:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Keywords separated by space</translation>
+      <translation>الكلمات الأساسية مفصولة بمسافة</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Description contains:</translation>
+      <translation>الوصف يحتوي على:</translation>
     </message>
     <message>
       <location/>
@@ -2502,7 +2502,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation>Speed</translation>
+      <translation>سرعة</translation>
     </message>
     <message>
       <location/>
@@ -2642,12 +2642,12 @@
     <message>
       <location/>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>لم يتم العثور على شيء</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>اسحب أي صورة أو ملف فيديو إلى نافذة التطبيق لتشغيلها</translation>
     </message>
   </context>
   <context>
@@ -2708,7 +2708,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation>Bitrate</translation>
+      <translation>معدل البت</translation>
     </message>
     <message>
       <location/>
@@ -2741,32 +2741,32 @@
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation type="unfinished">Allow only secure connections</translation>
+      <translation>السماح فقط بالاتصالات الآمنة</translation>
     </message>
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation type="unfinished">Encrypt video traffic</translation>
+      <translation>تشفير حركة الفيديو</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>عرض العلامة المائية مع اسم المستخدم على الفيديو</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>معاينة العلامة المائية</translation>
     </message>
     <message>
       <location/>
       <source>to</source>
-      <translation>to</translation>
+      <translation>إلى</translation>
     </message>
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>تحديد مدة الجلسة</translation>
     </message>
   </context>
   <context>
@@ -3006,12 +3006,12 @@
     <message>
       <location/>
       <source>Additional storage</source>
-      <translation>Additional storage</translation>
+      <translation>تخزين إضافي</translation>
     </message>
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>التنبؤ على البيانات المسجلة خلال</translation>
     </message>
   </context>
   <context>
@@ -3059,22 +3059,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>سيستمر تخزين بيانات Analytics على وحدة التخزين المعطلة.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>سوف يتوقف التسجيل في موقع التخزين المعطل. ومع ذلك ، فإن حذف لقطات قديمة منه سيستمر.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>تم تمكين التسجيل على وحدة تخزين USB</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>يمكن أن تشغل بيانات Analytics مساحة كبيرة. نوصي باختيار موقع آخر له بدلاً من قسم النظام.</translation>
     </message>
   </context>
   <context>
@@ -3159,7 +3159,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>نص</translation>
     </message>
     <message>
       <location/>
@@ -3169,17 +3169,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>حجم الخط</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>أدخل نصًا عاديًا أو HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>عرض المنطقة</translation>
     </message>
   </context>
   <context>
@@ -3187,17 +3187,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>مزامنة الوقت مع الإنترنت</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>وقت ال VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>لا تقم بمزامنة الوقت بين الخوادم</translation>
     </message>
   </context>
   <context>
@@ -3205,17 +3205,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Timestamp</translation>
+      <translation>الطابع الزمني</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>حجم الخط</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation>Format</translation>
+      <translation>شكل</translation>
     </message>
     <message>
       <location/>
@@ -3264,12 +3264,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>لا توجد أدوار مخصصة للمستخدم حتى الآن.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>اضغط &quot; قاعده جديدة&quot; لإنشاء واحده.</translation>
     </message>
   </context>
   <context>
@@ -3305,7 +3305,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>كشف الحركة</translation>
     </message>
   </context>
   <context>
@@ -3318,17 +3318,17 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>تحميل لقطات</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>تحميل ملف...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>تحميل ملف...</translation>
     </message>
   </context>
   <context>
@@ -3336,7 +3336,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>صفحة الويب هذه مخصصة لربط C2P</translation>
     </message>
   </context>
   <context>
@@ -3372,17 +3372,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>معاينة العلامة المائية</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation>Opacity</translation>
+      <translation>غموض</translation>
     </message>
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>التردد</translation>
     </message>
   </context>
 </TS>
