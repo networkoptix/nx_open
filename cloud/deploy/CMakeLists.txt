@@ -50,7 +50,7 @@ add_custom_command(
     TARGET cloud-docker-build-prepare
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-set(cloudBackendModules cloud_db connection_mediator traffic_relay)
+set(cloudBackendModules cloud_db connection_mediator traffic_relay discovery_service)
 set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
 
 nx_define_cloud_group_targets(backend ${cloudBackendModules})
