@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/akrylysov/algnhsa"
 	"github.com/julienschmidt/httprouter"
@@ -145,12 +147,21 @@ func getCloudModulesXml(writer http.ResponseWriter, request *http.Request, param
 }
 
 func main() {
-	log.Println("start lambda")
 	router := httprouter.New()
 	router.GET("/cluster/:clusterId/nodes", getOnlineNodes)
 	router.POST("/cluster/:clusterId/nodes", postNode)
 	for key := range CloudModulesXmlFunctions {
 		router.GET(key, getCloudModulesXml)
 	}
-	algnhsa.ListenAndServe(router, nil)
+
+	portPtr := flag.Int("http-port", -1, "The port to run the http server on")
+	flag.Parse()
+
+	if *portPtr == -1 { //< default value, use lambda implementation
+		log.Println("Running in lambda mode", *portPtr)
+		algnhsa.ListenAndServe(router, nil)
+	} else {
+		log.Println("Running in standalone mode on port", *portPtr)
+		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*portPtr), router))
+	}
 }
