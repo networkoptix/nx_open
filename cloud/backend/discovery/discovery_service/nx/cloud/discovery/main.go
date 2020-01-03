@@ -158,7 +158,7 @@ func main() {
 	flag.Parse()
 
 	if *portPtr == -1 { //< default value, use lambda implementation
-		log.Println("Running in lambda mode", *portPtr)
+		log.Println("Running in lambda mode")
 		algnhsa.ListenAndServe(router, nil)
 	} else {
 		log.Println("Running in standalone mode on port", *portPtr)
