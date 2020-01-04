@@ -13,7 +13,7 @@ ARG REVISION
 ARG BUILD_DATE
 ARG BUILD_HOST
 ARG BUILD_USER
-LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+LABEL maintainer="Andrey Kolesnikov <akolesnikov@networkoptix.com>" \
       version="$VERSION" \
       revision="$REVISION" \
       build-date="$BUILD_DATE" \
