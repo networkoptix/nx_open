@@ -6,6 +6,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/akrylysov/algnhsa"
@@ -146,7 +147,7 @@ func getCloudModulesXml(writer http.ResponseWriter, request *http.Request, param
 	writer.Write([]byte(xml))
 }
 
-func main() {
+func runHttpServer(port int) {
 	router := httprouter.New()
 	router.GET("/cluster/:clusterId/nodes", getOnlineNodes)
 	router.POST("/cluster/:clusterId/nodes", postNode)
@@ -154,14 +155,33 @@ func main() {
 		router.GET(key, getCloudModulesXml)
 	}
 
-	portPtr := flag.Int("http-port", -1, "The port to run the http server on")
-	flag.Parse()
-
-	if *portPtr == -1 { //< default value, use lambda implementation
+	if port == -1 { //< default value, use lambda implementation
 		log.Println("Running in lambda mode")
 		algnhsa.ListenAndServe(router, nil)
 	} else {
-		log.Println("Running in standalone mode on port", *portPtr)
-		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*portPtr), router))
+		log.Println("Running in standalone mode on port", port)
+		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 	}
+}
+
+func initializeLog(filePath string) {
+	f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file %v: %v", filePath, err)
+	}
+
+	log.SetOutput(f)
+	log.Println("=============== Started discovery service ===============")
+}
+
+func main() {
+	portPtr := flag.Int("http-port", -1, "The port to run the http server on")
+	logFilePathPtr := flag.String("log-file", "", "Path to the log file")
+	flag.Parse()
+
+	if *logFilePathPtr != "" {
+		initializeLog(*logFilePathPtr)
+	}
+
+	runHttpServer(*portPtr)
 }
