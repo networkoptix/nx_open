@@ -142,7 +142,6 @@ private:
     nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
     nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
-    bool m_currentMsgBodyChunked = false;
     std::optional<ChunkedStreamParser> m_chunkedBodyParser;
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;
