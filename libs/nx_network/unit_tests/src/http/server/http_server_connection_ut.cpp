@@ -5,6 +5,8 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/chunked_body_source.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/empty_message_body_source.h>
@@ -19,7 +21,43 @@ namespace network {
 namespace http {
 namespace test {
 
-static const char* const kTestPath = "/HttpServerConnectionTest";
+namespace {
+
+class TestChunkedBodySource:
+    public ChunkedBodySource
+{
+    using base_type = ChunkedBodySource;
+
+public:
+    using base_type::base_type;
+
+    /**
+     * Asserts on reading beyond the chunked stream EOF marker.
+     */
+    virtual void readAsync(
+        nx::utils::MoveOnlyFunc<
+            void(SystemError::ErrorCode, nx::Buffer)
+        > completionHandler) override
+    {
+        base_type::readAsync(
+            [completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode errorCode, nx::Buffer buf)
+            {
+                NX_ASSERT(!buf.isEmpty());
+                completionHandler(errorCode, std::move(buf));
+            });
+    }
+};
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kTestPath[] = "/HttpServerConnectionTest/noContent";
+static constexpr char kResourceWithBodyPath[] = "/HttpServerConnectionTest/resource";
+static constexpr char kResourceWithChunkedBodyPath[] = "/HttpServerConnectionTest/chunked";
+
+static constexpr char kResourceBody[] = "Hello, world";
 
 class HttpServerConnection:
     public ::testing::Test
@@ -27,29 +65,57 @@ class HttpServerConnection:
 protected:
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
         ASSERT_TRUE(m_httpServer.bindAndListen());
+
+        m_httpServer.registerRequestProcessorFunc(
+            kResourceWithBodyPath,
+            std::bind(&HttpServerConnection::provideMessageBody, this, _1, _2));
+
+        m_httpServer.registerRequestProcessorFunc(
+            kResourceWithChunkedBodyPath,
+            std::bind(&HttpServerConnection::provideChunkedMessageBody, this, _1, _2));
     }
 
     void whenRespondWithEmptyMessageBody()
     {
         installRequestHandlerWithEmptyBody();
-        performRequest(kUrlSchemeName);
+        performRequest(prepareUrl(kUrlSchemeName, kTestPath));
     }
 
     void whenIssuedRequestViaSsl()
     {
-        performRequest(kSecureUrlSchemeName);
+        performRequest(prepareUrl(kSecureUrlSchemeName, kTestPath));
     }
 
     void whenIssuedRequestViaRawTcp()
     {
-        performRequest(kUrlSchemeName);
+        performRequest(prepareUrl(kUrlSchemeName, kTestPath));
     }
 
     void whenReceiveStrictTransportSecurityHeaderInResponse()
     {
         whenIssuedRequestViaSsl();
         thenResponseContainsHeader(header::StrictTransportSecurity::NAME);
+    }
+
+    void whenReceivedChunkedResponse()
+    {
+        performRequest(prepareUrl(kUrlSchemeName, kResourceWithChunkedBodyPath));
+    }
+
+    void whenIssueRequestOverExistingConnection()
+    {
+        performRequest(
+            prepareUrl(kUrlSchemeName, kResourceWithBodyPath),
+            true /*reuseConnection*/);
+    }
+
+    void thenSuccessResponseIsReceived()
+    {
+        ASSERT_TRUE(m_prevResponse);
+        ASSERT_EQ(StatusCode::ok, m_prevResponse->statusLine.statusCode);
     }
 
     void thenOnResponseSentHandlerIsCalled()
@@ -81,15 +147,20 @@ protected:
         ASSERT_GE(m_prevStrictTransportSecurity.maxAge, desiredMinimalAge);
     }
 
+    void andTheConnectionIsReused()
+    {
+        ASSERT_GT(m_client->totalRequestsSentViaCurrentConnection(), 1);
+    }
+
     TestHttpServer& httpServer()
     {
         return m_httpServer;
     }
 
-    nx::utils::Url prepareRequestUrl(const char* requestPath) const
+    nx::utils::Url prepareUrl(const char* urlScheme, const char* path)
     {
-        return nx::network::url::Builder().setScheme(http::kUrlSchemeName)
-            .setEndpoint(m_httpServer.serverAddress()).setPath(requestPath);
+        return nx::network::url::Builder()
+            .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(path);
     }
 
 private:
@@ -97,6 +168,7 @@ private:
     nx::utils::SyncQueue<int /*dummy*/> m_responseSentEvents;
     boost::optional<Response> m_prevResponse;
     header::StrictTransportSecurity m_prevStrictTransportSecurity;
+    std::unique_ptr<HttpClient> m_client;
 
     void installRequestHandlerWithEmptyBody()
     {
@@ -107,13 +179,26 @@ private:
             std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2));
     }
 
-    void performRequest(const char* urlScheme)
+    void performRequest(const nx::utils::Url& url, bool reuseConnection = false)
     {
-        HttpClient client;
-        const auto url = nx::network::url::Builder()
-            .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(kTestPath);
-        ASSERT_TRUE(client.doGet(url));
-        m_prevResponse = *client.response();
+        m_prevResponse = boost::none;
+
+        if (!reuseConnection)
+            m_client.reset();
+
+        if (!m_client)
+        {
+            m_client = std::make_unique<HttpClient>();
+            m_client->setResponseReadTimeout(kNoTimeout);
+            m_client->setMessageBodyReadTimeout(kNoTimeout);
+        }
+
+        ASSERT_TRUE(m_client->doGet(url));
+        m_prevResponse = *m_client->response();
+
+        auto body = m_client->fetchEntireMessageBody();
+        if (body)
+            m_prevResponse->messageBody = std::move(*body);
     }
 
     void provideEmptyMessageBody(
@@ -128,6 +213,31 @@ private:
         result.dataSource = std::make_unique<EmptyMessageBodySource>(
             "text/plain",
             boost::none);
+        completionHandler(std::move(result));
+    }
+
+    void provideMessageBody(
+        RequestContext /*requestContext*/,
+        RequestProcessedHandler completionHandler)
+    {
+        RequestResult result(StatusCode::ok);
+        result.dataSource = std::make_unique<BufferSource>(
+            "text/plain",
+            kResourceBody);
+        completionHandler(std::move(result));
+    }
+
+    void provideChunkedMessageBody(
+        RequestContext requestContext,
+        RequestProcessedHandler completionHandler)
+    {
+        RequestResult result(StatusCode::ok);
+
+        requestContext.response->headers.emplace("Transfer-Encoding", "chunked");
+        result.dataSource = std::make_unique<TestChunkedBodySource>(
+            std::make_unique<BufferSource>(
+                "text/plain",
+                kResourceBody));
         completionHandler(std::move(result));
     }
 
@@ -171,6 +281,15 @@ TEST_F(
 
     thenStrictTransportSecurityHeaderIsValid();
     andStrictTransportSecurityMaxAgeIsNotLessThan(std::chrono::hours(24) * 365);
+}
+
+TEST_F(HttpServerConnection, connection_is_still_reusable_after_chunked_response)
+{
+    whenReceivedChunkedResponse();
+
+    whenIssueRequestOverExistingConnection();
+    thenSuccessResponseIsReceived();
+    andTheConnectionIsReused();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -246,7 +365,7 @@ private:
     {
         for (const auto& header: additionalHeaders)
             m_client.addAdditionalHeader(header.first, header.second);
-        ASSERT_TRUE(m_client.doGet(prepareRequestUrl(kTestPath)));
+        ASSERT_TRUE(m_client.doGet(prepareUrl(kUrlSchemeName, kTestPath)));
     }
 
     void saveHttpClientEndpoint(
@@ -319,14 +438,14 @@ protected:
 
     void whenSendMultipleRequests()
     {
-        const auto requestUrl = prepareRequestUrl(kPipeliningTestPath);
+        const auto requestUrl = prepareUrl(kUrlSchemeName, kPipeliningTestPath);
         if (!m_clientConnection)
         {
             auto connection = std::make_unique<TCPSocket>(AF_INET);
-            
+
             ASSERT_TRUE(connection->connect(url::getEndpoint(requestUrl), kNoTimeout))
                 << SystemError::getLastOSErrorText().toStdString();
-            
+
             ASSERT_TRUE(connection->setNonBlockingMode(true))
                 << SystemError::getLastOSErrorText().toStdString();
 

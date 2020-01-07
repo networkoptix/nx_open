@@ -8,6 +8,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "chunked_stream_parser.h"
 #include "http_types.h"
 #include "line_splitter.h"
 
@@ -115,18 +116,6 @@ public:
     static bool isEncodingSupported(const StringType& encoding);
 
 private:
-    enum ChunkStreamParseState
-    {
-        waitingChunkStart,
-        readingChunkSize,
-        readingChunkExtension,
-        skippingCRLF,
-        readingChunkData,
-        readingTrailer,
-        reachedChunkStreamEnd,
-        undefined
-    };
-
     ReadState m_state;
     ReadState m_nextState;
     Message m_httpMessage;
@@ -135,15 +124,10 @@ private:
     quint64 m_messageBodyBytesRead;
     BufferType m_msgBodyBuffer;
 
-    //!HTTP/1.1 chunk stream parsing
-    ChunkStreamParseState m_chunkStreamParseState;
-    ChunkStreamParseState m_nextChunkStreamParseState;
-    size_t m_currentChunkSize;
-    size_t m_currentChunkBytesRead;
-    BufferType::value_type m_prevChar;
+    ChunkedStreamParser m_chunkedStreamParser;
+
     BufferType m_codedMessageBodyBuffer;
     std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_contentDecoder;
-    int m_lineEndingOffset;
     bool m_decodeChunked;
     int m_currentMessageNumber;
     bool m_breakAfterReadingHeaders;
@@ -175,7 +159,7 @@ private:
     size_t readIdentityStream(
         const QnByteArrayConstRef& data,
         Func func);
-    unsigned int hexCharToInt(BufferType::value_type ch);
+
     /**
      * Returns nullptr if encodingName is unknown.
      */

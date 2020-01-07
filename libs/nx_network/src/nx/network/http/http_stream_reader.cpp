@@ -16,12 +16,6 @@ HttpStreamReader::HttpStreamReader():
     m_nextState(waitingMessageStart),
     m_isChunkedTransfer(false),
     m_messageBodyBytesRead(0),
-    m_chunkStreamParseState(waitingChunkStart),
-    m_nextChunkStreamParseState(undefined),
-    m_currentChunkSize(0),
-    m_currentChunkBytesRead(0),
-    m_prevChar(0),
-    m_lineEndingOffset(0),
     m_decodeChunked(true),
     m_currentMessageNumber(0),
     m_breakAfterReadingHeaders(false),
@@ -86,6 +80,7 @@ bool HttpStreamReader::parseBytes(
                         [this](const QnByteArrayConstRef& data)
                         {
                             m_codedMessageBodyBuffer.append(data.constData(), data.size());
+                            m_messageBodyBytesRead += data.size();
                         });
                     // Decoding content.
                     if ((msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0))
@@ -106,6 +101,7 @@ bool HttpStreamReader::parseBytes(
                         {
                             QnMutexLocker lk(&m_mutex);
                             m_msgBodyBuffer.append(data.constData(), data.size());
+                            m_messageBodyBytesRead += data.size();
                         });
                 }
 
@@ -116,7 +112,7 @@ bool HttpStreamReader::parseBytes(
                     *bytesProcessed = currentDataPos;
                 if ((m_contentLength &&         //< Content-Length known.
                     m_messageBodyBytesRead >= m_contentLength.get()) ||     //< Read whole message body.
-                    (m_isChunkedTransfer && m_chunkStreamParseState == reachedChunkStreamEnd))
+                    (m_isChunkedTransfer && m_chunkedStreamParser.eof()))
                 {
                     if (m_contentDecoder)
                         m_contentDecoder->flush();
@@ -319,7 +315,8 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                         {
                             m_state = pullingLineEndingBeforeMessageBody;
                             m_nextState = readingMessageBody;
-                            m_chunkStreamParseState = waitingChunkStart;
+
+                            m_chunkedStreamParser.reset();
                         }
                     }
                     else
@@ -439,144 +436,8 @@ size_t HttpStreamReader::readMessageBody(
     Func func)
 {
     return (m_isChunkedTransfer && m_decodeChunked)
-        ? readChunkStream(data, func)
+        ? m_chunkedStreamParser.parse(data, func)
         : readIdentityStream(data, func);
-}
-
-template<class Func>
-size_t HttpStreamReader::readChunkStream(
-    const QnByteArrayConstRef& data,
-    Func func)
-{
-    size_t currentOffset = 0;
-    for (; currentOffset < data.size(); )
-    {
-        const size_t currentOffsetBak = currentOffset;
-
-        const BufferType::value_type currentChar = data[(unsigned int)currentOffset];
-        switch (m_chunkStreamParseState)
-        {
-            case waitingChunkStart:
-                m_chunkStreamParseState = readingChunkSize;
-                m_currentChunkSize = 0;
-                m_currentChunkBytesRead = 0;
-                break;
-
-            case readingChunkSize:
-                if ((currentChar >= '0' && currentChar <= '9') ||
-                    (currentChar >= 'a' && currentChar <= 'f') ||
-                    (currentChar >= 'A' && currentChar <= 'F'))
-                {
-                    m_currentChunkSize <<= 4;
-                    m_currentChunkSize += hexCharToInt(currentChar);
-                }
-                else if (currentChar == ';')
-                {
-                    m_chunkStreamParseState = readingChunkExtension;
-                }
-                else if (currentChar == ' ')
-                {
-                    // Skipping whitespace.
-                }
-                else if (currentChar == '\r' || currentChar == '\n')
-                {
-                    // No extension?
-                    m_chunkStreamParseState = skippingCRLF;
-                    m_nextChunkStreamParseState = readingChunkData;
-                    break;
-                }
-                else
-                {
-                    // Parse error.
-                    return size_t(-1);
-                }
-                ++currentOffset;
-                break;
-
-            case readingChunkExtension:
-                // TODO: #ak Reading extension.
-                if (currentChar == '\r' || currentChar == '\n')
-                {
-                    m_chunkStreamParseState = skippingCRLF;
-                    m_nextChunkStreamParseState = readingChunkData;
-                    break;
-                }
-                ++currentOffset;
-                break;
-
-            case skippingCRLF:
-                // Supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that.
-                if ((m_lineEndingOffset < 2) &&
-                    ((currentChar == '\r' && m_lineEndingOffset == 0) ||
-                    (currentChar == '\n' && (m_lineEndingOffset == 0 || m_prevChar == '\r'))))
-                {
-                    ++m_lineEndingOffset;
-                    ++currentOffset;    //< Skipping.
-                    break;
-                }
-                else
-                {
-                    m_lineEndingOffset = 0;
-                }
-
-                m_chunkStreamParseState = m_nextChunkStreamParseState;
-                break;
-
-            case readingChunkData:
-            {
-                if (!m_currentChunkSize)
-                {
-                    // The last chunk.
-                    m_chunkStreamParseState = readingTrailer;
-                    break;
-                }
-
-                const size_t bytesToCopy = std::min<>(
-                    m_currentChunkSize - m_currentChunkBytesRead,
-                    data.size() - currentOffset);
-                func(data.mid(currentOffset, bytesToCopy));
-                m_messageBodyBytesRead += bytesToCopy;
-                m_currentChunkBytesRead += bytesToCopy;
-                currentOffset += bytesToCopy;
-                if (m_currentChunkBytesRead == m_currentChunkSize)
-                {
-                    m_chunkStreamParseState = skippingCRLF;
-                    m_nextChunkStreamParseState = waitingChunkStart;
-                }
-                break;
-            }
-
-            case readingTrailer:
-            {
-                ConstBufferRefType lineBuffer;
-                size_t bytesRead = 0;
-                const bool lineFound = m_lineSplitter.parseByLines(
-                    data.mid(currentOffset),
-                    &lineBuffer,
-                    &bytesRead);
-                currentOffset += bytesRead;
-                if (!lineFound)
-                    break;
-                if (lineBuffer.isEmpty())
-                {
-                    // Reached end of HTTP/1.1 chunk stream.
-                    m_chunkStreamParseState = reachedChunkStreamEnd;
-                    return currentOffset;
-                }
-                // TODO #ak Parsing entity-header.
-                break;
-            }
-
-            default:
-                NX_ASSERT(false);
-                break;
-        }
-
-        if (currentOffset != currentOffsetBak) //< Moved cursor.
-            m_prevChar = currentChar;
-    }
-
-    return currentOffset;
 }
 
 template<class Func>
@@ -588,19 +449,7 @@ size_t HttpStreamReader::readIdentityStream(
         ? std::min<size_t>(data.size(), m_contentLength.get() - m_messageBodyBytesRead)
         : data.size();    //< Content-Length is unknown.
     func(data.mid(0, bytesToCopy));
-    m_messageBodyBytesRead += bytesToCopy;
     return bytesToCopy;
-}
-
-unsigned int HttpStreamReader::hexCharToInt(BufferType::value_type ch)
-{
-    if (ch >= '0' && ch <= '9')
-        return ch - '0';
-    if (ch >= 'a' && ch <= 'f')
-        return ch - 'a' + 10;
-    if (ch >= 'A' && ch <= 'F')
-        return ch - 'A' + 10;
-    return 0;
 }
 
 std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
@@ -625,10 +474,7 @@ void HttpStreamReader::resetStateInternal()
         m_msgBodyBuffer.clear();
     }
 
-    m_chunkStreamParseState = waitingChunkStart;
-    m_currentChunkSize = 0;
-    m_currentChunkBytesRead = 0;
-    m_prevChar = 0;
+    m_chunkedStreamParser.reset();
 }
 
 } // namespace nx

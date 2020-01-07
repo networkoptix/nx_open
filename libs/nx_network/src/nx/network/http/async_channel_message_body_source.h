@@ -5,6 +5,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "abstract_msg_body_source.h"
@@ -28,6 +29,8 @@ public:
         m_channel(std::move(channel))
     {
         bindToAioThread(m_channel->getAioThread());
+
+        NX_VERBOSE(this, "Created message body source. MIME type %1", m_mimeType);
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
@@ -115,6 +118,11 @@ private:
             readBuffer.remove(*m_messageBodyLimit - m_totalBytesSent, readBuffer.size());
 
         m_totalBytesSent += readBuffer.size();
+
+        NX_VERBOSE(this, "Read another %1 bytes (errorCode %2). Total bytes read %3. "
+            "Message body limit %4",
+            readBuffer.size(), SystemError::toString(systemErrorCode), m_totalBytesSent,
+            m_messageBodyLimit);
 
         nx::utils::swapAndCall(
             m_completionHandler,
