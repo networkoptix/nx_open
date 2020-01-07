@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>About</translation>
+      <translation>نبذة</translation>
     </message>
     <message>
       <location/>
@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Support</translation>
+      <translation>الدعم</translation>
     </message>
     <message>
       <location/>

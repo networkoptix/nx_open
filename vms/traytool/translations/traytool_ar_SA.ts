@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>UAC must be enabled to request privileges for non-admin users.</translation>
+      <translation>يجب تمكين UAC لطلب امتيازات للمستخدمين غير المشرفين.</translation>
     </message>
   </context>
   <context>
