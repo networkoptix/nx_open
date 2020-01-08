@@ -13,7 +13,7 @@ namespace nx::network::cloud::speed_test {
 static constexpr float kBytesPerMsecToMegabitsPerSec = 1000.0F / 1024 / 1024 * 8;
 
 using BandwidthCompletionHandler =
-	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*bytesPerSecond*/)>;
+	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*Kbps*/)>;
 
 class NX_NETWORK_API UplinkBandwidthTester:
 	public network::aio::BasicPollable
@@ -40,7 +40,7 @@ private:
 
 	void sendRequest();
 
-	void testComplete(int bandwidth);
+	void testComplete(int bytesPerMsec);
 	void testFailed(SystemError::ErrorCode errorCode);
 
 private:

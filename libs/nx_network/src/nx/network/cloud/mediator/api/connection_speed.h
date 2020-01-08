@@ -8,9 +8,9 @@ namespace nx::hpm::api {
 
 struct NX_NETWORK_API ConnectionSpeed
 {
-    std::chrono::microseconds pingTime = std::chrono::microseconds(0);
-	// Bandwidth in bytes per millisecond
-	int bandwidth = 0;
+    std::chrono::milliseconds pingTime = std::chrono::milliseconds::zero();
+    // Bandwidth in Kbps.
+    int bandwidth = 0;
 
     bool operator==(const ConnectionSpeed& other) const;
 

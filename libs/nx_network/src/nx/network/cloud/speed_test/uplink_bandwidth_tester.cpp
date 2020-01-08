@@ -79,7 +79,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 				[this](SystemError::ErrorCode errorCode) {
 					using namespace std::placeholders;
 
-					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2", 
+					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2",
 						m_url, SystemError::toString(errorCode));
 
                     if (errorCode != SystemError::noError)
@@ -255,12 +255,13 @@ void UplinkBandwidthTester::sendRequest()
 		});
 }
 
-void nx::network::cloud::speed_test::UplinkBandwidthTester::testComplete(int bandwidth)
+void nx::network::cloud::speed_test::UplinkBandwidthTester::testComplete(int bytesPerMsec)
 {
     if (m_handler)
     {
         m_testContext = TestContext();
-        nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
+        const auto kbps = ((long long) bytesPerMsec * 1000) * 8 / 1024;
+        nx::utils::swapAndCall(m_handler, SystemError::noError, (int) kbps);
     }
 }
 

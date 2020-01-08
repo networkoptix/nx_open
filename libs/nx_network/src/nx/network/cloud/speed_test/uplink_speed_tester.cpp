@@ -60,12 +60,14 @@ void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
 		{
 			NX_VERBOSE(this,
-				"Bandwidth test complete, SystemError = %1", 
+				"Bandwidth test complete, SystemError = %1",
 				SystemError::toString(errorCode));
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);
 
-            emitTestResult(SystemError::noError, ConnectionSpeed{pingTime, bandwidth});
+            emitTestResult(
+                SystemError::noError,
+                ConnectionSpeed{duration_cast<milliseconds>(pingTime), bandwidth});
 		});
 }
 
