@@ -879,18 +879,18 @@
       <source>%n Cameras</source>
       <translation type="unfinished">
         <numerusform>%n Kamera</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -913,20 +913,20 @@
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Zařízení</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Zařízení</numerusform>
+        <numerusform>%n Zařízení</numerusform>
+        <numerusform>%n Zařízení</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n zařízení</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+        <numerusform>%n zařízení</numerusform>
+        <numerusform>%n zařízení</numerusform>
+        <numerusform>%n zařízení</numerusform>
       </translation>
     </message>
   </context>

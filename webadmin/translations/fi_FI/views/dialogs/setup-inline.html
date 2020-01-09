@@ -12,7 +12,7 @@
         Todennus epäonnistui.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Yritä uudelleen</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Yritä uudelleen</button>
     </p>
 </div>
 
@@ -55,7 +55,7 @@
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
-                   placeholder="System name" required auto-focus>
+                   placeholder="Järjestelmänimi" required auto-focus>
         </div>
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
@@ -107,7 +107,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>Local</h3>
+                <h3>Paikallinen</h3>
                 <p>
                     Toimii vain paikallisissa verkoissa <br>
                     Ei vaadi Internet-yhteyttä
@@ -171,17 +171,17 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Sähköposti" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Salasana" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Stay logged in
+                Pysy kirjautuneena
             </labe>
         </div>
 
@@ -228,12 +228,12 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
+                   type="password" autocomplete="new-password" placeholder="Toista salasana" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Save password
+                Tallenna salasana
             </labe>
         </div>
 
@@ -265,7 +265,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                All fields are required
+                Kaikki kentät ovat pakollisia
             </div>
         </div>
 
@@ -273,7 +273,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Passwords do not match
+                Salasanat eivät täsmää
             </div>
         </div>
     </form>
@@ -304,20 +304,20 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="Kirjaudu sisään" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Password" required>
+                   placeholder="Salasana" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                All fields are required
+                Kaikki kentät ovat pakollisia
             </div>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="retry()">Yritä uudelleen</button>
     </p>
 </div>
 
@@ -375,7 +375,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Järjestelmä on käyttövalmis</h2>
-    <p>Login</p>
+    <p>Kirjaudu sisään</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Jakaminen ja tilin asetukset</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="avaa {{Config.cloud.productName}}"
@@ -384,7 +384,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>System is ready for use</h2>
+    <h2>Järjestelmä on käyttövalmis</h2>
     <p>Palvelimen osoite</p>
     <h4>{{serverAddress}}</h4>
     <p>Järjestelmänvalvojan kirjautuminen</p>
@@ -406,7 +406,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
+        <button class="btn btn-primary" ng-click="retry()">Tallenna asetukset ja käynnistä laite uudelleen</button>
     </p>
 </div>
 
@@ -439,7 +439,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>Ei voi muodostaa yhteyttä {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -451,12 +451,12 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot setup System</h2>
+    <h2>Järjestelmää ei voi määrittää</h2>
     <p class="master-description">Jokin meni pieleen. <br>
         Virhekuvaus: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="retry()">Yritä uudelleen</button>
     </p>
 </div>
 
@@ -469,14 +469,14 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Web-selaimella</b></div>
-            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Osoite</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>Käyttämällä {{Config.productName}} sovellusta</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Kirjautuminen</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Salasana</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>

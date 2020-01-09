@@ -19,10 +19,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>Cổng</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Cổng" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -38,21 +38,21 @@
                         <h3>Khởi động lại máy chủ</h3>
                         <p>Việc thiết lập lại máy chủ về chế độ cài đặt mặc định (sẽ xóa cơ sở dữ liệu và đặt lại cấu hình).
                             Máy chủ sẽ được tách ra khỏi Hệ thống hiện tại. Lưu trữ video sẽ vẫn còn nguyên vẹn.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nhà sản xuât</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Tách máy chủ khỏi Hệ thống</h3>
                         <p>Hành động này sẽ tách máy chủ khỏi cơ sở dữ liệu hệ thống, người dùng cục bộ và cấu hình.
-                            Video archive will remain intact. <b>Tất cả các tài khoản đám mây sẽ bị xóa</b></p>
+                            Lưu trữ video sẽ vẫn còn nguyên vẹn. <b>Tất cả các tài khoản đám mây sẽ bị xóa</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Tách khỏi hệ thống</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Khởi động lại</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()"> Khởi động lại máy chủ </button> <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> Khởi động lại </button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Thay đổi mật khẩu</h3>
                             <p>Nếu hệ thống là cục bộ (không kết nối với dữ liệu đám mây), điều này sẽ thay đổi mật khẩu cho người dùng "admin" và mật khẩu khôi phục (gốc) trên một số máy chủ. <br> Nếu không, điều này sẽ chỉ thay đổi mật khẩu khôi phục.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
@@ -60,7 +60,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Đổi mật khẩu</button>
                             </div>
                         </form>
                     </div>
@@ -68,7 +68,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>Tên người sử dụng</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -82,8 +82,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Hợp nhất hệ thống</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Hợp nhất hệ thống</button></p>
                         </form>
                     </div>
 
@@ -131,7 +131,7 @@
                                     Buộc mã hóa lưu lượng video
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Lưu</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -149,8 +149,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Múi giờ</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Ngày tháng</label></td>
+                                        <td><label for="time">Thời gian</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

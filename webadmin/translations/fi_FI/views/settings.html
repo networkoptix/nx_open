@@ -41,22 +41,22 @@
                         <h3>Palauta palvelin</h3>
                         <p>Tämä toiminto palauttaa tämän palvelimen oletusasetuksiksi (tyhjentää tietokannan ja nollaa kokoonpanon).
                             Palvelin irrotetaan nykyisestä järjestelmästä. Videon arkisto säilyy ennallaan.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Palauta tehdasasetukset</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Irrota palvelin järjestelmästä</h3>
                         <p>Tämä toiminto poistaa palvelimen järjestelmästä ja säilyttää tietokannan, paikalliset käyttäjät ja kokoonpanot.
-                            Video archive will remain intact. <b>Kaikki pilvipalvelun käyttäjät poistetaan.</b></p>
+                            Videon arkisto säilyy ennallaan. <b>Kaikki pilvipalvelun käyttäjät poistetaan.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Irrota palvelin järjestelmästä</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Käynnistä uudelleen</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Muuta järjestelmänvalvojan salasana</h3>
                             <p>Jos järjestelmä on paikallinen (ei ole liitetty pilveen), tämä muuttaa käyttäjän "admin" - ja palautus (root) salasanaa joissakin palvelimissa. <br>
                                 Muuten tämä muuttaa vain palautussalasanan.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Vaihda salasana</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>Nimi</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Yhdistä järjestelmät</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Yhdistä järjestelmät</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     Pakota videoliikenteen salaus
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Tallenna</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Aikavyöhyke</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Päivämäärä</label></td>
+                                        <td><label for="time">Aika</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

@@ -5748,11 +5748,11 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Varattu</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>paikallinen</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5776,11 +5776,11 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>tuntematon</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7236,15 +7236,15 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Valitulla alueella</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valittu kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Valitut laitteet</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7253,7 +7253,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ei mitään</translation>
     </message>
   </context>
   <context>
@@ -8785,7 +8785,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Ota yhteyttä asiakastukeen.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10060,7 +10060,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Tiedoston korvaaminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10076,7 +10076,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Avaa kansio</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

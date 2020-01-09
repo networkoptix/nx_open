@@ -5746,7 +5746,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Gereserveerd</translation>
     </message>
     <message>
       <source>local</source>
@@ -5778,7 +5778,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -5867,7 +5867,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7234,15 +7234,15 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>In het geselecteerde gebied</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Geselecteerde camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Geselecteerde apparaat</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7251,7 +7251,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>geen</translation>
     </message>
   </context>
   <context>
@@ -7507,7 +7507,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>verwijderde camera</translation>
     </message>
   </context>
   <context>
@@ -7804,7 +7804,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8504,7 +8504,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>verwijderde camera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8575,7 +8575,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Update bestand is niet gevonden</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8921,7 +8921,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Geïnstalleerd</translation>
     </message>
     <message>
       <source>Failed to download update</source>
@@ -10058,7 +10058,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Fout tijdens het overschrijven van het bestand</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10074,7 +10074,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Open de vereiste map</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

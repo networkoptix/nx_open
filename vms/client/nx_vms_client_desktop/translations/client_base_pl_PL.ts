@@ -5869,7 +5869,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Zarezerwowane</translation>
     </message>
     <message>
       <source>local</source>
@@ -5901,7 +5901,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7429,15 +7429,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>W zaznaczonym obszarze</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Wybrana kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Wybrane urządzenie</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7446,7 +7446,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>brak</translation>
     </message>
   </context>
   <context>
@@ -9016,7 +9016,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Skontaktuj się z działem obsługi klienta.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10321,7 +10321,7 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Nie można nadpisać pliku</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10337,7 +10337,7 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Otwórz folder zawierający</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

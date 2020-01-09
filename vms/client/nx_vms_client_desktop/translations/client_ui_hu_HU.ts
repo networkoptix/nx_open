@@ -1998,7 +1998,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Letöltés &amp;&amp; Telepítés</translation>
     </message>
     <message>
       <location/>
@@ -2044,7 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Új virtuális kamera...</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3192,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS idő</translation>
     </message>
     <message>
       <location/>

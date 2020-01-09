@@ -21,14 +21,14 @@
         "tabs": {
             "server": "Server",
             "system": "System",
-            "device": "Device"
+            "device": "Enhet"
         },
         "confirmRestart": "Start serveren på nytt?",
         "couldntCheckInternet": "Kunne ikke sjekke sky-tilkoblingen",
         "confirmRestoreDefault": "Slett database og innstillinger? Denne prosessen tar litt tid, og serveren vil bli startet på nytt etterpå.",
         "confirmRestoreDefaultTitle": "Gjenopprett fabrikkinnstillinger",
         "unexpectedError": "Mislyktes: Uventet feil har oppstått",
-        "connnetionError": "Connection error",
+        "connnetionError": "Tilkoblingsfeil",
         "wrongPassword": "Feil passord.",
         "error": "Feil: ",
         "restartNeeded": "Endringer lagret. Start serveren på nytt for å legge til nye innstillinger?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Det er ikke sikkert å bruke portnummer mindre enn 1025. Serveren er kanskje ikke tilgjengelig. Fortsett uansett?",
         "confirmDisconnectFromCloud": "Koble systemet fra {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle skybrukerne vil bli slettet.</span><br><br>Systemet vil være tilgjengelig via lokalt nettverk med lokal administratorkonto.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Koble fra",
         "disconnectedFromCloudSuccess": "Systemet ble koblet fra {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "Kan ikke koble fra systemet",
         "confirmDisconnectFromSystem": "Koble serveren fra gjeldende system",
@@ -149,7 +149,7 @@
         "licenceError": "Advarsel! Du er i ferd med å slå sammen systemer med Starter-lisenser. Bare ett Starter-lisens er tillatt per System, så den andre lisensen blir deaktivert. Slå sammen uansett?",
         "duplicateServersError": "Kan ikke slå sammen systemer fordi de har minst én server med samme ID. Fjern denne serveren og prøv igjen.",
         "connectionFailed": "Tilkoblingen mislyktes: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Ukjent feil",
         "mergeFailed": "Sammenslåing mislyktes",
         "mergeSucceed": "Sammenslåing velykket.",
         "newSystemDisplayName": "Nytt system",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Innlogging eller passord er feil",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "For mange forsøk. Prøv igjen om et minutt."
     },
     "navigaion": {
         "cannotGetUser": "Serverfeil: kan ikke hente nåværende brukerdata"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "serveren starter",
         "serverRestarting": "serveren starter på nytt",
-        "serverOffline": "server is offline"
+        "serverOffline": "server frakoblet"
     },
     "fileUpload": {
         "started": "Oppdatering startet. Det vil ta flere minutter",
@@ -182,7 +182,7 @@
         "selectFiles": "Velg filer"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Ledig",
         "total": "Totalt",
         "occupied": "Opptatt",
         "reserved": "Reservert"

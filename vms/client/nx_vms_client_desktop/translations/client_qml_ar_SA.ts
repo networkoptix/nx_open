@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>إخفاء</translation>
     </message>
   </context>
   <context>

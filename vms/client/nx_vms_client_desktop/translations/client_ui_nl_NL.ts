@@ -3192,7 +3192,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tijd</translation>
     </message>
     <message>
       <location/>

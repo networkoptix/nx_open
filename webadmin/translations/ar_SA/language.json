@@ -29,7 +29,7 @@
         "confirmRestoreDefaultTitle": "Restore factory defaults",
         "unexpectedError": "Failed: unexpected error has happened",
         "connnetionError": "Connection error",
-        "wrongPassword": "Wrong password.",
+        "wrongPassword": "كلمة مرور خاطئة.",
         "error": "Error: ",
         "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Login or password is incorrect",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "محاولات كثيرة. حاول مرة أخرى بعد دقيقة."
     },
     "navigaion": {
         "cannotGetUser": "Server failure: cannot retrieve current user data"
@@ -192,28 +192,28 @@
     },
     "common": {
         "cameraLinks": {
-            "highStream": "High stream",
-            "lowStream": "Low stream",
-            "transcoding": "Transcoding",
+            "highStream": "التدفق الاعلى",
+            "lowStream": "التدفق المنخفض",
+            "transcoding": "التشفير",
             "unknown": "Unknown",
-            "copyToClipboard": "copy to clipboard",
+            "copyToClipboard": "نسخ إلى الحافظة",
             "copyDefaultText": "copy",
-            "copyActiveText": "copied to clipboard"
+            "copyActiveText": "نُسخ إلى الحافظة"
         },
-        "systemOffline": "System Offline",
+        "systemOffline": "النظام غير متصل",
         "cameraStates": {
-            "offline": "Offline",
+            "offline": "غير متصل",
             "error": "Error",
-            "unauthorized": "Authentication required",
-            "noData": "No data",
-            "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+            "unauthorized": "يستلزم التوثيق",
+            "noData": "لا يوجد بيانات",
+            "iosVideoTooLarge": "لا يدعم نظام التشغيل iOS الفيديو الذي يزيد حجمه عن حجم الوضوح الكامل (2MP: 1920 × 1080).",
+            "flashRequired": "يرجى <a href='https://get.adobe.com/flashplayer/' target='_blank'>تحميل برنامج ادوبي فلاش</a> لتشغيل الفيديو.",
             "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-            "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-            "noFormat": "This browser does not support video playback from this camera.",
-            "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-            "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
-            "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+            "noArmSupport": "لا يدعم هذا المستعرض أو الجهاز تشغيل الفيديو من الخوادم المستندة إلى ARM.",
+            "noFormat": "هذا المتصفح لا يدعم تشغيل الفيديو من هذه الكاميرا.",
+            "ieNoWebm": "من فضلك ، قم بتثبيت <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> لبرنامج Internet Explorer.",
+            "ieWin10": "من فضلك ، استخدم متصفحات Microsoft Edge أو Google Chrome.",
+            "ubuntuNX": "لا يدعم هذا المستعرض الفيديو من الخوادم المستندة إلى ARM. يرجى استخدام متصفح Chromium بدلاً من ذلك."
         },
         "searchCamPlaceholder": "Search",
         "resolution": {
@@ -221,18 +221,18 @@
             "high": "High",
             "low": "Low"
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "يستهلك Chromecast الموارد وقد يتسبب في حدوث مشكلات على الخادم لديك.",
         "voiceCommands": {
             "play": "play",
             "pause": "pause",
             "live": "go to live | show me live",
             "view": "view + [camera name]",
             "search": "find + [text for searchbar]",
-            "clear search": "clear search",
+            "clear search": "مسح البحث",
             "expand server": "expand server + [server name]",
             "collapse server": "collapse server + [server name]",
-            "expand all servers": "expand all servers",
-            "collapse all servers": "collapse all servers",
+            "expand all servers": "توسيع جميع الخوادم",
+            "collapse all servers": "طي جميع الخوادم",
             "stop listening": "stop listening",
             "help": "help | show commands"
         }

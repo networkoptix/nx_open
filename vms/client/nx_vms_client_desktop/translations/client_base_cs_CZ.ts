@@ -5872,11 +5872,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Vyhrazený</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>místní</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5900,11 +5900,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>neznámý</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -5993,7 +5993,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginy</translation>
     </message>
   </context>
   <context>
@@ -7432,15 +7432,15 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Ve vybrané oblasti</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Vybraná kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Vybrané zařízení</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7449,7 +7449,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>žádný</translation>
     </message>
   </context>
   <context>
@@ -7709,7 +7709,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>smazaná kamera</translation>
     </message>
   </context>
   <context>
@@ -7917,11 +7917,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
       </translation>
     </message>
     <message>
@@ -8020,7 +8020,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginy</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8738,7 +8738,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>smazaná kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8809,7 +8809,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Aktualizační soubor nebyl nalezen</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8963,7 +8963,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Stáhnout a nainstalovat</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -9019,7 +9019,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Prosím kontaktujte zákaznickou podporu.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -9094,7 +9094,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Neznámá diagnosticka události pluginu</translation>
     </message>
   </context>
   <context>
@@ -9159,7 +9159,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Nainstalováno</translation>
     </message>
     <message>
       <source>Failed to download update</source>
@@ -10324,7 +10324,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Přepsání souboru se nezdařilo</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10340,7 +10340,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Otevřít odpovídající složku</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

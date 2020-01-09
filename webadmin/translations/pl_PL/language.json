@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
+            "server": "Serwer",
             "system": "System",
-            "device": "Device"
+            "device": "Urządzenie"
         },
         "confirmRestart": "Uruchomić ponownie serwer?",
         "couldntCheckInternet": "Nie można sprawdzić połączenia do chmury",
         "confirmRestoreDefault": "Wyczyścić bazę danych i ustawienia? Proces ten zajmie trochę czasu, a po zakończeniu serwer zostanie ponownie uruchomiony.",
         "confirmRestoreDefaultTitle": "Przywróć ustawienia fabryczne",
         "unexpectedError": "Niepowodzenie: wystąpił nieoczekiwany błąd",
-        "connnetionError": "Connection error",
+        "connnetionError": "Błąd połączenia",
         "wrongPassword": "Nieprawidłowe hasło.",
         "error": "Błąd:",
         "restartNeeded": "Zmiany zostały zapisane. Uruchomić ponownie serwer używając nowych ustawień?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Nie jest bezpiecznie używać numeru portu niższego od 1025. Serwer może być niedostępny. Kontynuować mimo to?",
         "confirmDisconnectFromCloud": "Odłączyć system od {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Wszyscy użytkownicy chmury zostaną usunięci.</span><br><br>System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Rozłącz",
         "disconnectedFromCloudSuccess": "System został odłączony od {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "Nie można odłączyć systemu",
         "confirmDisconnectFromSystem": "Odłącz serwer z bieżącego systemu",
@@ -149,7 +149,7 @@
         "licenceError": "Uwaga! Zamierzasz złączyć systemy na licencjach Starter. Tylko jedna taka licencja może być wykorzystywana w złączonym systemie, więc druga z licencji zostanie dezaktywowana. Złączyć mimo to?",
         "duplicateServersError": "Nie można połączyć systemów, ponieważ mają co najmniej jeden serwer o tym samym identyfikatorze. Usuń ten serwer i spróbuj ponownie.",
         "connectionFailed": "Błąd połączenia: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Nieznany błąd",
         "mergeFailed": "Błąd złączania",
         "mergeSucceed": "Złączono pomyślnie.",
         "newSystemDisplayName": "Nowy system",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Nieprawidłowy login lub hasło",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Zbyt wiele prób. Spróbuj ponownie za minutę."
     },
     "navigaion": {
         "cannotGetUser": "Błąd serwera: nie można pobrać danych bieżącego użytkownika"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "uruchamianie serwera",
         "serverRestarting": "ponowne uruchamianie serwera",
-        "serverOffline": "server is offline"
+        "serverOffline": "serwer jest odłączony"
     },
     "fileUpload": {
         "started": "Aktualizacja została uruchomiona. To zajmie kilka minut",
@@ -182,7 +182,7 @@
         "selectFiles": "Wybierz pliki"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Bezpłatna",
         "total": "Razem",
         "occupied": "Zajęte",
         "reserved": "Zarezerwowane"

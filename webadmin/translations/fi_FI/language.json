@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "server": "Palvelin",
+            "system": "Järjestelmä",
+            "device": "Laite"
         },
         "confirmRestart": "Käynnistä palvelin?",
         "couldntCheckInternet": "Pilvi yhteyden tarkistaminen ei onnistunut",
         "confirmRestoreDefault": "Tyhjennä tietokanta ja asetukset? Tämä prosessi vie jonkin aikaa ja palvelin käynnistetään uudelleen.",
         "confirmRestoreDefaultTitle": "Palauta tehdasasetukset",
         "unexpectedError": "Epäonnistui: on tapahtunut odottamaton virhe",
-        "connnetionError": "Connection error",
+        "connnetionError": "Yhteysvirhe",
         "wrongPassword": "Väärä salasana.",
         "error": "Virhe: ",
         "restartNeeded": "Muutokset tallennettu. Käynnistä palvelin uudestaan vahvistaaksesi muutokset?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Ei ole turvallista käyttää alle 1025 portin numeroa. Palvelin ei ehkä ole käytettävissä. Jatka joka tapauksessa?",
         "confirmDisconnectFromCloud": "Irrota järjestelmä {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Kaikki pilvipalvelun käyttäjät poistetaan.</span><br><br>Järjestelmä on käytettävissä paikallisen verkon kautta paikallisen järjestelmänvalvojan tilillä.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Katkaise yhteys",
         "disconnectedFromCloudSuccess": "Järjestelmä on irrotettu {{CLOUD_NAME}} onnistuneesti",
         "disconnectedFromCloudError": "Järjestelmää ei voi irrottaa",
         "confirmDisconnectFromSystem": "Irrota palvelin nykyisestä järjestelmästä",
@@ -149,7 +149,7 @@
         "licenceError": "Varoitus! Olet yhdistämässä järjestelmiä Starter-lisensseihin. Järjestelmää kohti on sallittu vain yksi Starter-lisenssi, joten toinen lisenssi poistetaan käytöstä. Yhdistä silti?",
         "duplicateServersError": "Järjestelmiä ei voi yhdistää, koska niissä on vähintään yksi palvelin, jolla on sama tunnus. Poista tämä palvelin ja yritä uudelleen.",
         "connectionFailed": "Yhdistäminen epäonnistui: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Tuntematon virhe",
         "mergeFailed": "Yhdistäminen epäonnistui",
         "mergeSucceed": "Yhdistäminen onnistunut.",
         "newSystemDisplayName": "Uusi järjestelmä",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Käyttäjätunnus tai salasana on virheellinen",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Liian monta yritystä. Yritä myöhemmin uudelleen."
     },
     "navigaion": {
         "cannotGetUser": "Palvelinvirhe: ei voi hakea nykyisiä käyttäjätietoja"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "palvelin käynnistyy",
         "serverRestarting": "palvelin käynnistyy uudelleen",
-        "serverOffline": "server is offline"
+        "serverOffline": "palvelin pois käytöstä"
     },
     "fileUpload": {
         "started": "Päivitys käynnistettiin onnistuneesti. Se vie useita minuutteja",
@@ -182,7 +182,7 @@
         "selectFiles": "Valitse tiedostot"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Ilmainen",
         "total": "Yhteensä",
         "occupied": "Varattu",
         "reserved": "Varattu"

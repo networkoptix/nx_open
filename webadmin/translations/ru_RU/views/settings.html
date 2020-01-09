@@ -19,10 +19,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>Порт</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Порт" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -38,21 +38,21 @@
                         <h3>Сброс сервера</h3>
                         <p>Это действие вернет этот сервер к настройкам по умолчанию (очистит базу данных и сбросит конфигурацию).
                             Сервер будет отсоединен от текущей системы. Видео архив останется без изменений.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Восстановить значения по умолчанию</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Отсоединить сервер от системы</h3>
                         <p>Это действие отключит сервер от системы с сохранением базы данных, локальных пользователей и конфигурации.
-                            Video archive will remain intact. <b>Облачные пользователи будут удалены.</b></p>
+                            Видео архив останется без изменений. <b>Облачные пользователи будут удалены.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Отсоединить от системы</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Перезапуск</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустить сервер</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезагрузить</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Изменить пароль администратора</h3>
                             <p>Если система локальная  (не подключена к облаку), это изменит пароль для пользователя "admin" и пароль восстановления (пользователь "root") на некоторых серверах.
                                 <br>В другом случае это изменит только пароль восстановления.</p>
                             <div class="col-sm-6">
@@ -61,7 +61,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Изменить пароль</button>
                             </div>
                         </form>
                     </div>
@@ -69,7 +69,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>Имя</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -83,8 +83,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Объединить системы</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Объединить системы</button></p>
                         </form>
                     </div>
 
@@ -132,7 +132,7 @@
                                     Включить шифрование видео трафика
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Сохранить</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -150,8 +150,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Часовой пояс</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Дата</label></td>
+                                        <td><label for="time">Время</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

@@ -41,22 +41,22 @@
                         <h3>Restart server</h3>
                         <p>Denne handlingen vil tilbakeføre denne serveren til standardinnstillinger (tøm databasen og tilbakestill konfigurasjonen).
                             Serveren vil bli koblet fra det nåværende systemet. Videoarkivet forblir intakt.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Gjenopprett fabrikkinnstillinger</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Koble serveren fra systemet</h3>
                         <p>Denne handlingen vil fjerne serveren fra systemet som holder databasen, lokale brukere og konfigurasjonen.
-                            Video archive will remain intact. <b> Cloud-brukere vil bli slettet. </b></p>
+                            Videoarkivet forblir intakt. <b> Cloud-brukere vil bli slettet. </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Koble fra systemet</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Omstart</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Endre admin passord</h3>
                             <p>Hvis systemet er lokalt (ikke koblet til skyen), vil dette endre passordet for brukerens "admin" og gjenopprettingskoden (root) på enkelte servere. <br>
                                 Ellers vil dette bare endre gjenopprettingspassordet.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Bytt passord</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>Navn</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Slå sammen systemer</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Slå sammen systemer</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     Påtvunget kryptering av vidostrøm
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Lagre</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Tidssone</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Dato</label></td>
+                                        <td><label for="time">Tid</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>
