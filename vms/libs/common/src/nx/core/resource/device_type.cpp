@@ -23,5 +23,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::core::resource, DeviceType,
     (nx::core::resource::DeviceType::encoder, "Encoder")
     (nx::core::resource::DeviceType::ioModule, "IOModule")
     (nx::core::resource::DeviceType::hornSpeaker, "HornSpeaker")
-    (nx::core::resource::DeviceType::camera, "Multisensor camera")
+    (nx::core::resource::DeviceType::multisensorCamera, "Multisensor camera")
 );
