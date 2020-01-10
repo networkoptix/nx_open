@@ -91,7 +91,7 @@ QString uknownDeviceString(const QString& macAddress)
         PoeSettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
     return nx::utils::MacAddress(macAddress).isNull()
         ? kUnknownDeviceText
-        : kUnknownDeviceWithMacText;
+        : kUnknownDeviceWithMacText.arg(macAddress);
 }
 
 ViewNodeData wrongResourceNodeData(const QString& macAddress, bool connected)
