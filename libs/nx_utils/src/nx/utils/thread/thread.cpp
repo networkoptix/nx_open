@@ -19,8 +19,8 @@ Thread::Thread()
     // This value is not platform-dependent to be able to catch stack overflow error on every
     // platform.
 
-    constexpr size_t kDefaultThreadStackSize = 128 * 1024;
-    setStackSize(kDefaultThreadStackSize);
+    //constexpr size_t kDefaultThreadStackSize = 128 * 1024;
+    //setStackSize(kDefaultThreadStackSize);
 #endif
 }
 

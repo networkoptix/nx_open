@@ -10,6 +10,7 @@
 #include "android_video_decoder.h"
 #include "android_audio_decoder.h"
 #include "ios_video_decoder.h"
+#include "quick_sync/quick_sync_video_decoder.h"
 
 #include "jpeg_decoder.h"
 
@@ -54,6 +55,7 @@ void DecoderRegistrar::registerDecoders(
     {
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
+        VideoDecoderRegistry::instance()->addPlugin<QuickSyncVideoDecoder>();
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }

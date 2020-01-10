@@ -38,10 +38,14 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
 
+#include <QtX11Extras/QX11Info>
+
+#include <nx/media/quick_sync/va_surface_info.h>
+
 QT_BEGIN_NAMESPACE
 
 QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_RGB::supportedPixelFormats(
-                                        QAbstractVideoBuffer::HandleType handleType) const
+    QAbstractVideoBuffer::HandleType handleType) const
 {
     QList<QVideoFrame::PixelFormat> pixelFormats;
 
@@ -51,6 +55,10 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_RGB::supportedPixelFormats(
         pixelFormats.append(QVideoFrame::Format_BGR32);
         pixelFormats.append(QVideoFrame::Format_BGRA32);
         pixelFormats.append(QVideoFrame::Format_RGB565);
+    } else if (handleType == QAbstractVideoBuffer::GLTextureHandle) {
+        pixelFormats.append(QVideoFrame::Format_NV12);
+    } else if (handleType == kHandleTypeVaSurface) {
+        pixelFormats.append(QVideoFrame::Format_NV12);
     }
 
     return pixelFormats;
@@ -117,6 +125,9 @@ public:
 
 class QSGVideoMaterial_RGB : public QSGMaterial
 {
+    void* m_vaglx_surface = nullptr;
+    VADisplay m_display;
+
 public:
     QSGVideoMaterial_RGB(const QVideoSurfaceFormat &format) :
         m_format(format),
@@ -129,6 +140,9 @@ public:
 
     ~QSGVideoMaterial_RGB()
     {
+        if (m_vaglx_surface)
+            vaDestroySurfaceGLX(m_display, m_vaglx_surface);
+
         if (m_textureId)
             QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
     }
@@ -159,6 +173,7 @@ public:
     void setVideoFrame(const QVideoFrame &frame) {
         QMutexLocker lock(&m_frameMutex);
         m_frame = frame;
+        m_textureDirty = true;
     }
 
     void bind()
@@ -166,7 +181,55 @@ public:
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
 
         QMutexLocker lock(&m_frameMutex);
-        if (m_frame.isValid()) {
+        if (!m_textureDirty && m_frame.handleType() == kHandleTypeVaSurface)
+        {
+            functions->glActiveTexture(GL_TEXTURE0);
+            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+            return;
+        }
+
+        if (m_frame.isValid() && m_frame.handleType() == kHandleTypeVaSurface) {
+
+            auto surfaceInfo = m_frame.handle().value<VaSurfaceInfo>();
+            m_display = surfaceInfo.display;
+
+            if (m_textureSize != m_frame.size()) {
+                if (!m_textureSize.isEmpty())
+                    functions->glDeleteTextures(1, &m_textureId);
+                functions->glGenTextures(1, &m_textureId);
+                m_textureSize = m_frame.size();
+
+                functions->glActiveTexture(GL_TEXTURE0);
+                functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+                functions->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                    m_textureSize.width(), m_textureSize.height(), 0,
+                    GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+                if (m_vaglx_surface)
+                    vaDestroySurfaceGLX(m_display, m_vaglx_surface);
+
+                const auto status = vaCreateSurfaceGLX(m_display, GL_TEXTURE_2D, m_textureId, &m_vaglx_surface);
+                if (status != VA_STATUS_SUCCESS)
+                    qWarning() << "failed vaCreateSurfaceGLX" << status;
+            }
+
+            auto status = vaCopySurfaceGLX(m_display, m_vaglx_surface, surfaceInfo.id, 0);
+            if (status != VA_STATUS_SUCCESS)
+                qWarning() << "failed vaCopySurfaceGLX" << status;
+
+            m_textureDirty = false;
+            status = vaSyncSurface(m_display, surfaceInfo.id);
+            if (status != VA_STATUS_SUCCESS)
+                qWarning() << "failed vaSyncSurface" << status;
+
+            functions->glActiveTexture(GL_TEXTURE0);
+            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+        } else if (m_frame.isValid()) {
             if (m_frame.map(QAbstractVideoBuffer::ReadOnly)) {
                 QSize textureSize = m_frame.size();
 
@@ -226,6 +289,7 @@ public:
     QVideoFrame m_frame;
     QMutex m_frameMutex;
     QSize m_textureSize;
+    bool m_textureDirty = true;
     QVideoSurfaceFormat m_format;
     GLuint m_textureId;
     qreal m_opacity;
@@ -251,8 +315,14 @@ QSGVideoNode_RGB::~QSGVideoNode_RGB()
 {
 }
 
+QAbstractVideoBuffer::HandleType QSGVideoNode_RGB::handleType() const
+{
+    return m_handleType;
+}
+
 void QSGVideoNode_RGB::setCurrentFrame(const QVideoFrame &frame, FrameFlags)
 {
+    m_handleType = frame.handleType();
     m_material->setVideoFrame(frame);
     markDirty(DirtyMaterial);
 }

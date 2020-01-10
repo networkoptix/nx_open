@@ -11,7 +11,6 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLFramebufferObject>
 
-#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCache>
 #include <QtCore/QMap>

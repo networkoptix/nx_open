@@ -61,12 +61,11 @@ public:
     virtual QVideoFrame::PixelFormat pixelFormat() const {
         return m_format.pixelFormat();
     }
-    QAbstractVideoBuffer::HandleType handleType() const {
-        return QAbstractVideoBuffer::NoHandle;
-    }
+    QAbstractVideoBuffer::HandleType handleType() const;
     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
 
 private:
+    QAbstractVideoBuffer::HandleType m_handleType;
     QVideoSurfaceFormat m_format;
     QSGVideoMaterial_RGB *m_material;
     QVideoFrame m_frame;

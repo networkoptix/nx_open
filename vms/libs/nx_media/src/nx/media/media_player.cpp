@@ -33,6 +33,7 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
+#include "quick_sync/va_surface_info.h"
 
 #include "media_player_quality_chooser.h"
 
@@ -516,8 +517,13 @@ QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
         return videoFrame; //< Scale is not required.
 
+    // if video frame contains video memory surface then skip scaling
+    if (videoFrame->handleType() == kHandleTypeVaSurface)
+        return videoFrame;
+
     QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(
         videoFrame->pixelFormat());
+
     videoFrame->map(QAbstractVideoBuffer::ReadOnly);
     QImage img(
         videoFrame->bits(),

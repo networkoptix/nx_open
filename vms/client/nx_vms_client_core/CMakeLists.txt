@@ -17,8 +17,10 @@ mark_as_advanced(Qt5MultimediaQuick_LIBRARY)
 
 nx_add_target(nx_vms_client_core LIBRARY
     PUBLIC_LIBS
+        /usr/local/lib/libva-glx.so
         Qt5::Quick ${Qt5MultimediaQuick_LIBRARY}
-        appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update)
+        appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update
+        )
 
 if(TARGET qtkeychain)
     target_link_libraries(nx_vms_client_core PRIVATE qtkeychain)
@@ -29,8 +31,11 @@ endif()
 
 target_include_directories(nx_vms_client_core
     PUBLIC
+        /usr/local/include
         ${Qt5Quick_PRIVATE_INCLUDE_DIRS}
-        ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS})
+        ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS}
+        )
+
 
 if(withTests)
     add_subdirectory(unit_tests)

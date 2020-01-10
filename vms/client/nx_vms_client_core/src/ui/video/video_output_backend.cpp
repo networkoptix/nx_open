@@ -9,6 +9,7 @@
 #include <nx/media/media_player.h>
 #include <utils/common/app_info.h>
 
+#include <nx/utils/log/log.h>
 #include "video_output.h"
 #include "video_item_surface.h"
 #include "videonode_rgb.h"
@@ -66,7 +67,7 @@ QnVideoOutputBackend::QnVideoOutputBackend(QnVideoOutput* videoOutput):
     d->videoNodeFactories.append(&d->i420Factory);
     d->videoNodeFactories.append(&d->rgbFactory);
     d->videoNodeFactories.append(&d->textureFactory);
-    
+
     // Commented out hardware video decoder support for BananaPi (Allwinner) - used by Lite Client.
     //d->videoNodeFactories.append(&d->bpiFactory);
 }
