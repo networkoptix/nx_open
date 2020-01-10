@@ -468,11 +468,23 @@ void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metad
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
+    NX_VERBOSE(this,
+        "%1(): Called for data (type %2) with timestamp %3 us, resource: %4 (%5), catalog: %6",
+        __func__, media->dataType, media->timestamp, m_resource->getName(), m_resource->getId(),
+        m_catalog);
+
     qint64 afterThreshold = 5 * 1000000ll;
     Qn::RecordingType recType = m_currentScheduleTask.recordingType;
     if (recType == Qn::RecordingType::motionOnly || recType == Qn::RecordingType::motionAndLow)
         afterThreshold = m_currentScheduleTask.recordAfterSec * 1000000ll;
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
+
+    NX_VERBOSE(this,
+        "%1(): Is motion continue: %2, last motion data timestamp: %3 us, "
+        "resource: %4 (%5), catalog %6",
+        __func__, isMotionContinue, m_lastMotionTimeUsec,
+        m_resource->getName(), m_resource->getId(), m_catalog);
+
     if (!isMotionContinue)
     {
         if (m_endDateTimeUs == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTimeUs < MAX_FRAME_DURATION_MS*1000)
@@ -487,27 +499,54 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
     {
+        NX_VERBOSE(this, "%1(): Closing the recorder for resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
+
         close();
         return false;
     }
 
     if (m_catalog == QnServer::HiQualityCatalog && !metaData && !m_usePrimaryRecorder)
     {
+        NX_VERBOSE(this, "%1(): Closing the recorder for resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
+
         close();
         return false;
     }
 
-    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder) {
+    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder)
+    {
+        NX_VERBOSE(this, "%1(): Keeping metadata, resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
+
         keepRecentlyMotion(media);
         return false;
     }
 
     if (task.recordingType == Qn::RecordingType::always)
+    {
+        NX_VERBOSE(this,
+            "%1(): Recording type is 'always', returning 'true', resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
         return true;
+    }
     else if (task.recordingType == Qn::RecordingType::motionAndLow && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming()))
+    {
+        NX_VERBOSE(this,
+            "%1(): Recording type is 'motionAndLow', resource has dual streaming: %2, "
+            "returning 'true' resource: %3 (%4), catalog: %5",
+            __func__, camera->hasDualStreaming(),
+            m_resource->getName(), m_resource->getId(), m_catalog);
+
         return true;
+    }
     else if (task.recordingType == Qn::RecordingType::never)
     {
+        NX_VERBOSE(this,
+            "%1(): Recording type is 'never', returning 'false', resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
+
         close();
         if (media->dataType == QnAbstractMediaData::META_V1)
             keepRecentlyMotion(media);
@@ -515,7 +554,12 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     }
 
     if (metaData)
+    {
+        NX_VERBOSE(this,
+            "%1(): Got motion metadata, returning 'true', resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
         return true;
+    }
 
     // write motion only
     // if prebuffering mode and all buffer is full - drop data
@@ -523,12 +567,20 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
     if (!isMotionContinue && m_endDateTimeUs != (qint64)AV_NOPTS_VALUE)
     {
+        NX_VERBOSE(this,
+            "%1(): Closing recorder because of lack of motion, resource: %2 (%3), catalog: %4",
+            __func__, m_resource->getName(), m_resource->getId(), m_catalog);
+
         if (media->timestamp - m_endDateTimeUs < MAX_FRAME_DURATION_MS*1000)
             m_endDateTimeUs = media->timestamp;
         else
             m_endDateTimeUs += MIN_FRAME_DURATION_USEC;
         close();
     }
+
+    NX_VERBOSE(this,
+        "%1(): END, returning %2, resource: %3 (%4), catalog: %5",
+        __func__, isMotionContinue, m_resource->getName(), m_resource->getId(), m_catalog);
     return isMotionContinue;
 }
 
@@ -909,11 +961,23 @@ int QnServerStreamRecorder::getFRAfterThreshold() const
 
 void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
 {
+    NX_VERBOSE(this,
+        "%1(): Writing recent motion data starting from %2 us, resource %3 (%4), catalog %5",
+        __func__, writeAfterTime, m_resource->getName(), m_resource->getId(), m_catalog);
+
     writeAfterTime -= MOTION_AGGREGATION_PERIOD;
     for (int i = 0; i < m_recentlyMotion.size(); ++i)
     {
         if (m_recentlyMotion[i]->timestamp > writeAfterTime)
+        {
+            NX_VERBOSE(this,
+                "%1(): Writing motion metadata with timestamp %2 us, resource: %3 (%4), "
+                "catalog: %5",
+                __func__, m_recentlyMotion[i]->timestamp,
+                m_resource->getName(), m_resource->getId(), m_catalog);
+
             QnStreamRecorder::saveData(m_recentlyMotion[i]);
+        }
     }
     m_recentlyMotion.clear();
 }
@@ -927,12 +991,23 @@ void QnServerStreamRecorder::keepRecentlyMotion(const QnConstAbstractMediaDataPt
 
 bool QnServerStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
+    NX_VERBOSE(this,
+        "%1(): Saving data with timestamp %2 us, data type: %3, resource: %4 (%5), catalog %6",
+        __func__, md->timestamp, md->dataType,
+        m_resource->getName(), m_resource->getId(), m_catalog);
+
     writeRecentlyMotion(md->timestamp);
     return QnStreamRecorder::saveData(md);
 }
 
 void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
+    NX_VERBOSE(this,
+        "%1(): Writing data with timestamp %2 us, data type: %3, resource: %4 (%5), "
+        "catalog %6, stream index: %7",
+        __func__, md->timestamp, md->dataType,
+        m_resource->getName(), m_resource->getId(), m_catalog, streamIndex);
+
     QnStreamRecorder::writeData(md, streamIndex);
     m_diskErrorWarned = false;
 }

@@ -283,6 +283,9 @@ void QnStreamRecorder::markNeedKeyData()
 
 void QnStreamRecorder::flushPrebuffer()
 {
+    NX_VERBOSE(this, "Flushing prebuffer for resource %1 (%2)",
+        m_resource->getName(), m_resource->getId());
+
     while (!m_prebuffer.isEmpty())
     {
         QnConstAbstractMediaDataPtr d;
@@ -372,10 +375,20 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         {
             VERBOSE("no pre-buffering");
             m_nextIFrameTime = AV_NOPTS_VALUE;
+
+            bool prebufferFlushHasBeenLogged = false;
             while (!m_prebuffer.isEmpty())
             {
+                if (!prebufferFlushHasBeenLogged)
+                {
+                    NX_VERBOSE(this, "Flushing prebuffer inside %1(), resource %2 (%3)",
+                        __func__, m_resource->getName(), m_resource->getId());
+                    prebufferFlushHasBeenLogged = true;
+                }
+
                 QnConstAbstractMediaDataPtr d;
                 m_prebuffer.pop(d);
+
                 if (needSaveData(d))
                     saveData(d);
                 else if (md->dataType == QnAbstractMediaData::VIDEO)
@@ -398,10 +411,21 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
                 && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
             {
                 VERBOSE("find next I-Frame");
+                bool prebufferFlushHasBeenLogged = false;
                 while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
                 {
                     QnConstAbstractMediaDataPtr d;
                     m_prebuffer.pop(d);
+
+                    if (!prebufferFlushHasBeenLogged)
+                    {
+                        NX_VERBOSE(this, "Flushing prebuffer inside %1() "
+                            "until I-frame with timestamp %2 us for resource %3 (%4)",
+                            __func__, m_nextIFrameTime, m_resource->getName(), m_resource->getId());
+
+                        prebufferFlushHasBeenLogged = true;
+                    }
+
                     if (needSaveData(d))
                         saveData(d);
                     else if (md->dataType == QnAbstractMediaData::VIDEO)
@@ -463,7 +487,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
     {
-        NX_VERBOSE(this, "saveData(): META_V1");
+        NX_VERBOSE(this, "QnStreamRecorder::saveData(): META_V1, timestamp %1 us", md->timestamp);
         return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
     }
 
@@ -603,6 +627,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
     else
     {
+        NX_VERBOSE(this,
+            "QnStreamRecorder::saveData(): writing data with timestamp %1 us, data type: %2, "
+            "resource: %3 (%4), stream index: %5",
+            md->timestamp, md->dataType, m_resource->getName(), m_resource->getId(), streamIndex);
+
         writeData(md, streamIndex);
     }
 
@@ -1130,7 +1159,13 @@ bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/
 bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
+    {
+        NX_VERBOSE(this,
+            "QnStreamRecorder::saveMotion(): Saving motion, timestamp %2 us, resource: %3 (%4)",
+            __func__, motion->timestamp, m_resource->getName(), m_resource->getId());
         motion->serialize(m_motionFileList[motion->channelNumber].data());
+    }
+
     return true;
 }
 
