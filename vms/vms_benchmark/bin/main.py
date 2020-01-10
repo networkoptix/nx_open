@@ -1054,7 +1054,6 @@ def main(conf_file, ini_file, log_file):
             'not be zero simultaneously.'
         )
 
-    print(platform.system(), conf["boxLogin"], not conf["boxLogin"])
     # On Windows plink tool is used and this tool doesn't support the fallback to default for the
     # SSH login.
     if platform.system() == "Linux" and not conf["boxLogin"]:
