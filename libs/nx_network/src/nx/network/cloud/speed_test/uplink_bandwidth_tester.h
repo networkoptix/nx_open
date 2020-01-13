@@ -29,6 +29,9 @@ public:
 	virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 	virtual void stopWhileInAioThread() override;
 
+	/**
+	 * NOTE: handler reports bandwidth result in Kilobits per second iff there is no error.
+	 */
 	void doBandwidthTest(BandwidthCompletionHandler handler);
 
 private:
@@ -47,7 +50,16 @@ private:
     struct RunningValue
     {
         int totalBytesSent = 0;
-        float averageBandwidth = 0;
+		// in bytes per msec
+		float averageBandwidth = 0;
+
+		std::string toString() const
+		{
+			return 
+				std::string("{ totalBytesSent = ") + std::to_string(totalBytesSent)
+				+ ", averageBandwidth = " + std::to_string(averageBandwidth) + " bytes per msec"
+				+ " }";
+		}
     };
 
 	struct TestContext

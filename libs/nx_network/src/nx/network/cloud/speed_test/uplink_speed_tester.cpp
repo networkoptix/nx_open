@@ -136,11 +136,11 @@ void UplinkSpeedTester::emitTestResult(
     std::optional<ConnectionSpeed> result)
 {
     QString resultStr = result
-        ? lm("{pingTime: %1, bandwidth: %2 Bpms (%3 Mbps)}")
-        .args(result->pingTime, result->bandwidth, result->bandwidth * kBytesPerMsecToMegabitsPerSec)
+        ? lm("{pingTime: %1, bandwidth: %2 KilobitsPerSec}")
+        .args(result->pingTime, result->bandwidth)
 		: "none";
 
-	NX_VERBOSE(this, "Test complete, reporting system error: '%1' and speed test result: %2",
+	NX_VERBOSE(this, "Test complete, reporting system error: %1 and speed test result: %2",
 		SystemError::toString(errorCode), resultStr);
 
     if (m_handler)
