@@ -19,6 +19,8 @@ public:
         double currentConsumptionWatts = 0.0;
         double upperLimitWatts = 0.0;
         double lowerLimitWatts = 0.0;
+
+        bool isEmpty() const;
     };
 
 #define nx_vms_event_PoeOverBudgetEvent_Parameters_Fields \
@@ -38,6 +40,8 @@ public:
     virtual EventParameters getRuntimeParams() const override;
 
     virtual bool checkEventParams(const EventParameters &params) const override;
+
+    static Parameters consumptionParameters(const EventParameters &params);
 
 private:
     Parameters m_parameters;

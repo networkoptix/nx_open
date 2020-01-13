@@ -95,6 +95,10 @@ public:
     static QString getSoftwareTriggerName(const QString& name);
     static QString getSoftwareTriggerName(const EventParameters& params);
 
+    static QString poeConsumptionString(double current, double limit);
+    static QString poeOverallConsumptionString(double current, double limit);
+    static QString poeConsumptionStringFromParams(const EventParameters& params);
+
     QString getAnalyticsSdkEventName(const EventParameters& params,
         const QString& locale = QString()) const;
 };

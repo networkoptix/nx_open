@@ -40,6 +40,8 @@ private:
         const QnVirtualCameraResourcePtr& camera) const;
     QString description(const nx::vms::event::EventParameters& parameters) const;
 
+    QString getPoeOverBudgetDescription(const nx::vms::event::EventParameters& parameters) const;
+
     QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action,
         const QColor& color = QColor()) const;
 

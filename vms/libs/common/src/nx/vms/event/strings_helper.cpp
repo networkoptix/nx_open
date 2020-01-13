@@ -30,6 +30,15 @@
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/fusion/model_functions.h>
 
+namespace {
+
+QString poeConsumptionValue(double value)
+{
+    return QString::number(value, 'f', 1);
+}
+
+} // namespace
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -285,6 +294,13 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     {
         if (!params.caption.isEmpty() && !params.description.startsWith(params.caption))
             result << tr("Caption: %1").arg(params.caption);
+    }
+
+    if (eventType == EventType::poeOverBudgetEvent)
+    {
+        const auto consumption = poeConsumptionStringFromParams(params);
+        if (!consumption.isEmpty())
+            result << tr("Reason: Power limit exceeded (%1)", "%1 is consumption").arg(consumption);
     }
 
     const auto details = aggregatedEventDetails(action, aggregationInfo);
@@ -829,6 +845,27 @@ QString StringsHelper::allUsersText()
 QString StringsHelper::needToSelectUserText()
 {
     return tr("Select at least one user");
+}
+
+QString StringsHelper::poeConsumptionString(double current, double limit)
+{
+    return qFuzzyIsNull(current) || current < 0
+        ? QString("0 W")
+        : poeOverallConsumptionString(current, limit);
+}
+
+QString StringsHelper::poeOverallConsumptionString(double current, double limit)
+{
+    return QString("%1 W / %2 W").arg(poeConsumptionValue(current)).arg(poeConsumptionValue(limit));
+}
+
+QString StringsHelper::poeConsumptionStringFromParams(const EventParameters& params)
+{
+    const auto values = nx::vms::event::PoeOverBudgetEvent::consumptionParameters(params);
+    if (values.isEmpty())
+        return QString();
+
+    return poeOverallConsumptionString(values.currentConsumptionWatts, values.upperLimitWatts);
 }
 
 } // namespace event

@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/events/poe_over_budget_event.h>
 
 namespace nx::vms::client::desktop {
 
@@ -461,6 +462,22 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
     }
 }
 
+QString NotificationListModel::Private::getPoeOverBudgetDescription(
+    const nx::vms::event::EventParameters& parameters) const
+{
+    const auto consumptionString = event::StringsHelper::poeConsumptionStringFromParams(parameters);
+    if (consumptionString.isEmpty())
+        return QString();
+
+    static const auto kBoldTemplate = QString("<b>%1</b>");
+    static const auto kDescriptionTemplate =
+        QString("<font color = '%1'>%2</font> %3")
+        .arg(QPalette().color(QPalette::WindowText).name())
+        .arg(tr("Consumption"));
+
+    return kDescriptionTemplate.arg(kBoldTemplate.arg(consumptionString));
+}
+
 QString NotificationListModel::Private::description(
     const nx::vms::event::EventParameters& parameters) const
 {
@@ -470,6 +487,9 @@ QString NotificationListModel::Private::description(
         case EventType::pluginDiagnosticEvent:
         case EventType::analyticsSdkEvent:
             return parameters.description;
+
+        case EventType::poeOverBudgetEvent:
+            return getPoeOverBudgetDescription(parameters);
 
         default:
             return QString();

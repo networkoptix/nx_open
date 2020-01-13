@@ -17,6 +17,7 @@
 #include <nx/vms/api/data/network_block_data.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/mac_address.h>
+#include <nx/vms/event/strings_helper.h>
 
 namespace {
 
@@ -36,19 +37,10 @@ QString getSpeed(const NetworkPortState& port)
         : "-";
 }
 
-QString consumptionValue(double value)
-{
-    return QString::number(value, 'f', 1);
-}
-
 QString getConsumptionText(const NetworkPortState& port)
 {
-    if (qFuzzyIsNull(port.devicePowerConsumptionWatts) || port.devicePowerConsumptionWatts < 0)
-        return "0 W";
-
-    return QString("%1 W / %2 W")
-        .arg(consumptionValue(port.devicePowerConsumptionWatts))
-        .arg(consumptionValue(port.devicePowerConsumptionLimitWatts));
+    return nx::vms::event::StringsHelper::poeConsumptionString(
+        port.devicePowerConsumptionWatts, port.devicePowerConsumptionLimitWatts);
 }
 
 ViewNodeData poweringStatusData(const NetworkPortState& port)
@@ -245,9 +237,9 @@ node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatc
             return total;
         }();
 
-    const auto text = QString("%1 W / %2 W")
-        .arg(consumptionValue(consumption))
-        .arg(consumptionValue(data.upperPowerLimitWatts));
+
+    const auto text = nx::vms::event::StringsHelper::poeOverallConsumptionString(
+        consumption, data.upperPowerLimitWatts);
 
     const auto color = consumption > data.upperPowerLimitWatts
         ? colorTheme()->color("red_l2")
