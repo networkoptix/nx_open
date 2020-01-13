@@ -8,17 +8,17 @@ Column
 {
     id: item
 
-    /*
-    Used context properties:
-
-    var ctx_modelData
-    var ctx_engineId
-    var ctx_sections[]
-    int ctx_level
-    bool ctx_active
-    bool ctx_selected
-    NavigationMenu ctx_navigationMenu
-    */
+    /**
+     * Used context properties:
+     *
+     * var ctx_modelData
+     * var ctx_engineId
+     * var ctx_sections[]
+     * int ctx_level
+     * bool ctx_active
+     * bool ctx_selected
+     * NavigationMenu ctx_navigationMenu
+     */
 
     MenuItem
     {
