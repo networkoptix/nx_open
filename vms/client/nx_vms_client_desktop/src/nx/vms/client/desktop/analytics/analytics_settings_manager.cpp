@@ -230,11 +230,11 @@ void AnalyticsSettingsManager::Private::setSettings(
 {
     auto& data = dataByAgentIdRef(id);
 
-    const bool modelChanged = (data.model.isEmpty() || data.model != model);
+    const bool modelChanged = (data.model != model);
     if (modelChanged)
         data.model = model;
 
-    const bool valuesChanged = (data.values.isEmpty() || data.values != values);
+    const bool valuesChanged = (data.values != values);
     if (valuesChanged)
         data.values = values;
 
