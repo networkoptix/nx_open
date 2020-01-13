@@ -168,8 +168,6 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
 		const auto high = std::max(begin->second.averageBandwidth, it->second.averageBandwidth);
 		const auto low = std::min(begin->second.averageBandwidth, it->second.averageBandwidth);
 
-		NX_VERBOSE(this, "%1 / %2 = %3", low, high, low / high);
-
         if (!low || !high || low / high < kSimilarityThreshold)
             return std::nullopt;
     }
