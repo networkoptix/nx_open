@@ -69,17 +69,33 @@ struct TrackElement
 };
 
 /**
- * Track describes behavior of the object sequence, united by the track id. If the metadata packet
- * has fixed duration, first element of the path will be used to determine when the object should be
- * hidden. Otherwise we will use the latest element of the path. Path is never empty!
+ * Track describes behavior of the object sequence, united by the track id. Path is never empty!
  * Path is sorted by the timestamps. It is used to smooth rectangle movement through the video
  * frames.
  */
 struct Track
 {
     ObjectMetadata metadata;
-    std::optional<microseconds> endTimestamp;
+    std::optional<microseconds> minimalDuration;
     std::vector<TrackElement> path; //< Cannot be empty.
+
+    microseconds startTimestamp() const
+    {
+         return path.front().timestamp;
+    }
+
+    /**
+     * If we have minimal duration in the first track packet, we will used it to determine when to
+     * hide the frame. Otherwise we will use approximate value. Anyway, frame must be displayed all
+     * the time we are receiving the track packets.
+     */
+    microseconds endTimestamp() const
+    {
+        const auto approximatedTimestamp = path.back().timestamp + kMinimalObjectDuration;
+        return minimalDuration
+            ? std::max(startTimestamp() + *minimalDuration, approximatedTimestamp)
+            : approximatedTimestamp;
+    }
 };
 
 QString objectDescription(const std::vector<Attribute>& attributes)
@@ -388,7 +404,7 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
             {
                 track.metadata = objectMetadata;
                 if (packetHasDuration)
-                    track.endTimestamp = timestamp + microseconds(objectPacket->durationUs);
+                    track.minimalDuration = microseconds(objectPacket->durationUs);
             }
 
             track.path.emplace_back(objectMetadata.boundingBox, timestamp);
@@ -449,10 +465,8 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     for (const auto& track: tracks)
     {
         auto& objectInfo = d->addOrUpdateObject(track.metadata);
-        objectInfo.startTimestamp = track.path.front().timestamp;
-        objectInfo.endTimestamp = track.endTimestamp
-            ? *track.endTimestamp
-            : track.path.back().timestamp + kMinimalObjectDuration;
+        objectInfo.startTimestamp = track.startTimestamp();
+        objectInfo.endTimestamp = track.endTimestamp();
 
         // Make forecast for the rectangle movement to smooth it between analytics packets.
         if (track.path.size() > 1)
