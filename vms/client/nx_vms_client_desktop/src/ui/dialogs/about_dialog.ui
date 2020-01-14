@@ -230,20 +230,23 @@
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
+        <layout class="QGridLayout" name="supportLayout" columnstretch="0,1">
          <property name="topMargin">
           <number>6</number>
          </property>
          <property name="bottomMargin">
           <number>6</number>
          </property>
+         <property name="horizontalSpacing">
+          <number>16</number>
+         </property>
          <property name="verticalSpacing">
-          <number>4</number>
+          <number>8</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="customerSupportTitleLabel">
            <property name="text">
-            <string>Customer Support</string>
+            <string notr="true">&lt;Company Name&gt;</string>
            </property>
           </widget>
          </item>

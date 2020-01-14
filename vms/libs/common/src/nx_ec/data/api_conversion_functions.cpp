@@ -526,6 +526,8 @@ void fromResourceToApi(const QnLicensePtr& src, DetailedLicenseData& dst)
     dst.brand = src->brand();
     dst.expiration = src->expiration();
     dst.orderType = src->orderType();
+    dst.company = src->regionalSupport().company;
+    dst.support = src->regionalSupport().address;
 }
 
 void fromResourceListToApi(const QnLicenseList& src, LicenseDataList& dst)

@@ -17,6 +17,7 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <licensing/license.h>
 
 #include <core/resource/resource_display_info.h>
 #include "core/resource/resource_type.h"
@@ -45,14 +46,39 @@
 #include <utils/common/html.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 
+#include <nx/utils/app_info.h>
+
 using namespace nx::vms::client::desktop;
 
 namespace {
-    QString versionString(const QString &version) {
-        QString result = version;
-        result.replace(lit("-SNAPSHOT"), QString());
-        return result;
-    }
+
+QString versionString(const QString& version)
+{
+    QString result = version;
+    result.replace("-SNAPSHOT", QString());
+    return result;
+}
+
+/**
+ * Try to deduce what have been provided: email, http link or phone number.
+ */
+QString makeSupportHref(const QString& supportAddress)
+{
+    if (supportAddress.isEmpty())
+        return supportAddress;
+
+    // Check if email is provided
+    QnEmailAddress supportEmail(supportAddress);
+    if (supportEmail.isValid())
+        return makeMailHref(supportAddress);
+
+    // Simple check if phone is provided
+    if (supportAddress.startsWith("+"))
+        return supportAddress;
+
+    // In all uncertain cases try to make it a link.
+    return makeHref(supportAddress);
+}
 
 } // anonymous namespace
 
@@ -188,18 +214,32 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits.join(lineSeparator));
     ui->gpuLabel->setText(gpu.join(lineSeparator));
 
-    QString supportAddress = qnGlobalSettings->emailSettings().supportEmail;
-    QString supportLink = supportAddress;
-    QnEmailAddress supportEmail(supportAddress);
+    ui->customerSupportTitleLabel->setText(nx::utils::AppInfo::organizationName());
+    ui->customerSupportLabel->setText(
+        makeSupportHref(qnGlobalSettings->emailSettings().supportEmail));
 
-    // Check if email is provided
-    if (supportEmail.isValid())
-        supportLink = makeMailHref(supportAddress);
-    // simple check if phone is provided
-    else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
-        supportLink = makeHref(supportAddress);
+    std::set<QString> regionalSupportData;
+    for (const QnLicensePtr& license: licensePool()->getLicenses())
+    {
+        if (license->type() == Qn::LC_Trial)
+            continue;
 
-    ui->customerSupportLabel->setText(supportLink);
+        const QnLicense::RegionalSupport regionalSupport = license->regionalSupport();
+        if (regionalSupport.isValid())
+        {
+            const QString text = regionalSupport.company + "<br>"
+                + makeSupportHref(regionalSupport.address);
+            regionalSupportData.insert(text);
+        }
+    }
+
+    int row = 1;
+    for (const auto& regionalSupport: regionalSupportData)
+    {
+        ui->supportLayout->addWidget(new QLabel(tr("Regional support")), row, /*column*/ 0);
+        ui->supportLayout->addWidget(new QLabel(regionalSupport), row, /*column*/ 1);
+        ++row;
+    }
 }
 
 // -------------------------------------------------------------------------- //

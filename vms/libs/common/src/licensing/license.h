@@ -36,6 +36,21 @@ class QnLicense
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 
 public:
+    struct RegionalSupport
+    {
+        /**
+         * Supporter company name.
+         */
+        QString company;
+
+        /**
+         * Contact address. Can contain an email, a web site url or a phone number.
+         */
+        QString address;
+
+        bool isValid() const;
+    };
+
     QnLicense() = default;
     QnLicense(const QByteArray& licenseBlock);
     QnLicense(const nx::vms::api::DetailedLicenseData& value);
@@ -72,6 +87,11 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
+
+    /**
+     * Additional support info about license reseller.
+     */
+    RegionalSupport regionalSupport() const;
 
     virtual Qn::LicenseType type() const;
 
@@ -118,6 +138,8 @@ private:
     QByteArray m_signature2;
 
     QString m_orderType;
+
+    RegionalSupport m_regionalSupport;
 
     // Is partial v1 license valid (signature1 is used)
     bool m_isValid1 = false;
