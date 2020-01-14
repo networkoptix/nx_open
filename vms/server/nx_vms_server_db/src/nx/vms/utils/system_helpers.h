@@ -19,14 +19,15 @@ struct DbBackupFileData
 
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,
+    const QString& reason,
     const boost::optional<QString>& dbFilePath = boost::none,
     const boost::optional<int>& buildNumber = boost::none);
 
 
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const QString& reason = {});
 
 /* Newest files come first */
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace);
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason, qint64 freeSpace);
 
 } // namespace utils
 } // namespace vms

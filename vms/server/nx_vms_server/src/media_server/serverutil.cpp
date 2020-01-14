@@ -106,12 +106,15 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath,
+bool Utils::backupDatabase(
+    const QString& reason,
+    const boost::optional<QString>& dbFilePath,
     const boost::optional<int>& buildNumber)
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
-        std::move(connection), dbFilePath, buildNumber);
+    return nx::vms::utils::backupDatabase(
+        serverModule()->settings().backupDir(),
+        std::move(connection), reason, dbFilePath, buildNumber);
 }
 
 bool Utils::timeToMakeDbBackup() const

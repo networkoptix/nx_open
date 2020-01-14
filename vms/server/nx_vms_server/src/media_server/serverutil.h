@@ -99,6 +99,7 @@ public:
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 
     bool backupDatabase(
+        const QString& reason,
         const boost::optional<QString>& dbFilePath = boost::none,
         const boost::optional<int>& buildNumber = boost::none);
     /**

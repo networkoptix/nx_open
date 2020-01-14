@@ -25,10 +25,9 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-struct VmsUtilsFunctionsTag{};
-
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,
+    const QString& reason,
     const boost::optional<QString>& dbFilePath,
     const boost::optional<int>& buildNumber)
 {
@@ -36,13 +35,13 @@ bool backupDatabase(const QString& backupDir,
         ? *buildNumber
         : nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
 
-    const QString fileName = lm("%1_%2_%3.db").args(closeDirPath(backupDir) + "ecs",
-        buildNumberArg, qnSyncTime->currentMSecsSinceEpoch());
+    const QString fileName = lm("%1_%2_%3_%4.db").args(closeDirPath(backupDir) + "ecs",
+        buildNumberArg, qnSyncTime->currentMSecsSinceEpoch(), reason);
 
     QDir dir(backupDir);
     if (!dir.exists() && !dir.mkdir(backupDir))
     {
-        NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
+        NX_WARNING(NX_SCOPE_TAG, "Failed to create DB backup directory %1", dir);
         return false;
     }
 
@@ -51,8 +50,8 @@ bool backupDatabase(const QString& backupDir,
         const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
         if (errorCode != ec2::ErrorCode::ok)
         {
-            NX_ERROR(typeid(VmsUtilsFunctionsTag),
-                lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
+            NX_ERROR(NX_SCOPE_TAG, "Failed to dump EC database %1: %2",
+                fileName, ec2::toString(errorCode));
             return false;
         }
     }
@@ -60,21 +59,22 @@ bool backupDatabase(const QString& backupDir,
     {
         if (!QFile::copy(*dbFilePath, fileName))
         {
-            NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
+            NX_WARNING(NX_SCOPE_TAG, "Failed to copy DB %1 to %2", *dbFilePath, fileName);
             return false;
         }
     }
 
-    deleteOldBackupFilesIfNeeded(
-        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+    if (reason == "timer")
+    {
+        deleteOldBackupFilesIfNeeded(
+            backupDir, reason, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+    }
 
-    NX_WARNING(
-        typeid(VmsUtilsFunctionsTag), lm("Successfully created DB backup %1").args(fileName));
-
+    NX_WARNING(NX_SCOPE_TAG, "Successfully created DB backup %1", fileName);
     return true;
 }
 
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const QString& reason)
 {
     QDir dir(backupDir);
     QList<DbBackupFileData> result;
@@ -88,7 +88,10 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
             continue;
 
         auto nameSplits = fileInfo.baseName().split('_');
-        if (nameSplits.size() != 3)
+        if (nameSplits.size() != 3 && nameSplits.size() != 4)
+            continue;
+
+        if (!reason.isEmpty() && nameSplits.size() == 4 && nameSplits[3] != reason)
             continue;
 
         DbBackupFileData backupFileData;
@@ -118,11 +121,11 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
     return result;
 }
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace)
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason, qint64 freeSpace)
 {
     const qint64 kMaxFreeSpace = 10 * 1024 * 1024LL * 1024LL; //< 10Gb
     const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
-    const auto allBackupFiles = allBackupFilesDataSorted(backupDir);
+    const auto allBackupFiles = allBackupFilesDataSorted(backupDir, reason);
     for (int i = kMaxBackupFilesCount; i < allBackupFiles.size(); ++i)
         nx::SystemCommands().removePath(allBackupFiles[i].fullPath.toStdString());
 }

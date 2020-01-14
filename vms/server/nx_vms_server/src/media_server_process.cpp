@@ -4146,7 +4146,7 @@ void MediaServerProcess::connectSignals()
         [firstRun = true, this]() mutable
         {
             auto utils = nx::vms::server::Utils(serverModule());
-            utils.backupDatabase();
+            utils.backupDatabase("timer");
             if (firstRun)
             {
                 m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
@@ -4700,8 +4700,9 @@ void MediaServerProcess::run()
     auto utils = nx::vms::server::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())
     {
-        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()),
+        utils.backupDatabase(
+            "timer",
+            ec2::detail::QnDbManager::ecsDbFileName(serverModule->settings().dataDir()),
             ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
     }
 
