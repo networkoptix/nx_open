@@ -140,8 +140,14 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindowWidget());
-    m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
+    m_mergeDialog = new QnMergeSystemsDialog(mainWindowWidget());
+    connect(m_mergeDialog.data(), &QDialog::finished, this,
+        [this]()
+        {
+            m_mergeDialog->deleteLater();
+            m_mergeDialog.clear();
+        });
+
     m_mergeDialog->open();
 }
 

@@ -38,11 +38,10 @@ namespace {
 
 static const int kMaxSystemNameLength = 20;
 
-}
+} // namespace
 
-QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
+QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
     m_mergeTool(new QnMergeSystemsTool(this))
 {
@@ -312,7 +311,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         if (reconnectNeeded)
             successMessage += L'\n' + tr("You will be reconnected.");
 
-        hide(); //< Do not close dialog here as it will be deleted in messagebox event loop.
+        hide(); //< Do not close dialog here to avoid possible deletion in messagebox event loop.
 
         if (reconnectNeeded)
         {
