@@ -111,6 +111,11 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 //-------------------------------------------------------------------------------------------------
 // QnLicense
 
+bool QnLicense::RegionalSupport::isValid() const
+{
+    return !company.isEmpty() && !address.isEmpty();
+}
+
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
 {
@@ -133,13 +138,24 @@ QnLicense::QnLicense(const api::DetailedLicenseData& value)
     if (!value.orderType.isEmpty())
         params << QByteArray("ORDERTYPE=").append(value.orderType);
 
-    const auto licenseBlock = params.join('\n');
+    if (!value.company.isEmpty() && !value.support.isEmpty())
+    {
+        params << QByteArray("COMPANY=").append(value.company);
+        params << QByteArray("SUPPORT=").append(value.support);
+    }
+
+    const auto licenseBlock = params.join('\n') + '\n';
     loadLicenseBlock(licenseBlock);
 }
 
 bool QnLicense::isInfoMode() const
 {
     return m_signature.isEmpty() && m_signature2.isEmpty();
+}
+
+QnLicense::RegionalSupport QnLicense::regionalSupport() const
+{
+    return m_regionalSupport;
 }
 
 void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
@@ -485,6 +501,10 @@ void QnLicense::parseLicenseBlock(
                 m_signature2 = avalue;
             else if (aname == "ORDERTYPE")
                 m_orderType = QString::fromUtf8(avalue);
+            else if (aname == "COMPANY")
+                m_regionalSupport.company = QString::fromUtf8(avalue);
+            else if (aname == "SUPPORT")
+                m_regionalSupport.address = QString::fromUtf8(avalue);
         }
 
         // v1 license activation is 4 strings + signature
