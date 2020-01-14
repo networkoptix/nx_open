@@ -50,13 +50,13 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中脫離</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>重新啟動</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">重啟伺服器</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">重新開機</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>變更管理者密碼</h3>
                             <p>如果本系統是本機系統 (未連接到雲) 這將只改變管理者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
                                 否則這將只變更還原密碼.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">變更密碼</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>名稱</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>合併系統</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">合併系統</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     強制影片傳輸加密
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">儲存</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">時區</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">日期</label></td>
+                                        <td><label for="time">時效性</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

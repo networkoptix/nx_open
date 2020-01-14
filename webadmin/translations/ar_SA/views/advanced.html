@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">جيجابايت</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
  placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">جيجابايت</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">

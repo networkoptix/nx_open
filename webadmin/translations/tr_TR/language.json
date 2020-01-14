@@ -19,16 +19,16 @@
     },
     "settings": {
         "tabs": {
-            "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "server": "Sunucu",
+            "system": "Sistem",
+            "device": "Cihaz"
         },
         "confirmRestart": "Sunucuyu yeniden başlat?",
         "couldntCheckInternet": "Bulut bağlantısı kontrol edilemedi",
         "confirmRestoreDefault": "Database ve ayarlar temizlensin mi? Bu işlem biraz zaman alabilir ve tamamlandığında sunucu yeniden başlatılacak.",
         "confirmRestoreDefaultTitle": "Fabrika ayarlarına geri yükle",
         "unexpectedError": "Hata: beklenmedik bir hata oluştu",
-        "connnetionError": "Connection error",
+        "connnetionError": "Bağlantı hatası",
         "wrongPassword": "Hatalı parola.",
         "error": "Hata: ",
         "restartNeeded": "Değişiklikler kaydedildi. Yeni ayarlarda uygulama yeniden başlatılsın mı?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "1025 den daha düşük bir port kullanmak güvenli olmayabilir. Sunucuya erişim kesilebilir. Yinede devam edilsin mi?",
         "confirmDisconnectFromCloud": "{{CLOUD_NAME}} çıkış yapılsın mı",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tüm bulut kullanıcıları silinecek.</span><br><br>Sisteme sadece yerel yönetici hesabı erişebilecektir.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Bağlantıyı kes",
         "disconnectedFromCloudSuccess": "Sistemin {{CLOUD_NAME}} ile başarıyla bağlantısı kesildi",
         "disconnectedFromCloudError": "Sistem bağlantısı kesilemiyor",
         "confirmDisconnectFromSystem": "Sunucuyu mevcut sistemden ayır",
@@ -149,7 +149,7 @@
         "licenceError": "Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
         "duplicateServersError": "Sistemler birleştirilemiyor çünkü en az 1 sunucunun ID'si aynı. Lütfen bu sunucuyu silin ve tekrar deneyin.",
         "connectionFailed": "Bağlantı başarısız: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Bilinmeyen hata",
         "mergeFailed": "Birleştirme başarısız",
         "mergeSucceed": "Birleştirme başarılı.",
         "newSystemDisplayName": "Yeni sistem",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Kullanıcı adı veya şifre hatalı",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyiniz."
     },
     "navigaion": {
         "cannotGetUser": "Sunucu hatası: kullanıcı verileri alınamıyor"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "sunucu başlatılıyor",
         "serverRestarting": "sunucu yeniden başlatılıyor",
-        "serverOffline": "server is offline"
+        "serverOffline": "sunucu çevrimdışı"
     },
     "fileUpload": {
         "started": "Güncelleme başarıyla başlatıldı. Biraz zaman alabilir",
@@ -182,7 +182,7 @@
         "selectFiles": "Dosyaları seç"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Ücretsiz",
         "total": "Toplam",
         "occupied": "Kullanımda",
         "reserved": "Rezerve"

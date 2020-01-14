@@ -5683,11 +5683,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>สงวนไว้แล้ว</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>ท้องถิ่น</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5711,11 +5711,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 Tb</translation>
     </message>
   </context>
   <context>
@@ -5804,7 +5804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>ปลั๊กอิน</translation>
     </message>
   </context>
   <context>
@@ -7135,15 +7135,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>ในพื้นที่ที่เลือก</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>เลือกอุปกรณ์</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7152,7 +7152,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ไม่มี</translation>
     </message>
   </context>
   <context>
@@ -7696,7 +7696,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>ปลั๊กอิน</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8665,7 +8665,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>กรุณาติดต่อฝ่ายสนับสนุน</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -8737,7 +8737,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอินที่ไม่รู้จัก</translation>
     </message>
   </context>
   <context>
@@ -9926,7 +9926,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>ไม่สามารถเขียนทับไฟล์ได้</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -9942,7 +9942,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>เปิดโฟลเดอร์</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

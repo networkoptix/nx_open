@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Хранилища</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Недоступно
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Зарезервированное место"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">ГБ</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+ placeholder="Зарезервированное место"/>
+                            <div class="input-group-addon">ГБ</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Для сохранения необходимо исправить все отмеченные настройки</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Сохранить</button>
+        <button class="btn btn-warning" ng-click="cancel()">Отмена</button>
     </form>
 
     <h2>Настройки журнала</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Сохранить</button>
         </div>
     </form>
 
     <h1>Дополнительные настройки системы</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,13 +181,13 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Сохранить</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Предупреждение!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска <b>всех</b> серверов в системе.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>

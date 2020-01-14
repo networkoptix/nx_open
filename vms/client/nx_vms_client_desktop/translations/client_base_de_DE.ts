@@ -5746,7 +5746,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Reserviert</translation>
     </message>
     <message>
       <source>local</source>
@@ -5778,7 +5778,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7234,15 +7234,15 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Im ausgewählten Bereich</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Ausgewählte Kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Ausgewähltes Gerät</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7251,7 +7251,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>keine</translation>
     </message>
   </context>
   <context>
@@ -8783,7 +8783,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Bitte kontaktieren Sie den Kundensupport.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10058,7 +10058,7 @@ Sie können einen anderen Speicherort auf der Registerkarte &quot;Speicherverwal
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Fehler beim Überschreiben der Datei</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10074,7 +10074,7 @@ Sie können einen anderen Speicherort auf der Registerkarte &quot;Speicherverwal
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Enthaltene Ordner öffnen</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

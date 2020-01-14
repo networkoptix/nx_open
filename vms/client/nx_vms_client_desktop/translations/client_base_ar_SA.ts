@@ -2536,7 +2536,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>معرف منطقي ID</translation>
     </message>
   </context>
   <context>
@@ -2689,7 +2689,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>تعذر العثور على الحساب</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2706,7 +2706,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>محاولات كثيرة. حاول مرة أخرى بعد دقيقة.</translation>
     </message>
   </context>
   <context>
@@ -2929,7 +2929,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>محاولات كثيرة. حاول مرة أخرى بعد دقيقة.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -3160,7 +3160,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>محاولات كثيرة. حاول مرة أخرى بعد دقيقة.</translation>
     </message>
   </context>
   <context>
@@ -4517,7 +4517,7 @@ to %1</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>الكاميرا الافتراضية</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -4963,7 +4963,7 @@ to %1</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>لا توجد بيانات للتنبؤ</translation>
     </message>
   </context>
   <context>
@@ -5222,7 +5222,7 @@ to %1</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>تصدير الإشارات المرجعية...</translation>
     </message>
   </context>
   <context>
@@ -6003,7 +6003,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>local</translation>
     </message>
     <message>
       <source>ram</source>
@@ -6027,11 +6027,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>unknown</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -6253,7 +6253,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>تتطلب بعض الكاميرات تعيين كلمات مرور</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -7631,7 +7631,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>في المنطقة المحددة</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7648,7 +7648,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>none</translation>
     </message>
   </context>
   <context>
@@ -8487,7 +8487,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>إضافة جميع الأجهزة</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
@@ -8685,7 +8685,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>نص</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -8701,7 +8701,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>معلومات المرجعية</translation>
     </message>
     <message>
       <source>exported</source>
@@ -9256,7 +9256,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -9462,7 +9462,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>خطأ داخلي بالخادم.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -9596,7 +9596,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>يتتبع ويسجل جميع إجراءات المستخدم.</translation>
     </message>
     <message>
       <source>minutes</source>
@@ -9604,7 +9604,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>ساعات</translation>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -9694,7 +9694,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>جاري التنزيل...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9854,7 +9854,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>وقت ال VMS</translation>
     </message>
   </context>
   <context>
@@ -10591,7 +10591,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10607,7 +10607,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

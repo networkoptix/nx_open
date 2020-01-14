@@ -67,6 +67,6 @@
   <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
   <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
   <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
+  <String Id="Product_ArchMismatch_x86">تم تصميم هذه الحزمة لنظام التشغيل 32 بت. سيتم الآن ألغاء التثبيت.</String>
   <String Id="Product_ArchMismatch_x64">تم تصميم هذه الحزمة لنظام التشغيل 64 بت. سيتم الآن ألغاء التثبيت.</String>
 </WixLocalization>

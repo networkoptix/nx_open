@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>ストレージ</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                アクセス不可
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="予約済み領域"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">ギガバイト</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+ placeholder="予約済み領域"/>
+                            <div class="input-group-addon">ギガバイト</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">すべての強調表示されている設定を修正して保存します</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >保存</button>
+        <button class="btn btn-warning" ng-click="cancel()">キャンセル</button>
     </form>
 
     <h2>ログ設定</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >保存</button>
         </div>
     </form>
 
     <h1>拡張システム設定</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b>警告!</b>このページのすべての変更は、サーバーが正しく動作しなくなる可能性があります
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >保存</button>
         </div>
 
     </form>

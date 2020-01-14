@@ -929,7 +929,7 @@
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>وحدة I / O</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -1068,7 +1068,7 @@
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>نظام بدون اسم</translation>
     </message>
   </context>
   <context>

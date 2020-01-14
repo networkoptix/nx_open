@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>About</translation>
+      <translation>نبذة</translation>
     </message>
     <message>
       <location/>
@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Support</translation>
+      <translation>الدعم</translation>
     </message>
     <message>
       <location/>
@@ -1256,7 +1256,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>تصدير الفيديو</translation>
     </message>
     <message>
       <location/>
@@ -1348,7 +1348,7 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>على التصميم</translation>
     </message>
     <message>
       <location/>
@@ -1485,7 +1485,7 @@
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>القياسي</translation>
     </message>
     <message>
       <location/>
@@ -1592,12 +1592,12 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>معرف منطقي ID</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>انشاء</translation>
     </message>
     <message>
       <location/>
@@ -2044,7 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>كاميرا افتراضية جديدة...</translation>
     </message>
   </context>
   <context>

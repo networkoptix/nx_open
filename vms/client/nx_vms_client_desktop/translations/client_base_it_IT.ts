@@ -5747,7 +5747,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Riservato</translation>
     </message>
     <message>
       <source>local</source>
@@ -5779,7 +5779,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
   </context>
   <context>
@@ -7235,15 +7235,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Nell'area selezionata</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Telecamera selezionata</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivi selezionati</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7252,7 +7252,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>nessuno</translation>
     </message>
   </context>
   <context>
@@ -8784,7 +8784,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Si prega di contattare l'assistenza clienti.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -10060,7 +10060,7 @@ L'impostazione della posizione iniziale dei dati di analisi e' all'interno della
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Impossibile sovrascrivere il file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10076,7 +10076,7 @@ L'impostazione della posizione iniziale dei dati di analisi e' all'interno della
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Apri la cartella contenente</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
