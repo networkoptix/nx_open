@@ -1079,6 +1079,13 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     m_videoResolution.setHeight(m_frames[idx]->height);
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
+
+
+    NX_VERBOSE(this,
+        "Updating last frame timestamp; frame index in buffer: %1; "
+        "frame DTS: %2 us; frame PTS: %3 us; previously saved frame timestamp: %4",
+        idx, m_frames[idx]->pkt_dts, m_frames[idx]->pkt_pts, m_lastFrameTime);
+
     m_lastFrameTime = m_frames[idx]->pkt_dts;
     m_firstFrameTime = qMin(m_firstFrameTime, m_lastFrameTime); //< protection if time goes to past
 
@@ -1251,6 +1258,8 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
+    NX_VERBOSE(this, "Creating motion metadata with timestamp %1 us; m_lastFrameTimestamp: %2 us",
+        rez->timestamp, m_lastFrameTime);
     rez->channelNumber = m_channelNum;
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)

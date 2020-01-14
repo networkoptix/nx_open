@@ -469,8 +469,12 @@ void QnLiveStreamProvider::processMetadata(
     CLConstVideoDecoderOutputPtr uncompressedFrame;
     if (needToAnalyzeMotion)
     {
-        NX_VERBOSE(this, "Analyzing motion (Role: [%1]); needUncompressedFrame: %2",
-            getRole(), needUncompressedFrame);
+        NX_VERBOSE(this,
+            "Analyzing motion on frame with timestamp %1 us; "
+            "role: [%2]; resource: %3 (%4), needUncompressedFrame: %3",
+            compressedFrame->timestamp, getRole(),
+            m_resource->getName(), m_resource->getId(), needUncompressedFrame);
+
         if (motionEstimation->analyzeFrame(compressedFrame,
             needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
@@ -544,9 +548,29 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     }
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-        return m_motionEstimation[m_softMotionLastChannel]->getMotion();
+    {
+        const QnMetaDataV1Ptr motionMetadata =
+            m_motionEstimation[m_softMotionLastChannel]->getMotion();
+
+        if (motionMetadata)
+        {
+            NX_VERBOSE(this,
+                "Got motion metadata with timestamp %1 us; role: %2; resource %3 (%4)",
+                motionMetadata->timestamp, getRole(), m_resource->getName(), m_resource->getId());
+        }
+        else
+        {
+            NX_VERBOSE(this,
+                "Unable to get motion metadata for resource %1 (%2), role %3",
+                m_resource->getName(), m_resource->getId(), getRole());
+        }
+
+        return motionMetadata;
+    }
     else
+    {
         return getCameraMetadata();
+    }
 }
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
