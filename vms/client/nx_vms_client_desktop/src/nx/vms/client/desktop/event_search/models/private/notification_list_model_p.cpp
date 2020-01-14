@@ -14,6 +14,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <utils/common/delayed.h>
 #include <utils/media/audio_player.h>
 
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/events/poe_over_budget_event.h>
 
 namespace nx::vms::client::desktop {
 
@@ -168,7 +170,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
-    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
+    const auto actionType = action->actionType();
+    if (actionType == ActionType::showOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
             return;
@@ -224,7 +227,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
     eventData.source = resource;
 
-    if (action->actionType() == ActionType::playSoundAction)
+    if (actionType == ActionType::playSoundAction)
     {
         const auto soundUrl = action->getParams().url;
         if (!m_itemsByLoadingSound.contains(soundUrl))
@@ -232,8 +235,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
     }
-
-    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
+    else if (actionType == ActionType::showOnAlarmLayoutAction)
     {
         eventData.actionId = action::OpenInAlarmLayoutAction;
         eventData.actionParameters = alarmCameras;
@@ -244,6 +246,16 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     {
         switch (params.eventType)
         {
+            case EventType::poeOverBudgetEvent:
+            case EventType::fanErrorEvent:
+            {
+                NX_ASSERT(hasViewPermission);
+                eventData.actionId = action::ServerSettingsAction;
+                eventData.actionParameters = action::Parameters(resource);
+                eventData.actionParameters.setArgument(Qn::FocusTabRole, QnServerSettingsDialog::PoePage);
+                break;
+            }
+
             case EventType::cameraMotionEvent:
             case EventType::softwareTriggerEvent:
             case EventType::analyticsSdkEvent:
@@ -320,10 +332,10 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         }
     }
 
-    if (eventData.removable && action->actionType() != ActionType::playSoundAction)
+    if (eventData.removable && actionType != ActionType::playSoundAction)
         eventData.lifetime = kDisplayTimeout;
 
-    if (action->actionType() == ActionType::showPopupAction && camera)
+    if (actionType == ActionType::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera->getId(), action);
 
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
@@ -461,6 +473,22 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
     }
 }
 
+QString NotificationListModel::Private::getPoeOverBudgetDescription(
+    const nx::vms::event::EventParameters& parameters) const
+{
+    const auto consumptionString = event::StringsHelper::poeConsumptionStringFromParams(parameters);
+    if (consumptionString.isEmpty())
+        return QString();
+
+    static const auto kBoldTemplate = QString("<b>%1</b>");
+    static const auto kDescriptionTemplate =
+        QString("<font color = '%1'>%2</font> %3")
+        .arg(QPalette().color(QPalette::WindowText).name())
+        .arg(tr("Consumption"));
+
+    return kDescriptionTemplate.arg(kBoldTemplate.arg(consumptionString));
+}
+
 QString NotificationListModel::Private::description(
     const nx::vms::event::EventParameters& parameters) const
 {
@@ -470,6 +498,9 @@ QString NotificationListModel::Private::description(
         case EventType::pluginDiagnosticEvent:
         case EventType::analyticsSdkEvent:
             return parameters.description;
+
+        case EventType::poeOverBudgetEvent:
+            return getPoeOverBudgetDescription(parameters);
 
         default:
             return QString();

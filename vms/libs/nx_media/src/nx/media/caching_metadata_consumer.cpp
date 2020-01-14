@@ -6,6 +6,10 @@
 #include <QtCore/QMultiMap>
 #include <QtCore/QSharedPointer>
 
+#include <analytics/common/object_metadata.h>
+
+#include <nx/fusion/serialization/ubjson.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
 
@@ -55,17 +59,10 @@ public:
 
         QList<QnAbstractCompressedMetadataPtr> result;
 
-        auto it = std::upper_bound(
+        auto it = std::lower_bound(
             m_metadataByTimestamp.keyBegin(),
             m_metadataByTimestamp.keyEnd(),
             startTimestamp).base();
-
-        if (it != m_metadataByTimestamp.begin())
-        {
-            --it;
-            if ((*it)->duration() > 0 && it.key() + (*it)->duration() < startTimestamp)
-                ++it;
-        }
 
         while (maxCount > 0 && it != m_metadataByTimestamp.end()
             && (*it)->timestamp < endTimestamp)
@@ -122,6 +119,33 @@ private:
 };
 
 using MetadataCachePtr = QSharedPointer<MetadataCache>;
+
+QString metadataRepresentation(QnAbstractCompressedMetadataPtr metadata)
+{
+    if (metadata->metadataType != MetadataType::ObjectDetection)
+    {
+        return lm("type %1").arg(int(metadata->metadataType));
+    }
+
+    const auto compressedMetadata =
+            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+    if (!NX_ASSERT(compressedMetadata, "Unparseable object metadata"))
+        return lm("Unparseable object metadata");
+
+    using namespace nx::common::metadata;
+    const auto objectDataPacket = QnUbjson::deserialized<ObjectMetadataPacket>(
+        QByteArray::fromRawData(compressedMetadata->data(), int(compressedMetadata->dataSize())));
+
+    QStringList result;
+    for (const auto& objectData: objectDataPacket.objectMetadataList)
+    {
+        result.append(lm("Object type %1 track %2")
+            .args(objectData.typeId, objectData.trackId));
+        for (const auto& attribute: objectData.attributes)
+            result.append(lm("    %1 = %2").args(attribute.name, attribute.value));
+    }
+    return result.join('\n');
+}
 
 } // namespace
 
@@ -193,8 +217,8 @@ QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
-    NX_VERBOSE(this, "Metadata packet received, type %1, timestamp %2",
-        (int)metadata->metadataType,
+    NX_VERBOSE(this, "Metadata packet received, %1, timestamp %2",
+        metadataRepresentation(metadata),
         metadata->timestamp);
 
     const auto channel = static_cast<int>(metadata->channelNumber);

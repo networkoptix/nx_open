@@ -32,6 +32,19 @@ bool PoeOverBudgetEvent::checkEventParams(const EventParameters &params) const
     return true;
 }
 
+PoeOverBudgetEvent::Parameters PoeOverBudgetEvent::consumptionParameters(
+    const EventParameters &params)
+{
+    return QJson::deserialized(params.inputPortId.toLatin1(), Parameters());
+}
+
+bool PoeOverBudgetEvent::Parameters::isEmpty() const
+{
+    return qFuzzyIsNull(currentConsumptionWatts)
+        && qFuzzyIsNull(upperLimitWatts)
+        && qFuzzyIsNull(lowerLimitWatts);
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PoeOverBudgetEvent::Parameters, (json),
     nx_vms_event_PoeOverBudgetEvent_Parameters_Fields, (brief, true))
 

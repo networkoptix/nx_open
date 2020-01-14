@@ -17,7 +17,7 @@ public:
     AnalyticsSettingsManager* const settingsManager;
     QnUuid deviceId;
     QnVirtualCameraResourcePtr camera;
-    ListenPolicy listenPolicy = ListenPolicy::enabledEngines;
+    ListenPolicy listenPolicy = ListenPolicy::allEngines;
     QHash<QnUuid, AnalyticsSettingsListenerPtr> listeners;
     QSet<QnUuid> enabledEngines;
 
@@ -48,7 +48,7 @@ bool AnalyticsSettingsMultiListener::Private::isSuitableEngine(
 
 void AnalyticsSettingsMultiListener::Private::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (const auto engine = resource.dynamicCast<common::AnalyticsEngineResource>(); 
+    if (const auto engine = resource.dynamicCast<common::AnalyticsEngineResource>();
         engine && isSuitableEngine(engine))
     {
         addListener(resource->getId());

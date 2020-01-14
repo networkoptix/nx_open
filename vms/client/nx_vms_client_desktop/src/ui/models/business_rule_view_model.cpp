@@ -1406,7 +1406,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
     if (vms::event::requiresServerResource(m_actionType))
     {
         if (actionIsUsingSourceServer())
-            return getSourceText(detailed);
+            return tr("Source Server");
 
         QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
