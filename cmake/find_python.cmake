@@ -1,5 +1,11 @@
 function(check_python_at_least_37)
-    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(7|8)(\.*)?")
+    execute_process(
+        COMMAND "${PYTHON_EXECUTABLE}" --version
+        OUTPUT_VARIABLE PYTHON_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(7|8)(\..*)?")
         if ("${PYTHON_VERSION}" MATCHES "Python (.*)")
               message(
                   FATAL_ERROR
@@ -37,12 +43,6 @@ function(find_python_at_least_37)
         find_python_at_least_37(${ARGV_EXCEPT_FIRST})
     else()
         message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")
-
-        execute_process(
-            COMMAND "${PYTHON_EXECUTABLE}" --version
-            OUTPUT_VARIABLE PYTHON_VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
 
         check_python_at_least_37()
 
