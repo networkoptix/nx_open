@@ -1155,17 +1155,16 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
             }
         });
 
-    if (!m_connectingToServerDialog)
-        m_connectingToServerDialog = new ConnectingToServerDialog(mainWindowWidget());
-
-    m_connectingToServerDialog->setDisplayedServer(server);
-
     const auto showModalDialog =
         [this, server]()
         {
-            if (m_serverSelectionHandle == -1 || !NX_ASSERT(m_connectingToServerDialog))
+            if (m_serverSelectionHandle == -1)
                 return;
 
+            if (!m_connectingToServerDialog)
+                m_connectingToServerDialog = new ConnectingToServerDialog(mainWindowWidget());
+
+            m_connectingToServerDialog->setDisplayedServer(server);
             m_connectingToServerDialog->exec();
             m_serverSelectionHandle = -1;
         };
