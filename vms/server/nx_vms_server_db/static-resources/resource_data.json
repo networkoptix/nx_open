@@ -3878,6 +3878,34 @@
                     }
                 }
             }
+        },
+        {
+            "_comment1": "Mapping for firmware: V102_2019_03_15",
+            "keys": [
+                "GeoVision_2|GV-SD3732-IR"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [360, 0]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, 90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.45, 1.000],
+                        "logical": [1, 8.56, 17.75],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }

@@ -41,22 +41,22 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         <h3>Szerver visszaállítása</h3>
                         <p>Ez a művelet visszaállítja ezt a szervert az alapértelmezett értékekre (törli az adatbázist és visszaállítja a gyári konfigurációt).
                             A szerver leválik a jelenlegi rendszerről. A videóarchívum sértetlen marad.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Gyári beállítások visszaállítása</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Szerver leválasztása a rendszerről</h3>
                         <p>This action will detach server from the System keeping database, local users and configuration.
-                            Video archive will remain intact. <b>felhő felhasználók törlésre kerülnek</b></p>
+                            A videóarchívum sértetlen marad. <b>felhő felhasználók törlésre kerülnek</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztás a rendszerről</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Újraindítás</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Szerver újraindítása</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Admin jelszó módosítása</h3>
                             <p>Ha a rendszer helyi (nem kapcsolódik a felhő) az "admin" felhasználó és a helyreállítási (root) jelszó fog megváltozni egyes szervereken. <br>
                                 Egyébként csak a helyreállítási jelszó fog megváltozni.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Jelszó módosítása</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>Név</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Rendszerek összevonása</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Rendszerek összevonása</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                     Kényszerített videó forgalom titkosítás
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Mentés</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Idő zóna</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Dátum</label></td>
+                                        <td><label for="time">Idő</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

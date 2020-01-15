@@ -60,12 +60,14 @@ void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
 		{
 			NX_VERBOSE(this,
-				"Bandwidth test complete, SystemError = %1", 
+				"Bandwidth test complete, SystemError = %1",
 				SystemError::toString(errorCode));
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);
 
-            emitTestResult(SystemError::noError, ConnectionSpeed{pingTime, bandwidth});
+            emitTestResult(
+                SystemError::noError,
+                ConnectionSpeed{duration_cast<milliseconds>(pingTime), bandwidth});
 		});
 }
 
@@ -134,11 +136,11 @@ void UplinkSpeedTester::emitTestResult(
     std::optional<ConnectionSpeed> result)
 {
     QString resultStr = result
-        ? lm("{pingTime: %1, bandwidth: %2 Bpms (%3 Mbps)}")
-        .args(result->pingTime, result->bandwidth, result->bandwidth * kBytesPerMsecToMegabitsPerSec)
+        ? lm("{pingTime: %1, bandwidth: %2 KilobitsPerSec}")
+        .args(result->pingTime, result->bandwidth)
 		: "none";
 
-	NX_VERBOSE(this, "Test complete, reporting system error: '%1' and speed test result: %2",
+	NX_VERBOSE(this, "Test complete, reporting system error: %1 and speed test result: %2",
 		SystemError::toString(errorCode), resultStr);
 
     if (m_handler)

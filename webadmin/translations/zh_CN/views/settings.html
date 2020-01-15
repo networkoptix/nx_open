@@ -22,10 +22,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>端口</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="端口" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -41,22 +41,22 @@
                         <h3>重置服务器</h3>
                         <p>此操作将将此服务器恢复为默认值 (清除数据库并重置配置)。
                             服务器将与当前系统分离。 视频存档将保持不变。</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢复出厂默认值</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>从系统中分离服务器</h3>
                         <p>此操作将从系统中分离服务器但保持数据库，本地用户和配置。
-                            Video archive will remain intact. <b>云用户将被删除。</b></p>
+                            影像资料将保持完好 <b>云用户将被删除。</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>重启</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">重新启动服务器</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">重新启动</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>更改管理员密码</h3>
                             <p>如果本系统是本地系统 (未连接到云) 这将改变使用者"admin"的密码以及在某些服务器上的还原 (root) 密码.<br>
                                 否则这将只恢复密码.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">更改密码</button>
                             </div>
                         </form>
                     </div>
@@ -73,7 +73,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>Name</h3>
+                        <h3>名称</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>合并系统</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">合并系统</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@
                                     强制视频传输加密
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">时区</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">日期</label></td>
+                                        <td><label for="time">时效性</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

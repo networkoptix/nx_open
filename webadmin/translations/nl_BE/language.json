@@ -20,15 +20,15 @@
     "settings": {
         "tabs": {
             "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "system": "Systeem",
+            "device": "Apparaat"
         },
         "confirmRestart": "Server nu herstarten?",
         "couldntCheckInternet": "Kan de cloudverbinding niet controleren",
         "confirmRestoreDefault": "Database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
         "confirmRestoreDefaultTitle": "Fabrieksinstellingen herstellen",
         "unexpectedError": "Mislukt: er heeft zich een onverwachte fout voorgedaan",
-        "connnetionError": "Connection error",
+        "connnetionError": "Netwerkfout",
         "wrongPassword": "Wachtwoord onjuist.",
         "error": "Fout: ",
         "restartNeeded": "Wijzigingen opgeslagen. Wilt u de server herstarten om de nieuwe instellingen toe te passen?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Het is niet veilig om een poortnummer te gebruiken lager dan 1025. De server kan hierdoor niet toegankelijk zijn. Toch doorgaan?",
         "confirmDisconnectFromCloud": "Verbinding verbreken met systeem {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Verbinding verbreken",
         "disconnectedFromCloudSuccess": "Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "Kan het systeem niet loskoppelen",
         "confirmDisconnectFromSystem": "Koppel de server los van het huidige systeem",
@@ -149,7 +149,7 @@
         "licenceError": "Waarschuwing! U wilt systemen met samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Doorgaan met samenvoegen?",
         "duplicateServersError": "Kan systemen niet samenvoegen omdat minstens 2 servers hetzelfde ID hebben. Verwijder deze server en probeer het opnieuw.",
         "connectionFailed": "Verbinding mislukt: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Onbekende fout",
         "mergeFailed": "Samenvoegen mislukt",
         "mergeSucceed": "Samenvoegen gelukt.",
         "newSystemDisplayName": "Nieuw systeem",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Te veel pogingen. Probeer het over een minuut nog eens."
     },
     "navigaion": {
         "cannotGetUser": "Serverfout: kan de gebruikersgegevens niet ophalen"
@@ -182,7 +182,7 @@
         "selectFiles": "Bestand(en) selecteren"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Gratis",
         "total": "Totaal",
         "occupied": "Bezet",
         "reserved": "Gereserveerd"

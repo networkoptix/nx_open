@@ -74,11 +74,11 @@ public:
 
     static bool isLocalAppServer(const QString& host);
 
-    /*
-    * @param localSystemId - new local system id
-    * @param sysIdTime - database recovery time (last back time)
-    * @param tranLogTime - move transaction time to position at least tranLogTime
-    */
+    /**
+     * @param localSystemId - new local system id
+     * @param sysIdTime - database recovery time (last back time)
+     * @param tranLogTime - move transaction time to position at least tranLogTime
+     */
     bool configureLocalSystem(const ConfigureSystemData& data);
 
     /**
@@ -98,7 +98,8 @@ public:
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 
-    bool backupDatabase();
+    bool backupDatabase(const QString& reason);
+
     /**
      * Returns none if no backup file has been found.
      */
@@ -107,7 +108,7 @@ public:
     /**
      * Should be used when database file has not been opened yet.
      */
-    bool backupDatabaseViaCopy(int buildNumber);
+    bool backupDatabaseViaCopy(int buildNumber, const QString& reason);
 };
 
 } // namespace vms::server

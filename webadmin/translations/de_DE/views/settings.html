@@ -41,22 +41,22 @@ Bitte an das Netzwerk anschließen oder eine korrekte IP-Adresse vergeben.
                         <h3>Server zurücksetzen</h3>
                         <p>Diese Aktion wird diesen Server auf Standardwerte zurücksetzen (die Datenbank löschen und die Konfiguration zurücksetzen).
                             Der Server wird vom aktuellen System abgelöst. Videoarchiv bleibt intakt.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Werkseinstellungen wiederherstellen</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Server aus dem System trennen</h3>
                         <p>Durch diese Aktion wird der Server vom System getrennt, wobei Datenbank, lokale Benutzer und Konfiguration beibehalten werden.
-                            Video archive will remain intact. <b>Cloudbenutzer werden gelöscht.</b></p>
+                            Videoarchiv bleibt intakt. <b>Cloudbenutzer werden gelöscht.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Vom System trennen</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Neu starten</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Server neustarten</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Neustart</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
+                            <h3>Admin-Passwort ändern</h3>
                             <p>Wenn das System lokal ist (nicht mit der Cloud verbunden) ändert sich hiermit das Passwort für den Benutzer "admin" und das Wiederherstellungskennwort (root) auf einigen Servern.<br>
 Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                             <div class="col-sm-6">
@@ -65,7 +65,7 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Passwort ändern</button>
                             </div>
                         </form>
                     </div>
@@ -87,8 +87,8 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge Systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Systeme zusammenführen</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Systeme zusammenführen</button></p>
                         </form>
                     </div>
 
@@ -137,7 +137,7 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                                     Videotrafficverschlüsselung erzwingen
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Speichern</button>
                         </form>
                     </div>
                 </uib-tab>
@@ -155,8 +155,8 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Zeitzone</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Datum</label></td>
+                                        <td><label for="time">Uhrzeit</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

@@ -13,7 +13,7 @@
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
-                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No Systems found</a></li>
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>لا توجد أنظمة</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
                                 <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>

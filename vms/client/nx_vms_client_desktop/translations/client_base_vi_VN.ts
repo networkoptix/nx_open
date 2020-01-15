@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Trang...</translation>
     </message>
   </context>
   <context>
@@ -1812,15 +1812,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Quy tắc sự kiện đã thay đổi</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Quy tắc sự kiện được loại bỏ</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Quy tắc sự kiện đặt lại về mặc định</translation>
     </message>
   </context>
   <context>
@@ -2939,7 +2939,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Không thể phát hiện độ phân giải chụp</translation>
     </message>
   </context>
   <context>
@@ -5683,39 +5683,39 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Dự trữ</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>vị trí</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>quang</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>mạng</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
-      <translation type="unfinished">unknown</translation>
+      <translation>không xác định</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 Tb</translation>
     </message>
   </context>
   <context>
@@ -6410,7 +6410,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>TẢI XUỐNG&lt;br&gt;ĐÃ BẮT ĐẦU</translation>
     </message>
   </context>
   <context>
@@ -6554,7 +6554,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
     </message>
   </context>
   <context>
@@ -7135,15 +7135,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Trong khu vực được chọn</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Camera đã chọn</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Thiết bị được chọn</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7152,7 +7152,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>không xác định</translation>
     </message>
   </context>
   <context>
@@ -8665,7 +8665,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -8737,7 +8737,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
   </context>
   <context>
@@ -9921,19 +9921,19 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Lưu file dưới dạng...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Không thể ghi đè tệp</translation>
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Không thể lưu tệp</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>Thư mục %1 bị chặn để viết.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
@@ -9941,7 +9941,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Mở thư mục tập tin</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

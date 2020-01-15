@@ -112,17 +112,17 @@
         "takeCameraOwnershipWithoutLock": "取得摄影机所有权而不锁定",
         "timeSynchronizationEnabled": "启用时间同步",
         "primaryTimeServer": "將主時間同步校時服務器",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "osTimeChangeCheckPeriodMs": "作业系统时间变更检查期",
+        "syncTimeExchangePeriod": "交换同步时间周期",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "启用更新通知",
         "upnpPortMappingEnabled": "启用UPNP端口映射",
         "useTextEmailFormat": "发送纯文本电子邮件",
         "useWindowsEmailLineFeed": "在电子邮件中使用Windows换行字元",
-        "trafficEncryptionForced": "Force traffic encryption",
-        "videoTrafficEncryptionForced": "Force video traffic encryption",
-        "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings",
+        "trafficEncryptionForced": "强制传输加密",
+        "videoTrafficEncryptionForced": "强制视频传输加密",
+        "updateStatus": "更新状态",
+        "watermarkSettings": "浮水印设置",
         "maxWebMTranscoders": "服务器最大的WEBM连线数。 Chrome会立刻开启2个连接，然后关闭第一个连接。因此建议将参数值设置为> = 2",
         "maxEventLogRecords": "要保留最多笔在资料库中的事件日志记录。实际未删除记录的数量可能比指定值高出20％。",
         "forceLiveCacheForPrimaryStream": "是否为主串流缓存一些帧数。数值：“是” - 一直启用（可能占用大量RAM），“否” - 一直停用，除非回放需要（例如HLS），“自动” - 类似于“否”，但会在开启时改进使用者体验（例如: 当某些分析插件在摄像机上作用时）。"
@@ -149,7 +149,7 @@
         "licenceError": "警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
         "duplicateServersError": "至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试",
         "connectionFailed": "连接失败︰ ",
-        "unknownError": "Unknown error",
+        "unknownError": "未知的错误",
         "mergeFailed": "合并失败",
         "mergeSucceed": "合并成功。",
         "newSystemDisplayName": "新系统",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "登录名或密码不正确",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "尝试次数过多，请稍后重试。"
     },
     "navigaion": {
         "cannotGetUser": "服务器故障︰ 无法检索当前用户数据"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "启动服务器",
         "serverRestarting": "服务器正在重新启动 ！",
-        "serverOffline": "server is offline"
+        "serverOffline": "服务器离线"
     },
     "fileUpload": {
         "started": "成功更新。它将需要几分钟时间",
@@ -182,7 +182,7 @@
         "selectFiles": "选择文件"
     },
     "advanced": {
-        "free": "Free",
+        "free": "可用",
         "total": "总共",
         "occupied": "正忙",
         "reserved": "保留"

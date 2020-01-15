@@ -16,7 +16,7 @@ namespace {
 static constexpr char kSpeedTest[] = "SPEEDTEST";
 static constexpr int kPayloadSizeBytes = 1000 * 1000 ; //< 1 Megabyte
 static constexpr float kSimilarityThreshold = 0.97F;
-static constexpr int kMinRunningAverages = 4;
+static constexpr int kMinRunningAverages = 5;
 static constexpr auto kMinTestDuration = milliseconds(1);
 
 static QByteArray makePayload()
@@ -79,7 +79,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 				[this](SystemError::ErrorCode errorCode) {
 					using namespace std::placeholders;
 
-					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2", 
+					NX_VERBOSE(this, "TCP connection to %1, complete, system error = %2",
 						m_url, SystemError::toString(errorCode));
 
                     if (errorCode != SystemError::noError)
@@ -157,27 +157,22 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
     }
 
     auto end = m_testContext.runningValues.find(sequence);
-    std::vector<float> bandwidths;
+	NX_ASSERT(end != m_testContext.runningValues.end());
+	auto begin = std::prev(end, kMinRunningAverages);
 
-    std::transform(
-        std::prev(end, kMinRunningAverages),
-        end,
-        std::inserter(bandwidths, bandwidths.begin()),
-        [](const std::pair<const int, RunningValue>& elem)
-        {
-            return elem.second.averageBandwidth;
-        });
+	NX_VERBOSE(this, "Comparing %1 bandwidths: %2, similarity threshold = %3",
+		std::distance(begin, end), containerString(begin, end), kSimilarityThreshold);
 
-    for (auto it = std::next(bandwidths.begin(), 1); it != bandwidths.end(); ++it)
+    for (auto it = std::next(begin, 1); it != end; ++it)
     {
-        if (!*bandwidths.begin() || !*it)
-            return std::nullopt;
+		const auto high = std::max(begin->second.averageBandwidth, it->second.averageBandwidth);
+		const auto low = std::min(begin->second.averageBandwidth, it->second.averageBandwidth);
 
-        if (*bandwidths.begin() / *it < kSimilarityThreshold)
+        if (!low || !high || low / high < kSimilarityThreshold)
             return std::nullopt;
     }
 
-    return (int) bandwidths.front();
+	return begin->second.averageBandwidth;
 }
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
@@ -189,16 +184,19 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 	if (!sequence)
 		return testFailed(SystemError::invalidData);
 
-	NX_VERBOSE(this, "Received response %1", *sequence);
-
-    auto messageSentTime = nx::utils::utcTime() - m_pingTime;
-
+	auto messageSentTime = nx::utils::utcTime() - m_pingTime;
 	auto currentDuration = messageSentTime - m_testContext.startTime;
+
     if (currentDuration >= kMinTestDuration)
     {
-        float runningTotalBytesSent = m_testContext.runningValues[*sequence].totalBytesSent;
-        m_testContext.runningValues[*sequence].averageBandwidth =
-            runningTotalBytesSent / duration_cast<milliseconds>(currentDuration).count();
+		const auto it = m_testContext.runningValues.find(*sequence);
+		NX_ASSERT(it != m_testContext.runningValues.end());
+        it->second.averageBandwidth =
+            (float) it->second.totalBytesSent / duration_cast<milliseconds>(currentDuration).count();
+
+		NX_VERBOSE(this,
+			"Calculated running value for sequence %1, totalBytesSent: %2, running value: %3", 
+			*sequence, m_testContext.totalBytesSent, it->second);
 
         auto bytesPerMsec = stopEarlyIfAble(*sequence);
         if (bytesPerMsec)
@@ -206,12 +204,11 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
             const auto timeLeftUntilMessagesAreNotSent =
                 m_testDuration - (nx::utils::utcTime() - m_testContext.startTime);
             NX_VERBOSE(this,
-                "Stopping early on sequence: %1 with %2 Bpms (%3 Mbps), and %4 requests sent. "
+                "Stopping early on sequence: %1 with %2 bytes per msec, and %4 requests sent. "
                 "Time left until no more messages are sent: %5",
-                *sequence, *bytesPerMsec, *bytesPerMsec * kBytesPerMsecToMegabitsPerSec,
-                m_testContext.sequence,
+                *sequence, *bytesPerMsec, m_testContext.sequence,
                 duration_cast<milliseconds>(timeLeftUntilMessagesAreNotSent));
-
+			
             m_testContext.sendRequests = false;
             return testComplete(*bytesPerMsec);
         }
@@ -240,7 +237,8 @@ void UplinkBandwidthTester::sendRequest()
 
 	auto [sequence, buffer] = makeRequest();
 	m_testContext.totalBytesSent += buffer.size();
-	m_testContext.runningValues[sequence].totalBytesSent = m_testContext.totalBytesSent;
+	auto& runningValue = m_testContext.runningValues[sequence];
+	runningValue.totalBytesSent = m_testContext.totalBytesSent;
 
 	NX_VERBOSE(this, "Sending request %1, buffer size: %2", sequence, buffer.size());
 
@@ -253,14 +251,24 @@ void UplinkBandwidthTester::sendRequest()
 
 			sendRequest();
 		});
+
+	NX_VERBOSE(this, "Sent request %1, totalBytesSent: %2 running value: %3", 
+		sequence, m_testContext.totalBytesSent,
+		m_testContext.runningValues[sequence]);
 }
 
-void nx::network::cloud::speed_test::UplinkBandwidthTester::testComplete(int bandwidth)
+void UplinkBandwidthTester::testComplete(int bytesPerMsec)
 {
     if (m_handler)
     {
         m_testContext = TestContext();
-        nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
+		// * 8 converts to bits per msec, / 1024 to kilobits per msec, * 1000 to kilobits per sec
+		const auto kilobitsPerSec = ((long long)bytesPerMsec * 8 / 1024) * 1000;
+
+		NX_VERBOSE(this, "Test complete, reporting bytes per msec %1 (%2 kilobits per sec)",
+			bytesPerMsec, (int) kilobitsPerSec);
+
+        nx::utils::swapAndCall(m_handler, SystemError::noError, (int) kilobitsPerSec);
     }
 }
 

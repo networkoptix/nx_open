@@ -20,15 +20,15 @@
     "settings": {
         "tabs": {
             "server": "Server",
-            "system": "System",
-            "device": "Device"
+            "system": "Sistema",
+            "device": "Dispositivo"
         },
         "confirmRestart": "Riavviare il server?",
         "couldntCheckInternet": "Impossibile controllare la connessione cloud",
         "confirmRestoreDefault": "Cancella database e impostazioni? Questo processo richiederà del tempo e il server verrà riavviato in seguito.",
         "confirmRestoreDefaultTitle": "Ripristina le impostazioni di fabbrica",
         "unexpectedError": "Non riuscito: errore inatteso",
-        "connnetionError": "Connection error",
+        "connnetionError": "Errore di connessione",
         "wrongPassword": "Password errata.",
         "error": "Errore: ",
         "restartNeeded": "Modifiche salvate. Riavvia il server per applicare nuove impostazioni?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Non è sicuro usare il numero di porta inferiore a 1025. Il server potrebbe non essere accessibile. Continua comunque?",
         "confirmDisconnectFromCloud": "Scollegare il sistema da {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tutti gli utenti cloud verranno eliminati.</span><br><br>Il sistema sarà accessibile tramite la rete locale con account di amministratore locale.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Scollegamento",
         "disconnectedFromCloudSuccess": "Il sistema è stato disconnesso da {{CLOUD_NAME}} con successo",
         "disconnectedFromCloudError": "Impossibile connettersi al sistema",
         "confirmDisconnectFromSystem": "Scollega il server dal sistema corrente",
@@ -149,7 +149,7 @@
         "licenceError": "Avvertimento! Stai per unire i sistemi con le licenze Starter. È consentita una sola licenza di avviamento per sistema, pertanto la seconda licenza verrà disattivata. Unisci comunque?",
         "duplicateServersError": "Impossibile unire i sistemi poiché hanno almeno un server con lo stesso ID. Si prega di rimuovere questo server e riprovare.",
         "connectionFailed": "Connessione fallita: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Errore sconosciuto",
         "mergeFailed": "Unione non riuscita",
         "mergeSucceed": "Successo Unione.",
         "newSystemDisplayName": "Nuovo sistema",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "Login o password non corretti",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Troppi tentativi. Riprova tra un minuto."
     },
     "navigaion": {
         "cannotGetUser": "Errore del server: impossibile recuperare i dati utente correnti"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "il server si sta avviando",
         "serverRestarting": "il server si sta riavviando",
-        "serverOffline": "server is offline"
+        "serverOffline": "il server è offline"
     },
     "fileUpload": {
         "started": "Aggiornamento avviato correttamente. Ci vorranno diversi minuti",
@@ -182,7 +182,7 @@
         "selectFiles": "Selezionare i file"
     },
     "advanced": {
-        "free": "Free",
+        "free": "Versione gratuita",
         "total": "Totale",
         "occupied": "Occupato",
         "reserved": "Riservato"

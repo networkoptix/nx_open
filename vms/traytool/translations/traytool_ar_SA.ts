@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>UAC must be enabled to request privileges for non-admin users.</translation>
+      <translation>يجب تمكين UAC لطلب امتيازات للمستخدمين غير المشرفين.</translation>
     </message>
   </context>
   <context>
@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Unknown error: %1</source>
-      <translation type="unfinished">Unknown error: %1</translation>
+      <translation>خطأ غير معروف:%1</translation>
     </message>
   </context>
 </TS>

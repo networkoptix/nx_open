@@ -5,8 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
-#include <ui/dialogs/common/button_box_dialog.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <nx/utils/url.h>
@@ -16,13 +15,14 @@ namespace Ui { class QnMergeSystemsDialog; }
 
 class QnMergeSystemsTool;
 
-class QnMergeSystemsDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
+class QnMergeSystemsDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
+    using base_type = QnSessionAwareButtonBoxDialog;
 
-    typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnMergeSystemsDialog(QWidget *parent);
-    ~QnMergeSystemsDialog();
+    explicit QnMergeSystemsDialog(QWidget* parent);
+    virtual ~QnMergeSystemsDialog() override;
 
     nx::utils::Url url() const;
     QString password() const;
@@ -49,9 +49,9 @@ private:
 
 private:
     QScopedPointer<Ui::QnMergeSystemsDialog> ui;
-    QPushButton *m_mergeButton;
+    QPushButton* m_mergeButton = nullptr;
 
-    QnMergeSystemsTool *m_mergeTool;
+    QnMergeSystemsTool* const m_mergeTool;
 
     QnMediaServerResourcePtr m_discoverer;
     nx::utils::Url m_url;

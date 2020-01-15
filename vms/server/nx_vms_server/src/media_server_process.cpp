@@ -482,11 +482,16 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
-            result << storage; // if storage size isn't known do not delete it
-
-        NX_VERBOSE(
-            kLogTag, "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
-            storage->getUrl(), static_cast<bool>(fileStorage), totalSpace, storage->getSpaceLimit());
+        {
+            result << storage;
+            NX_VERBOSE(
+                kLogTag,
+                "Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete",
+                nx::utils::url::hidePassword(storage->getUrl()),
+                static_cast<bool>(fileStorage),
+                totalSpace,
+                storage->getSpaceLimit());
+        }
     }
 
     return result;
@@ -503,13 +508,26 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
-    const auto it = std::find_if(partitions.begin(), partitions.end(),
-        [&](const nx::vms::server::PlatformMonitor::PartitionSpace& part)
-    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
-    const auto storageType = (it != partitions.end())
-        ? it->type
-        : nx::vms::server::PlatformMonitor::NetworkPartition;
+    // Find the closest mount point. "/" matches everything on Linux.
+    auto storageType = nx::vms::server::PlatformMonitor::NetworkPartition;
+    QString closestMountPoint = "";
+    for (const auto& partition: partitions)
+    {
+        auto partitionPath = QnStorageResource::toNativeDirPath(partition.path);
+        if (!storagePath.startsWith(partitionPath))
+            continue;
+        if (!closestMountPoint.isEmpty())
+            if (closestMountPoint.length() > partitionPath.length())
+                continue;
+        closestMountPoint = partitionPath;
+        storageType = partition.type;
+    }
+    if (!closestMountPoint.isEmpty())
+    {
+        NX_VERBOSE(this, "Corresponding partition: %1 %2",
+            closestMountPoint, QnLexical::serialized(storageType));
+    }
     storage->setStorageType(QnLexical::serialized(storageType));
 
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
@@ -690,8 +708,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_DEBUG(this, lm("[Storages init] Existing storage: %1, spaceLimit = %2")
-                .args(storage.url, storage.spaceLimit));
+            NX_DEBUG(
+                this, "[Storages init] Existing storage: '%1', spaceLimit = %2",
+                nx::utils::url::hidePassword(storage.url), storage.spaceLimit);
+
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
@@ -4471,7 +4491,7 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
 
 void MediaServerProcess::onBackupDbTimer()
 {
-    Utils(serverModule()).backupDatabase();
+    Utils(serverModule()).backupDatabase("timer");
     m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
 }
 
@@ -4842,7 +4862,10 @@ void MediaServerProcess::run()
     NX_ASSERT(!nxVersion.isNull());
 
     if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
-        nx::vms::server::Utils(serverModule.get()).backupDatabaseViaCopy(nxVersionFromDb.build());
+    {
+        nx::vms::server::Utils utils(serverModule.get());
+        utils.backupDatabaseViaCopy(nxVersionFromDb.build(), "timer");
+    }
 
     if (!connectToDatabase())
         return;

@@ -107,15 +107,16 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase()
+bool Utils::backupDatabase(const QString& reason)
 {
     auto connection = ec2Connection();
     return nx::vms::utils::backupDatabaseLive(
         serverModule()->settings().backupDir(),
-        std::move(connection));
+        std::move(connection),
+        reason);
 }
 
-bool Utils::backupDatabaseViaCopy(int buildNumber)
+bool Utils::backupDatabaseViaCopy(int buildNumber, const QString& reason)
 {
     const auto backupDir = serverModule()->settings().backupDir();
     const auto dbFilePath = ec2::detail::QnDbManager::ecsDbFileName(serverModule()->settings().dataDir());
@@ -126,15 +127,18 @@ bool Utils::backupDatabaseViaCopy(int buildNumber)
         return false;
     }
 
-    const QString fileName = nx::vms::utils::backupDbFileName(backupDir, buildNumber);
+    const QString fileName = nx::vms::utils::backupDbFileName(backupDir, buildNumber, reason);
     if (!QFile::copy(dbFilePath, fileName))
     {
         NX_ERROR(this, "Failed to copy DB file %1 to %2", dbFilePath, fileName);
         return false;
     }
 
-    nx::vms::utils::deleteOldBackupFilesIfNeeded(
-        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+    if (reason == "timer")
+    {
+        nx::vms::utils::deleteOldBackupFilesIfNeeded(
+            backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()), reason);
+    }
 
     NX_INFO(this, "Successfully created DB backup %1", fileName);
     return true;

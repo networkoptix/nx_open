@@ -4865,7 +4865,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>카메라 및 리소스</translation>
     </message>
     <message>
       <source>Videowalls</source>
@@ -5684,7 +5684,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>예약됨</translation>
     </message>
     <message>
       <source>local</source>
@@ -5716,7 +5716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1TB</translation>
     </message>
   </context>
   <context>
@@ -5805,7 +5805,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>플러그인</translation>
     </message>
   </context>
   <context>
@@ -7136,15 +7136,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>선택된 영역에서</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>선택된 카메라</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>선택된 장치</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -7153,7 +7153,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>없음</translation>
     </message>
   </context>
   <context>
@@ -7407,7 +7407,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제 된 카메라</translation>
     </message>
   </context>
   <context>
@@ -7606,8 +7606,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라들</numerusform>
       </translation>
     </message>
     <message>
@@ -7697,7 +7697,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>플러그인</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -8388,7 +8388,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제 된 카메라</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8459,7 +8459,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>업데이트 파일을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8666,7 +8666,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>고객 지원팀으로 문의해 주세요.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -8803,7 +8803,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>설치됨</translation>
     </message>
     <message>
       <source>Failed to download update</source>
@@ -9155,7 +9155,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>북마크함...</translation>
     </message>
   </context>
   <context>
@@ -9926,7 +9926,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>파일을 덮어쓸지 실패</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -9942,7 +9942,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>연결된 폴더 열기</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

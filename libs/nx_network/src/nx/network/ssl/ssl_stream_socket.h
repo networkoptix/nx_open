@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <thread>
 
 #include <nx/utils/thread/mutex.h>
@@ -103,6 +104,8 @@ private:
     nx::Buffer m_emptyBuffer;
     aio::Timer m_handshakeTimer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;
+    std::optional<unsigned int> m_recvTimeoutBak;
+    std::optional<unsigned int> m_sendTimeoutBak;
 
     void startHandshakeTimer(std::chrono::milliseconds timout);
     void doHandshake();
@@ -113,6 +116,9 @@ private:
     void switchToAsyncModeIfNeeded();
 
     void handleSslError(int sslPipelineResultCode);
+
+    bool saveTimeouts();
+    bool restoreTimeouts();
 };
 
 //-------------------------------------------------------------------------------------------------

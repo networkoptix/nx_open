@@ -130,7 +130,7 @@ int QnConfigureRestHandler::execute(
         NX_DEBUG(this, lm("Changing local system id from %1 to %2")
             .args(owner->globalSettings()->localSystemId(), data.localSystemId));
 
-        if (!utils.backupDatabase())
+        if (!utils.backupDatabase("configure"))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_WARNING(this, lit("database backup error"));

@@ -640,7 +640,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>ملفات</translation>
     </message>
     <message>
       <source>Alt+Left</source>
@@ -696,7 +696,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>نوع</translation>
     </message>
     <message>
       <source>Type</source>
@@ -705,7 +705,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>تاريخ التَّعديل</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -909,7 +909,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation type="unfinished">&amp;Yes</translation>
+      <translation>&amp;نعم</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
@@ -917,7 +917,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation type="unfinished">&amp;No</translation>
+      <translation>&amp;لا</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>

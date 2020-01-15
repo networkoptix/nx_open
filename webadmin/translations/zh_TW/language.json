@@ -112,17 +112,17 @@
         "takeCameraOwnershipWithoutLock": "取得攝影機所有權而不鎖定",
         "timeSynchronizationEnabled": "時間同步啟用",
         "primaryTimeServer": "將主時間同步校時伺服器",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "osTimeChangeCheckPeriodMs": "作業系統時間變更檢查期",
+        "syncTimeExchangePeriod": "交換同步時間週期",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "更新通知啟動",
         "upnpPortMappingEnabled": "啟用 UPNP 埠映射",
         "useTextEmailFormat": "發送純文字電子郵件",
         "useWindowsEmailLineFeed": "在電子郵件中使用Windows換行字元",
-        "trafficEncryptionForced": "Force traffic encryption",
-        "videoTrafficEncryptionForced": "Force video traffic encryption",
-        "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings",
+        "trafficEncryptionForced": "強制傳輸加密",
+        "videoTrafficEncryptionForced": "強制影片傳輸加密",
+        "updateStatus": "更新狀態",
+        "watermarkSettings": "浮水印設定",
         "maxWebMTranscoders": "伺服器最大的WEBM連線數。Chrome會立刻開啟2個連接，然後關閉第一個連接。因此建議將參數值設置為> = 2。",
         "maxEventLogRecords": "要保留最多筆在資料庫中的事件日誌記錄。實際未刪除記錄的數量可能比預定高出20％。",
         "forceLiveCacheForPrimaryStream": "是否為主串流緩存一些幀數。數值：“是” - 一直啟用（可能占用大量RAM），“否” - 一直停用，除非回放需要（例如HLS），“自動” - 類似於“否”，但會在開啟時改進使用者體驗（例如當某些分析插件在攝影機上作用時）。"
@@ -149,7 +149,7 @@
         "licenceError": "警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
         "duplicateServersError": "至少有一個具有相同ID的伺服器, 所以無法合併系統。請刪除此伺服器, 然後重試。",
         "connectionFailed": "連接失敗: ",
-        "unknownError": "Unknown error",
+        "unknownError": "未知的錯誤",
         "mergeFailed": "合併失敗",
         "mergeSucceed": "合併成功.",
         "newSystemDisplayName": "新系統",
@@ -159,7 +159,7 @@
     },
     "login": {
         "incorrectPassword": "帳號或密碼不正確",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "嘗試次數過多，請稍後再試。"
     },
     "navigaion": {
         "cannotGetUser": "伺服器故障: 無法取得此使用者資料"
@@ -170,7 +170,7 @@
     "restartDialog": {
         "serverStarting": "伺服器正在啟動中",
         "serverRestarting": "伺服器正在重新啟動!",
-        "serverOffline": "server is offline"
+        "serverOffline": "伺服器已離線"
     },
     "fileUpload": {
         "started": "更新成功地開始. 這將需要幾分鐘時間",
@@ -182,7 +182,7 @@
         "selectFiles": "選擇檔案"
     },
     "advanced": {
-        "free": "Free",
+        "free": "可用",
         "total": "合計",
         "occupied": "被佔用",
         "reserved": "保留"

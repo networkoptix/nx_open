@@ -10,7 +10,7 @@
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>พื้นที่จัดเก็บ</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -58,7 +58,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                ไม่สามารถเข้าถึงได้
                             </div>
                         </div>
                     </td>
@@ -72,14 +72,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="เนื้อที่ที่สำรองไว้"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">กิกะไบต์</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+ placeholder="เนื้อที่ที่สำรองไว้"/>
+                            <div class="input-group-addon">กิกะไบต์</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -114,8 +114,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">แก้ไขการตั้งค่าที่ไฮไลต์ทั้งหมดเพื่อบันทึก</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >บันทึก</button>
+        <button class="btn btn-warning" ng-click="cancel()">ยกเลิก</button>
     </form>
 
     <h2>ล็อกการตั้งค่า</h2>
@@ -135,13 +135,13 @@
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >บันทึก</button>
         </div>
     </form>
 
     <h1>การตั้งค่าระบบขั้นสูง</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> คำเตือน! </b> การเปลี่ยนแปลงใด ๆ ในหน้านี้อาจทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -181,7 +181,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >บันทึก</button>
         </div>
 
     </form>

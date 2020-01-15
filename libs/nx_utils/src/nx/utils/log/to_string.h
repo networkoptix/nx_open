@@ -178,6 +178,29 @@ QString toString(const std::bitset<N>& value)
     return QString::fromStdString(result.str());
 }
 
+template<typename Iterator>
+QString containerString(
+    Iterator begin,
+    Iterator end,
+    const QString& delimiter = ", ",
+    const QString& prefix = "{ ",
+    const QString& suffix = " }",
+    const QString& empty = "none")
+{
+    if (begin == end)
+        return empty;
+
+    QStringList strings;
+    for (auto it = begin; it != end; ++it)
+        strings << toString(*it);
+
+    // QString::operator+= works much faster than template subsitution.
+    QString result = prefix;
+    result += strings.join(delimiter);
+    result += suffix;
+    return result;
+}
+
 template<typename Container>
 QString containerString(const Container& container,
     const QString& delimiter = ", ",
@@ -185,16 +208,5 @@ QString containerString(const Container& container,
     const QString& suffix = " }",
     const QString& empty = "none")
 {
-    if (container.begin() == container.end())
-        return empty;
-
-    QStringList strings;
-    for (const auto& item : container)
-        strings << toString(item);
-
-    // QString::operator+= works much faster than template subsitution.
-    QString result = prefix;
-    result += strings.join(delimiter);
-    result += suffix;
-    return result;
+    return containerString(container.begin(), container.end(), delimiter, prefix, suffix, empty);
 }

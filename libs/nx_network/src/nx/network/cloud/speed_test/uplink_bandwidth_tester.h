@@ -13,7 +13,7 @@ namespace nx::network::cloud::speed_test {
 static constexpr float kBytesPerMsecToMegabitsPerSec = 1000.0F / 1024 / 1024 * 8;
 
 using BandwidthCompletionHandler =
-	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*bytesPerSecond*/)>;
+	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*Kbps*/)>;
 
 class NX_NETWORK_API UplinkBandwidthTester:
 	public network::aio::BasicPollable
@@ -29,6 +29,9 @@ public:
 	virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 	virtual void stopWhileInAioThread() override;
 
+	/**
+	 * NOTE: handler reports bandwidth result in Kilobits per second iff there is no error.
+	 */
 	void doBandwidthTest(BandwidthCompletionHandler handler);
 
 private:
@@ -40,14 +43,23 @@ private:
 
 	void sendRequest();
 
-	void testComplete(int bandwidth);
+	void testComplete(int bytesPerMsec);
 	void testFailed(SystemError::ErrorCode errorCode);
 
 private:
     struct RunningValue
     {
         int totalBytesSent = 0;
-        float averageBandwidth = 0;
+		// in bytes per msec
+		float averageBandwidth = 0;
+
+		std::string toString() const
+		{
+			return 
+				std::string("{ totalBytesSent = ") + std::to_string(totalBytesSent)
+				+ ", averageBandwidth = " + std::to_string(averageBandwidth) + " bytes per msec"
+				+ " }";
+		}
     };
 
 	struct TestContext

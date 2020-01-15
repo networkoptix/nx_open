@@ -578,7 +578,9 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         return motionMetadata;
     }
     else
+    {
         return getCameraMetadata();
+    }
 }
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()

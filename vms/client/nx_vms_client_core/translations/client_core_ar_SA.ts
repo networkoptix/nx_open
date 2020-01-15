@@ -139,7 +139,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>محاولات كثيرة. حاول مرة أخرى بعد دقيقة.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>

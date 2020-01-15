@@ -1082,6 +1082,13 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     m_videoResolution.setHeight(m_frames[idx]->height);
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
+
+
+    NX_VERBOSE(this,
+        "Updating last frame timestamp; frame index in buffer: %1; "
+        "frame DTS: %2 us; frame PTS: %3 us; previously saved frame timestamp: %4",
+        idx, m_frames[idx]->pkt_dts, m_frames[idx]->pkt_pts, m_lastFrameTime);
+
     m_lastFrameTime = m_frames[idx]->pkt_dts;
     m_firstFrameTime = qMin(m_firstFrameTime, m_lastFrameTime); //< protection if time goes to past
 

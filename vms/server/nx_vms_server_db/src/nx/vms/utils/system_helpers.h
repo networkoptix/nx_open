@@ -25,13 +25,17 @@ struct DbBackupFileData
  */
 bool backupDatabaseLive(
     const QString& backupDir,
-    const ec2::AbstractECConnectionPtr& connection);
+    const ec2::AbstractECConnectionPtr& connection,
+    const QString& reason);
 
-QString backupDbFileName(const QString& backupDir, int buildNumber);
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
+QString backupDbFileName(const QString& backupDir, int buildNumber, const QString& reason);
+
+QList<DbBackupFileData> allBackupFilesDataSorted(
+    const QString& backupDir, const QString& reason = {});
 
 /* Newest files come first */
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace);
+void deleteOldBackupFilesIfNeeded(
+    const QString& backupDir, qint64 freeSpace, const QString& reason = {});
 
 } // namespace utils
 } // namespace vms

@@ -54,8 +54,9 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
     endif()
 endif()
 
-# Early loading rdep to download a toolchain if needed.
 include(cmake/find_python.cmake)
+
+# Early loading rdep to download a toolchain if needed.
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
