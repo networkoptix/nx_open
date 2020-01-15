@@ -589,7 +589,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const bool cloudConnection = isConnectionToCloud(url);
 
     // Stores local credentials for successful connection
-    if (helpers::isLocalUser(url.userName()) && !cloudConnection && options.testFlag(StoreSession))
+    if (!cloudConnection && options.testFlag(StoreSession))
     {
         NX_DEBUG(nx::vms::client::core::helpers::kCredentialsLogTag,
             lm("Store connection record of %1 to the system %2").args(url.userName(), localId));
