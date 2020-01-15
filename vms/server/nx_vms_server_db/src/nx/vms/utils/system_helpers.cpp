@@ -32,46 +32,48 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-struct VmsUtilsFunctionsTag{};
-static const auto& kLogTag = typeid(VmsUtilsFunctionsTag);
-
-QString backupDbFileName(const QString& backupDir, int buildNumber)
+QString backupDbFileName(const QString& backupDir, int buildNumber, const QString& reason)
 {
-    return QString("%1_%2_%3.db")
-        .arg(closeDirPath(backupDir) + "ecs")
-        .arg(buildNumber)
-        .arg(qnSyncTime->currentMSecsSinceEpoch());
+    return lm("%1_%2_%3_%4.db").args(
+        closeDirPath(backupDir) + "ecs",
+        buildNumber,
+        qnSyncTime->currentMSecsSinceEpoch(),
+        reason);
 }
 
 bool backupDatabaseLive(
     const QString& backupDir,
-    const ec2::AbstractECConnectionPtr& connection)
+    const ec2::AbstractECConnectionPtr& connection,
+    const QString& reason)
 {
     const auto buildNumber =
         nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
 
     if (!QDir(backupDir).exists() && !QDir().mkpath(backupDir))
     {
-        NX_ERROR(kLogTag, "Failed to create DB backup path %1", backupDir);
+        NX_ERROR(NX_SCOPE_TAG, "Failed to create DB backup path %1", backupDir);
         return false;
     }
 
-    const auto fileName = backupDbFileName(backupDir, buildNumber);
+    const auto fileName = backupDbFileName(backupDir, buildNumber, reason);
     const auto errorCode = connection->dumpDatabaseToFileSync(fileName);
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_ERROR(kLogTag, "Failed to dump EC database: %1", ec2::toString(errorCode));
+        NX_ERROR(NX_SCOPE_TAG, "Failed to dump EC database: %1", ec2::toString(errorCode));
         return false;
     }
 
-    deleteOldBackupFilesIfNeeded(
-        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+    if (reason == "timer")
+    {
+        const auto freeSpace = nx::SystemCommands().freeSpace(backupDir.toStdString());
+        deleteOldBackupFilesIfNeeded(backupDir, freeSpace, reason);
+    }
 
-    NX_INFO(kLogTag, "Successfully created DB backup %1", fileName);
+    NX_WARNING(NX_SCOPE_TAG, "Successfully created DB backup %1", fileName);
     return true;
 }
 
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const QString& reason)
 {
     QDir dir(backupDir);
     QList<DbBackupFileData> result;
@@ -85,7 +87,10 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
             continue;
 
         auto nameSplits = fileInfo.baseName().split('_');
-        if (nameSplits.size() != 3)
+        if (nameSplits.size() != 3 && nameSplits.size() != 4)
+            continue;
+
+        if (!reason.isEmpty() && nameSplits.size() == 4 && nameSplits[3] != reason)
             continue;
 
         DbBackupFileData backupFileData;
@@ -115,11 +120,11 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
     return result;
 }
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace)
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace, const QString& reason)
 {
     const qint64 kMaxFreeSpace = 10 * 1024 * 1024LL * 1024LL; //< 10Gb
     const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
-    const auto allBackupFiles = allBackupFilesDataSorted(backupDir);
+    const auto allBackupFiles = allBackupFilesDataSorted(backupDir, reason);
     for (int i = kMaxBackupFilesCount; i < allBackupFiles.size(); ++i)
         nx::SystemCommands().removePath(allBackupFiles[i].fullPath.toStdString());
 }

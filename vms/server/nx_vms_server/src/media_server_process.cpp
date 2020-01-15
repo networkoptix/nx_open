@@ -4491,7 +4491,7 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
 
 void MediaServerProcess::onBackupDbTimer()
 {
-    Utils(serverModule()).backupDatabase();
+    Utils(serverModule()).backupDatabase("timer");
     m_createDbBackupTimer->start(calculateDbBackupTimeout(), [this]() { onBackupDbTimer(); });
 }
 
@@ -4862,7 +4862,10 @@ void MediaServerProcess::run()
     NX_ASSERT(!nxVersion.isNull());
 
     if (!nxVersionFromDb.isNull() && nxVersion != nxVersionFromDb)
-        nx::vms::server::Utils(serverModule.get()).backupDatabaseViaCopy(nxVersionFromDb.build());
+    {
+        nx::vms::server::Utils utils(serverModule.get());
+        utils.backupDatabaseViaCopy(nxVersionFromDb.build(), "timer");
+    }
 
     if (!connectToDatabase())
         return;

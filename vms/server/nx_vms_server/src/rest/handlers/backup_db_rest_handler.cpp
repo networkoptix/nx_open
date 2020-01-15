@@ -17,7 +17,7 @@ int QnBackupDbRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     nx::vms::server::Utils utils(serverModule());
-    if (!utils.backupDatabase())
+    if (!utils.backupDatabase("manual"))
         return nx::network::http::StatusCode::internalServerError;
 
     return nx::network::http::StatusCode::ok;
