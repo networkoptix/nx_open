@@ -18,6 +18,15 @@ namespace nx::vms::server::rest {
 
 using namespace nx::network;
 
+class DeviceIdRetriever: public ::DeviceIdRetriever
+{
+    virtual QString retrieveDeviceId(const nx::network::http::Request& request) const override
+    {
+        const QUrlQuery urlQuery(request.requestLine.url.query());
+        return urlQuery.queryItemValue(kDeviceIdParameter);
+    }
+};
+
 DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
@@ -171,6 +180,12 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     result.json.setReply(response);
 
     return result;
+}
+
+std::unique_ptr<::DeviceIdRetriever>
+    DeviceAnalyticsSettingsHandler::createCustomDeviceIdRetriever() const
+{
+    return std::make_unique<DeviceIdRetriever>();
 }
 
 } // namespace nx::vms::server::rest

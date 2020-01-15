@@ -187,6 +187,10 @@ void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
 
 bool QnAutoRequestForwarder::isPathIgnored(const nx::network::http::Request* request)
 {
+    const QString path = request->requestLine.url.path();
+    if (m_deviceIdRetrieversByPath.find(path) != m_deviceIdRetrieversByPath.cend())
+        return false;
+
     for (const auto& mask: m_ignoredPathWildcardMarks)
     {
         QString path = request->requestLine.url.path();
@@ -233,6 +237,19 @@ void QnAutoRequestForwarder::addCameraIdUrlParams(
         .args(cameraIdUrlParams, path);
 }
 
+void QnAutoRequestForwarder::addCustomDeviceIdRetriever(
+    QString path, std::unique_ptr<DeviceIdRetriever> deviceIdRetriever)
+{
+    NX_ASSERT(!path.isEmpty());
+    NX_ASSERT(deviceIdRetriever);
+
+    m_deviceIdRetrieversByPath.emplace(path, std::move(deviceIdRetriever));
+    NX_DEBUG(this,
+        "Added a device id retriever for path %1, requests will be forwarded even if this path "
+        "is in the list of ignored for forwarding",
+        path);
+}
+
 bool QnAutoRequestForwarder::findCamera(
     const nx::network::http::Request& request,
     const QUrlQuery& urlQuery,
@@ -249,6 +266,9 @@ bool QnAutoRequestForwarder::findCamera(
         return true;
 
     if (findCameraInUrlQuery(request, urlQuery, outCamera))
+        return true;
+
+    if (findCameraWithinDeviceIdRetriever(request, outCamera))
         return true;
 
     NX_VERBOSE(this) << lm("Skipped: Camera not found");
@@ -338,7 +358,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
     const QUrlQuery& urlQuery,
     QnResourcePtr* const outCamera)
 {
-    const QString path = request.requestLine.url.path();
+    const QString path = request.requestLine.url.path();    
 
     // Path may contain an arbitrary prefix before the checked part.
     QStringList paramNames;
@@ -362,6 +382,21 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
         resourcePool(), &notFoundCameraId, params, paramNames);
     if (!*outCamera && !notFoundCameraId.isNull())
         NX_VERBOSE(this) << lm("Camera not found by flexible id [%1]").args(notFoundCameraId);
+    return *outCamera != nullptr;
+}
+
+bool QnAutoRequestForwarder::findCameraWithinDeviceIdRetriever(
+    const nx::network::http::Request& request,
+    QnResourcePtr* const outCamera)
+{
+    const QString path = request.requestLine.url.path();
+    if (const auto it = m_deviceIdRetrieversByPath.find(path);
+        it != m_deviceIdRetrieversByPath.cend())
+    {
+        if (const QString deviceId = it->second->retrieveDeviceId(request); !deviceId.isEmpty())
+            *outCamera = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), deviceId);
+    }
+
     return *outCamera != nullptr;
 }
 

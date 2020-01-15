@@ -16,6 +16,8 @@ public:
     virtual JsonRestResponse executeGet(const JsonRestRequest& request);
     virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
 
+    virtual std::unique_ptr<DeviceIdRetriever> createCustomDeviceIdRetriever() const override;
+
 private:
     std::optional<JsonRestResponse> checkCommonInputParameters(
         const QnRequestParams& parameters) const;

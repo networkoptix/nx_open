@@ -54,6 +54,12 @@ struct RestResponse
         RestContent content = {}, bool isUndefinedContentLength = false);
 };
 
+class DeviceIdRetriever
+{
+public:
+    virtual QString retrieveDeviceId(const nx::network::http::Request& request) const = 0;
+};
+
 /**
  * QnRestRequestHandler must be thread-safe.
  *
@@ -85,6 +91,11 @@ public:
 
     /** In derived classes, report all url params carrying camera id. */
     virtual QStringList cameraIdUrlParams() const { return {}; }
+
+    virtual std::unique_ptr<DeviceIdRetriever> createCustomDeviceIdRetriever() const
+    {
+        return nullptr;
+    }
 
 protected:
     /**

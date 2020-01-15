@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <rest/server/request_handler.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/http_types.h>
 #include <common/common_module_aware.h>
@@ -42,10 +43,23 @@ public:
      */
     void addCameraIdUrlParams(const QString& path, const QStringList& cameraIdUrlParams);
 
+
+    /**
+     * Enables request forwarding to the server the device with retrieved id belongs to. Works even
+     * for ignored paths.
+     * The url may have an arbitrary prefix before the specified path. Hence, the URL
+     * format: <scheme>://...<path>?<cameraIdParam>=<cameraId>...
+     *
+     * @param path Should have the format like "/api/ptz".
+     */
+    void addCustomDeviceIdRetriever(
+        QString path, std::unique_ptr<DeviceIdRetriever> deviceIdRetriever);
+
 private:
     QStringList m_ignoredPathWildcardMarks;
     QMultiHash<QString, QString> m_allowedPathPartByScheme;
     QHash<QString, QStringList> m_cameraIdUrlParamsByPath;
+    std::map<QString, std::unique_ptr<DeviceIdRetriever>> m_deviceIdRetrieversByPath;
 
     bool isPathIgnored(const nx::network::http::Request* request);
 
@@ -68,6 +82,10 @@ private:
         const nx::network::http::Request& request,
         const QUrlQuery& urlQuery,
         QnResourcePtr* const resource);
+
+    bool findCameraWithinDeviceIdRetriever(
+        const nx::network::http::Request& request,
+        QnResourcePtr* const outCamera);
 
     /** @return UTC time (milliseconds). */
     qint64 fetchTimestamp(const nx::network::http::Request& request, const QUrlQuery& urlQuery);
