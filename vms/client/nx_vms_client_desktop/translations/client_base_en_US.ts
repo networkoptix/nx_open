@@ -5,31 +5,31 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
         <source>Any type</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select area</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select some area on the video...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>In selected area</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to execute plugin action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Action requires some parameters to be filled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -984,15 +984,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Page...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect to this Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pin</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1061,39 +1061,39 @@ to view more bookmarks</source>
     <name>EventSearchWidget::Private</name>
     <message>
         <source>Server events</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Analytics events</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any device issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any camera issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any server event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device issues</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera issues</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any analytics event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1494,6 +1494,10 @@ to view more bookmarks</source>
         <source>Built for %1-%2 with %3.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Regional support</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
@@ -1837,15 +1841,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Event rule changed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event rule removed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event rules reset to default</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2035,27 +2039,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Select at least one device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Occurs</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Source camera</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Source and %n more cameras</source>
-        <translation>
-            <numerusform>Source and %n more camera</numerusform>
-            <numerusform>Source and %n more cameras</numerusform>
-        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -2089,19 +2074,35 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>Select server</source>
-        <translation type="unfinished"></translation>
+        <source>User</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Source Server</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Source Camera</source>
+        <translation></translation>
     </message>
     <message numerus="yes">
-        <source>%n cameras</source>
-        <translation type="unfinished">
-            <numerusform>%n camera</numerusform>
-            <numerusform>%n cameras</numerusform>
+        <source>Source and %n more Cameras</source>
+        <translation>
+            <numerusform>Source and %n more Camera</numerusform>
+            <numerusform>Source and %n more Cameras</numerusform>
         </translation>
     </message>
     <message>
-        <source>User</source>
-        <translation type="unfinished"></translation>
+        <source>Select at least one Device</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Select at least one Camera</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Select Server</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2142,7 +2143,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2231,7 +2232,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
         <source>Servers that support buzzer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2998,7 +2999,7 @@ to %1</source>
     </message>
     <message>
         <source>Could not detect capturing resolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3128,6 +3129,10 @@ to %1</source>
             <numerusform>Event log for %1 - %n event found</numerusform>
             <numerusform>Event log for %1 - %n events found</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3278,7 +3283,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
         <source>Servers that support fan diagnostic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3937,7 +3942,7 @@ to %1</source>
     </message>
     <message>
         <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4491,7 +4496,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
         <source>Servers that support PoE monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5224,7 +5229,7 @@ to %1</source>
     </message>
     <message>
         <source>PoE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5776,39 +5781,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Reserved</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>local</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ram</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>optical</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>swap</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>network</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>usb</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>smb</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6089,7 +6094,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6588,7 +6593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Failed to connect to the selected server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6647,7 +6652,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
         <source>Unable to acknowledge event on removed camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7257,28 +7262,28 @@ If you intended to move analytics data to another storage location, please conta
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
         <source>Select area on the video to filter results</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>In selected area</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected media</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>none</source>
         <comment>No currently selected camera</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7340,16 +7345,6 @@ If you intended to move analytics data to another storage location, please conta
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-        <source>%n users</source>
-        <translation>
-            <numerusform>%n user</numerusform>
-            <numerusform>%n users</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -8388,11 +8383,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
         <source>The proxy %1 requires a username and password.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select folder to upload</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8486,7 +8481,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8900,6 +8895,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Unknown Plugin Diagnostic Event</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Consumption</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8939,7 +8938,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
         <source>Sign In</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9045,61 +9044,61 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
         <source>%1 Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Powered</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unexpected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Empty</source>
         <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt; Unknown device %1 &gt;</source>
         <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Consumption</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt; Unknown device &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9245,21 +9244,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Only client-server video traffic can be encrypted</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
         <source>%n cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n camera</numerusform>
             <numerusform>%n cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>There are no compatible servers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9887,7 +9886,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Please enter your contact information and the reason for deactivating your license</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+        <source>%n Users</source>
+        <translation>
+            <numerusform>%n User</numerusform>
+            <numerusform>%n Users</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -10172,39 +10181,39 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
         <source>Save File As...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to save file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 folder is blocked for writing.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Downloading file...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Containing Folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop file downloading?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File downloaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File downloading failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
