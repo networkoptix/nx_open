@@ -99,12 +99,14 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
+#include <nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_expired_dialog.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
 #include <nx/analytics/utils.h>
 
+using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -113,6 +115,8 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 static constexpr int kReconnectDelayMs = 3000;
+
+static constexpr auto kSelectCurrentServerShowDialogDelay = 250ms;
 
 bool isConnectionToCloud(const nx::utils::Url& url)
 {
@@ -436,7 +440,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             commonModule()->engineVersion());
 
     if (serverSwitch && status != Qn::ConnectionResult::SuccessConnectionResult)
-        QnMessageBox::critical(mainWindowWidget(), tr("Failed to connect to the selected server"));
+        reportServerSelectionFailure();
 
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
     NX_DEBUG(this, lm("handleConnectReply: connection status %1").arg(status));
@@ -1098,8 +1102,11 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
 
     const auto discoveryManager = commonModule()->moduleDiscoveryManager();
     const auto endpoint = discoveryManager->getEndpoint(serverId);
-    if (!NX_ASSERT(endpoint && server->isOnline()))
+    if (!endpoint || !server->isOnline())
+    {
+        reportServerSelectionFailure();
         return;
+    }
 
     nx::utils::Url currentUrl = commonModule()->currentUrl();
     const auto systemId = globalSettings()->cloudSystemId();
@@ -1109,9 +1116,6 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     const bool cloudConnection = !systemId.isEmpty()
         && NX_ASSERT(currentUser) && currentUser->isCloud();
 
-    if (!disconnectFromServer(DisconnectFlag::NoFlags))
-        return;
-
     nx::utils::Url url;
     url.setUserName(currentUrl.userName());
     url.setPassword(currentUrl.password());
@@ -1120,9 +1124,53 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
         ? nx::vms::client::core::helpers::serverCloudHost(systemId, serverId)
         : endpoint->address.toString());
 
-    setLogicalState(LogicalState::connecting_to_target);
-    m_connecting.storeConnection = true;
-    connectToServer(url);
+    m_serverSelectionHandle = qnClientCoreModule->connectionFactory()->testConnection(url, this,
+        [this, url, guard = QPointer<QnWorkbenchConnectHandler>(this)](
+            int handle, ec2::ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
+        {
+            if (!guard)
+                return;
+
+            if (m_serverSelectionHandle != handle)
+                return;
+
+            m_serverSelectionHandle = -1;
+
+            if (m_connectingToServerDialog)
+                m_connectingToServerDialog->reject();
+
+            const auto result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+            if (result == Qn::SuccessConnectionResult)
+            {
+                if (!disconnectFromServer(DisconnectFlag::NoFlags))
+                    return;
+
+                setLogicalState(LogicalState::connecting_to_target);
+                m_connecting.storeConnection = true;
+                connectToServer(url);
+            }
+            else
+            {
+                reportServerSelectionFailure();
+            }
+        });
+
+    if (!m_connectingToServerDialog)
+        m_connectingToServerDialog = new ConnectingToServerDialog(mainWindowWidget());
+
+    m_connectingToServerDialog->setDisplayedServer(server);
+
+    const auto showModalDialog =
+        [this, server]()
+        {
+            if (m_serverSelectionHandle == -1 || !NX_ASSERT(m_connectingToServerDialog))
+                return;
+
+            m_connectingToServerDialog->exec();
+            m_serverSelectionHandle = -1;
+        };
+
+    executeDelayedParented(showModalDialog, kSelectCurrentServerShowDialogDelay, this);
 }
 
 void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
@@ -1381,4 +1429,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 
     reconnectStep();
     return true;
+}
+
+void QnWorkbenchConnectHandler::reportServerSelectionFailure()
+{
+    QnMessageBox::critical(mainWindowWidget(), tr("Failed to connect to the selected server"));
 }
