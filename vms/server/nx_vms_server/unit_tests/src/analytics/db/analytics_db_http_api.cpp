@@ -25,12 +25,25 @@ struct LookupRequestData
     LookupResult responseData;
 };
 
-class StorageMock final:
-    public AbstractEventsStorage
+enum class ResponsePreparation
 {
+    propagateResponseFromBase,
+    generateRandom,
+};
+
+class StorageMock final:
+    public MovableAnalyticsDb
+{
+    using base_type = MovableAnalyticsDb;
+
 public:
-    StorageMock(nx::utils::SyncQueue<LookupRequestData>* lookupRequestQueue):
-        m_lookupRequestQueue(lookupRequestQueue)
+    StorageMock(
+        nx::utils::SyncQueue<LookupRequestData>* lookupRequestQueue,
+        ResponsePreparation responsePreparation)
+        :
+        base_type(nullptr),
+        m_lookupRequestQueue(lookupRequestQueue),
+        m_responsePreparation(responsePreparation)
     {
     }
 
@@ -63,17 +76,35 @@ public:
         Filter filter,
         LookupCompletionHandler completionHandler) override
     {
-        m_asyncCaller.post(
-            [this, filter = std::move(filter),
-                completionHandler = std::move(completionHandler)]() mutable
-            {
-                LookupRequestData lookupRequestData;
-                lookupRequestData.filter = std::move(filter);
-                lookupRequestData.resultCode = ResultCode::ok;
-                lookupRequestData.responseData = generateRandomLookupResult();
-                m_lookupRequestQueue->push(lookupRequestData);
-                completionHandler(lookupRequestData.resultCode, lookupRequestData.responseData);
-            });
+        if (m_responsePreparation == ResponsePreparation::generateRandom)
+        {
+            m_asyncCaller.post(
+                [this, filter = std::move(filter),
+                    completionHandler = std::move(completionHandler)]() mutable
+                {
+                    LookupRequestData lookupRequestData;
+                    lookupRequestData.filter = std::move(filter);
+                    lookupRequestData.resultCode = ResultCode::ok;
+                    lookupRequestData.responseData = generateRandomLookupResult();
+                    m_lookupRequestQueue->push(lookupRequestData);
+                    completionHandler(lookupRequestData.resultCode, lookupRequestData.responseData);
+                });
+        }
+        else if (m_responsePreparation == ResponsePreparation::propagateResponseFromBase)
+        {
+            base_type::lookup(
+                filter,
+                [this, filter, completionHandler = std::move(completionHandler)](
+                    ResultCode resultCode, LookupResult lookupResult) mutable
+                {
+                    LookupRequestData lookupRequestData;
+                    lookupRequestData.filter = std::move(filter);
+                    lookupRequestData.resultCode = resultCode;
+                    lookupRequestData.responseData = lookupResult;
+                    m_lookupRequestQueue->push(lookupRequestData);
+                    completionHandler(resultCode, std::move(lookupResult));
+                });
+        }
     }
 
     virtual void lookupTimePeriods(
@@ -105,6 +136,7 @@ public:
 private:
     nx::utils::SyncQueue<LookupRequestData>* m_lookupRequestQueue;
     nx::network::aio::BasicPollable m_asyncCaller;
+    const ResponsePreparation m_responsePreparation;
 
     LookupResult generateRandomLookupResult()
     {
@@ -119,13 +151,11 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class AnalyticsDbHttpApi:
-    public ::testing::Test
+    public ::testing::TestWithParam<ResponsePreparation>
 {
 public:
     AnalyticsDbHttpApi()
     {
-        using namespace std::placeholders;
-
         m_factoryBak = EventsStorageFactory::instance().setCustomFunc(
             std::bind(&AnalyticsDbHttpApi::createEventsStorageMock, this));
     }
@@ -194,7 +224,7 @@ private:
 
     std::unique_ptr<AbstractEventsStorage> createEventsStorageMock()
     {
-        return std::make_unique<StorageMock>(&m_lookupRequests);
+        return std::make_unique<StorageMock>(&m_lookupRequests, GetParam());
     }
 
     std::unique_ptr<MediaServerClient> prepareMediaServerClient()
@@ -217,7 +247,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbHttpApi, analyticsLookupObjectTracks_correctly_returns_data)
+TEST_P(AnalyticsDbHttpApi, analyticsLookupObjectTracks_correctly_returns_data)
 {
     whenIssueLookup();
 
@@ -226,5 +256,15 @@ TEST_F(AnalyticsDbHttpApi, analyticsLookupObjectTracks_correctly_returns_data)
     andFilterIsPassedCorrectly();
     andLookupResultIsDeliveredCorrectly();
 }
+
+INSTANTIATE_TEST_CASE_P(
+    InitializedDb,
+    AnalyticsDbHttpApi,
+    ::testing::Values(ResponsePreparation::generateRandom));
+
+INSTANTIATE_TEST_CASE_P(
+    UninitializedDb,
+    AnalyticsDbHttpApi,
+    ::testing::Values(ResponsePreparation::propagateResponseFromBase));
 
 } // namespace nx::analytics::db::test

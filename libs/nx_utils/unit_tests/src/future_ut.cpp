@@ -17,3 +17,10 @@ TEST(promise, general)
     ASSERT_TRUE(promise.get_future().get());
     thread.join();
 }
+
+TEST(promise, set_value_is_called_from_the_same_thread)
+{
+    nx::utils::promise<bool> promise;
+    promise.set_value(true);
+    ASSERT_TRUE(promise.get_future().get());
+}
