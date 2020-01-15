@@ -66,8 +66,8 @@ bool backupDatabase(const QString& backupDir,
 
     if (reason == "timer")
     {
-        deleteOldBackupFilesIfNeeded(
-            backupDir, reason, nx::SystemCommands().freeSpace(backupDir.toStdString()));
+        const auto freeSpace = nx::SystemCommands().freeSpace(backupDir.toStdString());
+        deleteOldBackupFilesIfNeeded(backupDir, freeSpace, reason);
     }
 
     NX_WARNING(NX_SCOPE_TAG, "Successfully created DB backup %1", fileName);
@@ -121,7 +121,7 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const
     return result;
 }
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason, qint64 freeSpace)
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace, const QString& reason)
 {
     const qint64 kMaxFreeSpace = 10 * 1024 * 1024LL * 1024LL; //< 10Gb
     const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;

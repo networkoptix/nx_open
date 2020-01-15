@@ -23,11 +23,12 @@ bool backupDatabase(const QString& backupDir,
     const boost::optional<QString>& dbFilePath = boost::none,
     const boost::optional<int>& buildNumber = boost::none);
 
-
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const QString& reason = {});
+QList<DbBackupFileData> allBackupFilesDataSorted(
+    const QString& backupDir, const QString& reason = {});
 
 /* Newest files come first */
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason, qint64 freeSpace);
+void deleteOldBackupFilesIfNeeded(
+    const QString& backupDir, qint64 freeSpace, const QString& reason = {});
 
 } // namespace utils
 } // namespace vms

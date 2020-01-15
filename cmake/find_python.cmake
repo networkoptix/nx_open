@@ -7,17 +7,17 @@ function(check_python_version)
         ERROR_STRIP_TRAILING_WHITESPACE
     )
 
-    if (NOT "${PYTHON_VERSION}" MATCHES "Python 2\.7(\..*)?")
-        if ("${PYTHON_VERSION}" MATCHES "Python (.*)")
-              message(
-                  FATAL_ERROR
-                  "Executable ${PYTHON_EXECUTABLE} has invalid version: "
-                  "${CMAKE_MATCH_1} instead of 2.7*."
-              )
-         else()
-              message(FATAL_ERROR "Unexpected Python version: '${PYTHON_VERSION}'.")
-         endif()
-    endif()
+    #if (NOT "${PYTHON_VERSION}" MATCHES "Python 2\.7(\..*)?")
+    #    if ("${PYTHON_VERSION}" MATCHES "Python (.*)")
+    #          message(
+    #              FATAL_ERROR
+    #              "Executable ${PYTHON_EXECUTABLE} has invalid version: "
+    #              "${CMAKE_MATCH_1} instead of 2.7*."
+    #          )
+    #     else()
+    #          message(FATAL_ERROR "Unexpected Python version: '${PYTHON_VERSION}'.")
+    #     endif()
+    #endif()
 endfunction()
 
 function(find_python_2)
