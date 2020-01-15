@@ -404,7 +404,7 @@ void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
     const int usersInRole = countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(roleId));
     baseName = userRolesManager()->userRoleName(roleId);
-    extInfo = kExtraInfoTemplate.arg(tr("%n users", "", usersInRole));
+    extInfo = kExtraInfoTemplate.arg(tr("%n Users", "", usersInRole));
 }
 
 //-------------------------------------------------------------------------------------------------

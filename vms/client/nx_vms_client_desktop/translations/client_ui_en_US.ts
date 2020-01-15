@@ -33,11 +33,6 @@
         <source>System Servers</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>Customer Support</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>AccessibleResourcesWidget</name>
@@ -500,6 +495,11 @@
         <source>At</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Use event source server</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
@@ -534,12 +534,12 @@
     <message>
         <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1149,11 +1149,6 @@
         <location/>
         <source>Event Rules...</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Description:</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2088,17 +2083,17 @@
     <message>
         <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
         <source>Sign in</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2172,18 +2167,13 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
         <source>Attention! Power limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-        <source>Global Notification Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>for</source>
         <translation></translation>
     </message>
@@ -2831,7 +2821,7 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
         <source>Select Servers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

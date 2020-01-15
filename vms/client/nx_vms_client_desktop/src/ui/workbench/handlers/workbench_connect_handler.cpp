@@ -1104,6 +1104,11 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     nx::utils::Url currentUrl = commonModule()->currentUrl();
     const auto systemId = globalSettings()->cloudSystemId();
 
+    const auto currentUser = context()->user();
+
+    const bool cloudConnection = !systemId.isEmpty()
+        && NX_ASSERT(currentUser) && currentUser->isCloud();
+
     if (!disconnectFromServer(DisconnectFlag::NoFlags))
         return;
 
@@ -1111,9 +1116,9 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     url.setUserName(currentUrl.userName());
     url.setPassword(currentUrl.password());
     url.setPort(endpoint->port);
-    url.setHost((systemId.isEmpty() || !hasInternet(server))
-        ? endpoint->address.toString()
-        : nx::vms::client::core::helpers::serverCloudHost(systemId, serverId));
+    url.setHost(cloudConnection && hasInternet(server)
+        ? nx::vms::client::core::helpers::serverCloudHost(systemId, serverId)
+        : endpoint->address.toString());
 
     setLogicalState(LogicalState::connecting_to_target);
     m_connecting.storeConnection = true;

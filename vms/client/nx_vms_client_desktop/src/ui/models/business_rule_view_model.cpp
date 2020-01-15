@@ -1361,9 +1361,9 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
                     resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
-                    return tr("Source camera");
+                    return tr("Source Camera");
 
-                return tr("Source and %n more cameras", "", targetCameras.size());
+                return tr("Source and %n more Cameras", "", targetCameras.size());
             }
             break;
         }
@@ -1396,8 +1396,8 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         if (cameras.isEmpty())
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
-                tr("Select at least one device"),
-                tr("Select at least one camera")
+                tr("Select at least one Device"),
+                tr("Select at least one Camera")
             );
 
         return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
@@ -1412,10 +1412,10 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
         if (targetServers.isEmpty())
-            return tr("Select server");
+            return tr("Select Server");
 
         if (targetServers.count() > 1)
-            return tr("%1 Servers").arg(targetServers.count());
+            return tr("%n Servers", "", targetServers.count());
 
         return targetServers.first()->getName();
     }
