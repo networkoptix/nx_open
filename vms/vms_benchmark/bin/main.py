@@ -99,6 +99,8 @@ ini_definition = {
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
+    "plinkBin": {"type": "str", "default": "./plink"},
+    "sshpassBin": {"type": "str", "default": "sshpass"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
     "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
@@ -149,6 +151,8 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.ini_enable_secondary_stream = ini['enableSecondaryStream']
     stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
+    box_connection.ini_plink_bin = ini['plinkBin']
+    box_connection.ini_sshpass_bin = ini['sshpassBin']
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
