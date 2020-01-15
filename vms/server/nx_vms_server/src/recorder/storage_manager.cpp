@@ -1011,6 +1011,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
     // load from database
     for(auto c: sdb->loadFullFileCatalog())
     {
+        NX_MUTEX_LOCKER lock(&m_mutexCatalog);
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
         fileCatalog->addChunks(std::move(c->m_chunks));
     }
