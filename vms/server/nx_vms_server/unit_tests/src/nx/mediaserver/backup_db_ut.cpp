@@ -309,7 +309,7 @@ static void checkBackupFile(const QString& path, const nx::utils::SoftwareVersio
     QFileInfo fileInfo(path);
     ASSERT_TRUE(fileInfo.exists());
     const auto splits = fileInfo.fileName().split("_");
-    ASSERT_EQ(3, splits.size());
+    ASSERT_EQ(4, splits.size());
     ASSERT_EQ(expectedVersion.build(), splits[1].toInt());
 }
 
