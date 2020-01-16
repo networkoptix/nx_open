@@ -471,7 +471,7 @@ void QnLiveStreamProvider::processMetadata(
     {
         NX_VERBOSE(this,
             "Analyzing motion on frame with timestamp %1 us; "
-            "role: [%2]; resource: %3 (%4), needUncompressedFrame: %3",
+            "role: [%2]; resource: %3 (%4), needUncompressedFrame: %5",
             compressedFrame->timestamp, getRole(),
             m_resource->getName(), m_resource->getId(), needUncompressedFrame);
 
