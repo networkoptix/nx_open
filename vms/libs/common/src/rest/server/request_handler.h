@@ -57,6 +57,8 @@ struct RestResponse
 class DeviceIdRetriever
 {
 public:
+    virtual ~DeviceIdRetriever() = default;
+
     virtual QString retrieveDeviceId(const nx::network::http::Request& request) const = 0;
 };
 
