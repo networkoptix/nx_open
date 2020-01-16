@@ -70,15 +70,6 @@ static auto infoGroupProvider()
                 [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "pool",
-                [](const auto& r)
-                {
-                    if (!r->isWritable())
-                        return "Reserved";
-                    return r->isBackup() ? "Backup" : "Main";
-                }
-            ),
-            utils::metrics::makeSystemValueProvider<Resource>(
                 "type",
                 [](const auto& r) { return Value(r->getStorageType()); }
             )
@@ -97,13 +88,16 @@ static auto stateGroupProvider()
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
-                [](const auto& r)
+                [](const auto& r) -> Value
                 {
                     if (isServerOffline(r))
-                        return Value("Server Offline");
-                    auto status = r->getStatus();
-                    if (status == Qn::Online && r->isWritable())
-                        status = Qn::Recording;
+                        return "Server Offline";
+                    if (!r->isUsedForWriting())
+                        return "Disabled";
+
+                    const auto status = r->getStatus();
+                    if (status == Qn::Offline)
+                        return "Inaccessible";
                     return Value(QnLexical::serialized(status));
                 }
             ),
