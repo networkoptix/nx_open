@@ -422,6 +422,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
         manualCameraByUniqueId = m_manualCameraByUniqueId;
     }
 
+    std::set<QString> updatedManualCameraIds;
     std::vector<QFuture<QnResourceList>> searchFutures;
     for (const auto& manualCamera: manualCameraByUniqueId)
     {
@@ -439,16 +440,22 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
         // ping it until it's found even if discovery mode is disabled.
         // TODO: Refactor so samera is not pinged on manual addition. The resource from manual
         // search handler should be used instead!
-        if (!manualCamera.searcher || (
-            camera && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled))
+        const bool ignoreManualCameraInfo = !manualCamera.searcher
+            || (camera
+                && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled
+                && !manualCamera.isUpdated);
+
+        if (ignoreManualCameraInfo)
         {
             NX_VERBOSE(this, lm("Skip disabled searcher for camera %1 on %2").args(
                 manualCamera.uniqueId, manualCamera.url));
             continue;
         }
 
-        NX_VERBOSE(this, lm("Check %1 on %2").args(
-            manualCamera.uniqueId, manualCamera.url));
+        if (manualCamera.isUpdated)
+            updatedManualCameraIds.insert(manualCamera.uniqueId);
+
+        NX_VERBOSE(this, "Check %1 on %2", manualCamera.uniqueId, manualCamera.url);
         searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
     }
 
@@ -467,6 +474,13 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
             resource->setCommonModule(commonModule());
             resources << std::move(resource);
         }
+    }
+
+    QnMutexLocker lock(&m_searchersListMutex);
+    for (const auto& id: updatedManualCameraIds)
+    {
+        if (auto it = m_manualCameraByUniqueId.find(id); it != m_manualCameraByUniqueId.cend())
+            it->isUpdated = false;
     }
 }
 
@@ -716,7 +730,14 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vecto
             NX_DEBUG(this, lm("Manual camera %1 is registred for %2 on %3")
                 .args(camera.uniqueId, typeid(*searcher), camera.url));
 
-            const auto iterator = m_manualCameraByUniqueId.insert(camera.uniqueId, camera);
+            QnManualCameraInfo updatedManualCameraInfo = camera;
+            if (m_manualCameraByUniqueId.contains(camera.uniqueId))
+                updatedManualCameraInfo.isUpdated = true;
+
+            const auto iterator = m_manualCameraByUniqueId.insert(
+                updatedManualCameraInfo.uniqueId,
+                updatedManualCameraInfo);
+
             iterator.value().searcher = searcher;
             registeredUniqueIds << camera.uniqueId;
             break;

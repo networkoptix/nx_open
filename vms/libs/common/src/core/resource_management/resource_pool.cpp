@@ -147,6 +147,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         connect(resource, &QnResource::statusChanged, this, &QnResourcePool::statusChanged);
         connect(resource, &QnResource::statusChanged, this, &QnResourcePool::resourceChanged);
         connect(resource, &QnResource::resourceChanged, this, &QnResourcePool::resourceChanged);
+        connect(resource, &QnResource::urlChanged, this, &QnResourcePool::urlChanged);
 
         if (!resource->hasFlags(Qn::foreigner))
         {
