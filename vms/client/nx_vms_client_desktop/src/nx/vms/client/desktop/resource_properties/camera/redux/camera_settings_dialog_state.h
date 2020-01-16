@@ -100,6 +100,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         bool hasVideo = true;
         bool editableStreamUrls = false;
         bool networkLink = false;
+        bool usbDevice = false;
 
         int maxFpsWithoutMotion = 0;
 
@@ -361,6 +362,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     {
         return isSingleCamera()
             && !singleCameraProperties.networkLink
+            && !singleCameraProperties.usbDevice
             && devicesDescription.isWearable == CombinedValue::None
             && (ini().showWebPageForAllCameras ||
                 !singleCameraProperties.settingsUrlPath.isEmpty());

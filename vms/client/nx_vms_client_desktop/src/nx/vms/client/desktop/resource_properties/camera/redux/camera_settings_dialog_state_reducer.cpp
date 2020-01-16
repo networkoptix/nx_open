@@ -665,6 +665,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
+        singleProperties.usbDevice = singleProperties.vendor == "usb_cam"
+            && singleProperties.macAddress.isEmpty()
+            && state.singleCameraSettings.primaryStream().isEmpty()
+            && state.singleCameraSettings.secondaryStream().isEmpty();
+
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
         state.recording.mediaStreamCapability = firstCamera->cameraMediaCapability().
             streamCapabilities.value(nx::vms::api::StreamIndex::primary);
