@@ -370,13 +370,20 @@ void CameraWebPageWidget::Private::setupProxy()
 
 void CameraWebPageWidget::Private::setupCameraCookie()
 {
+    // Using session key cookie here to avoid PROXY_UNAUTHORIZED from server after HTTP CONNECT to
+    // the gateway which is not standard-compliant behaviour (see: VMS-16773).
+    QNetworkCookie sessionKeyCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME.toLower(),
+        parent->commonModule()->runningInstanceGUID().toByteArray());
     QNetworkCookie cameraCookie(Qn::CAMERA_GUID_HEADER_NAME, lastCamera.id.toUtf8());
+
     QUrl origin(lastRequestUrl);
     origin.setUserName(QString());
     origin.setPassword(QString());
     origin.setPath(QString());
     webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
         cameraCookie, origin);
+    webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
+        sessionKeyCookie, origin);
 }
 
 void CameraWebPageWidget::Private::loadPage()
