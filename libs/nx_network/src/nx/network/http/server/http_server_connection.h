@@ -5,6 +5,7 @@
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/http/abstract_msg_body_source.h>
+#include <nx/network/http/chunked_stream_parser.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
@@ -108,6 +109,7 @@ protected:
 private:
     struct RequestDescriptor
     {
+        http::RequestLine requestLine;
         nx::network::http::MimeProtoVersion httpVersion;
         nx::network::http::StringType protocolToUpgradeTo;
         std::int64_t sequence = 0;
@@ -140,6 +142,7 @@ private:
     nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
     nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
+    std::optional<ChunkedStreamParser> m_chunkedBodyParser;
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;
     std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;

@@ -656,8 +656,7 @@ Result<IAction::Result> Engine::executeAction(
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        actionUrl =
-            "http://internal.server/addPerson?trackId=" + UuidHelper::toStdString(trackId);
+        actionUrl = ini().addPersonActionUrlPrefix + UuidHelper::toStdString(trackId);
         NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(actionUrl);
     }
     else

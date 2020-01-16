@@ -39,6 +39,10 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_STRING("primary", preferredStream,
         "Preferred stream in the Engine manifest. Possible values: \"primary\", \"secondary\".");
+
+    NX_INI_STRING("http://internal.server/addPerson?trackId=", addPersonActionUrlPrefix,
+        "Prefix for the URL returned by addPerson action; track id will be appended to this "
+        "prefix.");
 };
 
 inline Ini& ini()

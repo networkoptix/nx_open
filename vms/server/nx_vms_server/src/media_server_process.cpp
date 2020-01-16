@@ -2980,6 +2980,16 @@ void MediaServerProcess::registerRestHandler(
     const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
     if (!cameraIdUrlParams.isEmpty())
         m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
+
+    if (std::unique_ptr<DeviceIdRetriever> deviceIdRetriever =
+        handler->createCustomDeviceIdRetriever())
+    {
+        QString realPath = path;
+        if (!realPath.startsWith('/'))
+            realPath.prepend('/');
+
+        m_autoRequestForwarder->addCustomDeviceIdRetriever(realPath, std::move(deviceIdRetriever));
+    }
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParams>

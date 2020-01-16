@@ -147,6 +147,18 @@ CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
         m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
         connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)), Qt::DirectConnection);
         m_chunkReader->start();
+        connect(
+            commonModule()->resourcePool(), &QnResourcePool::resourceRemoved,
+            [this](const QnResourcePtr& resource)
+            {
+                QnMutexLocker lock(&m_chunkReaderMutex);
+                if (resource.data() != this || m_chunkReader == 0)
+                    return;
+
+                m_chunkReaderMap.remove(getHostAddress());
+                delete m_chunkReader;
+                m_chunkReader = 0;
+            });
     }
 
     return CameraDiagnostics::NoErrorResult();
