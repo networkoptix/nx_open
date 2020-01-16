@@ -5,6 +5,8 @@
 
 #include <QtCore/QDateTime>
 
+#include <nx/utils/datetime.h>
+
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
@@ -50,7 +52,7 @@ void HttpServerConnection::processMessage(
         closeConnection(SystemError::invalidData);
         return;
     }
-    
+
     auto requestContext = prepareRequestProcessingContext(
         std::move(*requestMessage.request));
 
@@ -177,6 +179,7 @@ std::unique_ptr<HttpServerConnection::RequestContext>
 {
     auto requestContext = std::make_unique<RequestContext>();
     requestContext->descriptor.sequence = ++m_lastRequestSequence;
+    requestContext->descriptor.requestLine = request.requestLine;
     requestContext->descriptor.httpVersion = request.requestLine.version;
     requestContext->descriptor.protocolToUpgradeTo =
         nx::network::http::getHeaderValue(request.headers, "Upgrade");
@@ -297,6 +300,17 @@ void HttpServerConnection::prepareAndSendResponse(
     if (responseMessageContext->msgBody)
         responseMessageContext->msgBody->bindToAioThread(getAioThread());
 
+    std::string responseContentLengthStr = "-";
+    if (responseMessageContext->msgBody && responseMessageContext->msgBody->contentLength())
+        responseContentLengthStr = std::to_string(*responseMessageContext->msgBody->contentLength());
+
+    NX_VERBOSE(this, lm("%1 - %2 [%3] \"%4\" %5 %6")
+        .args(getForeignAddress().address, "?" /*username*/, // TODO: #ak Fetch username.
+            nx::utils::timestampToRfc2822(nx::utils::utcTime()),
+            requestDescriptor.requestLine.toString(),
+            responseMessageContext->msg.response->statusLine.statusCode,
+            responseContentLengthStr));
+
     addResponseHeaders(
         requestDescriptor,
         responseMessageContext->msg.response,
@@ -396,6 +410,15 @@ void HttpServerConnection::sendNextResponse()
     NX_ASSERT(!m_responseQueue.empty());
 
     m_currentMsgBody = std::move(m_responseQueue.front()->msgBody);
+
+    m_chunkedBodyParser = std::nullopt;
+    if (getHeaderValue(
+            m_responseQueue.front()->msg.response->headers,
+            "Transfer-Encoding").contains("chunked"))
+    {
+        m_chunkedBodyParser = ChunkedStreamParser();
+    }
+
     sendMessage(
         std::move(m_responseQueue.front()->msg),
         std::bind(&HttpServerConnection::responseSent, this));
@@ -410,7 +433,6 @@ void HttpServerConnection::responseSent()
         return;
     }
 
-    NX_VERBOSE(this, lm("Not full message has been sent yet. Fetching more message body to send..."));
     readMoreMessageBodyData();
 }
 
@@ -418,6 +440,9 @@ void HttpServerConnection::someMsgBodyRead(
     SystemError::ErrorCode errorCode,
     BufferType buf)
 {
+    NX_VERBOSE(this, "Got %1 bytes of message body. Error code %2",
+        buf.size(), SystemError::toString(errorCode));
+
     if (errorCode != SystemError::noError)
     {
         NX_DEBUG(this, lm("Error fetching message body to send. %1")
@@ -428,7 +453,7 @@ void HttpServerConnection::someMsgBodyRead(
 
     if (buf.isEmpty())
     {
-        if (!m_currentMsgBody->contentLength())
+        if (!m_currentMsgBody->contentLength() && !m_chunkedBodyParser)
         {
             // The only way to signal about the end of message body is to close a connection
             // if Content-Length is not specified.
@@ -442,6 +467,19 @@ void HttpServerConnection::someMsgBodyRead(
         return;
     }
 
+    if (m_chunkedBodyParser)
+    {
+        m_chunkedBodyParser->parse(buf, [](auto&&...) {});
+        if (m_chunkedBodyParser->eof())
+        {
+            // Reached end of HTTP/1.1 chunked message body.
+            sendData(
+                std::move(buf),
+                [this](auto&&...) { fullMessageHasBeenSent(); });
+            return;
+        }
+    }
+
     // TODO: #ak read and send message body async.
     //  Move async reading/writing to some separate class (async pipe) to enable reusage.
     //  AsyncChannelUnidirectionalBridge can serve that purpose.
@@ -453,6 +491,8 @@ void HttpServerConnection::someMsgBodyRead(
 
 void HttpServerConnection::readMoreMessageBodyData()
 {
+    NX_VERBOSE(this, "Not full message has been sent yet. Fetching more message body to send...");
+
     using namespace std::placeholders;
     m_currentMsgBody->readAsync(
         std::bind(&HttpServerConnection::someMsgBodyRead, this, _1, _2));
@@ -477,6 +517,8 @@ void HttpServerConnection::fullMessageHasBeenSent()
     if (!socket() ||        //< Socket could be taken by event handler.
         !m_isPersistent)
     {
+        NX_ASSERT(!socket() || m_responseQueue.empty());
+
         closeConnection(SystemError::noError);
         return;
     }
