@@ -120,7 +120,7 @@ TEST_F(MetricsStoragesApi, state)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto stateData = storageData["state"];
-    ASSERT_EQ("Offline", stateData["status"].toString());
+    ASSERT_EQ("Inaccessible", stateData["status"].toString());
     ASSERT_EQ(0, stateData["issues24h"].toInt());
 
     auto eventConnector = launcher->serverModule()->eventConnector();
@@ -138,7 +138,7 @@ TEST_F(MetricsStoragesApi, state)
         storageData = systemValues["storages"][storage->getId().toSimpleString()];
         stateData = storageData["state"];
     } while (kIssues != stateData["issues24h"].toInt());
-    ASSERT_EQ("Recording", stateData["status"].toString());
+    ASSERT_EQ("Online", stateData["status"].toString());
     ASSERT_EQ(kIssues, stateData["issues24h"].toInt());
 
     auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];

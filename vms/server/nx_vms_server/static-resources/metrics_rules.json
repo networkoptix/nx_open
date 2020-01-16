@@ -598,10 +598,6 @@
                         "display": "table|panel",
                         "format": "resource"
                     },
-                    "pool": {
-                        "format": "shortText",
-                        "display": "table|panel"
-                    },
                     "type": {
                         "format": "shortText",
                         "display": "table|panel"
@@ -616,13 +612,13 @@
                         "alarms": [
                             {
                                 "level": "error",
-                                "condition": "equal %status Offline",
-                                "text": "is Offline"
+                                "condition": "equal %status Inaccessible",
+                                "text": "is Inaccessible"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Server_Offline",
-                                "text": "is Unavailable: parent Server is Offline"
+                                "text": "is Inaccessible: parent Server is Offline"
                             }
                         ]
                     },
