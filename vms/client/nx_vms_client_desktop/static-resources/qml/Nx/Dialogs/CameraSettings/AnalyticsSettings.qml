@@ -195,8 +195,6 @@ Item
         height: parent.height - 16 - banner.height
         spacing: 16
 
-        enabled: !loading
-
         RowLayout
         {
             spacing: 16
@@ -252,6 +250,8 @@ Item
         SettingsView
         {
             id: settingsView
+
+            enabled: !loading
 
             Layout.fillHeight: true
             Layout.fillWidth: true
