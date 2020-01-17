@@ -111,7 +111,7 @@ Every minute of the test a progress line is printed with a brief status informat
 
 On a successful assessment, the tool produces a report that ends with the line:
 ```
-All tests are successfully finished.
+SUCCESS: All tests finished.
 ```
 
 If an ISSUE (assessment failure) or en ERROR (OS or similar failure) occurs, a message is printed
