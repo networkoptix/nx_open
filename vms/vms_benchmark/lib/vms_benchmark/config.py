@@ -83,14 +83,19 @@ class ConfigParser:
 
         return options
 
-    def __init__(self, filename, definition=None, is_file_optional=False):
+    def __init__(self, filepath, definition=None, is_file_optional=False):
         assert definition or not is_file_optional
 
-        self.OPTIONS_FROM_FILE = ConfigParser._load_file(filename, is_file_optional)
+        self.filepath = filepath
+        self.OPTIONS_FROM_FILE = ConfigParser._load_file(self.filepath, is_file_optional)
         self.options = self.OPTIONS_FROM_FILE.copy() if self.OPTIONS_FROM_FILE else {}
 
         if definition:
-            ConfigParser._set_option_values_using_definition(self.options, filename, definition)
+            ConfigParser._set_option_values_using_definition(
+                self.options,
+                self.filepath,
+                definition
+            )
 
     @staticmethod
     def _set_option_values_using_definition(options: dict, filename, definition: dict) -> None:

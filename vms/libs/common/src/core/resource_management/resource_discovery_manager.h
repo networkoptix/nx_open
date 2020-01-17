@@ -37,6 +37,7 @@ struct QnManualCameraInfo
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
     QString uniqueId;
+    bool isUpdated = false;
 };
 
 class QnAbstractResourceSearcher;

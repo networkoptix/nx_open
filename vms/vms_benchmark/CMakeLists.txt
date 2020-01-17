@@ -26,6 +26,11 @@ set(py_installer_args
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/main.py
 )
 
+set(vms_benchmark_rdep_dependencies
+    ${vms_benchmark_dev_dir}/zip/high.ts
+    ${vms_benchmark_dev_dir}/zip/low.ts
+)
+
 set(python_dir ${vms_benchmark_dev_dir}/python)
 
 if(targetDevice STREQUAL "windows-x64")
@@ -34,6 +39,10 @@ if(targetDevice STREQUAL "windows-x64")
     set(py_installer_with_env_command
         PYTHONPATH=${python_dir}/lib/python3.7/site-packages
         ${python_dir}/python3.exe ${py_installer_args}
+    )
+
+    list(APPEND vms_benchmark_rdep_dependencies
+        ${vms_benchmark_dev_dir}/zip/plink.exe
     )
 else()
     set(exe_extension "")
@@ -57,8 +66,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${build_dir}
 
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${vms_benchmark_dev_dir}/zip/high.ts
-        ${vms_benchmark_dev_dir}/zip/low.ts
+        ${vms_benchmark_rdep_dependencies}
         ${CMAKE_CURRENT_BINARY_DIR}/
 
     COMMAND ${CMAKE_COMMAND} -E env ${py_installer_with_env_command}

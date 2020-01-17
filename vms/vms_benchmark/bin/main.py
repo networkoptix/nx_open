@@ -99,6 +99,8 @@ ini_definition = {
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
     "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
     "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
+    "plinkBin": {"type": "str", "default": "./plink"},
+    "sshpassBin": {"type": "str", "default": "sshpass"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
     "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
@@ -135,31 +137,47 @@ ini_definition = {
 }
 
 
-def load_configs(conf_file, ini_file):
-    conf = ConfigParser(conf_file, conf_definition)
-    ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
+def load_configs(conf_file, ini_file_if_passed, ini_file_default):
+    def abspath(path):
+        if len(path) > 2 and path[0:2] == './':
+            return os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), path)
+        return path
 
-    test_camera_runner.ini_testcamera_bin = ini['testcameraBin']
-    test_camera_runner.ini_test_file_high_resolution = ini['testFileHighResolution']
-    test_camera_runner.ini_test_file_low_resolution = ini['testFileLowResolution']
+    conf = ConfigParser(conf_file, conf_definition)
+
+    ini_file = ini_file_if_passed or ini_file_default
+
+    ini = ConfigParser(
+        abspath(ini_file) if (
+            ini_file_if_passed is None and not os.path.exists(ini_file)
+        ) else ini_file,
+        ini_definition,
+        is_file_optional=True
+    )
+
+    test_camera_runner.ini_testcamera_bin = abspath(ini['testcameraBin'])
+    test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
+    test_camera_runner.ini_test_file_low_resolution = abspath(ini['testFileLowResolution'])
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
     test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
     test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
     test_camera_runner.ini_enable_secondary_stream = ini['enableSecondaryStream']
-    stream_reader_runner.ini_rtsp_perf_bin = ini['rtspPerfBin']
+    stream_reader_runner.ini_rtsp_perf_bin = abspath(ini['rtspPerfBin'])
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
+    box_connection.ini_plink_bin = abspath(ini['plinkBin'])
+    box_connection.ini_sshpass_bin = abspath(ini['sshpassBin'])
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
     box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
 
     if ini.OPTIONS_FROM_FILE is not None:
-        report(f"\nOverriding default options via {ini_file!r}:")
+        report(f"\nOverriding default options via {ini.filepath!r}:")
         for k, v in ini.OPTIONS_FROM_FILE.items():
             report(f"    {k}={v}")
 
-    report(f"\nConfiguration defined in {conf_file!r}:")
+    report(f"\nConfiguration defined in {conf.filepath!r}:")
     for k, v in conf.options.items():
         report(f"    {k}={v!r}")
 
@@ -1012,24 +1030,27 @@ def _connect_to_box(conf, conf_file):
     '--config',
     '-c',
     'conf_file',
-    default='vms_benchmark.conf',
+    default='./vms_benchmark.conf',
     metavar='<filename>',
     show_default=True,
-    help='Configuration file.')
+    help='Configuration file.'
+)
+# This options has the default value, see below (ini_file_default).
 @click.option(
     '--ini-config',
     '-i',
     'ini_file',
-    default='vms_benchmark.ini',
     metavar='<filename>',
-    show_default=True,
-    help='Internal configuration file for experimenting and debugging.')
+    help='Internal configuration file for experimenting and debugging.' +
+        '  [default: vms_benchmark.ini]'
+)
 @click.option(
     '--log', '-l', 'log_file',
     default='vms_benchmark.log',
     metavar='<filename>',
     show_default=True,
-    help='Detailed log of all actions; intended to be studied by the support team.')
+    help='Detailed log of all actions; intended to be studied by the support team.'
+)
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
@@ -1046,7 +1067,7 @@ def main(conf_file, ini_file, log_file):
         with open('./build_info.txt', 'r') as f:
             logging.info('build_info.txt\n' + ''.join(f.readlines()))
 
-    conf, ini = load_configs(conf_file, ini_file)
+    conf, ini = load_configs(conf_file, ini_file, ini_file_default='./vms_benchmark.ini')
 
     if ini['liveStreamsPerCameraRatio'] == 0 and ini['archiveStreamsPerCameraRatio'] == 0:
         raise exceptions.ConfigOptionsRestrictionError(
