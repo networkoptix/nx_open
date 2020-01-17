@@ -997,8 +997,8 @@ def _connect_to_box(conf, conf_file):
         ssh_key=conf['boxSshKey'],
         port=conf['boxSshPort'],
     )
-    host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
-    if host_key is not None:
+    if platform.system() == 'Windows':
+        host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
         box.supply_host_key(host_key)
 
     try:
