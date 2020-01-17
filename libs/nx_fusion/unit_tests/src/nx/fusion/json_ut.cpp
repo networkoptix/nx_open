@@ -111,9 +111,23 @@ TEST_F(QnJsonTextFixture, integralTypes)
 
 TEST_F(QnJsonTextFixture, chronoTypes)
 {
-    // Chrono types are 64-bit and so serialized as strings with extra quotes
-    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ("\"3\"", QJson::serialized(std::chrono::seconds(3)));
+    ASSERT_EQ(std::chrono::seconds(30), QJson::deserialized<std::chrono::seconds>("\"30\""));
+    ASSERT_EQ(std::chrono::seconds(30), QJson::deserialized<std::chrono::seconds>("30"));
+
+    ASSERT_EQ("\"5\"", QJson::serialized(std::chrono::milliseconds(5)));
     ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
+    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("50"));
+
+    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::microseconds(7)));
+    ASSERT_EQ(std::chrono::microseconds(70), QJson::deserialized<std::chrono::microseconds>("\"70\""));
+    ASSERT_EQ(std::chrono::microseconds(70), QJson::deserialized<std::chrono::microseconds>("70"));
+
+    // Jan 01, 2020, 00:00.
+    const std::chrono::microseconds timestamp(1577836800000000LL);
+    ASSERT_EQ("\"1577836800000000\"", QJson::serialized(timestamp));
+    ASSERT_EQ(timestamp, QJson::deserialized<std::chrono::microseconds>("\"1577836800000000\""));
+    ASSERT_EQ(timestamp, QJson::deserialized<std::chrono::microseconds>("1577836800000000"));
 }
 
 TEST_F(QnJsonTextFixture, QtStringTypes)
