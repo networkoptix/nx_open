@@ -15,14 +15,15 @@ class AnalyticsSettingsMultiListener::Private: public QObject, public QnConnecti
 
 public:
     AnalyticsSettingsManager* const settingsManager;
+    const ListenPolicy listenPolicy;
     QnUuid deviceId;
     QnVirtualCameraResourcePtr camera;
-    ListenPolicy listenPolicy = ListenPolicy::allEngines;
     QHash<QnUuid, AnalyticsSettingsListenerPtr> listeners;
+    QSet<QnUuid> compatibleEngines;
     QSet<QnUuid> enabledEngines;
 
 public:
-    Private(AnalyticsSettingsMultiListener* q);
+    Private(AnalyticsSettingsMultiListener* q, ListenPolicy listenPolicy);
     bool isSuitableEngine(const common::AnalyticsEngineResourcePtr& engine) const;
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
@@ -31,9 +32,13 @@ public:
     void addListener(const QnUuid& engineId);
 };
 
-AnalyticsSettingsMultiListener::Private::Private(AnalyticsSettingsMultiListener* q):
+AnalyticsSettingsMultiListener::Private::Private(
+    AnalyticsSettingsMultiListener* q,
+    ListenPolicy listenPolicy)
+    :
     q(q),
-    settingsManager(commonModule()->instance<AnalyticsSettingsManager>())
+    settingsManager(commonModule()->instance<AnalyticsSettingsManager>()),
+    listenPolicy(listenPolicy)
 {
 }
 
@@ -43,7 +48,7 @@ bool AnalyticsSettingsMultiListener::Private::isSuitableEngine(
     if (listenPolicy == ListenPolicy::enabledEngines)
         return enabledEngines.contains(engine->getId());
 
-    return true;
+    return compatibleEngines.contains(engine->getId());
 }
 
 void AnalyticsSettingsMultiListener::Private::handleResourceAdded(const QnResourcePtr& resource)
@@ -78,10 +83,20 @@ void AnalyticsSettingsMultiListener::Private::resubscribe()
 void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
     const QnResourcePtr& /*resource*/, const QString& key)
 {
-    if (key == camera->kUserEnabledAnalyticsEnginesProperty
+    if (key == camera->kCompatibleAnalyticsEnginesProperty
+        && listenPolicy == ListenPolicy::allEngines)
+    {
+         const auto newCompatibleEngines = camera->compatibleAnalyticsEngines();
+         if (newCompatibleEngines != compatibleEngines)
+         {
+             compatibleEngines = newCompatibleEngines;
+             resubscribe();
+         }
+    }
+    else if (key == camera->kUserEnabledAnalyticsEnginesProperty
         && listenPolicy == ListenPolicy::enabledEngines)
     {
-        const auto& newEnabledEngines = camera->enabledAnalyticsEngines();
+        const auto newEnabledEngines = camera->enabledAnalyticsEngines();
         if (enabledEngines != newEnabledEngines)
         {
             enabledEngines = newEnabledEngines;
@@ -109,10 +124,11 @@ void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId
 
 AnalyticsSettingsMultiListener::AnalyticsSettingsMultiListener(
     const QnVirtualCameraResourcePtr& camera,
+    ListenPolicy listenPolicy,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private(this))
+    d(new Private(this, listenPolicy))
 {
     d->camera = camera;
     connect(camera.data(), &QnResource::propertyChanged, d.data(),
@@ -124,25 +140,12 @@ AnalyticsSettingsMultiListener::AnalyticsSettingsMultiListener(
         &Private::handleResourceRemoved);
 
     d->enabledEngines = camera->enabledAnalyticsEngines();
+    d->compatibleEngines = camera->compatibleAnalyticsEngines();
     d->resubscribe();
 }
 
 AnalyticsSettingsMultiListener::~AnalyticsSettingsMultiListener()
 {
-}
-
-AnalyticsSettingsMultiListener::ListenPolicy AnalyticsSettingsMultiListener::listenPolicy() const
-{
-    return d->listenPolicy;
-}
-
-void AnalyticsSettingsMultiListener::setListenPolicy(
-    AnalyticsSettingsMultiListener::ListenPolicy policy)
-{
-    if (d->listenPolicy == policy)
-        return;
-
-    d->listenPolicy = policy;
 }
 
 QJsonObject AnalyticsSettingsMultiListener::values(const QnUuid& engineId) const

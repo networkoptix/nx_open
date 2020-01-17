@@ -19,11 +19,10 @@ public:
     };
 
     AnalyticsSettingsMultiListener(
-        const QnVirtualCameraResourcePtr& camera, QObject* parent = nullptr);
+        const QnVirtualCameraResourcePtr& camera,
+        ListenPolicy listenPolicy,
+        QObject* parent = nullptr);
     virtual ~AnalyticsSettingsMultiListener() override;
-
-    ListenPolicy listenPolicy() const;
-    void setListenPolicy(ListenPolicy policy);
 
     QJsonObject values(const QnUuid& engineId) const;
     QJsonObject model(const QnUuid& engineId) const;

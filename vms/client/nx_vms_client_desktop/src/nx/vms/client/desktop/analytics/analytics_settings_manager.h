@@ -49,6 +49,12 @@ private:
 
 using AnalyticsSettingsListenerPtr = std::shared_ptr<AnalyticsSettingsListener>;
 
+/**
+ * Centralized storage class, which ensures all subscribers ('listeners') are always have an access
+ * to an actual version of the analytics settings. When some class changes settings, manager sends
+ * these changes to the server and notifies other listeners about it. When changes are received from
+ * the server (using resource properties mechanism), actual values are re-requested if needed.
+ */
 class AnalyticsSettingsManager: public QObject
 {
     Q_OBJECT
@@ -68,7 +74,10 @@ public:
     QJsonObject values(const DeviceAgentId& agentId) const;
     QJsonObject model(const DeviceAgentId& agentId) const;
 
-    Error setValues(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
+    /**
+     * Send changed actual values to the server.
+     */
+    Error applyChanges(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
 
     bool isApplyingChanges() const;
 
