@@ -278,7 +278,7 @@ inline void serialize(QnJsonContext *, const std::chrono::TYPE &value, QJsonValu
 }                                                                                                   \
                                                                                                     \
 inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::chrono::TYPE *target) {      \
-    if(value.type() != QJsonValue::String)                                                          \
+    if (value.type() != QJsonValue::String && value.type() != QJsonValue::Double)                   \
         return false;                                                                               \
                                                                                                     \
     *target = std::chrono::TYPE(value.toVariant().value<std::chrono::TYPE::rep>());                 \
