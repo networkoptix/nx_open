@@ -12,7 +12,7 @@ StackLayout
     property string name: ""
     property Item childrenItem: column
     property StackLayout sectionsItem: control
-    property bool contentEnabled: column.enabled
+    property alias contentEnabled: column.enabled
     property Item scrollBarParent: null
 
     Scrollable
