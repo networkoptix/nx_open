@@ -15,6 +15,34 @@ uint qHash(const DeviceAgentId& key)
     return qHash(key.device) + qHash(key.engine);
 }
 
+std::tuple<
+    QnVirtualCameraResourcePtr,
+    QnMediaServerResourcePtr,
+    nx::vms::common::AnalyticsEngineResourcePtr
+    > toResources(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
+{
+    const auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device);
+    if (!NX_ASSERT(camera))
+        return {};
+
+    return {
+        camera,
+        camera->getParentServer(),
+        resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(agentId.engine)
+    };
+}
+
+QString toString(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
+{
+    const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device);
+    const auto engine = resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(
+        agentId.engine);
+
+    return QString("%1 - %2").arg(
+        device ? device->getName() : "Deleted device",
+        engine ? engine->getName() : "Deleted engine");
+};
+
 //-------------------------------------------------------------------------------------------------
 
 QJsonObject AnalyticsSettingsListener::model() const
@@ -43,6 +71,11 @@ class AnalyticsSettingsManager::Private: public QObject, public QnConnectionCont
 public:
     Private();
 
+    /**
+     * Raw values are values stored in the camera's property. They may differ from the actual values,
+     * received by a separate REST request. We are caching them to distinguish whether current user
+     * changes the settings or they are changed by another user (and we must refresh actual values).
+     */
     void refreshSettings(const DeviceAgentId& agentId, QJsonObject newRawValues);
     void handleListenerDeleted(const DeviceAgentId& id);
 
@@ -74,6 +107,7 @@ public:
     {
         return subscriptionByDeviceId[id.device].settingsByEngineId[id.engine];
     }
+
     SettingsData dataByAgentId(const DeviceAgentId& id) const
     {
         return subscriptionByDeviceId[id.device].settingsByEngineId[id.engine];
@@ -89,8 +123,8 @@ AnalyticsSettingsManager::Private::Private()
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &Private::handleResourceRemoved);
 
-    for (const common::AnalyticsEngineResourcePtr& engine:
-        resourcePool()->getResources<common::AnalyticsEngineResource>())
+    for (const auto& engine:
+        resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>())
     {
         handleResourceAdded(engine);
     }
@@ -102,23 +136,18 @@ AnalyticsSettingsManager::Private::Private()
 void AnalyticsSettingsManager::Private::refreshSettings(
     const DeviceAgentId& agentId, QJsonObject newRawValues)
 {
-    const auto& camera =
-        resourcePool()->getResourceById<QnVirtualCameraResource>(agentId.device);
-    if (!camera)
+    auto [device, server, engine] = toResources(agentId, resourcePool());
+    if (!device || !server || !engine)
         return;
-
-    const auto& engine =
-        resourcePool()->getResourceById<nx::vms::common::AnalyticsEngineResource>(agentId.engine);
-    if (!engine)
-        return;
-
-    const QnMediaServerResourcePtr& server = camera->getParentServer();
 
     if (newRawValues.isEmpty())
-        newRawValues = camera->deviceAgentSettingsValues()[agentId.engine];
+        newRawValues = device->deviceAgentSettingsValues()[agentId.engine];
+
+    NX_DEBUG(this, "Refreshing settings for %1 - %2", device->getName(), engine->getName());
+    NX_VERBOSE(this, "Raw values:\n%1", newRawValues);
 
     const auto handle = server->restConnection()->getDeviceAnalyticsSettings(
-        camera,
+        device,
         engine,
         nx::utils::guarded(this,
             [this, agentId, newRawValues](
@@ -126,9 +155,11 @@ void AnalyticsSettingsManager::Private::refreshSettings(
                     rest::Handle requestId,
                     const nx::vms::api::analytics::SettingsResponse &result)
             {
+                NX_VERBOSE(this, "Received reply %1 (success: %2)", requestId, success);
                 if (!pendingRefreshRequests.removeOne(requestId))
                     return;
 
+                // TODO: Shouldn't we queue another request here?
                 if (!success)
                     return;
 
@@ -137,6 +168,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(
             }),
         thread());
 
+    NX_VERBOSE(this, "Request handle %1", handle);
     if (handle > 0)
         pendingRefreshRequests.append(handle);
 }
@@ -166,16 +198,17 @@ void AnalyticsSettingsManager::Private::handleResourceRemoved(const QnResourcePt
 void AnalyticsSettingsManager::Private::handleDevicePropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!NX_ASSERT(camera))
+    const auto& device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!NX_ASSERT(device))
         return;
-
-    const QnUuid& deviceId = camera->getId();
 
     if (key == QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty
         || key == QnVirtualCameraResource::kDeviceAgentManifestsProperty)
     {
-        const QHash<QnUuid, QJsonObject>& valuesByEngine = camera->deviceAgentSettingsValues();
+        NX_DEBUG(this, "Device agent property %1 changed for %2", key, device->getName());
+
+        const QnUuid& deviceId = device->getId();
+        const QHash<QnUuid, QJsonObject>& valuesByEngine = device->deviceAgentSettingsValues();
         for (auto it = valuesByEngine.begin(); it != valuesByEngine.end(); ++it)
         {
             DeviceAgentId agentId{deviceId, it.key()};
@@ -197,6 +230,7 @@ void AnalyticsSettingsManager::Private::handleEnginePropertyChanged(
 
     if (key == common::AnalyticsEngineResource::kEngineManifestProperty)
     {
+        NX_DEBUG(this, "Engine manifest changed for %1", engine->getName());
         for (auto it = subscriptionByDeviceId.begin(); it != subscriptionByDeviceId.end(); ++it)
         {
             if (it->settingsByEngineId.contains(engineId))
@@ -207,6 +241,7 @@ void AnalyticsSettingsManager::Private::handleEnginePropertyChanged(
 
 void AnalyticsSettingsManager::Private::handleListenerDeleted(const DeviceAgentId& id)
 {
+    NX_VERBOSE(this, "Listener destroyed: %1", toString(id, resourcePool()));
     auto subscriptionIt = subscriptionByDeviceId.find(id.device);
     if (subscriptionIt != subscriptionByDeviceId.end())
     {
@@ -238,7 +273,14 @@ void AnalyticsSettingsManager::Private::setSettings(
     if (valuesChanged)
         data.values = values;
 
-    if (const auto& listener = data.listener.lock())
+    NX_VERBOSE(this, "Store settings for %1, model changed: %2, values changed: %3",
+        toString(id, resourcePool()), modelChanged, valuesChanged);
+    if (modelChanged)
+        NX_VERBOSE(this, "Updated model:\n%1", model);
+    if (valuesChanged)
+        NX_VERBOSE(this, "Updated values:\n%1", values);
+
+    if (auto listener = data.listener.lock())
     {
         if (modelChanged)
             emit listener->modelChanged(model);
@@ -261,10 +303,12 @@ AnalyticsSettingsManager::~AnalyticsSettingsManager()
 
 AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceAgentId& agentId)
 {
+    NX_VERBOSE(this, "Listener requested for %1", toString(agentId, d->resourcePool()));
     auto& data = d->dataByAgentIdRef(agentId);
     if (const auto& listener = data.listener.lock())
         return listener;
 
+    NX_DEBUG(this, "New listener created for %1", toString(agentId, d->resourcePool()));
     AnalyticsSettingsListenerPtr listener(new AnalyticsSettingsListener(agentId, this));
     data.listener = listener;
     connect(listener.get(), &QObject::destroyed, d.data(),
@@ -284,7 +328,7 @@ QJsonObject AnalyticsSettingsManager::model(const DeviceAgentId& agentId) const
     return d->dataByAgentId(agentId).model;
 }
 
-AnalyticsSettingsManager::Error AnalyticsSettingsManager::setValues(
+AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
     const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId)
 {
     if (isApplyingChanges())
@@ -292,26 +336,24 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::setValues(
 
     for (auto it = valuesByAgentId.begin(); it != valuesByAgentId.end(); ++it)
     {
-        const auto engine =
-            d->resourcePool()->getResourceById<common::AnalyticsEngineResource>(it.key().engine);
-        if (!NX_ASSERT(engine))
+        const auto agentId = it.key();
+        auto [device, server, engine] = toResources(agentId, d->resourcePool());
+        if (!device || !server || !engine)
             continue;
 
-        const auto device =
-            d->resourcePool()->getResourceById<QnVirtualCameraResource>(it.key().device);
-        if (!NX_ASSERT(device))
-            continue;
-
-        const auto server = device->getParentServer();
-        if (!NX_ASSERT(server))
-            continue;
+        const auto rawValues = it.value();
+        if (d->hasSubscription(agentId))
+        {
+            auto& data = d->dataByAgentIdRef(agentId);
+            data.rawValues = rawValues;
+        }
 
         const auto handle = server->restConnection()->setDeviceAnalyticsSettings(
             device,
             engine,
-            *it,
+            rawValues,
             nx::utils::guarded(this,
-                [this, agentId = it.key()](
+                [this, agentId](
                     bool success,
                     rest::Handle requestId,
                     const nx::vms::api::analytics::SettingsResponse& result)

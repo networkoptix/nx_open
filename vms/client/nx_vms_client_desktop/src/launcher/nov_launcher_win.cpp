@@ -108,6 +108,7 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
         "qml",
         "help",
         "resources",
+        "translations"
     };
 
     static const QStringList kIgnoredFiles{

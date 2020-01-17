@@ -17,6 +17,7 @@ Instrument
     property real snapDistance: 12
     property int minPoints: 2
     property int maxPoints: 0
+    property bool closed: false
 
     signal pointFinished()
 
@@ -33,6 +34,29 @@ Instrument
             function makePoint(p)
             {
                 return Qt.point(F.relX(p.x, item), F.relY(p.y, item))
+            }
+
+            function shouldFinish()
+            {
+                if (!count)
+                    return false
+
+                const p1 = get(count - 1)
+                if (closed)
+                {
+                    const p2 = get(0)
+                    if (p1.x === p2.x && p1.y === p2.y)
+                        return true
+                }
+
+                if (count > 1)
+                {
+                    const p3 = get(count - 2)
+                    if (p1.x === p3.x && p1.y === p3.y)
+                        return true
+                }
+
+                return false
             }
         }
 
@@ -83,16 +107,11 @@ Instrument
 
         d.processMove(mouse)
 
-        if (count > minPoints)
+        if (count > minPoints && pointsModel.shouldFinish())
         {
-            const p1 = pointsModel.get(0)
-            const p2 = pointsModel.get(count - 1)
-            if (p1.x === p2.x && p1.y === p2.y)
-            {
-                pointsModel.remove(count - 1)
-                finish()
-                return
-            }
+            pointsModel.remove(count - 1)
+            finish()
+            return
         }
 
         if (count == maxPoints)

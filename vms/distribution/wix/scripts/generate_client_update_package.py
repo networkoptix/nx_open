@@ -73,6 +73,7 @@ def create_client_update_file(config, output_file):
     client_update_files_directory = config['client_update_files_directory']
     fonts_directory = config['fonts_directory']
     locale_resources_directory = os.path.join(qt_directory, 'resources')
+    webengine_locales_directory = os.path.join(qt_directory, 'translations', 'qtwebengine_locales')
 
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
@@ -85,6 +86,7 @@ def create_client_update_file(config, output_file):
         e.zip_files_to(zip, e.icu_files(icu_directory), icu_directory)
         e.zip_files_to(zip, e.find_all_files(fonts_directory), binaries_dir)
         e.zip_files_to(zip, e.find_all_files(locale_resources_directory), qt_directory)
+        e.zip_files_to(zip, e.find_all_files(webengine_locales_directory), qt_directory)
 
         qt_bin_dir = os.path.join(qt_directory, 'bin')
         e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)

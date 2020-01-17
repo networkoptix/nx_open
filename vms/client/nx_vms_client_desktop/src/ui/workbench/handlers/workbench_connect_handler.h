@@ -17,6 +17,7 @@ class QnReconnectInfoDialog;
 struct QnConnectionInfo;
 
 namespace nx::vms::client::core { class ReconnectHelper; }
+namespace nx::vms::client::desktop { class ConnectingToServerDialog; }
 
 class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -126,6 +127,8 @@ private:
     void setPhysicalState(PhysicalState value);
     void handleStateChanged(LogicalState logicalValue, PhysicalState physicalValue);
 
+    void reportServerSelectionFailure();
+
     /**
      * Check if there is at least one online server and try to reconnect. If not, try again later.
      */
@@ -166,6 +169,9 @@ private:
     /** Flag that we should handle new connection. */
     bool m_warnMessagesDisplayed = false;
     ec2::CrashReporter m_crashReporter;
+
+    int m_serverSelectionHandle = -1;
+    QPointer<nx::vms::client::desktop::ConnectingToServerDialog> m_connectingToServerDialog;
 
     QPointer<QnReconnectInfoDialog> m_reconnectDialog;
     QScopedPointer<nx::vms::client::core::ReconnectHelper> m_reconnectHelper;

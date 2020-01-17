@@ -117,7 +117,8 @@ def build_exe(project, filename, components, candle_variables, config, external_
 def build_client(config):
 
     client_common_components = [
-        'webengine_resources.wixobj'
+        'webengine_resources.wixobj',
+        'webengine_locales.wixobj'
     ]
 
     client_common_components_paths = [

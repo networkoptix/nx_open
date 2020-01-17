@@ -436,7 +436,10 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
 
     if (const auto camera = resourceWidget->resource().dynamicCast<QnVirtualCameraResource>())
     {
-        d->settingsListener = new AnalyticsSettingsMultiListener(camera, this);
+        d->settingsListener = new AnalyticsSettingsMultiListener(
+            camera,
+            AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
+            this);
 
         connect(d->settingsListener, &AnalyticsSettingsMultiListener::modelChanged, d.data(),
             &Private::updateFigureKeys);

@@ -162,6 +162,10 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     const bool isNetworkLink = state.isSingleCamera()
         && state.singleCameraProperties.networkLink;
 
+    // Hide almost all fields for USB cameras.
+    const bool isUsbDevice = state.isSingleCamera()
+        && state.singleCameraProperties.usbDevice;
+
     ui->vendorTitleLabel->setHidden(isNetworkLink);
     ui->vendorLabel->setHidden(isNetworkLink);
     ui->modelTitleLabel->setHidden(isNetworkLink);
@@ -170,14 +174,22 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->vendorDetailLabel->setHidden(isNetworkLink);
     ui->modelDetailTitleLabel->setHidden(isNetworkLink);
     ui->modelDetailLabel->setHidden(isNetworkLink);
-    ui->firmwareTitleLabel->setHidden(isNetworkLink);
-    ui->firmwareLabel->setHidden(isNetworkLink);
-    ui->macAddressTitleLabel->setHidden(isNetworkLink);
-    ui->macAddressLabel->setHidden(isNetworkLink);
-    ui->webPageTitleLabel->setHidden(isNetworkLink);
-    ui->webPageLabel->setHidden(isNetworkLink);
-    ui->verticalSpacer1->setHidden(isNetworkLink);
-    ui->verticalSpacer2->setHidden(isNetworkLink);
+    ui->firmwareTitleLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->firmwareLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->macAddressTitleLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->macAddressLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->webPageTitleLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->webPageLabel->setHidden(isNetworkLink || isUsbDevice);
+    ui->ipAddressLabel->setHidden(isUsbDevice);
+    ui->ipAddressTitleLabel->setHidden(isUsbDevice);
+    ui->ipAddressDetailTitleLabel->setHidden(isUsbDevice);
+    ui->pingControlsWidget->setHidden(isUsbDevice);
+    ui->primaryStreamTitleLabel->setHidden(isUsbDevice);
+    ui->primaryStreamControlWidget->setHidden(isUsbDevice);
+    ui->secondaryStreamTitleLabel->setHidden(isUsbDevice);
+    ui->secondaryStreamControlWidget->setHidden(isUsbDevice);
+    ui->verticalSpacer1->setHidden(isNetworkLink || isUsbDevice);
+    ui->verticalSpacer2->setHidden(isNetworkLink || isUsbDevice);
 }
 
 void CameraInfoWidget::alignLabels()

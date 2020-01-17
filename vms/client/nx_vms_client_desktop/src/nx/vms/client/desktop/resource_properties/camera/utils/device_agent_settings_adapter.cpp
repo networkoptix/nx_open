@@ -98,7 +98,9 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
 
         if (camera)
         {
-            d->settingsListener = std::make_unique<AnalyticsSettingsMultiListener>(camera);
+            d->settingsListener = std::make_unique<AnalyticsSettingsMultiListener>(
+                camera,
+                AnalyticsSettingsMultiListener::ListenPolicy::allEngines);
 
             if (!d->currentEngineId.isNull())
                 d->refreshSettings(d->currentEngineId);
@@ -148,7 +150,7 @@ void DeviceAgentSettingsAdapter::applySettings()
             valuesToSet.insert(DeviceAgentId{cameraId, it.key()}, it.value().get());
     }
 
-    d->settingsManager->setValues(valuesToSet);
+    d->settingsManager->applyChanges(valuesToSet);
     d->updateLoadingState();
 }
 

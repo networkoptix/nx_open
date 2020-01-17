@@ -89,6 +89,7 @@ void VideoWallLicenseWatcher::at_checkLicenses()
             const auto overflowMs = duration_cast<milliseconds>(m_videoWallStopTime).count();
             const auto expirationDate = qnSyncTime->currentMSecsSinceEpoch() + overflowMs;
 
+            NX_INFO(this, "VideoWall license will expire after %1 ms.", overflowMs);
             syncLicenseOverflowTime(expirationDate);
         }
     }
