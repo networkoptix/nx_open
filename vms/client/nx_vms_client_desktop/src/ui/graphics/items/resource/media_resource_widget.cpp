@@ -573,7 +573,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
         return;
 
     m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay, this);
-    addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
+    addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, false, true));
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
         this, &QnMediaResourceWidget::handleSelectedAreaChanged);
