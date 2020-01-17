@@ -90,6 +90,10 @@ if(targetDevice STREQUAL "windows-x64")
             COMMAND ${CMAKE_COMMAND} -E copy ${dependency} vms_benchmark/testcamera/
         )
     endforeach()
+
+    list(APPEND copy_dependency_commands
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/vms/vms_benchmark/plink.exe vms_benchmark/
+    )
 else()
     set(benchmark_python_version 3.6)
 

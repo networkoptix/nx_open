@@ -307,6 +307,7 @@ signals:
     void resourceRemoved(const QnResourcePtr& resource);
     void resourceChanged(const QnResourcePtr& resource);
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
+    void urlChanged(const QnResourcePtr &resource);
 
 private:
     struct Private;

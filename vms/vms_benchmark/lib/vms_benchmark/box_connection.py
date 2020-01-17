@@ -6,6 +6,8 @@ from io import StringIO
 
 from vms_benchmark import exceptions
 
+ini_plink_bin: str
+ini_sshpass_bin: str
 ini_ssh_command_timeout_s: int
 ini_ssh_get_file_content_timeout_s: int
 
@@ -28,7 +30,7 @@ class BoxConnection:
         target = f"{login}@{host}" if login else host
         if platform.system() == 'Linux':
             self.ssh_args = [
-                *(('sshpass', '-p', password) if password else ()),
+                *((ini_sshpass_bin, '-p', password) if password else ()),
                 'ssh',
                 target, '-p', str(port),
                 '-o', 'PubkeyAuthentication=' + ('no' if password else 'yes'),
@@ -37,7 +39,7 @@ class BoxConnection:
             ]
         else:
             self.ssh_args = [
-                'plink',
+                ini_plink_bin,
                 target, '-P', str(port),
                 *(('-pw', password) if password else ()),
                 '-batch',

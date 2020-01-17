@@ -72,12 +72,20 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
 
     initializeControls();
 
+    connect(m_pool, &QnResourcePool::urlChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                setDeviceAdded(camera->getUniqueId());
+        });
+
     connect(m_pool, &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
                 setDeviceAdded(camera->getUniqueId());
         });
+
     connect(m_pool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {

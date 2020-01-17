@@ -7,6 +7,8 @@
 #include <sstream>
 #include <type_traits>
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 #include <QHash>
@@ -1535,8 +1537,9 @@ void QnPlOnvifResource::handleOneNotificationThreadUnsafe(
         portSourceIter->name, portSourceIter->value, data.name, data.value);
 
     // saving port state
-    const bool newValue = (data.value == "true")
-        || (data.value == "active") || (atoi(data.value.c_str()) > 0);
+    const bool newValue = (boost::algorithm::to_lower_copy(data.value) == "true")
+        || (boost::algorithm::to_lower_copy(data.value) == "active")
+        || (atoi(data.value.c_str()) > 0);
 
     const QString portSourceValue = QString::fromStdString(portSourceIter->value);
 
@@ -3285,7 +3288,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
 std::set<QString> QnPlOnvifResource::notificationTopicsForMonitoring() const
 {
     std::set<QString> result{
-        "Trigger/Relay", "IO/Port", "Trigger/DigitalInput", "Device/IO/VirtualPort"
+        "Trigger/Relay",
+        "IO/Port",
+        "Trigger/DigitalInput",
+        "Device/IO/VirtualPort",
+        "Device/Trigger/AlarmIn"
     };
     const auto additionalNotificationTopics = resourceData().value<std::vector<QString>>(
         "additionalNotificationTopics");
@@ -3296,7 +3303,7 @@ std::set<QString> QnPlOnvifResource::notificationTopicsForMonitoring() const
 
 std::set<QString> QnPlOnvifResource::allowedInputSourceNames() const
 {
-    std::set<QString> result{"port", "relaytoken", "index"};
+    std::set<QString> result{"port", "relaytoken", "index", "alarmintoken"};
     const auto additionalInputSourceNames = resourceData().value<std::vector<QString>>(
         "additionalInputSourceNames");
 
