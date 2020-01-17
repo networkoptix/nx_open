@@ -84,6 +84,9 @@
                     <Directory Id="ClientFontsDir" Name="fonts"/>
                     <Directory Id="vox" Name="vox"/>
                     <Directory Id="resources" Name="resources"/>
+                    <Directory Id="translations" Name="translations">
+                        <Directory Id="qtwebengine_locales" Name="qtwebengine_locales"/>
+                    </Directory>
 
                     <Component Id="ClientExecutable">
                         <File Id="client.exe"
@@ -132,6 +135,7 @@
             <ComponentGroupRef Id="client_qt_audio"/>
             <ComponentGroupRef Id="vox"/>
             <ComponentGroupRef Id="webengine_resources"/>
+            <ComponentGroupRef Id="webengine_locales"/>
 
             <ComponentRef Id="NovFileAssociation"/>
 
