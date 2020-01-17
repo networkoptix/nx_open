@@ -41,6 +41,7 @@ Figure
         id: pointMakerInstrument
 
         enabled: false
+        closed: polygon
 
         item: mouseArea
 
