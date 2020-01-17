@@ -64,11 +64,8 @@ bool backupDatabase(const QString& backupDir,
         }
     }
 
-    if (reason == "timer")
-    {
-        const auto freeSpace = nx::SystemCommands().freeSpace(backupDir.toStdString());
-        deleteOldBackupFilesIfNeeded(backupDir, freeSpace, reason);
-    }
+    const auto freeSpace = nx::SystemCommands().freeSpace(backupDir.toStdString());
+    deleteOldBackupFilesIfNeeded(backupDir, freeSpace, reason);
 
     NX_WARNING(NX_SCOPE_TAG, "Successfully created DB backup %1", fileName);
     return true;
