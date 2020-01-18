@@ -138,7 +138,7 @@ TEST_F(QnJsonTextFixture, chrono_time_point)
 
     const auto now = floor<milliseconds>(system_clock::now());
     const auto nowMsStr = QByteArray::number(
-        duration_cast<milliseconds>(now.time_since_epoch()).count());
+        (long long) duration_cast<milliseconds>(now.time_since_epoch()).count());
     const auto nowMsStrQuoted = "\"" + nowMsStr + "\"";
 
     ASSERT_EQ(nowMsStrQuoted, QJson::serialized(now));
