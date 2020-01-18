@@ -309,7 +309,7 @@ inline bool deserialize(
     const QJsonValue& value,
     std::chrono::system_clock::time_point* target)
 {
-    if (value.type() != QJsonValue::String)
+    if (value.type() != QJsonValue::String && value.type() != QJsonValue::Double)
         return false;
 
     const auto millisSinceEpoch = value.toVariant().toULongLong();

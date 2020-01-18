@@ -109,25 +109,41 @@ TEST_F(QnJsonTextFixture, integralTypes)
     ASSERT_EQ(-12, QJson::deserialized<int>("-12"));
 }
 
-TEST_F(QnJsonTextFixture, chronoTypes)
+TEST_F(QnJsonTextFixture, chrono_duration)
 {
-    ASSERT_EQ("\"3\"", QJson::serialized(std::chrono::seconds(3)));
-    ASSERT_EQ(std::chrono::seconds(30), QJson::deserialized<std::chrono::seconds>("\"30\""));
-    ASSERT_EQ(std::chrono::seconds(30), QJson::deserialized<std::chrono::seconds>("30"));
+    using namespace std::chrono;
 
-    ASSERT_EQ("\"5\"", QJson::serialized(std::chrono::milliseconds(5)));
-    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
-    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("50"));
+    ASSERT_EQ("\"3\"", QJson::serialized(seconds(3)));
+    ASSERT_EQ(seconds(30), QJson::deserialized<seconds>("\"30\""));
+    ASSERT_EQ(seconds(30), QJson::deserialized<seconds>("30"));
 
-    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::microseconds(7)));
-    ASSERT_EQ(std::chrono::microseconds(70), QJson::deserialized<std::chrono::microseconds>("\"70\""));
-    ASSERT_EQ(std::chrono::microseconds(70), QJson::deserialized<std::chrono::microseconds>("70"));
+    ASSERT_EQ("\"5\"", QJson::serialized(milliseconds(5)));
+    ASSERT_EQ(milliseconds(50), QJson::deserialized<milliseconds>("\"50\""));
+    ASSERT_EQ(milliseconds(50), QJson::deserialized<milliseconds>("50"));
+
+    ASSERT_EQ("\"7\"", QJson::serialized(microseconds(7)));
+    ASSERT_EQ(microseconds(70), QJson::deserialized<microseconds>("\"70\""));
+    ASSERT_EQ(microseconds(70), QJson::deserialized<microseconds>("70"));
 
     // Jan 01, 2020, 00:00.
-    const std::chrono::microseconds timestamp(1577836800000000LL);
+    const microseconds timestamp(1577836800000000LL);
     ASSERT_EQ("\"1577836800000000\"", QJson::serialized(timestamp));
-    ASSERT_EQ(timestamp, QJson::deserialized<std::chrono::microseconds>("\"1577836800000000\""));
-    ASSERT_EQ(timestamp, QJson::deserialized<std::chrono::microseconds>("1577836800000000"));
+    ASSERT_EQ(timestamp, QJson::deserialized<microseconds>("\"1577836800000000\""));
+    ASSERT_EQ(timestamp, QJson::deserialized<microseconds>("1577836800000000"));
+}
+
+TEST_F(QnJsonTextFixture, chrono_time_point)
+{
+    using namespace std::chrono;
+
+    const auto now = floor<milliseconds>(system_clock::now());
+    const auto nowMsStr = QByteArray::number(
+        duration_cast<milliseconds>(now.time_since_epoch()).count());
+    const auto nowMsStrQuoted = "\"" + nowMsStr + "\"";
+
+    ASSERT_EQ(nowMsStrQuoted, QJson::serialized(now));
+    ASSERT_EQ(now, QJson::deserialized<system_clock::time_point>(nowMsStrQuoted));
+    ASSERT_EQ(now, QJson::deserialized<system_clock::time_point>(nowMsStr));
 }
 
 TEST_F(QnJsonTextFixture, QtStringTypes)
