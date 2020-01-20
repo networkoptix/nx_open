@@ -997,8 +997,8 @@ def _connect_to_box(conf, conf_file):
         ssh_key=conf['boxSshKey'],
         port=conf['boxSshPort'],
     )
-    host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
-    if host_key is not None:
+    if platform.system() == 'Windows':
+        host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
         box.supply_host_key(host_key)
 
     try:
@@ -1157,16 +1157,20 @@ def _format_exception(exception):
         return f"Missing key: {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
-            return 'Server refuses passed credentials: check .conf options vmsUser and vmsPassword'
+            return ('Server refuses passed credentials: ' +
+                'check .conf options vmsUser and vmsPassword.')
         else:
-            return f'Unexpected HTTP request error (code {exception.code})'
+            return f'Unexpected HTTP request error (code {exception.code}).'
+    elif isinstance(exception, AssertionError):
+        return f"Internal error (assertion failed)."
     else:
-        return str(exception)
+        return str(exception) or "Exception " + type(exception).__name__
 
 
 def _do_report_exception(exception, recursive_level, prefix=''):
     indent = '    ' * recursive_level
     if isinstance(exception, VmsBenchmarkError):
+        s = str(exception) or "Exception " + type(exception).__name__
         report(f"{indent}{prefix}{str(exception)}")
         if isinstance(exception, VmsBenchmarkIssue):
             for sub_issue in exception.sub_issues:

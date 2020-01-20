@@ -321,7 +321,8 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
-    const QList<nx::network::QnInterfaceAndAddr>& intfList = nx::network::getAllIPv4Interfaces();
+    const QList<nx::network::QnInterfaceAndAddr>& intfList = nx::network::getAllIPv4Interfaces(
+        nx::network::InterfaceListPolicy::keepAllAddressesPerInterface);
 
     if( !m_isFirstSearch )
     {

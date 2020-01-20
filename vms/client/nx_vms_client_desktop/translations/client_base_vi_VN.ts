@@ -9937,7 +9937,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Dữ liệu đang tải...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -9945,15 +9945,15 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Dừng tải tập tin?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Tệp đã tải xuống</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Tải tệp không thành công</translation>
     </message>
   </context>
 </TS>
