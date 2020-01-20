@@ -589,8 +589,7 @@ void QnMediaResourceWidget::initAnalyticsOverlays()
         return;
 
     m_roiFiguresOverlayWidget = new RoiFiguresOverlayWidget(m_compositeOverlay, this);
-    addOverlayWidget(m_roiFiguresOverlayWidget,
-        {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
+    addOverlayWidget(m_roiFiguresOverlayWidget, {Visible, OverlayFlag::bindToViewport});
 
     m_areaHighlightOverlayWidget = new AreaHighlightOverlayWidget(m_compositeOverlay);
     addOverlayWidget(m_areaHighlightOverlayWidget,
