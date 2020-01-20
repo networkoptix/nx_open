@@ -259,7 +259,7 @@ Item
             onValuesEdited:
                 store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
-            contentEnabled: enableSwitch.checked
+            contentEnabled: enableSwitch.checked || isDeviceDependent
             scrollBarParent: scrollBarsParent
         }
     }
