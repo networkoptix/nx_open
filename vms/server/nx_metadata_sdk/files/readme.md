@@ -76,17 +76,25 @@ The recommended way to start developing a plugin is the following: inherit your 
 according to the Doxygen comments in those classes and interfaces they implement.
 
 ---------------------------------------------------------------------------------------------------
-## Sample: building and installing
+## Samples: building and installing
 
-This package includes a sample Analytics Plugin written in C++: `Stub Analytics Plugin`, located at
-`samples/stub_analytics_plugin/`. It receives video frames from a camera, ignores them, and
-generates stub metadata Objects looking as a rectangle moving diagonally across the frame, and also
-some hard-coded Events. This plugin has certain settings which allow to test various SDK features,
-some of its settings (those related to the Plugin object) are located in
-`stub_analytics_plugin_ini.h`.
+This package includes two samples of an Analytics Plugin written in C++, located at `samples/`.
 
-The included `Stub Analytics Plugin` source files can be compiled and linked using CMake, yielding
-`stub_analytics_plugin.dll` on Windows, or `libstub_analytics_plugin.so` on Linux.
+The first one is called `Sample Analytics Plugin`, located at `samples/sample_analytics_plugin/`.
+It receives video frames from a camera, ignores them, and generates stub metadata Objects looking
+as a rectangle moving diagonally across the frame. Also an Event is generated when the trajectory
+finishes a loop. This plugin has many comments in the source code, which help to better understand
+how Analytics Plugins should be written.
+
+The second sample is called `Stub Analytics Plugin`, located at `samples/stub_analytics_plugin/`.
+It also ignores all the received video frames from a camera, but has an extensive feature set - can
+generate various metadata Objects and Events, and tends to use every feature available in the SDK.
+This plugin has certain settings which allow to test various SDK features. Some settings are
+declared in the manifest and thus can be edited in the GUI, while some other settings which
+influence the plugin in general, including how to generate its manifest, are located in the .ini
+file (see `stub_analytics_plugin_ini.h`), backed by the .ini file mechanism `nx/kit/ini_config.h`.
+
+These samples can be compiled and linked using CMake.
 
 Prerequisites:
 ```
@@ -98,38 +106,38 @@ Prerequisites:
     - make or Ninja
 ```
 
-To compile the sample, and (if not cross-compiling) run unit tests, execute the commands collected
+To compile the samples, and (if not cross-compiling) run unit tests, execute the commands collected
 into the provided scripts (use their source code as a reference):
 ```
 # Windows, x64:
-build_sample.bat
+build_samples.bat
 
 # Linux or Windows with Cygwin, x64:
-build_sample.sh
+build_samples.sh
 
 # Linux, 64-bit ARM cross-compiling (e.g. Nvidia Tegra):
 # NOTE: The provided file toolchain_arm64.cmake defines which cross-compiler will be used.
-build_sample_arm64.sh
+build_samples_arm64.sh
 
 # Linux, 32-bit ARM cross-compiling (e.g. Raspberry Pi):
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
-build_sample_arm32.sh
+build_samples_arm32.sh
 ```
 
-On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
-open `..\metadata_sdk-build\stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
-sure that the platform combo-box is set to "x64".
+On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:
+open `..\metadata_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project.
+Make sure that the platform combo-box is set to "x64".
 
-After successful build, locate the main built artifact:
+After successful build, locate the built artifacts:
 ```
 # Windows:
-..\metadata_sdk-build\Debug\stub_analytics_plugin.dll
+..\metadata_sdk-build\<sample_name>\Debug\<sample_name>.dll
 
 # Linux:
-../metadata_sdk-build/libstub_analytics_plugin.so
+../metadata_sdk-build/<sample_name>/lib<sample_name>.so
 ```
 
-To install the plugin, just copy its library file to the dedicated folder in the VMS Server
+To install a plugin, just copy its library file to the dedicated folder in the VMS Server
 installation directory:
 ```
 # Windows:
@@ -138,4 +146,4 @@ C:\Program Files\<vms-installation-dir>\MediaServer\plugins\
 # Linux:
 /opt/<vms-installation-dir>/mediaserver/bin/plugins/
 ```
-ATTENTION: After copying the plugin library, the Server has to be restarted.
+ATTENTION: After copying a plugin library, the Server has to be restarted.

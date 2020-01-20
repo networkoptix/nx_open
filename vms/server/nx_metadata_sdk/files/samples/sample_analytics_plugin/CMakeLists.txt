@@ -6,7 +6,10 @@ project(sample_analytics_plugin)
 set(metadataSdkDir "" CACHE PATH "Path to unpacked VMS Metadata SDK zip.")
 
 if(metadataSdkDir STREQUAL "")
-    message(FATAL_ERROR "metadataSdkDir cache variable is undefined.")
+    set(metadataSdkDir ${CMAKE_CURRENT_LIST_DIR}/../..) #< Assume building samples inside the SDK.
+    if(NOT EXISTS ${metadataSdkDir}/src/nx/sdk OR NOT EXISTS ${metadataSdkDir}/nx_kit/src/nx/kit)
+        message(FATAL_ERROR "Define metadataSdkDir cache variable to point to the unzipped SDK.")
+    endif()
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
@@ -26,7 +29,7 @@ set(CMAKE_INSTALL_RPATH "$ORIGIN")
 
 if(WIN32)
     set(API_EXPORT_MACRO "__declspec(dllexport)")
-elseif(UNIX)
+else()
     set(API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
@@ -34,7 +37,7 @@ endif()
 # Define nx_kit lib, static.
 
 set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
-set(nxKitWithTests "YES" CACHE STRING "" FORCE)
+set(nxKitWithTests "NO" CACHE STRING "" FORCE)
 
 add_subdirectory(${metadataSdkDir}/nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
@@ -58,7 +61,7 @@ file(GLOB_RECURSE SAMPLE_ANALYTICS_PLUGIN_SRC ${SAMPLE_ANALYTICS_PLUGIN_SRC_DIR}
 
 add_library(sample_analytics_plugin SHARED ${SAMPLE_ANALYTICS_PLUGIN_SRC})
 target_include_directories(sample_analytics_plugin PRIVATE ${SAMPLE_ANALYTICS_PLUGIN_SRC_DIR})
-target_link_libraries(sample_analytics_plugin nx_kit nx_sdk)
+target_link_libraries(sample_analytics_plugin PRIVATE nx_kit nx_sdk)
 
 target_compile_definitions(sample_analytics_plugin
     PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
