@@ -170,7 +170,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     setupOverlayButtonsHandlers();
 
-    addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
+    addOverlayWidget(m_statusOverlay, {Invisible, OverlayFlag::autoRotate, StatusLayer});
 
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
@@ -249,7 +249,7 @@ void QnResourceWidget::setupOverlayButtonsHandlers()
 // TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
-    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
+    addOverlayWidget(m_hudOverlay, {UserVisible, OverlayFlag::autoRotate, InfoLayer});
     m_hudOverlay->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
@@ -259,7 +259,7 @@ void QnResourceWidget::setupHud()
 
 void QnResourceWidget::setupSelectionOverlay()
 {
-    addOverlayWidget(new ui::SelectionWidget(this), {Visible, false, false, SelectionLayer});
+    addOverlayWidget(new ui::SelectionWidget(this), {Visible, OverlayFlag::none, SelectionLayer});
 }
 
 void QnResourceWidget::createButtons()

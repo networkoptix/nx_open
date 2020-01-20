@@ -55,7 +55,7 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
     }
 
     QnViewportBoundWidget *boundWidget = dynamic_cast<QnViewportBoundWidget *>(widget);
-    if(params.bindToViewport && !boundWidget)
+    if (params.flags.testFlag(OverlayFlag::bindToViewport) && !boundWidget)
     {
         QGraphicsLinearLayout *boundLayout = new QGraphicsLinearLayout();
         boundLayout->setContentsMargins(params.margins.left()
@@ -72,7 +72,7 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
     childWidget->setZValue(params.z);
 
     QnFixedRotationTransform *rotationTransform = NULL;
-    if(params.autoRotate)
+    if (params.flags.testFlag(OverlayFlag::autoRotate))
     {
         rotationTransform = new QnFixedRotationTransform(widget);
         rotationTransform->setTarget(widget);
@@ -227,15 +227,14 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     return !qFuzzyIsNull(widget->opacity());
 }
 
-detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility
-    , bool autoRotate
-    , bool bindToViewport
-    , qreal z
-    , const QMarginsF &margins)
-
-    : visibility(visibility)
-    , autoRotate(autoRotate)
-    , bindToViewport(bindToViewport)
-    , z(z)
-    , margins(margins)
-{}
+detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility,
+    OverlayedBase::OverlayFlags flags,
+    qreal z,
+    const QMarginsF& margins)
+    :
+    visibility(visibility),
+    flags(flags),
+    z(z),
+    margins(margins)
+{
+}

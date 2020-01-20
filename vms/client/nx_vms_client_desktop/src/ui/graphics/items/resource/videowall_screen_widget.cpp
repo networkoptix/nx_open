@@ -64,7 +64,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     m_mainOverlayWidget->setLayout(m_layout);
     m_mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(m_mainOverlayWidget, detail::OverlayParams(UserVisible, true));
+    addOverlayWidget(m_mainOverlayWidget, {UserVisible, OverlayFlag::autoRotate});
 
     updateItems();
     updateButtonsVisibility();

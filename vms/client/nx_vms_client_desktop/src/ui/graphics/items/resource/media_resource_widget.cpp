@@ -554,7 +554,8 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setUserInputEnabled(
             accessController()->hasGlobalPermission(GlobalPermission::userInput));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
-        addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
+        addOverlayWidget(m_ioModuleOverlayWidget,
+            {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -573,7 +574,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
         return;
 
     m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay, this);
-    addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, false, true));
+    addOverlayWidget(m_areaSelectOverlayWidget, {Visible, OverlayFlag::bindToViewport});
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
         this, &QnMediaResourceWidget::handleSelectedAreaChanged);
@@ -588,10 +589,12 @@ void QnMediaResourceWidget::initAnalyticsOverlays()
         return;
 
     m_roiFiguresOverlayWidget = new RoiFiguresOverlayWidget(m_compositeOverlay, this);
-    addOverlayWidget(m_roiFiguresOverlayWidget, detail::OverlayParams(Visible, true, true));
+    addOverlayWidget(m_roiFiguresOverlayWidget,
+        {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
 
     m_areaHighlightOverlayWidget = new AreaHighlightOverlayWidget(m_compositeOverlay);
-    addOverlayWidget(m_areaHighlightOverlayWidget, detail::OverlayParams(Visible, true, true));
+    addOverlayWidget(m_areaHighlightOverlayWidget,
+        {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
 
     connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged,
         this, &QnMediaResourceWidget::updateAnalyticsVisibility);

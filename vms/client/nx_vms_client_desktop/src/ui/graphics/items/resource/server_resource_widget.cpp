@@ -612,8 +612,7 @@ void QnServerResourceWidget::addOverlays() {
     mainOverlayWidget->setLayout(mainOverlayLayout);
     mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget
-        , detail::OverlayParams(UserVisible, true));
+    addOverlayWidget(mainOverlayWidget, {UserVisible, OverlayFlag::autoRotate});
 }
 
 QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const {

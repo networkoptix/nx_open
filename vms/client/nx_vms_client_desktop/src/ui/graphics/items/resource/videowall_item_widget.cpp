@@ -145,7 +145,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
             setOverlayWidgetVisible(overlay, value, animated);
         });
 
-    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true));
+    addOverlayWidget(overlay, {UserVisible, OverlayFlag::autoRotate});
     setOverlayWidgetVisible(overlay, false, false);
 
     initInfoOverlay();
