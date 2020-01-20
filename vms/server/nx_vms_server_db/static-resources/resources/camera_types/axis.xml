@@ -397,7 +397,7 @@
                 <param name = "MaxFPS" default_value = "30"/>
             </params>
         </resource>
-        <resource name = "AXISM7104" public = "AXISP3704"/>
+        <resource name = "AXISM7104" public = "AXISP7304"/>
         <resource name = "AXISQ1798" public = "AXISQ6044"/>
         <resource name = "AXISM7104" public = "AXISQ6044"/>
         <resource name = "AXISP3245" public = "AXISQ1775"/>
