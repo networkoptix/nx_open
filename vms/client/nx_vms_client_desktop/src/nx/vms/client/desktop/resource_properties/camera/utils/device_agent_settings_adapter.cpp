@@ -129,6 +129,13 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
             d->settingsListener.reset();
         }
     }
+    else if (camera && !d->currentEngineId.isNull())
+    {
+        // Refresh settings even if camera is not changed. This happens when the dialog is re-opened
+        // or instantly after we have applied the changes.
+        d->refreshSettings(d->currentEngineId);
+    }
+
 }
 
 void DeviceAgentSettingsAdapter::applySettings()
