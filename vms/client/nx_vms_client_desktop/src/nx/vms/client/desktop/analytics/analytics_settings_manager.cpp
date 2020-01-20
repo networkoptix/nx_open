@@ -15,21 +15,14 @@ uint qHash(const DeviceAgentId& key)
     return qHash(key.device) + qHash(key.engine);
 }
 
-std::tuple<
-    QnVirtualCameraResourcePtr,
-    QnMediaServerResourcePtr,
-    nx::vms::common::AnalyticsEngineResourcePtr
-    > toResources(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
+auto toResources(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
 {
     const auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device);
-    if (!NX_ASSERT(camera))
-        return {};
-
-    return {
+    return std::make_tuple(
         camera,
-        camera->getParentServer(),
+        NX_ASSERT(camera) ? camera->getParentServer() : QnMediaServerResourcePtr(),
         resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(agentId.engine)
-    };
+    );
 }
 
 QString toString(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
