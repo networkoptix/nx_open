@@ -75,10 +75,14 @@ endfunction()
 function(_git_branch dir var)
     execute_process(
         COMMAND git -C "${dir}" show -s --format=%B
-        COMMAND sed -n "s/^Branch: \\(.*\\)$/\\1/p"
-        COMMAND tail -n1
-        OUTPUT_VARIABLE branch
+        OUTPUT_VARIABLE branch_output
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    string(REGEX REPLACE "\r?\n" ";" lines "${branch_output}")
+    foreach(line ${lines})
+        if ("${line}" MATCHES "^Branch: ")
+            string(REGEX REPLACE "^Branch: " "" branch "${line}")
+        endif()
+    endforeach()
     set(${var} "${branch}" PARENT_SCOPE)
 endfunction()
