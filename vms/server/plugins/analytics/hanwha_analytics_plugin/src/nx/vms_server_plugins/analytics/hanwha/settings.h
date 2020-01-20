@@ -876,23 +876,24 @@ bool readFromDeviceReply(const std::string& from, SettingGroupT* to,
 //-------------------------------------------------------------------------------------------------
 struct Settings
 {
+    static const int kMultiplicity = 4;
     ShockDetection shockDetection;
     Motion motion;
     MotionDetectionObjectSize motionDetectionObjectSize;
     IvaObjectSize ivaObjectSize;
-    MotionDetectionIncludeArea motionDetectionIncludeArea[8];
-    MotionDetectionExcludeArea motionDetectionExcludeArea[8];
+    MotionDetectionIncludeArea motionDetectionIncludeArea[kMultiplicity];
+    MotionDetectionExcludeArea motionDetectionExcludeArea[kMultiplicity];
     TamperingDetection tamperingDetection;
     DefocusDetection defocusDetection;
     FogDetection fogDetection;
     FaceDetectionGeneral faceDetectionGeneral;
-    //FaceDetectionExcludeArea faceDetectionExcludeArea[8];
+    //FaceDetectionExcludeArea faceDetectionExcludeArea[kMultiplicity];
     ObjectDetectionGeneral objectDetectionGeneral;
     ObjectDetectionBestShot objectDetectionBestShot;
-    ObjectDetectionExcludeArea objectDetectionExcludeArea[8];
-    IvaLine ivaLine[8];
-    IvaIncludeArea ivaIncludeArea[8];
-    IvaExcludeArea ivaExcludeArea[8];
+    ObjectDetectionExcludeArea objectDetectionExcludeArea[kMultiplicity];
+    IvaLine ivaLine[kMultiplicity];
+    IvaIncludeArea ivaIncludeArea[kMultiplicity];
+    IvaExcludeArea ivaExcludeArea[kMultiplicity];
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     SupportedEventCategories supportedCategories = {false};

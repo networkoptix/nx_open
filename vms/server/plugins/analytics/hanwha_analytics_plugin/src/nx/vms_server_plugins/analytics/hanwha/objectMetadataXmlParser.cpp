@@ -215,10 +215,10 @@ Ptr<ObjectMetadata> extractObject(
 
 //-------------------------------------------------------------------------------------------------
 
-Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
+std::vector<Ptr<ObjectMetadataPacket>> parseObjectMetadataXml(
     const QByteArray& data, const Hanwha::EngineManifest& manifest)
 {
-    Ptr<ObjectMetadataPacket> result;
+    std::vector<Ptr<ObjectMetadataPacket>> result;
 
     QDomDocument dom;
     dom.setContent(data, true);
@@ -256,7 +256,6 @@ Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
     if (!frameScales)
         return result;
 
-    result = makePtr<ObjectMetadataPacket>();
     QDomElement object = transformation.nextSiblingElement();
     for (; !object.isNull(); object = object.nextSiblingElement())
     {
@@ -264,7 +263,9 @@ Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
         {
             if (timestampAttribute)
                 objectMetadata->addAttribute(timestampAttribute);
-            result->addItem(objectMetadata.releasePtr());
+            Ptr<ObjectMetadataPacket> packet = makePtr<ObjectMetadataPacket>();
+            packet->addItem(objectMetadata.releasePtr());
+            result.push_back(packet);
         }
     }
 

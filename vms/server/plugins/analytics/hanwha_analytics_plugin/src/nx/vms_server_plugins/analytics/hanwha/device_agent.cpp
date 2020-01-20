@@ -190,6 +190,18 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
+namespace
+{
+    template<class T>
+    Uuid deviceObjectNumberToUuid(T deviceObjectNumber)
+    {
+        Uuid serverObjectNumber;
+        memcpy(&serverObjectNumber, &deviceObjectNumber,
+            std::min(sizeof(serverObjectNumber), sizeof(deviceObjectNumber)));
+        return serverObjectNumber;
+    }
+}
+
 /**
  * Receives `dataPacket` from Server. This packet is a `CustomMetadataPacket`, that contains xml
  * with the information about events occurred. The function parses the xml and extracts
@@ -205,25 +217,42 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
     std::cout << ++i << std::endl << (const char*)xmlData << std::endl << std::endl << std::endl;
 
     const auto ts = incomingPacket->timestampUs();
-    Ptr<ObjectMetadataPacket> outcomingPacket = parseObjectMetadataXml(
+
+    // `outcomingPackets` vector contains packets each of which contains exactly one object
+    // we'll pass each packet to `m_handler->handleMetadata` function.
+    // For now client does not support packets with multiple objects. When GUI team fix it
+    // we'll pass one packet with many objects instead of many packets with one object.
+
+    std::vector<Ptr<ObjectMetadataPacket>> outcomingPackets = parseObjectMetadataXml(
         xmlData, m_engine->engineManifest());
 
-    if (outcomingPacket && outcomingPacket->count())
+    for (const auto& outcomingPacket : outcomingPackets)
     {
         outcomingPacket->setTimestampUs(ts);
-        outcomingPacket->setDurationUs(1'000'000);
-
-        //auto objectMetadata = makePtr<ObjectMetadata>();
-        //static const Uuid trackId = id;
-        //objectMetadata->setTrackId(trackId);
-        //objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
-        //objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
-
-        //objectMetadataPacket->addItem(objectMetadata.get());
+        outcomingPacket->setDurationUs(1'000'000); // 1 second
 
         if (NX_ASSERT(m_handler))
             m_handler->handleMetadata(outcomingPacket.get());
     }
+
+/*
+    // This chunk of code is for test purposes.
+    Ptr<ObjectMetadataPacket> outcomingPacket = makePtr<ObjectMetadataPacket>();
+    outcomingPacket->setTimestampUs(ts);
+    outcomingPacket->setDurationUs(1'000'000);
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    int objectId = 100;
+    static const nx::sdk::Uuid trackId =
+        nx::vms_server_plugins::analytics::hanwha::deviceObjectNumberToUuid(objectId);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Head");
+    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
+    outcomingPacket->addItem(objectMetadata.get());
+
+    if (NX_ASSERT(m_handler))
+        m_handler->handleMetadata(outcomingPacket.get());
+//*/
 }
 
 /**
@@ -233,12 +262,12 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
 {
-    if (!m_serverHasSentInitialSettings)
-    {
-        // we should ignore initial settings
-        m_serverHasSentInitialSettings = true;
-        return;
-    }
+    //if (!m_serverHasSentInitialSettings)
+    //{
+    //    // we should ignore initial settings
+    //    m_serverHasSentInitialSettings = true;
+    //    return;
+    //}
 
     int c = sourceMap->count();
     //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
@@ -254,21 +283,21 @@ void DeviceAgent::doSetSettings(
     //    m_settings.motion, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber); //*
+    //    m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
 
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    //}
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
-    //}
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+    }
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
@@ -563,21 +592,21 @@ void DeviceAgent::readCameraSettings()
 
     readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
 
     readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
 
     sunapiReply = loadEventSettings("defocusdetection");
@@ -592,7 +621,7 @@ void DeviceAgent::readCameraSettings()
     sunapiReply = loadEventSettings("objectdetection");
     readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
     readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.objectDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
 
     sunapiReply = loadEventSettings("audiodetection");
