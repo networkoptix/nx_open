@@ -339,7 +339,7 @@
                         "display": "table|panel"
                     },
                     "type": {
-                        "format": "longText",
+                        "format": "text",
                         "display": "table|panel"
                     },
                     "ip": {
@@ -467,7 +467,7 @@
                         "isOptional": true
                     },
                     "fpsDeltaAverage10m": {
-                        "name": "Avg FPS Drop (10 min)",
+                        "name": "Avg FPS drop (10 min)",
                         "description": "Average FPS drop (10 min)",
                         "isOptional": true,
                         "display": "table|panel",
