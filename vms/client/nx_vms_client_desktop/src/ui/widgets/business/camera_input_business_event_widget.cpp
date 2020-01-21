@@ -32,7 +32,7 @@ void QnCameraInputBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *
 }
 
 void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
-    if (!model())
+    if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> guard(m_updating, true);
@@ -73,12 +73,22 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
             ui->relayComboBox->addItem(relayInput.getName(), relayInput.id);
     }
 
-    if (fields.testFlag(Field::eventParams))
+    if (fields.testFlag(Field::eventResources) || fields.testFlag(Field::eventParams))
     {
         QString text = model()->eventParams().inputPortId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
+
+        if (ui->relayComboBox->currentIndex() == -1)
+        {
+            // Item not found. Switch to '<automatic>'.
+            auto eventParams = model()->eventParams();
+            eventParams.inputPortId.clear();
+            model()->setEventParams(eventParams);
+            ui->relayComboBox->setCurrentIndex(0);
+        }
     }
+
 }
 
 void QnCameraInputBusinessEventWidget::paramsChanged() {
