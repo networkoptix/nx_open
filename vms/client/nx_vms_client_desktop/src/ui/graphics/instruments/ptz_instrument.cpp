@@ -287,8 +287,8 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     connect(overlay->modeButton(), &QnImageButtonWidget::clicked, this,
         &PtzInstrument::at_modeButton_clicked);
 
-    widget->addOverlayWidget(overlay, detail::OverlayParams(
-        QnResourceWidget::Invisible, true, false, QnResourceWidget::TopControlsLayer));
+    widget->addOverlayWidget(overlay, {QnResourceWidget::Invisible,
+        QnResourceWidget::OverlayFlag::autoRotate, QnResourceWidget::TopControlsLayer});
 
     return overlay;
 }

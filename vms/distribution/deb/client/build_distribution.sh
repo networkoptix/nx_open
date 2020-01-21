@@ -275,6 +275,8 @@ copyAdditionalQtFiles()
 
     echo "  Copying (Qt) resources"
     cp -r "$QT_DIR/resources" "$STAGE_MODULE/resources"
+    mkdir "$STAGE_MODULE/translations"
+    cp -r "$QT_DIR/translations/qtwebengine_locales" "$STAGE_MODULE/translations/qtwebengine_locales"
 }
 
 # [in] STAGE

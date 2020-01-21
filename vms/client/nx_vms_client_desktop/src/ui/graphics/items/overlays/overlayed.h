@@ -37,6 +37,14 @@ namespace detail {
             TopControlsLayer,
         };
 
+        enum class OverlayFlag
+        {
+            none = 0,
+            autoRotate = 0x01,
+            bindToViewport = 0x02
+        };
+        Q_DECLARE_FLAGS(OverlayFlags, OverlayFlag)
+
         bool isOverlayVisible() const;
         void setOverlayVisible(bool visible, bool animate);
 
@@ -87,17 +95,17 @@ namespace detail {
     struct OverlayParams
     {
         OverlayedBase::OverlayVisibility visibility;
-        bool autoRotate;
-        bool bindToViewport;
+        OverlayedBase::OverlayFlags flags;
         qreal z;
         QMarginsF margins;
 
-        OverlayParams(OverlayedBase::OverlayVisibility visibility = OverlayedBase::UserVisible
-            , bool autoRotate = false
-            , bool bindToViewport = false
-            , qreal z = OverlayedBase::BaseLayer
-            , const QMarginsF &margins = QMarginsF());
+        OverlayParams(OverlayedBase::OverlayVisibility visibility = OverlayedBase::UserVisible,
+            OverlayedBase::OverlayFlags = OverlayedBase::OverlayFlag::none,
+            qreal z = OverlayedBase::BaseLayer,
+            const QMarginsF &margins = QMarginsF());
     };
+
+    Q_DECLARE_OPERATORS_FOR_FLAGS(OverlayedBase::OverlayFlags);
 
 } // namespace detail
 

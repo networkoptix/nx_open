@@ -1134,7 +1134,7 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
             if (m_serverSelectionHandle != handle)
                 return;
 
-            m_serverSelectionHandle = -1;
+            m_serverSelectionHandle = kInvalidEC2RequestHandle;
 
             if (m_connectingToServerDialog)
                 m_connectingToServerDialog->reject();
@@ -1155,10 +1155,13 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
             }
         });
 
+    if (m_serverSelectionHandle == kInvalidEC2RequestHandle)
+        return;
+
     const auto showModalDialog =
         [this, server]()
         {
-            if (m_serverSelectionHandle == -1)
+            if (m_serverSelectionHandle == kInvalidEC2RequestHandle)
                 return;
 
             if (!m_connectingToServerDialog)
@@ -1166,7 +1169,7 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
 
             m_connectingToServerDialog->setDisplayedServer(server);
             m_connectingToServerDialog->exec();
-            m_serverSelectionHandle = -1;
+            m_serverSelectionHandle = kInvalidEC2RequestHandle;
         };
 
     executeDelayedParented(showModalDialog, kSelectCurrentServerShowDialogDelay, this);

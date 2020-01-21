@@ -32,7 +32,8 @@ QnWebResourceWidget::QnWebResourceWidget(
 
     const auto iconButton = titleBar()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
-    const auto webParams = detail::OverlayParams(Visible, false, true, BaseLayer, contentMargins);
+    const auto webParams = detail::OverlayParams(Visible, OverlayFlag::bindToViewport, BaseLayer,
+        contentMargins);
 
     addOverlayWidget(m_webEngineView, webParams);
     setFocusProxy(m_webEngineView);

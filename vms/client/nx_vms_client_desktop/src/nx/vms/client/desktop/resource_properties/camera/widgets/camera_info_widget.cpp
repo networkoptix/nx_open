@@ -188,8 +188,8 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->primaryStreamControlWidget->setHidden(isUsbDevice);
     ui->secondaryStreamTitleLabel->setHidden(isUsbDevice);
     ui->secondaryStreamControlWidget->setHidden(isUsbDevice);
-    ui->verticalSpacer1->setHidden(isNetworkLink || isUsbDevice);
-    ui->verticalSpacer2->setHidden(isNetworkLink || isUsbDevice);
+    ui->verticalSpacer1->setHidden(isNetworkLink || (isUsbDevice && !hasLogicalId));
+    ui->verticalSpacer2->setHidden(isNetworkLink);
 }
 
 void CameraInfoWidget::alignLabels()

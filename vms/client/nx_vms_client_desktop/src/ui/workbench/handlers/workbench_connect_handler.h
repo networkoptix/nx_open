@@ -170,7 +170,8 @@ private:
     bool m_warnMessagesDisplayed = false;
     ec2::CrashReporter m_crashReporter;
 
-    int m_serverSelectionHandle = -1;
+    static constexpr int kInvalidEC2RequestHandle = -1;
+    int m_serverSelectionHandle = kInvalidEC2RequestHandle;
     QPointer<nx::vms::client::desktop::ConnectingToServerDialog> m_connectingToServerDialog;
 
     QPointer<QnReconnectInfoDialog> m_reconnectDialog;
