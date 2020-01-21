@@ -312,6 +312,6 @@ Rectangle
         if (visible)
             player.playLive()
         else
-            player.pause()
+            player.stop()
     }
 }
