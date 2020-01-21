@@ -74,7 +74,7 @@ class QmlDeployUtil:
 
         def ignoref(directory, contents):
             skipped = ignored_always(directory, contents)
-            if skip_styles and directory.endswith(styles_directory):
+            if skip_styles and os.fsdecode(directory).endswith(styles_directory):
                 skipped = skipped.union(styles)
             if prefer_compiled:
                 skipped = skipped.union(f for f in contents if QmlDeployUtil.has_compiled_file(f, contents))
