@@ -162,7 +162,7 @@ class QmlDeployUtil:
                 continue
 
             paths.append(path)
-            previous_path = path
+            previous_path = path + os.sep
 
         for path in paths:
             subdir = os.path.relpath(path, self.import_path)
