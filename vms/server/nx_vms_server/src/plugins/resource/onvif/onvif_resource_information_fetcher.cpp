@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/match/wildcard.h>
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
@@ -138,14 +139,17 @@ bool OnvifResourceInformationFetcher::ignoreCamera(
 
     if (resourceData.value<bool>(ResourceDataKey::kIgnoreONVIF))
         return true;
-
+    
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
-        QRegExp rxVendor(QLatin1String((const char*)IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
-        QRegExp rxName(QLatin1String((const char*)IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        const char* rxVendor(IGNORE_VENDORS[i][0]);
+        const char* rxName(IGNORE_VENDORS[i][1]);
 
-        if (rxVendor.exactMatch(manufacturer) && rxName.exactMatch(name))
+        if (wildcardMatch(rxVendor, manufacturer, MatchMode::caseInsensitive) 
+            && wildcardMatch(rxName, name, MatchMode::caseInsensitive))
+        {
             return true;
+        }
     }
     return false;
 }
