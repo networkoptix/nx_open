@@ -407,7 +407,7 @@ void HanwhaResourceSearcher::createResource(
 
     QUrl url(devInfo.presentationUrl);
     if (url.port() == -1)
-        url.setPort(nx::network::http::DEFAULT_HTTP_PORT);
+        url.setPort(nx::network::http::defaultPortForScheme(url.scheme().toUtf8()));
 
     resource->setUrl(url.toString(QUrl::RemovePath));
     resource->setMAC(mac);
