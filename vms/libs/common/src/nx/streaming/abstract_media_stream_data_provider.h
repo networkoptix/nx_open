@@ -5,6 +5,7 @@
 #include <utils/camera/camera_diagnostics.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/media_stream_statistics.h>
+#include <nx/utils/value_cache.h>
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -19,7 +20,6 @@ public:
     virtual ~QnAbstractMediaStreamDataProvider();
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;
-    int getNumberOfChannels() const;
     qint64 bitrateBitsPerSecond() const;
     float getFrameRate() const;
     float getAverageGopSize() const;
@@ -53,16 +53,15 @@ protected:
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
     void onEvent(std::chrono::microseconds timestamp, CameraDiagnostics::Result event);
-private:
-    void loadNumberOfChannelsIfUndetected() const;
 protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
-    QnResourcePtr m_mediaResource;
-
+    QnMediaResourcePtr m_mediaResource;
 private:
-    mutable int m_numberOfchannels;
+    int getNumberOfChannels() const;
+private:
+    nx::utils::CachedValue<int> m_numberOfChannels;
     qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
     bool m_isCamera;
     std::atomic<int> m_numberOfErrors{};

@@ -17,6 +17,7 @@ using namespace nx::vms::api::metrics;
 using namespace std::chrono;
 
 static const int kMinDays = 5;
+const int kChannelCount = 4;
 
 namespace {
 
@@ -37,13 +38,13 @@ public:
 
     void onData(const QnAbstractMediaDataPtr& data)
     {
-        m_stat[0].onData(data);
+        m_stat[data->channelNumber].onData(data);
     }
 };
 
 } // namespace
 
-class MetricsCamerasApi: public ::testing::Test
+class MetricsCamerasApi: public ::testing::TestWithParam<int>
 {
 public:
     static QnSharedResourcePointer<resource::test::CameraMock> m_camera;
@@ -67,6 +68,13 @@ public:
         m_camera->blockInitialization();
         m_camera->setMinDays(kMinDays);
         m_camera->setMaxFps(30);
+        
+        auto customVideoLayout = QnCustomResourceVideoLayoutPtr(
+            new QnCustomResourceVideoLayout(QSize(kChannelCount, 1)));
+        for (int i = 0; i < kChannelCount; ++i)
+            customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+        m_camera->setProperty(ResourcePropertyKey::kVideoLayout, customVideoLayout->toString());
+
 
         QnScheduleTaskList schedule;
         for (int i = 0; i < 7; ++i)
@@ -141,14 +149,17 @@ public:
         auto cameraData = systemValues["cameras"][cameraId];
         auto streamData = cameraData[streamPrefix];
         ASSERT_EQ(30, streamData["targetFps"].toInt());
-        ASSERT_EQ("1280x720", streamData["resolution"].toString());
+
+        const int channelCount = m_camera->getVideoLayout()->channelCount();
+        const QString expectedResolution = lit("%1x720").arg(1280 * channelCount);
+        ASSERT_EQ(expectedResolution, streamData["resolution"].toString());
 
         auto alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
         if (!isPrimary)
         {
             EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::warning);
 
-            liveParams.resolution = QSize(640, 480);
+            liveParams.resolution = QSize(640 / channelCount, 480);
             dataProvider->setPrimaryStreamParams(liveParams);
             alarms = launcher->getFlat<SystemAlarms>("/ec2/metrics/alarms");
             EXPECT_EQ(alarms["cameras." + cameraId + ".secondaryStream.resolution.0"].level, AlarmLevel::none);
@@ -162,13 +173,18 @@ public:
         video->width = liveParams.resolution.width();
         video->height = liveParams.resolution.height();
         const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-        video->timestamp = currentTimeMs;
+        
         video->m_data.resize(1000 * 50);
 
-        for (int i = 0; i < 5; ++i)
+        for (int channel = 0; channel < channelCount; ++channel)
         {
-            video->timestamp += 50000; //< 20 fps, 1Mb/sec
-            dataProvider->onData(video);
+            video->timestamp = currentTimeMs;
+            video->channelNumber = channel;
+            for (int i = 0; i < 5; ++i)
+            {
+                video->timestamp += 50000; //< 20 fps, 1Mb/sec for each camera channel.
+                dataProvider->onData(video);
+            }
         }
 
         nx::utils::ElapsedTimer timer;
@@ -179,7 +195,7 @@ public:
             streamData = cameraData[streamPrefix];
         } while (streamData["fpsDelta"].isNull() && !timer.hasExpired(10s));
 
-        ASSERT_EQ(1000000, streamData["actualBitrateBps"].toInt());
+        ASSERT_EQ(1000000 * channelCount, streamData["actualBitrateBps"].toInt());
         ASSERT_FLOAT_EQ(10, streamData["fpsDelta"].toDouble());
 
         dataProvider->stop();
