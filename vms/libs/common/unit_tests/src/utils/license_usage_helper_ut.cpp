@@ -731,6 +731,8 @@ TEST_F(QnLicenseUsageHelperTest, proposeToStartVideowallControl)
     videowall->items()->addItem(item2);
 
     QnVideoWallLicenseUsageHelper helper(commonModule());
+    helper.setCustomValidator(m_validator.data()); //< Treat all videowall licenses as valid.
+
     ASSERT_FALSE(helper.isValid(Qn::LC_VideoWall));
     addLicenses(Qn::LC_VideoWall, 1);
 
