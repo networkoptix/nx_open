@@ -76,7 +76,7 @@ QnSharedResourcePointer<QnAbstractVideoCamera> ProxyDataProvider::getOwner() con
 // ------------------- AbstractPutInOrderDataProvider -------------------------
 
 AbstractDataReorderer::AbstractDataReorderer(const Settings& settings):
-    m_queueDuration(settings.initialQueueDuration),
+    m_queueDuration(std::max(settings.initialQueueDuration, settings.minQueueDuration)),
     m_settings(settings)
 {
     m_timer.restart();
@@ -130,12 +130,8 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
         return microseconds(int(value.count() * coeff));
     };
 
-    if (m_dataQueue.empty())
-        return;
-
-    const auto lastTime = (*m_dataQueue.rbegin())->timestamp;
-
-    const microseconds jitter = microseconds(std::max(0LL, lastTime - data->timestamp));
+    m_lastTime = std::max(data->timestamp, m_lastTime);
+    const microseconds jitter = microseconds(std::max(0LL, m_lastTime - data->timestamp));
     if (jitter == microseconds::zero())
         return;
 
@@ -165,7 +161,7 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
     NX_VERBOSE(this, "Time=%1, jitter: %2, maxJitter=%3",
         toMs(microseconds(data->timestamp)), toMs(jitter), toMs(maxJitter));
 
-    const auto keepDataToTime = (*m_dataQueue.rbegin())->timestamp - m_queueDuration.count();
+    const auto keepDataToTime = m_lastTime - m_queueDuration.count();
     if (data->timestamp < keepDataToTime)
     {
         // Increase queue size if need
