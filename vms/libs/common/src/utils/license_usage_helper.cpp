@@ -735,13 +735,18 @@ QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(
     const auto& resPool = helper->commonModule()->resourcePool();
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
     {
-        /* Calculate total screens used. */
+        // Calculate total screens used.
         totalScreens += videowall->items()->getItems().size();
 
-        /* Calculating running control sessions. */
-        for (const QnVideoWallItem &item : videowall->items()->getItems())
-            if (!item.runtimeStatus.controlledBy.isNull())
+        // Calculating running control sessions.
+        for (const QnVideoWallItem& item : videowall->items()->getItems())
+        {
+            const auto controlledBy = item.runtimeStatus.controlledBy;
+
+            // Skip own control sessions as they must be closed when new one is started.
+            if (!controlledBy.isNull() && controlledBy != controllerId)
                 ++controlSessions;
+        }
     }
     int screensLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
 

@@ -1148,7 +1148,9 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
         return false;
     }
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1);
+    const auto localInstanceId = runtimeInfoManager()->localInfo().uuid;
+
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1, localInstanceId);
     if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
         return false;
 
