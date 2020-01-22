@@ -81,7 +81,7 @@ namespace nx::vms::server {
         const Settings m_settings;
         nx::utils::QueueWithMax<JitterInfo> m_lastJitter;
         QnMutex m_mutex;
-        qint64 m_lastTime = 0;
+        qint64 m_lastTimeUs = 0;
     };
 
     class ProxyDataProvider: public QnAbstractStreamDataProvider

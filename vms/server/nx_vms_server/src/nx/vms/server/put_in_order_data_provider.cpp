@@ -130,8 +130,8 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
         return microseconds(int(value.count() * coeff));
     };
 
-    m_lastTime = std::max(data->timestamp, m_lastTime);
-    const microseconds jitter = microseconds(std::max(0LL, m_lastTime - data->timestamp));
+    m_lastTimeUs = std::max(data->timestamp, m_lastTimeUs);
+    const microseconds jitter = microseconds(std::max(0LL, m_lastTimeUs - data->timestamp));
     if (jitter == microseconds::zero())
         return;
 
@@ -161,7 +161,7 @@ void AbstractDataReorderer::updateBufferSize(const QnAbstractDataPacketPtr& data
     NX_VERBOSE(this, "Time=%1, jitter: %2, maxJitter=%3",
         toMs(microseconds(data->timestamp)), toMs(jitter), toMs(maxJitter));
 
-    const auto keepDataToTime = m_lastTime - m_queueDuration.count();
+    const auto keepDataToTime = m_lastTimeUs - m_queueDuration.count();
     if (data->timestamp < keepDataToTime)
     {
         // Increase queue size if need
