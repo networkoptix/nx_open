@@ -230,7 +230,7 @@ protected:
 private:
     static constexpr const char* const kDbConnectionName = "test";
     static constexpr const char* const kMigrationFileName =
-        ":/updates/100_10172019_encrypt_storage_url_credentials.sql";
+        ":/updates/99_20200122_encrypt_storage_url_credentials.sql";
 
     MediaServerLauncher m_server = MediaServerLauncher(QString(),
         0,
