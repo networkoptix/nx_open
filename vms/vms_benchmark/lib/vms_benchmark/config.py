@@ -1,3 +1,4 @@
+import os
 from typing import Optional, List, Dict
 
 from vms_benchmark import exceptions
@@ -86,7 +87,7 @@ class ConfigParser:
     def __init__(self, filepath, definition=None, is_file_optional=False):
         assert definition or not is_file_optional
 
-        self.filepath = filepath
+        self.filepath = os.path.realpath(filepath)
         self.OPTIONS_FROM_FILE = ConfigParser._load_file(self.filepath, is_file_optional)
         self.options = self.OPTIONS_FROM_FILE.copy() if self.OPTIONS_FROM_FILE else {}
 

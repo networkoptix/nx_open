@@ -81,6 +81,7 @@ namespace nx::vms::server {
         const Settings m_settings;
         nx::utils::QueueWithMax<JitterInfo> m_lastJitter;
         QnMutex m_mutex;
+        qint64 m_lastTimeUs = 0;
     };
 
     class ProxyDataProvider: public QnAbstractStreamDataProvider
@@ -122,7 +123,7 @@ namespace nx::vms::server {
     class SimpleReorderer: public AbstractDataReorderer
     {
     public:
-        SimpleReorderer(): AbstractDataReorderer(Settings()) {}
+        SimpleReorderer(const Settings& settings = Settings()): AbstractDataReorderer(settings) {}
 
         virtual void flushData(const QnAbstractDataPacketPtr& data) override;
         std::deque<QnAbstractDataPacketPtr>& queue();

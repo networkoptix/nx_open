@@ -9,7 +9,7 @@ set(depends mediaserver server_plugins) #< Not required technically, but useful 
 message(STATUS "Generating files for Metadata SDK")
 
 set(sdk_name metadata_sdk)
-set(zip_file ${distribution_output_dir}/${${sdk_name}_distribution_name}.zip)
+set(zip_file ${distribution_output_dir}/${metadata_sdk_distribution_name}.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)
@@ -30,13 +30,20 @@ file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
 set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tests)
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
-# Collect source files for the sample - Stub Analytics Plugin.
-set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
-set(copied_sample_target stub_analytics_plugin/src)
-set(copied_sample_origin ${copied_sample_dir}/${copied_sample_target})
-file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
+
+set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
+
+# Collect source files for the sample 1 - Sample Analytics Plugin.
+set(copied_sample_1_target sample_analytics_plugin)
+set(copied_sample_1_origin ${copied_samples_dir}/${copied_sample_1_target})
+file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/src/*)
+
+# Collect source files for the sample 2 - Stub Analytics Plugin.
+set(copied_sample_2_target stub_analytics_plugin)
+set(copied_sample_2_origin ${copied_samples_dir}/${copied_sample_2_target})
+file(GLOB_RECURSE copied_sample_2_files ${copied_sample_2_origin}/src/*)
 set(copied_sample_unit_tests_target stub_analytics_plugin/unit_tests/src)
-set(copied_sample_unit_tests_origin ${copied_sample_dir}/${copied_sample_unit_tests_target})
+set(copied_sample_unit_tests_origin ${copied_samples_dir}/${copied_sample_unit_tests_target})
 file(GLOB_RECURSE copied_sample_unit_tests_files ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
@@ -46,9 +53,9 @@ nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/copy_sdk_files.cmake.in
     ${copy_sdk_files_script} @ONLY)
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    set(sample_build_script "./build_sample.sh")
+    set(sample_build_script "./build_samples.sh")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(sample_build_script "build_sample.bat")
+    set(sample_build_script "build_samples.bat")
 else()
     message(FATAL_ERROR "Building SDK sample(s) supported only on Windows and Linux.")
 endif()
@@ -83,7 +90,8 @@ else()
 
     if(toolchainFile)
         set(compilingOptions ${compilingOptions}
-            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake)
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
+        )
     endif()
 endif()
 

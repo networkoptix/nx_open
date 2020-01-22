@@ -134,11 +134,8 @@ bool Utils::backupDatabaseViaCopy(int buildNumber, const QString& reason)
         return false;
     }
 
-    if (reason == "timer")
-    {
-        nx::vms::utils::deleteOldBackupFilesIfNeeded(
-            backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()), reason);
-    }
+    nx::vms::utils::deleteOldBackupFilesIfNeeded(
+        backupDir, nx::SystemCommands().freeSpace(backupDir.toStdString()), reason);
 
     NX_INFO(this, "Successfully created DB backup %1", fileName);
     return true;

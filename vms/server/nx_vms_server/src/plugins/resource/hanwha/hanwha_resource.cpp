@@ -889,6 +889,16 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
+    nx::utils::Url url(getUrl());
+    if (url.scheme() == nx::network::http::kSecureUrlSchemeName
+        && url.port() == nx::network::http::DEFAULT_HTTP_PORT)
+    {
+        NX_ASSERT(false, "Url is likely invalid: %1", url);
+        // Fix the URL which is likely brocken by the searcher of a previous version, see VMS-16991.
+        url.setPort(-1);
+        setUrl(url.toString());
+    }
+
     setCameraCapability(Qn::customMediaPortCapability, true);
     const auto result = initDevice();
     if (!result)

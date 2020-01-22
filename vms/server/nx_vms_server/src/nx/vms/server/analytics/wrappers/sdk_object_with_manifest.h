@@ -166,7 +166,7 @@ protected:
         QString additionalInfo = QString()) const
     {
         return sdk_support::TimedGuard(
-            std::chrono::hours(24), //sdkMethodTimeout(sdkMethod),
+            sdkMethodTimeout(sdkMethod),
             [this, sdkMethod, additionalInfo = std::move(additionalInfo)]()
             {
                 handleViolation(

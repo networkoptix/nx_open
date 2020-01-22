@@ -550,7 +550,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     else if (task.recordingType == Qn::RecordingType::never)
     {
         NX_VERBOSE(this,
-            "%1(): Recording type is 'never', returning false; ",
+            "%1(): Recording type is 'never', returning false; "
             "catalog %2, resource %3 (%4) %5",
             __func__, m_catalog, m_resource->getName(), m_resource->getId(), m_resource->getUrl());
         close();

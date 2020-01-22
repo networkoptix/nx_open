@@ -44,13 +44,23 @@ void QnAbstractMediaStreamDataProvider::onEvent(
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
     :
     QnAbstractStreamDataProvider(res),
-    m_numberOfchannels(1)
+    m_numberOfChannels(
+        [this] 
+        { 
+            return m_mediaResource ? m_mediaResource->getVideoLayout(this)->channelCount() : 1; 
+        })
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-    m_mediaResource = res;
-    NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
+    m_mediaResource = res.dynamicCast<QnMediaResource>();
+    NX_ASSERT(m_mediaResource);
     resetTimeCheck();
     m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
+    connect(res.data(), &QnResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
+        { 
+            if (propertyName == ResourcePropertyKey::kVideoLayout)
+                m_numberOfChannels.reset();
+        });
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
@@ -61,28 +71,15 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
 {
     QnMutexLocker mtx( &m_mutex );
-
-    loadNumberOfChannelsIfUndetected();
-
-    if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
+    if (channel < CL_MAX_CHANNEL_NUMBER)
         m_gotKeyFrame[channel] = 0;
-}
-
-void QnAbstractMediaStreamDataProvider::loadNumberOfChannelsIfUndetected() const
-{
-    if (m_numberOfchannels != 0)
-        return;
-    if (auto mediaRes = dynamic_cast<QnMediaResource*>(m_mediaResource.data()))
-        m_numberOfchannels = mediaRes->getVideoLayout(this)->channelCount();
 }
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );
 
-    loadNumberOfChannelsIfUndetected();
-
-    for (int i = 0; i < m_numberOfchannels; ++i)
+    for (int i = 0; i < getNumberOfChannels(); ++i)
         m_gotKeyFrame[i] = 0;
 }
 
@@ -96,9 +93,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
     QnMutexLocker mtx( &m_mutex );
 
-    loadNumberOfChannelsIfUndetected();
-
-    for (int i = 0; i < m_numberOfchannels; ++i)
+    for (int i = 0; i < getNumberOfChannels(); ++i)
         if (m_gotKeyFrame[i]==0)
             return true;
 
@@ -107,6 +102,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
+    m_numberOfChannels.reset();
     setNeedKeyData();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
         m_stat[i].reset();
@@ -124,14 +120,14 @@ const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(
 
 int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
 {
-    NX_ASSERT(m_numberOfchannels, "No channels?");
-    return m_numberOfchannels ? m_numberOfchannels : 1;
+    NX_ASSERT(m_numberOfChannels.get(), "No channels?");
+    return std::min(CL_MAX_CHANNEL_NUMBER, std::max(1, m_numberOfChannels.get()));
 }
 
 qint64 QnAbstractMediaStreamDataProvider::bitrateBitsPerSecond() const
 {
-    float rez = 0;
-    for (int i = 0; i < m_numberOfchannels; ++i)
+    qint64 rez = 0;
+    for (int i = 0; i < getNumberOfChannels(); ++i)
         rez += m_stat[i].bitrateBitsPerSecond();
     return rez;
 }
@@ -139,7 +135,7 @@ qint64 QnAbstractMediaStreamDataProvider::bitrateBitsPerSecond() const
 float QnAbstractMediaStreamDataProvider::getFrameRate() const
 {
     float rez = 0;
-    for (int i = 0; i < m_numberOfchannels; ++i)
+    for (int i = 0; i < getNumberOfChannels(); ++i)
         rez += m_stat[i].getFrameRate();
 
     return rez / getNumberOfChannels();
@@ -148,7 +144,7 @@ float QnAbstractMediaStreamDataProvider::getFrameRate() const
 float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
 {
     float rez = 0;
-    for (int i = 0; i < m_numberOfchannels; ++i)
+    for (int i = 0; i < getNumberOfChannels(); ++i)
         rez += m_stat[i].getAverageGopSize();
 
     return rez / getNumberOfChannels();
@@ -187,7 +183,7 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
                     // Most likely, timestamps reported by the camera are not so good.
                     NX_VERBOSE(this, lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
                         arg(timeDiff).
-                        arg(m_mediaResource ? m_mediaResource->getName() : QString()).
+                        arg(m_resource ? m_resource->getName() : QString()).
                         arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")));
 
                     media->timestamp = m_lastMediaTime[channel] + minFrameDurationUsec;

@@ -17,7 +17,7 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 
 //-------------------------------------------------------------------------------------------------
 
-nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parseObjectMetadataXml(
+std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket>> parseObjectMetadataXml(
     const QByteArray& data, const Hanwha::EngineManifest& manifest);
 
 //-------------------------------------------------------------------------------------------------

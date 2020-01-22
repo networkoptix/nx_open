@@ -49,7 +49,7 @@ public:
     virtual bool setProperty(
         const QString& key,
         const QString& value,
-        PropertyOptions options) override;
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     virtual bool saveProperties() override;
     virtual bool init() override;

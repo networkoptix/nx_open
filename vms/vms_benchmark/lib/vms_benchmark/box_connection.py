@@ -57,7 +57,6 @@ class BoxConnection:
         self.eth_speed = None
 
     def supply_host_key(self, host_key):
-        assert self.ssh_args[0] == 'plink'  # ssh: StrictHostKeyChecking=no
         self.ssh_args += ['-hostkey', host_key]
         logging.info("SSH command:\n    " + '\n    '.join(self.ssh_args))
 
