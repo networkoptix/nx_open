@@ -233,9 +233,9 @@ void SimpleReorderer::flushData(const QnAbstractDataPacketPtr& data)
     m_queue.push_back(data);
 }
 
-std::deque<QnAbstractDataPacketPtr>& SimpleReorderer::queue() 
-{ 
-    return m_queue; 
+std::deque<QnAbstractDataPacketPtr>& SimpleReorderer::queue()
+{
+    return m_queue;
 }
 
 } // namespace nx::vms::server
