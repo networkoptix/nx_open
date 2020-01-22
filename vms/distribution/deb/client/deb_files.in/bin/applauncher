@@ -16,4 +16,4 @@ else
     fi
 fi
 
-"$APPLAUNCHER_DIR/applauncher-bin" $@
+"$APPLAUNCHER_DIR/applauncher-bin" "$@"
