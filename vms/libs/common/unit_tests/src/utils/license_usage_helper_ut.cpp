@@ -8,6 +8,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <licensing/license_pool_scaffold.h>
 #include <licensing/license_stub.h>
@@ -713,4 +714,45 @@ TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
 
     camera->setParentId(m_armServer->getId());
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
+}
+
+TEST_F(QnLicenseUsageHelperTest, proposeToStartVideowallControl)
+{
+    QnUuid localInstanceId = QnUuid::createUuid();
+
+    QnVideoWallItem item1;
+    item1.uuid = QnUuid::createUuid();
+
+    QnVideoWallItem item2;
+    item2.uuid = QnUuid::createUuid();
+
+    auto videowall = addVideoWall();
+    videowall->items()->addItem(item1);
+    videowall->items()->addItem(item2);
+
+    QnVideoWallLicenseUsageHelper helper(commonModule());
+    ASSERT_FALSE(helper.isValid(Qn::LC_VideoWall));
+    addLicenses(Qn::LC_VideoWall, 1);
+
+    ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
+
+    {   // In the initial state we can start controlling.
+        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, localInstanceId);
+        ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
+    }
+
+    item1.runtimeStatus.online = true;
+    item1.runtimeStatus.controlledBy = localInstanceId;
+    videowall->items()->updateItem(item1);
+
+    {   // Another client cannot start control.
+        const auto anotherInstanceId = QnUuid::createUuid();
+        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, anotherInstanceId);
+        ASSERT_FALSE(helper.isValid(Qn::LC_VideoWall));
+    }
+
+    {   // We can switch our control to another item.
+        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, localInstanceId);
+        ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
+    }
 }

@@ -721,7 +721,8 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens)
 QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(
     QnVideoWallLicenseUsageHelper* helper,
     int screenCount,
-    int controlSessionsCount)
+    int controlSessionsCount,
+    QnUuid controllerId)
     :
     m_helper(helper),
     m_count(0)

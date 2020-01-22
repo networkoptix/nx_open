@@ -252,7 +252,8 @@ public:
     QnVideoWallLicenseUsageProposer(
         QnVideoWallLicenseUsageHelper* helper,
         int screenCount,
-        int controlSessionsCount);
+        int controlSessionsCount,
+        QnUuid controllerId = QnUuid());
     ~QnVideoWallLicenseUsageProposer();
 private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
