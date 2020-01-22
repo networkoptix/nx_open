@@ -240,13 +240,23 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
-            NX_DEBUG(this, lit("Applying SQL update %1").arg(fileName));
-            if (!beforeInstallUpdate(fileName))
-                return false;
-            if (!nx::sql::SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
-                return false;
-            if (!afterInstallUpdate(fileName))
-                return false;
+            // Is is required for safe rename from their initial incorrect names, which may cause
+            // harmfull reordering.
+            const auto alternativeName = alternativeUpdateName(fileName);
+            if (existUpdates.contains(alternativeName))
+            {
+                NX_DEBUG(this, "Skiping SQL update %1 bcause of %2", fileName, alternativeName);
+            }
+            else
+            {
+                NX_DEBUG(this, "Applying SQL update %1", fileName);
+                if (!beforeInstallUpdate(fileName))
+                    return false;
+                if (!nx::sql::SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
+                    return false;
+                if (!afterInstallUpdate(fileName))
+                    return false;
+            }
 
             QSqlQuery insQuery(m_sdb);
             insQuery.prepare(lit("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)"));
@@ -263,6 +273,11 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     }
 
     return true;
+}
+
+QString QnDbHelper::alternativeUpdateName(const QString& updateName) const
+{
+    return updateName;
 }
 
 bool QnDbHelper::beforeInstallUpdate(const QString& /*updateName*/)

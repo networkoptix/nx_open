@@ -809,6 +809,7 @@ namespace detail
         template <class ObjectListType>
         bool queryObjects(ObjectListType& objects);
 
+        virtual QString alternativeUpdateName(const QString& updateName) const override;
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
 

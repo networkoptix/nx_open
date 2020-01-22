@@ -62,6 +62,7 @@ public:
     virtual QnDbTransaction* getTransaction() = 0;
 
     bool applyUpdates(const QString &dirName);
+    virtual QString alternativeUpdateName(const QString& updateName) const;
     virtual bool beforeInstallUpdate(const QString& updateName);
     virtual bool afterInstallUpdate(const QString& updateName);
 
