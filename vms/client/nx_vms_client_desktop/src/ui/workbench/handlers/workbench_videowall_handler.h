@@ -122,7 +122,10 @@ private:
      */
     bool checkLocalFiles(const QnVideoWallItemIndex& index, const QnLayoutResourcePtr& layout);
 
-    bool validateLicenses(const QString& detail) const;
+    /**
+     * Show licenses error dialog with a corresponding text.
+     */
+    void showLicensesErrorDialog(const QString& detail) const;
 
     /** Returns id of the running client that is currently controlling provided layout. */
     QnUuid getLayoutController(const QnUuid& layoutId);

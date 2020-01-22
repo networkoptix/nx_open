@@ -738,23 +738,17 @@ TEST_F(QnLicenseUsageHelperTest, proposeToStartVideowallControl)
 
     ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
 
-    {   // In the initial state we can start controlling.
-        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, localInstanceId);
-        ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
-    }
+    // In the initial state we can start controlling.
+    ASSERT_TRUE(helper.canStartControlSession(localInstanceId));
 
     item1.runtimeStatus.online = true;
     item1.runtimeStatus.controlledBy = localInstanceId;
     videowall->items()->updateItem(item1);
 
-    {   // Another client cannot start control.
-        const auto anotherInstanceId = QnUuid::createUuid();
-        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, anotherInstanceId);
-        ASSERT_FALSE(helper.isValid(Qn::LC_VideoWall));
-    }
+    // Another client cannot start control.
+    const auto anotherInstanceId = QnUuid::createUuid();
+    ASSERT_FALSE(helper.canStartControlSession(anotherInstanceId));
 
-    {   // We can switch our control to another item.
-        QnVideoWallLicenseUsageProposer proposer(&helper, 0, 1, localInstanceId);
-        ASSERT_TRUE(helper.isValid(Qn::LC_VideoWall));
-    }
+    // We can switch our control to another item.
+    ASSERT_TRUE(helper.canStartControlSession(localInstanceId));
 }

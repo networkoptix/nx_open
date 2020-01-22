@@ -715,6 +715,12 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens)
     return (screens + 1) / 2;
 }
 
+bool QnVideoWallLicenseUsageHelper::canStartControlSession(const QnUuid& controllerInstanceId)
+{
+    QnVideoWallLicenseUsageProposer proposer(this, 0, 1, controllerInstanceId);
+    return isValid(Qn::LC_VideoWall);
+}
+
 /************************************************************************/
 /* QnVideoWallLicenseUsageProposer                                      */
 /************************************************************************/
