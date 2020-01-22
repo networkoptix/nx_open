@@ -81,6 +81,7 @@ AsyncClient::AsyncClient():
     m_requestSequence(0),
     m_forcedEof(false),
     m_precalculatedAuthorizationDisabled(false),
+    m_hideDefaultPortInHost(false),
     m_numberOfRedirectsTried(0)
 {
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
@@ -525,6 +526,11 @@ void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 void AsyncClient::setDisablePrecalculatedAuthorization(bool val)
 {
     m_precalculatedAuthorizationDisabled = val;
+}
+
+void AsyncClient::setHideDefaultPortInHost(bool value)
+{
+    m_hideDefaultPortInHost = value;
 }
 
 void AsyncClient::setSendTimeout(std::chrono::milliseconds sendTimeout)
@@ -1352,11 +1358,11 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx::network::http:
 
         if (m_additionalHeaders.count("Host") == 0)
         {
+            const auto host = nx::network::url::getEndpoint(
+                m_contentLocationUrl, m_hideDefaultPortInHost);
             nx::network::http::insertOrReplaceHeader(
                 &m_request.headers,
-                HttpHeader(
-                    "Host",
-                    nx::network::url::getEndpoint(m_contentLocationUrl).toString().toUtf8()));
+                HttpHeader("Host", host.toString().toUtf8()));
         }
     }
 

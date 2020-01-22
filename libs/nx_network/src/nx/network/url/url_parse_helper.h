@@ -15,7 +15,7 @@ namespace url {
  * @return 0 for unknown scheme
  */
 NX_NETWORK_API quint16 getDefaultPortForScheme(const QString& scheme);
-NX_NETWORK_API SocketAddress getEndpoint(const nx::utils::Url&);
+NX_NETWORK_API SocketAddress getEndpoint(const nx::utils::Url& url, bool hideDefaultPort = false);
 
 NX_NETWORK_API std::string normalizePath(const std::string&);
 NX_NETWORK_API QString normalizePath(const QString&);

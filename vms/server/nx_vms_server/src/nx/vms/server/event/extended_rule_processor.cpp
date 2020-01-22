@@ -465,7 +465,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             nx::network::http::HttpHeaders(),
             actionParameters.authType,
             nx::network::http::AsyncHttpClient::Timeouts(),
-            requestType);
+            requestType,
+            /*hideDefaultPortInHost*/ true);
         return true;
     }
     else
@@ -496,7 +497,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             callback,
             actionParameters.authType,
             QString(), QString(), //< login/password.
-            requestType);
+            requestType,
+            /*hideDefaultPortInHost*/ true);
         return true;
     }
 }
