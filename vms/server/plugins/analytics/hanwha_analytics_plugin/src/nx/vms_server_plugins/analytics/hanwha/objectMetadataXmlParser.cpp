@@ -200,7 +200,7 @@ Ptr<ObjectMetadata> extractObject(
         return result;
 
     result = makePtr<ObjectMetadata>();
-    static const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(objectId);
+    const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(objectId);
     result->setTrackId(trackId);
 
     result->setTypeId(objectTypeId);
@@ -215,10 +215,10 @@ Ptr<ObjectMetadata> extractObject(
 
 //-------------------------------------------------------------------------------------------------
 
-std::vector<Ptr<ObjectMetadataPacket>> parseObjectMetadataXml(
+Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
     const QByteArray& data, const Hanwha::EngineManifest& manifest)
 {
-    std::vector<Ptr<ObjectMetadataPacket>> result;
+    Ptr<ObjectMetadataPacket> result;
 
     QDomDocument dom;
     dom.setContent(data, true);
@@ -256,6 +256,7 @@ std::vector<Ptr<ObjectMetadataPacket>> parseObjectMetadataXml(
     if (!frameScales)
         return result;
 
+    result = makePtr<ObjectMetadataPacket>();
     QDomElement object = transformation.nextSiblingElement();
     for (; !object.isNull(); object = object.nextSiblingElement())
     {
@@ -263,15 +264,12 @@ std::vector<Ptr<ObjectMetadataPacket>> parseObjectMetadataXml(
         {
             if (timestampAttribute)
                 objectMetadata->addAttribute(timestampAttribute);
-            Ptr<ObjectMetadataPacket> packet = makePtr<ObjectMetadataPacket>();
-            packet->addItem(objectMetadata.releasePtr());
-            result.push_back(packet);
+            result->addItem(objectMetadata.releasePtr());
         }
     }
 
     //static int i = 0;
     //++i;
-
     //auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
     ////const auto ts = dataPacket->timestampUs();
     //objectMetadataPacket->setTimestampUs(timestamp);
