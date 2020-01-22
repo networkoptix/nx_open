@@ -366,20 +366,15 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 }
 
 /**
- Heuristic algorithm, that tries to fix incorrect URI of media stream for Dahua cameras.
+ * Heuristic algorithm, that tries to fix incorrect URI of media stream for Dahua cameras.
 
- Many Dahua cameras have a bug in ONVIF API implementation: GetMediaUri returns the same URL for
- different profiles (namely the ULR for the zero profile). This algorithm uses several assumptions,
- that were made after experimenting with Dahua cameras. Some of these assumptions may be wrong for
- some devices. In this case this function apparently should be updated.
-
- Common stream URL looks like the following:
- rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
- If incoming URL does not look like it, the function does nothing (otherwise it can corrupt
- the correct URL)
-
- The symptom of incorrect ULR is a zero value of subtype parameter. If so, the URL potentially
- should be fixed.
+ * Many Dahua cameras have a bug in ONVIF API implementation: GetMediaUri returns the same URL for
+ * different profiles (namely the ULR for the zero profile): channel number and subtype may be
+ * wrong.
+ * Common stream URL looks like the following:
+ * rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
+ * If incoming URL does not look like it, the function does nothing (otherwise it can corrupt
+ * the correct URL).
 */
 void QnOnvifStreamReader::fixDahuaStreamUrl(
     QString* urlString, const std::string& profileToken) const
@@ -398,9 +393,6 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
 
     const int neededSubtypeNumber = code % 100;
     const int neededChannelNumber = code / 100 + 1;
-
-    if (neededSubtypeNumber == 0)
-        return; //< Practice shows that urls are always correct for zero profile, no fix needed.
 
     constexpr auto kPath("/cam/realmonitor");
     constexpr auto kChannel("channel");
@@ -424,27 +416,11 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     if (!isNumber)
         return; //< Unknown url format => url should not be fixed.
 
-    if (currentChannelNumber != neededChannelNumber)
-    {
-        // Practice shows that `neededChannelNumber` (taken form Profile token) and
-        // `neededChannelNumber` (taken from ulr) are always equal. If not - url has
-        // unexpected format and better not to be fixed.
-        return;
-    }
+    // Fix channel.
+    query.removeQueryItem(kChannel);
+    query.addQueryItem(kChannel, QString::number(neededChannelNumber));
 
-    // Here we consider, that url is fixable.
-
-    if (currentSubtypeNumber != 0)
-    {
-        // Practice shows that ULRs with non-zero subtype are correct.
-        return;
-    }
-
-    if (currentSubtypeNumber == neededSubtypeNumber)
-    {
-        // Ulr seems to be correct, no fix needed.
-        return;
-    }
+    // Fix subtype (primary/secondary).
     query.removeQueryItem(kSubtype);
     query.addQueryItem(kSubtype, QString::number(neededSubtypeNumber));
 
