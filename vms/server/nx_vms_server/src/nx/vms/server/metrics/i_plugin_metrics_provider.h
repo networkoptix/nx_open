@@ -9,6 +9,7 @@ namespace nx::vms::server::metrics {
 struct PluginMetrics
 {
     QString name;
+    QString version;
     int numberOfBoundResources = 0;
     int numberOfAliveBoundResources = 0;
 };

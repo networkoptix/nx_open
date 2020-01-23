@@ -349,8 +349,11 @@ std::vector<PluginMetrics> Manager::metrics() const
 
             if (engineMetrics[engineId].name.isEmpty())
             {
-                if (const auto engineResource = resourcePool()->getResourceById(engineId))
+                if (const auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
+                {
                     engineMetrics[engineId].name = engineResource->getName();
+                    engineMetrics[engineId].version = engineResource->plugin()->manifest().version;
+                }
             }
         }
     }
