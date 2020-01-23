@@ -78,6 +78,8 @@ void AnalyticsSettingsMultiListener::Private::resubscribe()
     }
 
     oldListeners.clear();
+
+    emit q->enginesChanged();
 }
 
 void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
