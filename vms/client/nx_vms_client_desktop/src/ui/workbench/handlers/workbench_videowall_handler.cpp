@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
@@ -1142,8 +1143,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
-        QnMessageBox::warning(mainWindowWidget(),
-            tr("Video Wall license required"),
+        showLicensesErrorDialog(
             tr("To enable this feature, please activate a Video Wall license."));
         return false;
     }
@@ -1515,15 +1515,12 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-
-    QnLicenseListHelper licenseList(licensePool()->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall, licensePool()->validator()) == 0)
+    if (m_licensesHelper->totalLicenses(Qn::LC_VideoWall) == 0)
     {
-        QnMessageBox::warning(mainWindowWidget(),
-            tr("Video Wall license required"),
-            tr("To enable Video Wall, please activate a Video Wall license."));
+        showLicensesErrorDialog(
+            tr("To enable this feature, please activate a Video Wall license."));
         return;
-    } //< TODO: #GDM add "Licenses" button.
+    }
 
     QStringList usedNames;
     for (const auto& resource: resourcePool()->getResourcesWithFlag(Qn::videowall))
@@ -3331,8 +3328,27 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(
 
 void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail) const
 {
-    // TODO: #GDM Show specific dialog with "Add licenses" button.
-    QnMessageBox::warning(mainWindowWidget(), tr("More Video Wall licenses required"), detail);
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Warning,
+        tr("More Video Wall licenses required"),
+        detail,
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Ok,
+        mainWindowWidget());
+
+    if (menu()->canTrigger(ui::action::PreferencesLicensesTabAction))
+    {
+        auto activateLicensesButton =
+            messageBox.addButton(tr("Activate License..."), QDialogButtonBox::HelpRole);
+        connect(activateLicensesButton, &QPushButton::clicked, this,
+            [this, &messageBox]
+            {
+                messageBox.accept();
+                menu()->trigger(ui::action::PreferencesLicensesTabAction);
+            });
+    }
+
+    messageBox.exec();
 }
 
 QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid& layoutId)
