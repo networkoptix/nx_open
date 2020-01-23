@@ -186,6 +186,8 @@ nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
         return DeviceType::encoder;
     if (isMultiSensorCamera())
         return DeviceType::multisensorCamera;
+    if (!hasVideo())
+        return DeviceType::hornSpeaker;
     return DeviceType::camera;
 }
 
