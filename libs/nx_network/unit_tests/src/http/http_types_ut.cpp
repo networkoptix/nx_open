@@ -722,6 +722,22 @@ TEST_F(HttpHeaderServer, empty_product_not_first)
     test(false, serverHeader, "Product1/1.2.3.4 /5.6.7.8 (comment2)");
 }
 
+//-------------------------------------------------------------------------------------------------
+
+TEST(HttpHeaderHost, toString_omits_default_ports)
+{
+    ASSERT_EQ("example.com", Host("example.com:80").toString());
+    ASSERT_EQ("example.com", Host("example.com:443").toString());
+}
+
+TEST(HttpHeaderHost, toString_adds_non_default_ports)
+{
+    ASSERT_EQ("example.com:8080", Host("example.com:8080").toString());
+    ASSERT_EQ("example.com:1443", Host("example.com:1443").toString());
+}
+
+//-------------------------------------------------------------------------------------------------
+
 TEST(Http_readHeader, int_value)
 {
     nx::network::http::HttpHeaders headers;

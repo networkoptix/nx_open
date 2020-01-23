@@ -14,6 +14,7 @@
 #include <QtCore/QByteArray>
 
 #include <nx/network/buffer.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
@@ -783,6 +784,20 @@ struct NX_NETWORK_API ContentType
 
     ContentType(const StringType& headerValue = kPlain.toString());
     StringType toString() const;
+};
+
+class NX_NETWORK_API Host
+{
+public:
+    Host(const SocketAddress& endpoint);
+
+    /**
+     * Always omits default HTTP ports (80, 443).
+     */
+    StringType toString() const;
+
+private:
+    SocketAddress m_endpoint;
 };
 
 } // namespace header

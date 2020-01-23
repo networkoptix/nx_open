@@ -1915,6 +1915,21 @@ StringType ContentType::toString() const
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+Host::Host(const SocketAddress& endpoint):
+    m_endpoint(endpoint)
+{
+}
+
+StringType Host::toString() const
+{
+    if (m_endpoint.port == DEFAULT_HTTP_PORT || m_endpoint.port == DEFAULT_HTTPS_PORT)
+        return m_endpoint.address.toString().toUtf8();
+    else
+        return m_endpoint.toString().toUtf8();
+}
+
 } // namespace header
 
 //-------------------------------------------------------------------------------------------------
