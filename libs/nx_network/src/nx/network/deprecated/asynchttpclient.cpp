@@ -353,11 +353,6 @@ void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
     m_delegate.setDisablePrecalculatedAuthorization(val);
 }
 
-void AsyncHttpClient::setHideDefaultPortInHost(bool value)
-{
-    m_delegate.setHideDefaultPortInHost(value);
-}
-
 void AsyncHttpClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
 {
     m_delegate.setSendTimeout(std::chrono::milliseconds(sendTimeoutMs));
@@ -583,8 +578,7 @@ void downloadFileAsyncEx(
     const nx::network::http::HttpHeaders& extraHeaders,
     AuthType authType,
     AsyncHttpClient::Timeouts timeouts,
-    nx::network::http::Method::ValueType method,
-    bool hideDefaultPortInHost)
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setAdditionalHeaders(extraHeaders);
@@ -592,7 +586,6 @@ void downloadFileAsyncEx(
     httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
     httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
-    httpClient->setHideDefaultPortInHost(hideDefaultPortInHost);
     downloadFileAsyncEx(url, completionHandlerEx, std::move(httpClient), method);
 }
 
@@ -656,8 +649,7 @@ void uploadDataAsync(
     const AuthType authType,
     const QString& user,
     const QString& password,
-    nx::network::http::Method::ValueType method,
-    bool hideDefaultPortInHost)
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClientHolder = nx::network::http::AsyncHttpClient::create();
     httpClientHolder->setAdditionalHeaders(extraHeaders);
@@ -667,7 +659,6 @@ void uploadDataAsync(
         httpClientHolder->setUserPassword(password);
 
     httpClientHolder->setAuthType(authType);
-    httpClientHolder->setHideDefaultPortInHost(hideDefaultPortInHost);
 
     auto completionFunc = [callback, httpClientHolder]
         (nx::network::http::AsyncHttpClientPtr httpClient) mutable

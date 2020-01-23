@@ -270,9 +270,6 @@ public:
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
 
-    /** If true, Host will not contain default protocol port. Required for some buggy devices. false by default. */
-    void setHideDefaultPortInHost(bool value);
-
     /** Set socket connect/send timeout. */
     void setSendTimeout(std::chrono::milliseconds sendTimeout);
     /**
@@ -384,7 +381,6 @@ private:
     int m_requestSequence;
     bool m_forcedEof;
     bool m_precalculatedAuthorizationDisabled;
-    bool m_hideDefaultPortInHost;
     int m_numberOfRedirectsTried;
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;

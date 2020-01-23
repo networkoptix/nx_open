@@ -189,8 +189,6 @@ public:
      */
     void setDisablePrecalculatedAuthorization(bool val);
 
-    void setHideDefaultPortInHost(bool value);
-
     /** Set socket connect/send timeout. */
     void setSendTimeoutMs(unsigned int sendTimeoutMs);
     /**
@@ -440,8 +438,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     const nx::network::http::HttpHeaders& extraHeaders = nx::network::http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = defaultDownloadTimeouts(),
-    nx::network::http::Method::ValueType method = nx::network::http::Method::get,
-    bool hideDefaultPortInHost = false);
+    nx::network::http::Method::ValueType method = nx::network::http::Method::get);
 
 void downloadFileAsyncEx(
     const nx::utils::Url& url,
@@ -462,8 +459,7 @@ void NX_NETWORK_API uploadDataAsync(
     const AuthType authType = AuthType::authBasicAndDigest,
     const QString& user = QString(),
     const QString& password = QString(),
-    nx::network::http::Method::ValueType method = nx::network::http::Method::ValueType(),
-    bool hideDefaultPortInHost = false);
+    nx::network::http::Method::ValueType method = nx::network::http::Method::ValueType());
 
 SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
     const nx::utils::Url& url,
