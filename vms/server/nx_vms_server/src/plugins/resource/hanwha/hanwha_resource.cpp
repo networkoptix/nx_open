@@ -900,6 +900,15 @@ CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
         setStatus(status);
     }
 
+    // Update video related parameters in database for more accurate metrics.
+    QSet<QString> videoParametersIds;
+    for (const auto [id, info]: m_advancedParameterInfos)
+    {
+        if (id.contains("videoprofile"))
+            videoParametersIds.insert(id);
+    }
+    setApiParameters(getApiParameters(videoParametersIds));
+
     return result;
 }
 
