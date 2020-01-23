@@ -120,7 +120,6 @@ private:
     mutable double m_prevSampleAspectRatio;
     qint64 m_prevTimestamp;
     bool m_spsFound;
-    std::deque<qint64> m_dtsQueue;
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;
     bool m_needRecreate;
