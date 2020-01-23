@@ -130,6 +130,9 @@ private:
 
     void updateSystemHasManyServers();
 
+    void registerAliveNode(const QnResourceTreeModelNode* node);
+    void unregisterAliveNode(const QnResourceTreeModelNode* node);
+
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr& resource);
     void at_resPool_resourceRemoved(const QnResourcePtr& resource);
@@ -173,6 +176,9 @@ private:
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;
 
+    /** Set of all instantiated nodes for safety checks. */
+    QSet<const QnResourceTreeModelNode*> m_allAliveNodes;
+
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
 
@@ -187,6 +193,7 @@ private:
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
 
+    bool m_beingDestroyed = false;
     bool m_resetInProgress = false;
     int m_userChangedDepth = 0;
 };

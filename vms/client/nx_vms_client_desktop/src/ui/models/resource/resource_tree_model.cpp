@@ -245,6 +245,7 @@ QnResourceTreeModel::QnResourceTreeModel(
 
 QnResourceTreeModel::~QnResourceTreeModel()
 {
+    m_beingDestroyed = true;
     QSignalBlocker scopedSignalBlocker(this); // TODO: #vbreus Ideally this shouldn't be needed
     for (auto node: m_allNodes)
         node->deinitialize();
@@ -668,7 +669,15 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::rootNode(NodeType nodeType) cons
 // -------------------------------------------------------------------------- //
 QModelIndex QnResourceTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
-    if(!hasIndex(row, column, parent)) /* hasIndex calls rowCount and columnCount. */
+    if (parent.isValid())
+    {
+        const QnResourceTreeModelNode* parentInternalNode =
+            static_cast<QnResourceTreeModelNode*>(parent.internalPointer());
+        if (!NX_ASSERT(m_allAliveNodes.contains(parentInternalNode)))
+            return QModelIndex();
+    }
+
+    if (!hasIndex(row, column, parent)) /* hasIndex calls rowCount and columnCount. */
         return QModelIndex();
 
     return node(parent)->child(row)->createIndex(row, column);
@@ -1332,6 +1341,18 @@ void QnResourceTreeModel::updateSystemHasManyServers()
     }
 
     updateNodeParent(m_rootNodes[ResourceTreeNodeType::servers]);
+}
+
+void QnResourceTreeModel::registerAliveNode(const QnResourceTreeModelNode* node)
+{
+    if (!m_beingDestroyed)
+        m_allAliveNodes.insert(node);
+}
+
+void QnResourceTreeModel::unregisterAliveNode(const QnResourceTreeModelNode* node)
+{
+    if (!m_beingDestroyed)
+        m_allAliveNodes.remove(node);
 }
 
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
