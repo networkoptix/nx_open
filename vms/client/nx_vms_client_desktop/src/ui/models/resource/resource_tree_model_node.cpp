@@ -81,6 +81,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
     m_checkedChildren(0)
 {
     NX_ASSERT(model != NULL);
+    if (m_model)
+        m_model->registerAliveNode(this);
+
     m_editable.checked = false;
     m_icon = calculateIcon();
 }
@@ -88,6 +91,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, QnUuid())
 {
+    if (m_model)
+        m_model->registerAliveNode(this);
+
     switch(nodeType)
     {
     case NodeType::root:
@@ -183,6 +189,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType, const QString &name) :
     QnResourceTreeModelNode(model, nodeType)
 {
+    if (m_model)
+        m_model->registerAliveNode(this);
+
     NX_ASSERT(
         nodeType == NodeType::localSystem
         || nodeType == NodeType::recorder
@@ -198,6 +207,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
+    if (m_model)
+        m_model->registerAliveNode(this);
+
     NX_ASSERT(nodeType == NodeType::resource
         || nodeType == NodeType::edge
         || nodeType == NodeType::sharedLayout
@@ -214,6 +226,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, uuid)
 {
+    if (m_model)
+        m_model->registerAliveNode(this);
+
     NX_ASSERT(nodeType == NodeType::layoutItem
         || nodeType == NodeType::videoWallItem
         || nodeType == NodeType::videoWallMatrix
@@ -245,6 +260,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 
 QnResourceTreeModelNode::~QnResourceTreeModelNode()
 {
+    if (m_model)
+        m_model->unregisterAliveNode(this);
+
     NX_ASSERT(m_resource.isNull());
 }
 
