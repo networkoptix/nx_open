@@ -802,6 +802,16 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
                 }
             }
+            if (m_resyncFlags.testFlag(ResyncCameras))
+            {
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    nx::vms::api::CameraData,
+                    nx::vms::api::CameraDataList>(ApiCommand::saveCamera))
+                {
+                    return false;
+                }
+            }
         }
 
         // Set admin user's password
@@ -1782,6 +1792,41 @@ bool QnDbManager::encryptStoragePasswords()
     return true;
 }
 
+bool QnDbManager::fixHttpsCameraUrls()
+{
+    QSqlQuery query(m_sdb);
+    QString queryString = "UPDATE vms_resource SET url = ? WHERE id = ?";
+    if (!query.prepare(queryString))
+        return false;
+
+    nx::vms::api::CameraDataList cameraList;
+    if (doQueryNoLock(QnUuid(), cameraList) != ErrorCode::ok)
+        return false;
+
+    for (const auto camera: cameraList)
+    {
+        nx::utils::Url url(camera.url);
+        if (url.scheme() != nx::network::http::kSecureUrlSchemeName
+            || url.port() != nx::network::http::DEFAULT_HTTP_PORT)
+        {
+            continue;
+        }
+
+        url.setPort(-1);
+        NX_DEBUG(this, "Remove port on camera %1 in likely incorrect URL: %2", camera.id, camera.url);
+
+        query.addBindValue(url.toString());
+        query.addBindValue(camera.id.toString());
+        if (!query.exec())
+        {
+            NX_ERROR(this, "Failed to execute query %1. Error: %2", queryString, query.lastError());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::encryptBusinessRules()
 {
     QSqlQuery query(m_sdb);
@@ -2121,6 +2166,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
         return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/99_20200122_fix_https_camera_urls.sql")))
+        return fixHttpsCameraUrls() && resyncIfNeeded(ResyncCameras);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

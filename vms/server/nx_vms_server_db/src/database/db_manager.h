@@ -784,6 +784,7 @@ namespace detail
             ResyncResourceProperties = 0x10000,
             ResyncAnalyticsPlugins = 0x20000,
             ResyncAnalyticsEngines = 0x40000,
+            ResyncCameras = 0x80000,
        };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
@@ -830,6 +831,7 @@ namespace detail
         bool encryptKvPairs();
         bool encryptBusinessRules();
         bool encryptStoragePasswords();
+        bool fixHttpsCameraUrls();
         bool moveAnalyticsStorageIdToProperty();
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();
