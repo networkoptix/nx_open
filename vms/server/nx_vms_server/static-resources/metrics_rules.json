@@ -361,7 +361,7 @@
                     },
                     "recording": {
                         "name": "Recording",
-                        "format": "text",
+                        "format": "shortText",
                         "display": "table|panel"
                     }
                 }
