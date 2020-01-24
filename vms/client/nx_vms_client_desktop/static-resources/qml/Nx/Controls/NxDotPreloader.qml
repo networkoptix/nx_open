@@ -28,6 +28,7 @@ BusyIndicator
                 SequentialAnimation on opacity
                 {
                     id: opacityAnimation;
+                    running: control.running
 
                     PauseAnimation
                     {

@@ -157,7 +157,7 @@ Column
         NxDotPreloader
         {
             color: ColorTheme.brightText;
-            visible: control.isConnecting;
+            running: control.isConnecting;
 
             anchors.centerIn: parent;
         }
