@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -172,10 +173,14 @@ void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
         return;
 
     auto items = currentLayout->items(camera);
-    if (items.empty())
-        return;
+    auto iter = std::find_if(items.begin(), items.end(),
+        [](const QnWorkbenchItem* item)
+        {
+            return item->zoomRect().isNull();
+        });
 
-    workbench()->setItem(Qn::ZoomedRole, *items.cbegin());
+    if (iter != items.end())
+        workbench()->setItem(Qn::ZoomedRole, *iter);
 }
 
 void QnWorkbenchNotificationsHandler::handleExitFullscreenAction(
