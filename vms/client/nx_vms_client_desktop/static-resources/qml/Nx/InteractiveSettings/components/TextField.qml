@@ -6,7 +6,6 @@ LabeledItem
 {
     id: control
 
-    property alias value: textField.text
     property string defaultValue: ""
     property string validationRegex: ""
     property string validationRegexFlags: ""
@@ -21,7 +20,22 @@ LabeledItem
         text: defaultValue
         warningText: validationErrorMessage
 
-        textField.onEditingFinished:
+        textField.onEditingFinished: updateWarning()
+
+        function updateWarning()
+        {
             warningState = validationRegex && !validationRegex.test(text)
+        }
+    }
+
+    function getValue()
+    {
+        return textField.text
+    }
+
+    function setValue(value)
+    {
+        textField.text = value
+        textField.updateWarning()
     }
 }

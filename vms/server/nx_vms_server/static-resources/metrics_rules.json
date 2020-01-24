@@ -265,11 +265,11 @@
                         "insert": "encodedPixels"
                     },
                     "primaryStreams": {
-                        "name": "Primary streams",
+                        "name": "Outgoing Primary streams",
                         "display": "panel"
                     },
                     "secondaryStreams": {
-                        "name": "Secondary streams",
+                        "name": "Outgoing Secondary streams",
                         "display": "panel"
                     }
                 }

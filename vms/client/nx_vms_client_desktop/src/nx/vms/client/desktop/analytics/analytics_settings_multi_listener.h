@@ -30,6 +30,7 @@ public:
     QSet<QnUuid> engineIds() const;
 
 signals:
+    void enginesChanged();
     void valuesChanged(const QnUuid& engineId, const QJsonObject& values);
     void modelChanged(const QnUuid& engineId, const QJsonObject& values);
 

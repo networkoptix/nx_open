@@ -410,6 +410,7 @@ Item
         NxCirclesPreloader
         {
             id: preloader;
+            running: parent.visible
             anchors.horizontalCenter: parent.horizontalCenter;
         }
 

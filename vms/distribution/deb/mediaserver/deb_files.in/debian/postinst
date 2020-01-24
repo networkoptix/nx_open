@@ -342,7 +342,7 @@ startServer()
         echo "WARNING: Server process not found" \
             "despite 'systemctl start ...' finished with zero exit status." \
             "This could be caused by the server crash or slow starting. " \
-            "See Server logs (journalctl -u $COMPANY_NAME-mediaserver)." \
+            "See Server logs: journalctl -u $COMPANY_NAME-mediaserver" \
             >&2
     fi
 }

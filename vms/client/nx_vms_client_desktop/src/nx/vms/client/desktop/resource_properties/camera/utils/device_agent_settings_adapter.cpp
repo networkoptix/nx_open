@@ -53,7 +53,7 @@ void DeviceAgentSettingsAdapter::Private::updateLoadingState()
 
     if (settingsManager->isApplyingChanges())
     {
-        NX_VERBOSE(this, "Keep loading state as apply is in progress");
+        NX_VERBOSE(this, "Keep loading state while applying changes");
         loading = true;
     }
     else if (!currentEngineId.isNull() && settingsListener->model(currentEngineId).isEmpty())

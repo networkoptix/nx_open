@@ -44,8 +44,8 @@ using nx::vms::client::core::Geometry;
 
 namespace {
 
-// Peek objects up to 2 seconds in the future. Actual value will be limited by the delay buffer.
-static constexpr microseconds kFutureMetadataLength = 2s;
+// Peek objects up to 2 seconds in the future and into the past.
+static constexpr microseconds kMetadataWindowSize = 2s;
 
 // When metadata duration is not set, object will live for average period between metadata
 // packets plus this constant. This constant is needed to avoid areas flickering when average
@@ -54,17 +54,27 @@ static constexpr microseconds kMinimalObjectDuration = 50ms;
 
 static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
 
+milliseconds toMs(microseconds value)
+{
+    return duration_cast<milliseconds>(value);
+}
+
 struct TrackElement
 {
-    TrackElement(const QRectF& rectangle, microseconds timestamp):
-        rectangle(rectangle), timestamp(timestamp) {}
+    TrackElement(const ObjectMetadata& metadata, microseconds timestamp):
+        metadata(metadata), timestamp(timestamp) {}
 
-    QRectF rectangle;
+    ObjectMetadata metadata;
     microseconds timestamp = 0us;
 
     bool operator<(const TrackElement& other) const
     {
         return timestamp < other.timestamp;
+    }
+
+    bool operator<(const microseconds& other) const
+    {
+        return timestamp < other;
     }
 };
 
@@ -75,7 +85,6 @@ struct TrackElement
  */
 struct Track
 {
-    ObjectMetadata metadata;
     std::optional<microseconds> minimalDuration;
     std::vector<TrackElement> path; //< Cannot be empty.
 
@@ -95,6 +104,19 @@ struct Track
         return minimalDuration
             ? std::max(startTimestamp() + *minimalDuration, approximatedTimestamp)
             : approximatedTimestamp;
+    }
+
+    /**
+     * Trim track by start time, leaving the only one path element, located before or on the
+     * selected time.
+     */
+    void trimByStartTime(milliseconds startTime)
+    {
+        auto iter = std::lower_bound(path.begin(), path.end(), startTime);
+        if (iter == path.end() || (iter != path.begin() && toMs(iter->timestamp) > startTime))
+            --iter;
+        path.erase(path.begin(), iter);
+        NX_ASSERT(!path.empty());
     }
 };
 
@@ -135,11 +157,6 @@ QRectF interpolatedRectangle(
         / (qreal) (futureRectangleTimestamp - rectangleTimestamp).count();
 
     return linearCombine(1 - factor, rectangle, factor, futureRectangle);
-}
-
-milliseconds toMs(microseconds value)
-{
-    return duration_cast<milliseconds>(value);
 }
 
 QString approximateDebugTime(microseconds value)
@@ -379,8 +396,8 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
     // Peek some future metatada packets to prolong existing areas' lifetime at least until the
     // latest track id appearance.
     QList<ObjectMetadataPacketPtr> objectMetadataPackets = metadataProvider->metadataRange(
-        timestamp,
-        timestamp + kFutureMetadataLength,
+        timestamp - kMetadataWindowSize,
+        timestamp + kMetadataWindowSize,
         channel);
 
     // Left only objects which are to be displayed right now, store tracks for others.
@@ -400,14 +417,10 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
                 continue; //< Skip specialized best shot records.
 
             Track& track = objectTrackByTrackId[objectMetadata.trackId];
-            if (track.path.empty())
-            {
-                track.metadata = objectMetadata;
-                if (packetHasDuration)
-                    track.minimalDuration = microseconds(objectPacket->durationUs);
-            }
+            if (packetHasDuration)
+                track.minimalDuration = microseconds(objectPacket->durationUs);
 
-            track.path.emplace_back(objectMetadata.boundingBox, timestamp);
+            track.path.emplace_back(objectMetadata, timestamp);
             NX_ASSERT(std::is_sorted(track.path.cbegin(), track.path.cend()));
         }
     }
@@ -416,8 +429,14 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
     const auto timestampMs = toMs(timestamp);
 
     std::vector<Track> result;
-    for (const auto& track: objectTrackByTrackId)
+    for (auto track: objectTrackByTrackId)
     {
+        // Skip tracks which end before the current frame.
+        if (toMs(track.endTimestamp()) <= timestampMs)
+            continue;
+
+        track.trimByStartTime(timestampMs);
+
         if (toMs(track.path.cbegin()->timestamp) <= timestampMs)
             result.push_back(track);
     }
@@ -464,7 +483,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     // Process each object from the actual metadata packets.
     for (const auto& track: tracks)
     {
-        auto& objectInfo = d->addOrUpdateObject(track.metadata);
+        auto& objectInfo = d->addOrUpdateObject(track.path[0].metadata);
         objectInfo.startTimestamp = track.startTimestamp();
         objectInfo.endTimestamp = track.endTimestamp();
 
@@ -473,7 +492,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         {
             const auto& nextElement = track.path[1];
             objectInfo.futureRectangleTimestamp = nextElement.timestamp;
-            objectInfo.futureRectangle = nextElement.rectangle;
+            objectInfo.futureRectangle = nextElement.metadata.boundingBox;
         }
         else
         {

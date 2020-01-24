@@ -19,7 +19,7 @@ namespace {
 const int camerasPerAnalogEncoder = QnLicensePool::camerasPerAnalogEncoder();
 }
 
-class QnLicenseUsageHelperTest: public testing::Test, protected QnResourcePoolTestHelper
+class QnCamLicenseUsageHelperTest: public testing::Test, protected QnResourcePoolTestHelper
 {
 protected:
 
@@ -108,13 +108,13 @@ protected:
 };
 
 /** Initial test. Check if empty helper is valid. */
-TEST_F(QnLicenseUsageHelperTest, init)
+TEST_F(QnCamLicenseUsageHelperTest, init)
 {
     ASSERT_TRUE(m_helper->isValid());
 }
 
 /** Basic test for single license type. */
-TEST_F(QnLicenseUsageHelperTest, checkSingleLicenseType)
+TEST_F(QnCamLicenseUsageHelperTest, checkSingleLicenseType)
 {
     addRecordingCamera();
 
@@ -131,7 +131,7 @@ TEST_F(QnLicenseUsageHelperTest, checkSingleLicenseType)
 }
 
 /** Basic test for license borrowing. */
-TEST_F(QnLicenseUsageHelperTest, borrowTrialLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, borrowTrialLicenses)
 {
     addRecordingCamera(Qn::LC_VMAX);
     addRecordingCamera(Qn::LC_AnalogEncoder);
@@ -154,7 +154,7 @@ TEST_F(QnLicenseUsageHelperTest, borrowTrialLicenses)
 }
 
 /** Advanced test for license borrowing. */
-TEST_F(QnLicenseUsageHelperTest, borrowTrialAndEdgeLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, borrowTrialAndEdgeLicenses)
 {
     addRecordingCameras(Qn::LC_VMAX, 2);
     addRecordingCameras(Qn::LC_AnalogEncoder, 2);
@@ -170,7 +170,7 @@ TEST_F(QnLicenseUsageHelperTest, borrowTrialAndEdgeLicenses)
 }
 
 /** Advanced test for license borrowing. */
-TEST_F(QnLicenseUsageHelperTest, borrowDifferentLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, borrowDifferentLicenses)
 {
     /* 14 cameras total. */
     addRecordingCameras(Qn::LC_VMAX, 4);
@@ -193,7 +193,7 @@ TEST_F(QnLicenseUsageHelperTest, borrowDifferentLicenses)
  *  Test for analog encoders politics.
  *  One analog encoder license should allow to record up to camerasPerAnalogEncoder cameras.
  */
-TEST_F(QnLicenseUsageHelperTest, checkAnalogEncoderSimple)
+TEST_F(QnCamLicenseUsageHelperTest, checkAnalogEncoderSimple)
 {
     addLicenses(Qn::LC_AnalogEncoder, 1);
 
@@ -211,7 +211,7 @@ TEST_F(QnLicenseUsageHelperTest, checkAnalogEncoderSimple)
  *  One license should allow to record up to camerasPerAnalogEncoder cameras
  *  if and only if they are on the same encoder.
  */
-TEST_F(QnLicenseUsageHelperTest, checkAnalogEncoderGroups)
+TEST_F(QnCamLicenseUsageHelperTest, checkAnalogEncoderGroups)
 {
     addLicenses(Qn::LC_AnalogEncoder, 1);
 
@@ -228,7 +228,7 @@ TEST_F(QnLicenseUsageHelperTest, checkAnalogEncoderGroups)
  *  Test for borrowing licenses for analog encoders.
  *  All cameras that missing the analog encoder license should borrow other licenses one-to-one.
  */
-TEST_F(QnLicenseUsageHelperTest, borrowForAnalogEncoder)
+TEST_F(QnCamLicenseUsageHelperTest, borrowForAnalogEncoder)
 {
     int overflow = camerasPerAnalogEncoder - 1;
     if (overflow <= 0)
@@ -252,7 +252,7 @@ TEST_F(QnLicenseUsageHelperTest, borrowForAnalogEncoder)
  *  Test for calculating required licenses for analog encoders.
  *  For up to camerasPerAnalogEncoder cameras we should require only 1 analog encoder license.
  */
-TEST_F(QnLicenseUsageHelperTest, calculateRequiredLicensesForAnalogEncoder)
+TEST_F(QnCamLicenseUsageHelperTest, calculateRequiredLicensesForAnalogEncoder)
 {
     for (int i = 0; i < camerasPerAnalogEncoder; ++i)
     {
@@ -264,7 +264,7 @@ TEST_F(QnLicenseUsageHelperTest, calculateRequiredLicensesForAnalogEncoder)
 }
 
 /** Basic test for single license type proposing. */
-TEST_F(QnLicenseUsageHelperTest, proposeSingleLicenseType)
+TEST_F(QnCamLicenseUsageHelperTest, proposeSingleLicenseType)
 {
     auto cameras = addRecordingCameras(Qn::LC_Professional, 2, false);
 
@@ -277,7 +277,7 @@ TEST_F(QnLicenseUsageHelperTest, proposeSingleLicenseType)
 }
 
 /** Basic test for single license type proposing with borrowing. */
-TEST_F(QnLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing)
+TEST_F(QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing)
 {
     auto cameras = addRecordingCameras(Qn::LC_Professional, 2, false);
 
@@ -293,7 +293,7 @@ TEST_F(QnLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing)
  *  Basic test for analog encoder proposing.
  *  Valid helper should have correct proposedLicenses count.
  */
-TEST_F(QnLicenseUsageHelperTest, proposeAnalogEncoderCameras)
+TEST_F(QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras)
 {
     auto cameras = addRecordingCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder, false);
 
@@ -309,7 +309,7 @@ TEST_F(QnLicenseUsageHelperTest, proposeAnalogEncoderCameras)
  *  Basic test for analog encoder proposing with overflow.
  *  Invalid helper should have correct requiredLicenses count.
  */
-TEST_F(QnLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow)
+TEST_F(QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow)
 {
     int overflow = camerasPerAnalogEncoder - 1;
     if (overflow <= 0)
@@ -327,7 +327,7 @@ TEST_F(QnLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow)
 }
 
 /** Basic test for single license type requirement. */
-TEST_F(QnLicenseUsageHelperTest, checkRequiredLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, checkRequiredLicenses)
 {
     auto cameras = addRecordingCameras(Qn::LC_Professional, 2, false);
 
@@ -340,7 +340,7 @@ TEST_F(QnLicenseUsageHelperTest, checkRequiredLicenses)
 }
 
 /** Basic test for analog licenses requirement. */
-TEST_F(QnLicenseUsageHelperTest, checkRequiredAnalogLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, checkRequiredAnalogLicenses)
 {
     auto cameras = addRecordingCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder, false);
 
@@ -353,7 +353,7 @@ TEST_F(QnLicenseUsageHelperTest, checkRequiredAnalogLicenses)
 }
 
 /** Basic test for camera overflow. */
-TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflow)
+TEST_F(QnCamLicenseUsageHelperTest, checkLicenseOverflow)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional, true);
 
@@ -362,7 +362,7 @@ TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflow)
 }
 
 /** Basic test for camera overflow. */
-TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflowProposeEnable)
+TEST_F(QnCamLicenseUsageHelperTest, checkLicenseOverflowProposeEnable)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional, false);
 
@@ -376,7 +376,7 @@ TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflowProposeEnable)
 }
 
 /** Basic test for camera overflow. */
-TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflowProposeDisable)
+TEST_F(QnCamLicenseUsageHelperTest, checkLicenseOverflowProposeDisable)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional, true);
 
@@ -393,7 +393,7 @@ TEST_F(QnLicenseUsageHelperTest, checkLicenseOverflowProposeDisable)
 /**
  *  Profiling test.
  */
-TEST_F(QnLicenseUsageHelperTest, profileCalculateSpeed)
+TEST_F(QnCamLicenseUsageHelperTest, profileCalculateSpeed)
 {
     const int camerasCountPerType = 200;
     const int borrowedCount = 30;   //must be less than half of camerasCountPerType
@@ -430,7 +430,7 @@ TEST_F(QnLicenseUsageHelperTest, profileCalculateSpeed)
 }
 
 /** Basic test for io license type. */
-TEST_F(QnLicenseUsageHelperTest, checkIOLicenseType)
+TEST_F(QnCamLicenseUsageHelperTest, checkIOLicenseType)
 {
     addRecordingCamera(Qn::LC_IO, true);
 
@@ -441,7 +441,7 @@ TEST_F(QnLicenseUsageHelperTest, checkIOLicenseType)
 }
 
 /** Basic test for start license type. */
-TEST_F(QnLicenseUsageHelperTest, checkStartLicenseType)
+TEST_F(QnCamLicenseUsageHelperTest, checkStartLicenseType)
 {
     addRecordingCamera(Qn::LC_Professional, true);
 
@@ -452,7 +452,7 @@ TEST_F(QnLicenseUsageHelperTest, checkStartLicenseType)
 }
 
 /** Test for start license borrowing. */
-TEST_F(QnLicenseUsageHelperTest, borrowStartLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, borrowStartLicenses)
 {
     addRecordingCamera(Qn::LC_VMAX);
     addRecordingCamera(Qn::LC_AnalogEncoder);
@@ -479,7 +479,7 @@ TEST_F(QnLicenseUsageHelperTest, borrowStartLicenses)
 }
 
 /** Test for several start licenses in the same system. */
-TEST_F(QnLicenseUsageHelperTest, checkStartLicenseOverlapping)
+TEST_F(QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping)
 {
     addRecordingCameras(Qn::LC_Professional, 8, true);
 
@@ -495,7 +495,7 @@ TEST_F(QnLicenseUsageHelperTest, checkStartLicenseOverlapping)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkEdgeLicensesArmActivating)
+TEST_F(QnCamLicenseUsageHelperTest, checkEdgeLicensesArmActivating)
 {
     setArmMode();
     addLicenses(Qn::LC_Edge, 1);
@@ -504,7 +504,7 @@ TEST_F(QnLicenseUsageHelperTest, checkEdgeLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkStartLicensesArmActivating)
+TEST_F(QnCamLicenseUsageHelperTest, checkStartLicensesArmActivating)
 {
     setArmMode();
     addLicenses(Qn::LC_Start, 8);
@@ -513,7 +513,7 @@ TEST_F(QnLicenseUsageHelperTest, checkStartLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkProLicensesArmActivating)
+TEST_F(QnCamLicenseUsageHelperTest, checkProLicensesArmActivating)
 {
     setArmMode();
     addLicenses(Qn::LC_Professional, 8);
@@ -522,7 +522,7 @@ TEST_F(QnLicenseUsageHelperTest, checkProLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkIoLicensesArmActivating)
+TEST_F(QnCamLicenseUsageHelperTest, checkIoLicensesArmActivating)
 {
     setArmMode();
     addLicenses(Qn::LC_IO, 8);
@@ -530,7 +530,7 @@ TEST_F(QnLicenseUsageHelperTest, checkIoLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkVmaxInitLicense)
+TEST_F(QnCamLicenseUsageHelperTest, checkVmaxInitLicense)
 {
     addLicenses(Qn::LC_VMAX, 1);
     auto vmax = addCamera();
@@ -542,7 +542,7 @@ TEST_F(QnLicenseUsageHelperTest, checkVmaxInitLicense)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnLicenseUsageHelperTest, checkNvrInitLicense)
+TEST_F(QnCamLicenseUsageHelperTest, checkNvrInitLicense)
 {
     addLicenses(Qn::LC_Bridge, 1);
     auto nvr = addCamera();
@@ -555,7 +555,7 @@ TEST_F(QnLicenseUsageHelperTest, checkNvrInitLicense)
 }
 
 /** Check if license info is filled for every license type. */
-TEST_F(QnLicenseUsageHelperTest, validateLicenseInfo)
+TEST_F(QnCamLicenseUsageHelperTest, validateLicenseInfo)
 {
     for (int i = 0; i < Qn::LC_Count; ++i)
     {
@@ -575,7 +575,7 @@ TEST_F(QnLicenseUsageHelperTest, validateLicenseInfo)
 }
 
 /** Check if license names are filled for every license type. */
-TEST_F(QnLicenseUsageHelperTest, validateLicenseNames)
+TEST_F(QnCamLicenseUsageHelperTest, validateLicenseNames)
 {
     for (int i = 0; i < Qn::LC_Count; ++i)
     {
@@ -599,7 +599,7 @@ TEST_F(QnLicenseUsageHelperTest, validateLicenseNames)
 }
 
 /** Check if license names are filled for every license type. */
-TEST_F(QnLicenseUsageHelperTest, validateFutureLicenses)
+TEST_F(QnCamLicenseUsageHelperTest, validateFutureLicenses)
 {
     addFutureLicenses(1);
     addRecordingCameras(Qn::LC_Professional, 1, true);
@@ -607,7 +607,7 @@ TEST_F(QnLicenseUsageHelperTest, validateFutureLicenses)
 }
 
 /** Check if can enable recoding if everything is good. */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingTrivial)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingTrivial)
 {
     addLicense(Qn::LC_Professional);
     auto camera = addRecordingCamera(Qn::LC_Professional, false);
@@ -615,21 +615,21 @@ TEST_F(QnLicenseUsageHelperTest, canEnableRecordingTrivial)
 }
 
 /** Check if can enable recoding if recording is already enabled (even if no licenses). */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingIfAlreadyEnabled)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingIfAlreadyEnabled)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional);
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
 
 /** Check if cannot enable recoding if everything is bad. */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingTrivialNegative)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingTrivialNegative)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional, false);
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 }
 
 /** Check if can enable recoding with license borrowing. */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingBorrowing)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingBorrowing)
 {
     addLicense(Qn::LC_Professional);
     auto camera = addRecordingCamera(Qn::LC_Analog, false);
@@ -637,7 +637,7 @@ TEST_F(QnLicenseUsageHelperTest, canEnableRecordingBorrowing)
 }
 
 /** Check if can enable recoding if everything is good on the current camera type. */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingAlreadyInvalid)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingAlreadyInvalid)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional);
     addLicense(Qn::LC_Analog);
@@ -647,7 +647,7 @@ TEST_F(QnLicenseUsageHelperTest, canEnableRecordingAlreadyInvalid)
 }
 
 /** Check if cannot enable recoding if something is bad on one of the camera types. */
-TEST_F(QnLicenseUsageHelperTest, cannotExtendRecordingAlreadyInvalid)
+TEST_F(QnCamLicenseUsageHelperTest, cannotExtendRecordingAlreadyInvalid)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional);
     addLicense(Qn::LC_Analog);
@@ -659,7 +659,7 @@ TEST_F(QnLicenseUsageHelperTest, cannotExtendRecordingAlreadyInvalid)
 }
 
 /** Check if cannot enable recoding if license is used as borrowed. */
-TEST_F(QnLicenseUsageHelperTest, cannotSwitchUsedLicense)
+TEST_F(QnCamLicenseUsageHelperTest, cannotSwitchUsedLicense)
 {
     auto camera = addRecordingCamera(Qn::LC_Analog);
     addLicense(Qn::LC_Professional);
@@ -669,7 +669,7 @@ TEST_F(QnLicenseUsageHelperTest, cannotSwitchUsedLicense)
 }
 
 /** Check if call does not modify inner state. */
-TEST_F(QnLicenseUsageHelperTest, canEnableRecordingSavesState)
+TEST_F(QnCamLicenseUsageHelperTest, canEnableRecordingSavesState)
 {
     auto camera = addRecordingCamera(Qn::LC_Analog);
     auto secondCamera = addRecordingCamera(Qn::LC_Professional);
@@ -679,7 +679,7 @@ TEST_F(QnLicenseUsageHelperTest, canEnableRecordingSavesState)
     ASSERT_TRUE(m_helper->canEnableRecording(secondCamera));
 }
 
-TEST_F(QnLicenseUsageHelperTest, licenseTypeChanged)
+TEST_F(QnCamLicenseUsageHelperTest, licenseTypeChanged)
 {
     auto camera = addRecordingCamera(Qn::LC_Professional, false);
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
@@ -691,7 +691,7 @@ TEST_F(QnLicenseUsageHelperTest, licenseTypeChanged)
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
 }
 
-TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
+TEST_F(QnCamLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
 {
     auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
@@ -703,7 +703,7 @@ TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
 
-TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
+TEST_F(QnCamLicenseUsageHelperTest, moveArmCameraToArmServer)
 {
     auto camera = addDefaultRecordingCamera();
     ASSERT_FALSE(m_helper->canEnableRecording(camera));

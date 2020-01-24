@@ -4,6 +4,7 @@
 
 #include <ui/style/skin.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
@@ -12,8 +13,7 @@ namespace {
 
 QString getText(const QnMediaServerResourcePtr& server)
 {
-    return lit("%1 (%2)").arg(server->getName(),
-        server->getPrimaryAddress().address.toString());
+    return QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl);
 }
 
 QIcon getIcon(const QnMediaServerResourcePtr& server)

@@ -241,9 +241,7 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    QStringList arguments;
-    for (const auto& serialized: task.arguments)
-        arguments.append(serialized.split(QRegularExpression("\\s+"), QString::SkipEmptyParts));
+    QStringList arguments = task.arguments;
 
     if (AppInfo::isLinux())
     {

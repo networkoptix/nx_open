@@ -1,8 +1,6 @@
 set(depends
     desktop_client
-    mediaserver
-    server_plugins
-    testcamera
+    applauncher
 )
 
 # Files copied to .deb by build_distribution.sh.

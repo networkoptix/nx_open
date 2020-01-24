@@ -625,37 +625,43 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(
     :
     base_type(commonModule, parent)
 {
-    auto updateIfNeeded =
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource.dynamicCast<QnVideoWallResource>())
-                return;
-            emit licenseUsageChanged();
-        };
-
     auto connectTo =
         [this](const QnVideoWallResourcePtr& videowall)
         {
-            connect(videowall, &QnVideoWallResource::itemAdded, this,
+            connect(videowall,
+                &QnVideoWallResource::itemAdded,
+                this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
-            connect(videowall, &QnVideoWallResource::itemChanged, this,
-                &QnLicenseUsageWatcher::licenseUsageChanged);
-            connect(videowall, &QnVideoWallResource::itemRemoved, this,
+            connect(videowall,
+                &QnVideoWallResource::itemRemoved,
+                this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
         };
 
-    auto connectIfNeeded =
+    auto resourceAdded =
         [this, connectTo](const QnResourcePtr& resource)
         {
-            if (const auto& videowall = resource.dynamicCast<QnVideoWallResource>())
+            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+            {
                 connectTo(videowall);
+                emit licenseUsageChanged();
+            }
+        };
+
+    auto resourceRemoved =
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+            {
+                videowall->disconnect(this);
+                emit licenseUsageChanged();
+            }
         };
 
     const auto& resPool = commonModule->resourcePool();
 
-    connect(resPool, &QnResourcePool::resourceAdded, this, connectIfNeeded);
-    connect(resPool, &QnResourcePool::resourceAdded, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourceAdded, this, resourceAdded);
+    connect(resPool, &QnResourcePool::resourceRemoved, this, resourceRemoved);
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 }
@@ -686,21 +692,13 @@ void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUs
     boost::fill(proposedToUse, 0);
 
     int usedScreens = 0;
-    int controlSessions = 0;
-    const auto& resPool = commonModule()->resourcePool();
-    for (const QnVideoWallResourcePtr &videowall : resPool->getResources<QnVideoWallResource>())
-    {
-        /* Calculating total screens. */
+
+    // Calculating total screens.
+    for (const auto& videowall: commonModule()->resourcePool()->getResources<QnVideoWallResource>())
         usedScreens += videowall->items()->getItems().size();
 
-        /* Calculating running control sessions. */
-        for (const QnVideoWallItem &item : videowall->items()->getItems())
-            if (!item.runtimeStatus.controlledBy.isNull())
-                ++controlSessions;
-    }
-
-    basicUsedLicenses[Qn::LC_VideoWall] = qMax(controlSessions,
-        QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens));
+    basicUsedLicenses[Qn::LC_VideoWall] =
+        QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens);
     proposedToUse[Qn::LC_VideoWall] = basicUsedLicenses[Qn::LC_VideoWall] + m_proposed;
 }
 
@@ -715,13 +713,30 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens)
     return (screens + 1) / 2;
 }
 
+bool QnVideoWallLicenseUsageHelper::canStartControlSession(const QnUuid& controllerInstanceId)
+{
+    int controlSessions = 0;
+    for (const auto& videowall: commonModule()->resourcePool()->getResources<QnVideoWallResource>())
+    {
+        // Calculating running control sessions.
+        for (const QnVideoWallItem& item: videowall->items()->getItems())
+        {
+            const auto controlledBy = item.runtimeStatus.controlledBy;
+
+            // Skip own control sessions as they must be closed when new one is started.
+            if (!controlledBy.isNull() && controlledBy != controllerInstanceId)
+                ++controlSessions;
+        }
+    }
+    return controlSessions < totalLicenses(Qn::LC_VideoWall);
+}
+
 /************************************************************************/
 /* QnVideoWallLicenseUsageProposer                                      */
 /************************************************************************/
 QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(
     QnVideoWallLicenseUsageHelper* helper,
-    int screenCount,
-    int controlSessionsCount)
+    int screenCount)
     :
     m_helper(helper),
     m_count(0)
@@ -730,31 +745,17 @@ QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(
         return;
 
     int totalScreens = 0;
-    int controlSessions = 0;
     const auto& resPool = helper->commonModule()->resourcePool();
+
+    // Calculate total screens used.
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
-    {
-        /* Calculate total screens used. */
         totalScreens += videowall->items()->getItems().size();
 
-        /* Calculating running control sessions. */
-        for (const QnVideoWallItem &item : videowall->items()->getItems())
-            if (!item.runtimeStatus.controlledBy.isNull())
-                ++controlSessions;
-    }
-    int screensLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
+    const int totalLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
 
-    /* Select which requirement is currently in action. */
-    int totalLicensesUsed = qMax(screensLicensesUsed, controlSessions);
-
-    /* Proposed change for screens. */
-    int screensValue = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens + screenCount);
-
-    /* Proposed change for control sessions. */
-    int controlSessionsValue = controlSessions + controlSessionsCount;
-
-    /* Select proposed requirement. */
-    int proposedLicensesUsage = qMax(controlSessionsValue, screensValue);
+    // Proposed change for screens.
+    const int proposedLicensesUsage = QnVideoWallLicenseUsageHelper::licensesForScreens(
+        totalScreens + screenCount);
 
     m_count = proposedLicensesUsage - totalLicensesUsed;
     m_helper->propose(m_count);

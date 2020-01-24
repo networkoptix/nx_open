@@ -446,8 +446,16 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
         connect(d->settingsListener, &AnalyticsSettingsMultiListener::valuesChanged, d.data(),
             &Private::updateFigures);
 
-        for (const QnUuid& engineId: d->settingsListener->engineIds())
-            d->updateFigureKeys(engineId, d->settingsListener->model(engineId));
+        auto initializeKeys =
+            [this]()
+            {
+                for (const QnUuid& engineId: d->settingsListener->engineIds())
+                    d->updateFigureKeys(engineId, d->settingsListener->model(engineId));
+            };
+        connect(
+            d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,
+            this, initializeKeys);
+        initializeKeys();
     }
 }
 
