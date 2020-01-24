@@ -789,6 +789,8 @@ struct NX_NETWORK_API ContentType
 class NX_NETWORK_API Host
 {
 public:
+    static const StringType NAME;
+
     Host(const SocketAddress& endpoint);
 
     /**

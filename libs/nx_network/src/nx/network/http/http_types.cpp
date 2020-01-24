@@ -1917,6 +1917,8 @@ StringType ContentType::toString() const
 
 //-------------------------------------------------------------------------------------------------
 
+const StringType Host::NAME("Host");
+
 Host::Host(const SocketAddress& endpoint):
     m_endpoint(endpoint)
 {

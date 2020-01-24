@@ -1351,13 +1351,7 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx::network::http:
         }
 
         if (m_additionalHeaders.count("Host") == 0)
-        {
-            const auto host = nx::network::url::getEndpoint(
-                m_contentLocationUrl, /*hideDefaultPortInHost*/ true);
-            nx::network::http::insertOrReplaceHeader(
-                &m_request.headers,
-                HttpHeader("Host", host.toString().toUtf8()));
-        }
+            insertOrReplaceHeader(&m_request.headers, header::Host(url::getEndpoint(m_contentLocationUrl)));
     }
 
     // It is not correct just to replace headers because there

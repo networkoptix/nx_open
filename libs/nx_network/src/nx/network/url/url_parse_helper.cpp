@@ -19,13 +19,11 @@ quint16 getDefaultPortForScheme(const QString& scheme)
     return 0;
 }
 
-SocketAddress getEndpoint(const nx::utils::Url& url, bool hideDefaultPort)
+SocketAddress getEndpoint(const nx::utils::Url& url)
 {
-    const auto defaultPort = getDefaultPortForScheme(url.scheme());
-    SocketAddress address(url.host(), static_cast<quint16>(url.port(defaultPort)));
-    if (hideDefaultPort && address.port == defaultPort)
-        address.port = 0;
-    return address;
+    return SocketAddress(
+        url.host(),
+        static_cast<quint16>(url.port(getDefaultPortForScheme(url.scheme()))));
 }
 
 std::string normalizePath(const std::string& path)
