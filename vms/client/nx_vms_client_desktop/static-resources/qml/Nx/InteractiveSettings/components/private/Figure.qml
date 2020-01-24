@@ -246,4 +246,9 @@ LabeledItem
         showOnCameraCheckBox.checked = !value || value.showOnCamera !== false
         figure = value && value.figure
     }
+
+    function resetValue()
+    {
+        setValue(null)
+    }
 }
