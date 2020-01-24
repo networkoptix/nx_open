@@ -703,7 +703,12 @@ bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
     nx::vms::api::EventActionData actionData;
     ec2::fromResourceToApi(action, actionData);
-    ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+
+    const auto connection = ec2Connection();
+    if (!connection)
+        return false;
+
+    connection->getEventRulesManager(Qn::kSystemAccess)->
         broadcastEventAction(
             actionData,
             this,
