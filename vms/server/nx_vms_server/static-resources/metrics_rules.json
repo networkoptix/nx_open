@@ -361,7 +361,7 @@
                     },
                     "recording": {
                         "name": "Recording",
-                        "format": "shortText",
+                        "format": "text",
                         "display": "table|panel"
                     }
                 }
@@ -450,7 +450,7 @@
                     "resolution": {
                         "name": "Resolution",
                         "isOptional": true,
-                        "format": "shortText",
+                        "format": "text",
                         "display": "table|panel"
                     },
                     "targetFps": {
@@ -500,7 +500,7 @@
                     "resolution": {
                         "name": "Resolution",
                         "isOptional": true,
-                        "format": "shortText",
+                        "format": "text",
                         "display": "table|panel",
                         "alarms": [
                             {
