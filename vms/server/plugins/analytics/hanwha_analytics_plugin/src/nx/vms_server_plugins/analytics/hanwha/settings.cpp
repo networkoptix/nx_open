@@ -84,7 +84,7 @@ nx::kit::Json getMdRoiInfo(nx::kit::Json channelInfo, int sunapiIndex)
             return result;
         }
     }
-    return result;;
+    return result;
 }
 
 /**
@@ -107,7 +107,7 @@ nx::kit::Json getIvaLineInfo(nx::kit::Json channelInfo, int sunapiIndex)
             return result;
         }
     }
-    return result;;
+    return result;
 }
 
 /**
@@ -130,7 +130,7 @@ nx::kit::Json getIvaRoiInfo(nx::kit::Json channelInfo, int sunapiIndex)
             return result;
         }
     }
-    return result;;
+    return result;
 }
 
 /**
@@ -233,18 +233,11 @@ void serverReadOrThrow(const char* source, std::string* destination)
         throw ServerValueError();
 
     *destination = source;
-    if (destination->size() >= 2 && destination->front() == '"' && destination->back() == '"')
-    {
-        *destination = destination->substr(1, destination->size() - 2);
-        return;
-    }
-
-    throw ServerValueError();
 }
 
 std::string serverWrite(std::string value)
 {
-    return "\"" + value + "\"";
+    return value;
 }
 
 void serverReadOrThrow(const char* source, std::vector<PluginPoint>* destination)
@@ -401,9 +394,10 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
 
     if (const auto& param = json[key]; param.is_string())
     {
-        if (param.string_value() == "RightSide")
+        // Different firmware versions have different valid value sets for line crossing direction.
+        if ((param.string_value() == "RightSide") || (param.string_value() == "Right"))
             *result = Direction::Right;
-        else if (param.string_value() == "LeftSide")
+        else if ((param.string_value() == "LeftSide") || (param.string_value() == "Left"))
             *result = Direction::Left;
         else if (param.string_value() == "BothDirections")
             *result = Direction::Both;
@@ -590,7 +584,8 @@ void MotionDetectionObjectSize::writeToServer(
 {
     settingsDestination->setValue("MotionDetection.MinObjectSize.Points",
         serverWrite(std::pair(minWidth, minHeight)));
-
+    settingsDestination->setValue("MotionDetection.MaxObjectSize.Points",
+        serverWrite(std::pair(maxWidth, maxHeight)));
 }
 
 void MotionDetectionObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -660,6 +655,14 @@ void IvaObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSou
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxWidth);
     NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxHeight);
     initialized = true;
+}
+
+void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+{
+    settingsDestination->setValue("IVA.MinObjectSize.Points",
+        serverWrite(std::pair(minWidth, minHeight)));
+    settingsDestination->setValue("IVA.MaxObjectSize.Points",
+        serverWrite(std::pair(maxWidth, maxHeight)));
 }
 
 void IvaObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1114,11 +1117,10 @@ void ObjectDetectionBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* s
 
 void ObjectDetectionBestShot::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
-    // This doesn't work in the PNO-A0981R now (bug in the camera).
-    sunapiReadOrThrow(channelInfo, "BestShot", frameSize, &person, "Person");
-    sunapiReadOrThrow(channelInfo, "BestShot", frameSize, &vehicle, "Vehicle");
-    sunapiReadOrThrow(channelInfo, "BestShot", frameSize, &face, "Face");
-    sunapiReadOrThrow(channelInfo, "BestShot", frameSize, &licensePlate, "LicensePlate");
+    sunapiReadOrThrow(channelInfo, "ObjectTypes", frameSize, &person, "Person");
+    sunapiReadOrThrow(channelInfo, "ObjectTypes", frameSize, &vehicle, "Vehicle");
+    sunapiReadOrThrow(channelInfo, "ObjectTypes", frameSize, &face, "Face");
+    sunapiReadOrThrow(channelInfo, "ObjectTypes", frameSize, &licensePlate, "LicensePlate");
     initialized = true;
 }
 
