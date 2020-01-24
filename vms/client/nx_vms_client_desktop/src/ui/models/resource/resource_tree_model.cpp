@@ -692,6 +692,12 @@ QModelIndex QnResourceTreeModel::parent(const QModelIndex& index) const
 {
     if (!index.isValid() || index.model() != this)
         return QModelIndex();
+
+    const QnResourceTreeModelNode* indexInternalNode =
+        static_cast<QnResourceTreeModelNode*>(index.internalPointer());
+    if (!NX_ASSERT(m_allAliveNodes.contains(indexInternalNode)))
+        return QModelIndex();
+
     return node(index)->parent()->createIndex(Qn::NameColumn);
 }
 
