@@ -1,5 +1,9 @@
 #include "client_startup_parameters.h"
 
+#if defined(Q_OS_WIN)
+    #include <Windows.h>
+#endif
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
@@ -115,7 +119,33 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     QString windowGeometry;
     addParserParam(commandLineParser, &windowGeometry, "--window-geometry");
 
-    commandLineParser.parse(argc, (const char**) argv, stderr);
+    // This is kinda hacky solution to avoid massive refactoring before release. More sane value is
+    // to process this in the main.cpp (using wmain entry) and pass arguments as QStringList to the
+    // module runApplication routine.
+    #if defined(Q_OS_WIN)
+        LPWSTR* wargv;
+        int wargc = 0;
+
+        wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+        NX_ASSERT(wargc == argc, "Command-line parsing error");
+        if (wargv)
+        {
+            QStringList arguments;
+            for (int i = 0; i < wargc; i++)
+                arguments.push_back(QString::fromWCharArray(wargv[i]));
+
+            commandLineParser.parse(arguments, stderr);
+            // Free memory allocated for CommandLineToArgvW arguments.
+            LocalFree(wargv);
+        }
+        else
+        {
+            // Fallback routine.
+            commandLineParser.parse(argc, (const char**) argv, stderr);
+        }
+    #else
+        commandLineParser.parse(argc, (const char**) argv, stderr);
+    #endif
 
     if (!strCustomUri.isEmpty())
     {
