@@ -97,6 +97,7 @@
     #include <nx/vms/client/desktop/ini.h>
     #include <nx/gdi_tracer/gdi_handle_tracer.h>
     #include <nx/vms/client/desktop/debug_utils/instruments/widget_profiler.h>
+    #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 
 namespace {
@@ -270,6 +271,11 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     }
 
     QnGLCheckerInstrument::checkGLHardware();
+
+    #if defined(Q_OS_WIN)
+    if (qnRuntime->isVideoWallMode())
+        QWindowsWindowFunctions::setHasBorderInFullScreen(mainWindow->windowHandle(), true);
+    #endif
 
     mainWindow->show();
 

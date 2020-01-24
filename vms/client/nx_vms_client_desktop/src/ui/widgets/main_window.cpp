@@ -897,7 +897,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         // Block default activation processing in fullscreen.
         case WM_NCACTIVATE:
         {
-            if (!isFullScreenMode())
+            if (!isFullScreenMode() || qnRuntime->isVideoWallMode())
                 return false;
 
             *result = TRUE;
