@@ -158,7 +158,7 @@ Item
     {
         id: loadingIndicator
 
-        visible: online && loading
+        running: online && loading
         anchors.centerIn: parent
         color: ColorTheme.windowText
     }

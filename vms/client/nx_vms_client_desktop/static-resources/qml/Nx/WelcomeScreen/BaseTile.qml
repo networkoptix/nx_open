@@ -432,7 +432,7 @@ Item
 
             NxDotPreloader
             {
-                visible: control.isConnecting && !control.isExpanded;
+                running: control.isConnecting && !control.isExpanded;
                 anchors.centerIn: parent;
                 color: ColorTheme.text;
             }
