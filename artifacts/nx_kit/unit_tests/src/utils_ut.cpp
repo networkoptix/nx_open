@@ -120,13 +120,13 @@ TEST(utils, toString_wchar)
 
     if (kWcharSize == 2) //< E.g. MSVC
     {
-        ASSERT_STREQ(R"('\x00FF')", toString(L'\xFF'));
-        ASSERT_STREQ(R"('\xABCD')", toString(L'\xABCD'));
+        ASSERT_STREQ(R"('\u00FF')", toString(L'\xFF'));
+        ASSERT_STREQ(R"('\uABCD')", toString(L'\uABCD'));
     }
     else if (kWcharSize == 4) //< E.g. GCC/Clang
     {
-        ASSERT_STREQ(R"('\x000000FF')", toString(L'\xFF'));
-        ASSERT_STREQ(R"('\x0000ABCD')", toString(L'\xABCD'));
+        ASSERT_STREQ(R"('\U000000FF')", toString(L'\xFF'));
+        ASSERT_STREQ(R"('\U0000ABCD')", toString(L'\uABCD'));
     }
 }
 
@@ -143,6 +143,9 @@ TEST(utils, toString_char_ptr)
     ASSERT_STREQ(R"("str\\with_backslash")", toString("str\\with_backslash"));
     ASSERT_STREQ(R"("str\twith_tab")", toString("str\twith_tab"));
     ASSERT_STREQ(R"("str\nwith_newline")", toString("str\nwith_newline"));
+    ASSERT_STREQ(R"("str\nwith_newline")", toString("str\nwith_newline"));
+    ASSERT_STREQ(R"("str\rwith_cr")", toString("str\rwith_cr"));
+    ASSERT_STREQ(R"("str\rwith_cr")", toString("str\rwith_cr"));
     ASSERT_STREQ(R"("str\x7F""with_127")", toString("str\x7Fwith_127"));
     ASSERT_STREQ(R"("str\x1F""with_31")", toString("str\x1Fwith_31"));
     ASSERT_STREQ(R"("str\xFF""with_255")", toString("str\xFFwith_255"));
@@ -157,13 +160,13 @@ TEST(utils, toString_wchar_ptr)
 
     if (kWcharSize == 2) //< MSVC
     {
-        // `R"(` is not used here because `\xABCD` does not compile in MSVC 2017.
-        ASSERT_STREQ("\"-\\xABCD\"\"-\"", toString(L"-\xABCD-"));
+        // `R"(` is not used here because `\uABCD` does not compile in MSVC 2017.
+        ASSERT_STREQ("\"-\\uABCD\"\"-\"", toString(L"-\uABCD-"));
     }
     else if (kWcharSize == 4) //< Linux
     {
-        // `R"(` is not used here because `\xABCD` does not compile in MSVC 2017.
-        ASSERT_STREQ("\"-\\x0000ABCD\"\"-\"", toString(L"-\x0000ABCD-"));
+        // `R"(` is not used here because `\uABCD` does not compile in MSVC 2017.
+        ASSERT_STREQ("\"-\\U0000ABCD\"\"-\"", toString(L"-\U0000ABCD-"));
     }
 }
 
