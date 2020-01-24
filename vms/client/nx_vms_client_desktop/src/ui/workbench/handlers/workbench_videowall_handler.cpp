@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
@@ -1142,15 +1143,19 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
-        QnMessageBox::warning(mainWindowWidget(),
-            tr("Video Wall license required"),
+        showLicensesErrorDialog(
             tr("To enable this feature, please activate a Video Wall license."));
         return false;
     }
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1);
-    if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
+    const auto localInstanceId = runtimeInfoManager()->localInfo().uuid;
+
+    if (!m_licensesHelper->canStartControlSession(localInstanceId))
+    {
+        showLicensesErrorDialog(
+            tr("Activate one more license to start Video Wall control session."));
         return false;
+    }
 
     auto layout = workbench()->currentLayout()->resource();
     if (!layout)
@@ -1510,15 +1515,12 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-
-    QnLicenseListHelper licenseList(licensePool()->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall, licensePool()->validator()) == 0)
+    if (m_licensesHelper->totalLicenses(Qn::LC_VideoWall) == 0)
     {
-        QnMessageBox::warning(mainWindowWidget(),
-            tr("Video Wall license required"),
-            tr("To enable Video Wall, please activate a Video Wall license."));
+        showLicensesErrorDialog(
+            tr("To enable this feature, please activate a Video Wall license."));
         return;
-    } //< TODO: #GDM add "Licenses" button.
+    }
 
     QStringList usedNames;
     for (const auto& resource: resourcePool()->getResourcesWithFlag(Qn::videowall))
@@ -1706,8 +1708,11 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (videoWall.isNull())
         return;
 
-    if (!validateLicenses(tr("Activate one more license to start Video Wall.")))
+    if (!m_licensesHelper->isValid())
+    {
+        showLicensesErrorDialog(tr("Activate one more license to start Video Wall."));
         return;
+    }
 
     switchToVideoWallMode(videoWall);
 }
@@ -3321,15 +3326,29 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(
         layout->layoutResources().toList());
 }
 
-bool QnWorkbenchVideoWallHandler::validateLicenses(const QString& detail) const
+void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail) const
 {
-    // TODO: #GDM add "Licenses" button
-    if (!m_licensesHelper->isValid())
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Warning,
+        tr("More Video Wall licenses required"),
+        detail,
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Ok,
+        mainWindowWidget());
+
+    if (menu()->canTrigger(ui::action::PreferencesLicensesTabAction))
     {
-        QnMessageBox::warning(mainWindowWidget(), tr("More Video Wall licenses required"), detail);
-        return false;
+        auto activateLicensesButton =
+            messageBox.addButton(tr("Activate License..."), QDialogButtonBox::HelpRole);
+        connect(activateLicensesButton, &QPushButton::clicked, this,
+            [this, &messageBox]
+            {
+                messageBox.accept();
+                menu()->trigger(ui::action::PreferencesLicensesTabAction);
+            });
     }
-    return true;
+
+    messageBox.exec();
 }
 
 QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid& layoutId)

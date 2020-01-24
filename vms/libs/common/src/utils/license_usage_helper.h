@@ -237,6 +237,9 @@ public:
     /** Calculate how many licenses are required for the given screens count. */
     static int licensesForScreens(int screens);
 
+    /** Check if a new control session can be started by the given client instance. */
+    bool canStartControlSession(const QnUuid& controllerInstanceId);
+
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
@@ -251,8 +254,7 @@ class QnVideoWallLicenseUsageProposer
 public:
     QnVideoWallLicenseUsageProposer(
         QnVideoWallLicenseUsageHelper* helper,
-        int screenCount,
-        int controlSessionsCount);
+        int screenCount);
     ~QnVideoWallLicenseUsageProposer();
 private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
