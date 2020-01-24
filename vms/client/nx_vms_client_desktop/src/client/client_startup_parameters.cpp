@@ -123,10 +123,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     // to process this in the main.cpp (using wmain entry) and pass arguments as QStringList to the
     // module runApplication routine.
     #if defined(Q_OS_WIN)
-        LPWSTR* wargv;
         int wargc = 0;
-
-        wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+        LPWSTR* wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
         NX_ASSERT(wargc == argc, "Command-line parsing error");
         if (wargv)
         {
