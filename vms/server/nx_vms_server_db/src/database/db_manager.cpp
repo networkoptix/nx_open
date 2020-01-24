@@ -1482,11 +1482,21 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
 
 QString QnDbManager::alternativeUpdateName(const QString& updateName) const
 {
-    auto alternativeName = updateName;
-    alternativeName.replace(
-        "/99_20200122_encrypt_storage_url_credentials.sql",
-        "/100_10172019_encrypt_storage_url_credentials.sql");
-    return alternativeName;
+    static const std::map<QString, QString> kUpdateRenames =
+    {
+        {
+            "/99_20200122_encrypt_storage_url_credentials.sql",
+            "/100_10172019_encrypt_storage_url_credentials.sql",
+        },
+    };
+
+    for (const auto [original, rename]: kUpdateRenames)
+    {
+        if (updateName.endsWith(original))
+            return updateName.left(updateName.size() - original.size()) + rename;
+    }
+
+    return updateName;
 }
 
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
