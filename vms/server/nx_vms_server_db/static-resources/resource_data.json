@@ -947,7 +947,9 @@
                 "3r global inc.|xpm4m32",
                 "3r global inc.|xst08",
                 "unix|ipm32r32p",
-                "hangzhou hikvision digital technology co., ltd|ds-7732*"
+                "hangzhou hikvision digital technology co., ltd|ds-7732*",
+                "axis|axisp7304*",
+                "axis|axism7104"
             ],
             "analogEncoder": true
         },
