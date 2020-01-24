@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.190",
+    "version": "1.0.1.191",
     "data": [
         {
             "keys": [
@@ -2524,7 +2524,7 @@
         },
         {
             "__comment__": "entropix issues resolution",
-            "keys":["*|DSC-TVC-0200*","DSC-TVC-0200*|*"],
+            "keys":["*|*DSC-TVC-0200*","DSC-TVC-0200*|*"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -3323,8 +3323,8 @@
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
             "cellinx|nbm2-h6",
-            "*|DSC-TVC-0200*",
-            "DSC-TVC-0200*|ipcam",
+            "*|*DSC-TVC-0200*",
+            "DSC-TVC-0200*|*",
             "vivotek|ma9322*",
             "entropix|*"
             ],
