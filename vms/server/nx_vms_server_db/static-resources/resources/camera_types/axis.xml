@@ -237,14 +237,7 @@
         </resource>
         <resource name = "AXISM3105" public = "AXISM3104"/>
         <resource name = "AXISM3106" public = "AXISM3104"/>
-        <resource name = "AXISQ3708" public = "AXIS_COMMON">
-            <params>
-                <param name = "MaxFPS"
-                default_value ="20"/>
-                <param name = "channelsAmount"
-                default_value = "3"/>                
-            </params>
-        </resource>
+        <resource name = "AXISQ3708" public = "AXISQ3617"/>
         <resource name = "AXISP1264" public = "AXISM3104"/>
         <resource name = "AXISP1254" public = "AXISM3104"/>
         <resource name = "AXISM1065" public = "AXISM3104"/>
