@@ -155,7 +155,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     const auto actionData = deserializeActionData(body);
     if (!actionData)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, "Invalid JSON object provided");
+        result.setError(QnJsonRestResult::InvalidParameter, "Invalid JSON object provided.");
         return StatusCode::ok;
     }
 
@@ -168,14 +168,14 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     const auto engineResource = engineForAction(*actionData);
     if (!engineResource)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, "Engine not found");
+        result.setError(QnJsonRestResult::InvalidParameter, "Engine not found.");
         return StatusCode::ok;
     }
 
     const auto actionTypeDescriptor = actionDescriptor(*actionData);
     if (!actionTypeDescriptor)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, "Action type descriptor not found");
+        result.setError(QnJsonRestResult::InvalidParameter, "Action type descriptor not found.");
         return StatusCode::ok;
     }
 
@@ -191,7 +191,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
             QnJsonRestResult::CantProcessRequest,
             "Unable to collect all needed Action data. Try to enable recording "
             "and/or wait some time until all the information needed for the Action "
-            "is in the archive");
+            "is in the archive.");
         return StatusCode::ok;
     }
 
@@ -229,7 +229,7 @@ QString QnExecuteAnalyticsActionRestHandler::checkInputParameters(
     const auto makeErrorMessage =
         [](const QString& missingField)
         {
-            return lm("Missing required field '%1'").args(missingField);
+            return lm("Missing required field '%1'.").args(missingField);
         };
 
     if (actionData.engineId.isNull())
@@ -249,7 +249,7 @@ resource::AnalyticsEngineResourcePtr QnExecuteAnalyticsActionRestHandler::engine
         resourcePool()->getResourceById<resource::AnalyticsEngineResource>(actionData.engineId);
 
     if (!engineResource)
-        NX_WARNING(this, "Engine with id %1 not found", actionData.engineId);
+        NX_WARNING(this, "Engine with id %1 not found.", actionData.engineId);
 
     return engineResource;
 }
@@ -263,8 +263,8 @@ std::optional<nx::vms::api::analytics::ActionTypeDescriptor>
     const auto descriptor = actionTypeDescriptorManager.descriptor(actionData.actionId);
     if (!descriptor)
     {
-        NX_WARNING(this,
-            "Unable to find an action type descriptor for action type id %1", actionData.actionId);
+        NX_WARNING(this, "Unable to find an action type descriptor for action type id %1.",
+            actionData.actionId);
     }
 
     return descriptor;
@@ -279,7 +279,7 @@ std::optional<ExtendedAnalyticsActionData>
         const nx::vms::api::analytics::ActionTypeDescriptor& actionTypeDescriptor)
 {
     if (!NX_ASSERT(engineResource,
-        "Unable to create extended analytics action data without engine resource"))
+        "Unable to create extended analytics action data without engine resource."))
     {
         return std::nullopt;
     }
@@ -312,13 +312,13 @@ std::optional<ExtendedAnalyticsActionData>
     const auto objectTrack = fetchObjectTrack(trackId, needFullTrack);
     if (!objectTrack)
     {
-        NX_DEBUG(this, "Unable to fetch Track by id %1", trackId);
+        NX_ERROR(this, "Unable to fetch Track by id %1.", trackId);
         return std::nullopt;
     }
 
     if (objectTrack->objectPositionSequence.empty())
     {
-        NX_DEBUG(this, "Object Track %1 position sequence is empty", trackId);
+        NX_ERROR(this, "Object Track %1 position sequence is empty.", trackId);
         return std::nullopt;
     }
 
@@ -335,8 +335,8 @@ std::optional<ExtendedAnalyticsActionData>
 
     if (!NX_ASSERT(bestShotTimestampUs != AV_NOPTS_VALUE))
     {
-        NX_DEBUG(this,
-            "Failed to fetch the best shot timestamp for the Object Track %1", trackId);
+        NX_ERROR(this,
+            "Failed to fetch the best shot timestamp for the Object Track %1.", trackId);
         return std::nullopt;
     }
 
@@ -362,8 +362,8 @@ std::optional<ExtendedAnalyticsActionData>
 
         if (!objectPosition)
         {
-            NX_WARNING(this,
-                "Unable to find best shot position for Track %1 by timestamp %2 us",
+            NX_ERROR(this,
+                "Unable to find best shot position for Track %1 by timestamp %2 us.",
                 trackId,
                 bestShotTimestampUs);
             return std::nullopt;
@@ -391,15 +391,13 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     AnalyticsActionResult* outActionResult)
 {
     static const QString kNoEngineToExecuteActionMessage(
-        "No engine resource to execute action has been provided");
-
+        "No Engine Resource to has been provided for executing the Action.");
     if (!NX_ASSERT(actionData.engine, kNoEngineToExecuteActionMessage))
         return kNoEngineToExecuteActionMessage;
 
     const auto action = makePtr<Action>(actionData);
     static const QString kNoSdkEngineToExecuteActionMessage(
-        "No SDK engine to execute the action has been provided");
-
+        "No SDK Engine object has been provided for executing the Action.");
     const wrappers::EnginePtr sdkEngine = actionData.engine->sdkEngine();
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
@@ -478,7 +476,7 @@ std::optional<nx::analytics::db::ObjectPosition>
     if (lowerBound == objectPositionSequence.cend() && upperBound == objectPositionSequence.cend())
     {
         NX_DEBUG(this,
-            "Unable to find position with timestamp %1 in the Track %2",
+            "Unable to find position with timestamp %1 in the Track %2.",
             timestampUs, objectTrack.id);
 
         return std::nullopt;
@@ -488,13 +486,13 @@ std::optional<nx::analytics::db::ObjectPosition>
     {
         NX_DEBUG(this,
             "Unable to find lower bound for position with timestamp %1 in the Track %2, "
-            "using upper bound %3",
+            "using upper bound %3.",
             timestampUs, objectTrack.id, upperBound->timestampUs);
 
         return *upperBound;
     }
 
-    NX_DEBUG(this, "Got poistion for timestamp %1 for the Track %2, position timestmap is %3",
+    NX_DEBUG(this, "Got poistion for timestamp %1 for the Track %2, position timestmap is %3.",
         timestampUs, objectTrack.id, lowerBound->timestampUs);
 
     return *lowerBound;
@@ -511,24 +509,24 @@ std::optional<nx::analytics::db::ObjectTrack>
     filter.maxObjectTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
 
     NX_DEBUG(this,
-        "Trying to fetch Track with id %1. Full Track is needed: %2",
+        "Trying to fetch Track with id %1. Full Track is needed: %2.",
         objectTrackId, needFullTrack);
 
     const auto lookupResult = makeDatabaseRequest(filter);
     if (!lookupResult)
     {
-        NX_WARNING(this, "Unable to fetch an object appearance info for objectTrackId %1",
+        NX_WARNING(this, "Unable to fetch an object appearance info for objectTrackId %1.",
             objectTrackId);
         return std::nullopt;
     }
 
     NX_ASSERT(lookupResult->size() <= 1,
-        lm("Only one object Track has been requested but got %1").args(lookupResult->size()));
+        lm("Only one object Track has been requested but got %1.").args(lookupResult->size()));
 
     if (!lookupResult->empty())
         return lookupResult->at(0);
 
-    NX_DEBUG(this, "Database lookup result is empty for object Track %1", objectTrackId);
+    NX_DEBUG(this, "Database lookup result is empty for object Track %1.", objectTrackId);
     return std::nullopt;
 }
 
@@ -536,13 +534,13 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
     const QnUuid& deviceId,
     const int64_t timestampUs)
 {
-    NX_DEBUG(this, "Trying to fetch image by timestamp. Device id: %1, timestamp: %2",
+    NX_DEBUG(this, "Trying to fetch image by timestamp. Device id: %1, timestamp: %2.",
         deviceId, timestampUs);
 
     const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
     if (!device)
     {
-        NX_WARNING(this, "Unable to find device %1", device);
+        NX_WARNING(this, "Unable to find device %1.", device);
         return CLVideoDecoderOutputPtr();
     }
 
@@ -559,7 +557,7 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
     CLVideoDecoderOutputPtr result = helper.getImage(cameraImageRequest);
     if (!result)
     {
-        NX_DEBUG(this, "Unable to fetch image by timestamp %1. Device id: %2",
+        NX_DEBUG(this, "Unable to fetch image by timestamp %1. Device id: %2.",
             deviceId, timestampUs);
     }
 
@@ -569,7 +567,7 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
 std::optional<LookupResult> QnExecuteAnalyticsActionRestHandler::makeDatabaseRequest(
     const Filter& filter)
 {
-    NX_DEBUG(this, "Executing analytics database request with filter %1", filter);
+    NX_DEBUG(this, "Executing analytics database request with filter %1.", filter);
 
     nx::utils::promise<std::tuple<ResultCode, LookupResult>> lookupCompleted;
     serverModule()->analyticsEventsStorage()->lookup(
@@ -586,7 +584,7 @@ std::optional<LookupResult> QnExecuteAnalyticsActionRestHandler::makeDatabaseReq
     {
         NX_WARNING(
             this,
-            "Error occured while executing request to the analytics database with filter %1",
+            "Error occured while executing request to the analytics database with filter %1.",
             filter);
         return std::nullopt;
     }
