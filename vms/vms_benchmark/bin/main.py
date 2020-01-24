@@ -568,13 +568,14 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
             time.sleep(1)
         return False, None
 
-    try:
-        discovering_timeout_seconds = ini['cameraDiscoveryTimeoutSeconds']
+    discovering_timeout_seconds = ini['cameraDiscoveryTimeoutSeconds']
 
-        report(
-            "    Waiting for virtual camera discovery and going live "
-            f"(timeout is {discovering_timeout_seconds} s)..."
-        )
+    report(
+        "    Waiting for virtual camera discovery and going live "
+        f"(timeout is {discovering_timeout_seconds} s)..."
+    )
+
+    try:
         if ini['addCamerasManually']:
             cameras = api.add_cameras(box.local_ip, test_camera_count)
         else:
@@ -582,9 +583,13 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
                 timeout=discovering_timeout_seconds, online_duration=3)
             if not res:
                 raise exceptions.TestCameraError('Timeout expired.')
+    except Exception as e:
+        raise exceptions.TestCameraError(
+            f"Not all virtual cameras were discovered or went live.", e) from e
 
-        report("    All virtual cameras discovered and went live.")
+    report("    All virtual cameras discovered and went live.")
 
+    try:
         for camera in cameras:
             if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
                 report(f"    Recording on camera {camera.id} enabled.")
@@ -593,7 +598,9 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
                     f"Failed enabling recording on camera {camera.id}.")
     except Exception as e:
         raise exceptions.TestCameraError(
-            f"Not all virtual cameras were discovered or went live.", e) from e
+            f"Can't enable recording on virtual cameras.", e) from e
+
+    report("    Recording enabled on all virtual cameras.")
 
     return cameras
 
@@ -933,25 +940,33 @@ def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
     return ram_free_bytes
 
 
-def _test_vms(api, box, box_platform, conf, ini, vms):
-    ram_free_bytes = box_platform.obtain_ram_free_bytes()
-    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
-    _check_storages(api, ini, camera_count=max(ini['virtualCameraCount']))
+def _remove_cameras(api):
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
         if cameras is not None:
             break
         report(f"Attempt #{i} to get camera list")
         time.sleep(i)
+
     if cameras is not None:
-        for camera in cameras:
-            if not api.remove_camera(camera.id):
-                raise exceptions.ServerApiError(
-                    message=f"Unable to remove camera with id={camera.id}"
-                )
+        if not cameras:
+            return
+
+        report('Unregistering all virtual cameras from Server...')
+        try:
+            for camera in cameras:
+                if not api.remove_camera(camera.id):
+                    raise exceptions.ServerApiError(
+                        message=f"Unable to remove camera with id={camera.id}"
+                    )
+        except VmsBenchmarkError as e:
+            raise exceptions.VmsBenchmarkError(
+                f'Unable to unregister virtual cameras.',
+                original_exception=e
+            )
+        report('All virtual cameras unregistered.')
     else:
         raise exceptions.ServerApiError(message="Unable to get camera list.")
-    _run_load_tests(api, box, box_platform, conf, ini, vms)
 
 
 def _obtain_box_platform(box, linux_distribution):
@@ -1178,7 +1193,17 @@ def main(conf_file, ini_file, log_file):
         _clear_storages(box, storages, conf)
         vms = _restart_vms(api, box, linux_distribution, vms, ini)
 
-        _test_vms(api, box, box_platform, conf, ini, vms)
+        ram_free_bytes = box_platform.obtain_ram_free_bytes()
+        report(
+            (f"Box RAM free after restart: {to_megabytes(ram_free_bytes)} MB "
+                f"of {to_megabytes(box_platform.ram_bytes)} MB")
+        )
+
+        _remove_cameras(api)
+
+        _check_storages(api, ini, camera_count=max(ini['virtualCameraCount']))
+
+        _run_load_tests(api, box, box_platform, conf, ini, vms)
 
         report('\nSUCCESS: All tests finished.')
     finally:
