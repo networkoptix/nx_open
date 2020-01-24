@@ -996,6 +996,43 @@ struct RemoveUserRoleAccess
     }
 };
 
+struct ModifyAccessRightsChecker
+{
+    ErrorCode operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::AccessRightsData& param)
+    {
+        if (hasSystemAccess(accessData))
+            return ErrorCode::ok;
+
+        const auto& resPool = commonModule->resourcePool();
+        auto user = resPool->getResourceById<QnUserResource>(accessData.userId);
+        if (!commonModule->resourceAccessManager()->hasGlobalPermission(
+            user, GlobalPermission::admin))
+        {
+            return ErrorCode::forbidden;
+        }
+
+        // Following lines are similar to the QnSharedResourcesManager::setSharedResources security
+        // check assert.
+        if (param.resourceIds.empty())
+            return ErrorCode::ok;
+
+        if (param.userId != accessData.userId)
+        {
+            user = resPool->getResourceById<QnUserResource>(param.userId);
+            if (!user)
+                return ErrorCode::ok;
+        }
+
+        if (const QnResourceAccessSubject subject(user); subject.effectiveId() != subject.id())
+            return ErrorCode::forbidden;
+
+        return ErrorCode::ok;
+    }
+};
+
 struct VideoWallControlAccess
 {
     ErrorCode operator()(

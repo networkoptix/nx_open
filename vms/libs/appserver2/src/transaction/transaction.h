@@ -659,7 +659,7 @@ APPLY(504, setAccessRights, nx::vms::api::AccessRightsData, \
                        false, /* system*/ \
                        &createHashForApiAccessRightsDataHelper, /* getHash*/ \
                        UserNotificationManagerHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       ModifyAccessRightsChecker(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
