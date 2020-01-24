@@ -1502,6 +1502,25 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
     return true;
 }
 
+QString QnDbManager::alternativeUpdateName(const QString& updateName) const
+{
+    static const std::map<QString, QString> kUpdateRenames =
+    {
+        {
+            "/99_20200122_encrypt_storage_url_credentials.sql",
+            "/100_10172019_encrypt_storage_url_credentials.sql",
+        },
+    };
+
+    for (const auto [original, rename]: kUpdateRenames)
+    {
+        if (updateName.endsWith(original))
+            return updateName.left(updateName.size() - original.size()) + rename;
+    }
+
+    return updateName;
+}
+
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
@@ -2161,7 +2180,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
         return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
 
-    if (updateName.endsWith(lit("/100_10172019_encrypt_storage_url_credentials.sql")))
+    if (updateName.endsWith(lit("/99_20200122_encrypt_storage_url_credentials.sql")))
         return encryptStoragePasswords() && resyncIfNeeded({ResyncStorages});
 
     if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))

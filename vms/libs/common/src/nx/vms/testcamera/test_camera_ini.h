@@ -8,9 +8,6 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("test_camera.ini") { reload(); }
 
-    NX_INI_STRING("92-61", macAddressPrefix,
-        "The first two bytes of the desired MAC address, separeted by '-'.");
-
     NX_INI_INT(4984, discoveryPort, "Port on which test camera expects discovery packets used\n"
         "for Server's auto camera discovery feature.");
 

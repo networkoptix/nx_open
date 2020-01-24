@@ -304,7 +304,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_frame->data[0] = 0;
     m_spsFound = false;
-    m_dtsQueue.clear();
 }
 
 void QnFfmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )

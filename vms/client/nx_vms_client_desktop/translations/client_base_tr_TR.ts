@@ -1299,7 +1299,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
         <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
       </translation>
@@ -1310,21 +1310,21 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
         <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
         <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
