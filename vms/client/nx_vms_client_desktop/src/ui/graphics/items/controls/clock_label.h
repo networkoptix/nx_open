@@ -1,14 +1,15 @@
-#ifndef QN_CLOCK_LABEL_H
-#define QN_CLOCK_LABEL_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtWidgets/QMenu>
 
 #include <ui/graphics/items/standard/graphics_label.h>
 
-class QnClockDataProvider : public QObject
+class QnClockDataProvider: public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
+
 public:
     enum ClockType
     {
@@ -16,17 +17,16 @@ public:
         localSystemClock
     };
 
-    explicit QnClockDataProvider(QObject *parent = 0);
-    ~QnClockDataProvider();
+    explicit QnClockDataProvider(QObject* parent = nullptr);
+    virtual ~QnClockDataProvider() override;
 
-    void setClockType( ClockType clockType );
+    void setClockType(ClockType clockType);
 
 signals:
-    void timeChanged(const QString &timeString);
+    void timeChanged(const QString& timeString);
 
 private:
-
-    QTimer *m_timer;
+    QTimer* m_timer;
     ClockType m_clockType;
 };
 
@@ -34,19 +34,17 @@ private:
 class QnClockLabel: public GraphicsLabel
 {
     Q_OBJECT
-    typedef GraphicsLabel base_type;
+    using base_type = GraphicsLabel;
 
 public:
-    QnClockLabel(QGraphicsItem *parent = NULL);
-    virtual ~QnClockLabel();
+    QnClockLabel(QGraphicsItem* parent = nullptr);
+    virtual ~QnClockLabel() override;
 
 protected:
-    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event ) override;
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
     QAction* m_serverTimeAction;
     QAction* m_localTimeAction;
     QnClockDataProvider* m_provider;
 };
-
-#endif // QN_CLOCK_LABEL_H
