@@ -32,6 +32,8 @@ static CameraOptions makeCameraOptions(
 {
     CameraOptions result;
 
+    result.macAddressPrefix = options.macAddressPrefix;
+
     result.shiftPts = options.shiftPts;
     result.includePts = options.includePts;
     result.unloopPts = options.unloopPts;

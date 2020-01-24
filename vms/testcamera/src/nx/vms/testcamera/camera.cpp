@@ -21,9 +21,9 @@ namespace nx::vms::testcamera {
 
 static constexpr unsigned int kSendTimeoutMs = 1000;
 
-static nx::utils::MacAddress makeMacAddress(int cameraNumber)
+static nx::utils::MacAddress makeMacAddress(int cameraNumber, const QString& macAddressPrefix)
 {
-    QString macAddressString = ini().macAddressPrefix;
+    QString macAddressString = macAddressPrefix;
     for (int i = 3; i >= 0; --i)
         macAddressString += QString().sprintf("-%02x", (cameraNumber >> (i * 8)) & 0xFF);
 
@@ -68,7 +68,7 @@ Camera::Camera(
     m_frameLogger(frameLogger),
     m_fileCache(fileCache),
     m_number(number),
-    m_macAddress(makeMacAddress(number)),
+    m_macAddress(makeMacAddress(number, cameraOptions.macAddressPrefix)),
     m_cameraOptions(cameraOptions),
     m_primaryFileNames(primaryFileNames),
     m_secondaryFileNames(secondaryFileNames),

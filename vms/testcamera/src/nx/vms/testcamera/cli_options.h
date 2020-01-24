@@ -25,6 +25,7 @@ struct CliOptions
     bool showHelp = false;
     nx::utils::log::Level logLevel = utils::log::Level::info;
     int maxFileSizeMegabytes = 100;
+    QString macAddressPrefix = "92-61";
     bool cameraForFile = false;
     bool includePts = false;
     OptionalUs shiftPts;
