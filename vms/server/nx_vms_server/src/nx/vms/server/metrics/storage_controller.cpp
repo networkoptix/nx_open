@@ -92,12 +92,14 @@ static auto stateGroupProvider()
                 {
                     if (isServerOffline(r))
                         return "Server Offline";
-                    if (!r->isUsedForWriting())
-                        return "Disabled";
 
                     const auto status = r->getStatus();
                     if (status == Qn::Offline)
                         return "Inaccessible";
+
+                    if (!r->isUsedForWriting())
+                        return "Disabled";
+
                     return Value(QnLexical::serialized(status));
                 }
             ),

@@ -20,6 +20,11 @@ public:
         updateMaxLevel();
     }
 
+    ~LoggerCollection()
+    {
+        m_destroyed = true;
+    }
+
     std::shared_ptr<AbstractLogger> main()
     {
         QnMutexLocker lock(&m_mutex);
@@ -58,6 +63,9 @@ public:
 
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const
     {
+        if (m_destroyed)
+            return nullptr;
+
         QnMutexLocker lock(&m_mutex);
         if (exactMatch)
         {
@@ -67,7 +75,7 @@ public:
                 ? m_mainLogger
                 : it->second;
         }
-		
+
         for (auto& it: m_loggersByFilters)
         {
             if (it.first.accepts(tag))
@@ -98,6 +106,9 @@ private:
     }
 
 private:
+    /** Helps avoid crashing if a method is called during the static deinitialization phase. */
+    bool m_destroyed = false;
+
     mutable QnMutex m_mutex;
     std::shared_ptr<AbstractLogger> m_mainLogger;
     std::map<Filter, std::shared_ptr<AbstractLogger>> m_loggersByFilters;

@@ -93,12 +93,21 @@ public:
         m_levelReducer(levelReducer),
         m_logger(getLogger(m_tag))
     {
-        if (!m_logger->isToBeLogged(levelReducer->baseLevel(), m_tag))
+        if (m_logger && !m_logger->isToBeLogged(levelReducer->baseLevel(), m_tag))
             m_logger.reset();
     }
 
     void log(const QString& message)
     {
+        // Avoid crashing during the static deinitialization phase - log to stderr instead.
+        if (!m_logger)
+        {
+            // LevelReducer can be already destroyed at this time, so ignore the level.
+            std::cerr << (m_tag.toString() + ": " + message + "\n").toStdString();
+            std::flush(std::cerr);
+            return;
+        }
+
         const auto [level, isOnLimit] = m_levelReducer->nextLevel();
         m_logger->log(level, m_tag, isOnLimit ? "TOO MANY SIMILAR MESSAGES: " + message : message);
     }

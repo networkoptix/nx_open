@@ -263,7 +263,10 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
                 for (const auto& value: serverModule()->pluginManager()->metrics())
                 {
                     if (value.numberOfAliveBoundResources > 0)
-                        result.push_back(lm("%1. %2").args(result.size() + 1, value.name));
+                    {
+                        result.push_back(lm("%1. %2 %3").args(
+                            result.size() + 1, value.name, value.version));
+                    }
                 }
                 return result.isEmpty() ? Value() : Value(result.join(L'\n'));
             }

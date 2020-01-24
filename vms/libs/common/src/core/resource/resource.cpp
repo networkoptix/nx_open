@@ -552,13 +552,6 @@ bool QnResource::setUrlUnsafe(const QString& value)
     if (m_url == value)
         return false;
 
-    QUrl url(value);
-    if (url.scheme() == nx::network::http::kSecureUrlSchemeName
-        && url.port() == nx::network::http::DEFAULT_HTTP_PORT)
-    {
-        NX_ASSERT(false, "Url is likely invalid: %1", value);
-    }
-
     m_url = value;
     return true;
 }

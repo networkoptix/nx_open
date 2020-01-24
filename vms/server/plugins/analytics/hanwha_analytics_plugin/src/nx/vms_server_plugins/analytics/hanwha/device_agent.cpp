@@ -214,6 +214,7 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
     static int i = 0;
+    std::cout << "========================" << std::endl;
     std::cout << ++i << std::endl << (const char*)xmlData << std::endl << std::endl << std::endl;
 
     const auto ts = incomingPacket->timestampUs();
@@ -223,11 +224,13 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
     // For now client does not support packets with multiple objects. When GUI team fix it
     // we'll pass one packet with many objects instead of many packets with one object.
 
-    std::vector<Ptr<ObjectMetadataPacket>> outcomingPackets = parseObjectMetadataXml(
+    Ptr<ObjectMetadataPacket> outcomingPacket = parseObjectMetadataXml(
         xmlData, m_engine->engineManifest());
 
-    for (const auto& outcomingPacket : outcomingPackets)
+    if (outcomingPacket && outcomingPacket->count())
     {
+        std::cout << outcomingPacket->count() << std::endl;
+
         outcomingPacket->setTimestampUs(ts);
         outcomingPacket->setDurationUs(1'000'000); // 1 second
 

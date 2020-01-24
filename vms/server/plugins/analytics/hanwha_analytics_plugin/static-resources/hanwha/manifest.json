@@ -16,7 +16,7 @@
         {
             "id": "nx.hanwha.ObjectDetection.Face",
             "name": "Face tracking",
-            "internalName": "Face_"
+            "internalName": "Face"
         },
         {
             "id": "nx.hanwha.ObjectDetection.Head",
