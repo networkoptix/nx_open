@@ -1,7 +1,5 @@
 #pragma once
 
-#include <queue>
-
 #include <nx/network/http/server/abstract_authentication_manager.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_server_connection.h>
@@ -53,13 +51,7 @@ private:
 		// in bytes per msec
 		float averageBandwidth = 0;
 
-		std::string toString() const
-		{
-			return 
-				std::string("{ totalBytesSent = ") + std::to_string(totalBytesSent)
-				+ ", averageBandwidth = " + std::to_string(averageBandwidth) + " bytes per msec"
-				+ " }";
-		}
+		std::string toString() const;
     };
 
 	struct TestContext
