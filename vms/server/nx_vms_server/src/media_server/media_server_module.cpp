@@ -100,6 +100,7 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/vms/server/analytics/iframe_search_helper.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -289,6 +290,10 @@ QnMediaServerModule::QnMediaServerModule(
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
     m_context.reset(new UniquePtrContext());
+
+    m_analyticsIFrameSearchHelper = store(
+        new nx::vms::server::analytics::IFrameSearchHelper(
+            commonModule()->resourcePool(), m_videoCameraPool));
 
     m_analyticsEventsStorage = store(
         nx::analytics::db::EventsStorageFactory::instance().create(this).release());
@@ -776,4 +781,9 @@ QString QnMediaServerModule::metadataDatabaseDir() const
         server->metadataStorageId());
     const auto pathBase = storageResource ? storageResource->getPath() : defaultDir;
     return closeDirPath(pathBase);
+}
+
+nx::vms::server::analytics::AbstractIFrameSearchHelper* QnMediaServerModule::iframeSearchHelper()
+{
+    return m_analyticsIFrameSearchHelper;
 }

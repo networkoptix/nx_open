@@ -47,12 +47,19 @@ class QnPlatformAbstraction;
 class QnServerConnector;
 class QnResourceStatusWatcher;
 class StreamingChunkTranscoder;
+class IFrameSearchHelper;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::vms::server::hls { class SessionPool; }
 namespace nx::vms::server { class CmdLineArguments; }
-namespace nx::vms::server::analytics { class SdkObjectFactory; }
+namespace nx::vms::server::analytics 
+{
+    class SdkObjectFactory; 
+    class AbstractIFrameSearchHelper;
+    class IFrameSearchHelper;
+}
 namespace nx::vms::server::network { class MulticastAddressRegistry;  }
+
 
 namespace nx::vms::server::event {
     class ExtendedRuleProcessor;
@@ -169,6 +176,8 @@ public:
     QString metadataDatabaseDir() const;
     bool isStopping() const { return m_isStopping.load(); }
     void initOutgoingSocketCounter();
+
+    nx::vms::server::analytics::AbstractIFrameSearchHelper* iframeSearchHelper();
 private:
     void registerResourceDataProviders();
     /**
@@ -230,6 +239,7 @@ private:
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
     std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
+    nx::vms::server::analytics::IFrameSearchHelper* m_analyticsIFrameSearchHelper = nullptr;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
     // (at least some of them) because of unknown reasons. So QnResource can not make soap requests

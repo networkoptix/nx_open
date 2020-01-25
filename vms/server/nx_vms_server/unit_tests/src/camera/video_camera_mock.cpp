@@ -58,6 +58,15 @@ std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequ
     return nullptr;
 }
 
+QnConstCompressedVideoDataPtr MediaServerVideoCameraMock::getIFrameByTime(
+    StreamIndex /*streamIndex*/,
+    qint64 /*time*/,
+    int /*channel*/,
+    nx::api::ImageRequest::RoundMethod /*roundMethod*/) const
+{
+    return nullptr;
+}
+
 void MediaServerVideoCameraMock::stopAndCleanup()
 {
 }

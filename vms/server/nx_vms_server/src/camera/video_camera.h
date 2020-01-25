@@ -97,6 +97,12 @@ public:
         MediaQuality streamQuality,
         qint64 targetDurationUSec) = 0;
     virtual QnResourcePtr resource() const = 0;
+
+    virtual QnConstCompressedVideoDataPtr getIFrameByTime(
+        StreamIndex streamIndex,
+        qint64 time,
+        int channel,
+        nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
 };
 
 class QnVideoCamera: public QObject, public QnAbstractMediaServerVideoCamera
@@ -132,6 +138,12 @@ public:
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
+
+    QnConstCompressedVideoDataPtr getIFrameByTime(
+        StreamIndex streamIndex,
+        qint64 time,
+        int channel,
+        nx::api::ImageRequest::RoundMethod roundMethod) const override;
 
     virtual void stopAndCleanup() override;
     virtual bool isSomeActivity() const override;
