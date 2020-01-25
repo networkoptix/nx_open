@@ -136,7 +136,7 @@ void UplinkSpeedTester::emitTestResult(
     std::optional<ConnectionSpeed> result)
 {
     QString resultStr = result
-        ? lm("{pingTime: %1, bandwidth: %2 KilobitsPerSec}")
+        ? lm("{pingTime: %1, bandwidth: %2 Kbps}")
         .args(result->pingTime, result->bandwidth)
 		: "none";
 
