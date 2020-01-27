@@ -1518,7 +1518,8 @@ void MediaServerProcess::registerRestHandlers(
         new ::rest::handlers::SetPrimaryTimeServerRestHandler(), kAdmin);
 
     /**%apidoc GET /api/storageStatus
-     * Check whether specified folder is used as a Server storage, and if yes, report details.
+     * Check whether the specified location could be used as a server storage path and report the location details.
+     * If the location is already used as the server storage report the details storage ID and status are expected in response.
      * %param:string path Folder to check.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
