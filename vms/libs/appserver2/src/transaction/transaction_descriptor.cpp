@@ -1007,16 +1007,13 @@ struct ModifyAccessRightsChecker
         if (hasSystemAccess(accessData))
             return ErrorCode::ok;
 
-        const auto& resPool = commonModule->resourcePool();
-        if (auto user = resPool->getResourceById<QnUserResource>(accessData.userId)
-            ;
-            !commonModule->resourceAccessManager()->hasGlobalPermission(
-                user, GlobalPermission::admin))
+        if (!commonModule->resourceAccessManager()->hasGlobalPermission(
+            accessData, GlobalPermission::admin))
         {
             return ErrorCode::forbidden;
         }
 
-        auto user = resPool->getResourceById<QnUserResource>(param.userId);
+        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(param.userId);
         if (!user)
         {
             if (!commonModule->resourceAccessManager()->userRolesManager()->hasRole(param.userId))
